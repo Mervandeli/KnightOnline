@@ -184,6 +184,8 @@
     <ClCompile Include="UITradeSellBBS.cpp" />
     <ClCompile Include="UITransactionDlg.cpp" />
     <ClCompile Include="UIUpgradeSelect.cpp" />
+    <ClCompile Include="UIItemUpgrade.cpp" />
+    <ClCompile Include="UIRingUpgrade.cpp" />
     <ClCompile Include="UIVarious.cpp" />
     <ClCompile Include="UIWareHouseDlg.cpp" />
     <ClCompile Include="UIWarp.cpp" />

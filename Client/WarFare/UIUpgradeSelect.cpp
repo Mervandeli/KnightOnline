@@ -1,8 +1,8 @@
 ﻿#include "StdAfx.h"
 #include "UIUpgradeSelect.h"
 #include "GameProcMain.h"
-// #include "UIItemUpgrade.h"
-// #include "UIRingUpgrade.h"
+#include "UIItemUpgrade.h"
+#include "UIRingUpgrade.h"
 #include "UIManager.h"
 
 #include <N3BASE/N3UIButton.h>
@@ -42,7 +42,7 @@ bool CUIUpgradeSelect::ReceiveMessage(
 	{
 		if (pSender == m_pBtn_Upgrade_1)
 		{
-#if 1
+#if 0
 			CGameProcedure::MessageBoxPost(
 				"CUIItemUpgrade needs to be implemented.",
 				"Not implemented",
@@ -60,7 +60,7 @@ bool CUIUpgradeSelect::ReceiveMessage(
 		}
 		else if (pSender == m_pBtn_Upgrade_2)
 		{
-#if 1
+#if 0
 			CGameProcedure::MessageBoxPost(
 				"CUIRingUpgrade needs to be implemented.",
 				"Not implemented",

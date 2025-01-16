@@ -56,6 +56,8 @@
 #include "UIQuestTalk.h"
 #include "UIDead.h"
 #include "UIUpgradeSelect.h"
+#include "UIItemUpgrade.h"
+#include "UIRingUpgrade.h"
 
 #include "SubProcPerTrade.h"
 #include "CountableItemEditDlg.h"
@@ -171,6 +173,8 @@ CGameProcMain::CGameProcMain()				// r기본 생성자.. 각 변수의 역활은
 	m_pUIQuestTalk = new CUIQuestTalk();
 	m_pUIDead = new CUIDead();
 	m_pUIUpgradeSelect = new CUIUpgradeSelect();
+	m_pUIItemUpgrade = new CUIItemUpgrade();
+	m_pUIRingUpgrade = new CUIRingUpgrade();
 
 	m_pSubProcPerTrade = new CSubProcPerTrade();
 	m_pMagicSkillMng = new CMagicSkillMng(this);
@@ -223,6 +227,8 @@ CGameProcMain::~CGameProcMain()
 	delete m_pUIQuestTalk;
 	delete m_pUIDead;
 	delete m_pUIUpgradeSelect;
+	delete m_pUIItemUpgrade;
+	delete m_pUIRingUpgrade;
 
 	delete m_pSubProcPerTrade;
 	delete m_pMagicSkillMng;
@@ -4167,6 +4173,16 @@ void CGameProcMain::InitUI()
 		(iH - m_pUIUpgradeSelect->GetHeight()) / 2);
 	m_pUIUpgradeSelect->SetState(UI_STATE_COMMON_NONE);
 	m_pUIUpgradeSelect->SetStyle(m_pUIUpgradeSelect->GetStyle() | UISTYLE_USER_MOVE_HIDE | UISTYLE_SHOW_ME_ALONE);
+
+	m_pUIItemUpgrade->Init(s_pUIMgr);
+	m_pUIItemUpgrade->LoadFromFile(pTbl->szItemUpgrade);
+	m_pUIItemUpgrade->SetVisibleWithNoSound(false);
+	m_pUIItemUpgrade->SetStyle(UISTYLE_USER_MOVE_HIDE | UISTYLE_SHOW_ME_ALONE);
+
+	m_pUIRingUpgrade->Init(s_pUIMgr);
+	m_pUIRingUpgrade->LoadFromFile(pTbl->szUpgradeRing);
+	m_pUIRingUpgrade->SetVisibleWithNoSound(false);
+	m_pUIRingUpgrade->SetStyle(UISTYLE_USER_MOVE_HIDE | UISTYLE_SHOW_ME_ALONE);
 }
 
 void CGameProcMain::MsgSend_RequestTargetHP(int16_t siIDTarget, uint8_t byUpdateImmediately)

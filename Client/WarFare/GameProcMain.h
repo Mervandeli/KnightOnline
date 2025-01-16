@@ -56,6 +56,8 @@ public:
 	class CUIInn*				m_pUIInn;
 	class CUICreateClanName*	m_pUICreateClanName;
 	class CUIExitMenu*			m_pUIExitMenu;
+	class CUIItemUpgrade*    m_pUIItemUpgrade;
+	class CUIRingUpgrade*    m_pUIRingUpgrade;
 
 
 	class CUIKnightsOperation*	m_pUIKnightsOp;					// 기사단 리스트 보기, 가입, 등...
