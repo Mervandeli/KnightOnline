@@ -16,5 +16,11 @@ public:
 
 protected:
     CN3UIButton*    m_pBtn_Close;
+    CN3UIButton*    m_pBtn_Cancel;
+    CN3UIButton*    m_pBtn_Ok;
+    CN3UIString*    m_pText_Gold;
+    CN3UIString*    m_pText_ItemName;
+    CN3UIString*    m_pText_ItemLevel;
+    CN3UIString*    m_pText_ItemPrice;
     int             m_iNpcID;
 }; 
