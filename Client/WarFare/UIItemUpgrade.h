@@ -2,6 +2,9 @@
 
 #include <N3BASE/N3UIBase.h>
 #include <N3BASE/N3UIButton.h>
+#include <N3BASE/N3UIString.h>
+
+
 
 class CUIItemUpgrade : public CN3UIBase
 {
@@ -13,14 +16,14 @@ public:
     bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg);
     void SetVisible(bool bVisible);
     void SetNpcID(int iNpcID) { m_iNpcID = iNpcID; }
+    void Tick();
+    void UpdateGold();
+
 
 protected:
     CN3UIButton*    m_pBtn_Close;
     CN3UIButton*    m_pBtn_Cancel;
     CN3UIButton*    m_pBtn_Ok;
     CN3UIString*    m_pText_Gold;
-    CN3UIString*    m_pText_ItemName;
-    CN3UIString*    m_pText_ItemLevel;
-    CN3UIString*    m_pText_ItemPrice;
     int             m_iNpcID;
 }; 

@@ -1,12 +1,17 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 #include "UIItemUpgrade.h"
 #include "GameProcMain.h"
 #include "UIManager.h"
+#include "UIInventory.h"
+#include "LocalInput.h"
+#include "GameBase.h"
+#include "PlayerMySelf.h"
 
 CUIItemUpgrade::CUIItemUpgrade()
 {
     m_pBtn_Close = nullptr;
     m_iNpcID = 0;
+   
 }
 
 CUIItemUpgrade::~CUIItemUpgrade()
@@ -21,10 +26,6 @@ bool CUIItemUpgrade::Load(HANDLE hFile)
     m_pBtn_Cancel = (CN3UIButton*)GetChildByID("btn_cancel");__ASSERT(m_pBtn_Cancel, "NULL UI Component!!");
     m_pBtn_Ok = (CN3UIButton*)GetChildByID("btn_ok");__ASSERT(m_pBtn_Ok, "NULL UI Component!!");
 
-    m_pText_Gold = (CN3UIString*)GetChildByID("text_gold");__ASSERT(m_pText_Gold, "NULL UI Component!!");
-    m_pText_ItemName = (CN3UIString*)GetChildByID("text_itemname");__ASSERT(m_pText_ItemName, "NULL UI Component!!");
-    m_pText_ItemLevel = (CN3UIString*)GetChildByID("text_itemlevel");__ASSERT(m_pText_ItemLevel, "NULL UI Component!!");
-    m_pText_ItemPrice = (CN3UIString*)GetChildByID("text_itemprice");__ASSERT(m_pText_ItemPrice, "NULL UI Component!!");
     
 
     return true;
@@ -32,6 +33,7 @@ bool CUIItemUpgrade::Load(HANDLE hFile)
 
 bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
+
     if (pSender->GetID() == m_pBtn_Close->GetID())
     {
         if (dwMsg == UIMSG_BUTTON_CLICK)
@@ -68,3 +70,41 @@ void CUIItemUpgrade::SetVisible(bool bVisible)
         m_iNpcID = 0;
     }
 } 
+
+void CUIItemUpgrade::Tick()
+{
+    UpdateGold();
+
+
+}
+
+
+
+void CUIItemUpgrade::UpdateGold()
+{
+    
+	CN3UIString* pStatic = (CN3UIString* )GetChildByID("text_gold"); __ASSERT(pStatic, "NULL UI Component!!");
+	if(pStatic)
+	{
+		char szBuff[32] = "";
+		sprintf(szBuff, "%d", CGameBase::s_pPlayer->m_InfoExt.iGold);
+		int buffLength = strlen(szBuff);
+		int goldLength = buffLength + (buffLength / 3) - (buffLength % 3 == 0 ? 1 : 0);
+
+		char szGold[42] = "";
+		szGold[goldLength] = '\0';
+
+		for (int i = buffLength - 1, k = goldLength - 1; i >= 0; i--, k--)
+		{
+			if ((buffLength - 1 - i) % 3 == 0 && (buffLength - 1 != i))
+				szGold[k--] = ',';
+
+			szGold[k] = szBuff[i];
+		}
+
+
+		pStatic->SetString(szGold);
+	}
+    
+}
+

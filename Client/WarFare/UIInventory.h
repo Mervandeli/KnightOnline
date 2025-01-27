@@ -13,6 +13,7 @@
 #include "N3UIArea.h"
 #include "N3UIImage.h"
 #include "GameProcedure.h"
+
 #include "GameDef.h"
 #include "N3UIWndBase.h"
 #include "ItemRepairMgr.h"
