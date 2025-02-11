@@ -1,21 +1,34 @@
 ﻿#include "StdAfx.h"
 #include "UIItemUpgrade.h"
-#include "GameProcMain.h"
+
 #include "UIManager.h"
-#include "UIInventory.h"
+
 #include "LocalInput.h"
 #include "GameBase.h"
 #include "PlayerMySelf.h"
+#include "SubProcPerTrade.h"
+#include "UITransactionDlg.h"
+#include "UISkillTreeDlg.h"
 
 CUIItemUpgrade::CUIItemUpgrade()
 {
     m_pBtn_Close = nullptr;
     m_iNpcID = 0;
+ 
+    
+    
+
    
 }
 
 CUIItemUpgrade::~CUIItemUpgrade()
 {
+    Release();
+}
+
+void CUIItemUpgrade::Release()
+{
+
 }
 
 bool CUIItemUpgrade::Load(HANDLE hFile)
@@ -33,6 +46,8 @@ bool CUIItemUpgrade::Load(HANDLE hFile)
 
 bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
+   
+
 
     if (pSender->GetID() == m_pBtn_Close->GetID())
     {
@@ -74,8 +89,31 @@ void CUIItemUpgrade::SetVisible(bool bVisible)
 void CUIItemUpgrade::Tick()
 {
     UpdateGold();
+    
+    
+    CUIInventory* pInven = CGameProcedure::s_pProcMain->m_pUIInventory;
 
+    int i = 0;
+	for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
+	{
+		if(pInven->m_pMyInvWnd[i])
+		{
+			__IconItemSkill* spItem = pInven->m_pMyInvWnd[i];
+			spItem->pUIIcon->SetParent(this);
 
+			pInven->m_pMyInvWnd[i] = NULL;
+			CN3UIArea* pArea;
+
+			pArea = pInven->GetChildAreaByiOrder(UI_AREA_TYPE_INV, i);
+			if ( pArea )
+			{
+				spItem->pUIIcon->SetRegion(pArea->GetRegion());
+				spItem->pUIIcon->SetMoveRect(pArea->GetRegion());
+			}			
+
+			pInven->m_pMyInvWnd[i] = spItem;
+		}
+	}
 }
 
 

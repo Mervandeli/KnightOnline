@@ -4178,10 +4178,17 @@ void CGameProcMain::InitUI()
 	m_pUIItemUpgrade->LoadFromFile(pTbl->szItemUpgrade);
 	m_pUIItemUpgrade->SetVisibleWithNoSound(false);
 	m_pUIItemUpgrade->SetStyle(UISTYLE_USER_MOVE_HIDE | UISTYLE_SHOW_ME_ALONE);
+	rc = m_pUIItemUpgrade->GetRegion();
+	iX = (iW - (rc.right - rc.left));
+	iY = (iH - (rc.bottom - rc.top))/8;
+	m_pUIItemUpgrade->SetPos(iX, iY);
 
 	m_pUIRingUpgrade->Init(s_pUIMgr);
 	m_pUIRingUpgrade->LoadFromFile(pTbl->szUpgradeRing);
 	m_pUIRingUpgrade->SetVisibleWithNoSound(false);
+	m_pUIRingUpgrade->SetPos(
+		(iW - m_pUIRingUpgrade->GetWidth()) / 2,
+		(iH - m_pUIRingUpgrade->GetHeight()) / 2);
 	m_pUIRingUpgrade->SetStyle(UISTYLE_USER_MOVE_HIDE | UISTYLE_SHOW_ME_ALONE);
 }
 
