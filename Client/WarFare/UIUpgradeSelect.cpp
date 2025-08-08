@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 #include "UIUpgradeSelect.h"
 #include "GameProcMain.h"
-// #include "UIItemUpgrade.h"
+#include "UIItemUpgrade.h"
 // #include "UIRingUpgrade.h"
 #include "UIManager.h"
 
@@ -42,19 +42,13 @@ bool CUIUpgradeSelect::ReceiveMessage(
 	{
 		if (pSender == m_pBtn_Upgrade_1)
 		{
-#if 1
-			CGameProcedure::MessageBoxPost(
-				"CUIItemUpgrade needs to be implemented.",
-				"Not implemented",
-				MB_OK);
-#else
+
 			CUIItemUpgrade* pUIItemUpgrade = CGameProcedure::s_pProcMain->m_pUIItemUpgrade;
 			if (pUIItemUpgrade != nullptr)
 			{
-				pUIItemUpgrade->SetVisible(true);
-				pUIItemUpgrade->SetNpcID(m_iNpcID);
+				pUIItemUpgrade->Open();
+				// pUIItemUpgrade->SetNpcID(m_iNpcID);
 			}
-#endif
 
 			SetVisible(false);
 		}

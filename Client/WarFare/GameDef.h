@@ -1086,6 +1086,7 @@ constexpr int MAX_ITEM_WARE_PAGE			= 8;
 constexpr int MAX_ITEM_PER_TRADE			= 12;	// Max items in a player trading window
 constexpr int MAX_ITEM_BUNDLE_DROP_PIECE	= 6;
 constexpr int MAX_ITEM_EX_RE_NPC			= 4;	// Max items in the (outdated, unused) NPC exchange/repair UI.
+constexpr int MAX_ITEM_UPGRADE_SLOT				= 9;	// Max items in the item upgrade UI.
 
 constexpr int MAX_SKILL_FROM_SERVER			= 9;	// Max number of skill point slots received from the server.
 
