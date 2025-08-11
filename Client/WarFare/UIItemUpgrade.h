@@ -33,15 +33,18 @@ public:
 	__IconItemSkill* m_pMyUpgradeInv[MAX_ITEM_INVENTORY];
 	__IconItemSkill* m_pBackupUpgradeInv[MAX_ITEM_INVENTORY];
 	__IconItemSkill* m_pUpgradeItemSlot;	// Which item to upgrade
+	__IconItemSkill* m_pUpgradeResultSlot;
 	int8_t m_iUpgradeSlotInvPos[MAX_ITEM_UPGRADE_SLOT+1];
 	CN3UIString* m_pStrMyGold;
 	
 	// Animation state management
 	enum AnimationState {
 		ANIM_NONE = 0,
+		ANIM_START,
 		ANIM_COVER_CLOSING,
 		ANIM_FLIPFLOP,
-		ANIM_COVER_OPENING
+		ANIM_COVER_OPENING,
+		ANIM_DONE
 	} m_eAnimationState = ANIM_NONE;
 	
 	float m_fAnimationTimer = 0.0f;
@@ -116,9 +119,12 @@ public:
 	void				DeleteIconItemSkill(__IconItemSkill*& pItem);
 	void				SendToServerUpgradeMsg();
 	void				MsgRecv_ItemUpgrade(Packet& pkt);
-	void				DoAnimationCover();
 	void				FlipFlopAnim();
 	void				AnimClose();
+	void				ShowResultItem();
+	void				LogUpgradeResult();
+	void				UpdateHideItems();
+	void				StartUpgradeAnim();
 	void				UpdateCoverAnimation();
 	void				UpdateFlipFlopAnimation();
 	void				HideAllAnimationFrames();
