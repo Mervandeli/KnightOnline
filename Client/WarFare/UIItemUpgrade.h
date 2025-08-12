@@ -41,8 +41,8 @@ public:
 	enum AnimationState {
 		ANIM_NONE = 0,
 		ANIM_START,
-		ANIM_COVER_CLOSING,
 		ANIM_FLIPFLOP,
+		ANIM_RESULT,
 		ANIM_COVER_OPENING,
 		ANIM_DONE
 	} m_eAnimationState = ANIM_NONE;
@@ -121,9 +121,7 @@ public:
 	void				MsgRecv_ItemUpgrade(Packet& pkt);
 	void				FlipFlopAnim();
 	void				AnimClose();
-	void				ShowResultItem();
-	void				LogUpgradeResult();
-	void				UpdateHideItems();
+	void				ShowResultUpgrade();
 	void				StartUpgradeAnim();
 	void				UpdateCoverAnimation();
 	void				UpdateFlipFlopAnimation();

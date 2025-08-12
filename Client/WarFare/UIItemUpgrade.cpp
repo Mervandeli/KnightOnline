@@ -105,18 +105,14 @@ void CUIItemUpgrade::Tick()
 		case ANIM_START:
 			StartUpgradeAnim();
 			break;
-		case ANIM_COVER_CLOSING:
-			UpdateHideItems();
-			UpdateCoverAnimation();
-			break;
 		case ANIM_FLIPFLOP:
 			UpdateFlipFlopAnimation();
 			break;
+		case ANIM_RESULT:
+			ShowResultUpgrade();
+			break;
 		case ANIM_COVER_OPENING:
 			UpdateCoverAnimation();
-			break;
-		case ANIM_DONE:
-			ShowResultItem();
 			break;
 		case ANIM_NONE:
 			m_fAnimationTimer = 0.0f;
@@ -307,7 +303,6 @@ void CUIItemUpgrade::Close()
 {
 	if (IsVisible())
 		SetVisible(false);
-	UpdateBackupUpgradeInv();
 	RestoreInventoryFromBackup();
 	AnimClose();
 
@@ -885,6 +880,7 @@ void CUIItemUpgrade::SendToServerUpgradeMsg()
 
 void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 {
+	m_bReceivedResultFromServer = true;
 	int8_t result = pkt.read<uint8_t>();
 	uint32_t nItemID[10];
 	uint8_t bPos[10];
@@ -902,21 +898,32 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 	e_ItemType eType;
 	std::string szIconFN;
 	float fUVAspect = (float) 45.0f / (float) 64.0f;
+	std::string szMsg;
+		// Clean upgrade scroll slots
+	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
+	{
+		DeleteIconItemSkill(m_pMyUpgradeSLot[i]);
+	}
 
+	// Clean  item upgrade slot
+	DeleteIconItemSkill(m_pUpgradeItemSlot);
+	
 
 	if (result == 0 || result == 1)
 	{
-
-		m_bReceivedResultFromServer = true;
 		m_eAnimationState = ANIM_START;
 
 		if (result == 0)
 		{
 			m_bUpgradeSuccesfull = false;
+			CGameBase::GetText(6701, &szMsg);
+			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
 		}
 		else if (result == 1)
 		{
 			m_bUpgradeSuccesfull = true;
+			CGameBase::GetText(6700, &szMsg);
+			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(128, 128, 255, 255));
 
 			itemBasic = CGameBase::s_pTbl_Items_Basic.Find(nItemID[0] / 1000 * 1000);
 			if (itemBasic && itemBasic->byExtIndex >= 0 && itemBasic->byExtIndex <= MAX_ITEM_EXTENSION)
@@ -944,10 +951,29 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 	}
 	else
 	{
-		//Upgrade Not Match or other
 		m_bReceivedResultFromServer = false;
 		RestoreInventoryFromBackup();
+		if (result == 2)
+		{
+			//cannot perform item upgrade
+			CGameBase::GetText(6702, &szMsg);
+			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
+
+		}
+		else if (result == 3)
+		{
+			//Upgrade Need coin
+			CGameBase::GetText(6703, &szMsg);
+			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
+		}
+		else if (result == 4)
+		{
+			//Upgrade Not Match or other
+			CGameBase::GetText(6704, &szMsg);
+			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
+		}
 	}
+
 
 	CN3UIWndBase::AllHighLightIconFree();
 	SetState(UI_STATE_COMMON_NONE);
@@ -958,88 +984,39 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 
 void CUIItemUpgrade::UpdateCoverAnimation()
 {
-	m_fAnimationTimer += CN3Base::s_fSecPerFrm;
-	float t = m_fAnimationTimer / COVER_ANIMATION_DURATION;
+    m_fAnimationTimer += CN3Base::s_fSecPerFrm;
+    float t = m_fAnimationTimer / COVER_ANIMATION_DURATION;
+    if (t > 1.0f) t = 1.0f;
 
-	if (t > 1.0f) t = 1.0f;
+    // Only handle opening (covers move outward and hide)
+    float ease = 1.0f - ((1.0f - t) * (1.0f - t));
+	m_iCoverShift = m_rcCover1Original.bottom - m_rcCover1Original.top;
+    // Calculate new Y positions for opening
+    int y1 = m_rcCover1Original.top + (int)((m_rcCover1Original.top - m_iCoverShift - m_rcCover1Original.top) * ease);
+    int y2 = m_rcCover2Original.top + (int)((m_rcCover2Original.top + m_iCoverShift - m_rcCover2Original.top) * ease);
 
-	// Make covers visible during animation
-	m_pImageCover1->SetVisible(true);
-	m_pImageCover2->SetVisible(true);
-	m_pImageCover1->SetParent(this);
-	m_pImageCover2->SetParent(this);
+    // Animation completed - hide covers and reset positions
+    if (t >= 1.0f)
+    {
+        m_eAnimationState = ANIM_NONE;
+        m_pImageCover1->SetVisible(false);
+        m_pImageCover2->SetVisible(false);
+        m_pImageCover1->SetRegion(m_rcCover1Original);
+        m_pImageCover2->SetRegion(m_rcCover2Original);
+        return;
+    }
 
-	// Calculate start and end Y positions
-	int cover1StartY = m_rcCover1Original.top - m_iCoverShift;
-	int cover2StartY = m_rcCover2Original.top + m_iCoverShift;
-	int cover1EndY = m_rcCover1Original.top;
-	int cover2EndY = m_rcCover2Original.top;
-
-	int y1, y2;
-
-	if (m_eAnimationState == ANIM_COVER_CLOSING)
-	{
-		// Closing phase: quadratic ease-in
-		float ease = t * t;
-
-		// Cover1 moves from start to center
-		y1 = cover1StartY + (int) ((cover1EndY - cover1StartY) * ease);
-		// Cover2 moves from start to center  
-		y2 = cover2StartY + (int) ((cover2EndY - cover2StartY) * ease);
-
-		// Animation completed - start flipflop
-		if (t >= 1.0f)
-		{
-
-			// Ensure covers are at exactly center region before flipflop
-			m_pImageCover1->SetRegion(m_rcCover1Original);
-			m_pImageCover2->SetRegion(m_rcCover2Original);
-			m_eAnimationState = ANIM_FLIPFLOP;
-			m_fAnimationTimer = 0.0f;
-			m_iCurrentFrame = 0;
-
-			return; // Exit early to prevent further position updates
-		}
-	}
-	else
-	{
-		// Opening phase: quadratic ease-out
-		float ease = 1.0f - ((1.0f - t) * (1.0f - t));
-
-		// Cover1 moves from center back to start
-		y1 = cover1EndY + (int) ((cover1StartY - cover1EndY) * ease);
-		// Cover2 moves from center back to start
-		y2 = cover2EndY + (int) ((cover2StartY - cover2EndY) * ease);
-
-		// Animation completed - hide covers and reset positions
-		if (t >= 1.0f)
-		{
-			m_eAnimationState = ANIM_DONE;
-			m_pImageCover1->SetVisible(false);
-			m_pImageCover2->SetVisible(false);
-
-			// Force reset covers to their exact original regions for next animation
-			m_pImageCover1->SetRegion(m_rcCover1Original);
-			m_pImageCover2->SetRegion(m_rcCover2Original);
-			return; // Exit early to prevent further position updates
-		}
-	}
-
-	// Create regions with updated Y positions, keeping X and size identical to original
-	RECT rc1 = m_rcCover1Original;
-	RECT rc2 = m_rcCover2Original;
-
-	// Update Y positions while maintaining original width and height
-	int height1 = rc1.bottom - rc1.top;
-	int height2 = rc2.bottom - rc2.top;
-	rc1.top = y1;
-	rc1.bottom = y1 + height1;
-	rc2.top = y2;
-	rc2.bottom = y2 + height2;
-
-	// Apply the updated regions
-	m_pImageCover1->SetRegion(rc1);
-	m_pImageCover2->SetRegion(rc2);
+    // Update cover regions
+    RECT rc1 = m_rcCover1Original;
+    RECT rc2 = m_rcCover2Original;
+    int height1 = rc1.bottom - rc1.top;
+    int height2 = rc2.bottom - rc2.top;
+    rc1.top = y1;
+    rc1.bottom = y1 + height1;
+    rc2.top = y2;
+    rc2.bottom = y2 + height2;
+    m_pImageCover1->SetRegion(rc1);
+    m_pImageCover2->SetRegion(rc2);
 }
 
 void CUIItemUpgrade::UpdateFlipFlopAnimation()
@@ -1055,8 +1032,7 @@ void CUIItemUpgrade::UpdateFlipFlopAnimation()
 		{
 			HideAllAnimationFrames();
 			
-			// Start cover opening animation
-			m_eAnimationState = ANIM_COVER_OPENING;
+			m_eAnimationState = ANIM_RESULT;
 			m_fAnimationTimer = 0.0f;
 		}
 		else
@@ -1258,98 +1234,52 @@ void CUIItemUpgrade::AnimClose()
 	float m_fAnimationTimer = 0.0f;
 	int m_iCurrentFrame = 0;
 	m_eAnimationState = ANIM_NONE;
+	m_pImageCover1->SetVisible(false);
+	m_pImageCover2->SetVisible(false);
 
 	HideAllAnimationFrames();
 
-
 }
 
-void CUIItemUpgrade::ShowResultItem()
+void CUIItemUpgrade::ShowResultUpgrade()
 {
-
-	if (m_fAnimationTimer == 0.0f)
+	// Show result item in result area if upgrade was successful
+	if (m_bUpgradeSuccesfull && m_pUpgradeResultSlot && m_pAreaResult)
 	{
-		m_fAnimationTimer = 1.0f; // 1 Second Show
-		return;
-	}
-
-	m_fAnimationTimer -= CN3Base::s_fSecPerFrm;
-
-	// Result to Inventory
-	if (m_fAnimationTimer <= 0.0f)
-	{	
-		//UpdateBackupUpgradeInv();
-		RestoreInventoryFromBackup();
-		m_eAnimationState = ANIM_NONE; // Animation finish
-	}
-
-}
-
-void CUIItemUpgrade::LogUpgradeResult(){
-	std::string szMsg;
-	if (m_bUpgradeSuccesfull)
-	{
-		CGameBase::GetText(6700, &szMsg);
-		CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 255, 0, 255));
+		// Set icon position to result area
 		m_pUpgradeResultSlot->pUIIcon->SetRegion(m_pAreaResult->GetRegion());
 		m_pUpgradeResultSlot->pUIIcon->SetMoveRect(m_pAreaResult->GetRegion());
+		m_pUpgradeResultSlot->pUIIcon->SetParent(this);
+		m_pUpgradeResultSlot->pUIIcon->SetVisible(true);
 	}
-	else
-	{
-		CGameBase::GetText(6701, &szMsg);
-		CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 60, 60, 255));
-	}
-}
 
+	m_eAnimationState = ANIM_COVER_OPENING;
 
-
-void CUIItemUpgrade::UpdateHideItems()
-{
-	static float alpha = 2.0f;
-
-	alpha -= CN3Base::s_fSecPerFrm;
-	if (alpha < 0.0f) alpha = 0.0f;
-
-	BYTE a = (BYTE) (alpha * 255.0f);
-
-	if (m_pUpgradeItemSlot && m_pUpgradeItemSlot->pUIIcon)
-		m_pUpgradeItemSlot->pUIIcon->SetColor(D3DCOLOR_RGBA(255, 255, 255, a));
-
-	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
-		if (m_pMyUpgradeSLot[i] && m_pMyUpgradeSLot[i]->pUIIcon)
-		{
-			m_pMyUpgradeSLot[i]->pUIIcon->SetColor(D3DCOLOR_RGBA(255, 255, 255, a));
-		}
 }
 
 void CUIItemUpgrade::StartUpgradeAnim()
 {
-	if (!m_pImageCover1 || !m_pImageCover2) return;
+	if (m_bReceivedResultFromServer)
+	{
+		if (!m_pImageCover1 || !m_pImageCover2) return;
+		m_fAnimationTimer = 0.0f;
+		m_iCurrentFrame = 0;
 
-	m_pImageCover1 = (CN3UIImage*) (this->GetChildByID("img_cover_01")); __ASSERT(m_pImageCover1, "NULL UI Component!!");
-	m_pImageCover2 = (CN3UIImage*) (this->GetChildByID("img_cover_02")); __ASSERT(m_pImageCover2, "NULL UI Component!!");
+		m_pImageCover1 = (CN3UIImage*) (this->GetChildByID("img_cover_01")); __ASSERT(m_pImageCover1, "NULL UI Component!!");
+		m_pImageCover2 = (CN3UIImage*) (this->GetChildByID("img_cover_02")); __ASSERT(m_pImageCover2, "NULL UI Component!!");
 
-	m_fAnimationTimer = 0.0f; // Animasyon zamanlayıcısını sıfırla
-	m_iCurrentFrame = 0;
+		// Make covers visible during animation
+		m_pImageCover1->SetVisible(true);
+		m_pImageCover2->SetVisible(true);
+		m_pImageCover1->SetParent(this);
+		m_pImageCover2->SetParent(this);
 
-		// Capture current correct positions as the true original positions
-	m_rcCover1Original = m_pImageCover1->GetRegion();
-	m_rcCover2Original = m_pImageCover2->GetRegion();
+		// save original positions
+		m_rcCover1Original = m_pImageCover1->GetRegion();
+		m_rcCover2Original = m_pImageCover2->GetRegion();
 
-	// Calculate the height of the covers for displacement
-	m_iCoverShift = m_rcCover1Original.bottom - m_rcCover1Original.top;
-
-	// Create starting regions - move Y positions, keep X and size same
-	RECT rc1Start = m_rcCover1Original;
-	RECT rc2Start = m_rcCover2Original;
-	rc1Start.top -= m_iCoverShift;
-	rc1Start.bottom -= m_iCoverShift;
-	rc2Start.top += m_iCoverShift;
-	rc2Start.bottom += m_iCoverShift;
-
-	// Initialize covers to starting regions
-	m_pImageCover1->SetRegion(rc1Start);
-	m_pImageCover2->SetRegion(rc2Start);
-	m_eAnimationState = ANIM_COVER_CLOSING;
+		m_eAnimationState = ANIM_FLIPFLOP;
+	}
+	
 }
 
