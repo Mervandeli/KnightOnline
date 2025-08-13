@@ -107,17 +107,17 @@ bool CN3Texture::Create(int nWidth, int nHeight, D3DFORMAT Format, BOOL bGenerat
 #ifdef _N3GAME
 	if(rval == D3DERR_INVALIDCALL)
 	{
-		CLogWriter::Write("N3Texture: createtexture err D3DERR_INVALIDCALL(%s)", m_szFileName.c_str());
+		CLogWriter::Write("N3Texture: createtexture err D3DERR_INVALIDCALL({})", m_szFileName);
 		return false;
 	}
 	if(rval == D3DERR_OUTOFVIDEOMEMORY)
 	{
-		CLogWriter::Write("N3Texture: createtexture err D3DERR_OUTOFVIDEOMEMORY(%s)", m_szFileName.c_str());
+		CLogWriter::Write("N3Texture: createtexture err D3DERR_OUTOFVIDEOMEMORY({})", m_szFileName);
 		return false;
 	}
 	if(rval == E_OUTOFMEMORY)
 	{
-		CLogWriter::Write("N3Texture: createtexture err E_OUTOFMEMORY(%s)", m_szFileName.c_str());
+		CLogWriter::Write("N3Texture: createtexture err E_OUTOFMEMORY({})", m_szFileName);
 		return false;
 	}
 #endif
@@ -187,7 +187,7 @@ bool CN3Texture::LoadFromFile(const std::string& szFileName, uint32_t iVer)
 		if(hFile == INVALID_HANDLE_VALUE)
 		{
 #ifdef _N3GAME
-			CLogWriter::Write("invalid file handle(%d) - Can't open texture file(%s)", (int)hFile, szFullPath.c_str());
+			CLogWriter::Write("invalid file handle({}) - Can't open texture file({})", (int)hFile, szFullPath);
 #endif
 			return false;
 		}
@@ -223,7 +223,7 @@ bool CN3Texture::LoadFromFile(const std::string& szFileName, uint32_t iVer)
 		else
 		{
 #ifdef _N3GAME
-			CLogWriter::Write("N3Texture - Failed to load texture(%s)", szFullPath.c_str());
+			CLogWriter::Write("N3Texture - Failed to load texture({})", szFullPath);
 #endif
 		}
 
@@ -260,7 +260,7 @@ bool CN3Texture::Load(HANDLE hFile)
 		|| HeaderOrg.szID[3] < 3)
 	{
 #ifdef _N3GAME
-		CLogWriter::Write("N3Texture Warning - Old format DXT file (%s)", m_szFileName.c_str());
+		CLogWriter::Write("N3Texture Warning - Old format DXT file ({})", m_szFileName);
 #endif
 	}
 
@@ -316,7 +316,7 @@ bool CN3Texture::Load(HANDLE hFile)
 	if (m_lpTexture == nullptr)
 	{
 #ifdef _N3GAME
-		CLogWriter::Write("N3Texture error - Can't create texture (%s)", m_szFileName.c_str());
+		CLogWriter::Write("N3Texture error - Can't create texture ({})", m_szFileName);
 #endif
 		return false;
 	}
@@ -336,13 +336,15 @@ bool CN3Texture::Load(HANDLE hFile)
 		{
 			if(iMMC > 1)
 			{
-				if(m_iLOD > 0) // LOD 만큼 건너뛰기...
+				if (m_iLOD > 0) // LOD 만큼 건너뛰기...
 				{
-					size_t iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
-					for(int i = 0; i < m_iLOD; i++, iWTmp /= 2, iHTmp /= 2)
+					int iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
+					for (int i = 0; i < m_iLOD; i++, iWTmp /= 2, iHTmp /= 2)
 					{
-						if(D3DFMT_DXT1 == HeaderOrg.Format) iSkipSize += iWTmp * iHTmp / 2; // DXT1 형식은 16비트 포맷에 비해 1/4 로 압축..
-						else iSkipSize += iWTmp * iHTmp; // DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축..
+						if (D3DFMT_DXT1 == HeaderOrg.Format)
+							iSkipSize += iWTmp * iHTmp / 2; // DXT1 형식은 16비트 포맷에 비해 1/4 로 압축..
+						else
+							iSkipSize += iWTmp * iHTmp; // DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축..
 					}
 					::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고.
 				}
@@ -362,7 +364,7 @@ bool CN3Texture::Load(HANDLE hFile)
 				}
 
 				// 텍스처 압축안되는 비디오 카드를 위한 여분의 데이터 건너뛰기.. 
-				size_t iWTmp = HeaderOrg.nWidth / 2, iHTmp = HeaderOrg.nHeight / 2;
+				int iWTmp = HeaderOrg.nWidth / 2, iHTmp = HeaderOrg.nHeight / 2;
 				for(; iWTmp >= 4 && iHTmp >= 4; iWTmp /= 2, iHTmp /= 2) // 한픽셀에 두바이트가 들어가는 A1R5G5B5 혹은 A4R4G4B4 포맷으로 되어 있다..
 					::SetFilePointer(hFile, iWTmp * iHTmp * 2, 0, FILE_CURRENT); // 건너뛰고.
 			}
@@ -389,11 +391,13 @@ bool CN3Texture::Load(HANDLE hFile)
 			if(iMMC > 1) // LOD 만큼 건너뛰기...
 			{
 				// 압축 데이터 건너뛰기..
-				size_t iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
-				for(; iWTmp >= 4 && iHTmp >= 4; iWTmp /= 2, iHTmp /= 2)
+				int iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
+				for (; iWTmp >= 4 && iHTmp >= 4; iWTmp /= 2, iHTmp /= 2)
 				{
-					if(D3DFMT_DXT1 == HeaderOrg.Format) iSkipSize += iWTmp * iHTmp / 2; // DXT1 형식은 16비트 포맷에 비해 1/4 로 압축..
-					else iSkipSize += iWTmp * iHTmp; // DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축..
+					if (D3DFMT_DXT1 == HeaderOrg.Format)
+						iSkipSize += iWTmp * iHTmp / 2; // DXT1 형식은 16비트 포맷에 비해 1/4 로 압축..
+					else
+						iSkipSize += iWTmp * iHTmp; // DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축..
 				}
 				::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고.
 
@@ -406,7 +410,8 @@ bool CN3Texture::Load(HANDLE hFile)
 				}
 
 				// 비디오 카드 지원 텍스처 크기가 작을경우 건너뛰기..
-				for(; iWTmp > s_DevCaps.MaxTextureWidth || iHTmp > s_DevCaps.MaxTextureHeight; iWTmp /= 2, iHTmp /= 2)
+				for (; iWTmp > static_cast<int>(s_DevCaps.MaxTextureWidth) || iHTmp > static_cast<int>(s_DevCaps.MaxTextureHeight);
+					iWTmp /= 2, iHTmp /= 2)
 					iSkipSize += iWTmp * iHTmp * 2;
 				if(iSkipSize) ::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고.
 
@@ -454,10 +459,12 @@ bool CN3Texture::Load(HANDLE hFile)
 			}
 
 			// 비디오 카드 지원 텍스처 크기가 작을경우 건너뛰기..
-			size_t iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
-			for(; iWTmp > s_DevCaps.MaxTextureWidth || iHTmp > s_DevCaps.MaxTextureHeight; iWTmp /= 2, iHTmp /= 2)
+			int iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
+			for (; iWTmp > static_cast<int>(s_DevCaps.MaxTextureWidth) || iHTmp > static_cast<int>(s_DevCaps.MaxTextureHeight);
+				iWTmp /= 2, iHTmp /= 2)
 				iSkipSize += iWTmp * iHTmp * iPixelSize;
-			if(iSkipSize) ::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고.
+			if (iSkipSize != 0)
+				::SetFilePointer(hFile, iSkipSize, 0, FILE_CURRENT); // 건너뛰고.
 
 			// 데이터 읽기..
 			for (int i = 0; i < iMMC; i++)
@@ -509,7 +516,7 @@ bool CN3Texture::SkipFileHandle(HANDLE hFile)
 	if(	'N' != HeaderOrg.szID[0] || 'T' != HeaderOrg.szID[1] || 'F' != HeaderOrg.szID[2] || 3 != HeaderOrg.szID[3] ) // "NTF"3 - Noah Texture File Ver. 3.0
 	{
 #ifdef _N3GAME
-		CLogWriter::Write("N3Texture Warning - Old format DXT file (%s)", m_szFileName.c_str());
+		CLogWriter::Write("N3Texture Warning - Old format DXT file ({})", m_szFileName);
 #endif
 	}
 
@@ -618,7 +625,7 @@ bool CN3Texture::Save(HANDLE hFile)
 		if(nMMC < nMMC2)
 		{
 #ifdef _N3GAME
-			CLogWriter::Write("N3Texture save warning - Invalid MipMap Count (%s)", m_szFileName.c_str());
+			CLogWriter::Write("N3Texture save warning - Invalid MipMap Count ({})", m_szFileName);
 #endif
 			m_Header.bMipMap = FALSE;
 			nMMC = 1;

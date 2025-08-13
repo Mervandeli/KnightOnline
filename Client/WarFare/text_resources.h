@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "ClientResourceFormatter.h"
+
 enum e_TextResourceID
 {
 	IDS_BIND_POINT_FAILED						= 1001,
@@ -614,4 +616,5 @@ enum e_TextResourceID
 	IDS_CMD_PLC									= 9020,
 
 	IDS_QUEST_SEARCH_LEVEL_ERROR				= 10100, // You can only search up to +%d levels from your current level.
+	IDS_TRANSACTION_OK_CANCEL_MESSAGE			= 11500, // Will you sell %s? 
 };

@@ -39,9 +39,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <Import Project="$(PropsDir)client_application.props" />
-  <Import Project="$(PropsDir)directx9.props" />
   <Import Project="$(PropsDir)cp949_strings.props" />
   <Import Project="$(PropsDir)jpegfile.props" />
+  <Import Project="$(PropsDir)n3base-project.props" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
@@ -104,6 +104,7 @@
     <ClCompile Include="Bird.cpp" />
     <ClCompile Include="BirdMng.cpp" />
     <ClCompile Include="Catapult.cpp" />
+    <ClCompile Include="ClientResourceFormatter.cpp" />
     <ClCompile Include="CountableItemEditDlg.cpp" />
     <ClCompile Include="DungeonManager.cpp" />
     <ClCompile Include="EventManager.cpp" />
@@ -120,6 +121,7 @@
     <ClCompile Include="GameProcOption.cpp" />
     <ClCompile Include="GrassBoard.cpp" />
     <ClCompile Include="GrassMng.cpp" />
+    <ClCompile Include="IconItemSkill.cpp" />
     <ClCompile Include="ItemRepairMgr.cpp" />
     <ClCompile Include="LightMgr.cpp" />
     <ClCompile Include="LocalInput.cpp" />
@@ -181,6 +183,7 @@
     <ClCompile Include="UIMessageBox.cpp" />
     <ClCompile Include="UIMessageBoxManager.cpp" />
     <ClCompile Include="UIMessageWnd.cpp" />
+    <ClCompile Include="UIMsgBoxOkCancel.cpp" />
     <ClCompile Include="UINationSelectDlg.cpp" />
     <ClCompile Include="UINotice.cpp" />
     <ClCompile Include="UINPCChangeEvent.cpp" />
@@ -218,6 +221,7 @@
     <ClInclude Include="BirdMng.h" />
     <ClInclude Include="Bitset.h" />
     <ClInclude Include="Catapult.h" />
+    <ClInclude Include="ClientResourceFormatter.h" />
     <ClInclude Include="CountableItemEditDlg.h" />
     <ClInclude Include="DungeonManager.h" />
     <ClInclude Include="EventManager.h" />
@@ -236,6 +240,7 @@
     <ClInclude Include="GameProcOption.h" />
     <ClInclude Include="GrassBoard.h" />
     <ClInclude Include="GrassMng.h" />
+    <ClInclude Include="IconItemSkill.h" />
     <ClInclude Include="N3ClientShapeMgr.h" />
     <ClInclude Include="N3Pond.h" />
     <ClInclude Include="N3River.h" />
@@ -300,6 +305,7 @@
     <ClInclude Include="UIMessageBox.h" />
     <ClInclude Include="UIMessageBoxManager.h" />
     <ClInclude Include="UIMessageWnd.h" />
+    <ClInclude Include="UIMsgBoxOkCancel.h" />
     <ClInclude Include="UINationSelectDlg.h" />
     <ClInclude Include="UINotice.h" />
     <ClInclude Include="UINPCChangeEvent.h" />

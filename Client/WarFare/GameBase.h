@@ -37,8 +37,6 @@ protected:
 	static void StaticMemberRelease();
 
 public:
-	static bool GetText(uint32_t nResourceID, std::string* szText);
-	static bool GetTextF(uint32_t nResourceID, std::string* szText, ...);
 	static bool	GetTextByAttrib(e_ItemAttrib eAttrib, std::string& szAttrib);
 	static bool GetTextByClass(e_Class eClass, std::string& szText);
 	static bool GetTextByItemClass(e_ItemClass eItemClass, std::string& szText);
@@ -53,6 +51,7 @@ public:
 	static e_Class_Represent	GetRepresentClass(e_Class eClass);
 
 	static e_ItemType MakeResrcFileNameForUPC(	__TABLE_ITEM_BASIC* pItem,
+												__TABLE_ITEM_EXT* pItemExt,
 												std::string* szResrcFN,
 												std::string* szIconFN,
 												e_PartPosition& ePartPosition,
@@ -61,7 +60,9 @@ public:
 
 	class CPlayerBase*	CharacterGetByID(int iID, bool bFromAlive);
 	bool				IsValidCharacter(CPlayerBase* pCharacter);
-	static std::string FormatNumber(int iNumber);
+	static std::string	FormatNumber(int iNumber);
+	static std::string	UnformatNumber(const std::string& input);
+	static void			ConvertPipesToNewlines(std::string& input);
 
 	CGameBase();
 	virtual ~CGameBase();

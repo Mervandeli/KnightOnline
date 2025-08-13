@@ -156,64 +156,6 @@ STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "Ebenezer information (&A)"
     IDP_SOCKETS_INIT_FAILED "Failed to initialize winsock."
-    IDP_BATTLEZONE_OPEN     "Lunar Gate is now open.  The War has begun."
-    IDP_KARUS_VICTORY       "Karus is victorious. They killed %d warriors and lost %d warriors"
-    IDP_ELMORAD_VICTORY     "El Morad is victorious. They killed %d warriors and lost %d warriors"
-    IDP_KARUS_BANISH        "El Morad warriors in the battle zone have been banned!"
-    IDP_ELMORAD_BANISH      "Karus warriors in the battle zone have been banned!"
-    IDP_KNIGHT_NAME_REPEAT  "This Knights name already exist."
-    IDP_KNIGHT_ALREADY_REGISTERED "You are already in a Knights"
-END
-
-STRINGTABLE
-BEGIN
-    IDP_KNIGHT_INSUFFICIENT_LEVEL 
-                            "You need to be at least at Level 20 in order to create a Knights"
-    IDP_KNIGHT_INSUFFICIENT_LOYALTY 
-                            "You need to have at least 800 National Points in order to create a Knights"
-    IDP_KNIGHT_INSUFFICIENT_SKILL 
-                            "You need to have at least 10 Leadership skill points and 5 Manner skill points in order to create a"
-    IDP_KNIGHT_INSUFFICIENT_CHARISMA 
-                            "You need to have at least 120 Attractactiveness skill points in order to create a Knights"
-    IDP_KNIGHT_INSUFFICIENT_GOLD 
-                            "You need to have at least 1,000,000 Coins in order to create a Knights"
-    IDP_KNIGHT_CREATE_FAIL  "You have failed creating a Knights"
-    IDP_KNIGHT_NOT_AVAILABLE "This Knights does not exist"
-    IDP_KNIGHT_LEADER_ONLY  "This is authorized for Head of Knights only."
-    IDP_KNIGHT_MINIMUM_SUBLEADER 
-                            "This is authorized for ranks higher than Vice Head of Knights only."
-    IDP_KNIGHT_NOT_REGISTERED "Not Register Knights"
-    IDP_KNIGHT_DB_FAIL      "Failed Update DB with Knights"
-    IDP_WRONG_ID            "This ID does not exist"
-    IDP_SOURCE_UNABLE       "Source Unable"
-    IDP_MINIMUM_OFFICER     "This is authorized for ranks higher than officer"
-    IDP_ANNOUNCEMENT        "#### NOTICE : %s ####"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_ELMORAD_LOSER       "El Morad have lost the war. They killed [%d] warriors and lost [%d] warriors"
-    IDS_KARUS_LOSER         "Karus have lost the war. They killed [%d] warriors and lost [%d] warriors"
-    IDS_BANISH_USER         "Users in the Lunar Valley and the enemy�s territory will be teleported back to their own Nations."
-    IDS_BATTLE_CLOSE        "Lunar Gate is closing."
-    IDS_KILL_GATEKEEPER     "The user that killed the enemy�s gatekeeper is [%s][%s]. Congratulations!!"
-    IDS_KILL_CAPTAIN        "The user that killed the enemy�s captain is [%s][%s]. Congratulations!!"
-    IDS_KILL_KARUS_GUARD1   "The sentry at the 1st Karus fortress has been killed. The user that killed the sentry is [%s][%s]"
-    IDS_KILL_KARUS_GUARD2   "The sentry at the 2nd Karus fortress has been killed. The user that killed the sentry is [%s][%s]"
-    IDS_KILL_ELMO_GUARD1    "The sentry at the 1st El Morad fortress has been killed. The user that killed the sentry is [%s][%s]"
-    IDS_KILL_ELMO_GUARD2    "The sentry at the 2nd El Morad fortress has been killed. The user that killed the sentry is [%s][%s]"
-    IDS_KARUS_CAPTAIN       "The captain(s) for Karus is(are) %s, %s, %s, %s, %s"
-    IDS_ELMO_CAPTAIN        "The captain(s) for El Morad is(are) %s, %s, %s, %s, %s"
-    IDS_KARUS_CAPTAIN_DEPRIVE 
-                            "[%s][%s], the captain for Karus has been killed"
-    IDS_ELMO_CAPTAIN_DEPRIVE 
-                            "[%s][%s], the captain for El Morad has been killed"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_COUPON_NOTEPAD_ID   "3572-8471-3720-2495"
-    IDS_COUPON_POSTIT_ID    "7352-6539-3720-2495"
 END
 
 #endif    // English (Neutral) resources

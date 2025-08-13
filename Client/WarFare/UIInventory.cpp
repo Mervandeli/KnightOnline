@@ -337,8 +337,10 @@ void CUIInventory::Render()
 	// 갯수 표시되야 할 아이템 갯수 표시..
 	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )
 	{
-		if ( m_pMyInvWnd[i] && ((m_pMyInvWnd[i]->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) || 
-					(m_pMyInvWnd[i]->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)) )
+		if (m_pMyInvWnd[i] != nullptr
+			&& ((m_pMyInvWnd[i]->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE)
+				|| (m_pMyInvWnd[i]->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
+				|| (m_pMyInvWnd[i]->pItemBasic->byClass == ITEM_CLASS_CONSUMABLE)))
 		{
 			// string 얻기..
 			CN3UIString* pStr = GetChildStringByiOrder(i);
@@ -353,7 +355,12 @@ void CUIInventory::Render()
 					if ( m_pMyInvWnd[i]->pUIIcon->IsVisible() )
 					{
 						pStr->SetVisible(true);
-						pStr->SetStringAsInt(m_pMyInvWnd[i]->iCount);
+						
+						if (m_pMyInvWnd[i]->pItemBasic->byClass == ITEM_CLASS_CONSUMABLE)
+							pStr->SetStringAsInt(m_pMyInvWnd[i]->iDurability);
+						else
+							pStr->SetStringAsInt(m_pMyInvWnd[i]->iCount);
+						
 						pStr->Render();
 					}
 					else
@@ -612,11 +619,13 @@ int	CUIInventory::GetArmDestinationIndex(__IconItemSkill* spItem)
 		return false;
 
 	__TABLE_ITEM_BASIC*		pItem;
+	__TABLE_ITEM_EXT* pItemExt = nullptr;
 	pItem = CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pItemBasic;
+	pItemExt = CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pItemExt;
 
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	e_ItemType eType = CGameProcedure::MakeResrcFileNameForUPC(pItem, NULL, NULL, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
 	if(ITEM_TYPE_UNKNOWN == eType) return false;
 
 	if ( IsValidRaceAndClass(pItem, CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pItemExt) )
@@ -1643,7 +1652,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 						case CLASS_EL_PROTECTOR:
 							break;
 						default:
-							CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS, &szMsg);
+							szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS);
 							CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 							return false;
 					}
@@ -1660,7 +1669,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 						case CLASS_EL_ASSASIN:
 							break;
 						default:
-							CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS, &szMsg);
+							szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS);
 							CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 							return false;
 					}
@@ -1677,7 +1686,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 						case CLASS_EL_ENCHANTER:
 							break;
 						default:
-							CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS, &szMsg);
+							szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS);
 							CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 							return false;
 					}
@@ -1694,7 +1703,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 						case CLASS_EL_DRUID:
 							break;
 						default:
-							CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS, &szMsg);
+							szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS);
 							CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 							return false;
 					}
@@ -1707,7 +1716,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 						case CLASS_EL_BLADE:
 							break;
 						default:
-							CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS, &szMsg);
+							szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS);
 							CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 							return false;
 					}
@@ -1720,7 +1729,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 						case CLASS_EL_PROTECTOR:
 							break;
 						default:
-							CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS, &szMsg);
+							szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS);
 							CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 							return false;
 					}
@@ -1733,7 +1742,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 						case CLASS_EL_RANGER:
 							break;
 						default:
-							CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS, &szMsg);
+							szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS);
 							CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 							return false;
 					}
@@ -1746,7 +1755,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 						case CLASS_EL_ASSASIN:
 							break;
 						default:
-							CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS, &szMsg);
+							szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS);
 							CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 							return false;
 					}
@@ -1759,7 +1768,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 						case CLASS_EL_MAGE:
 							break;
 						default:
-							CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS, &szMsg);
+							szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS);
 							CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 							return false;
 					}
@@ -1772,7 +1781,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 						case CLASS_EL_ENCHANTER:
 							break;
 						default:
-							CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS, &szMsg);
+							szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS);
 							CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 							return false;
 					}
@@ -1785,7 +1794,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 						case CLASS_EL_CLERIC:
 							break;
 						default:
-							CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS, &szMsg);
+							szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS);
 							CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 							return false;
 					}
@@ -1798,7 +1807,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 						case CLASS_EL_DRUID:
 							break;
 						default:
-							CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS, &szMsg);
+							szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS);
 							CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 							return false;
 					}
@@ -1807,7 +1816,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 				default:
 					if (CGameBase::s_pPlayer->m_InfoBase.eClass != pItem->byClass)
 					{
-						CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS, &szMsg);
+						szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_CLASS);
 						CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 						return false;
 					}
@@ -1817,21 +1826,21 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 
 		if ( (pItem->byAttachPoint == ITEM_LIMITED_EXHAUST) && (CGameBase::s_pPlayer->m_InfoBase.iLevel < pItem->cNeedLevel+pItemExt->siNeedLevel) )
 		{
-			CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_LOW_LEVEL, &szMsg);
+			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_LEVEL);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 			return false;
 		}
 
 		if ( pInfoExt->iRank < pItem->byNeedRank+pItemExt->siNeedRank )
 		{
-			CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_LOW_RANK, &szMsg);
+			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_RANK);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 			return false;
 		}
 		
 		if ( pInfoExt->iTitle < pItem->byNeedTitle+pItemExt->siNeedTitle )
 		{
-			CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_LOW_TITLE, &szMsg);
+			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_TITLE);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 			return false;
 		}
@@ -1841,7 +1850,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 			iNeedValue += pItemExt->siNeedStrength;
 		if ( pInfoExt->iStrength < iNeedValue )
 		{
-			CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_LOW_POWER, &szMsg);
+			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_POWER);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 			return false;
 		}
@@ -1851,7 +1860,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 			iNeedValue += pItemExt->siNeedStamina;
 		if ( pInfoExt->iStamina < iNeedValue )
 		{
-			CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_LOW_STR, &szMsg);
+			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_STR);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 			return false;
 		}
@@ -1861,7 +1870,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 			iNeedValue += pItemExt->siNeedDexterity;
 		if ( pInfoExt->iDexterity < iNeedValue )
 		{
-			CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_LOW_DEX, &szMsg);
+			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_DEX);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff1010);
 			return false;
 		}
@@ -1871,7 +1880,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 			iNeedValue += pItemExt->siNeedInteli;
 		if ( pInfoExt->iIntelligence < iNeedValue )
 		{
-			CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_LOW_INT, &szMsg);
+			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_INT);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 			return false;
 		}
@@ -1881,7 +1890,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 			iNeedValue += pItemExt->siNeedMagicAttack;
 		if ( pInfoExt->iMagicAttak < iNeedValue )
 		{
-			CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_LOW_CHA, &szMsg);
+			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_CHA);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 			return false;
 		}
@@ -1890,7 +1899,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 	}
 	else
 	{
-		CGameBase::GetText(IDS_MSG_VALID_CLASSNRACE_INVALID_RACE, &szMsg);
+		szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_INVALID_RACE);
 		CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 	}
 	return false;
@@ -1902,11 +1911,14 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 		return false;
 
 	__TABLE_ITEM_BASIC*		pItem;
+	__TABLE_ITEM_EXT* pItemExt;
+
 	pItem = CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pItemBasic;
+	pItemExt = CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pItemExt;
 
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	e_ItemType eType = CGameProcedure::MakeResrcFileNameForUPC(pItem, NULL, NULL, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
 	if(ITEM_TYPE_UNKNOWN == eType) return false;
 
 	if ( IsValidRaceAndClass(pItem, CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pItemExt) )
@@ -2187,11 +2199,13 @@ bool CUIInventory::IsValidPosFromArmToArm(int iOrder)
 		return false;
 
 	__TABLE_ITEM_BASIC*		pItem;
+	__TABLE_ITEM_EXT* pItemExt;
 	pItem = CN3UIWndBase::m_sRecoveryJobInfo.pItemSource->pItemBasic;
+	pItemExt = CN3UIWndBase::m_sRecoveryJobInfo.pItemSource->pItemExt;
 
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	e_ItemType eType = CGameProcedure::MakeResrcFileNameForUPC(pItem, NULL, NULL, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
 	if(ITEM_TYPE_UNKNOWN == eType) return false;
 
 	if ( IsValidRaceAndClass(pItem, CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pItemExt) )
@@ -2246,11 +2260,13 @@ bool CUIInventory::IsValidPosFromArmToArmInverse(int iOrder)
 		return false;
 
 	__TABLE_ITEM_BASIC*		pItem;
+	__TABLE_ITEM_EXT* pItemExt;
 	pItem = CN3UIWndBase::m_sRecoveryJobInfo.pItemTarget->pItemBasic;
+	pItemExt = CN3UIWndBase::m_sRecoveryJobInfo.pItemTarget->pItemExt;
 
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	e_ItemType eType = CGameProcedure::MakeResrcFileNameForUPC(pItem, NULL, NULL, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
 	if(ITEM_TYPE_UNKNOWN == eType) return false;
 
 	if ( IsValidRaceAndClass(pItem, CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pItemExt) )
@@ -2305,7 +2321,7 @@ void CUIInventory::ItemAdd(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_EXT* pItemExt
 	std::string szFN;
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	e_ItemType eType = CGameProcedure::MakeResrcFileNameForUPC(pItem, &szFN, NULL, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, &szFN, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
 
 	if(ITEM_TYPE_PLUG == eType)
 	{
@@ -2331,7 +2347,7 @@ void CUIInventory::ItemDelete(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_EXT* pItem
 
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	e_ItemType eType = CGameProcedure::MakeResrcFileNameForUPC(pItem, NULL, NULL, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
 	
 	if(pLooks)
 	{
@@ -2357,7 +2373,8 @@ void CUIInventory::DurabilityChange(e_ItemSlot eSlot, int iDurability)
 	if ( eSlot < ITEM_SLOT_EAR_RIGHT || eSlot >= ITEM_SLOT_COUNT )
 	{
 		__ASSERT(0, "Durability Change Item Index Weird.");
-		CLogWriter::Write("Durability Change Item Index Weird. Slot(%d) Durability(%d)", eSlot, iDurability);
+		CLogWriter::Write("Durability Change Item Index Weird. Slot({}) Durability({})",
+			static_cast<int>(eSlot), iDurability);
 		return;
 	}
 
@@ -2371,23 +2388,23 @@ void CUIInventory::DurabilityChange(e_ItemSlot eSlot, int iDurability)
 				m_pMySlot[eSlot]->pUIIcon->SetStyle(m_pMySlot[eSlot]->pUIIcon->GetStyle() | UISTYLE_DURABILITY_EXHAUST);
 
 				// 메시지 박스 출력..
-				CGameBase::GetTextF(
-					IDS_DURABILITY_EXOAST,
-					&szDur,
-					m_pMySlot[eSlot]->pItemBasic->szName.c_str());
+				szDur = fmt::format_text_resource(IDS_DURABILITY_EXOAST,
+					m_pMySlot[eSlot]->pItemBasic->szName);
 				CGameProcedure::s_pProcMain->MsgOutput(szDur, 0xffff3b3b);
 			}
 			else
 			{
 				__ASSERT(0, "Durability Change Item NULL icon or NULL item.");
-				CLogWriter::Write("Durability Change Item NULL icon or NULL item. Slot(%d) Durability(%d)", eSlot, iDurability);
+				CLogWriter::Write("Durability Change Item NULL icon or NULL item. Slot({}) Durability({})",
+					static_cast<int>(eSlot), iDurability);
 			}
 		}
 	}
 	else
 	{
 		__ASSERT(0, "Durability Change Item NULL Slot.");
-		CLogWriter::Write("Durability Change Item ... NULL Slot. Slot(%d) Durability(%d)", eSlot, iDurability);
+		CLogWriter::Write("Durability Change Item ... NULL Slot. Slot({}) Durability({})",
+			static_cast<int>(eSlot), iDurability);
 	}
 }
 
@@ -2396,14 +2413,20 @@ void CUIInventory::ReceiveResultFromServer(int iResult, int iUserGold)
 	m_cItemRepairMgr.ReceiveResultFromServer(iResult, iUserGold);
 }
 
-int CUIInventory::GetCountInInvByID(int iID)
+int CUIInventory::GetCountInInvByID(int iID) const
 {
-	int i;
-	for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
+	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
-		if ( (m_pMyInvWnd[i] != NULL) && (m_pMyInvWnd[i]->pItemBasic->dwID == (iID/1000*1000)) &&
-				(m_pMyInvWnd[i]->pItemExt->dwID == (iID%1000)) )
-		return m_pMyInvWnd[i]->iCount;
+		__IconItemSkill* spItem = m_pMyInvWnd[i];
+		if (spItem == nullptr
+			|| spItem->pItemBasic->dwID != (iID / 1000 * 1000)
+			|| spItem->pItemExt->dwID != (iID % 1000))
+			continue;
+
+		if (spItem->pItemBasic->byClass == ITEM_CLASS_CONSUMABLE)
+			return spItem->iDurability;
+
+		return spItem->iCount;
 	}
 
 	return 0;
@@ -2443,14 +2466,14 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 				if ( NULL == pItem || NULL == pItemExt )
 				{
 					__ASSERT(0, "NULL Item");
-					CLogWriter::Write("MyInfo - Inv - Unknown Item %d, IDNumber", iID);
+					CLogWriter::Write("MyInfo - Inv - Unknown Item {}, IDNumber", iID);
 					return;
 				}
 
 				e_PartPosition ePart;
 				e_PlugPosition ePlug;
 				std::string szIconFN;
-				e_ItemType eType = CGameProcedure::MakeResrcFileNameForUPC(pItem, NULL, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+				e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
 				if(ITEM_TYPE_UNKNOWN == eType) CLogWriter::Write("MyInfo - slot - Unknown Item");
 				__ASSERT(ITEM_TYPE_UNKNOWN != eType, "Unknown Item");
 				
@@ -2498,14 +2521,14 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 				if ( NULL == pItem || NULL == pItemExt )
 				{
 					__ASSERT(0, "NULL Item");
-					CLogWriter::Write("MyInfo - Inv - Unknown Item %d, IDNumber", iID);
+					CLogWriter::Write("MyInfo - Inv - Unknown Item {}, IDNumber", iID);
 					return;
 				}
 
 				e_PartPosition ePart;
 				e_PlugPosition ePlug;
 				std::string szIconFN;
-				e_ItemType eType = CGameProcedure::MakeResrcFileNameForUPC(pItem, NULL, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+				e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
 				if(ITEM_TYPE_UNKNOWN == eType) 
 				{ 
 					CLogWriter::Write("MyInfo - slot - Unknown Item");
@@ -2555,14 +2578,14 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 				if ( NULL == pItem || NULL == pItemExt )
 				{
 					__ASSERT(0, "NULL Item");
-					CLogWriter::Write("MyInfo - Inv - Unknown Item %d, IDNumber", iID);
+					CLogWriter::Write("MyInfo - Inv - Unknown Item {}, IDNumber", iID);
 					return;
 				}
 
 				e_PartPosition ePart;
 				e_PlugPosition ePlug;
 				std::string szIconFN;
-				e_ItemType eType = CGameProcedure::MakeResrcFileNameForUPC(pItem, NULL, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+				e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
 				if(ITEM_TYPE_UNKNOWN == eType) CLogWriter::Write("MyInfo - slot - Unknown Item");
 				__ASSERT(ITEM_TYPE_UNKNOWN != eType, "Unknown Item");
 				
@@ -2610,14 +2633,14 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 				if ( NULL == pItem || NULL == pItemExt )
 				{
 					__ASSERT(0, "NULL Item");
-					CLogWriter::Write("MyInfo - Inv - Unknown Item %d, IDNumber", iID);
+					CLogWriter::Write("MyInfo - Inv - Unknown Item {}, IDNumber", iID);
 					return;
 				}
 
 				e_PartPosition ePart;
 				e_PlugPosition ePlug;
 				std::string szIconFN;
-				e_ItemType eType = CGameProcedure::MakeResrcFileNameForUPC(pItem, NULL, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+				e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
 				if(ITEM_TYPE_UNKNOWN == eType) CLogWriter::Write("MyInfo - slot - Unknown Item");
 				__ASSERT(ITEM_TYPE_UNKNOWN != eType, "Unknown Item");
 				
@@ -2789,7 +2812,7 @@ bool CUIInventory::CheckWeightValidate(__IconItemSkill* spItem)
 	__InfoPlayerMySelf*	pInfoExt = &(CGameBase::s_pPlayer->m_InfoExt);
 	if ( (pInfoExt->iWeight + spItem->pItemBasic->siWeight) > pInfoExt->iWeightMax)
 	{	 
-		CGameBase::GetText(IDS_ITEM_WEIGHT_OVERFLOW, &szMsg);	
+		szMsg = fmt::format_text_resource(IDS_ITEM_WEIGHT_OVERFLOW);	
 		CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);	
 		return false;	
 	}

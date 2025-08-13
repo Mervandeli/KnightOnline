@@ -602,9 +602,11 @@ bool CN3CPlug::Load(HANDLE hFile)
 		pPMesh->m_iFileFormatVersion = m_iFileFormatVersion; // NOTE: Setting the version for further components
 
 		pPMesh->Load(hFile);
+
 		static int iSN = 0;
-		char szFNTmp[256]; sprintf(szFNTmp, "Temp_Plug_%d.N3PMesh", iSN++);
+		std::string szFNTmp = fmt::format("Temp_Plug_{}.N3PMesh", iSN++);
 		pPMesh->FileNameSet(szFNTmp);
+
 		s_MngPMesh.Add(pPMesh);
 		m_PMeshInstFX.Create(pPMesh); // FX 에 쓸 PMesh Instance
 	}
@@ -1293,8 +1295,7 @@ bool CN3Chr::Save(HANDLE hFile)
 		nL = m_Parts[i]->FileName().size();
 		if(nL <= 0)
 		{
-			char szFNTmp[256];
-			wsprintf(szFNTmp, "%s_Default%d.N3CPart", m_szName.c_str(), i);
+			std::string szFNTmp = fmt::format("{}_Default{}.N3CPart", m_szName, i);
 			m_Parts[i]->FileNameSet(szFNTmp);
 		}
 		nL = m_Parts[i]->FileName().size();
@@ -1310,8 +1311,7 @@ bool CN3Chr::Save(HANDLE hFile)
 		nL = m_Plugs[i]->FileName().size();
 		if(nL <= 0)
 		{
-			char szFNTmp[256];
-			wsprintf(szFNTmp, "%s_Default%d.N3CPlug", m_szName.c_str(), i);
+			std::string szFNTmp = fmt::format("{}_Default{}.N3CPlug", m_szName, i);
 			m_Plugs[i]->FileNameSet(szFNTmp);
 			i++;
 		}
@@ -2004,9 +2004,11 @@ void CN3Chr::PartAlloc(int iCount)
 	}
 }
 
-void CN3Chr::PartDelete(size_t iIndex)
+void CN3Chr::PartDelete(int iIndex)
 {
-	if (iIndex >= m_Parts.size()) return;
+	if (iIndex < 0
+		|| iIndex >= static_cast<int>(m_Parts.size()))
+		return;
 
 	auto it = m_Parts.begin();
 	std::advance(it, iIndex);
@@ -2015,9 +2017,12 @@ void CN3Chr::PartDelete(size_t iIndex)
 	m_Parts.erase(it);
 }
 
-CN3CPart* CN3Chr::PartSet(size_t iIndex, const std::string& szFN)
+CN3CPart* CN3Chr::PartSet(int iIndex, const std::string& szFN)
 {
-	if (iIndex >= m_Parts.size()) return NULL;
+	if (iIndex < 0
+		|| iIndex >= static_cast<int>(m_Parts.size()))
+		return nullptr;
+
 	if (m_Parts[iIndex]->FileName() == szFN) return m_Parts[iIndex];
 
 	if (szFN.empty()) m_Parts[iIndex]->Release();
@@ -2026,9 +2031,10 @@ CN3CPart* CN3Chr::PartSet(size_t iIndex, const std::string& szFN)
 	return m_Parts[iIndex];
 }
 
-void CN3Chr::PlugDelete(size_t iIndex)
+void CN3Chr::PlugDelete(int iIndex)
 {
-	if (iIndex >= m_Plugs.size())
+	if (iIndex < 0
+		|| iIndex >= static_cast<int>(m_Plugs.size()))
 		return;
 
 	auto it = m_Plugs.begin();
@@ -2038,16 +2044,21 @@ void CN3Chr::PlugDelete(size_t iIndex)
 	m_Plugs.erase(it);
 }
 
-CN3CPlug* CN3Chr::PlugSet(size_t iIndex, const std::string& szFN)
+CN3CPlug* CN3Chr::PlugSet(int iIndex, const std::string& szFN)
 {
-	if (iIndex >= m_Plugs.size()) return NULL;
+	if (iIndex < 0
+		|| iIndex >= static_cast<int>(m_Plugs.size()))
+		return nullptr;
 		
-	if (m_Plugs[iIndex]->FileName() == szFN) return m_Plugs[iIndex];
+	if (m_Plugs[iIndex]->FileName() == szFN)
+		return m_Plugs[iIndex];
 
-	 if(szFN.empty()) m_Plugs[iIndex]->Release();
-	else m_Plugs[iIndex]->LoadFromFile(szFN);
-	
-	this->RemakePlugTracePolygons();
+	if (szFN.empty())
+		m_Plugs[iIndex]->Release();
+	else
+		m_Plugs[iIndex]->LoadFromFile(szFN);
+
+	RemakePlugTracePolygons();
 
 	return m_Plugs[iIndex];
 }
@@ -2310,8 +2321,7 @@ CN3FXPlug*	CN3Chr::FXPlugCreate()
 		
 		if (m_szName.size()>0)
 		{
-			char szFN[_MAX_PATH];
-			wsprintf(szFN, "Chr\\%s.N3FXPlug", m_szName.c_str());	// 캐릭터의 이름을 붙인다.
+			std::string szFN = fmt::format("Chr\\{}.N3FXPlug", m_szName);	// 캐릭터의 이름을 붙인다.
 			m_pFXPlug->FileNameSet(szFN);
 		}
 		else m_pFXPlug->FileNameSet("Chr\\Default.N3FXPlug");	// 그냥 default이름을 붙인다.

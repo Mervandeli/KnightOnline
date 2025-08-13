@@ -64,7 +64,7 @@ CUILogIn_1298::CUILogIn_1298()
 
 	m_iSelectedServerIndex = -1;
 
-	for (size_t i = 0; i < MAX_SERVERS; i++)
+	for (int i = 0; i < MAX_SERVERS; i++)
 	{
 		m_pServer_Group[i] = nullptr;
 		m_pArrow_Group[i] = nullptr;
@@ -105,8 +105,7 @@ bool CUILogIn_1298::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		}
 		else if (pSender == m_pBtn_Option) // 옵션..
 		{
-			std::string szMsg;
-			CGameBase::GetText(IDS_CONFIRM_EXECUTE_OPTION, &szMsg);
+			std::string szMsg = fmt::format_text_resource(IDS_CONFIRM_EXECUTE_OPTION);
 			CGameProcedure::MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_EXECUTE_OPTION);
 			return true;
 		}
@@ -245,7 +244,7 @@ bool CUILogIn_1298::Load(HANDLE hFile)
 		m_pGroup_ServerList->SetVisible(false);
 
 	// get List_Server (structure: Group_ServerList_01 -> server_20 -> List_Server )
-	for (size_t i = 0; i < MAX_SERVERS; i++)
+	for (int i = 0; i < MAX_SERVERS; i++)
 	{
 		std::string szID = "server_" + std::to_string(i + 1);
 		N3_VERIFY_UI_COMPONENT(m_pServer_Group[i], m_pGroup_ServerList->GetChildByID(szID));
@@ -342,7 +341,7 @@ bool CUILogIn_1298::ServerInfoAdd(const __GameServerInfo& GSI)
 bool CUILogIn_1298::ServerInfoGet(int iIndex, __GameServerInfo& GSI)
 {
 	if (iIndex < 0
-		|| iIndex >= (int) m_ListServerInfos.size())
+		|| iIndex >= static_cast<int>(m_ListServerInfos.size()))
 		return false;
 
 	GSI = m_ListServerInfos[iIndex];

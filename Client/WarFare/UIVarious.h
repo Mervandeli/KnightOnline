@@ -70,7 +70,7 @@ public:
 
 	void	UpdateHP(int iVal, int iValMax);
 	void	UpdateMSP(int iVal, int iValMax);
-	void	UpdateExp(uint64_t iVal, uint64_t iValMax);
+	void	UpdateExp(int64_t iVal, int64_t iValMax);
 	void	UpdateAttackPoint(int iVal, int iDelta);
 	void	UpdateGuardPoint(int iVal, int iDelta);
 	void	UpdateWeight(int iVal, int iValMax);
@@ -86,6 +86,8 @@ public:
 	void	UpdateRegistMagic(int iVal, int iDelta);
 	void	UpdateRegistCurse(int iVal, int iDelta);
 	void	UpdateRegistPoison(int iVal, int iDelta);
+
+	static std::string FormatWithDelta(int iVal, int iDelta);
 
 	void			MsgSendAblityPointChange(uint8_t byType, int16_t siValueDelta); // 능력치 변화 패킷으로 보내기..
 
@@ -222,7 +224,7 @@ typedef std::map<std::string, __FriendsInfo>::value_type val_FI;
 class CUIFriends : public CN3UIBase  
 {
 protected:
-	size_t m_iPageCur;
+	int m_iPageCur;
 	std::map<std::string, __FriendsInfo> m_MapFriends;
 
 	CN3UIList* m_pList_Friends;

@@ -86,8 +86,8 @@ void CUITradeList::Open(int iIDTarget)
 	__TABLE_ITEM_BASIC* pItem = NULL;
 
 	// 아이디 = 직업 코드*1000 + 001부터.. (직업 코드+1)*100 + 001까지..
-	size_t i, iIDFirst, iIDIndexFirst, iIDIndexLast, iDivide, iTotalCount;
-	iIDFirst = iIDTarget*1000+1;
+	int i, iIDFirst, iIDIndexFirst, iIDIndexLast, iDivide, iTotalCount;
+	iIDFirst = iIDTarget * 1000 + 1;
 
 	if (!CGameBase::s_pTbl_Exchange_Quest.IDToIndex(iIDFirst, &iIDIndexFirst))
 		return;		// 아무런 리스트도 가지고 있지 않다..
@@ -115,7 +115,6 @@ void CUITradeList::Open(int iIDTarget)
 	if (!iIDIndexLast) iIDIndexLast = iTotalCount;
 
 	// 메시지 박스 텍스트 표시..
-	char pszID[32];
 	for( i = iIDIndexFirst; i < iIDIndexFirst + 40; i++ )
 	{
 		pQuest						= CGameBase::s_pTbl_Exchange_Quest.GetIndexedData(i);
@@ -135,8 +134,7 @@ void CUITradeList::Open(int iIDTarget)
 			if(pItem) m_sStr[i-iIDIndexFirst] += pItem->szName;
 			else m_sStr[i-iIDIndexFirst] += "NULL Item";
 			m_sStr[i-iIDIndexFirst]		+= "를 ";	
-			sprintf(pszID, "%d",i);
-			m_sStr[i-iIDIndexFirst]		+= pszID;
+			m_sStr[i-iIDIndexFirst]		+= std::to_string(i);
 			m_sStr[i-iIDIndexFirst]		+= "\n";
 		}
 		else
