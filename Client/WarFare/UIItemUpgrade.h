@@ -79,6 +79,7 @@ protected:
 	e_UIWND_DISTRICT	GetWndDistrict(__IconItemSkill* spItem);
 	void				SendToServerUpgradeMsg(int itemID, byte pos, int iCount)
 	{};
+    void HandleInventoryIconRightClick(); // Add this declaration
 
 public:
 	CUIItemUpgrade();
@@ -129,7 +130,7 @@ public:
 	void				CreateUIIconForItem(__IconItemSkill* pItem, const std::string& szIconFN = "");
 	__IconItemSkill*	CreateIconFromSource(__IconItemSkill* pSrc, int count);
 	void				SetupIconArea(__IconItemSkill* pItem, CN3UIArea* pArea);
-	bool				HandleUpgradeAreaDrop(__IconItemSkill* spItem, POINT ptCur);
+	bool				HandleUpgradeAreaDrop(__IconItemSkill* spItem);
 	bool				HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder);
 	bool				IsSlotCompatible(__IconItemSkill* pSrc, int iDestiOrder);
 	void				Tick() override;
