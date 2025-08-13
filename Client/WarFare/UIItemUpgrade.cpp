@@ -12,8 +12,7 @@
 #include "UIInventory.h"
 #include "UIManager.h"
 #include "PlayerMySelf.h"
-
-
+#include "text_resources.h"
 #include "UIHotKeyDlg.h"
 #include "UISkillTreeDlg.h"
 #include "resource.h"
@@ -919,13 +918,13 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 		if (result == 0)
 		{
 			m_bUpgradeSuccesfull = false;
-			CGameBase::GetText(6701, &szMsg);
+			szMsg = fmt::format_text_resource(6701);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
 		}
 		else if (result == 1)
 		{
 			m_bUpgradeSuccesfull = true;
-			CGameBase::GetText(6700, &szMsg);
+			szMsg = fmt::format_text_resource(6701);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(128, 128, 255, 255));
 
 			itemBasic = CGameBase::s_pTbl_Items_Basic.Find(nItemID[0] / 1000 * 1000);
@@ -933,7 +932,7 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 				itemExt = CGameBase::s_pTbl_Items_Exts[itemBasic->byExtIndex].Find(nItemID[0] % 1000);
 			else
 				itemExt = NULL;
-			eType = CGameProcedure::MakeResrcFileNameForUPC(itemBasic, NULL, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace);
+			eType = CGameProcedure::MakeResrcFileNameForUPC(itemBasic, NULL, &szIconFN, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace);
 			if (ITEM_TYPE_UNKNOWN == eType) return;
 			__IconItemSkill* spItemNew;
 			spItemNew = new __IconItemSkill;
@@ -959,20 +958,20 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 		if (result == 2)
 		{
 			//cannot perform item upgrade
-			CGameBase::GetText(6702, &szMsg);
+			szMsg = fmt::format_text_resource(6701);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
 
 		}
 		else if (result == 3)
 		{
 			//Upgrade Need coin
-			CGameBase::GetText(6703, &szMsg);
+			szMsg = fmt::format_text_resource(6701);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
 		}
 		else if (result == 4)
 		{
 			//Upgrade Not Match or other
-			CGameBase::GetText(6704, &szMsg);
+			szMsg = fmt::format_text_resource(6701);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
 		}
 	}
