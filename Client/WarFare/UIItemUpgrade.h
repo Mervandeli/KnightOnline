@@ -101,7 +101,7 @@ public:
 
 	void				InitIconWnd(e_UIWND eWnd) override;
 
-	__IconItemSkill* GetHighlightIconItem(CN3UIIcon* pUIIcon) override;
+	__IconItemSkill*	GetHighlightIconItem(CN3UIIcon* pUIIcon) override;
 
 	void				IconRestore();
 
@@ -112,10 +112,9 @@ public:
 	void				ItemMoveFromThisToInv();
 	void                RestoreInventoryFromBackup();
 	void				GoldUpdate();
-	void				InitIconUpdate()
-	{};
+	void				InitIconUpdate(){};
 	bool				IsUpgradeScroll(uint32_t dwID);
-	bool IsTrina(uint32_t dwID);
+	bool				IsTrina(uint32_t dwID);
 	bool				IsAllowedUpgradeItem(__IconItemSkill* spItem);
 	void				DeleteIconItemSkill(__IconItemSkill*& pItem);
 	void				SendToServerUpgradeMsg();
