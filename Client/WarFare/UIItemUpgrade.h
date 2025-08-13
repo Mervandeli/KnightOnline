@@ -114,7 +114,8 @@ public:
 	void				GoldUpdate();
 	void				InitIconUpdate()
 	{};
-	bool				IsUpgradeScrollorTrina(uint32_t dwID);
+	bool				IsUpgradeScroll(uint32_t dwID);
+	bool IsTrina(uint32_t dwID);
 	bool				IsAllowedUpgradeItem(__IconItemSkill* spItem);
 	void				DeleteIconItemSkill(__IconItemSkill*& pItem);
 	void				SendToServerUpgradeMsg();

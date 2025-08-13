@@ -17,17 +17,7 @@
 #include "UIHotKeyDlg.h"
 #include "UISkillTreeDlg.h"
 #include "resource.h"
-
-// Item ID Constants
-static const uint32_t MIN_UPGRADE_ITEM_ID = 379000000;
-static const uint32_t MAX_UPGRADE_ITEM_ID = 379257000;
-static const uint32_t TRINA_ITEM_ID = 700002000;
-
 // Animation Constants
-static const float COVER_ANIMATION_DURATION = 0.8f;
-static const float FLIPFLOP_FRAME_DELAY = 0.1f;
-static const int FLIPFLOP_MAX_FRAMES = 20;
-static const float UV_ASPECT_RATIO = 45.0f / 64.0f;
 
 
 #ifdef _DEBUG
@@ -759,8 +749,8 @@ void CUIItemUpgrade::RestoreInventoryFromBackup()
 
 
 
-// Checks if the given item ID is an upgrade scroll or Trina.
-bool CUIItemUpgrade::IsUpgradeScrollorTrina(uint32_t dwID)
+// Checks if the given item ID is an upgrade scroll.
+bool CUIItemUpgrade::IsUpgradeScroll(uint32_t dwID)
 {
 	static const int upgradeItemIDs[] = {
 	// Blessed Upgrade Scroll
@@ -778,6 +768,19 @@ bool CUIItemUpgrade::IsUpgradeScrollorTrina(uint32_t dwID)
 	379226000, 379227000, 379228000, 379229000, 379230000,
 	379231000, 379232000, 379233000, 379234000, 379235000, 379255000,
 
+	};
+
+	for (int id : upgradeItemIDs)
+	{
+		if (dwID == id)
+			return true;
+	}
+	return false;
+}
+
+bool CUIItemUpgrade::IsTrina(uint32_t dwID)
+{
+	static const int upgradeItemIDs[] = {
 	// Trina
 	379256000, 379257000, 379258000, 700002000
 	};
@@ -985,6 +988,7 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 void CUIItemUpgrade::UpdateCoverAnimation()
 {
     m_fAnimationTimer += CN3Base::s_fSecPerFrm;
+	static const float COVER_ANIMATION_DURATION = 0.8f;
     float t = m_fAnimationTimer / COVER_ANIMATION_DURATION;
     if (t > 1.0f) t = 1.0f;
 
@@ -1022,6 +1026,8 @@ void CUIItemUpgrade::UpdateCoverAnimation()
 void CUIItemUpgrade::UpdateFlipFlopAnimation()
 {
 	m_fAnimationTimer += CN3Base::s_fSecPerFrm;
+	static const float FLIPFLOP_FRAME_DELAY = 0.1f;
+	static const int FLIPFLOP_MAX_FRAMES = 20;
 
 	if (m_fAnimationTimer >= FLIPFLOP_FRAME_DELAY)
 	{
@@ -1044,13 +1050,24 @@ void CUIItemUpgrade::UpdateFlipFlopAnimation()
 
 void CUIItemUpgrade::HideAllAnimationFrames()
 {
-	for (int i = 0; i < FLIPFLOP_MAX_FRAMES; ++i)
-	{
-		char szID[32];
-		sprintf(szID, m_bUpgradeSuccesfull ? "img_s_load_%d" : "img_f_load_%d", i);
-		if (CN3UIImage* pImg = (CN3UIImage*)GetChildByID(szID))
-			pImg->SetVisible(false);
-	}
+    // Hide all img_s_load_X frames
+    for (int i = 0;; ++i)
+    {
+        char szID[32];
+        sprintf(szID, "img_s_load_%d", i);
+        CN3UIImage* pImg = (CN3UIImage*)GetChildByID(szID);
+        if (!pImg) break;
+        pImg->SetVisible(false);
+    }
+    // Hide all img_f_load_X frames
+    for (int i = 0;; ++i)
+    {
+        char szID[32];
+        sprintf(szID, "img_f_load_%d", i);
+        CN3UIImage* pImg = (CN3UIImage*)GetChildByID(szID);
+        if (!pImg) break;
+        pImg->SetVisible(false);
+    }
 }
 
 void CUIItemUpgrade::CreateUIIconForItem(__IconItemSkill* pItem, const std::string& szIconFN)
@@ -1059,7 +1076,8 @@ void CUIItemUpgrade::CreateUIIconForItem(__IconItemSkill* pItem, const std::stri
 
 	pItem->pUIIcon = new CN3UIIcon;
 	pItem->pUIIcon->Init(this);
-	
+
+	static const float UV_ASPECT_RATIO = 45.0f / 64.0f;
 	std::string iconFile = szIconFN.empty() ? pItem->szIconFN : szIconFN;
 	pItem->pUIIcon->SetTex(iconFile);
 	pItem->pUIIcon->SetUVRect(0, 0, UV_ASPECT_RATIO, UV_ASPECT_RATIO);
@@ -1126,7 +1144,7 @@ bool CUIItemUpgrade::HandleUpgradeAreaDrop(__IconItemSkill* spItem, POINT ptCur)
 
 bool CUIItemUpgrade::IsSlotCompatible(__IconItemSkill* pSrc, int iDestiOrder)
 {
-	if (!IsUpgradeScrollorTrina(pSrc->pItemBasic->dwID))
+	if (!IsUpgradeScroll(pSrc->pItemBasic->dwID) && !IsTrina(pSrc->pItemBasic->dwID))
 		return false;
 
 	// Check if item with the same dwID is already in the slot
@@ -1136,17 +1154,16 @@ bool CUIItemUpgrade::IsSlotCompatible(__IconItemSkill* pSrc, int iDestiOrder)
 		{
 			uint32_t id = m_pMyUpgradeSLot[k]->pItemBasic->dwID;
 			// If the 2nd trina is trying to be added
-			if (id == TRINA_ITEM_ID && pSrc->pItemBasic->dwID == TRINA_ITEM_ID)
+			if (IsTrina(id) && IsTrina(pSrc->pItemBasic->dwID))
 				return false;
 			// If the 2nd Upgrade Scroll is trying to be added
-			if (id >= MIN_UPGRADE_ITEM_ID && id <= MAX_UPGRADE_ITEM_ID &&
-				pSrc->pItemBasic->dwID >= MIN_UPGRADE_ITEM_ID && pSrc->pItemBasic->dwID <= MAX_UPGRADE_ITEM_ID)
+			if (IsUpgradeScroll(id) && IsUpgradeScroll(pSrc->pItemBasic->dwID))
 				return false;
 			// If there is an upgrade scroll in the slot, only trina can be added
-			if ((id >= MIN_UPGRADE_ITEM_ID && id <= MAX_UPGRADE_ITEM_ID) && pSrc->pItemBasic->dwID != TRINA_ITEM_ID)
+			if (IsUpgradeScroll(id) && !IsTrina(pSrc->pItemBasic->dwID))
 				return false;
 			// If there is TRINA in the slot, only scroll can be added
-			if (id == TRINA_ITEM_ID && !(pSrc->pItemBasic->dwID >= MIN_UPGRADE_ITEM_ID && pSrc->pItemBasic->dwID <= MAX_UPGRADE_ITEM_ID))
+			if (IsTrina(id) && !IsUpgradeScroll(pSrc->pItemBasic->dwID))
 				return false;
 		}
 	}
