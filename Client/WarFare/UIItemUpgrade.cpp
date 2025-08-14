@@ -724,26 +724,12 @@ void CUIItemUpgrade::RestoreInventoryFromBackup()
 }
 
 // Checks if the given item ID is an upgrade scroll.
-bool CUIItemUpgrade::IsUpgradeScroll(uint32_t dwID)
+bool CUIItemUpgrade::IsUpgradeScroll(uint32_t dwEffectID2)
 {
-	static const std::unordered_set<int> upgradeItemIDs = {
-	// Blessed Upgrade Scroll
-	379016000, 379021000, 379022000, 379023000, 379024000, 379025000,
-	379030000, 379031000, 379032000, 379033000, 379034000, 379035000,
-	379138000, 379139000, 379140000, 379141000, 379020000, 379019000,
+	if (dwEffectID2 == 255)
+		return true;
 
-	// Upgrade Scroll (Middle)
-	379205000, 379206000, 379208000, 379209000, 379210000,
-	379211000, 379212000, 379213000, 379214000, 379215000,
-	379216000, 379217000, 379218000, 379219000, 379220000,
-
-	// Upgrade Scroll (Low)
-	379221000, 379222000, 379223000, 379224000, 379225000,
-	379226000, 379227000, 379228000, 379229000, 379230000,
-	379231000, 379232000, 379233000, 379234000, 379235000, 379255000,
-	};
-
-	return upgradeItemIDs.contains(dwID);
+	return false;
 }
 
 bool CUIItemUpgrade::IsTrina(uint32_t dwID)
@@ -1100,29 +1086,30 @@ bool CUIItemUpgrade::HandleUpgradeAreaDrop(__IconItemSkill* spItem)
 
 bool CUIItemUpgrade::IsSlotCompatible(__IconItemSkill* pSrc, int iDestiOrder)
 {
-	if (!IsUpgradeScroll(pSrc->pItemBasic->dwID) && !IsTrina(pSrc->pItemBasic->dwID))
+	if (!IsUpgradeScroll(pSrc->pItemBasic->dwEffectID2))
 		return false;
 
-	// Check if item with the same dwID is already in the slot
+	bool m_bhasTrina = false;
+	bool m_bhasScroll = false;
+
 	for (int k = 0; k < MAX_ITEM_UPGRADE_SLOT; ++k)
 	{
 		if (m_pMyUpgradeSLot[k])
 		{
-			uint32_t id = m_pMyUpgradeSLot[k]->pItemBasic->dwID;
-			// If the 2nd trina is trying to be added
-			if (IsTrina(id) && IsTrina(pSrc->pItemBasic->dwID))
-				return false;
-			// If the 2nd Upgrade Scroll is trying to be added
-			if (IsUpgradeScroll(id) && IsUpgradeScroll(pSrc->pItemBasic->dwID))
-				return false;
-			// If there is an upgrade scroll in the slot, only trina can be added
-			if (IsUpgradeScroll(id) && !IsTrina(pSrc->pItemBasic->dwID))
-				return false;
-			// If there is TRINA in the slot, only scroll can be added
-			if (IsTrina(id) && !IsUpgradeScroll(pSrc->pItemBasic->dwID))
-				return false;
+			if (IsTrina(m_pMyUpgradeSLot[k]->pItemBasic->dwID))
+			{
+				m_bhasTrina = true;
+			}
+			else 
+				m_bhasScroll = true;
 		}
 	}
+	if (m_bhasTrina && IsTrina(pSrc->pItemBasic->dwID))
+		return false;
+	if (m_bhasScroll && !IsTrina(pSrc->pItemBasic->dwID))
+		return false;
+	if (m_bhasTrina && m_bhasScroll)
+		return false;
 	return true;
 }
 

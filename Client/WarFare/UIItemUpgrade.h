@@ -114,7 +114,7 @@ public:
 	void                RestoreInventoryFromBackup();
 	void				GoldUpdate();
 	void				InitIconUpdate(){};
-	bool				IsUpgradeScroll(uint32_t dwID);
+	bool				IsUpgradeScroll(uint32_t dwEffectID2);
 	bool				IsTrina(uint32_t dwID);
 	bool				IsAllowedUpgradeItem(__IconItemSkill* spItem);
 	void				DeleteIconItemSkill(__IconItemSkill*& pItem);
