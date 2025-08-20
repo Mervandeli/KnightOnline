@@ -9,7 +9,6 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include <N3Base/N3UIBase.h>
 #include <N3Base/N3UIArea.h>
 #include <N3Base/N3UIString.h>
 #include <N3Base/N3UIImage.h>
@@ -19,16 +18,16 @@
 #include "GameDef.h"
 #include "N3UIWndBase.h"
 
+const int MAX_ITEM_UPGRADE_SLOT = 9;	// Max items in the item upgrade UI.
 
 
 //////////////////////////////////////////////////////////////////////
 
 class CUIItemUpgrade : public CN3UIWndBase
 {
-	friend class CUIInventory;
 
-public:
-	// 직접 접근해야 할 객체 참조 포인터
+private:
+
 	__IconItemSkill* m_pMyUpgradeSLot[MAX_ITEM_UPGRADE_SLOT]; // Upgrade and Trina Scroll Slot
 	__IconItemSkill* m_pMyUpgradeInv[MAX_ITEM_INVENTORY];
 	__IconItemSkill* m_pBackupUpgradeInv[MAX_ITEM_INVENTORY];
@@ -73,39 +72,32 @@ public:
 	//this_ui_add_end
 
 
-protected:
-	int					GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWndDist);
-	RECT GetSampleRect();
-	e_UIWND_DISTRICT	GetWndDistrict(__IconItemSkill* spItem);
-	void				SendToServerUpgradeMsg(int itemID, byte pos, int iCount)
-	{};
-    void HandleInventoryIconRightClick(); // Add this declaration
-
 public:
 	CUIItemUpgrade();
 	~CUIItemUpgrade() override;
 	void				Release() override;
+	void				Close();
+	void				Open();
+	void				SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false) override;
+	void				InitIconWnd(e_UIWND eWnd) override;
+	void				MsgRecv_ItemUpgrade(Packet& pkt);
+private:
 
-	//this_ui_add_start
+	int					GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWndDist);
+	RECT				GetSampleRect();
+	e_UIWND_DISTRICT	GetWndDistrict(__IconItemSkill* spItem);
+	void				HandleInventoryIconRightClick();
 	bool				OnKeyPress(int iKey) override;
 	void				UpdateBackupUpgradeInv();
 	bool				Load(HANDLE hFile) override;
-	void				SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false) override;
+	
 	void				SetVisible(bool bVisible) override;
-	//this_ui_add_end
-
 	uint32_t			MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
 	bool				ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
 	void				Render() override;
-	void				Close();
-	void				Open();
-
-	void				InitIconWnd(e_UIWND eWnd) override;
 
 	__IconItemSkill*	GetHighlightIconItem(CN3UIIcon* pUIIcon) override;
-
 	void				IconRestore();
-
 	bool				ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur) override;
 	void				CancelIconDrop(__IconItemSkill* spItem) override;
 	void				AcceptIconDrop(__IconItemSkill* spItem) override;
@@ -119,7 +111,7 @@ public:
 	bool				IsAllowedUpgradeItem(__IconItemSkill* spItem);
 	void				DeleteIconItemSkill(__IconItemSkill*& pItem);
 	void				SendToServerUpgradeMsg();
-	void				MsgRecv_ItemUpgrade(Packet& pkt);
+
 	void				FlipFlopAnim();
 	void				AnimClose();
 	void				ShowResultUpgrade();
