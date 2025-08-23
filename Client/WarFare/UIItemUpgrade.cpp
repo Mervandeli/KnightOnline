@@ -30,7 +30,7 @@ CUIItemUpgrade::CUIItemUpgrade()
 {
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		m_pMyUpgradeSLot[i] = nullptr;
+		m_pUpgradeScrollSlots[i] = nullptr;
 	}
 	for (int i = 0; i < 10; i++)
 	{
@@ -47,14 +47,21 @@ CUIItemUpgrade::CUIItemUpgrade()
 	m_pUpgradeItemSlot = nullptr;
 	m_pUITooltipDlg = nullptr;
 	m_pStrMyGold = nullptr;
+
+	m_eAnimationState = ANIM_NONE;
+	m_fAnimationTimer = 0.0f;
+	m_iCurrentFrame = 0;
+	m_bUpgradeSucceeded = false;
+	m_bUpgradeInProgress = false;
+	m_iNpcID = 0;
 }
 
 CUIItemUpgrade::~CUIItemUpgrade()
 {
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		DeleteIconItemSkill(m_pMyUpgradeSLot[i]);
-		m_iUpgradeSlotInvPos[i + 1] = -1; // 0 is UpgradeItemSlot [1,2..9] m_pMyUpgradeSLot slot
+		DeleteIconItemSkill(m_pUpgradeScrollSlots[i]);
+		m_iUpgradeSlotInvPos[i + 1] = -1; // 0 is UpgradeItemSlot [1,2..9] m_pUpgradeScrollSlots slot
 	}
 
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
@@ -65,22 +72,17 @@ CUIItemUpgrade::~CUIItemUpgrade()
 	DeleteIconItemSkill(m_pUpgradeItemSlot);
 	m_iUpgradeSlotInvPos[0] = -1; //UpgradeItemSlot position
 
-	if (m_pUITooltipDlg != nullptr)
-	{
-		delete m_pUITooltipDlg;
-		m_pUITooltipDlg = nullptr;
-	}
 	m_pStrMyGold = nullptr;
 
-	CN3UIBase::Release();
+	CN3UIWndBase::Release();
 }
 
 void CUIItemUpgrade::Release()
 {
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		DeleteIconItemSkill(m_pMyUpgradeSLot[i]);
-		m_iUpgradeSlotInvPos[i+1] = -1; // 0 is UpgradeItemSlot [1,2..9] m_pMyUpgradeSLot slot
+		DeleteIconItemSkill(m_pUpgradeScrollSlots[i]);
+		m_iUpgradeSlotInvPos[i+1] = -1; // 0 is UpgradeItemSlot [1,2..9] m_pUpgradeScrollSlots slot
 	}
 
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
@@ -91,38 +93,34 @@ void CUIItemUpgrade::Release()
 	DeleteIconItemSkill(m_pUpgradeItemSlot);
 	m_iUpgradeSlotInvPos[0] = -1; //UpgradeItemSlot position
 
-	if (m_pUITooltipDlg != nullptr)
-	{
-		delete m_pUITooltipDlg;
-		m_pUITooltipDlg = nullptr;
-	}
 	m_pStrMyGold = nullptr;
 
-	CN3UIBase::Release();
+	CN3UIWndBase::Release();
 }
 
 void CUIItemUpgrade::Tick()
 {
-	switch (m_eAnimationState)
+	if (m_pImageCover1 != nullptr && m_pImageCover2 != nullptr)
 	{
-		case ANIM_START:
-			StartUpgradeAnim();
-			break;
-		case ANIM_FLIPFLOP:
-			UpdateFlipFlopAnimation();
-			break;
-		case ANIM_RESULT:
-			ShowResultUpgrade();
-			break;
-		case ANIM_COVER_OPENING:
-			UpdateCoverAnimation();
-			break;
-		case ANIM_NONE:
-			m_fAnimationTimer = 0.0f;
-			m_iCurrentFrame = 0;
-			break;
-		default:
-			break;
+		switch (m_eAnimationState)
+		{
+			case ANIM_START:
+				StartUpgradeAnim();
+				break;
+			case ANIM_FLIPFLOP:
+				UpdateFlipFlopAnimation();
+				break;
+			case ANIM_RESULT:
+				ShowResultUpgrade();
+				break;
+			case ANIM_COVER_OPENING:
+				UpdateCoverAnimation();
+				break;
+			case ANIM_NONE:
+				m_fAnimationTimer = 0.0f;
+				m_iCurrentFrame = 0;
+				break;
+		}
 	}
 
 	CN3UIBase::Tick();
@@ -160,8 +158,9 @@ void CUIItemUpgrade::Render()
 	// Display the count for items that should show a count.
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
-		if (m_pMyUpgradeInv[i] != nullptr && ((m_pMyUpgradeInv[i]->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||
-			(m_pMyUpgradeInv[i]->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)))
+		__IconItemSkill* spItem = m_pMyUpgradeInv[i];
+		if (spItem != nullptr && ((spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||
+			(spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)))
 		{
 			char szID[32];
 			sprintf(szID, "s_count_%d", i);
@@ -214,12 +213,11 @@ void CUIItemUpgrade::InitIconWnd(e_UIWND eWnd)
 	m_pUITooltipDlg->Init(this);
 	m_pUITooltipDlg->LoadFromFile(pTbl->szItemInfo);
 	m_pUITooltipDlg->InitPos();
-	m_pUITooltipDlg->SetVisible(FALSE);
+	m_pUITooltipDlg->SetVisible(false);
 
 	CN3UIWndBase::InitIconWnd(eWnd);
 
-	m_pStrMyGold = (CN3UIString*) GetChildByID("text_gold");
-	__ASSERT(m_pStrMyGold, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pStrMyGold, (CN3UIString*) GetChildByID("text_gold"));
 	if (m_pStrMyGold != nullptr) 
 		m_pStrMyGold->SetString("0");
 }
@@ -228,8 +226,8 @@ __IconItemSkill* CUIItemUpgrade::GetHighlightIconItem(CN3UIIcon* pUIIcon)
 {
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		if (m_pMyUpgradeSLot[i] != nullptr && m_pMyUpgradeSLot[i]->pUIIcon == pUIIcon)
-			return m_pMyUpgradeSLot[i];
+		if (m_pUpgradeScrollSlots[i] != nullptr && m_pUpgradeScrollSlots[i]->pUIIcon == pUIIcon)
+			return m_pUpgradeScrollSlots[i];
 	}
 
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
@@ -249,6 +247,11 @@ void CUIItemUpgrade::Open()
 	SetVisible(true);
 
 	GoldUpdate();
+}
+
+void CUIItemUpgrade::SetNpcID(int iNpcID)
+{
+	m_iNpcID = iNpcID;
 }
 
 void CUIItemUpgrade::GoldUpdate()
@@ -340,12 +343,6 @@ void CUIItemUpgrade::ItemMoveFromThisToInv()
 
 bool CUIItemUpgrade::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 {
-	// Temp Define 
-#define FAIL_RETURN {	\
-		CN3UIWndBase::AllHighLightIconFree();	\
-		SetState(UI_STATE_COMMON_NONE);	\
-		return false;	\
-	}
 
 	CN3UIArea* pArea;
 	e_UIWND_DISTRICT eUIWnd = UIWND_DISTRICT_UNKNOWN;
@@ -354,10 +351,10 @@ bool CUIItemUpgrade::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 
 	//  Check if the selected window is correct and the drop is valid.
 	if (CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd != m_eUIWnd)
-		FAIL_RETURN
-		if ((CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_UPGRADE_SLOT) &&
-			(CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_UPGRADE_INV))
-			FAIL_RETURN
+		return false;
+	if ((CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_UPGRADE_SLOT) &&
+		(CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_UPGRADE_INV))
+		return false;
 
 	// Find which slot or area the item is being dropped onto.
 	int iDestiOrder = -1;
@@ -388,7 +385,7 @@ bool CUIItemUpgrade::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 			if (eUIWnd == UIWND_DISTRICT_UPGRADE_SLOT)
 			{
 
-				if (iDestiOrder != -1 && m_pMyUpgradeSLot[iDestiOrder] == nullptr)
+				if (iDestiOrder != -1 && m_pUpgradeScrollSlots[iDestiOrder] == nullptr)
 				{
 					
 					int iSourceOrder = GetItemiOrder(spItem, UIWND_DISTRICT_UPGRADE_INV);
@@ -400,7 +397,7 @@ bool CUIItemUpgrade::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 						
 					}
 				}
-				FAIL_RETURN
+				return false;
 			}
 			else if (m_pAreaUpgrade != nullptr && m_pAreaUpgrade->IsIn(ptCur.x, ptCur.y))
 			{
@@ -472,7 +469,7 @@ uint32_t CUIItemUpgrade::MouseProc(uint32_t dwFlags, const POINT& ptCur, const P
 }
 
 // Returns the index of the given item in the specified window district.
-int CUIItemUpgrade::GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWndDist)
+int CUIItemUpgrade::GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWndDist) const
 {
 	int iReturn = -1;
 
@@ -481,7 +478,7 @@ int CUIItemUpgrade::GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWnd
 		case UIWND_DISTRICT_UPGRADE_SLOT:
 			for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 			{
-				if (m_pMyUpgradeSLot[i] != nullptr && m_pMyUpgradeSLot[i] == spItem)
+				if (m_pUpgradeScrollSlots[i] != nullptr && m_pUpgradeScrollSlots[i] == spItem)
 					return i;
 			}
 			break;
@@ -519,7 +516,7 @@ e_UIWND_DISTRICT CUIItemUpgrade::GetWndDistrict(__IconItemSkill* spItem)
 {
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		if (m_pMyUpgradeSLot[i] != nullptr && m_pMyUpgradeSLot[i] == spItem)
+		if (m_pUpgradeScrollSlots[i] != nullptr && m_pUpgradeScrollSlots[i] == spItem)
 			return UIWND_DISTRICT_UPGRADE_SLOT;
 	}
 
@@ -534,11 +531,6 @@ e_UIWND_DISTRICT CUIItemUpgrade::GetWndDistrict(__IconItemSkill* spItem)
 // Handles UI messages such as button clicks and icon events.
 bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	// Temp Define
-#define FAIL_CODE {		\
-				SetState(UI_STATE_COMMON_NONE);	\
-				return false;	\
-			}
 
 	if (pSender == nullptr)
 		return false;
@@ -547,9 +539,9 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 	{
 		if (pSender == m_pBtnClose)
 			Close();
-		else if (pSender == m_pBtnCancel)
+		else if (pSender == m_pBtnCancel && !m_bUpgradeInProgress)
 			RestoreInventoryFromBackup();
-		else if (pSender == m_pBtnOk)
+		else if (pSender == m_pBtnOk && !m_bUpgradeInProgress)
 		{
 			SendToServerUpgradeMsg();
 		}
@@ -573,12 +565,14 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd = UIWND_UPGRADE;
 			eUIWnd = GetWndDistrict(spItem);
 			if (eUIWnd == UIWND_DISTRICT_UPGRADE_SLOT)
-				FAIL_CODE
-				if (eUIWnd == UIWND_DISTRICT_UNKNOWN)	FAIL_CODE
-					CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict = eUIWnd;
+				return false;
+			if (eUIWnd == UIWND_DISTRICT_UNKNOWN)	
+				return false;
+			CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict = eUIWnd;
 			iOrder = GetItemiOrder(spItem, eUIWnd);
-			if (iOrder == -1)	FAIL_CODE
-				CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder = iOrder;
+			if (iOrder == -1)	
+				return false;
+			CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder = iOrder;
 			CN3UIWndBase::m_sSelectedIconInfo.pItemSelect = spItem;
 			// Set icon region for moving.
 			((CN3UIIcon*) pSender)->SetRegion(GetSampleRect());
@@ -647,18 +641,13 @@ bool CUIItemUpgrade::Load(HANDLE hFile)
 	if (CN3UIBase::Load(hFile) == false)
 		return false;
 
-	m_pBtnClose = (CN3UIButton*) (this->GetChildByID("btn_close"));
-	__ASSERT(m_pBtnClose, "NULL UI Component!!");
-	m_pBtnOk = (CN3UIButton*) (this->GetChildByID("btn_ok"));
-	__ASSERT(m_pBtnOk, "NULL UI Component!!");
-	m_pBtnCancel = (CN3UIButton*) (this->GetChildByID("btn_cancel"));
-	__ASSERT(m_pBtnCancel, "NULL UI Component!!");
-	m_pBtnConversation = (CN3UIButton*) (this->GetChildByID("btn_conversation"));
-	__ASSERT(m_pBtnConversation, "NULL UI Component!!");
-	m_pAreaUpgrade = (CN3UIArea*) (this->GetChildByID("a_upgrade"));
-	__ASSERT(m_pAreaUpgrade, "NULL UI Component!!");
-	m_pAreaResult = (CN3UIArea*) (this->GetChildByID("a_result"));
-	__ASSERT(m_pAreaResult, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtnClose, (CN3UIButton*) this->GetChildByID("btn_close"));
+	N3_VERIFY_UI_COMPONENT(m_pBtnOk, (CN3UIButton*) this->GetChildByID("btn_ok"));
+	N3_VERIFY_UI_COMPONENT(m_pBtnCancel, (CN3UIButton*) this->GetChildByID("btn_cancel"));
+	N3_VERIFY_UI_COMPONENT(m_pBtnConversation, (CN3UIButton*) this->GetChildByID("btn_conversation"));
+	N3_VERIFY_UI_COMPONENT(m_pAreaUpgrade, (CN3UIArea*) this->GetChildByID("a_upgrade"));
+	N3_VERIFY_UI_COMPONENT(m_pAreaResult, (CN3UIArea*) this->GetChildByID("a_result"));
+
 	this->GetChildByID("img_cover_01")->SetVisible(false);
 	this->GetChildByID("img_cover_02")->SetVisible(false);
 	
@@ -721,8 +710,8 @@ void CUIItemUpgrade::RestoreInventoryFromBackup()
 
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		if (m_pMyUpgradeSLot[i] != nullptr)
-			DeleteIconItemSkill(m_pMyUpgradeSLot[i]);
+		if (m_pUpgradeScrollSlots[i] != nullptr)
+			DeleteIconItemSkill(m_pUpgradeScrollSlots[i]);
 
 	}
 
@@ -749,7 +738,7 @@ void CUIItemUpgrade::RestoreInventoryFromBackup()
 }
 
 // Checks if the given item ID is an upgrade scroll.
-bool CUIItemUpgrade::IsUpgradeScroll(uint32_t dwEffectID2)
+bool CUIItemUpgrade::IsUpgradeScroll(uint32_t dwEffectID2) const
 {
 	if (dwEffectID2 == 255)
 		return true;
@@ -757,7 +746,7 @@ bool CUIItemUpgrade::IsUpgradeScroll(uint32_t dwEffectID2)
 	return false;
 }
 
-bool CUIItemUpgrade::IsTrina(uint32_t dwID)
+bool CUIItemUpgrade::IsTrina(uint32_t dwID) const
 {
 	static const std::unordered_set<int> upgradeItemIDs = {
 	// Trina
@@ -768,7 +757,7 @@ bool CUIItemUpgrade::IsTrina(uint32_t dwID)
 }
 
 // Checks if the given item is allowed to be upgraded (unique or upgrade type).
-bool CUIItemUpgrade::IsAllowedUpgradeItem(__IconItemSkill* spItem)
+bool CUIItemUpgrade::IsAllowedUpgradeItem(__IconItemSkill* spItem) const
 {
 	if (m_pUpgradeItemSlot != nullptr)
 		return false;
@@ -804,9 +793,9 @@ void CUIItemUpgrade::DeleteIconItemSkill(__IconItemSkill*& pItem)
 
 void CUIItemUpgrade::SendToServerUpgradeMsg()
 {
-	if (m_pUpgradeItemSlot == nullptr || m_pMyUpgradeSLot == nullptr)
+	if (m_pUpgradeItemSlot == nullptr || m_pUpgradeScrollSlots == nullptr)
 		return;
-
+	m_bUpgradeInProgress = true;
 	uint8_t byBuff[512];
 	int iOffset = 0;
 	int itotalSent = 0;
@@ -814,8 +803,7 @@ void CUIItemUpgrade::SendToServerUpgradeMsg()
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_ITEM_UPGRADE);
 	CAPISocket::MP_AddByte(byBuff, iOffset, ITEM_UPGRADE_PROCESS);
 	CAPISocket::MP_AddByte(byBuff, iOffset, 1);
-	uint16_t sNpcID = 1;
-	CAPISocket::MP_AddByte(byBuff, iOffset, sNpcID);
+	CAPISocket::MP_AddByte(byBuff, iOffset, m_iNpcID);
 
 	int32_t nItemID;
 	int8_t bPos;
@@ -824,7 +812,7 @@ void CUIItemUpgrade::SendToServerUpgradeMsg()
 	if (m_pUpgradeItemSlot != nullptr)
 	{
 		nItemID= m_pUpgradeItemSlot->pItemBasic->dwID + m_pUpgradeItemSlot->pItemExt->dwID;
-		bPos= m_iUpgradeSlotInvPos[0]; // m_pUpgradeItemSlot pozition
+		bPos= m_iUpgradeSlotInvPos[0]; // m_pUpgradeItemSlot position
 
 		CAPISocket::MP_AddDword(byBuff, iOffset, nItemID);
 		CAPISocket::MP_AddByte(byBuff, iOffset, bPos);
@@ -834,10 +822,10 @@ void CUIItemUpgrade::SendToServerUpgradeMsg()
 	// Add Upgrade Slots
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
 	{
-		if (m_pMyUpgradeSLot[i] != nullptr)
+		if (m_pUpgradeScrollSlots[i] != nullptr)
 		{
-			nItemID= m_pMyUpgradeSLot[i]->pItemBasic->dwID +
-				m_pMyUpgradeSLot[i]->pItemExt->dwID;
+			nItemID= m_pUpgradeScrollSlots[i]->pItemBasic->dwID +
+				m_pUpgradeScrollSlots[i]->pItemExt->dwID;
 			bPos = m_iUpgradeSlotInvPos[i+1];
 			CAPISocket::MP_AddDword(byBuff, iOffset, nItemID);
 			CAPISocket::MP_AddByte(byBuff, iOffset, bPos);
@@ -859,7 +847,6 @@ void CUIItemUpgrade::SendToServerUpgradeMsg()
 
 void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 {
-	m_bReceivedResultFromServer = true;
 	int8_t result = pkt.read<uint8_t>();
 	uint32_t nItemID[10];
 	uint8_t bPos[10];
@@ -879,7 +866,7 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 		// Clean upgrade scroll slots
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
 	{
-		DeleteIconItemSkill(m_pMyUpgradeSLot[i]);
+		DeleteIconItemSkill(m_pUpgradeScrollSlots[i]);
 	}
 
 	// Clean  item upgrade slot
@@ -891,13 +878,13 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 
 		if (result == 0)
 		{
-			m_bUpgradeSuccesfull = false;
+			m_bUpgradeSucceeded = false;
 			szMsg = fmt::format_text_resource(6701);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
 		}
 		else if (result == 1)
 		{
-			m_bUpgradeSuccesfull = true;
+			m_bUpgradeSucceeded = true;
 			szMsg = fmt::format_text_resource(6700);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(128, 128, 255, 255));
 
@@ -926,7 +913,6 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 	}
 	else
 	{
-		m_bReceivedResultFromServer = false;
 		RestoreInventoryFromBackup();
 		if (result == 2)
 		{
@@ -965,7 +951,7 @@ void CUIItemUpgrade::UpdateCoverAnimation()
 
     // Only handle opening (covers move outward and hide)
     float ease = 1.0f - ((1.0f - t) * (1.0f - t));
-	m_iCoverShift = m_rcCover1Original.bottom - m_rcCover1Original.top;
+	int m_iCoverShift = m_rcCover1Original.bottom - m_rcCover1Original.top;
     // Calculate new Y positions for opening
     int y1 = m_rcCover1Original.top + (int)((m_rcCover1Original.top - m_iCoverShift - m_rcCover1Original.top) * ease);
     int y2 = m_rcCover2Original.top + (int)((m_rcCover2Original.top + m_iCoverShift - m_rcCover2Original.top) * ease);
@@ -978,6 +964,7 @@ void CUIItemUpgrade::UpdateCoverAnimation()
         m_pImageCover2->SetVisible(false);
         m_pImageCover1->SetRegion(m_rcCover1Original);
         m_pImageCover2->SetRegion(m_rcCover2Original);
+		m_bUpgradeInProgress = false;
         return;
     }
 
@@ -1058,7 +1045,7 @@ void CUIItemUpgrade::CreateUIIconForItem(__IconItemSkill* pItem, const std::stri
 	pItem->pUIIcon->SetVisible(true);
 }
 
-__IconItemSkill* CUIItemUpgrade::CreateIconFromSource(__IconItemSkill* pSrc, int count)
+__IconItemSkill* CUIItemUpgrade::CreateIconFromSource(const __IconItemSkill* pSrc, int count)
 {
 	if (pSrc == nullptr)
 		return nullptr;	
@@ -1109,7 +1096,7 @@ bool CUIItemUpgrade::HandleUpgradeAreaDrop(__IconItemSkill* spItem)
 	return true;
 }
 
-bool CUIItemUpgrade::IsSlotCompatible(__IconItemSkill* pSrc, int iDestiOrder)
+bool CUIItemUpgrade::IsSlotCompatible(__IconItemSkill* pSrc, int iDestiOrder) const
 {
 	if (!IsUpgradeScroll(pSrc->pItemBasic->dwEffectID2))
 		return false;
@@ -1119,9 +1106,9 @@ bool CUIItemUpgrade::IsSlotCompatible(__IconItemSkill* pSrc, int iDestiOrder)
 
 	for (int k = 0; k < MAX_ITEM_UPGRADE_SLOT; ++k)
 	{
-		if (m_pMyUpgradeSLot[k] != nullptr)
+		if (m_pUpgradeScrollSlots[k] != nullptr)
 		{
-			if (IsTrina(m_pMyUpgradeSLot[k]->pItemBasic->dwID))
+			if (IsTrina(m_pUpgradeScrollSlots[k]->pItemBasic->dwID))
 			{
 				m_bhasTrina = true;
 			}
@@ -1140,7 +1127,7 @@ bool CUIItemUpgrade::IsSlotCompatible(__IconItemSkill* pSrc, int iDestiOrder)
 
 bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 {
-	if (iDestiOrder == -1 || m_pMyUpgradeSLot[iDestiOrder] != nullptr)
+	if (iDestiOrder == -1 || m_pUpgradeScrollSlots[iDestiOrder] != nullptr)
 		return false;
 
 	int iSourceOrder = GetItemiOrder(spItem, UIWND_DISTRICT_UPGRADE_INV);
@@ -1163,13 +1150,13 @@ bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 			sprintf(szID, "a_m_%d", iDestiOrder);
 			CN3UIArea* pSlotArea = (CN3UIArea*)GetChildByID(szID);
 			SetupIconArea(pNew, pSlotArea);
-			m_pMyUpgradeSLot[iDestiOrder] = pNew;
+			m_pUpgradeScrollSlots[iDestiOrder] = pNew;
 			pSrc->iCount -= 1;
 		}
 		else
 		{
 			// If the last one, move directly
-			m_pMyUpgradeSLot[iDestiOrder] = pSrc;
+			m_pUpgradeScrollSlots[iDestiOrder] = pSrc;
 			m_pMyUpgradeInv[iSourceOrder] = nullptr;
 			char szID[32];
 			sprintf(szID, "a_m_%d", iDestiOrder);
@@ -1180,7 +1167,7 @@ bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 	else
 	{
 		// If is not countable item, just move it
-		m_pMyUpgradeSLot[iDestiOrder] = pSrc;
+		m_pUpgradeScrollSlots[iDestiOrder] = pSrc;
 		m_pMyUpgradeInv[iSourceOrder] = nullptr;
 		char szID[32];
 		sprintf(szID, "a_m_%d", iDestiOrder);
@@ -1200,14 +1187,14 @@ void CUIItemUpgrade::FlipFlopAnim()
 	if (m_iCurrentFrame > 0)
 	{
 		char szID[32];
-		sprintf(szID, m_bUpgradeSuccesfull ? "img_s_load_%d" : "img_f_load_%d", m_iCurrentFrame - 1);
+		sprintf(szID, m_bUpgradeSucceeded ? "img_s_load_%d" : "img_f_load_%d", m_iCurrentFrame - 1);
 		if (CN3UIImage* pImg = (CN3UIImage*)GetChildByID(szID))
 			pImg->SetVisible(false);
 	}
 
 	// Show current frame
 	char szID[32];
-	sprintf(szID, m_bUpgradeSuccesfull ? "img_s_load_%d" : "img_f_load_%d", m_iCurrentFrame);
+	sprintf(szID, m_bUpgradeSucceeded ? "img_s_load_%d" : "img_f_load_%d", m_iCurrentFrame);
 	if (CN3UIImage* pImg = (CN3UIImage*) GetChildByID(szID))
 	{
 		pImg->SetVisible(true);
@@ -1232,7 +1219,7 @@ void CUIItemUpgrade::AnimClose()
 void CUIItemUpgrade::ShowResultUpgrade()
 {
 	// Show result item in result area if upgrade was successful
-	if (m_bUpgradeSuccesfull && m_pUpgradeResultSlot->pUIIcon != nullptr && m_pAreaResult != nullptr)
+	if (m_bUpgradeSucceeded && m_pUpgradeResultSlot->pUIIcon != nullptr && m_pAreaResult != nullptr)
 	{
 		// Set icon position to result area
 		m_pUpgradeResultSlot->pUIIcon->SetRegion(m_pAreaResult->GetRegion());
@@ -1246,17 +1233,15 @@ void CUIItemUpgrade::ShowResultUpgrade()
 
 void CUIItemUpgrade::StartUpgradeAnim()
 {
-	if (m_bReceivedResultFromServer)
+	if (m_bUpgradeInProgress)
 	{
 		if (m_pImageCover1 == nullptr || m_pImageCover2 == nullptr)
 			return;
 		m_fAnimationTimer = 0.0f;
 		m_iCurrentFrame = 0;
 
-		m_pImageCover1 = (CN3UIImage*) (this->GetChildByID("img_cover_01"));
-		__ASSERT(m_pImageCover1, "NULL UI Component!!");
-		m_pImageCover2 = (CN3UIImage*) (this->GetChildByID("img_cover_02"));
-		__ASSERT(m_pImageCover2, "NULL UI Component!!");
+		N3_VERIFY_UI_COMPONENT(m_pImageCover1, (CN3UIImage*) this->GetChildByID("img_cover_01"));
+		N3_VERIFY_UI_COMPONENT(m_pImageCover2, (CN3UIImage*) this->GetChildByID("img_cover_02"));
 
 		// Make covers visible during animation
 		m_pImageCover1->SetVisible(true);

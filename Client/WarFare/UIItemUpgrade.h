@@ -3,11 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #if !defined(AFX_UIItemUpgrade_H__fd9f5093_0ed3_4c08_9e31_19c40773b24d__INCLUDED_)
-#define AFX_UITRANSACTIONDLG_H__fd9f5093_0ed3_4c08_9e31_19c40773b24d__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+#define AFX_UIUIItemUpgrade_H__fd9f5093_0ed3_4c08_9e31_19c40773b24d__INCLUDED_
 
 #include <N3Base/N3UIArea.h>
 #include <N3Base/N3UIString.h>
@@ -28,7 +24,7 @@ class CUIItemUpgrade : public CN3UIWndBase
 
 private:
 
-	__IconItemSkill* m_pMyUpgradeSLot[MAX_ITEM_UPGRADE_SLOT]; // Upgrade and Trina Scroll Slot
+	__IconItemSkill* m_pUpgradeScrollSlots[MAX_ITEM_UPGRADE_SLOT]; // Upgrade and Trina Scroll Slot
 	__IconItemSkill* m_pMyUpgradeInv[MAX_ITEM_INVENTORY];
 	__IconItemSkill* m_pBackupUpgradeInv[MAX_ITEM_INVENTORY];
 	__IconItemSkill* m_pUpgradeItemSlot;	// Which item to upgrade
@@ -44,23 +40,19 @@ private:
 		ANIM_RESULT,
 		ANIM_COVER_OPENING,
 		ANIM_DONE
-	} m_eAnimationState = ANIM_NONE;
+	};
+	AnimationState m_eAnimationState;
 	
-	float m_fAnimationTimer = 0.0f;
-	int m_iCurrentFrame = 0;
-	bool m_bUpgradeSuccesfull = false;
-	bool m_bReceivedResultFromServer = false;
-	
-	// Cover animation data
-	int m_iCoverShift = 0;
+	float m_fAnimationTimer;
+	int m_iCurrentFrame;
+	bool m_bUpgradeSucceeded;
+	bool m_bUpgradeInProgress;
+	int m_iNpcID;
+
 	RECT m_rcCover1Original;
 	RECT m_rcCover2Original;
 
-
 	CUIImageTooltipDlg* m_pUITooltipDlg;
-
-
-	//this_ui_add_start
 	CN3UIButton* m_pBtnClose;
 	CN3UIButton* m_pBtnOk;
 	CN3UIButton* m_pBtnCancel;
@@ -69,8 +61,6 @@ private:
 	CN3UIArea* m_pAreaResult;
 	CN3UIImage* m_pImageCover1;
 	CN3UIImage* m_pImageCover2;
-	//this_ui_add_end
-
 
 public:
 	CUIItemUpgrade();
@@ -81,9 +71,10 @@ public:
 	void				SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false) override;
 	void				InitIconWnd(e_UIWND eWnd) override;
 	void				MsgRecv_ItemUpgrade(Packet& pkt);
+	void				SetNpcID(int iNpcID);
 private:
 
-	int					GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWndDist);
+	int					GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWndDist) const;
 	RECT				GetSampleRect();
 	e_UIWND_DISTRICT	GetWndDistrict(__IconItemSkill* spItem);
 	void				HandleInventoryIconRightClick();
@@ -106,9 +97,9 @@ private:
 	void                RestoreInventoryFromBackup();
 	void				GoldUpdate();
 	void				InitIconUpdate(){};
-	bool				IsUpgradeScroll(uint32_t dwEffectID2);
-	bool				IsTrina(uint32_t dwID);
-	bool				IsAllowedUpgradeItem(__IconItemSkill* spItem);
+	bool				IsUpgradeScroll(uint32_t dwEffectID2) const;
+	bool				IsTrina(uint32_t dwID) const;
+	bool				IsAllowedUpgradeItem(__IconItemSkill* spItem) const;
 	void				DeleteIconItemSkill(__IconItemSkill*& pItem);
 	void				SendToServerUpgradeMsg();
 
@@ -119,12 +110,12 @@ private:
 	void				UpdateCoverAnimation();
 	void				UpdateFlipFlopAnimation();
 	void				HideAllAnimationFrames();
-	void				CreateUIIconForItem(__IconItemSkill* pItem, const std::string& szIconFN = "");
-	__IconItemSkill*	CreateIconFromSource(__IconItemSkill* pSrc, int count);
+	void				CreateUIIconForItem(__IconItemSkill* spItem, const std::string& szIconFN = "");
+	__IconItemSkill*	CreateIconFromSource(const __IconItemSkill* pSrc, int count);
 	void				SetupIconArea(__IconItemSkill* pItem, CN3UIArea* pArea);
 	bool				HandleUpgradeAreaDrop(__IconItemSkill* spItem);
 	bool				HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder);
-	bool				IsSlotCompatible(__IconItemSkill* pSrc, int iDestiOrder);
+	bool				IsSlotCompatible(__IconItemSkill* pSrc, int iDestiOrder) const;
 	void				Tick() override;
 };
 

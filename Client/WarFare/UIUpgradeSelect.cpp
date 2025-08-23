@@ -47,7 +47,7 @@ bool CUIUpgradeSelect::ReceiveMessage(
 			if (pUIItemUpgrade != nullptr)
 			{
 				pUIItemUpgrade->Open();
-				// pUIItemUpgrade->SetNpcID(m_iNpcID);
+				pUIItemUpgrade->SetNpcID(m_iNpcID);
 			}
 
 			SetVisible(false);
