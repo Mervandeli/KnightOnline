@@ -122,7 +122,6 @@ void CUIItemUpgrade::Tick()
 				break;
 		}
 	}
-
 	CN3UIBase::Tick();
 }
 
@@ -162,8 +161,7 @@ void CUIItemUpgrade::Render()
 		if (spItem != nullptr && ((spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||
 			(spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)))
 		{
-			char szID[32];
-			sprintf(szID, "s_count_%d", i);
+			std::string szID = fmt::format("s_count_{}", i);
 			CN3UIString* pStr = (CN3UIString*)GetChildByID(szID);
 			if (pStr != nullptr)
 			{
@@ -188,8 +186,7 @@ void CUIItemUpgrade::Render()
 		}
 		else
 		{
-			char szID[32];
-			sprintf(szID, "s_count_%d", i);
+			std::string szID = fmt::format("s_count_{}", i);
 			CN3UIString* pStr = (CN3UIString*)GetChildByID(szID);
 			if (pStr != nullptr)
 				pStr->SetVisible(false);
@@ -244,7 +241,7 @@ __IconItemSkill* CUIItemUpgrade::GetHighlightIconItem(CN3UIIcon* pUIIcon)
 
 void CUIItemUpgrade::Open()
 {
-	SetVisible(true);
+	SetVisibleWithNoSound(true,false,false);
 
 	GoldUpdate();
 }
@@ -278,9 +275,8 @@ void CUIItemUpgrade::ItemMoveFromInvToThis()
 			pInven->m_pMyInvWnd[i] = nullptr;
 			CN3UIArea* pArea;
 
-			char szID[32];
-			sprintf(szID, "a_slot_%d", i);
-			pArea = (CN3UIArea*)GetChildByID(szID);
+			std::string szID = fmt::format("a_slot_{}", i);
+			pArea = (CN3UIArea*) GetChildByID(szID);
 			if (pArea != nullptr)
 			{
 				spItem->pUIIcon->SetRegion(pArea->GetRegion());
@@ -288,29 +284,27 @@ void CUIItemUpgrade::ItemMoveFromInvToThis()
 			}
 
 			m_pMyUpgradeInv[i] = spItem;
+
+			m_pBackupUpgradeInv[i] = new __IconItemSkill(*m_pMyUpgradeInv[i]);// Backup the inventory state for restoration if needed.
 		}
-		// Backup the inventory state for restoration if needed.
-		m_pBackupUpgradeInv[i] = nullptr;
-		if (m_pMyUpgradeInv[i] != nullptr)
+		else
 		{
-			m_pBackupUpgradeInv[i] = new __IconItemSkill(*m_pMyUpgradeInv[i]);
+			m_pMyUpgradeInv[i] = nullptr;
+			m_pBackupUpgradeInv[i] = nullptr;
 		}
+
 	}
 }
 
 void CUIItemUpgrade::Close()
 {
-	if (IsVisible())
-		SetVisible(false);
-	RestoreInventoryFromBackup();
-	AnimClose();
+	bool bwork = IsVisible();
+	SetVisibleWithNoSound(false, bwork,false);
 
 	if (GetState() == UI_STATE_ICON_MOVING)
 		IconRestore();
 	SetState(UI_STATE_COMMON_NONE);
 	CN3UIWndBase::AllHighLightIconFree();
-
-	ItemMoveFromThisToInv();
 }
 
 void CUIItemUpgrade::ItemMoveFromThisToInv()
@@ -361,8 +355,7 @@ bool CUIItemUpgrade::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 	bool bFound = false;
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		char szID[32];
-		sprintf(szID, "a_m_%d", i);
+		std::string szID = fmt::format("a_m_{}", i);
 		pArea = (CN3UIArea*)GetChildByID(szID);
 		if (pArea != nullptr && pArea->IsIn(ptCur.x, ptCur.y))
 		{
@@ -373,28 +366,23 @@ bool CUIItemUpgrade::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 		}
 	}
 
-	if (spItem != CN3UIWndBase::m_sSelectedIconInfo.pItemSelect)
-		CN3UIWndBase::m_sSelectedIconInfo.pItemSelect = spItem;
+	CN3UIWndBase::m_sSelectedIconInfo.pItemSelect = spItem;
 
 	CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict = eUIWnd;
 
 	switch (CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict)
 	{
-
 		case UIWND_DISTRICT_UPGRADE_INV:
 			if (eUIWnd == UIWND_DISTRICT_UPGRADE_SLOT)
 			{
-
 				if (iDestiOrder != -1 && m_pUpgradeScrollSlots[iDestiOrder] == nullptr)
 				{
-					
 					int iSourceOrder = GetItemiOrder(spItem, UIWND_DISTRICT_UPGRADE_INV);
 					if (iSourceOrder != -1)
 					{
 						__IconItemSkill* pSrc = m_pMyUpgradeInv[iSourceOrder];
 						if (!HandleSlotDrop(pSrc, iDestiOrder))
 							return false;
-						
 					}
 				}
 				return false;
@@ -439,8 +427,7 @@ void CUIItemUpgrade::IconRestore()
 	{
 		if (m_pMyUpgradeInv[CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
 		{
-			char szID[32];
-			sprintf(szID, "a_slot_%d", CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder);
+			std::string szID = fmt::format("a_slot_{}", CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder);
 			pArea = (CN3UIArea*)GetChildByID(szID);
 			if (pArea != nullptr)
 			{
@@ -453,8 +440,9 @@ void CUIItemUpgrade::IconRestore()
 
 uint32_t CUIItemUpgrade::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld)
 {
+	
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
-	HandleInventoryIconRightClick();
+	HandleInventoryIconRightClick(ptCur , dwFlags);
 	if (!m_bVisible)
 		return dwRet;
 
@@ -600,24 +588,16 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 	return true;
 }
 
-void CUIItemUpgrade::SetVisible(bool bVisible)
+
+void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFocus)
 {
-	CN3UIBase::SetVisible(bVisible);
+	CN3UIBase::SetVisibleWithNoSound(bVisible, bWork, bReFocus);
+
 	if (bVisible)
 	{
 		CGameProcedure::s_pUIMgr->SetVisibleFocusedUI(this);
 		ItemMoveFromInvToThis();
 	}
-	else
-	{
-		CGameProcedure::s_pUIMgr->ReFocusUI();//this_ui
-		RestoreInventoryFromBackup();
-	}
-}
-
-void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFocus)
-{
-	CN3UIBase::SetVisibleWithNoSound(bVisible, bWork, bReFocus);
 
 	if (bWork && !bVisible)
 	{
@@ -630,7 +610,8 @@ void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFo
 		//Move the items from this window's inventory area to the inventory area of this inventory window.
 		RestoreInventoryFromBackup();
 		ItemMoveFromThisToInv();
-
+		AnimClose();
+		
 		if (m_pUITooltipDlg != nullptr) m_pUITooltipDlg->DisplayTooltipsDisable();
 	}
 }
@@ -653,11 +634,11 @@ bool CUIItemUpgrade::Load(HANDLE hFile)
 	
 	for (int i = 0; i < 20; ++i)
 	{
-		char szID[32];
-		sprintf(szID, "img_s_load_%d", i);
+		std::string szID;
+		szID = fmt::format("img_s_load_{}", i);
 		if (CN3UIImage* pImg = (CN3UIImage*) GetChildByID(szID))
 			pImg->SetVisible(false);
-		sprintf(szID, "img_f_load_%d", i);
+		szID = fmt::format("img_f_load_{}", i);
 		if (CN3UIImage* pImg = (CN3UIImage*) GetChildByID(szID))
 			pImg->SetVisible(false);
 	}
@@ -671,7 +652,6 @@ bool CUIItemUpgrade::OnKeyPress(int iKey)
 	{
 		case DIK_ESCAPE:
 			ReceiveMessage(m_pBtnClose, UIMSG_BUTTON_CLICK);
-			if (m_pUITooltipDlg != nullptr) m_pUITooltipDlg->DisplayTooltipsDisable();
 			return true;
 	}
 
@@ -728,8 +708,7 @@ void CUIItemUpgrade::RestoreInventoryFromBackup()
 				CreateUIIconForItem(m_pMyUpgradeInv[i]);
 
 				//Set the UI position based on the inventory area
-				char szID[32];
-				sprintf(szID, "a_slot_%d", i);
+				std::string szID = fmt::format("a_slot_{}", i);
 				CN3UIArea* pArea = (CN3UIArea*)GetChildByID(szID);
 				SetupIconArea(m_pMyUpgradeInv[i], pArea);
 			}
@@ -913,6 +892,7 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 	}
 	else
 	{
+		m_bUpgradeInProgress = false;
 		RestoreInventoryFromBackup();
 		if (result == 2)
 		{
@@ -1011,8 +991,7 @@ void CUIItemUpgrade::HideAllAnimationFrames()
     // Hide all img_s_load_X frames
     for (int i = 0;; ++i)
     {
-        char szID[32];
-        sprintf(szID, "img_s_load_%d", i);
+		std::string szID = fmt::format("img_s_load_{}", i);
         CN3UIImage* pImg = (CN3UIImage*)GetChildByID(szID);
         if (pImg == nullptr) break;
         pImg->SetVisible(false);
@@ -1020,8 +999,7 @@ void CUIItemUpgrade::HideAllAnimationFrames()
     // Hide all img_f_load_X frames
     for (int i = 0;; ++i)
     {
-        char szID[32];
-        sprintf(szID, "img_f_load_%d", i);
+		std::string szID = fmt::format("img_f_load_{}", i);
         CN3UIImage* pImg = (CN3UIImage*)GetChildByID(szID);
         if (pImg == nullptr) break;
         pImg->SetVisible(false);
@@ -1146,8 +1124,7 @@ bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 		{
 			// Create a new icon, put it in 1 slot, reduce the number in the inventory
 			__IconItemSkill* pNew = CreateIconFromSource(pSrc, 1);
-			char szID[32];
-			sprintf(szID, "a_m_%d", iDestiOrder);
+			std::string szID = fmt::format("a_m_{}", iDestiOrder);
 			CN3UIArea* pSlotArea = (CN3UIArea*)GetChildByID(szID);
 			SetupIconArea(pNew, pSlotArea);
 			m_pUpgradeScrollSlots[iDestiOrder] = pNew;
@@ -1158,8 +1135,7 @@ bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 			// If the last one, move directly
 			m_pUpgradeScrollSlots[iDestiOrder] = pSrc;
 			m_pMyUpgradeInv[iSourceOrder] = nullptr;
-			char szID[32];
-			sprintf(szID, "a_m_%d", iDestiOrder);
+			std::string szID = fmt::format("a_m_{}", iDestiOrder);
 			CN3UIArea* pSlotArea = (CN3UIArea*)GetChildByID(szID);
 			SetupIconArea(pSrc, pSlotArea);
 		}
@@ -1169,8 +1145,7 @@ bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 		// If is not countable item, just move it
 		m_pUpgradeScrollSlots[iDestiOrder] = pSrc;
 		m_pMyUpgradeInv[iSourceOrder] = nullptr;
-		char szID[32];
-		sprintf(szID, "a_m_%d", iDestiOrder);
+		std::string szID = fmt::format("a_m_{}", iDestiOrder);
 		CN3UIArea* pSlotArea = (CN3UIArea*)GetChildByID(szID);
 		SetupIconArea(pSrc, pSlotArea);
 	}
@@ -1182,25 +1157,23 @@ void CUIItemUpgrade::FlipFlopAnim()
 {
 	if (m_eAnimationState != ANIM_FLIPFLOP)
 		return;
+	std::string szID;
 
 	// Hide before frame
 	if (m_iCurrentFrame > 0)
 	{
-		char szID[32];
-		sprintf(szID, m_bUpgradeSucceeded ? "img_s_load_%d" : "img_f_load_%d", m_iCurrentFrame - 1);
+		szID = fmt::format(fmt::runtime(m_bUpgradeSucceeded ? "img_s_load_{}" : "img_f_load_{}"), m_iCurrentFrame - 1);
 		if (CN3UIImage* pImg = (CN3UIImage*)GetChildByID(szID))
 			pImg->SetVisible(false);
 	}
 
 	// Show current frame
-	char szID[32];
-	sprintf(szID, m_bUpgradeSucceeded ? "img_s_load_%d" : "img_f_load_%d", m_iCurrentFrame);
+	szID = fmt::format(fmt::runtime(m_bUpgradeSucceeded ? "img_s_load_{}" : "img_f_load_{}"), m_iCurrentFrame);
 	if (CN3UIImage* pImg = (CN3UIImage*) GetChildByID(szID))
 	{
 		pImg->SetVisible(true);
 		pImg->SetParent(this);
 	}
-
 }
 void CUIItemUpgrade::AnimClose()
 {
@@ -1213,6 +1186,7 @@ void CUIItemUpgrade::AnimClose()
 	}
 
 	m_eAnimationState = ANIM_NONE;
+	m_bUpgradeInProgress = false;
 	HideAllAnimationFrames();
 }
 
@@ -1257,11 +1231,9 @@ void CUIItemUpgrade::StartUpgradeAnim()
 	}
 }
 
-void CUIItemUpgrade::HandleInventoryIconRightClick()
+void CUIItemUpgrade::HandleInventoryIconRightClick(POINT ptCur, uint32_t dwMouseFlags)
 {
-    // Get mouse position
-    POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
-	uint32_t dwMouseFlags = CGameProcedure::s_pLocalInput->MouseGetFlag();
+
     // Check for right mouse button click using MOUSE_RBCLICKED
     if (dwMouseFlags & MOUSE_RBCLICKED)
     {
@@ -1273,9 +1245,7 @@ void CUIItemUpgrade::HandleInventoryIconRightClick()
 				continue;
 
             CN3UIIcon* pIcon = pIconSkill->pUIIcon;
-            const RECT& rc = pIcon->GetRegion();
-            if (pIcon->IsVisible() && rc.left <= ptCur.x && ptCur.x <= rc.right &&
-                rc.top <= ptCur.y && ptCur.y <= rc.bottom)
+            if (pIcon->IsVisible() && pIcon->IsIn(ptCur.x, ptCur.y))
             {
                 // Call HandleSlotDrop and HandleUpgradeAreaDrop for the icon under the mouse
 				if (HandleUpgradeAreaDrop(pIconSkill))

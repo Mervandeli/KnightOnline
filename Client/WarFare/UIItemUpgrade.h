@@ -77,12 +77,11 @@ private:
 	int					GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWndDist) const;
 	RECT				GetSampleRect();
 	e_UIWND_DISTRICT	GetWndDistrict(__IconItemSkill* spItem);
-	void				HandleInventoryIconRightClick();
+	void				HandleInventoryIconRightClick(POINT ptCur, uint32_t dwMouseFlags);
 	bool				OnKeyPress(int iKey) override;
 	void				UpdateBackupUpgradeInv();
 	bool				Load(HANDLE hFile) override;
 	
-	void				SetVisible(bool bVisible) override;
 	uint32_t			MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
 	bool				ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
 	void				Render() override;
