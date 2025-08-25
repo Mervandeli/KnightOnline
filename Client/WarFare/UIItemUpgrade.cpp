@@ -137,20 +137,20 @@ void CUIItemUpgrade::Render()
 	for (UIListReverseItor itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
-		if ((GetState() == UI_STATE_ICON_MOVING) && (pChild->UIType() == UI_TYPE_ICON) && (CN3UIWndBase::m_sSelectedIconInfo.pItemSelect) &&
-			((CN3UIIcon*) pChild == CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon))
+		if (GetState() == UI_STATE_ICON_MOVING && pChild->UIType() == UI_TYPE_ICON && CN3UIWndBase::m_sSelectedIconInfo.pItemSelect &&
+			(CN3UIIcon*) pChild == CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon)
 			continue;
 		pChild->Render();
 
-		if ((GetState() == UI_STATE_COMMON_NONE) &&
-			(pChild->UIType() == UI_TYPE_ICON) && (pChild->GetStyle() & UISTYLE_ICON_HIGHLIGHT))
+		if (GetState() == UI_STATE_COMMON_NONE &&
+			pChild->UIType() == UI_TYPE_ICON && pChild->GetStyle() & UISTYLE_ICON_HIGHLIGHT)
 		{
 			bTooltipRender = true;
 			spItem = GetHighlightIconItem((CN3UIIcon*) pChild);
 		}
 	}
 
-	if ((GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::m_sSelectedIconInfo.pItemSelect))
+	if (GetState() == UI_STATE_ICON_MOVING && CN3UIWndBase::m_sSelectedIconInfo.pItemSelect)
 		CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->Render();
 
 	if (spItem != nullptr)
@@ -229,10 +229,7 @@ void CUIItemUpgrade::ItemMoveFromInvToThis()
 			spItem->pUIIcon->SetParent(this);
 
 			pInven->m_pMyInvWnd[i] = nullptr;
-			CN3UIArea* pArea;
-
-			std::string szID = fmt::format("a_slot_{}", i);
-			pArea = (CN3UIArea*) GetChildByID(szID);
+			CN3UIArea* pArea = m_pSlotArea[i];
 			if (pArea != nullptr)
 			{
 				spItem->pUIIcon->SetRegion(pArea->GetRegion());
@@ -241,7 +238,8 @@ void CUIItemUpgrade::ItemMoveFromInvToThis()
 
 			m_pMyUpgradeInv[i] = spItem;
 			ShowItemCount(m_pMyUpgradeInv[i],i);
-			m_pBackupUpgradeInv[i] = new __IconItemSkill(*m_pMyUpgradeInv[i]);// Backup the inventory state for restoration if needed.
+			// Backup the inventory state for restoration if needed.
+			m_pBackupUpgradeInv[i] = new __IconItemSkill(*m_pMyUpgradeInv[i]);
 		}
 		else
 		{
@@ -300,8 +298,8 @@ bool CUIItemUpgrade::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 	//  Check if the selected window is correct and the drop is valid.
 	if (CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd != m_eUIWnd)
 		return false;
-	if ((CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_UPGRADE_SLOT) &&
-		(CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_UPGRADE_INV))
+	if (CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_UPGRADE_SLOT &&
+		CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict != UIWND_DISTRICT_UPGRADE_INV)
 		return false;
 
 	// Find which slot or area the item is being dropped onto.
@@ -309,8 +307,7 @@ bool CUIItemUpgrade::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 	bool bFound = false;
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		std::string szID = fmt::format("a_m_{}", i);
-		pArea = (CN3UIArea*)GetChildByID(szID);
+		pArea = m_pSlotArea[i];
 		if (pArea != nullptr && pArea->IsIn(ptCur.x, ptCur.y))
 		{
 			bFound = true;
@@ -370,8 +367,7 @@ void CUIItemUpgrade::IconRestore()
 		int iOrder = CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder;
 		if (m_pMyUpgradeInv[iOrder] != nullptr)
 		{
-			std::string szID = fmt::format("a_slot_{}", iOrder);
-			pArea = (CN3UIArea*)GetChildByID(szID);
+			pArea = m_pSlotArea[iOrder];
 			if (pArea != nullptr)
 			{
 				m_pMyUpgradeInv[iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
@@ -389,8 +385,7 @@ uint32_t CUIItemUpgrade::MouseProc(uint32_t dwFlags, const POINT& ptCur, const P
 	if (!m_bVisible)
 		return dwRet;
 
-	if ((GetState() == UI_STATE_ICON_MOVING) &&
-		(CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd == UIWND_UPGRADE))
+	if (GetState() == UI_STATE_ICON_MOVING && CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd == UIWND_UPGRADE)
 	{
 		CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(GetSampleRect());
 		CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(GetSampleRect());
@@ -402,8 +397,6 @@ uint32_t CUIItemUpgrade::MouseProc(uint32_t dwFlags, const POINT& ptCur, const P
 // Returns the index of the given item in the specified window district.
 int CUIItemUpgrade::GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWndDist) const
 {
-	int iReturn = -1;
-
 	switch (eWndDist)
 	{
 		case UIWND_DISTRICT_UPGRADE_SLOT:
@@ -417,13 +410,13 @@ int CUIItemUpgrade::GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWnd
 		case UIWND_DISTRICT_UPGRADE_INV:
 			for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 			{
-				if ((m_pMyUpgradeInv[i] != nullptr) && (m_pMyUpgradeInv[i] == spItem))
+				if (m_pMyUpgradeInv[i] != nullptr && m_pMyUpgradeInv[i] == spItem)
 					return i;
 			}
 			break;
 	}
 
-	return iReturn;
+	return -1;
 }
 
 // Returns a rectangle centered at the mouse position, used for moving icons.
@@ -432,7 +425,7 @@ RECT CUIItemUpgrade::GetSampleRect()
 	RECT rect;
 	CN3UIArea* pArea;
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
-	pArea = (CN3UIArea*)GetChildByID("a_slot_0");
+	pArea = m_pSlotArea[0];
 	rect = pArea->GetRegion();
 	float fWidth = (float) (rect.right - rect.left);
 	float fHeight = (float) (rect.bottom - rect.top);
@@ -453,7 +446,7 @@ e_UIWND_DISTRICT CUIItemUpgrade::GetWndDistrict(__IconItemSkill* spItem)
 
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
-		if ((m_pMyUpgradeInv[i] != nullptr) && (m_pMyUpgradeInv[i] == spItem))
+		if (m_pMyUpgradeInv[i] != nullptr && m_pMyUpgradeInv[i] == spItem)
 			return UIWND_DISTRICT_UPGRADE_INV;
 	}
 	return UIWND_DISTRICT_UNKNOWN;
@@ -582,6 +575,18 @@ bool CUIItemUpgrade::Load(HANDLE hFile)
 
 	this->GetChildByID("img_cover_01")->SetVisible(false);
 	this->GetChildByID("img_cover_02")->SetVisible(false);
+
+	for (int i = 0; i < MAX_ITEM_INVENTORY; ++i)
+	{
+		std::string szID = fmt::format("a_slot_{}", i);
+		m_pSlotArea[i] = (CN3UIArea*) GetChildByID(szID);
+	}
+
+	for (int i = 0; i < MAX_ITEM_INVENTORY; ++i)
+	{
+		std::string szID = fmt::format("s_count_{}", i);
+		m_pSlotString[i] = (CN3UIString*) GetChildByID(szID);
+	}
 	
 	for (int i = 0; i < 20; ++i)
 	{
@@ -652,8 +657,8 @@ void CUIItemUpgrade::RestoreInventoryFromBackup()
 			{
 				CreateUIIconForItem(m_pMyUpgradeInv[i]);
 				//Set the UI position based on the inventory area
-				std::string szID = fmt::format("a_slot_{}", i);
-				CN3UIArea* pArea = (CN3UIArea*)GetChildByID(szID);
+
+				CN3UIArea* pArea = m_pSlotArea[i];
 				SetupIconArea(m_pMyUpgradeInv[i], pArea);
 				ShowItemCount(m_pMyUpgradeInv[i], i);
 			}
@@ -1061,8 +1066,7 @@ bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 		{
 			// Create a new icon, put it in 1 slot, reduce the number in the inventory
 			__IconItemSkill* pNew = CreateIconFromSource(pSrc, 1);
-			std::string szID = fmt::format("a_m_{}", iDestiOrder);
-			CN3UIArea* pSlotArea = (CN3UIArea*)GetChildByID(szID);
+			CN3UIArea* pSlotArea = m_pSlotArea[iDestiOrder];
 			SetupIconArea(pNew, pSlotArea);
 			m_pUpgradeScrollSlots[iDestiOrder] = pNew;
 			pSrc->iCount -= 1;
@@ -1073,8 +1077,7 @@ bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 			// If the last one, move directly
 			m_pUpgradeScrollSlots[iDestiOrder] = pSrc;
 			m_pMyUpgradeInv[iSourceOrder] = nullptr;
-			std::string szID = fmt::format("a_m_{}", iDestiOrder);
-			CN3UIArea* pSlotArea = (CN3UIArea*)GetChildByID(szID);
+			CN3UIArea* pSlotArea = m_pSlotArea[iDestiOrder];
 			SetupIconArea(pSrc, pSlotArea);
 		}
 	}
@@ -1083,8 +1086,7 @@ bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 		// If is not countable item, just move it
 		m_pUpgradeScrollSlots[iDestiOrder] = pSrc;
 		m_pMyUpgradeInv[iSourceOrder] = nullptr;
-		std::string szID = fmt::format("a_m_{}", iDestiOrder);
-		CN3UIArea* pSlotArea = (CN3UIArea*)GetChildByID(szID);
+		CN3UIArea* pSlotArea = m_pSlotArea[iDestiOrder];
 		SetupIconArea(pSrc, pSlotArea);
 	}
 	m_iUpgradeScrollSlotInvPos[iDestiOrder] = iSourceOrder;
@@ -1203,17 +1205,16 @@ void CUIItemUpgrade::HandleInventoryIconRightClick(POINT ptCur, uint32_t dwMouse
 void CUIItemUpgrade::ShowItemCount(__IconItemSkill* spItem,int iorder) 
 {
 	// Display the count for items that should show a count.
-	if (spItem != nullptr && ((spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||
-		(spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)))
+	if (spItem != nullptr && spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE || 
+		spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
 	{
-		std::string szID = fmt::format("s_count_{}", iorder);
-		CN3UIString* pStr = (CN3UIString*) GetChildByID(szID);
+		CN3UIString* pStr = m_pSlotString[iorder];
 		if (pStr != nullptr)
 		{		
 			if (spItem->pUIIcon->IsVisible())
 			{
 				pStr->SetStringAsInt(spItem->iCount);
-				if ((GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::m_sSelectedIconInfo.pItemSelect))
+				if (GetState() == UI_STATE_ICON_MOVING && CN3UIWndBase::m_sSelectedIconInfo.pItemSelect)
 					pStr->SetStringAsInt(spItem->iCount - 1);
 				pStr->SetVisible(true);
 				pStr->Render();
@@ -1227,8 +1228,7 @@ void CUIItemUpgrade::ShowItemCount(__IconItemSkill* spItem,int iorder)
 	}
 	else
 	{
-		std::string szID = fmt::format("s_count_{}", iorder);
-		CN3UIString* pStr = (CN3UIString*) GetChildByID(szID);
+		CN3UIString* pStr = m_pSlotString[iorder];
 		if (pStr != nullptr)
 			pStr->SetVisible(false);
 	}
