@@ -31,11 +31,9 @@ CUIItemUpgrade::CUIItemUpgrade()
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
 		m_pUpgradeScrollSlots[i] = nullptr;
+		m_iUpgradeScrollSlotInvPos[i] = -1;
 	}
-	for (int i = 0; i < 10; i++)
-	{
-		m_iUpgradeSlotInvPos[i] = -1;
-	}
+
 
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
@@ -61,7 +59,7 @@ CUIItemUpgrade::~CUIItemUpgrade()
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
 		DeleteIconItemSkill(m_pUpgradeScrollSlots[i]);
-		m_iUpgradeSlotInvPos[i + 1] = -1; // 0 is UpgradeItemSlot [1,2..9] m_pUpgradeScrollSlots slot
+		m_iUpgradeScrollSlotInvPos[i] = -1; //  [1,2..9] m_pUpgradeScrollSlots slot
 	}
 
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
@@ -70,7 +68,7 @@ CUIItemUpgrade::~CUIItemUpgrade()
 		DeleteIconItemSkill(m_pBackupUpgradeInv[i]);
 	}
 	DeleteIconItemSkill(m_pUpgradeItemSlot);
-	m_iUpgradeSlotInvPos[0] = -1; //UpgradeItemSlot position
+	m_iUpgradeItemSlotInvPos = -1; //UpgradeItemSlot position
 
 	m_pStrMyGold = nullptr;
 
@@ -82,7 +80,7 @@ void CUIItemUpgrade::Release()
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
 		DeleteIconItemSkill(m_pUpgradeScrollSlots[i]);
-		m_iUpgradeSlotInvPos[i+1] = -1; // 0 is UpgradeItemSlot [1,2..9] m_pUpgradeScrollSlots slot
+		m_iUpgradeScrollSlotInvPos[i] = -1; // [1,2..9] m_pUpgradeScrollSlots slot
 	}
 
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
@@ -91,7 +89,7 @@ void CUIItemUpgrade::Release()
 		DeleteIconItemSkill(m_pBackupUpgradeInv[i]);
 	}
 	DeleteIconItemSkill(m_pUpgradeItemSlot);
-	m_iUpgradeSlotInvPos[0] = -1; //UpgradeItemSlot position
+	m_iUpgradeItemSlotInvPos = -1; //UpgradeItemSlot position
 
 	m_pStrMyGold = nullptr;
 
@@ -770,7 +768,7 @@ void CUIItemUpgrade::SendToServerUpgradeMsg()
 	if (m_pUpgradeItemSlot != nullptr)
 	{
 		nItemID= m_pUpgradeItemSlot->pItemBasic->dwID + m_pUpgradeItemSlot->pItemExt->dwID;
-		bPos= m_iUpgradeSlotInvPos[0]; // m_pUpgradeItemSlot position
+		bPos= m_iUpgradeItemSlotInvPos; // m_pUpgradeItemSlot position
 
 		CAPISocket::MP_AddDword(byBuff, iOffset, nItemID);
 		CAPISocket::MP_AddByte(byBuff, iOffset, bPos);
@@ -784,7 +782,7 @@ void CUIItemUpgrade::SendToServerUpgradeMsg()
 		{
 			nItemID= m_pUpgradeScrollSlots[i]->pItemBasic->dwID +
 				m_pUpgradeScrollSlots[i]->pItemExt->dwID;
-			bPos = m_iUpgradeSlotInvPos[i+1];
+			bPos = m_iUpgradeScrollSlotInvPos[i];
 			CAPISocket::MP_AddDword(byBuff, iOffset, nItemID);
 			CAPISocket::MP_AddByte(byBuff, iOffset, bPos);
 			++itotalSent;
@@ -1037,7 +1035,7 @@ bool CUIItemUpgrade::HandleUpgradeAreaDrop(__IconItemSkill* spItem)
 		if (m_pMyUpgradeInv[i] == spItem)
 		{
 			m_pMyUpgradeInv[i] = nullptr;
-			m_iUpgradeSlotInvPos[0] = i; // m_pUpgradeItemSlot position
+			m_iUpgradeItemSlotInvPos = i; // m_pUpgradeItemSlot position
 			break;
 		}
 	}
@@ -1129,7 +1127,7 @@ bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 		CN3UIArea* pSlotArea = (CN3UIArea*)GetChildByID(szID);
 		SetupIconArea(pSrc, pSlotArea);
 	}
-	m_iUpgradeSlotInvPos[iDestiOrder+1] = iSourceOrder;
+	m_iUpgradeScrollSlotInvPos[iDestiOrder] = iSourceOrder;
 	return true;
 }
 
