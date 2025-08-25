@@ -154,44 +154,7 @@ void CUIItemUpgrade::Render()
 		}
 	}
 
-	// Display the count for items that should show a count.
-	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
-	{
-		__IconItemSkill* spItem = m_pMyUpgradeInv[i];
-		if (spItem != nullptr && ((spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||
-			(spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)))
-		{
-			std::string szID = fmt::format("s_count_{}", i);
-			CN3UIString* pStr = (CN3UIString*)GetChildByID(szID);
-			if (pStr != nullptr)
-			{
-				if ((GetState() == UI_STATE_ICON_MOVING) && (m_pMyUpgradeInv[i] == CN3UIWndBase::m_sSelectedIconInfo.pItemSelect))
-				{
-					pStr->SetVisible(false);
-				}
-				else
-				{
-					if (m_pMyUpgradeInv[i]->pUIIcon->IsVisible())
-					{
-						pStr->SetVisible(true);
-						pStr->SetStringAsInt(m_pMyUpgradeInv[i]->iCount);
-						pStr->Render();
-					}
-					else
-					{
-						pStr->SetVisible(false);
-					}
-				}
-			}
-		}
-		else
-		{
-			std::string szID = fmt::format("s_count_{}", i);
-			CN3UIString* pStr = (CN3UIString*)GetChildByID(szID);
-			if (pStr != nullptr)
-				pStr->SetVisible(false);
-		}
-	}
+
 
 	if ((GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::m_sSelectedIconInfo.pItemSelect))
 		CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->Render();
@@ -284,7 +247,7 @@ void CUIItemUpgrade::ItemMoveFromInvToThis()
 			}
 
 			m_pMyUpgradeInv[i] = spItem;
-
+			ShowItemCount(m_pMyUpgradeInv[i],i);
 			m_pBackupUpgradeInv[i] = new __IconItemSkill(*m_pMyUpgradeInv[i]);// Backup the inventory state for restoration if needed.
 		}
 		else
@@ -425,17 +388,20 @@ void CUIItemUpgrade::IconRestore()
 
 	if (CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict == UIWND_DISTRICT_UPGRADE_INV)
 	{
-		if (m_pMyUpgradeInv[CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
+		int iOrder = CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder;
+		if (m_pMyUpgradeInv[iOrder] != nullptr)
 		{
-			std::string szID = fmt::format("a_slot_{}", CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder);
+			std::string szID = fmt::format("a_slot_{}", iOrder);
 			pArea = (CN3UIArea*)GetChildByID(szID);
 			if (pArea != nullptr)
 			{
-				m_pMyUpgradeInv[CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
-				m_pMyUpgradeInv[CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
+				m_pMyUpgradeInv[iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
+				m_pMyUpgradeInv[iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
 			}
 		}
+		ShowItemCount(m_pMyUpgradeInv[iOrder], iOrder);
 	}
+	
 }
 
 uint32_t CUIItemUpgrade::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld)
@@ -567,6 +533,18 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			((CN3UIIcon*) pSender)->SetMoveRect(GetSampleRect());
 			// Play item sound.
 			if (spItem != nullptr) PlayItemSound(spItem->pItemBasic);
+
+			// Show item count with icount-1 when icon is dragged (if countable)
+			if (spItem != nullptr && 
+				(spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE ||
+				 spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
+			{
+				if (spItem->iCount > 0)
+				{
+					ShowItemCount(spItem, iOrder);
+				}
+					
+			}
 			break;
 
 		case UIMSG_ICON_UP:
@@ -711,6 +689,7 @@ void CUIItemUpgrade::RestoreInventoryFromBackup()
 				std::string szID = fmt::format("a_slot_{}", i);
 				CN3UIArea* pArea = (CN3UIArea*)GetChildByID(szID);
 				SetupIconArea(m_pMyUpgradeInv[i], pArea);
+				ShowItemCount(m_pMyUpgradeInv[i], i);
 			}
 		}
 	}
@@ -1129,6 +1108,7 @@ bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 			SetupIconArea(pNew, pSlotArea);
 			m_pUpgradeScrollSlots[iDestiOrder] = pNew;
 			pSrc->iCount -= 1;
+			ShowItemCount(pSrc, iSourceOrder);
 		}
 		else
 		{
@@ -1264,5 +1244,43 @@ void CUIItemUpgrade::HandleInventoryIconRightClick(POINT ptCur, uint32_t dwMouse
             }
         }
     }
+}
+
+void CUIItemUpgrade::ShowItemCount(__IconItemSkill* spItem,int iorder) 
+{
+		// Display the count for items that should show a count.
+
+	if (spItem != nullptr && ((spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||
+		(spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)))
+	{
+		std::string szID = fmt::format("s_count_{}", iorder);
+		CN3UIString* pStr = (CN3UIString*) GetChildByID(szID);
+		if (pStr != nullptr)
+		{
+				
+			if (spItem->pUIIcon->IsVisible())
+			{
+				pStr->SetStringAsInt(spItem->iCount);
+				if ((GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::m_sSelectedIconInfo.pItemSelect))
+					pStr->SetStringAsInt(spItem->iCount - 1);
+				pStr->SetVisible(true);
+				pStr->Render();
+				pStr->SetParent(this);
+			}
+			else
+			{
+				pStr->SetVisible(false);
+			}
+				
+		}
+	}
+	else
+	{
+		std::string szID = fmt::format("s_count_{}", iorder);
+		CN3UIString* pStr = (CN3UIString*) GetChildByID(szID);
+		if (pStr != nullptr)
+			pStr->SetVisible(false);
+	}
+	
 }
 

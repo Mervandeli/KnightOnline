@@ -78,6 +78,7 @@ private:
 	RECT				GetSampleRect();
 	e_UIWND_DISTRICT	GetWndDistrict(__IconItemSkill* spItem);
 	void				HandleInventoryIconRightClick(POINT ptCur, uint32_t dwMouseFlags);
+	void				ShowItemCount(__IconItemSkill* spItem, int iorder);
 	bool				OnKeyPress(int iKey) override;
 	void				UpdateBackupUpgradeInv();
 	bool				Load(HANDLE hFile) override;
