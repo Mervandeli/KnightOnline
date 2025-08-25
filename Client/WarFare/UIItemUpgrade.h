@@ -29,7 +29,8 @@ private:
 	__IconItemSkill* m_pBackupUpgradeInv[MAX_ITEM_INVENTORY];
 	__IconItemSkill* m_pUpgradeItemSlot;	// Which item to upgrade
 	__IconItemSkill* m_pUpgradeResultSlot;
-	int8_t m_iUpgradeSlotInvPos[MAX_ITEM_UPGRADE_SLOT+1];
+	int8_t m_iUpgradeScrollSlotInvPos[MAX_ITEM_UPGRADE_SLOT];
+	int8_t m_iUpgradeItemSlotInvPos;
 	CN3UIString* m_pStrMyGold;
 	
 	// Animation state management
@@ -90,8 +91,6 @@ private:
 	__IconItemSkill*	GetHighlightIconItem(CN3UIIcon* pUIIcon) override;
 	void				IconRestore();
 	bool				ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur) override;
-	void				CancelIconDrop(__IconItemSkill* spItem) override;
-	void				AcceptIconDrop(__IconItemSkill* spItem) override;
 	void				ItemMoveFromInvToThis();
 	void				ItemMoveFromThisToInv();
 	void                RestoreInventoryFromBackup();
