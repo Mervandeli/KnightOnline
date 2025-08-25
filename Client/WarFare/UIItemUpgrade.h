@@ -60,6 +60,9 @@ private:
 	CN3UIButton* m_pBtnConversation;
 	CN3UIArea* m_pAreaUpgrade;
 	CN3UIArea* m_pAreaResult;
+	CN3UIArea* m_pInvArea[MAX_ITEM_INVENTORY];
+	CN3UIString* m_pInvString[MAX_ITEM_INVENTORY];
+	CN3UIArea* m_pSlotArea[MAX_ITEM_UPGRADE_SLOT];
 	CN3UIImage* m_pImageCover1;
 	CN3UIImage* m_pImageCover2;
 

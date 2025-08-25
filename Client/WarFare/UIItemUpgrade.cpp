@@ -229,7 +229,7 @@ void CUIItemUpgrade::ItemMoveFromInvToThis()
 			spItem->pUIIcon->SetParent(this);
 
 			pInven->m_pMyInvWnd[i] = nullptr;
-			CN3UIArea* pArea = m_pSlotArea[i];
+			CN3UIArea* pArea = m_pInvArea[i];
 			if (pArea != nullptr)
 			{
 				spItem->pUIIcon->SetRegion(pArea->GetRegion());
@@ -367,7 +367,7 @@ void CUIItemUpgrade::IconRestore()
 		int iOrder = CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder;
 		if (m_pMyUpgradeInv[iOrder] != nullptr)
 		{
-			pArea = m_pSlotArea[iOrder];
+			pArea = m_pInvArea[iOrder];
 			if (pArea != nullptr)
 			{
 				m_pMyUpgradeInv[iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
@@ -425,7 +425,7 @@ RECT CUIItemUpgrade::GetSampleRect()
 	RECT rect;
 	CN3UIArea* pArea;
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
-	pArea = m_pSlotArea[0];
+	pArea = m_pInvArea[0];
 	rect = pArea->GetRegion();
 	float fWidth = (float) (rect.right - rect.left);
 	float fHeight = (float) (rect.bottom - rect.top);
@@ -576,16 +576,22 @@ bool CUIItemUpgrade::Load(HANDLE hFile)
 	this->GetChildByID("img_cover_01")->SetVisible(false);
 	this->GetChildByID("img_cover_02")->SetVisible(false);
 
-	for (int i = 0; i < MAX_ITEM_INVENTORY; ++i)
+	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
 	{
-		std::string szID = fmt::format("a_slot_{}", i);
+		std::string szID = fmt::format("a_m_{}", i);
 		m_pSlotArea[i] = (CN3UIArea*) GetChildByID(szID);
 	}
 
 	for (int i = 0; i < MAX_ITEM_INVENTORY; ++i)
 	{
+		std::string szID = fmt::format("a_slot_{}", i);
+		m_pInvArea[i] = (CN3UIArea*) GetChildByID(szID);
+	}
+
+	for (int i = 0; i < MAX_ITEM_INVENTORY; ++i)
+	{
 		std::string szID = fmt::format("s_count_{}", i);
-		m_pSlotString[i] = (CN3UIString*) GetChildByID(szID);
+		m_pInvString[i] = (CN3UIString*) GetChildByID(szID);
 	}
 	
 	for (int i = 0; i < 20; ++i)
@@ -658,7 +664,7 @@ void CUIItemUpgrade::RestoreInventoryFromBackup()
 				CreateUIIconForItem(m_pMyUpgradeInv[i]);
 				//Set the UI position based on the inventory area
 
-				CN3UIArea* pArea = m_pSlotArea[i];
+				CN3UIArea* pArea = m_pInvArea[i];
 				SetupIconArea(m_pMyUpgradeInv[i], pArea);
 				ShowItemCount(m_pMyUpgradeInv[i], i);
 			}
@@ -1208,7 +1214,7 @@ void CUIItemUpgrade::ShowItemCount(__IconItemSkill* spItem,int iorder)
 	if (spItem != nullptr && spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE || 
 		spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
 	{
-		CN3UIString* pStr = m_pSlotString[iorder];
+		CN3UIString* pStr = m_pInvString[iorder];
 		if (pStr != nullptr)
 		{		
 			if (spItem->pUIIcon->IsVisible())
@@ -1228,7 +1234,7 @@ void CUIItemUpgrade::ShowItemCount(__IconItemSkill* spItem,int iorder)
 	}
 	else
 	{
-		CN3UIString* pStr = m_pSlotString[iorder];
+		CN3UIString* pStr = m_pInvString[iorder];
 		if (pStr != nullptr)
 			pStr->SetVisible(false);
 	}
