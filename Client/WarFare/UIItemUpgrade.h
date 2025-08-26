@@ -15,7 +15,8 @@
 #include "N3UIWndBase.h"
 
 const int MAX_ITEM_UPGRADE_SLOT = 9;	// Max items in the item upgrade UI.
-
+const int MAX_UPGRADE_MATERIAL = 10;	// Max items in the item upgrade UI.
+const int FLIPFLOP_MAX_FRAMES = 20;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -44,6 +45,10 @@ private:
 	};
 	AnimationState m_eAnimationState;
 	
+	enum ItemBasic {
+		UpgradeMaterial = 255,
+	};
+
 	float m_fAnimationTimer;
 	int m_iCurrentFrame;
 	bool m_bUpgradeSucceeded;
