@@ -107,7 +107,6 @@ private:
 	bool				IsUpgradeScroll(uint32_t dwEffectID2) const;
 	bool				IsTrina(uint32_t dwID) const;
 	bool				IsAllowedUpgradeItem(__IconItemSkill* spItem) const;
-	void				DeleteIconItemSkill(__IconItemSkill*& pItem);
 	void				SendToServerUpgradeMsg();
 
 	void				FlipFlopAnim();
