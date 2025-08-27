@@ -86,7 +86,7 @@ private:
 	int					GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWndDist) const;
 	RECT				GetSampleRect();
 	e_UIWND_DISTRICT	GetWndDistrict(__IconItemSkill* spItem);
-	void				HandleInventoryIconRightClick(POINT ptCur, uint32_t dwMouseFlags);
+	void				HandleInventoryIconRightClick(POINT ptCur);
 	void				ShowItemCount(__IconItemSkill* spItem, int iorder);
 	bool				OnKeyPress(int iKey) override;
 	void				UpdateBackupUpgradeInv();
