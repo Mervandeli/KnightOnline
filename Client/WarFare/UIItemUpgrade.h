@@ -116,12 +116,11 @@ private:
 	void				UpdateCoverAnimation();
 	void				UpdateFlipFlopAnimation();
 	void				HideAllAnimationFrames();
-	void				CreateUIIconForItem(__IconItemSkill* spItem, const std::string& szIconFN = "");
-	__IconItemSkill*	CreateIconFromSource(const __IconItemSkill* pSrc, int count);
-	void				SetupIconArea(__IconItemSkill* pItem, CN3UIArea* pArea);
+	void				CreateUIIconForItem(__IconItemSkill* spItem);
+	void				SetupIconArea(__IconItemSkill* spItem, CN3UIArea* pArea);
 	bool				HandleUpgradeAreaDrop(__IconItemSkill* spItem);
 	bool				HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder);
-	bool				IsSlotCompatible(__IconItemSkill* pSrc, int iDestiOrder) const;
+	bool				IsSlotCompatible(__IconItemSkill* pSrc) const;
 	void				Tick() override;
 };
 
