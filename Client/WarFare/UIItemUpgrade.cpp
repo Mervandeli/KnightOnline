@@ -399,8 +399,9 @@ uint32_t CUIItemUpgrade::MouseProc(uint32_t dwFlags, const POINT& ptCur, const P
 	}
 	if (GetState() == UI_STATE_ICON_MOVING && CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd == UIWND_UPGRADE)
 	{
-		CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(GetSampleRect());
-		CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(GetSampleRect());
+		RECT region = GetSampleRect();
+		CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(region);
+		CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(region);
 	}
 
 	return CN3UIWndBase::MouseProc(dwFlags, ptCur, ptOld);
@@ -485,7 +486,7 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 	__IconItemSkill* spItem = nullptr;
 	e_UIWND_DISTRICT eUIWnd;
 	int iOrder;
-
+	RECT region = GetSampleRect();
 	uint32_t dwBitMask = 0x000f0000;
 
 	switch (dwMsg & dwBitMask)
@@ -503,12 +504,15 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWndDistrict = eUIWnd;
 			iOrder = GetItemiOrder(spItem, eUIWnd);
 			if (iOrder == -1)	
+			{
+				SetState(UI_STATE_COMMON_NONE);
 				return false;
+			}
 			CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.iOrder = iOrder;
 			CN3UIWndBase::m_sSelectedIconInfo.pItemSelect = spItem;
 			// Set icon region for moving.
-			((CN3UIIcon*) pSender)->SetRegion(GetSampleRect());
-			((CN3UIIcon*) pSender)->SetMoveRect(GetSampleRect());
+			pSender->SetRegion(region);
+			pSender->SetMoveRect(region);
 			// Play item sound.
 			if (spItem != nullptr) PlayItemSound(spItem->pItemBasic);
 
@@ -526,15 +530,18 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			break;
 
 		case UIMSG_ICON_UP:
-			if (!CGameProcedure::s_pUIMgr->BroadcastIconDropMsg(CN3UIWndBase::m_sSelectedIconInfo.pItemSelect))
+			POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
+			spItem = CN3UIWndBase::m_sSelectedIconInfo.pItemSelect;
+			if (!ReceiveIconDrop(spItem, ptCur))
 				IconRestore();// Restore the icon position to its original place if drop failed.
 			break;
 
 		case UIMSG_ICON_DOWN:
-			if (GetState() == UI_STATE_ICON_MOVING)
+			spItem = CN3UIWndBase::m_sSelectedIconInfo.pItemSelect;
+			if (GetState() == UI_STATE_ICON_MOVING && spItem != nullptr)
 			{
-				CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(GetSampleRect());
-				CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(GetSampleRect());
+				spItem->pUIIcon->SetRegion(region);
+				spItem->pUIIcon->SetMoveRect(region);
 			}
 			break;
 	}
@@ -543,7 +550,7 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFocus)
 {
-	CN3UIBase::SetVisibleWithNoSound(bVisible, bWork, bReFocus);
+	CN3UIWndBase::SetVisibleWithNoSound(bVisible, bWork, bReFocus);
 
 	if (bVisible)
 	{
@@ -559,7 +566,7 @@ void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFo
 		SetState(UI_STATE_COMMON_NONE);
 		CN3UIWndBase::AllHighLightIconFree();
 
-		//Move the items from this window's inventory area to the inventory area of this inventory window.
+		// Move the items from this window's inventory area to the inventory area of this inventory window.
 		RestoreInventoryFromBackup();
 		ItemMoveFromThisToInv();
 		AnimClose();
@@ -571,18 +578,23 @@ void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFo
 // Loads the UI from file and initializes all required UI components.
 bool CUIItemUpgrade::Load(HANDLE hFile)
 {
-	if (CN3UIBase::Load(hFile) == false)
+	if (!CN3UIBase::Load(hFile))
 		return false;
 
-	N3_VERIFY_UI_COMPONENT(m_pBtnClose, (CN3UIButton*) this->GetChildByID("btn_close"));
-	N3_VERIFY_UI_COMPONENT(m_pBtnOk, (CN3UIButton*) this->GetChildByID("btn_ok"));
-	N3_VERIFY_UI_COMPONENT(m_pBtnCancel, (CN3UIButton*) this->GetChildByID("btn_cancel"));
-	N3_VERIFY_UI_COMPONENT(m_pBtnConversation, (CN3UIButton*) this->GetChildByID("btn_conversation"));
-	N3_VERIFY_UI_COMPONENT(m_pAreaUpgrade, (CN3UIArea*) this->GetChildByID("a_upgrade"));
-	N3_VERIFY_UI_COMPONENT(m_pAreaResult, (CN3UIArea*) this->GetChildByID("a_result"));
+		N3_VERIFY_UI_COMPONENT(m_pBtnClose, (CN3UIButton*) GetChildByID("btn_close"));
+		N3_VERIFY_UI_COMPONENT(m_pBtnOk, (CN3UIButton*) GetChildByID("btn_ok"));
+		N3_VERIFY_UI_COMPONENT(m_pBtnCancel, (CN3UIButton*) GetChildByID("btn_cancel"));
+		N3_VERIFY_UI_COMPONENT(m_pBtnConversation, (CN3UIButton*) GetChildByID("btn_conversation"));
+		N3_VERIFY_UI_COMPONENT(m_pAreaUpgrade, (CN3UIArea*) GetChildByID("a_upgrade"));
+		N3_VERIFY_UI_COMPONENT(m_pAreaResult, (CN3UIArea*) GetChildByID("a_result"));
+		N3_VERIFY_UI_COMPONENT(m_pImageCover1, (CN3UIImage*) GetChildByID("img_cover_01"));
+		N3_VERIFY_UI_COMPONENT(m_pImageCover2, (CN3UIImage*) GetChildByID("img_cover_02"));
 
-	this->GetChildByID("img_cover_01")->SetVisible(false);
-	this->GetChildByID("img_cover_02")->SetVisible(false);
+	if (m_pImageCover1 != nullptr && m_pImageCover2 != nullptr)
+	{
+		m_pImageCover1->SetVisible(false);
+		m_pImageCover2->SetVisible(false);
+	}
 
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
 	{
@@ -621,7 +633,7 @@ bool CUIItemUpgrade::OnKeyPress(int iKey)
 	switch (iKey)
 	{
 		case DIK_ESCAPE:
-			ReceiveMessage(m_pBtnClose, UIMSG_BUTTON_CLICK);
+			Close();
 			return true;
 	}
 	return CN3UIBase::OnKeyPress(iKey);
@@ -705,7 +717,6 @@ void CUIItemUpgrade::RestoreInventoryFromBackup()
 	}
 }
 
-// Checks if the given item ID is an upgrade scroll.
 bool CUIItemUpgrade::IsUpgradeScroll(uint32_t dwEffectID2) const
 {
 	if (dwEffectID2 == UpgradeMaterial)
@@ -729,16 +740,26 @@ bool CUIItemUpgrade::IsAllowedUpgradeItem(__IconItemSkill* spItem) const
 		return false;
 	if (spItem != nullptr  && spItem->pItemBasic != nullptr)
 	{
-		if (spItem->pItemBasic->byAttachPoint == ITEM_POS_FINGER // Ring
-			|| spItem->pItemBasic->byAttachPoint == ITEM_POS_NECK // Necklace
-			|| spItem->pItemBasic->byAttachPoint == ITEM_POS_BELT // Belt
-			|| spItem->pItemBasic->byAttachPoint == ITEM_POS_EAR) // Earring
+		switch (spItem->pItemBasic->byAttachPoint)
 		{
-			return false;
+			case ITEM_POS_DUAL:
+			case ITEM_POS_RIGHTHAND:
+			case ITEM_POS_LEFTHAND:
+			case ITEM_POS_TWOHANDRIGHT:
+			case ITEM_POS_TWOHANDLEFT:
+			case ITEM_POS_SHOES:
+			case ITEM_POS_GLOVES:
+			case ITEM_POS_HEAD:
+			case ITEM_POS_LOWER:
+			case ITEM_POS_UPPER:
+				break;
+			default:
+				return false;
+				break;
 		}
 	}
 	e_ItemAttrib eTA = (e_ItemAttrib) (spItem->pItemExt->byMagicOrRare);
-	return (eTA == ITEM_ATTRIB_UNIQUE || eTA == ITEM_ATTRIB_UPGRADE || eTA == ITEM_ATTRIB_UNIQUE_REVERSE || eTA == ITEM_ATTRIB_UPGRADE);
+	return (eTA == ITEM_ATTRIB_UNIQUE || eTA == ITEM_ATTRIB_UPGRADE || eTA == ITEM_ATTRIB_UNIQUE_REVERSE);
 }
 
 void CUIItemUpgrade::SendToServerUpgradeMsg()
@@ -886,19 +907,19 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 		RestoreInventoryFromBackup();
 		if (result == 2)
 		{
-			//cannot perform item upgrade
+			// Cannot perform item upgrade
 			szMsg = fmt::format_text_resource(6702);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
 		}
 		else if (result == 3)
 		{
-			//Upgrade Need coin
+			// Upgrade Need coin
 			szMsg = fmt::format_text_resource(6703);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
 		}
 		else if (result == 4)
 		{
-			//Upgrade Not Match or other
+			// Upgrade Not Match or other
 			szMsg = fmt::format_text_resource(6704);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
 		}
@@ -1184,9 +1205,6 @@ void CUIItemUpgrade::StartUpgradeAnim()
 			return;
 		m_fAnimationTimer = 0.0f;
 		m_iCurrentFrame = 0;
-
-		N3_VERIFY_UI_COMPONENT(m_pImageCover1, (CN3UIImage*) this->GetChildByID("img_cover_01"));
-		N3_VERIFY_UI_COMPONENT(m_pImageCover2, (CN3UIImage*) this->GetChildByID("img_cover_02"));
 
 		// Make covers visible during animation
 		m_pImageCover1->SetVisible(true);
