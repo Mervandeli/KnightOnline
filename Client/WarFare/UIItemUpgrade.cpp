@@ -670,7 +670,7 @@ void CUIItemUpgrade::RestoreInventoryFromBackup()
 		m_pUpgradeItemSlot = nullptr;
 	}
 
-	if (m_pUpgradeResultSlot != nullptr)
+	if (m_pUpgradeResultSlot != nullptr && m_iUpgradeItemSlotInvPos != -1)
 	{
 		SetupIconArea(m_pUpgradeResultSlot, m_pInvArea[m_iUpgradeItemSlotInvPos]);
 		m_pUpgradeResultSlot = nullptr;
@@ -776,14 +776,14 @@ void CUIItemUpgrade::SendToServerUpgradeMsg()
 	CAPISocket::MP_AddByte(byBuff, iOffset, 1);
 	CAPISocket::MP_AddByte(byBuff, iOffset, m_iNpcID);
 
-	int32_t nItemID;
-	int8_t bPos;
+	int32_t nItemID = 0;
+	int8_t bPos = -1;
 
 	// Add Upgrade Item
 	if (m_pUpgradeItemSlot != nullptr)
 	{
-		nItemID= m_pUpgradeItemSlot->pItemBasic->dwID + m_pUpgradeItemSlot->pItemExt->dwID;
-		bPos= m_iUpgradeItemSlotInvPos; // m_pUpgradeItemSlot position
+		nItemID = m_pUpgradeItemSlot->pItemBasic->dwID + m_pUpgradeItemSlot->pItemExt->dwID;
+		bPos = m_iUpgradeItemSlotInvPos; // m_pUpgradeItemSlot position
 
 		CAPISocket::MP_AddDword(byBuff, iOffset, nItemID);
 		CAPISocket::MP_AddByte(byBuff, iOffset, bPos);
@@ -823,8 +823,8 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 	uint8_t bPos[10];
 	for (int i = 0; i < MAX_UPGRADE_MATERIAL; i++)
 	{
-		pkt >> nItemID[i];
-		pkt >> bPos[i];
+		nItemID[i] = pkt.read<uint32_t>();
+		bPos[i] = pkt.read<uint8_t>();
 	}
 
 	__TABLE_ITEM_EXT* itemExt = nullptr;
@@ -862,68 +862,70 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 		m_pUpgradeItemSlot = nullptr;
 	}
 
-	if (result == 0 || result == 1)
+	if (result == 0)
 	{
+		//Item Upgrade Failed
+		m_bUpgradeSucceeded = false;
 		m_eAnimationState = ANIM_START;
-
-		if (result == 0)
-		{
-			m_bUpgradeSucceeded = false;
-			szMsg = fmt::format_text_resource(6701);
-			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
-		}
-		else if (result == 1)
-		{
-			m_bUpgradeSucceeded = true;
-			szMsg = fmt::format_text_resource(6700);
-			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(128, 128, 255, 255));
-
-			itemBasic = CGameBase::s_pTbl_Items_Basic.Find(nItemID[0] / 1000 * 1000);
-			if (itemBasic && itemBasic->byExtIndex >= 0 && itemBasic->byExtIndex <= MAX_ITEM_EXTENSION)
-				itemExt = CGameBase::s_pTbl_Items_Exts[itemBasic->byExtIndex].Find(nItemID[0] % 1000);
-			else
-				itemExt = nullptr;
-			e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(itemBasic, itemExt, nullptr, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace);
-			if (ITEM_TYPE_UNKNOWN == eType)
-				return;
-			__IconItemSkill* spItemNew;
-			spItemNew = new __IconItemSkill;
-			spItemNew->pItemBasic = itemBasic;
-			spItemNew->pItemExt = itemExt;
-			spItemNew->szIconFN = szIconFN;
-			spItemNew->iCount = 1;
-			CreateUIIconForItem(spItemNew);
-
-			if (m_pAreaResult != nullptr)
-			{
-				m_pUpgradeResultSlot = spItemNew;
-				m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos] = m_pUpgradeResultSlot;
-			}
-		}
+		szMsg = fmt::format_text_resource(IDS_ITEM_UPGRADE_FAIL);
+		CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_XRGB(255, 0, 255));
 	}
-	else
+	else if (result == 1)
 	{
+		//Item Upgrade Succeeded
+		m_bUpgradeSucceeded = true;
+		m_eAnimationState = ANIM_START;
+		szMsg = fmt::format_text_resource(IDS_ITEM_UPGRADE_SUCCESS);
+		CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_XRGB(128, 128, 255));
+
+		itemBasic = CGameBase::s_pTbl_Items_Basic.Find(nItemID[0] / 1000 * 1000);
+		itemExt = nullptr;
+
+		if (itemBasic && itemBasic->byExtIndex >= 0 && itemBasic->byExtIndex < MAX_ITEM_EXTENSION)
+			itemExt = CGameBase::s_pTbl_Items_Exts[itemBasic->byExtIndex].Find(nItemID[0] % 1000);
+
+		if (ITEM_TYPE_UNKNOWN == CGameBase::MakeResrcFileNameForUPC(itemBasic, itemExt, nullptr, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace))
+			return;
+		__IconItemSkill* spItemNew;
+		spItemNew = new __IconItemSkill;
+		spItemNew->pItemBasic = itemBasic;
+		spItemNew->pItemExt = itemExt;
+		spItemNew->szIconFN = szIconFN;
+		spItemNew->iCount = 1;
+		CreateUIIconForItem(spItemNew);
+		m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos] = spItemNew;
+
+		if (m_pAreaResult != nullptr && m_eAnimationState != ANIM_NONE)
+		{
+			m_pUpgradeResultSlot = spItemNew;
+		}
+	
+	}
+	else if (result == 2)
+	{
+		// Cannot perform item upgrade
 		m_bUpgradeInProgress = false;
 		RestoreInventoryFromBackup();
-		if (result == 2)
-		{
-			// Cannot perform item upgrade
-			szMsg = fmt::format_text_resource(6702);
-			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
-		}
-		else if (result == 3)
-		{
-			// Upgrade Need coin
-			szMsg = fmt::format_text_resource(6703);
-			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
-		}
-		else if (result == 4)
-		{
-			// Upgrade Not Match or other
-			szMsg = fmt::format_text_resource(6704);
-			CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_RGBA(255, 0, 255, 255));
-		}
+		szMsg = fmt::format_text_resource(IDS_ITEM_UPGRADE_CANNOT_PERFORM);
+		CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_XRGB(255, 0, 255));
 	}
+	else if (result == 3)
+	{
+		// Upgrade Need coin
+		m_bUpgradeInProgress = false;
+		RestoreInventoryFromBackup();
+		szMsg = fmt::format_text_resource(IDS_ITEM_UPGRADE_NEED_COIN);
+		CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_XRGB(255, 0, 255));
+	}
+	else if (result == 4)
+	{
+		// Upgrade Not Match or other
+		m_bUpgradeInProgress = false;
+		RestoreInventoryFromBackup();
+		szMsg = fmt::format_text_resource(IDS_ITEM_UPGRADE_NON_MATCH);
+		CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_XRGB(255, 0, 255));
+	}
+	
 	UpdateBackupUpgradeInv();
 	GoldUpdate();
 	CN3UIWndBase::AllHighLightIconFree();
@@ -1223,7 +1225,7 @@ void CUIItemUpgrade::StartUpgradeAnim()
 void CUIItemUpgrade::HandleInventoryIconRightClick(POINT ptCur)
 {
     // Check for right mouse button click using MOUSE_RBCLICKED
-	if (m_pUpgradeResultSlot != nullptr)
+	if (m_pUpgradeResultSlot != nullptr && m_iUpgradeItemSlotInvPos != -1)
 	{
 		SetupIconArea(m_pUpgradeResultSlot, m_pInvArea[m_iUpgradeItemSlotInvPos]);
 		m_pUpgradeResultSlot = nullptr;
