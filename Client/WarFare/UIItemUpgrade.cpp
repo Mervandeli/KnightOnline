@@ -314,8 +314,6 @@ bool CUIItemUpgrade::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 {
 	CN3UIArea* pArea;
 	e_UIWND_DISTRICT eUIWnd = UIWND_DISTRICT_UNKNOWN;
-	if (!m_bVisible)
-		return false;
 
 	//  Check if the selected window is correct and the drop is valid.
 	if (CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd != m_eUIWnd)
@@ -400,8 +398,13 @@ uint32_t CUIItemUpgrade::MouseProc(uint32_t dwFlags, const POINT& ptCur, const P
 	if (GetState() == UI_STATE_ICON_MOVING && CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd == UIWND_UPGRADE)
 	{
 		RECT region = GetSampleRect();
-		CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(region);
-		CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(region);
+
+		if (CN3UIWndBase::m_sSelectedIconInfo.pItemSelect != nullptr)
+		{
+			CN3UIIcon* pUIIcon = CN3UIWndBase::m_sSelectedIconInfo.pItemSelect->pUIIcon;
+			pUIIcon->SetRegion(region);
+			pUIIcon->SetMoveRect(region);
+		}
 	}
 
 	return CN3UIWndBase::MouseProc(dwFlags, ptCur, ptOld);
@@ -825,6 +828,8 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 	{
 		nItemID[i] = pkt.read<uint32_t>();
 		bPos[i] = pkt.read<uint8_t>();
+		if (bPos[i] < 0 || bPos[i] > MAX_ITEM_INVENTORY)
+			bPos[i] = -1;
 	}
 
 	__TABLE_ITEM_EXT* itemExt = nullptr;
@@ -893,7 +898,9 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 		spItemNew->szIconFN = szIconFN;
 		spItemNew->iCount = 1;
 		CreateUIIconForItem(spItemNew);
-		m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos] = spItemNew;
+
+		if(bPos[0] != -1)
+			m_pMyUpgradeInv[bPos[0]] = spItemNew;
 
 		if (m_pAreaResult != nullptr && m_eAnimationState != ANIM_NONE)
 		{
@@ -937,7 +944,6 @@ void CUIItemUpgrade::UpdateCoverAnimation()
     m_fAnimationTimer += CN3Base::s_fSecPerFrm;
 	static const float COVER_ANIMATION_DURATION = 0.8f;
     float t = m_fAnimationTimer / COVER_ANIMATION_DURATION;
-    if (t > 1.0f) t = 1.0f;
 
     // Only handle opening (covers move outward and hide)
     float ease = 1.0f - ((1.0f - t) * (1.0f - t));
@@ -950,10 +956,13 @@ void CUIItemUpgrade::UpdateCoverAnimation()
     if (t >= 1.0f)
     {
         m_eAnimationState = ANIM_NONE;
-        m_pImageCover1->SetVisible(false);
-        m_pImageCover2->SetVisible(false);
-        m_pImageCover1->SetRegion(m_rcCover1Original);
-        m_pImageCover2->SetRegion(m_rcCover2Original);
+		if (m_pImageCover1 != nullptr && m_pImageCover1 != nullptr)
+		{
+			m_pImageCover1->SetVisible(false);
+			m_pImageCover2->SetVisible(false);
+			m_pImageCover1->SetRegion(m_rcCover1Original);
+			m_pImageCover2->SetRegion(m_rcCover2Original);
+		}
 		m_bUpgradeInProgress = false;
         return;
     }
@@ -967,14 +976,18 @@ void CUIItemUpgrade::UpdateCoverAnimation()
     rc1.bottom = y1 + height1;
     rc2.top = y2;
     rc2.bottom = y2 + height2;
-    m_pImageCover1->SetRegion(rc1);
-    m_pImageCover2->SetRegion(rc2);
+
+	if (m_pImageCover1 != nullptr && m_pImageCover1 != nullptr)
+	{
+		m_pImageCover1->SetRegion(rc1);
+		m_pImageCover2->SetRegion(rc2);
+	}
 }
 
 void CUIItemUpgrade::UpdateFlipFlopAnimation()
 {
 	m_fAnimationTimer += CN3Base::s_fSecPerFrm;
-	static const float FLIPFLOP_FRAME_DELAY = 0.1f;
+	constexpr float FLIPFLOP_FRAME_DELAY = 0.1f;
 
 	if (m_fAnimationTimer >= FLIPFLOP_FRAME_DELAY)
 	{
@@ -998,7 +1011,7 @@ void CUIItemUpgrade::UpdateFlipFlopAnimation()
 void CUIItemUpgrade::HideAllAnimationFrames()
 {
     // Hide all img_s_load_X frames
-    for (int i = 0;; ++i)
+    for (int i = 0; i < FLIPFLOP_MAX_FRAMES; ++i)
     {
 		std::string szID = fmt::format("img_s_load_{}", i);
         CN3UIImage* pImg = (CN3UIImage*)GetChildByID(szID);
@@ -1006,7 +1019,7 @@ void CUIItemUpgrade::HideAllAnimationFrames()
         pImg->SetVisible(false);
     }
     // Hide all img_f_load_X frames
-    for (int i = 0;; ++i)
+    for (int i = 0; i < FLIPFLOP_MAX_FRAMES; ++i)
     {
 		std::string szID = fmt::format("img_f_load_{}", i);
         CN3UIImage* pImg = (CN3UIImage*)GetChildByID(szID);
@@ -1020,7 +1033,7 @@ void CUIItemUpgrade::CreateUIIconForItem(__IconItemSkill* spItem)
 	if (spItem == nullptr)
 		return;
 
-	spItem->pUIIcon = new CN3UIIcon;
+	spItem->pUIIcon = new CN3UIIcon();
 	spItem->pUIIcon->Init(this);
 
 	static const float UV_ASPECT_RATIO = 45.0f / 64.0f;
@@ -1290,4 +1303,3 @@ void CUIItemUpgrade::ShowItemCount(__IconItemSkill* spItem,int iorder)
 	}
 	
 }
-
