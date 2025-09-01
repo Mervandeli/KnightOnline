@@ -20,7 +20,7 @@ static char THIS_FILE[]=__FILE__;
 #endif
 
 static const __Vector3 s_vLightOffset = __Vector3(10.0f, 40.0f, 30.0f);
-CN3SndObj*	CPlayerBase::m_pSnd_MyMove = NULL;
+CN3SndObj*	CPlayerBase::m_pSnd_MyMove = nullptr;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -35,7 +35,7 @@ CPlayerBase::CPlayerBase()
 
 	m_Chr.PosSet(__Vector3(0.0f, 0.0f, 0.0f));
 
-	m_pLooksRef = NULL;				// 기본적인 모습과 기본 정보 참조 테이블
+	m_pLooksRef = nullptr;				// 기본적인 모습과 기본 정보 참조 테이블
 	memset(m_pItemPlugBasics, 0, sizeof(m_pItemPlugBasics)); // 캐릭터에 붙은 무기들..
 	memset(m_pItemPlugExts, 0, sizeof(m_pItemPlugExts));
 	memset(m_pItemPartBasics, 0, sizeof(m_pItemPartBasics)); // 캐릭터에 붙은 갑옷들..
@@ -79,19 +79,19 @@ CPlayerBase::CPlayerBase()
 	m_fScaleToSet = 1.0f;			// 점차 스케일 값변화..
 	m_fScalePrev = 1.0f;
 
-	m_pSnd_Move = NULL;
-	m_pSnd_Attack_0 = NULL;
-//	m_pSnd_Attack_1 = NULL;
-	m_pSnd_Struck_0 = NULL;
-//	m_pSnd_Struck_1 = NULL;
-	m_pSnd_Breathe_0 = NULL;
-//	m_pSnd_Breathe_1 = NULL;
-	m_pSnd_Blow = NULL;
+	m_pSnd_Move = nullptr;
+	m_pSnd_Attack_0 = nullptr;
+//	m_pSnd_Attack_1 = nullptr;
+	m_pSnd_Struck_0 = nullptr;
+//	m_pSnd_Struck_1 = nullptr;
+	m_pSnd_Breathe_0 = nullptr;
+//	m_pSnd_Breathe_1 = nullptr;
+	m_pSnd_Blow = nullptr;
 	m_bSoundAllSet = false;
 
 	m_InfoBase.Init();				// 첨엔 종족값을 모른다..
 
-	m_pShapeExtraRef = NULL;					// 이 NPC 가 성문이나 집등 오브젝트의 형태이면 이 포인터를 세팅해서 쓴,다..
+	m_pShapeExtraRef = nullptr;					// 이 NPC 가 성문이나 집등 오브젝트의 형태이면 이 포인터를 세팅해서 쓴,다..
 
 	m_fCastFreezeTime = 0.0f;
 	m_fAttackDelta = 1.0f;			// 스킬이나 마법에 의해 변하는 공격 속도.. 1.0 이 기본이고 클수록 더 빨리 공격한다.
@@ -102,7 +102,7 @@ CPlayerBase::CPlayerBase()
 	// 그림자 초기화
 //	By : Ecli666 ( On 2002-03-29 오후 4:23:36 )
 /*
-	m_pTexShadow = NULL;
+	m_pTexShadow = nullptr;
 	m_pTexShadow = s_MngTex.Get("Chr\\Shadow_Character.tga"); 
 	m_vShadows[0].Set(-0.7f, 0, 0.7f, 0, 0);
 	m_vShadows[1].Set( 0.7f, 0, 0.7f, 1, 0);
@@ -112,10 +112,10 @@ CPlayerBase::CPlayerBase()
 //	~(By Ecli666 On 2002-03-29 오후 4:23:36 )
 
 	// 폰트 초기화... // 정보 표시용 폰트와 풍선용은 따로 생성한다..
-	m_pIDFont = NULL;
-	m_pClanFont = NULL;
-	m_pInfoFont = NULL;
-	m_pBalloonFont = NULL;
+	m_pIDFont = nullptr;
+	m_pClanFont = nullptr;
+	m_pInfoFont = nullptr;
+	m_pBalloonFont = nullptr;
 	m_fTimeBalloon = 0;
 
 	m_bAnimationChanged = false;	// 큐에 넣은 에니메이션이 변하는 순간만 세팅된다..
@@ -141,10 +141,10 @@ CPlayerBase::~CPlayerBase()
 //	s_MngTex.Delete(m_pTexShadow);
 
 //	~(By Ecli666 On 2002-03-29 오후 4:24:14 )
-	delete m_pClanFont; m_pClanFont = NULL;
-	delete m_pIDFont; m_pIDFont = NULL;
-	delete m_pInfoFont; m_pInfoFont = NULL;
-	delete m_pBalloonFont; m_pBalloonFont = NULL;
+	delete m_pClanFont; m_pClanFont = nullptr;
+	delete m_pIDFont; m_pIDFont = nullptr;
+	delete m_pInfoFont; m_pInfoFont = nullptr;
+	delete m_pBalloonFont; m_pBalloonFont = nullptr;
 
 	m_bSoundAllSet = false;
 	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Move);
@@ -177,7 +177,7 @@ void CPlayerBase::Release()
 //	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Breathe_1);
 	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Blow);
 
-	m_pLooksRef = NULL;				// 기본적인 모습과 기본 정보 참조 테이블
+	m_pLooksRef = nullptr;				// 기본적인 모습과 기본 정보 참조 테이블
 	memset(m_pItemPlugBasics, 0, sizeof(m_pItemPlugBasics)); // 캐릭터에 붙은 무기들..
 	memset(m_pItemPlugExts, 0, sizeof(m_pItemPlugExts));
 	memset(m_pItemPartBasics, 0, sizeof(m_pItemPartBasics)); // 캐릭터에 붙은 갑옷들..
@@ -214,7 +214,7 @@ void CPlayerBase::Release()
 
 	m_InfoBase.Init();				// 첨엔 종족값을 모른다..
 
-	m_pShapeExtraRef = NULL;					// 이 NPC 가 성문이나 집등 오브젝트의 형태이면 이 포인터를 세팅해서 쓴,다..
+	m_pShapeExtraRef = nullptr;					// 이 NPC 가 성문이나 집등 오브젝트의 형태이면 이 포인터를 세팅해서 쓴,다..
 
 	m_fCastFreezeTime = 0.0f;
 	m_fAttackDelta = 1.0f;		// 스킬이나 마법에 의해 변하는 공격 속도.. 1.0 이 기본이고 클수록 더 빨리 공격한다.
@@ -268,7 +268,7 @@ void CPlayerBase::SetSoundAndInitFont(uint32_t dwFontFlag)
 		m_pIDFont->InitDeviceObjects( s_lpD3DDev );
 		m_pIDFont->RestoreDeviceObjects();
 
-		m_pIDFont->SetText(m_InfoBase.szID.c_str()); // 폰트에 텍스트 지정.
+		m_pIDFont->SetText(m_InfoBase.szID); // 폰트에 텍스트 지정.
 		m_pIDFont->SetFontColor(m_InfoBase.crID);
 	}
 }
@@ -304,10 +304,10 @@ void CPlayerBase::ReleaseSoundAndFont()
 //	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Breathe_1);
 	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Blow);
 
-	delete m_pIDFont; m_pIDFont = NULL;
-	delete m_pInfoFont; m_pInfoFont = NULL;
-	delete m_pClanFont; m_pClanFont = NULL;
-	delete m_pBalloonFont; m_pBalloonFont = NULL;
+	delete m_pIDFont; m_pIDFont = nullptr;
+	delete m_pInfoFont; m_pInfoFont = nullptr;
+	delete m_pClanFont; m_pClanFont = nullptr;
+	delete m_pBalloonFont; m_pBalloonFont = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -403,7 +403,7 @@ void CPlayerBase::RenderShadow()
 {
 //	By : Ecli666 ( On 2002-03-29 오후 4:22:59 )
 /*
-	LPDIRECT3DTEXTURE8 lpTex = NULL;
+	LPDIRECT3DTEXTURE8 lpTex = nullptr;
 	if(m_pTexShadow) lpTex = m_pTexShadow->Get();
 
 	__AlphaPrimitive* pAP = s_AlphaMgr.Add();
@@ -422,7 +422,7 @@ void CPlayerBase::RenderShadow()
 		pAP->nVertexCount		= 4;
 	//	pAP->MtxWorld			= &m_Matrix;
 		pAP->pVertices			= m_vShadows;
-		pAP->pwIndices			= NULL;
+		pAP->pwIndices			= nullptr;
 
 		pAP->MtxWorld.Identity();
 		pAP->MtxWorld.PosSet(m_Chr.m_Matrix.Pos());
@@ -475,7 +475,7 @@ void CPlayerBase::RenderShadow()
 
 void CPlayerBase::RenderChrInRect(CN3Chr* pChr, const RECT& Rect)
 {
-	if (NULL == pChr) return;
+	if (nullptr == pChr) return;
 
 	// 2002년 2월 15일 Dino 재수정..
 	// viewport 영역을 0보다 작은곳에서부터 (즉 front buffer의 영역을 벗어나게) 지정할 수 없기 때문에 계산이 복잡해졌다.
@@ -605,7 +605,7 @@ void CPlayerBase::RotateTo(float fYaw, bool bImmediately)
 
 void CPlayerBase::RotateTo(CPlayerBase* pOther)
 {
-	if(NULL == pOther || pOther == this) return;
+	if(nullptr == pOther || pOther == this) return;
 
 	__Vector3 vDir = pOther->Position() - m_Chr.Pos();
 	vDir.y = 0.0f;
@@ -696,7 +696,7 @@ void CPlayerBase::TickDurationColor()
 		m_fDurationColorTime = 0;
 		m_fDurationColorTimeCur = 0;
 
-		CN3CPart* pPart = NULL;
+		CN3CPart* pPart = nullptr;
 		int iPC = m_Chr.m_Parts.size();
 		for(int i = 0; i < iPC; i++)
 		{
@@ -707,7 +707,7 @@ void CPlayerBase::TickDurationColor()
 	else
 	{
 		float fD = m_fDurationColorTimeCur / m_fDurationColorTime;
-		CN3CPart* pPart = NULL;
+		CN3CPart* pPart = nullptr;
 		int iPC = m_Chr.m_Parts.size();
 		for(int i = 0; i < iPC; i++)
 		{
@@ -1797,7 +1797,7 @@ bool CPlayerBase::CheckCollisionToTargetByPlug(CPlayerBase* pTarget, int nPlug, 
 	////////////////////////////////////////////////////////////////////////
 	// 칼 궤적이 남는 시점이 아니면 충돌체크를 하지 않는다.
 	//	__AnimData* pAni = m_Chr.AniCur(0);
-	//	if(NULL == pAni) return false;
+	//	if(nullptr == pAni) return false;
 	//	float fFrmCur = m_Chr.FrmCur(0);
 	//	if(fFrmCur < pAni->fFrmPlugTraceStart || fFrmCur > pAni->fFrmPlugTraceEnd) return false; 
 	// 칼 궤적이 남는 시점이 아니면 충돌체크를 하지 않는다.
@@ -1855,7 +1855,7 @@ CN3CPlugBase* CPlayerBase::PlugSet(e_PlugPosition ePos, const std::string& szFN,
 	if(ePos < PLUG_POS_RIGHTHAND || ePos >= PLUG_POS_COUNT)
 	{
 		__ASSERT(0, "Invalid Plug Position");
-		return NULL;
+		return nullptr;
 	}
 
 	int iJoint = 0;
@@ -1888,7 +1888,7 @@ CN3CPlugBase* CPlayerBase::PlugSet(e_PlugPosition ePos, const std::string& szFN,
 
 
 	CN3CPlugBase* pPlug = m_Chr.PlugSet(ePos, szFN);
-	if(NULL == pPlug) return NULL;
+	if(nullptr == pPlug) return nullptr;
 
 	if (PLUG_POS_LEFTHAND == ePos || PLUG_POS_RIGHTHAND == ePos)
 	{
@@ -1902,7 +1902,7 @@ CN3CPlugBase* CPlayerBase::PlugSet(e_PlugPosition ePos, const std::string& szFN,
 //		CN3CPlug_Cloak *pPlugCloak = (CN3CPlug_Cloak*)pPlug;
 //	}
 
-	if(pPlug && NULL == pItemBasic && NULL == pItemExt) pPlug->TexOverlapSet(""); // 기본 착용이면..
+	if(pPlug && nullptr == pItemBasic && nullptr == pItemExt) pPlug->TexOverlapSet(""); // 기본 착용이면..
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -1976,7 +1976,7 @@ CN3CPart* CPlayerBase::PartSet(e_PartPosition ePos, const std::string& szFN, __T
 	if(ePos < PART_POS_UPPER || ePos >= PART_POS_COUNT)
 	{
 		__ASSERT(0, "Invalid Item Position");
-		return NULL;
+		return nullptr;
 	}
 
 	if(PART_POS_UPPER == ePos) // 상체일 경우 특별한 처리가 필요..
@@ -2004,7 +2004,7 @@ CN3CPart* CPlayerBase::PartSet(e_PartPosition ePos, const std::string& szFN, __T
 				else // 하체에 입고 있었던 아이템이 없다면..
 				{
 					__TABLE_PLAYER_LOOKS* pLooks = s_pTbl_UPC_Looks.Find(m_InfoBase.eRace);	// User Player Character Skin 구조체 포인터..
-					this->PartSet(PART_POS_LOWER, pLooks->szPartFNs[PART_POS_LOWER], NULL, NULL); // 하체에 기본옷을 입힌다.
+					this->PartSet(PART_POS_LOWER, pLooks->szPartFNs[PART_POS_LOWER], nullptr, nullptr); // 하체에 기본옷을 입힌다.
 				}
 			}
 		}
@@ -2022,7 +2022,7 @@ CN3CPart* CPlayerBase::PartSet(e_PartPosition ePos, const std::string& szFN, __T
 		}
 	}
 
-	CN3CPart* pPart = NULL;
+	CN3CPart* pPart = nullptr;
 	if(szFN.empty()) // 파일 이름이 없는거면.. 기본 착용..
 	{
 		if(PART_POS_HAIR_HELMET == ePos)
@@ -2053,7 +2053,7 @@ CN3CPart* CPlayerBase::PartSet(e_PartPosition ePos, const std::string& szFN, __T
 	m_pItemPartBasics[ePos] = pItemBasic; // 아이템 적용
 	m_pItemPartExts[ePos] = pItemExt;
 
-	if(pPart && NULL == pItemBasic && NULL == pItemExt) pPart->TexOverlapSet(""); // 기본 착용이면..
+	if(pPart && nullptr == pItemBasic && nullptr == pItemExt) pPart->TexOverlapSet(""); // 기본 착용이면..
 
 	return pPart;
 }
@@ -2066,7 +2066,7 @@ void CPlayerBase::DurabilitySet(e_ItemSlot eSlot, int iDurability)
 	{
 		e_PlugPosition ePos = PLUG_POS_LEFTHAND;
 		if(ITEM_SLOT_HAND_RIGHT == eSlot) ePos = PLUG_POS_RIGHTHAND;
-		if(NULL == m_pItemPlugBasics[ePos] || NULL == m_pItemPlugExts[ePos])
+		if(nullptr == m_pItemPlugBasics[ePos] || nullptr == m_pItemPlugExts[ePos])
 		{
 			if(0 != iDurability)
 			{
@@ -2083,7 +2083,7 @@ void CPlayerBase::DurabilitySet(e_ItemSlot eSlot, int iDurability)
 		}
 
 		CN3CPlug* pPlug = m_Chr.Plug(ePos);
-		if(NULL == pPlug) 
+		if(nullptr == pPlug) 
 		{
 			__ASSERT(0, "NULL Plug");
 			return;
@@ -2131,7 +2131,7 @@ void CPlayerBase::DurabilitySet(e_ItemSlot eSlot, int iDurability)
 
 bool CPlayerBase::InitChr(__TABLE_PLAYER_LOOKS* pTbl)
 {
-	if(NULL == pTbl) return false;
+	if(nullptr == pTbl) return false;
 
 	m_pLooksRef = pTbl;
 
@@ -2159,9 +2159,9 @@ void CPlayerBase::RegenerateCollisionMesh() // 최대 최소값을 다시 찾고
 CPlayerBase* CPlayerBase::TargetPointerCheck(bool bMustAlive)
 {
 	CPlayerBase* pTarget = this->CharacterGetByID(m_iIDTarget, bMustAlive);
-//	if(pTarget && (PSA_DEATH == pTarget->State())) pTarget = NULL; //픽킹에 의해서 선택된 캐릭을 중간의 임의적으로 수정 못하게 막음
+//	if(pTarget && (PSA_DEATH == pTarget->State())) pTarget = nullptr; //픽킹에 의해서 선택된 캐릭을 중간의 임의적으로 수정 못하게 막음
 
-//	if(NULL == pTarget) { m_iIDTarget = -1; }
+//	if(nullptr == pTarget) { m_iIDTarget = -1; }
 	return pTarget;
 }
 
@@ -2207,7 +2207,7 @@ const __Matrix44 CPlayerBase::CalcShadowMtxBasicPlane(__Vector3 vOffs)
 
 void CPlayerBase::RenderShadow(float fAngle)
 {
-	if(NULL == m_Chr.Joint()) return;
+	if(nullptr == m_Chr.Joint()) return;
 	if(m_Chr.m_nLOD < 0 || m_Chr.m_nLOD > MAX_CHR_LOD) return;
 	
 	int iLODTemp = m_Chr.m_nLOD; // 그림자는 부하를 적게 줄여 찍는다..
@@ -2450,9 +2450,9 @@ void CPlayerBase::RenderShadow(float fAngle)
 
 void CPlayerBase::CalcPart(CN3CPart* pPart, int nLOD, __Vector3 vDir)
 {
-	if(NULL == pPart) return;
+	if(nullptr == pPart) return;
 	if(nLOD < 0 || nLOD > MAX_CHR_LOD) return;
-	if(NULL == pPart->Skins() || NULL == pPart->Skin(nLOD) || pPart->Skin(nLOD)->VertexCount() <= 0) return;
+	if(nullptr == pPart->Skins() || nullptr == pPart->Skin(nLOD) || pPart->Skin(nLOD)->VertexCount() <= 0) return;
 
 #ifdef _DEBUG
 	CN3Base::s_RenderInfo.nChr_Part++; // Rendering Information Update...
@@ -2506,7 +2506,7 @@ void CPlayerBase::CalcPart(CN3CPart* pPart, int nLOD, __Vector3 vDir)
 
 void CPlayerBase::CalcPlug(CN3CPlugBase* pPlug, const __Matrix44* pmtxJoint, __Matrix44& mtxMV, __Vector3 vDir)
 {
-	if(NULL == pPlug || NULL == pPlug->PMeshInst()) return;
+	if(nullptr == pPlug || nullptr == pPlug->PMeshInst()) return;
 	if(pPlug->PMeshInst()->GetNumVertices() <= 0) return;
 
 #ifdef _DEBUG
@@ -2526,7 +2526,7 @@ void CPlayerBase::CalcPlug(CN3CPlugBase* pPlug, const __Matrix44* pmtxJoint, __M
 	__Vector3 vec, A, B, C, vPick;
 	float t, u, v, fx, fz;
 
-	__VertexT1*	pVerT1 = NULL;
+	__VertexT1*	pVerT1 = nullptr;
 	pVerT1 = pPlug->PMeshInst()->GetVertices();
 
 	for ( int i = 0; i < iTotalCount; i++ )

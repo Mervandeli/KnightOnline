@@ -76,9 +76,9 @@ bool CN3CPartSkins::Save(HANDLE hFile)
 CN3CPart::CN3CPart()
 {
 	m_dwType |= OBJ_CHARACTER_PART;
-	m_pTexRef = NULL;
-	m_pTexOverlapRef = NULL;
-	m_pSkinsRef = NULL;
+	m_pTexRef = nullptr;
+	m_pTexOverlapRef = nullptr;
+	m_pSkinsRef = nullptr;
 
 	m_bVisible = true;
 	m_dwReserved = 0;
@@ -102,8 +102,8 @@ void CN3CPart::Release()
 
 	s_MngTex.Delete(&m_pTexRef);
 	s_MngTex.Delete(&m_pTexOverlapRef);
-	m_pTexRef = NULL;
-	m_pTexOverlapRef = NULL;
+	m_pTexRef = nullptr;
+	m_pTexOverlapRef = nullptr;
 	s_MngSkins.Delete(&m_pSkinsRef);
 
 	CN3BaseFileAccess::Release();
@@ -125,21 +125,21 @@ bool CN3CPart::Load(HANDLE hFile)
 	int nL = 0;
 	char szFN[256] = "";
 
-	ReadFile(hFile, &m_dwReserved, 4, &dwRWC, NULL);
-	ReadFile(hFile, &m_MtlOrg, sizeof(__Material), &dwRWC, NULL);
+	ReadFile(hFile, &m_dwReserved, 4, &dwRWC, nullptr);
+	ReadFile(hFile, &m_MtlOrg, sizeof(__Material), &dwRWC, nullptr);
 	m_Mtl = m_MtlOrg;
 
-	ReadFile(hFile, &nL, 4, &dwRWC, NULL);
+	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 	if(nL > 0) 
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL;
+		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
 		this->TexSet(szFN);
 	}
 
-	ReadFile(hFile, &nL, 4, &dwRWC, NULL);
+	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 	if(nL > 0) 
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL;
+		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
 		s_MngSkins.Delete(&m_pSkinsRef);
 		m_pSkinsRef = s_MngSkins.Get(szFN);
 	}
@@ -155,18 +155,18 @@ bool CN3CPart::Save(HANDLE hFile)
 	DWORD dwRWC = 0;
 	int nL = 0;
 
-	WriteFile(hFile, &m_dwReserved, 4, &dwRWC, NULL);
-	WriteFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, NULL);
+	WriteFile(hFile, &m_dwReserved, 4, &dwRWC, nullptr);
+	WriteFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr);
 	
 	if(m_pTexRef) nL = m_pTexRef->FileName().size();
 	else nL = 0;
-	WriteFile(hFile, &nL, 4, &dwRWC, NULL);
-	if(nL > 0) WriteFile(hFile, m_pTexRef->FileName().c_str(), nL, &dwRWC, NULL);
+	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+	if(nL > 0) WriteFile(hFile, m_pTexRef->FileName().c_str(), nL, &dwRWC, nullptr);
 
 	if(m_pSkinsRef) nL = m_pSkinsRef->FileName().size();
 	else nL = 0;
-	WriteFile(hFile, &nL, 4, &dwRWC, NULL);
-	if(nL > 0) WriteFile(hFile, m_pSkinsRef->FileName().c_str(), nL, &dwRWC, NULL);
+	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+	if(nL > 0) WriteFile(hFile, m_pSkinsRef->FileName().c_str(), nL, &dwRWC, nullptr);
 
 	return true;
 }
@@ -176,7 +176,7 @@ void CN3CPart::Render(int nLOD)
 {
 	if(false == m_bVisible) return;
 	if(nLOD < 0 || nLOD > MAX_CHR_LOD) return;
-	if(NULL == m_pSkinsRef || m_pSkinsRef->m_Skins[nLOD].VertexCount() <= 0) return;
+	if(nullptr == m_pSkinsRef || m_pSkinsRef->m_Skins[nLOD].VertexCount() <= 0) return;
 
 #ifdef _DEBUG
 	CN3Base::s_RenderInfo.nChr_Part++; // Rendering Information Update...
@@ -203,7 +203,7 @@ void CN3CPart::Render(int nLOD)
 	}
 
 	s_lpD3DDev->SetMaterial(&m_Mtl);
-	LPDIRECT3DTEXTURE9 lpTex = NULL;
+	LPDIRECT3DTEXTURE9 lpTex = nullptr;
 	bool bUseTwoUV = false;
 	if(m_pTexRef) lpTex = m_pTexRef->Get();
 	if(lpTex)
@@ -230,7 +230,7 @@ void CN3CPart::Render(int nLOD)
 	{
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
-		s_lpD3DDev->SetTexture(0, NULL);
+		s_lpD3DDev->SetTexture(0, nullptr);
 	}
 
 	m_pSkinsRef->m_Skins[nLOD].Render(bUseTwoUV);
@@ -238,7 +238,7 @@ void CN3CPart::Render(int nLOD)
 	if(bUseTwoUV)
 	{
 		s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-		s_lpD3DDev->SetTexture(1, NULL);
+		s_lpD3DDev->SetTexture(1, nullptr);
 	}
 
 	if((m_Mtl.nRenderFlags & RF_ALPHABLENDING) && FALSE == dwAlpha)		s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
@@ -269,7 +269,7 @@ void CN3CPart::TexOverlapSet(CN3Texture* pTex)
 void CN3CPart::RenderSelected(int nLOD)
 {
 	if(nLOD < 0 || nLOD > MAX_CHR_LOD) return;
-	if(NULL == m_pSkinsRef) return;
+	if(nullptr == m_pSkinsRef) return;
 
 	m_pSkinsRef->m_Skins[nLOD].RenderSelected();
 }
@@ -282,8 +282,8 @@ CN3CPlugBase::CN3CPlugBase()
 	m_ePlugType = PLUGTYPE_NORMAL;
 	m_nJointIndex = 0;
 
-	m_pTexRef = NULL;
-	m_pTexOverlapRef = NULL;
+	m_pTexRef = nullptr;
+	m_pTexOverlapRef = nullptr;
 
 	m_bVisible = true;
 	m_Mtl.Init();
@@ -372,7 +372,7 @@ void CN3CPlugBase::Render(const __Matrix44& mtxParent, const __Matrix44& mtxJoin
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx);
 
 	s_lpD3DDev->SetMaterial(&m_Mtl);
-	LPDIRECT3DTEXTURE9 lpTex = NULL;
+	LPDIRECT3DTEXTURE9 lpTex = nullptr;
 	bool bUseTwoUV = false;
 	if(m_pTexRef) lpTex = m_pTexRef->Get();
 	if(lpTex)
@@ -398,7 +398,7 @@ void CN3CPlugBase::Render(const __Matrix44& mtxParent, const __Matrix44& mtxJoin
 	{
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
-		s_lpD3DDev->SetTexture(0, NULL);
+		s_lpD3DDev->SetTexture(0, nullptr);
 	}
 
 	if((m_Mtl.nRenderFlags & RF_ALPHABLENDING) && FALSE == dwAlpha)	s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
@@ -411,7 +411,7 @@ void CN3CPlugBase::Render(const __Matrix44& mtxParent, const __Matrix44& mtxJoin
 	if(bUseTwoUV) // 텍스처 스테이지 두개로 렌더링한다...!!
 	{
 		s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-		s_lpD3DDev->SetTexture(1, NULL);
+		s_lpD3DDev->SetTexture(1, nullptr);
 	}
 }
 
@@ -442,32 +442,32 @@ bool CN3CPlugBase::Load(HANDLE hFile)
 	int nL = 0;
 	char szFN[512] = "";
 
-	ReadFile(hFile, &m_ePlugType, 4, &dwRWC, NULL); // Plug Type
+	ReadFile(hFile, &m_ePlugType, 4, &dwRWC, nullptr); // Plug Type
 //#ifdef _N3TOOL
 	if (m_ePlugType > PLUGTYPE_MAX)
 	{
 		m_ePlugType = PLUGTYPE_NORMAL;
 	}
 //#endif
-	ReadFile(hFile, &m_nJointIndex, 4, &dwRWC, NULL); // Plug Joint Index
+	ReadFile(hFile, &m_nJointIndex, 4, &dwRWC, nullptr); // Plug Joint Index
 
-	ReadFile(hFile, &m_vPosition, sizeof(m_vPosition), &dwRWC, NULL);
-	ReadFile(hFile, &m_MtxRot, sizeof(m_MtxRot), &dwRWC, NULL);
-	ReadFile(hFile, &m_vScale, sizeof(m_vScale), &dwRWC, NULL);
+	ReadFile(hFile, &m_vPosition, sizeof(m_vPosition), &dwRWC, nullptr);
+	ReadFile(hFile, &m_MtxRot, sizeof(m_MtxRot), &dwRWC, nullptr);
+	ReadFile(hFile, &m_vScale, sizeof(m_vScale), &dwRWC, nullptr);
 
-	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, NULL); // 재질
+	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질
 
-	ReadFile(hFile, &nL, 4, &dwRWC, NULL);
+	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 	if(nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL;
+		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
 		this->PMeshSet(szFN);
 	}
 
-	ReadFile(hFile, &nL, 4, &dwRWC, NULL);
+	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 	if(nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL;
+		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
 		this->TexSet(szFN);
 	}	
 
@@ -484,25 +484,25 @@ bool CN3CPlugBase::Save(HANDLE hFile)
 	DWORD dwRWC = 0;
 	int nL = 0;
 
-	WriteFile(hFile, &m_ePlugType, 4, &dwRWC, NULL); // Plug Type
-	WriteFile(hFile, &m_nJointIndex, 4, &dwRWC, NULL); // Plug Joint Index
+	WriteFile(hFile, &m_ePlugType, 4, &dwRWC, nullptr); // Plug Type
+	WriteFile(hFile, &m_nJointIndex, 4, &dwRWC, nullptr); // Plug Joint Index
 
-	WriteFile(hFile, &m_vPosition, sizeof(m_vPosition), &dwRWC, NULL);
-	WriteFile(hFile, &m_MtxRot, sizeof(m_MtxRot), &dwRWC, NULL);
-	WriteFile(hFile, &m_vScale, sizeof(m_vScale), &dwRWC, NULL);
+	WriteFile(hFile, &m_vPosition, sizeof(m_vPosition), &dwRWC, nullptr);
+	WriteFile(hFile, &m_MtxRot, sizeof(m_MtxRot), &dwRWC, nullptr);
+	WriteFile(hFile, &m_vScale, sizeof(m_vScale), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, NULL); // 재질
+	WriteFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질
 
 	nL = 0;
 	CN3PMesh* pPMesh = m_PMeshInst.GetMesh();
 	if(pPMesh) nL = pPMesh->FileName().size();
-	WriteFile(hFile, &nL, 4, &dwRWC, NULL);
-	if(nL > 0) WriteFile(hFile, pPMesh->FileName().c_str(), nL, &dwRWC, NULL);
+	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+	if(nL > 0) WriteFile(hFile, pPMesh->FileName().c_str(), nL, &dwRWC, nullptr);
 
 	nL = 0;
 	if(m_pTexRef) nL = m_pTexRef->FileName().size();
-	WriteFile(hFile, &nL, 4, &dwRWC, NULL);
-	if(nL > 0) WriteFile(hFile, m_pTexRef->FileName().c_str(), nL, &dwRWC, NULL);
+	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+	if(nL > 0) WriteFile(hFile, m_pTexRef->FileName().c_str(), nL, &dwRWC, nullptr);
 
 	return 0;
 }
@@ -539,10 +539,10 @@ CN3CPlug::CN3CPlug()
 	m_fTrace0 = 0; // 궤적 위치..
 	m_fTrace1 = 0; // 궤적 위치..
 
-	m_pFXMainBundle = NULL;
-	m_pFXPart = NULL;
+	m_pFXMainBundle = nullptr;
+	m_pFXPart = nullptr;
 
-	for(int i=0;i<MAX_FXTAIL;i++) m_pFXTailBundle[i] = NULL;
+	for(int i=0;i<MAX_FXTAIL;i++) m_pFXTailBundle[i] = nullptr;
 
 //	m_strFXName[PLUGATTR_FIRE] = "fx//fire_sword0_1.fxb";
 //	m_strFXName[PLUGATTR_ICE] = "fx//ice_sword0_1.fxb";
@@ -552,11 +552,11 @@ CN3CPlug::CN3CPlug()
 
 CN3CPlug::~CN3CPlug()
 {
-	if(m_pFXMainBundle) { delete m_pFXMainBundle; m_pFXMainBundle = NULL; }
+	if(m_pFXMainBundle) { delete m_pFXMainBundle; m_pFXMainBundle = nullptr; }
 
 	for(int i=0;i<MAX_FXTAIL;i++)
 	{
-		if(m_pFXTailBundle[i]) { delete m_pFXTailBundle[i]; m_pFXTailBundle[i] = NULL; }
+		if(m_pFXTailBundle[i]) { delete m_pFXTailBundle[i]; m_pFXTailBundle[i] = nullptr; }
 	}
 }
 
@@ -572,11 +572,11 @@ void CN3CPlug::Release()
 
 	m_PMeshInstFX.Release(); // FX 에 쓸 PMesh Instance
 
-	if(m_pFXMainBundle) { delete m_pFXMainBundle; m_pFXMainBundle = NULL; }
+	if(m_pFXMainBundle) { delete m_pFXMainBundle; m_pFXMainBundle = nullptr; }
 
 	for(int i=0;i<MAX_FXTAIL;i++)
 	{
-		if(m_pFXTailBundle[i]) { delete m_pFXTailBundle[i]; m_pFXTailBundle[i] = NULL; }
+		if(m_pFXTailBundle[i]) { delete m_pFXTailBundle[i]; m_pFXTailBundle[i] = nullptr; }
 	}
 }
 
@@ -585,17 +585,17 @@ bool CN3CPlug::Load(HANDLE hFile)
 	CN3CPlugBase::Load(hFile);
 	DWORD dwRWC = 0;
 
-	ReadFile(hFile, &m_nTraceStep, 4, &dwRWC, NULL); // 궤적 갯수..
+	ReadFile(hFile, &m_nTraceStep, 4, &dwRWC, nullptr); // 궤적 갯수..
 	if(m_nTraceStep > 0)
 	{
-		ReadFile(hFile, &m_crTrace, 4, &dwRWC, NULL); // 궤적 색깔.. 검은색이면 없다..
-		ReadFile(hFile, &m_fTrace0, 4, &dwRWC, NULL); // 궤적 위치..
-		ReadFile(hFile, &m_fTrace1, 4, &dwRWC, NULL); // 궤적 위치..
+		ReadFile(hFile, &m_crTrace, 4, &dwRWC, nullptr); // 궤적 색깔.. 검은색이면 없다..
+		ReadFile(hFile, &m_fTrace0, 4, &dwRWC, nullptr); // 궤적 위치..
+		ReadFile(hFile, &m_fTrace1, 4, &dwRWC, nullptr); // 궤적 위치..
 	}
 	else m_nTraceStep = 0;
 
 	int iUseVMesh = 0;
-	ReadFile(hFile, &iUseVMesh, 4, &dwRWC, NULL); // 메시를 쓰는가??
+	ReadFile(hFile, &iUseVMesh, 4, &dwRWC, nullptr); // 메시를 쓰는가??
 	if(iUseVMesh)
 	{
 		CN3PMesh* pPMesh = new CN3PMesh();
@@ -623,7 +623,7 @@ void CN3CPlug::InitFX(std::string& szFXMain, std::string& szFXTail, D3DCOLOR Tra
 	if(szFXMain.empty())
 	{
 		if(m_pFXMainBundle) delete m_pFXMainBundle;
-		m_pFXMainBundle = NULL;
+		m_pFXMainBundle = nullptr;
 		m_strFXMainName = szFXMain;
 	}
 	else if(!m_pFXMainBundle || szFXMain!=m_pFXMainBundle->FileName())
@@ -634,7 +634,7 @@ void CN3CPlug::InitFX(std::string& szFXMain, std::string& szFXTail, D3DCOLOR Tra
 		if(!m_pFXMainBundle->LoadFromFile(m_strFXMainName.c_str()))
 		{
 			delete m_pFXMainBundle;
-			m_pFXMainBundle = NULL;
+			m_pFXMainBundle = nullptr;
 			m_strFXMainName = "";
 
 			m_crTrace = 0xffffffff;
@@ -655,7 +655,7 @@ void CN3CPlug::InitFX(std::string& szFXMain, std::string& szFXTail, D3DCOLOR Tra
 		for(int i=0;i<MAX_FXTAIL;i++)
 		{
 			if(m_pFXTailBundle[i]) delete m_pFXTailBundle[i];
-			m_pFXTailBundle[i] = NULL;
+			m_pFXTailBundle[i] = nullptr;
 		}
 	}
 	else if(!m_pFXTailBundle[0] || szFXTail!=m_pFXTailBundle[0]->FileName())
@@ -666,7 +666,7 @@ void CN3CPlug::InitFX(std::string& szFXMain, std::string& szFXTail, D3DCOLOR Tra
 		if(!m_pFXTailBundle[0]->LoadFromFile(m_strFXTailName.c_str()))
 		{
 			delete m_pFXTailBundle[0];
-			m_pFXTailBundle[0] = NULL;
+			m_pFXTailBundle[0] = nullptr;
 			m_strFXTailName = "";
 			return;			
 		}
@@ -694,17 +694,17 @@ bool CN3CPlug::Save(HANDLE hFile)
 	CN3CPlugBase::Save(hFile);
 	DWORD dwRWC = 0;
 
-	WriteFile(hFile, &m_nTraceStep, 4, &dwRWC, NULL); // 궤적 갯수..
+	WriteFile(hFile, &m_nTraceStep, 4, &dwRWC, nullptr); // 궤적 갯수..
 	if(m_nTraceStep > 0 && m_nTraceStep <= MAX_PLUG_TRACE_VERTEX/2 - 1)
 	{
-		WriteFile(hFile, &m_crTrace, 4, &dwRWC, NULL); // 궤적 색깔.. 검은색이면 없다..
-		WriteFile(hFile, &m_fTrace0, 4, &dwRWC, NULL); // 궤적 위치..
-		WriteFile(hFile, &m_fTrace1, 4, &dwRWC, NULL); // 궤적 위치..
+		WriteFile(hFile, &m_crTrace, 4, &dwRWC, nullptr); // 궤적 색깔.. 검은색이면 없다..
+		WriteFile(hFile, &m_fTrace0, 4, &dwRWC, nullptr); // 궤적 위치..
+		WriteFile(hFile, &m_fTrace1, 4, &dwRWC, nullptr); // 궤적 위치..
 	}
 	else m_nTraceStep = 0;
 	
 	int iUseVMesh = (m_PMeshInstFX.GetMesh()) ? true : false; // 메쉬.. FX에 쓴다..
-	WriteFile(hFile, &iUseVMesh, 4, &dwRWC, NULL); // 위치 정보 메시를 쓰는가??
+	WriteFile(hFile, &iUseVMesh, 4, &dwRWC, nullptr); // 위치 정보 메시를 쓰는가??
 	if(iUseVMesh) m_PMeshInstFX.GetMesh()->Save(hFile);
 
 	return 0;
@@ -818,7 +818,7 @@ void CN3CPlug::RenderFX(const __Matrix44& mtxParent, const __Matrix44& mtxJoint)
 			pAP->dwPrimitiveSize	= sizeof(__VertexT1);
 			pAP->fCameraDistance	= fCameraDist + fHeight;
 
-			pAP->lpTex				= NULL;
+			pAP->lpTex				= nullptr;
 			if(m_pFXPart->m_ppRefTex[iTexIdx])
 				pAP->lpTex = m_pFXPart->m_ppRefTex[iTexIdx]->Get();
 			
@@ -852,7 +852,7 @@ void CN3CPlug::RenderFX(const __Matrix44& mtxParent, const __Matrix44& mtxJoint)
 			pAP->dwPrimitiveSize	= sizeof(__VertexT1);
 			pAP->fCameraDistance	= (s_CameraData.vEye - mtx.Pos()).Magnitude() + fHeight;
 
-			pAP->lpTex				= NULL;
+			pAP->lpTex				= nullptr;
 			iTexIdx = (iTexIdx+1) % m_pFXPart->m_iNumTex;
 			if(m_pFXPart->m_ppRefTex[iTexIdx])
 				pAP->lpTex = m_pFXPart->m_ppRefTex[iTexIdx]->Get();
@@ -883,7 +883,7 @@ void CN3CPlug::RenderFX(const __Matrix44& mtxParent, const __Matrix44& mtxJoint)
 			pAP->dwPrimitiveSize	= sizeof(__VertexT1);
 			pAP->fCameraDistance	= (s_CameraData.vEye - mtx.Pos()).Magnitude() + fHeight;
 
-			pAP->lpTex				= NULL;
+			pAP->lpTex				= nullptr;
 			iTexIdx = (iTexIdx+1) % m_pFXPart->m_iNumTex;
 			if(m_pFXPart->m_ppRefTex[iTexIdx])
 				pAP->lpTex = m_pFXPart->m_ppRefTex[iTexIdx]->Get();
@@ -920,7 +920,7 @@ void CN3CPlug::RenderFX(const __Matrix44& mtxParent, const __Matrix44& mtxJoint)
 			pAP->dwPrimitiveSize	= sizeof(__VertexT1);
 			pAP->fCameraDistance	= (s_CameraData.vEye - mtx.Pos()).Magnitude() + fHeight;
 
-			pAP->lpTex				= NULL;
+			pAP->lpTex				= nullptr;
 			iTexIdx = (iTexIdx+1) % m_pFXPart->m_iNumTex;
 			if(m_pFXPart->m_ppRefTex[iTexIdx])
 				pAP->lpTex = m_pFXPart->m_ppRefTex[iTexIdx]->Get();
@@ -953,7 +953,7 @@ void CN3CPlug::RenderFX(const __Matrix44& mtxParent, const __Matrix44& mtxJoint)
 			pAP->dwPrimitiveSize	= sizeof(__VertexT1);
 			pAP->fCameraDistance	= (s_CameraData.vEye - mtx.Pos()).Magnitude() + fHeight;
 
-			pAP->lpTex				= NULL;
+			pAP->lpTex				= nullptr;
 			iTexIdx = (iTexIdx+1) % m_pFXPart->m_iNumTex;
 			if(m_pFXPart->m_ppRefTex[iTexIdx])
 				pAP->lpTex = m_pFXPart->m_ppRefTex[iTexIdx]->Get();
@@ -1039,14 +1039,14 @@ CN3Chr::CN3Chr()
 {
 	m_dwType |= OBJ_CHARACTER;
 
-	m_pRootJointRef = NULL;
-	m_pRootJointRef = NULL;
+	m_pRootJointRef = nullptr;
+	m_pRootJointRef = nullptr;
 
-	m_pAniCtrlRef = NULL;
-	m_pMeshCollision = NULL;
-	m_pFXPlug = NULL;
+	m_pAniCtrlRef = nullptr;
+	m_pMeshCollision = nullptr;
+	m_pFXPlug = nullptr;
 
-//	m_pSkinCollision = NULL;
+//	m_pSkinCollision = nullptr;
 	m_fAniSpeedDelta = 1.0f;			// 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다..
 
 	this->Release();
@@ -1072,7 +1072,7 @@ CN3Chr::~CN3Chr()
 	s_MngAniCtrl.Delete(&m_pAniCtrlRef);
 
 	// 충돌 메시는 캐릭터에서는 지운다..
-	delete m_pMeshCollision; m_pMeshCollision = NULL;
+	delete m_pMeshCollision; m_pMeshCollision = nullptr;
 
 	delete m_pFXPlug;
 }
@@ -1100,7 +1100,7 @@ void CN3Chr::Release()
 	m_vTraces.clear();
 
 //	s_MngSkin.Delete(m_pSkinCollision);
-//	m_pSkinCollision = NULL;
+//	m_pSkinCollision = nullptr;
 
 	// Animation Control
 	s_MngAniCtrl.Delete(&m_pAniCtrlRef);
@@ -1117,16 +1117,16 @@ void CN3Chr::Release()
 	m_fAniSpeedDelta = 1.0f;			// 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다..
 
 	// 충돌 메시는 캐릭터에서는 지운다..
-	delete m_pMeshCollision; m_pMeshCollision = NULL;
+	delete m_pMeshCollision; m_pMeshCollision = nullptr;
 
-	if (m_pFXPlug) {delete m_pFXPlug; m_pFXPlug = NULL;}
+	if (m_pFXPlug) {delete m_pFXPlug; m_pFXPlug = nullptr;}
 
 	CN3TransformCollision::Release();
 }
 
 bool CN3Chr::Load(HANDLE hFile)
 {
-	if(m_pRootJointRef != NULL) CN3Chr::Release();
+	if(m_pRootJointRef != nullptr) CN3Chr::Release();
 
 	CN3TransformCollision::Load(hFile);
 
@@ -1135,39 +1135,39 @@ bool CN3Chr::Load(HANDLE hFile)
 	int nL = 0;
 	char szFN[512] = "";
 
-	ReadFile(hFile, &nL, 4, &dwRWC, NULL);
-	ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL;
+	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
+	ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
 	this->JointSet(szFN); // 뼈대 세팅..
 
 	// Part Allocation, Loading .. 
 	int iPC = 0;
-	ReadFile(hFile, &iPC, 4, &dwRWC, NULL);
+	ReadFile(hFile, &iPC, 4, &dwRWC, nullptr);
 	this->PartAlloc(iPC);
 	for(int i = 0; i < iPC; i++)
 	{
 		nL = 0;
-		ReadFile(hFile, &nL, 4, &dwRWC, NULL);
+		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 		if(nL > 0)
 		{
-			ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL;
+			ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
 			m_Parts[i]->LoadFromFile(szFN);
 		}
 	}
 	
 	// Plug Allocation, Loading .. 
 	m_Plugs.clear();
-	ReadFile(hFile, &iPC, 4, &dwRWC, NULL);
+	ReadFile(hFile, &iPC, 4, &dwRWC, nullptr);
 	this->PlugAlloc(iPC);
 	for(int i = 0; i < iPC; i++)
 	{
 		nL = 0;
-		ReadFile(hFile, &nL, 4, &dwRWC, NULL);
+		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 		if(nL > 0)
 		{
-			ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL;
+			ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
 			m_Plugs[i]->LoadFromFile(szFN);
 
-//			CN3CPlugBase* pPlug = NULL;
+//			CN3CPlugBase* pPlug = nullptr;
 //			e_PlugType eType = CN3CPlugBase::GetPlugTypeByFileName(szFN);
 //			if (eType == PLUGTYPE_NORMAL)			
 //			{	// PLUGTYPE_NORMAL
@@ -1197,24 +1197,24 @@ bool CN3Chr::Load(HANDLE hFile)
 
 	// Animation Control..
 	nL = 0;
-	ReadFile(hFile, &nL, 4, &dwRWC, NULL);
+	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 	if(nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL;
+		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
 		this->AniCtrlSet(szFN);
 	}
 
-	ReadFile(hFile, m_nJointPartStarts, sizeof(m_nJointPartStarts), &dwRWC, NULL); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
-	ReadFile(hFile, m_nJointPartEnds, sizeof(m_nJointPartEnds), &dwRWC, NULL); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
+	ReadFile(hFile, m_nJointPartStarts, sizeof(m_nJointPartStarts), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
+	ReadFile(hFile, m_nJointPartEnds, sizeof(m_nJointPartEnds), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
 
 //////////////////////////////////////////////////
 //	Coded (By Dino On 2002-10-10 오후 2:33:07 )
 //	FXPlug
 	nL = 0;
-	ReadFile(hFile, &nL, sizeof(nL), &dwRWC, NULL);
+	ReadFile(hFile, &nL, sizeof(nL), &dwRWC, nullptr);
 	if (nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL;
+		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
 		FXPlugSet(szFN);
 	}
 //	End Of Code (By Dino On 2002-10-10 오후 2:33:07 )
@@ -1228,14 +1228,14 @@ bool CN3Chr::Load(HANDLE hFile)
 
 __AnimData* CN3Chr::AniDataCur()
 {
-	if(NULL == m_pAniCtrlRef) return NULL;
+	if(nullptr == m_pAniCtrlRef) return nullptr;
 	return m_pAniCtrlRef->DataGet(m_FrmCtrl.iAni);
 }
 
 #ifdef _N3TOOL
 __AnimData* CN3Chr::AniDataUpper()
 {
-	if(NULL == m_pAniCtrlRef) return NULL;
+	if(nullptr == m_pAniCtrlRef) return nullptr;
 	return m_pAniCtrlRef->DataGet(m_FrmCtrlUpper.iAni);
 }
 
@@ -1248,8 +1248,8 @@ bool CN3Chr::Save(HANDLE hFile)
 
 	// 관절 파일 이름 써주기..
 	if(m_pRootJointRef) nL = m_pRootJointRef->FileName().size();
-	WriteFile(hFile, &nL, 4, &dwRWC, NULL);
-	if(nL > 0) WriteFile(hFile, m_pRootJointRef->FileName().c_str(), nL, &dwRWC, NULL);
+	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+	if(nL > 0) WriteFile(hFile, m_pRootJointRef->FileName().c_str(), nL, &dwRWC, nullptr);
 
 	// 내용이 없는 Part Data는 걸러낸다..
 	std::vector<CN3CPart*> PartsTmp = m_Parts;
@@ -1257,7 +1257,7 @@ bool CN3Chr::Save(HANDLE hFile)
 	m_Parts.resize(64);
 
 	it_CPart it = PartsTmp.begin(), itEnd = PartsTmp.end();
-	CN3CPart* pPart = NULL;
+	CN3CPart* pPart = nullptr;
 	for(; it != itEnd; it++)
 	{
 		pPart = *it;
@@ -1282,13 +1282,13 @@ bool CN3Chr::Save(HANDLE hFile)
 		else // 없으면..
 		{
 			delete pPart; // 지운다..
-			*it = NULL;
+			*it = nullptr;
 		}
 	}
 
 	// 실제 저장..
 	int iPC = m_Parts.size();
-	WriteFile(hFile, &iPC, 4, &dwRWC, NULL);
+	WriteFile(hFile, &iPC, 4, &dwRWC, nullptr);
 	int i;
 	for(i = 0; i < iPC; i++)
 	{
@@ -1299,13 +1299,13 @@ bool CN3Chr::Save(HANDLE hFile)
 			m_Parts[i]->FileNameSet(szFNTmp);
 		}
 		nL = m_Parts[i]->FileName().size();
-		WriteFile(hFile, &nL, 4, &dwRWC, NULL);
-		WriteFile(hFile, m_Parts[i]->FileName().c_str(), nL, &dwRWC, NULL);
+		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+		WriteFile(hFile, m_Parts[i]->FileName().c_str(), nL, &dwRWC, nullptr);
 		m_Parts[i]->SaveToFile();
 	}
 	
 	iPC = m_Plugs.size();
-	WriteFile(hFile, &iPC, 4, &dwRWC, NULL);
+	WriteFile(hFile, &iPC, 4, &dwRWC, nullptr);
 	for(i = 0; i < iPC; i++)
 	{
 		nL = m_Plugs[i]->FileName().size();
@@ -1317,37 +1317,37 @@ bool CN3Chr::Save(HANDLE hFile)
 		}
 
 		nL = m_Plugs[i]->FileName().size();
-		WriteFile(hFile, &nL, 4, &dwRWC, NULL);
-		WriteFile(hFile, m_Plugs[i]->FileName().c_str(), nL, &dwRWC, NULL);
+		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+		WriteFile(hFile, m_Plugs[i]->FileName().c_str(), nL, &dwRWC, nullptr);
 		m_Plugs[i]->SaveToFile();
 	}
 	
 //	nL = 0;
 //	if(m_pSkinCollision) nL = m_pSkinCollision->m_szName.size();
-//	WriteFile(hFile, &nL, 4, &dwRWC, NULL);
-//	if(nL > 0) WriteFile(hFile, m_pSkinCollision->m_szName.c_str(), nL, &dwRWC, NULL);
+//	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+//	if(nL > 0) WriteFile(hFile, m_pSkinCollision->m_szName.c_str(), nL, &dwRWC, nullptr);
 	
 	// Animation Control..
 	nL = 0;
 	if(m_pAniCtrlRef) nL = m_pAniCtrlRef->FileName().size();
-	WriteFile(hFile, &nL, 4, &dwRWC, NULL);
+	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
 	if(nL > 0)
 	{
-		WriteFile(hFile, m_pAniCtrlRef->FileName().c_str(), nL, &dwRWC, NULL);
+		WriteFile(hFile, m_pAniCtrlRef->FileName().c_str(), nL, &dwRWC, nullptr);
 	}
 
-	WriteFile(hFile, m_nJointPartStarts, sizeof(m_nJointPartStarts), &dwRWC, NULL); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
-	WriteFile(hFile, m_nJointPartEnds, sizeof(m_nJointPartEnds), &dwRWC, NULL); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
+	WriteFile(hFile, m_nJointPartStarts, sizeof(m_nJointPartStarts), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
+	WriteFile(hFile, m_nJointPartEnds, sizeof(m_nJointPartEnds), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
 
 //////////////////////////////////////////////////
 //	Coded (By Dino On 2002-10-11 오후 2:19:11 )
 //	FXPlug
 	nL = 0;
 	if (m_pFXPlug) nL = m_pFXPlug->FileName().size();
-	WriteFile(hFile, &nL, sizeof(nL), &dwRWC, NULL);
+	WriteFile(hFile, &nL, sizeof(nL), &dwRWC, nullptr);
 	if (nL>0)
 	{
-		WriteFile(hFile, m_pFXPlug->FileName().c_str(), nL, &dwRWC, NULL);
+		WriteFile(hFile, m_pFXPlug->FileName().c_str(), nL, &dwRWC, nullptr);
 		m_pFXPlug->SaveToFile();
 	}
 //	End Of Code (By Dino On 2002-10-11 오후 2:19:11 )
@@ -1359,7 +1359,7 @@ bool CN3Chr::Save(HANDLE hFile)
 
 void CN3Chr::Tick(float fFrm)
 {
-	if(NULL == m_pRootJointRef)
+	if(nullptr == m_pRootJointRef)
 	{
 		m_nLOD = -1;
 		return;
@@ -1429,7 +1429,7 @@ void CN3Chr::Tick(float fFrm)
 
 void CN3Chr::TickAnimationFrame()
 {
-	if(NULL == m_FrmCtrl.pAniData) return; // 에니메이션 데이터 가 없다!!
+	if(nullptr == m_FrmCtrl.pAniData) return; // 에니메이션 데이터 가 없다!!
 
 	// 루핑중이고 지연시간이 있으면..
 	if(	(m_FrmCtrl.pAniData->iBlendFlags & 1) &&
@@ -1533,7 +1533,7 @@ void CN3Chr::TickAnimationFrame()
 
 void CN3Chr::TickJoints()
 {
-	if(NULL == m_FrmCtrlUpper.pAniData) // 상하체 통째로 처리..
+	if(nullptr == m_FrmCtrlUpper.pAniData) // 상하체 통째로 처리..
 	{
 		int iJC = m_JointRefs.size();
 		for(int i = 0; i < iJC; i++)
@@ -1594,9 +1594,9 @@ void CN3Chr::TickJoints()
 
 void CN3Chr::TickPlugs(float fLOD)
 {
-	if(NULL == this->m_pRootJointRef) return;
+	if(nullptr == this->m_pRootJointRef) return;
 
-	CN3CPlug*	pPlug = NULL;
+	CN3CPlug*	pPlug = nullptr;
 	
 	float fFrmCur = m_FrmCtrl.fFrmCur;
 //	if(m_FrmCtrlUpper.pAniData) fFrmCur = m_FrmCtrlUpper.fFrmCur; // 상체 에니메이션이 있으면...
@@ -1609,8 +1609,8 @@ void CN3Chr::TickPlugs(float fLOD)
 		if (pPlug->m_ePlugType== PLUGTYPE_NORMAL)
 		{
 			__AnimData* pAniData = m_FrmCtrlUpper.pAniData;
-			if(NULL == pAniData) pAniData = m_FrmCtrl.pAniData;
-			if(NULL == pAniData) continue;
+			if(nullptr == pAniData) pAniData = m_FrmCtrl.pAniData;
+			if(nullptr == pAniData) continue;
 			if(pPlug->m_nTraceStep <= 0) continue;
 			
 			pPlug->m_bRenderTrace = false;
@@ -1675,7 +1675,7 @@ void CN3Chr::RemakePlugTracePolygons()
 		return;
 
 	size_t iPC = m_Plugs.size();
-	m_vTraces.assign(iPC, NULL);
+	m_vTraces.assign(iPC, nullptr);
 	for(size_t i = 0; i < iPC; i++)
 	{
 		int iTS = m_Plugs[i]->m_nTraceStep;
@@ -1687,7 +1687,7 @@ void CN3Chr::RemakePlugTracePolygons()
 
 void CN3Chr::Render()
 {
-	if(NULL == m_pRootJointRef) return;
+	if(nullptr == m_pRootJointRef) return;
 	if(m_nLOD < 0 || m_nLOD >= MAX_CHR_LOD) return;
 
 
@@ -1731,7 +1731,7 @@ void CN3Chr::Render()
 	}
 
 	// Plug - 붙이는 부분 Rendering
-	CN3CPlug* pPlug = NULL;
+	CN3CPlug* pPlug = nullptr;
 	iPC = m_Plugs.size();
 	for(int i = 0; i < iPC; i++)
 	{
@@ -1765,14 +1765,14 @@ void CN3Chr::Render()
 				pAP->dwFVF				= FVF_CV;
 				pAP->dwPrimitiveSize	= sizeof(__VertexColor);
 				pAP->fCameraDistance	= (s_CameraData.vEye - m_Matrix.Pos()).Magnitude();
-				pAP->lpTex				= NULL;
+				pAP->lpTex				= nullptr;
 				pAP->ePrimitiveType		= D3DPT_TRIANGLESTRIP;
 				pAP->nPrimitiveCount	= (pPlug->m_nTraceStep-1)*2;
 				pAP->nRenderFlags		= RF_DOUBLESIDED | RF_DIFFUSEALPHA | RF_NOTUSELIGHT | RF_NOTZWRITE;
 				pAP->nVertexCount		= (pPlug->m_nTraceStep)*2;
 				pAP->MtxWorld			= m_Matrix;
 				pAP->pVertices			= m_vTraces[i];
-				pAP->pwIndices			= NULL;
+				pAP->pwIndices			= nullptr;
 			}
 		}
 		else if (pPlug->m_ePlugType == PLUGTYPE_CLOAK)
@@ -1801,8 +1801,8 @@ void CN3Chr::BuildMesh()
 	int nJIndex = 0, nAffect = 0;
 
 	int i = 0, j = 0, k = 0, nVC = 0;
-	CN3IMesh* pIMesh = NULL;
-	CN3Skin* pSkin = NULL;
+	CN3IMesh* pIMesh = nullptr;
+	CN3Skin* pSkin = nullptr;
 
 	__Matrix44* pMtxJs = &(m_MtxJoints[0]);
 	__Matrix44* pMtxJIs = &(m_MtxInverses[0]);
@@ -1811,16 +1811,16 @@ void CN3Chr::BuildMesh()
 	for(i = 0; i < iPC; i++)
 	{
 		pSkin = m_Parts[i]->Skin(m_nLOD);
-		if(NULL == pSkin) continue;
+		if(nullptr == pSkin) continue;
 
 		__VertexXyzNormal* pVDest = pSkin->Vertices();
 		__VertexSkinned* pVSrc = pSkin->SkinVertices();
-		if(NULL == pVDest || NULL == pVSrc) continue;
+		if(nullptr == pVDest || nullptr == pVSrc) continue;
 
 		nVC = pSkin->VertexCount();
 		__Vector3 vFinal;
 		int nAffect = 0;
-		float* pfWeights = NULL;
+		float* pfWeights = nullptr;
 		for(j = 0; j < nVC; j++) // j < m_nBoneVertices 와 같다..
 		{
 
@@ -1861,7 +1861,7 @@ void CN3Chr::BuildMesh()
 		else
 		{
 			int nAffect = 0;
-			float* pfWeights = NULL;
+			float* pfWeights = nullptr;
 			for(j = 0; j < nVC; j++) // j < m_nBoneVertices 와 같다..
 			{
 				nAffect = pVSrc[j].nAffect;
@@ -1900,8 +1900,8 @@ void CN3Chr::BuildMesh(int nLOD)
 	int nJIndex = 0, nAffect = 0;
 
 	int i = 0, j = 0, k = 0, nVC = 0;
-	CN3IMesh* pIMesh = NULL;
-	CN3Skin* pSkin = NULL;
+	CN3IMesh* pIMesh = nullptr;
+	CN3Skin* pSkin = nullptr;
 
 	__Matrix44* pMtxJs = &(m_MtxJoints[0]);
 	__Matrix44* pMtxJIs = &(m_MtxInverses[0]);
@@ -1910,16 +1910,16 @@ void CN3Chr::BuildMesh(int nLOD)
 	for(i = 0; i < iPC; i++)
 	{
 		pSkin = m_Parts[i]->Skin(nLOD);
-		if(NULL == pSkin) continue;
+		if(nullptr == pSkin) continue;
 
 		__VertexXyzNormal* pVDest = pSkin->Vertices();
 		__VertexSkinned* pVSrc = pSkin->SkinVertices();
-		if(NULL == pVDest || NULL == pVSrc) continue;
+		if(nullptr == pVDest || nullptr == pVSrc) continue;
 
 		nVC = pSkin->VertexCount();
 		__Vector3 vFinal;
 		int nAffect = 0;
-		float* pfWeights = NULL;
+		float* pfWeights = nullptr;
 		for(j = 0; j < nVC; j++) // j < m_nBoneVertices 와 같다..
 		{
 
@@ -1947,14 +1947,14 @@ void CN3Chr::BuildMesh(int nLOD)
 
 void CN3Chr::Init()
 {
-	if(NULL == m_pRootJointRef) return;
+	if(nullptr == m_pRootJointRef) return;
 
 	// 관절이 몇개 있는지 계산하고.. 포인터 할당..
 
 	int iJC = 0;
 	__Matrix44 mtxTmp; mtxTmp.Identity();
 	m_pRootJointRef->NodeCount(iJC);
-	m_JointRefs.assign(iJC, NULL);
+	m_JointRefs.assign(iJC, nullptr);
 	m_MtxJoints.assign(iJC, mtxTmp);
 	m_MtxInverses.assign(iJC, mtxTmp);
 	
@@ -1962,9 +1962,9 @@ void CN3Chr::Init()
 	m_pRootJointRef->Tick(0); // 초기에 관절 위치 계산..
 	for(int i = 0; i < iJC; i++) // 관절 갯수 만큼 각 관절의 참조 포인터와 역행렬을 얻어놓는다..
 	{
-		m_JointRefs[i] = NULL;
+		m_JointRefs[i] = nullptr;
 		m_pRootJointRef->FindPointerByID(i, m_JointRefs[i]);
-		::D3DXMatrixInverse(&(m_MtxInverses[i]), NULL, &(m_JointRefs[i]->m_Matrix)); // 로컬 축에 대한 역행렬을 구한다..
+		::D3DXMatrixInverse(&(m_MtxInverses[i]), nullptr, &(m_JointRefs[i]->m_Matrix)); // 로컬 축에 대한 역행렬을 구한다..
 		m_MtxJoints[i] = m_JointRefs[i]->m_Matrix;
 	}
 
@@ -1973,14 +1973,14 @@ void CN3Chr::Init()
 	this->FindMinMax();
 	
 	// 충돌 체크를 위한 폴리곤.. 크기에 맞게 변환..
-	if(NULL == m_pMeshCollision) m_pMeshCollision = new CN3VMesh();
+	if(nullptr == m_pMeshCollision) m_pMeshCollision = new CN3VMesh();
 	m_pMeshCollision->CreateCube(m_vMin, m_vMax);
 }
 
 void CN3Chr::JointSet(const std::string& szFN)
 {
 	bool bNeedInit = false;
-	if(NULL == m_pRootJointRef) bNeedInit = true;
+	if(nullptr == m_pRootJointRef) bNeedInit = true;
 	else if(m_pRootJointRef && m_pRootJointRef->FileName() != szFN) bNeedInit = true;// 파일 이름이 달라야 지우고 새로 한다..
 
 	if(bNeedInit)
@@ -1999,7 +1999,7 @@ void CN3Chr::PartAlloc(int iCount)
 		
 	if(iCount > 0) 
 	{
-		m_Parts.assign(iCount, NULL);
+		m_Parts.assign(iCount, nullptr);
 		for(int i = 0; i < iCount; i++) m_Parts[i] = new CN3CPart();
 	}
 }
@@ -2071,7 +2071,7 @@ void CN3Chr::PlugAlloc(int iCount)
 		
 	if(iCount > 0) 
 	{
-		m_Plugs.assign(iCount, NULL);
+		m_Plugs.assign(iCount, nullptr);
 		for(int i = 0; i < iCount; i++) m_Plugs[i] = new CN3CPlug();
 	}
 }
@@ -2096,7 +2096,7 @@ void CN3Chr::AniCtrlSet(const std::string& szFN)
 		m_FrmCtrl.fFrmCur = 0;
 		m_FrmCtrl.fFrmPrev = 0;				// 최근 프레임
 		m_FrmCtrl.iAniLoop = 0;
-		m_FrmCtrl.pAniData = NULL;
+		m_FrmCtrl.pAniData = nullptr;
 	}
 }
 
@@ -2106,7 +2106,7 @@ int	CN3Chr::AniCurSet(	int iAni,					// Animation 번호,
 						float fFreezeTime,			// 멈출시간...
 						bool bStopUpperAnimation)	// 상체 에니메이션이 있으면.. 멈추도록
 {
-	if(NULL == m_pAniCtrlRef) return -1;
+	if(nullptr == m_pAniCtrlRef) return -1;
 	if(iAni == m_FrmCtrl.iAni) return -1; // 같은 에니메이션이면 돌아간다.
 //	if(iAni == m_FrmCtrl.iAni) { m_FrmCtrl.iAniLoop = 0; return -1; } // 같은 에니메이션이면 루핑 참조 카운트만 초기화하고 돌아간다.
 	if(iAni < 0 || iAni >= m_pAniCtrlRef->Count()) return -1;
@@ -2135,12 +2135,12 @@ int	CN3Chr::AniCurSet(	int iAni,					// Animation 번호,
 
 void CN3Chr::AniFixToLastFrame( int iAni ) // 마지막 프레임으로 고정 시켜 버린다.
 {
-	if(NULL == m_pAniCtrlRef) return;
+	if(nullptr == m_pAniCtrlRef) return;
 	if(iAni == m_FrmCtrl.iAni) return; // 같은 에니메이션이면 돌아간다.
 	if(iAni < 0 || iAni >= m_pAniCtrlRef->Count()) return;
 
 	__AnimData* pAniData = m_pAniCtrlRef->DataGet(iAni);
-	if(NULL == pAniData) return;
+	if(nullptr == pAniData) return;
 
 	m_FrmCtrl.Init();
 	m_FrmCtrl.iAni = iAni;
@@ -2157,7 +2157,7 @@ void CN3Chr::AniFixToLastFrame( int iAni ) // 마지막 프레임으로 고정 �
 
 void CN3Chr::AniUpperSet(int iAni, float fFreezeTime)
 {
-	if(NULL == m_pAniCtrlRef) return;
+	if(nullptr == m_pAniCtrlRef) return;
 	if(iAni < 0 || iAni >= m_pAniCtrlRef->Count()) return;
 	if(iAni == m_FrmCtrlUpper.iAni) return; // 전의 것과 같으면 넘어간다..
 
@@ -2250,17 +2250,17 @@ int CN3Chr::CheckCollisionPrecisely(int ixScreen, int iyScreen, __Vector3* pvPic
 
 
 	static __Matrix44 mtxWI, mtxWIRot;
-	D3DXMatrixInverse(&mtxWI, NULL, &m_Matrix); // World Matrix Inverse
+	D3DXMatrixInverse(&mtxWI, nullptr, &m_Matrix); // World Matrix Inverse
 	mtxWIRot = mtxWI;
 	mtxWIRot.PosSet(0,0,0);
 	__Vector3 vPos2 = vPos * mtxWI;
 	__Vector3 vDir2 = vDir * mtxWIRot;
 
-	CN3VMesh* pvMesh = NULL;
+	CN3VMesh* pvMesh = nullptr;
 	__Matrix44 Mtx = m_Matrix;
 	pvMesh = CollisionMesh();
 
-	if(NULL == pvMesh) 
+	if(nullptr == pvMesh) 
 		return -1;
 
 	if(!pvMesh->Pick(Mtx, vPos, vDir, pvPick))
@@ -2281,13 +2281,13 @@ int CN3Chr::CheckCollisionPrecisely(const __Vector3 &vPos, const __Vector3 &vDir
 
 	__Vector3 v0, v1, v2;
 
-	CN3Skin* pSkin = NULL;
+	CN3Skin* pSkin = nullptr;
 	__Vector3 vPos2 = vPos, vDir2 = vDir;
 	int iPC = m_Parts.size();
 	for(int i = 0; i < iPC; i++)
 	{
 		pSkin = m_Parts[i]->Skin(m_nLOD);
-		if(NULL == pSkin) continue;
+		if(nullptr == pSkin) continue;
 
 		if(pSkin->CheckCollisionPrecisely(vPos2, vDir2, pvPick))
 		{
@@ -2308,7 +2308,7 @@ CN3FXPlug* CN3Chr::FXPlugSet(const std::string& strFN)
 {
 	if (m_pFXPlug) m_pFXPlug->Release();
 	else m_pFXPlug = new CN3FXPlug();
-	if (false == m_pFXPlug->LoadFromFile(strFN)) return NULL;
+	if (false == m_pFXPlug->LoadFromFile(strFN)) return nullptr;
 	return m_pFXPlug;
 }
 
@@ -2332,7 +2332,7 @@ CN3FXPlug*	CN3Chr::FXPlugCreate()
 void	CN3Chr::FXPlugDelete()
 {
 	if (m_pFXPlug) delete m_pFXPlug;
-	m_pFXPlug = NULL;
+	m_pFXPlug = nullptr;
 }
 //	End Of Code (By Dino On 2002-10-10 오후 2:36:28 )
 //////////////////////////////////////////////////

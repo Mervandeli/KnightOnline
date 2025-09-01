@@ -18,7 +18,7 @@ public:
 
 public:
 	void UpdateAll();
-	CDlgUnusedFiles(CWnd* pParent = NULL);   // standard constructor
+	CDlgUnusedFiles(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgUnusedFiles)

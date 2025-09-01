@@ -52,7 +52,7 @@ BOOL CN3CEDoc::OnNewDocument()
 		m_Scene.ChrGet(0)->Release();
 		m_Scene.ChrGet(0)->AniDefaultSet(); // 기본 에니메이션 세팅..
 	}
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 
 	return TRUE;
 }
@@ -106,7 +106,7 @@ BOOL CN3CEDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		if('\\' == szPath[i] || '/' == szPath[i]) nFind++;
 		if(nFind >= 2)
 		{
-			szPath[i] = NULL;
+			szPath[i] = '\0';
 			break;
 		}
 	}
@@ -126,14 +126,14 @@ BOOL CN3CEDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		}
 	}
 
-	if(m_Scene.ChrGet(0)->AniCtrl() == NULL)
+	if(m_Scene.ChrGet(0)->AniCtrl() == nullptr)
 	{
 		m_Scene.ChrGet(0)->AniDefaultSet(); // 기본 에니메이션 세팅..
 	}
 
 	m_bLoadingNow = FALSE;
 
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 
 	return TRUE;
 }
@@ -151,13 +151,13 @@ BOOL CN3CEDoc::OnSaveDocument(LPCTSTR lpszPathName)
 		if('\\' == szPath[i] || '/' == szPath[i]) nFind++;
 		if(nFind >= 2)
 		{
-			szPath[i] = NULL;
+			szPath[i] = '\0';
 			break;
 		}
 	}
 	
 	char szDrive[_MAX_DRIVE], szDir[_MAX_DIR], szFName[_MAX_FNAME];
-	_splitpath(lpszPathName, szDrive, szDir, szFName, NULL);
+	_splitpath(lpszPathName, szDrive, szDir, szFName, nullptr);
 
 	m_Scene.PathSet(szPath); // 경로를 정해주고..
 	CN3Chr* pChr = m_Scene.ChrGet(0);
@@ -169,7 +169,7 @@ BOOL CN3CEDoc::OnSaveDocument(LPCTSTR lpszPathName)
 //		pJoint->SaveToFile(); // 관절도 저장해준다..
 //	}
 
-	CN3CPlugBase* pPlug = NULL;
+	CN3CPlugBase* pPlug = nullptr;
 	int nCPC = pChr->PlugCount();
 	for(int i = 0; i < nCPC; i++)
 	{
@@ -190,7 +190,7 @@ void CN3CEDoc::OnFileSaveAsOneFolder()
 {
 	// TODO: Add your specialized creation code here
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(FALSE, "N3Chr", NULL, dwFlags, "Character Data File(*.N3Chr)|*.N3Chr||", NULL);
+	CFileDialog dlg(FALSE, "N3Chr", nullptr, dwFlags, "Character Data File(*.N3Chr)|*.N3Chr||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	CString szFullFileName = dlg.GetPathName();
 
@@ -202,13 +202,13 @@ void CN3CEDoc::OnFileSaveAsOneFolder()
 		if('\\' == szPath[i] || '/' == szPath[i]) nFind++;
 		if(nFind >= 2)
 		{
-			szPath[i] = NULL;
+			szPath[i] = '\0';
 			break;
 		}
 	}
 
 	char szDrive[_MAX_DRIVE], szDir[_MAX_DIR];
-	_splitpath(szFullFileName, szDrive, szDir, NULL, NULL);
+	_splitpath(szFullFileName, szDrive, szDir, nullptr, nullptr);
 
 	m_Scene.PathSet(szPath); // 경로를 정해주고..
 	CN3Chr* pChr = m_Scene.ChrGet(0);
@@ -221,12 +221,12 @@ void CN3CEDoc::OnFileSaveAsOneFolder()
 		pJoint->SaveToFile(szFN); // 관절도 저장해준다..
 	}
 
-	CN3CPlugBase* pPlug = NULL;
+	CN3CPlugBase* pPlug = nullptr;
 	int nCPC = pChr->PlugCount();
 	for(int i = 0; i < nCPC; i++)
 	{
 		pPlug = pChr->Plug(i);
-		if(NULL == pPlug) continue;
+		if(nullptr == pPlug) continue;
 
 		char szFN[256];
 		if(pPlug->PMesh())
@@ -236,7 +236,7 @@ void CN3CEDoc::OnFileSaveAsOneFolder()
 		}
 		if(pPlug->Tex())
 		{
-			_makepath(szFN, szDrive, szDir, pPlug->Tex()->m_szName.c_str(), NULL);
+			_makepath(szFN, szDrive, szDir, pPlug->Tex()->m_szName.c_str(), nullptr);
 			pPlug->Tex()->SaveToFile(szFN);
 		}
 
@@ -244,12 +244,12 @@ void CN3CEDoc::OnFileSaveAsOneFolder()
 		pPlug->SaveToFile(szFN);
 	}
 
-	CN3CPart* pPart = NULL;
+	CN3CPart* pPart = nullptr;
 	nCPC = pChr->PartCount();
 	for(int i = 0; i < nCPC; i++)
 	{
 		pPart = pChr->Part(i);
-		if(NULL == pPart) continue;
+		if(nullptr == pPart) continue;
 
 		char szFN[256];
 		
@@ -282,7 +282,7 @@ void CN3CEDoc::OnFileSaveAsOneFolder()
 	
 	m_Scene.ChrGet(0)->SaveToFile(std::string(szFullFileName));
 	this->SetPathName(szFullFileName);
-	this->UpdateAllViews(NULL); // 모두 업데이트..
+	this->UpdateAllViews(nullptr); // 모두 업데이트..
 }
 
 void CN3CEDoc::OnCloseDocument() 
@@ -295,11 +295,11 @@ void CN3CEDoc::OnCloseDocument()
 void CN3CEDoc::OnToolOptimizeAnimationData() 
 {
 	CN3Chr* pChr = m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 	CN3Joint* pJointSrc = pChr->Joint();
-	if(NULL == pJointSrc) return;
+	if(nullptr == pJointSrc) return;
 
 	float fSamplingRate = 30.0f / pJointSrc->m_KeyRot.SamplingRate();
 	if(	fSamplingRate != 6.0f &&
@@ -315,7 +315,7 @@ void CN3CEDoc::OnToolOptimizeAnimationData()
 
 	CString FileName;
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg1(FALSE, "N3Anim", NULL, dwFlags, "Animation Data(*.N3Anim)|*.n3Anim||", NULL);
+	CFileDialog dlg1(FALSE, "N3Anim", nullptr, dwFlags, "Animation Data(*.N3Anim)|*.n3Anim||", nullptr);
 	if(dlg1.DoModal() == IDCANCEL) return;
 	FileName = dlg1.GetPathName();
 	
@@ -324,7 +324,7 @@ void CN3CEDoc::OnToolOptimizeAnimationData()
 	pAniCtrl->SaveToFile(szFN); // 저장..
 	pAniCtrl->FileNameSet(szFNPrev);
 
-	CFileDialog dlg2(FALSE, "N3Joint", NULL, dwFlags, "Joint File(*.N3Joint)|*.N3Joint||", NULL);
+	CFileDialog dlg2(FALSE, "N3Joint", nullptr, dwFlags, "Joint File(*.N3Joint)|*.N3Joint||", nullptr);
 	if(dlg2.DoModal() == IDCANCEL) return;
 	FileName = dlg2.GetPathName();
 
@@ -376,5 +376,5 @@ void CN3CEDoc::OnToolOptimizeAnimationData()
 	pChr->JointSet("");
 	pChr->JointSet(JointDest.FileName());
 
-	UpdateAllViews(NULL); // 모든 뷰 초기화..
+	UpdateAllViews(nullptr); // 모든 뷰 초기화..
 }

@@ -21,10 +21,10 @@ static char THIS_FILE[]=__FILE__;
 
 CUITradeExplanation::CUITradeExplanation()
 {
-	m_pBtn_PageUp		= NULL;
-	m_pBtn_PageDown		= NULL;	
-	m_pBtn_Close		= NULL;
-	m_pText_Explanation = NULL;
+	m_pBtn_PageUp		= nullptr;
+	m_pBtn_PageDown		= nullptr;	
+	m_pBtn_Close		= nullptr;
+	m_pText_Explanation = nullptr;
 	
 	m_szExplanation		= "";
 	m_iCurSel			= 0;
@@ -76,10 +76,10 @@ bool CUITradeExplanation::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-	m_pBtn_PageUp		= (CN3UIButton*)(this->GetChildByID("btn_pageup"));		__ASSERT(m_pBtn_PageUp, "NULL UI Component!!!");
-	m_pBtn_PageDown		= (CN3UIButton*)(this->GetChildByID("btn_pagedown"));	__ASSERT(m_pBtn_PageDown, "NULL UI Component!!!");
-	m_pBtn_Close		= (CN3UIButton*)(this->GetChildByID("btn_close"));		__ASSERT(m_pBtn_Close, "NULL UI Component!!!");
-	m_pText_Explanation	= (CN3UIString*)(this->GetChildByID("Text_Title"));		__ASSERT(m_pText_Explanation, "NULL UI Component!!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_PageUp, GetChildByID<CN3UIButton>("btn_pageup"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_PageDown, GetChildByID<CN3UIButton>("btn_pagedown"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Close, GetChildByID<CN3UIButton>("btn_close"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Explanation, GetChildByID<CN3UIString>("Text_Title"));
 
 	return true;
 }

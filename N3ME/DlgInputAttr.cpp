@@ -16,7 +16,7 @@ static char THIS_FILE[]=__FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgInputAttr dialog
-CDlgInputAttr::CDlgInputAttr(CWnd* pParent /*=NULL*/)
+CDlgInputAttr::CDlgInputAttr(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgInputAttr::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgInputAttr)
@@ -46,7 +46,7 @@ END_MESSAGE_MAP()
 BOOL CDlgInputAttr::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
-	SetWindowPos(NULL, m_Point.x, m_Point.y,0,0, SWP_NOSIZE );
+	SetWindowPos(nullptr, m_Point.x, m_Point.y,0,0, SWP_NOSIZE );
 	
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CDTexGroupMng* pDTexGroupMng = pFrm->GetDTexGroupMng();

@@ -13,7 +13,6 @@
 #include "SubProcPerTrade.h"
 #include "CountableItemEditDlg.h"
 #include "UIMsgBoxOkCancel.h"
-#include "UIItemExchange.h"
 #include "UIWareHouseDlg.h"
 
 #include <N3Base/DFont.h>
@@ -70,7 +69,7 @@ uint32_t CUIManager::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT
 		if ( CGameProcedure::s_pProcMain && CGameProcedure::s_pProcMain->m_pUITransactionDlg && 
 			(CGameProcedure::s_pProcMain->m_pUITransactionDlg->IsVisible()))// && (pChild->UIType() != UI_TYPE_ICON_MANAGER) )
 		{	
-			if ( CN3UIWndBase::m_pCountableItemEdit->IsLocked() )
+			if ( CN3UIWndBase::s_pCountableItemEdit->IsLocked() )
 			{
 				if ( pChild->m_szID.compare("base_tradeedit") != 0 )
 					{	++itor; continue;	}
@@ -80,7 +79,7 @@ uint32_t CUIManager::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT
 		if ( CGameProcedure::s_pProcMain && CGameProcedure::s_pProcMain->m_pUIWareHouseDlg && 
 			(CGameProcedure::s_pProcMain->m_pUIWareHouseDlg->IsVisible()))// && (pChild->UIType() != UI_TYPE_ICON_MANAGER) )
 		{	
-			if ( CN3UIWndBase::m_pCountableItemEdit->IsLocked() )
+			if ( CN3UIWndBase::s_pCountableItemEdit->IsLocked() )
 			{
 				if ( pChild->m_szID.compare("base_tradeedit") != 0 )
 					{	++itor; continue;	}
@@ -96,7 +95,7 @@ uint32_t CUIManager::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT
 					{	++itor; continue;	}
 			}
 
-			if ( CN3UIWndBase::m_pCountableItemEdit->IsLocked() )
+			if ( CN3UIWndBase::s_pCountableItemEdit->IsLocked() )
 			{
 				if ( pChild->m_szID.compare("base_tradeedit") != 0 )
 					{	++itor; continue;	}
@@ -149,7 +148,7 @@ uint32_t CUIManager::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT
 		m_dwMouseFlagsCur |= dwChildRet;
 	}
 
-//	if(UI_MOUSE_LBCLICK & dwFlags) m_pUIFocused = NULL; // 포커스 받은 UI 기록.. 아무것도 안하면.. 널이다..
+//	if(UI_MOUSE_LBCLICK & dwFlags) m_pUIFocused = nullptr; // 포커스 받은 UI 기록.. 아무것도 안하면.. 널이다..
 
 	return m_dwMouseFlagsCur;
 }
@@ -263,7 +262,7 @@ void CUIManager::Render()
 
 void CUIManager::RenderStateSet()
 {
-	if(NULL == s_lpD3DDev) return;
+	if(nullptr == s_lpD3DDev) return;
 
 #ifdef _DEBUG
 	__ASSERT(FALSE == s_sRSFU.bSet, "이전에 RenderStateSet()함수를 호출하고 RenderStateRestore()함수가 호출되지 않은 상태입니다.");
@@ -339,7 +338,7 @@ bool CUIManager::BroadcastIconDropMsg(__IconItemSkill* spItem)
 	// 어느 누구의 영역에도 속하지 않으면.. 해당 아이콘을 가진 윈도우에게 Cancel 메시지를 날려 준다..
 	if ( !bFound )
 	{
-		switch ( CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd )
+		switch ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd )
 		{
 			case UIWND_INVENTORY:
 				CGameProcedure::s_pProcMain->m_pUIInventory->CancelIconDrop(spItem);
@@ -352,10 +351,6 @@ bool CUIManager::BroadcastIconDropMsg(__IconItemSkill* spItem)
 			case UIWND_WARE_HOUSE:
 				CGameProcedure::s_pProcMain->m_pUIWareHouseDlg->CancelIconDrop(spItem);
 				break;
-
-			case UIWND_EXCHANGE_REPAIR:
-				CGameProcedure::s_pProcMain->m_pUIItemREDlg->CancelIconDrop(spItem);
-				break;
 		}
 	}
 	return false;
@@ -365,7 +360,7 @@ CN3UIBase* CUIManager::GetTopUI(bool bVisible)
 {
 	if(!bVisible) 
 	{
-		if(m_Children.empty()) return NULL;
+		if(m_Children.empty()) return nullptr;
 		else return *(m_Children.begin());
 	}
 
@@ -376,14 +371,14 @@ CN3UIBase* CUIManager::GetTopUI(bool bVisible)
 		if(pUI->IsVisible()) return pUI;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 void CUIManager::SetFocusedUI(CN3UIBase* pUI)
 {
-	if(NULL == pUI)
+	if(nullptr == pUI)
 	{
-		m_pUIFocused = NULL;
+		m_pUIFocused = nullptr;
 		return;
 	}
 
@@ -410,9 +405,9 @@ CN3UIBase* CUIManager::ReFocusUI()
 
 void CUIManager::SetVisibleFocusedUI(CN3UIBase *pUI)
 {
-	if(NULL == pUI)
+	if(nullptr == pUI)
 	{
-		m_pUIFocused = NULL;
+		m_pUIFocused = nullptr;
 		return;
 	}
 
@@ -422,7 +417,7 @@ void CUIManager::SetVisibleFocusedUI(CN3UIBase *pUI)
 	UIListItor it = m_Children.begin(), itEnd = m_Children.end();
 
 	uint32_t dwUIStyle, dwUIHideStyle;
-	CN3UIBase* pUIHide = NULL;
+	CN3UIBase* pUIHide = nullptr;
 
 	dwUIStyle = pUI->GetStyle();
 	if(dwUIStyle & UISTYLE_SHOW_ME_ALONE)
@@ -430,7 +425,7 @@ void CUIManager::SetVisibleFocusedUI(CN3UIBase *pUI)
 		for(; it != itEnd;)
 		{
 			pUIHide = *it;
-			if(pUIHide == NULL)
+			if(pUIHide == nullptr)
 			{
 				it = m_Children.erase(it);
 				continue;
@@ -448,7 +443,7 @@ void CUIManager::SetVisibleFocusedUI(CN3UIBase *pUI)
 		for(; it != itEnd;)
 		{
 			pUIHide = *it;
-			if(pUIHide == NULL)
+			if(pUIHide == nullptr)
 			{
 				it = m_Children.erase(it);
 				continue;
@@ -496,7 +491,7 @@ CN3UIBase* CUIManager::GetEnableFocusTopUI(bool bVisible)
 {
 	if(!bVisible) 
 	{
-		if(m_Children.empty()) return NULL;
+		if(m_Children.empty()) return nullptr;
 		else return *(m_Children.begin());
 	}
 
@@ -510,7 +505,7 @@ CN3UIBase* CUIManager::GetEnableFocusTopUI(bool bVisible)
 			return pUI;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 void CUIManager::UserMoveHideUIs()
@@ -521,7 +516,7 @@ void CUIManager::UserMoveHideUIs()
 	{
 		CN3UIBase* pUI = *(it);
 
-		if(pUI == NULL) continue;
+		if(pUI == nullptr) continue;
 
 		if(pUI->IsVisible() && (pUI->GetStyle() & UISTYLE_USER_MOVE_HIDE))
 		{

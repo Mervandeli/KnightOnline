@@ -21,12 +21,12 @@ static char THIS_FILE[]=__FILE__;
 
 CUITradeBBSEditDlg::CUITradeBBSEditDlg()
 {
-	m_pEditTitle		= NULL;
-	m_pEditPrice		= NULL;
-	m_pEditExplanation	= NULL;
+	m_pEditTitle		= nullptr;
+	m_pEditPrice		= nullptr;
+	m_pEditExplanation	= nullptr;
 
-	m_pBtn_Ok			= NULL;
-	m_pBtn_Cancel		= NULL;
+	m_pBtn_Ok			= nullptr;
+	m_pBtn_Cancel		= nullptr;
 }
 
 CUITradeBBSEditDlg::~CUITradeBBSEditDlg()
@@ -65,11 +65,11 @@ bool CUITradeBBSEditDlg::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-	m_pEditTitle		= (CN3UIEdit*)(this->GetChildByID("edit_name"));	__ASSERT(m_pEditTitle, "NULL UI Component!!!");
-	m_pEditPrice		= (CN3UIEdit*)(this->GetChildByID("edit_price"));	__ASSERT(m_pEditPrice, "NULL UI Component!!!");
-	m_pEditExplanation	= (CN3UIEdit*)(this->GetChildByID("edit_memo"));	__ASSERT(m_pEditExplanation, "NULL UI Component!!!");
-	m_pBtn_Ok			= (CN3UIButton*)(this->GetChildByID("btn_Ok"));		__ASSERT(m_pBtn_Ok, "NULL UI Component!!!");
-	m_pBtn_Cancel		= (CN3UIButton*)(this->GetChildByID("btn_Cancel"));	__ASSERT(m_pBtn_Cancel, "NULL UI Component!!!");
+	N3_VERIFY_UI_COMPONENT(m_pEditTitle, GetChildByID<CN3UIEdit>("edit_name"));
+	N3_VERIFY_UI_COMPONENT(m_pEditPrice, GetChildByID<CN3UIEdit>("edit_price"));
+	N3_VERIFY_UI_COMPONENT(m_pEditExplanation, GetChildByID<CN3UIEdit>("edit_memo"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Ok, GetChildByID<CN3UIButton>("btn_Ok"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel, GetChildByID<CN3UIButton>("btn_Cancel"));
 
 	m_pEditTitle->SetMaxString(18);
 	m_pEditPrice->SetMaxString(8);
@@ -80,7 +80,7 @@ bool CUITradeBBSEditDlg::Load(HANDLE hFile)
 
 bool CUITradeBBSEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 
 	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{

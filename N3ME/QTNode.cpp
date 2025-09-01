@@ -28,8 +28,8 @@ CQTNode::CQTNode()
 	int i;
 	for(i=0;i<DIR_NUM;i++)
 	{
-		m_pFriend[i] = NULL;
-		m_pChild[i] = NULL;
+		m_pFriend[i] = nullptr;
+		m_pChild[i] = nullptr;
 	}
 }
 
@@ -74,7 +74,7 @@ void CQTNode::Init(int level, CLyTerrain* pTerrain)
 	{
 		for(i=0;i<DIR_NUM;i++)
 		{
-			m_pChild[i] = NULL;
+			m_pChild[i] = nullptr;
 		}
 	}
 }
@@ -95,12 +95,12 @@ void CQTNode::LinkFriend()
 	if(m_pChild[DIR_LEFT])
 	{
 		if(this->m_pFriend[DIR_LEFT]) m_pChild[DIR_LEFT]->m_pFriend[DIR_LEFT] = this->m_pFriend[DIR_LEFT]->m_pChild[DIR_TOP];
-		else m_pChild[DIR_LEFT]->m_pFriend[DIR_LEFT] = NULL;
+		else m_pChild[DIR_LEFT]->m_pFriend[DIR_LEFT] = nullptr;
 
 		m_pChild[DIR_LEFT]->m_pFriend[DIR_RIGHT] = this->m_pChild[DIR_TOP];
 		
 		if(this->m_pFriend[DIR_TOP]) m_pChild[DIR_LEFT]->m_pFriend[DIR_TOP] = this->m_pFriend[DIR_TOP]->m_pChild[DIR_BOTTOM];
-		else m_pChild[DIR_LEFT]->m_pFriend[DIR_TOP] = NULL;
+		else m_pChild[DIR_LEFT]->m_pFriend[DIR_TOP] = nullptr;
 		
 		m_pChild[DIR_LEFT]->m_pFriend[DIR_BOTTOM] = this->m_pChild[DIR_BOTTOM];
 
@@ -111,10 +111,10 @@ void CQTNode::LinkFriend()
 		m_pChild[DIR_TOP]->m_pFriend[DIR_LEFT] = this->m_pChild[DIR_LEFT];
 
 		if(this->m_pFriend[DIR_RIGHT]) m_pChild[DIR_TOP]->m_pFriend[DIR_RIGHT] = this->m_pFriend[DIR_RIGHT]->m_pChild[DIR_LEFT];
-		else m_pChild[DIR_TOP]->m_pFriend[DIR_RIGHT] = NULL;
+		else m_pChild[DIR_TOP]->m_pFriend[DIR_RIGHT] = nullptr;
 
 		if(this->m_pFriend[DIR_TOP]) m_pChild[DIR_TOP]->m_pFriend[DIR_TOP] = this->m_pFriend[DIR_TOP]->m_pChild[DIR_RIGHT];
-		else m_pChild[DIR_TOP]->m_pFriend[DIR_TOP] = NULL;
+		else m_pChild[DIR_TOP]->m_pFriend[DIR_TOP] = nullptr;
 
 		m_pChild[DIR_TOP]->m_pFriend[DIR_BOTTOM] = this->m_pChild[DIR_RIGHT];
 
@@ -125,26 +125,26 @@ void CQTNode::LinkFriend()
 		m_pChild[DIR_RIGHT]->m_pFriend[DIR_LEFT] = this->m_pChild[DIR_BOTTOM];
 
 		if(this->m_pFriend[DIR_RIGHT]) m_pChild[DIR_RIGHT]->m_pFriend[DIR_RIGHT] = this->m_pFriend[DIR_RIGHT]->m_pChild[DIR_BOTTOM];
-		else m_pChild[DIR_RIGHT]->m_pFriend[DIR_RIGHT] = NULL;
+		else m_pChild[DIR_RIGHT]->m_pFriend[DIR_RIGHT] = nullptr;
 
 		m_pChild[DIR_RIGHT]->m_pFriend[DIR_TOP] = this->m_pChild[DIR_TOP];
 
 		if(this->m_pFriend[DIR_BOTTOM]) m_pChild[DIR_RIGHT]->m_pFriend[DIR_BOTTOM] = this->m_pFriend[DIR_BOTTOM]->m_pChild[DIR_TOP];
-		else m_pChild[DIR_RIGHT]->m_pFriend[DIR_BOTTOM] = NULL;
+		else m_pChild[DIR_RIGHT]->m_pFriend[DIR_BOTTOM] = nullptr;
 
 		m_pChild[DIR_RIGHT]->LinkFriend();
 	}
 	if(m_pChild[DIR_BOTTOM])
 	{
 		if(this->m_pFriend[DIR_LEFT]) m_pChild[DIR_BOTTOM]->m_pFriend[DIR_LEFT] = this->m_pFriend[DIR_LEFT]->m_pChild[DIR_RIGHT];
-		else m_pChild[DIR_BOTTOM]->m_pFriend[DIR_LEFT] = NULL;
+		else m_pChild[DIR_BOTTOM]->m_pFriend[DIR_LEFT] = nullptr;
 
 		m_pChild[DIR_BOTTOM]->m_pFriend[DIR_RIGHT] = this->m_pChild[DIR_RIGHT];
 		
 		m_pChild[DIR_BOTTOM]->m_pFriend[DIR_TOP] = this->m_pChild[DIR_LEFT];
 
 		if(this->m_pFriend[DIR_BOTTOM]) m_pChild[DIR_BOTTOM]->m_pFriend[DIR_BOTTOM] = this->m_pFriend[DIR_BOTTOM]->m_pChild[DIR_LEFT];
-		else m_pChild[DIR_BOTTOM]->m_pFriend[DIR_BOTTOM] = NULL;
+		else m_pChild[DIR_BOTTOM]->m_pFriend[DIR_BOTTOM] = nullptr;
 
 		m_pChild[DIR_BOTTOM]->LinkFriend();
 	}
@@ -162,7 +162,7 @@ void CQTNode::Release()
 		{
 			m_pChild[i]->Release();
 			delete m_pChild[i];
-			m_pChild[i] = NULL;
+			m_pChild[i] = nullptr;
 		}
 	}
 }
@@ -419,7 +419,7 @@ void CQTNode::RenderMaxLevel()
 	//
 	CN3Texture* pRefLightMapTex[4];
 	int NumLightMapUse = 0;
-	__VertexT1* pLightMapVertices = NULL;
+	__VertexT1* pLightMapVertices = nullptr;
 	//
 
 
@@ -454,7 +454,7 @@ void CQTNode::RenderMaxLevel()
 		}
 
 		tmpTIdx = m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.TexIdx.TexID;
-		if((m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.Attr.Group<=0) || m_pRefTerrain->GetTileTex(tmpTIdx)==NULL)	//타일이 없을때...
+		if((m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.Attr.Group<=0) || m_pRefTerrain->GetTileTex(tmpTIdx)==nullptr)	//타일이 없을때...
 		{
 			int NumTileInColorTex = m_pRefTerrain->m_iColorMapTexSize / m_pRefTerrain->m_iColorMapPixelPerUnitDistance;
 			u1 = (float)(cx % NumTileInColorTex);
@@ -484,7 +484,7 @@ void CQTNode::RenderMaxLevel()
 		else
 		{
 			tmpTIdx = m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo2.TexIdx.TexID;
-			if((m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo2.Attr.Group<=0) && m_pRefTerrain->GetTileTex(tmpTIdx)==NULL &&
+			if((m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo2.Attr.Group<=0) && m_pRefTerrain->GetTileTex(tmpTIdx)==nullptr &&
 				m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.Attr.Attr!=DTEX_FULL)
 			{
 				dir1 = m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.Dir;
@@ -588,7 +588,7 @@ void CQTNode::RenderMaxLevel()
 		}
 
 		tmpTIdx = m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.TexIdx.TexID;
-		if((m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.Attr.Group<=0) || m_pRefTerrain->GetTileTex(tmpTIdx)==NULL)	//타일이 없을때...
+		if((m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.Attr.Group<=0) || m_pRefTerrain->GetTileTex(tmpTIdx)==nullptr)	//타일이 없을때...
 		{
 			int NumTileInColorTex = m_pRefTerrain->m_iColorMapTexSize / m_pRefTerrain->m_iColorMapPixelPerUnitDistance;
 			u1 = (float)(cx % NumTileInColorTex);
@@ -618,7 +618,7 @@ void CQTNode::RenderMaxLevel()
 		else
 		{
 			tmpTIdx = m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo2.TexIdx.TexID;
-			if((m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo2.Attr.Group<=0) && m_pRefTerrain->GetTileTex(tmpTIdx)==NULL &&
+			if((m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo2.Attr.Group<=0) && m_pRefTerrain->GetTileTex(tmpTIdx)==nullptr &&
 				m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.Attr.Attr!=DTEX_FULL)
 			{
 				dir1 = m_pRefTerrain->m_ppMapData[cx][cz].DTexInfo1.Dir;
@@ -736,10 +736,10 @@ void CQTNode::RenderMaxLevel()
 		
 		if(m_pRefTerrain->m_ppMapData[tx][tz].DTexInfo2.Attr.Group>0 && m_pRefTerrain->GetTileTex(t2))
 			hr = m_pRefTerrain->s_lpD3DDev->SetTexture( 1, m_pRefTerrain->GetTileTex(t2)->Get());
-		//else hr = m_pRefTerrain->s_lpD3DDev->SetTexture( 1, NULL);
+		//else hr = m_pRefTerrain->s_lpD3DDev->SetTexture( 1, nullptr);
 		else
 		{
-			hr = m_pRefTerrain->s_lpD3DDev->SetTexture( 1, NULL);
+			hr = m_pRefTerrain->s_lpD3DDev->SetTexture( 1, nullptr);
 			COP2 = D3DTOP_DISABLE;
 			/*
 			if(m_pRefTerrain->m_ppMapData[tx][tz].DTexInfo1.Attr.Attr > DTEX_FULL 
@@ -790,7 +790,7 @@ void CQTNode::RenderMaxLevel()
 			hr = m_pRefTerrain->s_lpD3DDev->SetTextureStageState( 2, D3DTSS_COLOROP, D3DTOP_MODULATE);
 			hr = m_pRefTerrain->s_lpD3DDev->SetTextureStageState( 2, D3DTSS_COLORARG1, D3DTA_CURRENT);
 			hr = m_pRefTerrain->s_lpD3DDev->SetTextureStageState( 2, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-			m_pRefTerrain->s_lpD3DDev->SetTexture(2, NULL);
+			m_pRefTerrain->s_lpD3DDev->SetTexture(2, nullptr);
 		}
 
 
@@ -957,7 +957,7 @@ void CQTNode::RenderMaxLevel()
 
 		if(m_pRefTerrain->m_ppMapData[tx][tz].DTexInfo1.bActive && m_pRefTerrain->GetTileTex(t1)) 
 			hr = m_pRefTerrain->s_lpD3DDev->SetTexture( 0, m_pRefTerrain->GetTileTex(t1)->Get());
-		//else hr = m_pRefTerrain->s_lpD3DDev->SetTexture( 0, NULL);
+		//else hr = m_pRefTerrain->s_lpD3DDev->SetTexture( 0, nullptr);
 		else
 		{
 			int ctx = (tx * TERRAIN_CELL_SIZE) / (m_pRefTerrain->m_iColorMapTexSize * m_pRefTerrain->m_iColorMapPixelPerUnitDistance);
@@ -967,7 +967,7 @@ void CQTNode::RenderMaxLevel()
 
 		if(m_pRefTerrain->m_ppMapData[tx][tz].DTexInfo2.bActive && m_pRefTerrain->GetTileTex(t2))
 			hr = m_pRefTerrain->s_lpD3DDev->SetTexture( 1, m_pRefTerrain->GetTileTex(t2)->Get());
-		else hr = m_pRefTerrain->s_lpD3DDev->SetTexture( 1, NULL);
+		else hr = m_pRefTerrain->s_lpD3DDev->SetTexture( 1, nullptr);
 				
 		hr = m_pRefTerrain->s_lpD3DDev->DrawPrimitive( D3DPT_TRIANGLEFAN, (i<<2), 2);
 
@@ -1147,7 +1147,7 @@ void CQTNode::RenderNormalLevel()
 	hr = m_pRefTerrain->s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 	hr = m_pRefTerrain->s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
 
-	hr = m_pRefTerrain->s_lpD3DDev->SetTexture( 1, NULL );
+	hr = m_pRefTerrain->s_lpD3DDev->SetTexture( 1, nullptr );
 	
 	hr = m_pRefTerrain->s_lpD3DDev->DrawPrimitive( D3DPT_TRIANGLEFAN, 0, VC-2);
 

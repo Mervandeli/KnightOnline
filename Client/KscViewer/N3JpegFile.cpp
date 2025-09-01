@@ -1,4 +1,4 @@
-// N3JpegFile.cpp: implementation of the CN3JpegFile class.
+﻿// N3JpegFile.cpp: implementation of the CN3JpegFile class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -20,17 +20,17 @@ CN3JpegFile::CN3JpegFile()
 {
 	m_uiWidth	= 0;
 	m_uiHeight	= 0;
-	m_pImageBuf = NULL;
+	m_pImageBuf = nullptr;
 }
 
 CN3JpegFile::~CN3JpegFile()
 {
-	if(m_pImageBuf) delete m_pImageBuf; m_pImageBuf = NULL;
+	if(m_pImageBuf) delete m_pImageBuf; m_pImageBuf = nullptr;
 }
 
 void CN3JpegFile::Release()
 {
-	if(m_pImageBuf) delete m_pImageBuf; m_pImageBuf = NULL;
+	if(m_pImageBuf) delete m_pImageBuf; m_pImageBuf = nullptr;
 
 	m_uiWidth	= 0;
 	m_uiHeight	= 0;
@@ -60,8 +60,8 @@ BOOL CN3JpegFile::LoadJpegFile(std::string csJpeg)
 
 void CN3JpegFile::DrawImage(HDC hDC)
 {
-	if(hDC == NULL) return;
-	if(m_pImageBuf == NULL) return;
+	if(hDC == nullptr) return;
+	if(m_pImageBuf == nullptr) return;
 	if(m_uiWidth == 0 || m_uiHeight == 0) return;
 
 	// Center It

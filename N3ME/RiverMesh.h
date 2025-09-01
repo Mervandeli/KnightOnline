@@ -43,7 +43,7 @@ public:
 	int				VertexCount() const {return m_iVC;}
 	int				IndexCount() const {return m_iIC;}
 	int				GetAnimTexCount() const {return m_iAnimTextureCount;}
-	CN3Texture*		AnimTexGet(int iIndex) const { if (iIndex<0 || iIndex>=m_iAnimTextureCount) return NULL; return m_pAnimTextures[iIndex];}
+	CN3Texture*		AnimTexGet(int iIndex) const { if (iIndex<0 || iIndex>=m_iAnimTextureCount) return nullptr; return m_pAnimTextures[iIndex];}
 	float			GetAnimTexFPS() const {return m_fAnimTexFPS;}
 	void			SetAnimTexFPS(float fFPS) {m_fAnimTexFPS = fFPS;}
 	DWORD			GetAlphaFactor() const {return m_dwAlphaFactor;}
@@ -77,7 +77,7 @@ public:
 	int				AddVertex(__Vector3& vPos1, __Vector3& vPos2, __Vector3& vPos3, __Vector3& vPos4);
 	int				AddVertex();
 	int				DeleteVertex(int iIndex);	// 쌍으로 지우고 뒤에 있는 것들을 앞으로 두개씩 이동
-	__VertexXyzT2*	GetVertex(int iIndex) {if (iIndex<0 || iIndex>=m_iVC) return NULL; return m_pVertices+iIndex;}
+	__VertexXyzT2*	GetVertex(int iIndex) {if (iIndex<0 || iIndex>=m_iVC) return nullptr; return m_pVertices+iIndex;}
 	__Vector3		GetCenter();
 
 	BOOL			SetTextureName(LPCTSTR pszFName);

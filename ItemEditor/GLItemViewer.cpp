@@ -1,4 +1,4 @@
-/*
+﻿/*
 */
 
 #include "base.h"
@@ -65,14 +65,14 @@ bool GLItemViewer::BuildShaders(void) {
 	};
 
 	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertShader, 1, &vertSource, NULL);
+	glShaderSource(vertShader, 1, &vertSource, nullptr);
 	glCompileShader(vertShader);
 
 	GLint status;
 	glGetShaderiv(vertShader, GL_COMPILE_STATUS, &status);
 	if(status == GL_FALSE) {
 		char buffer[512];
-		glGetShaderInfoLog(vertShader, 512, NULL, buffer);
+		glGetShaderInfoLog(vertShader, 512, nullptr, buffer);
 		fprintf(stderr, "ERROR(glCompileShader):\n%s\n", buffer);
 		return false;
 	}
@@ -89,13 +89,13 @@ bool GLItemViewer::BuildShaders(void) {
 	};
 
 	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragShader, 1, &fragSource, NULL);
+	glShaderSource(fragShader, 1, &fragSource, nullptr);
 	glCompileShader(fragShader);
 
 	glGetShaderiv(fragShader, GL_COMPILE_STATUS, &status);
 	if(status == GL_FALSE) {
 		char buffer[512];
-		glGetShaderInfoLog(fragShader, 512, NULL, buffer);
+		glGetShaderInfoLog(fragShader, 512, nullptr, buffer);
 		fprintf(stderr, "ERROR(glCompileShader):\n%s\n", buffer);
 		return false;
 	}
@@ -108,7 +108,7 @@ bool GLItemViewer::BuildShaders(void) {
 	glGetProgramiv(glProgram, GL_LINK_STATUS, &status);
 	if(status == GL_FALSE) {
 		char buffer[512];
-		glGetProgramInfoLog(glProgram, 512, NULL, buffer);
+		glGetProgramInfoLog(glProgram, 512, nullptr, buffer);
 		fprintf(stderr, "ERROR(glLinkProgram):\n%s\n", buffer);
 		return false;
 	}
@@ -377,15 +377,15 @@ void GLItemViewer::Clear(void) {
 
 	eType              = ITEM_TYPE_UNKNOWN;
 	m_nFC              = 0;
-	m_pVertices        = NULL;
-	m_pwVtxIndices     = NULL;
-	m_pfUVs            = NULL;
-	m_pwUVsIndices     = NULL;
-	compTexData        = NULL;
+	m_pVertices        = nullptr;
+	m_pwVtxIndices     = nullptr;
+	m_pfUVs            = nullptr;
+	m_pwUVsIndices     = nullptr;
+	compTexData        = nullptr;
 	compTexSize        = 0;
 	iPixelSize         = 0;
-	m_pIndices0        = NULL;
-	m_pVertices0       = NULL;
+	m_pIndices0        = nullptr;
+	m_pVertices0       = nullptr;
 	m_iMaxNumIndices0  = 0;
 	m_iMaxNumVertices0 = 0;
 }
@@ -411,7 +411,7 @@ void GLItemViewer::RenderItem(ItemInfo* item, e_Race race) {
 
 			printf("filename: %s\n", filename);
 			FILE* pFile = fopen(filename, "rb");
-			if(pFile == NULL) {
+			if(pFile == nullptr) {
 				fprintf(stderr, "ERROR: Missing N3Plug %s\n", filename);
 				return;
 			}
@@ -424,7 +424,7 @@ void GLItemViewer::RenderItem(ItemInfo* item, e_Race race) {
 
 			printf("filename: %s\n", filename);
 			FILE* pFile = fopen(filename, "rb");
-			if(pFile == NULL) {
+			if(pFile == nullptr) {
 				fprintf(stderr, "ERROR: Missing N3Part %s\n", filename);
 				return;
 			}

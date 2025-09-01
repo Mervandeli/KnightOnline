@@ -23,6 +23,15 @@
 
 constexpr int CURRENT_VERSION = 1298;
 
+// This is the maximum time we must wait after sending the WIZ_VERSION_CHECK packet on the login scene, before we're allowed
+// to attempt to re-establish a connection to the game server.
+// We'll use 5 seconds here as it's a more than reasonable enough time for it to receive a packet, even with lag, while not being
+// too excessive.
+// If the client disconnects in this time, this timer will be reset, so there's no need to account for this.
+// Officially it Sleep()s for 1 second prior to even sending WIZ_VERSION_CHECK packet we need to wait for, so there's not really
+// a comparable official limit. All this accomplishes is reducing the number of connection attempts, not preventing overlaps.
+constexpr float TIME_UNTIL_NEXT_GAME_CONNECTION_ATTEMPT = 5.0f;
+
 constexpr float PACKET_INTERVAL_MOVE = 1.5f;				// Interval between regularly sent player/NPC movement packets.
 constexpr float PACKET_INTERVAL_ROTATE = 4.0f;				// Interval between regularly sent player rotation packets.
 constexpr float PACKET_INTERVAL_REQUEST_TARGET_HP = 2.0f;
@@ -181,7 +190,7 @@ enum e_Ani {	ANI_BREATH = 0, ANI_WALK, ANI_RUN, ANI_WALK_BACKWARD, ANI_STRUCK0, 
 // MAX_INCLINE_CLIMB = sqrt(1 - sin(90 - Maximum slope angle)^2)
 constexpr float MAX_INCLINE_CLIMB = 0.6430f; // Maximum climbable slope value = 40 degrees
 
-enum e_MoveDirection { MD_STOP, MD_FOWARD, MD_BACKWARD, MD_UNKNOWN = 0xffffffff };
+enum e_MoveDirection { MD_STOP, MD_FORWARD, MD_BACKWARD, MD_UNKNOWN = 0xffffffff };
 
 constexpr float MOVE_DELTA_WHEN_RUNNING = 3.0f;	// Movement multiplier for running.
 constexpr float MOVE_SPEED_WHEN_WALK = 1.5f;	// Standard player walking speed.
@@ -284,13 +293,6 @@ enum e_ItemClass	{	ITEM_CLASS_DAGGER = 11, // dagger
 						ITEM_CLASS_CONSUMABLE = 255, // Consumable items with 'charges' that use the durability/duration instead of stacks
 
 						ITEM_CLASS_UNKNOWN = 0xffffffff }; // 
-
-enum e_ItemSaleType
-{
-	SALE_TYPE_LOW = 0,			 // sells lower than purchase price
-	SALE_TYPE_FULL = 1,			 // sells equal to purchase price
-	SALE_TYPE_LOW_NO_REPAIR = 2, // irreparable items sell for lower price than purchase
-};
 
 enum e_Nation { NATION_NOTSELECTED = 0, NATION_KARUS, NATION_ELMORAD, NATION_UNKNOWN = 0xffffffff };
 
@@ -1177,7 +1179,6 @@ enum e_SkillMagicTaget	{	SKILLMAGIC_TARGET_SELF = 1,					// Targets myself
 							
 							SKILLMAGIC_TARGET_UNKNOWN = 0xffffffff
 						};
-
 
 // define fx...
 struct __TABLE_FX

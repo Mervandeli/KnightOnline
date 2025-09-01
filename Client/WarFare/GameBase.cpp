@@ -470,7 +470,7 @@ e_ItemType CGameBase::MakeResrcFileNameForUPC(	__TABLE_ITEM_BASIC* pItem,
 	if(pszResrcFN) *pszResrcFN = "";
 	if(pszIconFN) *pszIconFN = "";
 
-	if(NULL == pItem) return ITEM_TYPE_UNKNOWN;
+	if(nullptr == pItem) return ITEM_TYPE_UNKNOWN;
 	
 	e_ItemType eType	= ITEM_TYPE_UNKNOWN;
 	e_ItemPosition ePos	= (e_ItemPosition)pItem->byAttachPoint;
@@ -592,7 +592,7 @@ bool CGameBase::IsValidCharacter(CPlayerBase* pCharacter)
 
 CPlayerBase* CGameBase::CharacterGetByID(int iID, bool bFromAlive)
 {
-	if(iID < 0) return NULL;
+	if(iID < 0) return nullptr;
 	if(iID == s_pPlayer->IDNumber()) return s_pPlayer;
 	return s_pOPMgr->CharacterGetByID(iID, bFromAlive);
 }
@@ -647,3 +647,26 @@ void CGameBase::ConvertPipesToNewlines(std::string& input)
 	std::ranges::replace(input, '|', '\n');
 }
 
+bool CGameBase::IsItemClassWeapon(e_ItemClass itemClass)
+{
+	switch (itemClass)
+	{
+		case ITEM_CLASS_DAGGER:
+		case ITEM_CLASS_SWORD:
+		case ITEM_CLASS_SWORD_2H:
+		case ITEM_CLASS_AXE:
+		case ITEM_CLASS_AXE_2H:
+		case ITEM_CLASS_MACE:
+		case ITEM_CLASS_MACE_2H:
+		case ITEM_CLASS_SPEAR:
+		case ITEM_CLASS_POLEARM:
+		case ITEM_CLASS_BOW:
+		case ITEM_CLASS_BOW_CROSS:
+		case ITEM_CLASS_BOW_LONG:
+		case ITEM_CLASS_STAFF:
+		case ITEM_CLASS_JAVELIN:
+			return true;
+	}
+
+	return false;
+}

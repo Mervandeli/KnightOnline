@@ -59,6 +59,7 @@ typedef CSTLMap <model::MagicType2>			MagicType2TableMap;
 typedef CSTLMap <model::MagicType3>			MagicType3TableMap;
 typedef CSTLMap	<model::MagicType4>			MagicType4TableMap;
 typedef CSTLMap <model::MagicType5>			MagicType5TableMap;
+typedef CSTLMap <model::MagicType7>			MagicType7TableMap;
 typedef CSTLMap <model::MagicType8>			MagicType8TableMap;
 typedef CSTLMap <CNpc>						NpcMap;
 typedef CSTLMap <CAISocket>					AISocketMap;
@@ -119,6 +120,7 @@ public:
 	BOOL LoadMagicType8();
 	BOOL LoadMagicType4();
 	BOOL LoadMagicType5();
+	BOOL LoadMagicType7();
 	BOOL LoadMagicType3();
 	BOOL LoadMagicType2();
 	BOOL LoadMagicType1();
@@ -161,7 +163,7 @@ public:
 	void UserInOutForMe(CUser* pSendUser);	// 9 Regions All Users USERINOUT Packet Packaging Function
 	void NpcInOutForMe(CUser* pSendUser);	// 9 Regions All Npcs NPCINOUT Packet Packaging Function
 	void Send_Region(char* pBuf, int len, int zone, int x, int z, CUser* pExceptUser = nullptr, bool bDirect = true);	// zone == real zone number
-	void Send_All(char* pBuf, int len, CUser* pExceptUser = nullptr, int nation = 0);	// pointer != NULL don`t send to that user pointer
+	void Send_All(char* pBuf, int len, CUser* pExceptUser = nullptr, int nation = 0);	// pointer != nullptr don`t send to that user pointer
 	void Send_AIServer(int zone, char* pBuf, int len);
 	static CUser* GetUserPtr(const char* userid, NameType type);
 
@@ -202,6 +204,7 @@ public:
 	MagicType3TableMap		m_MagicType3TableMap;
 	MagicType4TableMap		m_MagicType4TableMap;
 	MagicType5TableMap		m_MagicType5TableMap;
+	MagicType7TableMap		m_MagicType7TableMap;
 	MagicType8TableMap		m_MagicType8TableMap;
 	CoefficientTableMap		m_CoefficientTableMap;		// 공식 계산 계수데이타 테이블
 	LevelUpTableArray		m_LevelUpTableArray;

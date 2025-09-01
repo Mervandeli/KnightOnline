@@ -17,7 +17,7 @@ static char THIS_FILE[]=__FILE__;
 CLightMgr::CLightMgr()
 {
 	m_Lights.clear();
-	for(int i=0;i<LGT_MAX;i++) m_pActiveLight[i] = NULL;
+	for(int i=0;i<LGT_MAX;i++) m_pActiveLight[i] = nullptr;
 }
 
 CLightMgr::~CLightMgr()
@@ -49,7 +49,7 @@ void CLightMgr::Release()
 	for(int i=0;i<LGT_MAX;i++)
 	{
 		if(m_pActiveLight[i]) delete m_pActiveLight[i];
-		m_pActiveLight[i] = NULL;
+		m_pActiveLight[i] = nullptr;
 	}
 	//	Release..
 	/////////////////////////////////////////////
@@ -104,7 +104,7 @@ void CLightMgr::Tick()
 			m_pActiveLight[i]->Apply();
 
 			AddLight(m_pActiveLight[i]);
-			m_pActiveLight[i] = NULL;
+			m_pActiveLight[i] = nullptr;
 			NumSlotEmpty++;
 
 			continue;
@@ -156,14 +156,14 @@ void CLightMgr::LoadZoneLight(const char* szFN)
 	if(!szFN) return;
 	
 	DWORD dwRWC;
-	HANDLE hFile = CreateFile(szFN, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(szFN, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if(INVALID_HANDLE_VALUE == hFile) return;
 
 	int iVersion;
-	ReadFile(hFile, &iVersion, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &iVersion, sizeof(int), &dwRWC, nullptr);
 
 	int cnt;
-	ReadFile(hFile, &cnt, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
 	for(int i=0;i<cnt;i++)
 	{
 		CN3Light* pLgt = new CN3Light;

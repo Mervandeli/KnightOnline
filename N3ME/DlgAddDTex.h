@@ -14,7 +14,7 @@ class CDlgAddDTex : public CDialog
 {
 // Construction
 public:
-	CDlgAddDTex(CWnd* pParent = NULL);   // standard constructor
+	CDlgAddDTex(CWnd* pParent = nullptr);   // standard constructor
 
 	CString	m_TexName;
 

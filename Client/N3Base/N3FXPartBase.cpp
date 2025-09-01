@@ -20,8 +20,8 @@ CN3FXPartBase::CN3FXPartBase()
 	m_iVersion = 0;
 	m_iBaseVersion = SUPPORTED_PART_BASE_VERSION;
 
-	m_pRefBundle = NULL;
-	m_pRefPrevPart = NULL;
+	m_pRefBundle = nullptr;
+	m_pRefPrevPart = nullptr;
 
 	m_iType = FX_PART_TYPE_NONE;
 
@@ -38,7 +38,7 @@ CN3FXPartBase::CN3FXPartBase()
 	m_vPos.Set(0,0,0);
 	m_vCurrPos = m_vPos;
 
-	m_ppRefTex = NULL;
+	m_ppRefTex = nullptr;
 	m_iNumTex = 0;
 	m_fTexFPS = 30.0f;
 
@@ -81,7 +81,7 @@ CN3FXPartBase::~CN3FXPartBase()
 	{
 		for(int i=0; i<m_iNumTex;i++) CN3Base::s_MngTex.Delete(&m_ppRefTex[i]);
 		delete[] m_ppRefTex;
-		m_ppRefTex = NULL;
+		m_ppRefTex = nullptr;
 	}
 }
 
@@ -329,7 +329,7 @@ bool CN3FXPartBase::DecodeScriptFile(const char* lpPathName)
 	while(!feof(stream))
 	{
 		char* pResult = fgets(szLine, 512, stream);
-		if(pResult == NULL) continue;
+		if(pResult == nullptr) continue;
 
 		ZeroMemory(szCommand,80);
 		ZeroMemory(szBuf[0],80);
@@ -538,49 +538,49 @@ bool CN3FXPartBase::Save(HANDLE hFile)
 	DWORD			dwRWC = 0;
 	
 	cTmp = (uint8_t)m_iVersion;
-	WriteFile(hFile, &cTmp, sizeof(uint8_t), &dwRWC, NULL);
+	WriteFile(hFile, &cTmp, sizeof(uint8_t), &dwRWC, nullptr);
 
 	cTmp = (uint8_t)m_iBaseVersion;
-	WriteFile(hFile, &cTmp, sizeof(uint8_t), &dwRWC, NULL);
+	WriteFile(hFile, &cTmp, sizeof(uint8_t), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_fLife, sizeof(float), &dwRWC, NULL);
+	WriteFile(hFile, &m_fLife, sizeof(float), &dwRWC, nullptr);
 
 	cTmp = (uint8_t)m_iType;
-	WriteFile(hFile, &cTmp, sizeof(uint8_t), &dwRWC, NULL);
+	WriteFile(hFile, &cTmp, sizeof(uint8_t), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_vVelocity, sizeof(__Vector3), &dwRWC, NULL);
-	WriteFile(hFile, &m_vAcceleration, sizeof(__Vector3), &dwRWC, NULL);
-	WriteFile(hFile, &m_vRotVelocity, sizeof(__Vector3), &dwRWC, NULL);
+	WriteFile(hFile, &m_vVelocity, sizeof(__Vector3), &dwRWC, nullptr);
+	WriteFile(hFile, &m_vAcceleration, sizeof(__Vector3), &dwRWC, nullptr);
+	WriteFile(hFile, &m_vRotVelocity, sizeof(__Vector3), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_bOnGround, sizeof(bool), &dwRWC, NULL);
+	WriteFile(hFile, &m_bOnGround, sizeof(bool), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_vPos, sizeof(__Vector3), &dwRWC, NULL);
+	WriteFile(hFile, &m_vPos, sizeof(__Vector3), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_iNumTex, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &m_iNumTex, sizeof(int), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_fTexFPS, sizeof(float), &dwRWC, NULL);
+	WriteFile(hFile, &m_fTexFPS, sizeof(float), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_pTexName, MAX_PATH, &dwRWC, NULL);
+	WriteFile(hFile, &m_pTexName, MAX_PATH, &dwRWC, nullptr);
 
 	/* 
 	if(m_iBaseVersion<2)
 	{
-		WriteFile(hFile, &m_bAlpha, sizeof(BOOL), &dwRWC, NULL);
-		WriteFile(hFile, &m_dwSrcBlend, sizeof(uint32_t), &dwRWC, NULL);
-		WriteFile(hFile, &m_dwDestBlend, sizeof(uint32_t), &dwRWC, NULL);
+		WriteFile(hFile, &m_bAlpha, sizeof(BOOL), &dwRWC, nullptr);
+		WriteFile(hFile, &m_dwSrcBlend, sizeof(uint32_t), &dwRWC, nullptr);
+		WriteFile(hFile, &m_dwDestBlend, sizeof(uint32_t), &dwRWC, nullptr);
 
-		WriteFile(hFile, &m_fFadeOut, sizeof(float), &dwRWC, NULL);
-		WriteFile(hFile, &m_fFadeIn, sizeof(float), &dwRWC, NULL);
+		WriteFile(hFile, &m_fFadeOut, sizeof(float), &dwRWC, nullptr);
+		WriteFile(hFile, &m_fFadeIn, sizeof(float), &dwRWC, nullptr);
 	}
 	//*/
 
 	// m_iBaseVersion >= 2 
 	//
-	WriteFile(hFile, &m_dwSrcBlend, sizeof(uint32_t), &dwRWC, NULL);
-	WriteFile(hFile, &m_dwDestBlend, sizeof(uint32_t), &dwRWC, NULL);
+	WriteFile(hFile, &m_dwSrcBlend, sizeof(uint32_t), &dwRWC, nullptr);
+	WriteFile(hFile, &m_dwDestBlend, sizeof(uint32_t), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_fFadeOut, sizeof(float), &dwRWC, NULL);
-	WriteFile(hFile, &m_fFadeIn, sizeof(float), &dwRWC, NULL);
+	WriteFile(hFile, &m_fFadeOut, sizeof(float), &dwRWC, nullptr);
+	WriteFile(hFile, &m_fFadeIn, sizeof(float), &dwRWC, nullptr);
 	
 	m_dwRenderFlag = RF_ALPHABLENDING | RF_NOTUSEFOG | RF_DIFFUSEALPHA | RF_NOTUSELIGHT | RF_DOUBLESIDED | RF_NOTZWRITE | RF_NOTZBUFFER; 
 	if(m_dwZEnable == D3DZB_TRUE) m_dwRenderFlag ^= RF_NOTZBUFFER;
@@ -589,7 +589,7 @@ bool CN3FXPartBase::Save(HANDLE hFile)
 	if(m_dwLight == TRUE) m_dwRenderFlag ^= RF_NOTUSELIGHT;
 	if(m_bAlpha != TRUE) m_dwRenderFlag ^= RF_ALPHABLENDING;
 	
-	WriteFile(hFile, &m_dwRenderFlag, sizeof(uint32_t), &dwRWC, NULL);
+	WriteFile(hFile, &m_dwRenderFlag, sizeof(uint32_t), &dwRWC, nullptr);
 
 	return true;
 }

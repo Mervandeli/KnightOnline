@@ -22,16 +22,14 @@ public:
 	std::string		m_szClanName;
 
 public:
-	void SetVisible(bool bVisible);
+	CUICreateClanName();
+	~CUICreateClanName() override;
+	bool Load(HANDLE hFile) override;
+	void SetVisible(bool bVisible) override;
+	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
 	void Open(int msg = 0);
 	bool MakeClan();
-	void MsgSend_MakeClan();
-
-	bool Load(HANDLE hFile);
-	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg);
-
-	CUICreateClanName();
-	virtual ~CUICreateClanName();	
+	void MsgSend_MakeClan() const;
 };
 
 #endif //#if !defined(__UICREATECLANNAME_H__)

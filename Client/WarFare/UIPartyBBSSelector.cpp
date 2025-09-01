@@ -22,8 +22,8 @@ static char THIS_FILE[]=__FILE__;
 
 CUIPartyBBSSelector::CUIPartyBBSSelector()
 {
-	m_pBtn_WantPartyMember	= NULL;
-	m_pBtn_WantParty		= NULL;
+	m_pBtn_WantPartyMember	= nullptr;
+	m_pBtn_WantParty		= nullptr;
 }
 
 CUIPartyBBSSelector::~CUIPartyBBSSelector()
@@ -68,8 +68,8 @@ bool CUIPartyBBSSelector::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-	m_pBtn_WantPartyMember	= (CN3UIButton*)GetChildByID("Btn_WantParty");			__ASSERT(m_pBtn_WantPartyMember,	"NULL UI Component!!");
-	m_pBtn_WantParty		= (CN3UIButton*)GetChildByID("Btn_WantPartyMember");	__ASSERT(m_pBtn_WantParty,	"NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_WantPartyMember, GetChildByID<CN3UIButton>("Btn_WantParty"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_WantParty, GetChildByID<CN3UIButton>("Btn_WantPartyMember"));
 
 	return true;
 }

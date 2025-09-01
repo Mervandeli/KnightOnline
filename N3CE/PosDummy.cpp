@@ -73,7 +73,7 @@ BOOL CPosDummy::MouseMsgFilter(LPMSG pMsg)
 						vPos = vRayOrig + vRayDir*fT;
 
 						__Vector3 vDiffPos = vPos - m_vPos;
-						TransDiff(&vDiffPos, NULL, NULL);
+						TransDiff(&vDiffPos, nullptr, nullptr);
 						m_vPos = vPos;
 					}
 					break;
@@ -87,7 +87,7 @@ BOOL CPosDummy::MouseMsgFilter(LPMSG pMsg)
 						vPos += ((m_pSelectedCube->vCenterPos*(-1.0f))*mat);
 
 						__Vector3 vDiffPos;	vDiffPos.Set(vPos.x - m_vPos.x, 0, 0);
-						TransDiff(&vDiffPos, NULL, NULL);
+						TransDiff(&vDiffPos, nullptr, nullptr);
 						m_vPos.x = vPos.x;
 					}
 					break;
@@ -101,7 +101,7 @@ BOOL CPosDummy::MouseMsgFilter(LPMSG pMsg)
 						vPos += ((m_pSelectedCube->vCenterPos*(-1.0f))*mat);
 
 						__Vector3 vDiffPos;	vDiffPos.Set(0, vPos.y - m_vPos.y, 0);
-						TransDiff(&vDiffPos, NULL, NULL);
+						TransDiff(&vDiffPos, nullptr, nullptr);
 						m_vPos.y = vPos.y;
 					}
 					break;
@@ -115,7 +115,7 @@ BOOL CPosDummy::MouseMsgFilter(LPMSG pMsg)
 						vPos += ((m_pSelectedCube->vCenterPos*(-1.0f))*mat);
 
 						__Vector3 vDiffPos;	vDiffPos.Set(0, 0, vPos.z - m_vPos.z);
-						TransDiff(&vDiffPos, NULL, NULL);
+						TransDiff(&vDiffPos, nullptr, nullptr);
 						m_vPos.z = vPos.z;
 					}
 					break;

@@ -39,7 +39,7 @@ CGround::~CGround()
 	if(m_pTile) CN3Base::s_MngTex.Delete(&m_pTile);
 
 	if(m_pVB) delete[] m_pVB;
-	m_pVB = NULL;
+	m_pVB = nullptr;
 }
 
 void CGround::Render()
@@ -55,7 +55,7 @@ void CGround::Render()
 	s_lpD3DDev->SetRenderState( D3DRS_ZWRITEENABLE, TRUE);
 
 	if(m_pTile) s_lpD3DDev->SetTexture(0, m_pTile->Get());
-	else s_lpD3DDev->SetTexture(0, NULL);
+	else s_lpD3DDev->SetTexture(0, nullptr);
 
 	s_lpD3DDev->DrawPrimitiveUP( D3DPT_TRIANGLELIST, m_iSize/m_iTileSize*m_iSize/m_iTileSize*2, m_pVB, sizeof(__VertexT1));
 

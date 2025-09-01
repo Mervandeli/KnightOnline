@@ -69,17 +69,17 @@ public:
 
 	// Shapes..
 	virtual bool CheckCollisionCameraWithShape(__Vector3& vEyeResult, const __Vector3& vAt, float fNP) = 0;
-	virtual float GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal = NULL) = 0; 
+	virtual float GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal = nullptr) = 0; 
 	virtual void RenderCollisionWithShape(const __Vector3& vPos) = 0;
-	virtual float GetHeightWithShape(float fX, float fZ, __Vector3* pvNormal = NULL) = 0; 
+	virtual float GetHeightWithShape(float fX, float fZ, __Vector3* pvNormal = nullptr) = 0; 
 	virtual CN3Shape* ShapeGetByIDWithShape(int iID) = 0;
-	virtual CN3Shape* PickWithShape(int iXScreen, int iYScreen, bool bMustHaveEvent, __Vector3* pvPick = NULL) = 0;
+	virtual CN3Shape* PickWithShape(int iXScreen, int iYScreen, bool bMustHaveEvent, __Vector3* pvPick = nullptr) = 0;
 	virtual bool CheckCollisionWithShape(	const __Vector3& vPos,			// 충돌 위치
 														const __Vector3& vDir,					    // 방향 벡터
 														float fSpeedPerSec,							 // 초당 움직이는 속도
-														__Vector3* pvCol = NULL,				  // 충돌 지점
-														__Vector3* pvNormal = NULL,				// 충돌한면의 법선벡터
-														__Vector3* pVec = NULL) = 0;			// 충돌한 면 의 폴리곤 __Vector3[3]
+														__Vector3* pvCol = nullptr,				  // 충돌 지점
+														__Vector3* pvNormal = nullptr,				// 충돌한면의 법선벡터
+														__Vector3* pVec = nullptr) = 0;			// 충돌한 면 의 폴리곤 __Vector3[3]
 
 	// Sky..
 	virtual D3DCOLOR GetSkyColorWithSky()	{	return 0x00000000;	}
@@ -90,7 +90,7 @@ public:
 	virtual D3DCOLOR GetLightDiffuseColorWithSky(int iIndex)	{	return 0xffffffff;	}
 	virtual D3DCOLOR GetLightAmbientColorWithSky(int iIndex)	{	return 0xffffffff;	}
 	virtual D3DCOLOR GetFogColorWithSky()	{	return 0xffffffff;	}
-	//virtual CN3Sun*	GetSunPointerWithSky()	{	return NULL;	}
+	//virtual CN3Sun*	GetSunPointerWithSky()	{	return nullptr;	}
 
 	// Bird..
 

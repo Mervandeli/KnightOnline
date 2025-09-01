@@ -16,7 +16,7 @@ class CDlgModifyDTex : public CDialog
 public:
 	int		m_State;
 	CPoint	m_Pos;
-	CDlgModifyDTex(CWnd* pParent = NULL);   // standard constructor
+	CDlgModifyDTex(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgModifyDTex)

@@ -18,7 +18,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgSetLightMap dialog
 
 
-CDlgSetLightMap::CDlgSetLightMap(CWnd* pParent /*=NULL*/)
+CDlgSetLightMap::CDlgSetLightMap(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgSetLightMap::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgSetLightMap)
@@ -72,7 +72,7 @@ BOOL CDlgSetLightMap::OnInitDialog()
 	m_ColorWidth = 70;
 	m_ColorHeight = 30;
 
-	m_ColorView.SetWindowPos(NULL, 0, 0, m_ColorWidth, m_ColorHeight, SWP_DRAWFRAME|SWP_NOMOVE);
+	m_ColorView.SetWindowPos(nullptr, 0, 0, m_ColorWidth, m_ColorHeight, SWP_DRAWFRAME|SWP_NOMOVE);
 
 	Invalidate(FALSE);
 

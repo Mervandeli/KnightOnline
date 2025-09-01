@@ -19,8 +19,8 @@
 
 CPondMesh::CPondMesh()
 {
-	m_pdwIndex = NULL;
-	m_pTexture = NULL;
+	m_pdwIndex = nullptr;
+	m_pTexture = nullptr;
 
 	Release();
 }
@@ -43,7 +43,7 @@ void CPondMesh::Release()
 	m_fTV = 50.0f;	
 	
 	m_bUVState = TRUE;
-	m_pTerrain = NULL;
+	m_pTerrain = nullptr;
 
 	m_iRectVC = 0;
 	ZeroMemory(m_pRectVts, 100*sizeof(__VertexXyzT2));
@@ -57,8 +57,8 @@ void CPondMesh::Release()
 	
 	ClearSelectPos();
 
-	if (m_pTexture) { s_MngTex.Delete(&m_pTexture); m_pTexture = NULL;}
-	if (m_pdwIndex) { delete []m_pdwIndex;m_pdwIndex = NULL;}
+	if (m_pTexture) { s_MngTex.Delete(&m_pTexture); m_pTexture = nullptr;}
+	if (m_pdwIndex) { delete []m_pdwIndex;m_pdwIndex = nullptr;}
 }
 
 void CPondMesh::Render()
@@ -70,7 +70,7 @@ void CPondMesh::Render()
 
 	//	영역 상자 그리기
 	{
-		s_lpD3DDev->SetTexture(0, NULL);
+		s_lpD3DDev->SetTexture(0, nullptr);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 		s_lpD3DDev->SetFVF(FVF_XYZCOLOR);
@@ -111,7 +111,7 @@ void CPondMesh::Render()
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 		s_lpD3DDev->SetTexture(0, m_pTexture->Get());
 		s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-		s_lpD3DDev->SetTexture(1, NULL);
+		s_lpD3DDev->SetTexture(1, nullptr);
 		
 
 		// render
@@ -125,7 +125,7 @@ void CPondMesh::Render()
 										  , sizeof(__VertexXyzT2));
 
 		// restore
-		s_lpD3DDev->SetTexture(1, NULL);
+		s_lpD3DDev->SetTexture(1, nullptr);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAOP, dwAlphaOP);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAARG1, dwAlphaArg1);
 		s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlphaBlend);
@@ -137,7 +137,7 @@ void CPondMesh::Render()
 	{
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
-		s_lpD3DDev->SetTexture(0, NULL);
+		s_lpD3DDev->SetTexture(0, nullptr);
 
 		// backup state
 		__Material BackupMtrl;
@@ -162,7 +162,7 @@ void CPondMesh::RenderVertexPoint()	// 잘보이게 점만 다시 그리기
 	HRESULT hr;
 
 	// set texture
-	hr = s_lpD3DDev->SetTexture(0, NULL);
+	hr = s_lpD3DDev->SetTexture(0, nullptr);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 
@@ -259,11 +259,11 @@ void CPondMesh::UpdateMovePos(__Vector3 vMovingPos)
 
 void CPondMesh::MakeDrawRect(__Vector3* p4vPos)	//	화면에 보일 연못의 영역테두리 만든다
 {
-	if(p4vPos==NULL) return;
+	if(p4vPos==nullptr) return;
 
 	memcpy(m_vDrawBox,p4vPos,sizeof(__Vector3)*4);
 	m_fWaterHeight = p4vPos[0].y;	//	물의 높이를 받는다
-	p4vPos = NULL;	//	메모리에서 이상한 결과과 나올까봐..
+	p4vPos = nullptr;	//	메모리에서 이상한 결과과 나올까봐..
 
 	//----------------------------------------------------------------------------
 	DWORD color = 0xffffff00;
@@ -316,7 +316,7 @@ void CPondMesh::MakePondPos()
 	if(m_iWaterScaleWidth*m_iWaterScaleHeight<=0) return;
 
 
-	if(m_pdwIndex == NULL || (m_iBackUpWidht != m_iWaterScaleWidth || m_iBackUpHeight != m_iWaterScaleHeight)) 
+	if(m_pdwIndex == nullptr || (m_iBackUpWidht != m_iWaterScaleWidth || m_iBackUpHeight != m_iWaterScaleHeight)) 
 	{
 		delete []m_pdwIndex; 
 		m_pdwIndex = new WORD [m_iWaterScaleWidth*m_iWaterScaleHeight*6];
@@ -379,7 +379,7 @@ BOOL CPondMesh::SetTextureName(LPCTSTR pszFName)
 
 void CPondMesh::MakeIndex()
 {
-	if(m_pdwIndex==NULL) 
+	if(m_pdwIndex==nullptr) 
 	{
 		m_pdwIndex = new WORD [m_iWaterScaleWidth*m_iWaterScaleHeight*6];
 	}
@@ -478,7 +478,7 @@ void CPondMesh::ClearSelectPos()
 	int iSize = m_vSelect.size();
 	if(iSize>0)
 	{
-		__SELECT_PO* pSel = NULL;
+		__SELECT_PO* pSel = nullptr;
 		it_SelVtx it = m_vSelect.begin();
 		for(int i = 0; i < iSize; i++, it++)
 		{
@@ -519,13 +519,13 @@ void CPondMesh::InputSelectPos(float fX,float fY,float fZ,int iVC)
 
 		int iSize = m_vSelect.size();
 		it_SelVtx it = m_vSelect.begin();
-		__SELECT_PO* pSelpo = NULL;
+		__SELECT_PO* pSelpo = nullptr;
 		for(int i=0;i<iSize;++i,++it)
 		{
 			pSelpo = *it;
 			if (pSelpo && pSelpo->ix == iWidth && pSelpo->iz == iHeight)  
 			{
-				pSelpo = NULL;
+				pSelpo = nullptr;
 				return;
 			}
 		}
@@ -584,7 +584,7 @@ void CPondMesh::MovingPos()
 {
 	int iSize = m_vSelect.size();
 	it_SelVtx it = m_vSelect.begin();
-	__SELECT_PO* pSelpo = NULL;
+	__SELECT_PO* pSelpo = nullptr;
 
 	for(int i=0;i<iSize;++i,++it)
 	{
@@ -780,32 +780,32 @@ bool CPondMesh::Load1001(HANDLE hFile)
 	DWORD dwNum;
 	int iLen; char szTextueFName[_MAX_PATH];
 
-	ReadFile(hFile, &m_iPondID, sizeof(m_iPondID), &dwNum, NULL);		// 연못 번호
-	ReadFile(hFile, &m_dwPondAlpha, sizeof(m_dwPondAlpha), &dwNum, NULL);		// 연못 알파
-	ReadFile(hFile, &m_fWaterHeight, sizeof(m_fWaterHeight), &dwNum, NULL);
-	ReadFile(hFile, &m_iWaterScaleWidth, sizeof(m_iWaterScaleWidth), &dwNum, NULL);
-	ReadFile(hFile, &m_iWaterScaleHeight, sizeof(m_iWaterScaleHeight), &dwNum, NULL);
-	ReadFile(hFile, &m_fTU, sizeof(m_fTU), &dwNum, NULL);
-	ReadFile(hFile, &m_fTV, sizeof(m_fTV), &dwNum, NULL);
-	ReadFile(hFile, &m_fWaterScaleX, sizeof(m_fWaterScaleX), &dwNum, NULL);
-	ReadFile(hFile, &m_fWaterScaleZ, sizeof(m_fWaterScaleZ), &dwNum, NULL);
-	ReadFile(hFile, &m_bUVState, sizeof(m_bUVState), &dwNum, NULL);
+	ReadFile(hFile, &m_iPondID, sizeof(m_iPondID), &dwNum, nullptr);		// 연못 번호
+	ReadFile(hFile, &m_dwPondAlpha, sizeof(m_dwPondAlpha), &dwNum, nullptr);		// 연못 알파
+	ReadFile(hFile, &m_fWaterHeight, sizeof(m_fWaterHeight), &dwNum, nullptr);
+	ReadFile(hFile, &m_iWaterScaleWidth, sizeof(m_iWaterScaleWidth), &dwNum, nullptr);
+	ReadFile(hFile, &m_iWaterScaleHeight, sizeof(m_iWaterScaleHeight), &dwNum, nullptr);
+	ReadFile(hFile, &m_fTU, sizeof(m_fTU), &dwNum, nullptr);
+	ReadFile(hFile, &m_fTV, sizeof(m_fTV), &dwNum, nullptr);
+	ReadFile(hFile, &m_fWaterScaleX, sizeof(m_fWaterScaleX), &dwNum, nullptr);
+	ReadFile(hFile, &m_fWaterScaleZ, sizeof(m_fWaterScaleZ), &dwNum, nullptr);
+	ReadFile(hFile, &m_bUVState, sizeof(m_bUVState), &dwNum, nullptr);
 
-	ReadFile(hFile, m_vDrawBox, sizeof(m_vDrawBox), &dwNum, NULL);				// 한줄에 있는 점 갯수
+	ReadFile(hFile, m_vDrawBox, sizeof(m_vDrawBox), &dwNum, nullptr);				// 한줄에 있는 점 갯수
 
-	ReadFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, NULL);				// 점 갯수
+	ReadFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, nullptr);				// 점 갯수
 	if (m_iVC>0)
 	{
-		ReadFile(hFile, m_pViewVts, m_iVC*sizeof(__VertexXyzT2), &dwNum, NULL);	// vertex buffer
+		ReadFile(hFile, m_pViewVts, m_iVC*sizeof(__VertexXyzT2), &dwNum, nullptr);	// vertex buffer
 		ReInputBackPos();	//	백업용에 새로좌표입력
 	}
-	ReadFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, NULL);				// IndexBuffer Count.
+	ReadFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, nullptr);				// IndexBuffer Count.
 
-	ReadFile(hFile, &iLen, sizeof(iLen), &dwNum, NULL);				// texture file name length
+	ReadFile(hFile, &iLen, sizeof(iLen), &dwNum, nullptr);				// texture file name length
 	if (iLen>0)
 	{
-		ReadFile(hFile, szTextueFName, iLen, &dwNum, NULL);			// texture name
-		szTextueFName[iLen] = NULL;
+		ReadFile(hFile, szTextueFName, iLen, &dwNum, nullptr);			// texture name
+		szTextueFName[iLen] = '\0';
 		m_pTexture = s_MngTex.Get(szTextueFName, TRUE);				// load texture
 	}
 
@@ -826,22 +826,22 @@ bool CPondMesh::Load1000(HANDLE hFile)
 	int iLen; char szTextueFName[_MAX_PATH];
 	float fScaleTemp;
 
-	ReadFile(hFile, &m_iPondID, sizeof(m_iPondID), &dwNum, NULL);			// 연못 번호
-	ReadFile(hFile, &m_dwPondAlpha, sizeof(m_dwPondAlpha), &dwNum, NULL);	// 연못 알파
+	ReadFile(hFile, &m_iPondID, sizeof(m_iPondID), &dwNum, nullptr);			// 연못 번호
+	ReadFile(hFile, &m_dwPondAlpha, sizeof(m_dwPondAlpha), &dwNum, nullptr);	// 연못 알파
 
-	ReadFile(hFile, &m_iWaterScaleWidth, sizeof(m_iWaterScaleWidth), &dwNum, NULL);	// 한줄에 있는 점 갯수
+	ReadFile(hFile, &m_iWaterScaleWidth, sizeof(m_iWaterScaleWidth), &dwNum, nullptr);	// 한줄에 있는 점 갯수
 
-	ReadFile(hFile, &fScaleTemp, sizeof(fScaleTemp), &dwNum, NULL);
-	ReadFile(hFile, &fScaleTemp, sizeof(fScaleTemp), &dwNum, NULL);
+	ReadFile(hFile, &fScaleTemp, sizeof(fScaleTemp), &dwNum, nullptr);
+	ReadFile(hFile, &fScaleTemp, sizeof(fScaleTemp), &dwNum, nullptr);
 
-	ReadFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, NULL);			// 점 갯수
-	if (m_iVC>0)	ReadFile(hFile, m_pVertices, m_iVC*sizeof(__Vector3), &dwNum, NULL);	// vertex buffer
-	ReadFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, NULL);			// IndexBufferCount.
-	ReadFile(hFile, &iLen, sizeof(iLen), &dwNum, NULL);				// texture name length
+	ReadFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, nullptr);			// 점 갯수
+	if (m_iVC>0)	ReadFile(hFile, m_pVertices, m_iVC*sizeof(__Vector3), &dwNum, nullptr);	// vertex buffer
+	ReadFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, nullptr);			// IndexBufferCount.
+	ReadFile(hFile, &iLen, sizeof(iLen), &dwNum, nullptr);				// texture name length
 	if (iLen>0)
 	{
-		ReadFile(hFile, szTextueFName, iLen, &dwNum, NULL);			// texture name
-		szTextueFName[iLen] = NULL;
+		ReadFile(hFile, szTextueFName, iLen, &dwNum, nullptr);			// texture name
+		szTextueFName[iLen] = '\0';
 		m_pTexture = s_MngTex.Get(szTextueFName, TRUE);				// load texture
 	}
 
@@ -884,27 +884,27 @@ bool CPondMesh::Load(HANDLE hFile)
 	int iLen; char szTextueFName[_MAX_PATH];
 	float fScaleTemp;
 
-	ReadFile(hFile, &m_iPondID, sizeof(m_iPondID), &dwNum, NULL);		// 연못 번호
+	ReadFile(hFile, &m_iPondID, sizeof(m_iPondID), &dwNum, nullptr);		// 연못 번호
 
 	m_dwPondAlpha = 0xddffffff;
 
-	ReadFile(hFile, &m_iWaterScaleWidth, sizeof(int), &dwNum, NULL);				// 한줄에 있는 점 갯수
+	ReadFile(hFile, &m_iWaterScaleWidth, sizeof(int), &dwNum, nullptr);				// 한줄에 있는 점 갯수
 
-	ReadFile(hFile, &fScaleTemp, sizeof(fScaleTemp), &dwNum, NULL);
-	ReadFile(hFile, &fScaleTemp, sizeof(fScaleTemp), &dwNum, NULL);
+	ReadFile(hFile, &fScaleTemp, sizeof(fScaleTemp), &dwNum, nullptr);
+	ReadFile(hFile, &fScaleTemp, sizeof(fScaleTemp), &dwNum, nullptr);
 
-	ReadFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, NULL);			// 점 갯수
+	ReadFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, nullptr);			// 점 갯수
 	if (m_iVC>0)
 	{
-		ReadFile(hFile, m_pViewVts, m_iVC*sizeof(__VertexXyzT2), &dwNum, NULL);	// vertex buffer
+		ReadFile(hFile, m_pViewVts, m_iVC*sizeof(__VertexXyzT2), &dwNum, nullptr);	// vertex buffer
 		ReInputBackPos();	//	백업용에 새로좌표입력
 	}
-	ReadFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, NULL);			// IndexBufferCount.
-	ReadFile(hFile, &iLen, sizeof(iLen), &dwNum, NULL);				// texture name length
+	ReadFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, nullptr);			// IndexBufferCount.
+	ReadFile(hFile, &iLen, sizeof(iLen), &dwNum, nullptr);				// texture name length
 	if (iLen>0)
 	{
-		ReadFile(hFile, szTextueFName, iLen, &dwNum, NULL);	// texture name
-		szTextueFName[iLen] = NULL;
+		ReadFile(hFile, szTextueFName, iLen, &dwNum, nullptr);	// texture name
+		szTextueFName[iLen] = '\0';
 		m_pTexture = s_MngTex.Get(szTextueFName, TRUE);				// load texture
 	}
 
@@ -941,29 +941,29 @@ bool CPondMesh::Save(HANDLE hFile)
 {
 	DWORD dwNum = 0;
 
-	WriteFile(hFile, &m_iPondID, sizeof(m_iPondID), &dwNum, NULL);		// 연못 번호
-	WriteFile(hFile, &m_dwPondAlpha, sizeof(m_dwPondAlpha), &dwNum, NULL);		// 연못 알파
-	WriteFile(hFile, &m_fWaterHeight, sizeof(m_fWaterHeight), &dwNum, NULL);
-	WriteFile(hFile, &m_iWaterScaleWidth, sizeof(m_iWaterScaleWidth), &dwNum, NULL);
-	WriteFile(hFile, &m_iWaterScaleHeight, sizeof(m_iWaterScaleHeight), &dwNum, NULL);
-	WriteFile(hFile, &m_fTU, sizeof(m_fTU), &dwNum, NULL);
-	WriteFile(hFile, &m_fTV, sizeof(m_fTV), &dwNum, NULL);
-	WriteFile(hFile, &m_fWaterScaleX, sizeof(m_fWaterScaleX), &dwNum, NULL);
-	WriteFile(hFile, &m_fWaterScaleZ, sizeof(m_fWaterScaleZ), &dwNum, NULL);
-	WriteFile(hFile, &m_bUVState, sizeof(m_bUVState), &dwNum, NULL);
+	WriteFile(hFile, &m_iPondID, sizeof(m_iPondID), &dwNum, nullptr);		// 연못 번호
+	WriteFile(hFile, &m_dwPondAlpha, sizeof(m_dwPondAlpha), &dwNum, nullptr);		// 연못 알파
+	WriteFile(hFile, &m_fWaterHeight, sizeof(m_fWaterHeight), &dwNum, nullptr);
+	WriteFile(hFile, &m_iWaterScaleWidth, sizeof(m_iWaterScaleWidth), &dwNum, nullptr);
+	WriteFile(hFile, &m_iWaterScaleHeight, sizeof(m_iWaterScaleHeight), &dwNum, nullptr);
+	WriteFile(hFile, &m_fTU, sizeof(m_fTU), &dwNum, nullptr);
+	WriteFile(hFile, &m_fTV, sizeof(m_fTV), &dwNum, nullptr);
+	WriteFile(hFile, &m_fWaterScaleX, sizeof(m_fWaterScaleX), &dwNum, nullptr);
+	WriteFile(hFile, &m_fWaterScaleZ, sizeof(m_fWaterScaleZ), &dwNum, nullptr);
+	WriteFile(hFile, &m_bUVState, sizeof(m_bUVState), &dwNum, nullptr);
 
-	WriteFile(hFile, m_vDrawBox, sizeof(m_vDrawBox), &dwNum, NULL);				// 한줄에 있는 점 갯수
+	WriteFile(hFile, m_vDrawBox, sizeof(m_vDrawBox), &dwNum, nullptr);				// 한줄에 있는 점 갯수
 
-	WriteFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, NULL);				// 점 갯수
-	if (m_iVC>0) WriteFile(hFile, m_pViewVts, m_iVC*sizeof(__VertexXyzT2), &dwNum, NULL);	// vertex buffer
-	WriteFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, NULL);				// IndexBuffer Count.
+	WriteFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, nullptr);				// 점 갯수
+	if (m_iVC>0) WriteFile(hFile, m_pViewVts, m_iVC*sizeof(__VertexXyzT2), &dwNum, nullptr);	// vertex buffer
+	WriteFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, nullptr);				// IndexBuffer Count.
 
 	int iLen = 0;
 	if(m_pTexture) iLen = m_pTexture->FileName().size();
-	WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, NULL);				// texture file name length
+	WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, nullptr);				// texture file name length
 	if (iLen>0)
 	{
-		WriteFile(hFile, m_pTexture->FileName().c_str(), iLen, &dwNum, NULL);			// texture file name
+		WriteFile(hFile, m_pTexture->FileName().c_str(), iLen, &dwNum, nullptr);			// texture file name
 	}
 
 	return 0;

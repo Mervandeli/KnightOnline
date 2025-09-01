@@ -29,9 +29,9 @@ CN3FXSPart::CN3FXSPart()
 	
 	m_Mtl.Init();
 
-//	m_pPM = NULL;
+//	m_pPM = nullptr;
 
-	m_pRefShape = NULL;
+	m_pRefShape = nullptr;
 }
 
 CN3FXSPart::~CN3FXSPart()
@@ -39,7 +39,7 @@ CN3FXSPart::~CN3FXSPart()
 	int iTC = m_TexRefs.size();
 	for(int i = 0; i < iTC; i++) s_MngTex.Delete(&m_TexRefs[i]);
 
-//	if(m_pPM) { m_pPM->Release(); delete m_pPM; m_pPM = NULL; }
+//	if(m_pPM) { m_pPM->Release(); delete m_pPM; m_pPM = nullptr; }
 }
 
 void CN3FXSPart::Release()
@@ -55,7 +55,7 @@ void CN3FXSPart::Release()
 	for(int i = 0; i < iTC; i++) s_MngTex.Delete(&m_TexRefs[i]);
 	m_TexRefs.clear();
 
-//	if(m_pPM) { m_pPM->Release(); delete m_pPM; m_pPM = NULL; }
+//	if(m_pPM) { m_pPM->Release(); delete m_pPM; m_pPM = nullptr; }
 	m_FXPMInst.Release();
 
 }
@@ -70,7 +70,7 @@ void CN3FXSPart::TexAlloc(int nCount)
 	for(int i = 0; i < iTC; i++) s_MngTex.Delete(&m_TexRefs[i]);
 	m_TexRefs.clear();
 
-	m_TexRefs.assign(nCount, NULL);
+	m_TexRefs.assign(nCount, nullptr);
 }
 
 CN3Texture* CN3FXSPart::Tex(int iIndex)
@@ -105,7 +105,7 @@ void CN3FXSPart::TexSet(int iIndex, CN3Texture* pTex)
 void CN3FXSPart::Tick(const __Matrix44& mtxParent) 
 {
 	CN3FXPMesh* pFXPMesh = m_FXPMInst.GetMesh();
-	if(NULL == pFXPMesh) return;
+	if(nullptr == pFXPMesh) return;
 
 	m_bOutOfCameraRange = FALSE;
 
@@ -143,7 +143,7 @@ void CN3FXSPart::Render()
 	CN3Base::s_RenderInfo.nShape_Part++; // Rendering Information Update...
 #endif
 	
-	LPDIRECT3DTEXTURE9 lpTex = NULL;
+	LPDIRECT3DTEXTURE9 lpTex = nullptr;
 	int iTC = m_TexRefs.size();
 	if(iTC > 0)
 	{
@@ -179,7 +179,7 @@ void CN3FXSPart::Render()
 
 	s_lpD3DDev->SetMaterial(&m_Mtl); // 재질 설정..
 	s_lpD3DDev->SetTexture(0, lpTex);
-	if(NULL != lpTex)
+	if(nullptr != lpTex)
 	{
 		s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
 		s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );		
@@ -226,37 +226,37 @@ bool CN3FXSPart::Load(HANDLE hFile)
 	int nL = 0;
 	char szFN[256];
 
-	ReadFile(hFile, &m_vPivot, sizeof(__Vector3), &dwRWC, NULL);
+	ReadFile(hFile, &m_vPivot, sizeof(__Vector3), &dwRWC, nullptr);
 
-	ReadFile(hFile, &nL, 4, &dwRWC, NULL); // Mesh FileName
-	ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL; // 메시 파일 이름..
+	ReadFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
+	ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 메시 파일 이름..
 
 	//m_pRefShape의 경로와 읽어들인 파일명을 합쳐라...
 	char szPath[_MAX_PATH];
 	char szFName[_MAX_FNAME], szExt[_MAX_EXT];
 	char szDir[_MAX_DIR];
-	_splitpath(m_pRefShape->FileName().c_str(), NULL, szDir, NULL, NULL);
-	_splitpath(szFN, NULL, NULL, szFName, szExt);
-	_makepath(szPath, NULL, szDir, szFName, szExt);
+	_splitpath(m_pRefShape->FileName().c_str(), nullptr, szDir, nullptr, nullptr);
+	_splitpath(szFN, nullptr, nullptr, szFName, szExt);
+	_makepath(szPath, nullptr, szDir, szFName, szExt);
 
 	if(!this->MeshSet(szPath)) return false;
 
-	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, NULL); // 재질
+	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질
 
 	int iTC = 0;
-	ReadFile(hFile, &iTC, 4, &dwRWC, NULL);
-	ReadFile(hFile, &m_fTexFPS, 4, &dwRWC, NULL);
+	ReadFile(hFile, &iTC, 4, &dwRWC, nullptr);
+	ReadFile(hFile, &m_fTexFPS, 4, &dwRWC, nullptr);
 	m_TexRefs.clear();
 	this->TexAlloc(iTC); // Texture Pointer Pointer 할당..
 	for(int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기..
 	{
-		ReadFile(hFile, &nL, 4, &dwRWC, NULL);
+		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 		if(nL > 0)
 		{
-			ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL; // 텍스처 파일 이름..
+			ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 텍스처 파일 이름..
 			
-			_splitpath(szFN, NULL, NULL, szFName, szExt);
-			_makepath(szPath, NULL, szDir, szFName, szExt);
+			_splitpath(szFN, nullptr, nullptr, szFName, szExt);
+			_makepath(szPath, nullptr, szDir, szFName, szExt);
 			m_TexRefs[j] = s_MngTex.Get(szPath);
 		}
 	}
@@ -347,7 +347,7 @@ void CN3FXShape::Tick(float fFrm)
 	CN3TransformCollision::Tick(m_fFrmCur);
 	m_mtxFinalTransform = CN3Transform::m_Matrix * m_mtxParent;
 
-	CN3FXSPart* pPD = NULL;
+	CN3FXSPart* pPD = nullptr;
 	int iPC = m_Parts.size();
 	for(int i = 0; i < iPC; i++)
 	{
@@ -376,10 +376,10 @@ bool CN3FXShape::Load(HANDLE hFile)
 	for(int i = 0; i < iPC; i++) delete m_Parts[i];
 	m_Parts.clear();
 
-	ReadFile(hFile, &iPC, 4, &dwRWC, NULL); // Part Count
+	ReadFile(hFile, &iPC, 4, &dwRWC, nullptr); // Part Count
 	if(iPC > 0)
 	{
-		m_Parts.assign(iPC, NULL);
+		m_Parts.assign(iPC, nullptr);
 		for(int i = 0; i < iPC; i++)
 		{
 			m_Parts[i] = new CN3FXSPart();
@@ -390,11 +390,11 @@ bool CN3FXShape::Load(HANDLE hFile)
 	}
 
 	uint32_t dwTmp;		
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, NULL); // 소속
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, NULL); // 속성 0
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, NULL); // 속성 1
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, NULL); // 속성 2
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, NULL); // 속성 3
+	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 소속
+	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 0
+	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 1
+	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 2
+	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 3
 
 	this->FindMinMax();
 
@@ -410,19 +410,19 @@ bool CN3FXShape::Save(HANDLE hFile)
 	
 	int nL = 0;
 	
-	CN3SPart* pPD = NULL;
+	CN3SPart* pPD = nullptr;
 	int iPC = m_Parts.size();
-	WriteFile(hFile, &iPC, 4, &dwRWC, NULL); // Mesh FileName
+	WriteFile(hFile, &iPC, 4, &dwRWC, nullptr); // Mesh FileName
 	for(int i = 0; i < iPC; i++)
 	{
 		m_Parts[i]->Save(hFile);
 	}
 
-	WriteFile(hFile, &m_iBelong, 4, &dwRWC, NULL); // 소속
-	WriteFile(hFile, &m_iAttr0, 4, &dwRWC, NULL); // 속성 0
-	WriteFile(hFile, &m_iAttr1, 4, &dwRWC, NULL); // 속성 1
-	WriteFile(hFile, &m_iAttr2, 4, &dwRWC, NULL); // 속성 2
-	WriteFile(hFile, &m_iAttr3, 4, &dwRWC, NULL); // 속성 3
+	WriteFile(hFile, &m_iBelong, 4, &dwRWC, nullptr); // 소속
+	WriteFile(hFile, &m_iAttr0, 4, &dwRWC, nullptr); // 속성 0
+	WriteFile(hFile, &m_iAttr1, 4, &dwRWC, nullptr); // 속성 1
+	WriteFile(hFile, &m_iAttr2, 4, &dwRWC, nullptr); // 속성 2
+	WriteFile(hFile, &m_iAttr3, 4, &dwRWC, nullptr); // 속성 3
 	*/
 	return true;
 }
@@ -455,7 +455,7 @@ void CN3FXShape::FindMinMax()
 
 	// 가장 큰 지점찾기..
 	static __Matrix44 mtxWI;
-	D3DXMatrixInverse(&mtxWI, NULL, &m_mtxFinalTransform); // World Matrix Inverse
+	D3DXMatrixInverse(&mtxWI, nullptr, &m_mtxFinalTransform); // World Matrix Inverse
 	int iPC = m_Parts.size();
 	for(int i = 0; i < iPC; i++)
 	{
@@ -526,7 +526,7 @@ void CN3FXShape::Duplicate(CN3FXShape* pSrc)
 	iPC = pSrc->m_Parts.size();
 	if(iPC > 0)
 	{
-		m_Parts.assign(iPC, NULL);
+		m_Parts.assign(iPC, nullptr);
 		for(int i = 0; i < iPC; i++)
 		{
 			m_Parts[i] = new CN3FXSPart();

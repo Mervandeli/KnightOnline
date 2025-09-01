@@ -125,38 +125,38 @@ void CN3UIIcon::Render()
 {
 	if (!IsVisible()) return;
 
-	CN3UIWndBase::m_pSelectionImage->SetVisible(false);
+	CN3UIWndBase::s_pSelectionImage->SetVisible(false);
 
 /*	if ( m_dwStyle & UISTYLE_ICON_HIGHLIGHT )
 	{		
-		CN3UIWndBase::m_pSelectionImage->SetVisible(true);
-		CN3UIWndBase::m_pSelectionImage->SetRegion(GetRegion());
-		CN3UIWndBase::m_pSelectionImage->Render();
-		CN3UIWndBase::m_pSelectionImage->SetVisible(false);
+		CN3UIWndBase::s_pSelectionImage->SetVisible(true);
+		CN3UIWndBase::s_pSelectionImage->SetRegion(GetRegion());
+		CN3UIWndBase::s_pSelectionImage->Render();
+		CN3UIWndBase::s_pSelectionImage->SetVisible(false);
 	}*/
 
 	CN3UIImage::Render();
 
 	if (m_dwStyle & UISTYLE_DISABLE_SKILL)
 	{
-		CN3UIWndBase::m_pSelectionImage->SetVisible(true);
-		CN3UIWndBase::m_pSelectionImage->SetRegion(GetRegion());
-		m_dc = CN3UIWndBase::m_pSelectionImage->GetColor();
-		CN3UIWndBase::m_pSelectionImage->SetColor(D3DCOLOR_RGBA(40,40, 40, 160));
-		CN3UIWndBase::m_pSelectionImage->RenderIconWrapper();
-		CN3UIWndBase::m_pSelectionImage->SetColor(m_dc);
-		CN3UIWndBase::m_pSelectionImage->SetVisible(false);
+		CN3UIWndBase::s_pSelectionImage->SetVisible(true);
+		CN3UIWndBase::s_pSelectionImage->SetRegion(GetRegion());
+		m_dc = CN3UIWndBase::s_pSelectionImage->GetColor();
+		CN3UIWndBase::s_pSelectionImage->SetColor(D3DCOLOR_RGBA(40,40, 40, 160));
+		CN3UIWndBase::s_pSelectionImage->RenderIconWrapper();
+		CN3UIWndBase::s_pSelectionImage->SetColor(m_dc);
+		CN3UIWndBase::s_pSelectionImage->SetVisible(false);
 	}
 
 	if( m_dwStyle & UISTYLE_DURABILITY_EXHAUST )
 	{
-		CN3UIWndBase::m_pSelectionImage->SetVisible(true);
-		CN3UIWndBase::m_pSelectionImage->SetRegion(GetRegion());
-		m_dc = CN3UIWndBase::m_pSelectionImage->GetColor();
-		CN3UIWndBase::m_pSelectionImage->SetColor(D3DCOLOR_RGBA(200, 20, 20, 100));
-		CN3UIWndBase::m_pSelectionImage->RenderIconWrapper();
-		CN3UIWndBase::m_pSelectionImage->SetColor(m_dc);
-		CN3UIWndBase::m_pSelectionImage->SetVisible(false);
+		CN3UIWndBase::s_pSelectionImage->SetVisible(true);
+		CN3UIWndBase::s_pSelectionImage->SetRegion(GetRegion());
+		m_dc = CN3UIWndBase::s_pSelectionImage->GetColor();
+		CN3UIWndBase::s_pSelectionImage->SetColor(D3DCOLOR_RGBA(200, 20, 20, 100));
+		CN3UIWndBase::s_pSelectionImage->RenderIconWrapper();
+		CN3UIWndBase::s_pSelectionImage->SetColor(m_dc);
+		CN3UIWndBase::s_pSelectionImage->SetVisible(false);
 	}
 }
 

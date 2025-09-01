@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgPercent dialog
 
 
-CDlgPercent::CDlgPercent(CWnd* pParent /*=NULL*/)
+CDlgPercent::CDlgPercent(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgPercent::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgPercent)

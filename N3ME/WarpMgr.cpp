@@ -23,7 +23,7 @@ static char THIS_FILE[]=__FILE__;
 
 CWarpMgr::CWarpMgr()
 {
-	m_pRefMapMng = NULL;				// 지형 참조 포인터..
+	m_pRefMapMng = nullptr;				// 지형 참조 포인터..
 	m_bActive = false;
 
 	m_ListWarpInfo.clear();
@@ -43,7 +43,7 @@ CWarpMgr::~CWarpMgr()
 	{
 		m_pDlg->DestroyWindow();
 		delete m_pDlg;
-		m_pDlg = NULL;
+		m_pDlg = nullptr;
 	}
 }
 
@@ -74,16 +74,16 @@ bool CWarpMgr::Load(HANDLE hFile)
 	ClearList();
 
 	DWORD dwRWC;
-	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
 
 	if(m_iVersion==1)
 	{
 		int cnt;
-		ReadFile(hFile, &cnt, sizeof(int), &dwRWC, NULL);
+		ReadFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
 		for(int i=0;i<cnt;i++)
 		{
 			WARPINFO* pWI = new WARPINFO;
-			ReadFile(hFile, pWI, sizeof(WARPINFO), &dwRWC, NULL);
+			ReadFile(hFile, pWI, sizeof(WARPINFO), &dwRWC, nullptr);
 			m_ListWarpInfo.push_back(pWI);
 		}
 	}
@@ -95,10 +95,10 @@ bool CWarpMgr::Load(HANDLE hFile)
 bool CWarpMgr::Save(HANDLE hFile)
 {
 	DWORD dwRWC;
-	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
 
 	int cnt = m_ListWarpInfo.size();
-	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
 
 	std::list<WARPINFO*>::iterator it, ite;
 
@@ -106,7 +106,7 @@ bool CWarpMgr::Save(HANDLE hFile)
 	for(it=m_ListWarpInfo.begin(); it!=ite; it++)
 	{
 		WARPINFO* pWI = (*it);
-		WriteFile(hFile, pWI, sizeof(WARPINFO), &dwRWC, NULL);
+		WriteFile(hFile, pWI, sizeof(WARPINFO), &dwRWC, nullptr);
 	}
 	return true;
 }
@@ -115,7 +115,7 @@ void CWarpMgr::SaveServerData(HANDLE hFile)
 {
 	DWORD dwRWC;
 	int cnt = m_ListWarpInfo.size();
-	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
 
 	std::list<WARPINFO*>::iterator it, ite;
 
@@ -123,7 +123,7 @@ void CWarpMgr::SaveServerData(HANDLE hFile)
 	for(it=m_ListWarpInfo.begin(); it!=ite; it++)
 	{
 		WARPINFO* pWI = (*it);
-		WriteFile(hFile, pWI, sizeof(WARPINFO), &dwRWC, NULL);
+		WriteFile(hFile, pWI, sizeof(WARPINFO), &dwRWC, nullptr);
 	}
 }
 
@@ -137,7 +137,7 @@ WARPINFO* CWarpMgr::GetInfoByName(char* pName)
 		WARPINFO* pWI = (*it);
 		if(strcmp(pName, pWI->szName)==0) return pWI;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void CWarpMgr::DelInfo(WARPINFO* pInfo)

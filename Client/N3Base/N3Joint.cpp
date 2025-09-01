@@ -19,7 +19,7 @@ CN3Joint::CN3Joint()
 	m_dwType |= OBJ_JOINT;
 	
 	m_qOrient.Identity();		// Joint Orient Quaternion
-	m_pParent = NULL;
+	m_pParent = nullptr;
 }
 
 CN3Joint::~CN3Joint()
@@ -34,14 +34,14 @@ CN3Joint::~CN3Joint()
 void CN3Joint::Release()
 {
 	m_qOrient.Identity();		// Joint Orient Quaternion
-	m_KeyOrient.Release();		// Joint Orient 키값... NULL 이면 없는거다..
+	m_KeyOrient.Release();		// Joint Orient 키값... nullptr 이면 없는거다..
 	
 	for(it_Joint it = m_Children.begin(), itEnd = m_Children.end(); it != itEnd; it++)
 	{
 		delete *it;
 	}
 	m_Children.clear();
-	m_pParent = NULL;
+	m_pParent = nullptr;
 
 	CN3Transform::Release();
 }
@@ -56,7 +56,7 @@ bool CN3Joint::Load(HANDLE hFile)
 	m_KeyOrient.Load(hFile); // Joint Orient...
 
 	int nCC = 0;
-	ReadFile(hFile, &nCC, 4, &dwRWC, NULL);
+	ReadFile(hFile, &nCC, 4, &dwRWC, nullptr);
 	for(int i = 0; i < nCC; i++)
 	{
 		CN3Joint* pChild = new CN3Joint();
@@ -78,9 +78,9 @@ bool CN3Joint::Save(HANDLE hFile)
 	m_KeyOrient.Save(hFile); // 
 
 	int iSize = m_Children.size();
-	WriteFile(hFile, &iSize, 4, &dwRWC, NULL);
+	WriteFile(hFile, &iSize, 4, &dwRWC, nullptr);
 
-	CN3Joint* pChild = NULL;
+	CN3Joint* pChild = nullptr;
 	it_Joint it = m_Children.begin();
 	for(int i = 0; i < iSize; i++, it++)
 	{
@@ -121,7 +121,7 @@ void CN3Joint::Render(const __Matrix44* pMtxParent, float fUnitSize)
 
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &stm);
 	s_lpD3DDev->SetMaterial(&smtl);
-	s_lpD3DDev->SetTexture(0, NULL);
+	s_lpD3DDev->SetTexture(0, nullptr);
 
 	if(m_pParent) // 부모 관절과 이어주는 선..
 	{
@@ -187,7 +187,7 @@ void CN3Joint::Render(const __Matrix44* pMtxParent, float fUnitSize)
 	if(dwAlpha) s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlpha);
 	if(dwLight) s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, dwLight);
 
-	CN3Joint* pChild = NULL;
+	CN3Joint* pChild = nullptr;
 	it_Joint it = m_Children.begin();
 	int iSize = m_Children.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -204,7 +204,7 @@ void CN3Joint::ChildAdd(CN3Joint *pChild)
 {
 	__ASSERT(pChild, "Child joint pointer is NULL!");
 
-	CN3Joint* pChild2 = NULL;
+	CN3Joint* pChild2 = nullptr;
 	it_Joint it = m_Children.begin();
 	int iSize = m_Children.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -219,7 +219,7 @@ void CN3Joint::ChildAdd(CN3Joint *pChild)
 
 void CN3Joint::ChildDelete(CN3Joint *pChild)
 {
-	if(NULL == pChild) return;
+	if(nullptr == pChild) return;
 	it_Joint it = m_Children.begin(), itEnd = m_Children.end();
 	int iSize = m_Children.size();
 	for(; it != itEnd; )
@@ -227,7 +227,7 @@ void CN3Joint::ChildDelete(CN3Joint *pChild)
 		if(*it == pChild) 
 		{
 			it = m_Children.erase(it);
-			pChild->ParentSet(NULL);
+			pChild->ParentSet(nullptr);
 			break;
 		}
 		else
@@ -251,7 +251,7 @@ void CN3Joint::NodeCount(int &nCount)
 {
 	nCount++;
 	
-	CN3Joint* pChild = NULL;
+	CN3Joint* pChild = nullptr;
 	it_Joint it = m_Children.begin();
 	int iSize = m_Children.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -268,14 +268,14 @@ BOOL CN3Joint::FindPointerByName(const std::string& szName, CN3Joint *&pJoint) /
 {
 	if(szName.empty())
 	{
-		pJoint = NULL;
+		pJoint = nullptr;
 		return FALSE;
 	}
 
 	if(m_szName == szName) return TRUE;
 	pJoint = this;
 		
-	CN3Joint* pChild = NULL;
+	CN3Joint* pChild = nullptr;
 	it_Joint it = m_Children.begin();
 	int iSize = m_Children.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -293,13 +293,13 @@ BOOL CN3Joint::FindPointerByName(const std::string& szName, CN3Joint *&pJoint) /
 BOOL CN3Joint::FindPointerByID(int nID, CN3Joint *&pJoint)
 {
 	static int stnID = 0;
-	if(pJoint == NULL) stnID = 0;
+	if(pJoint == nullptr) stnID = 0;
 
 	pJoint = this;
 	if(nID == stnID) return TRUE;
 	stnID++;
 
-	CN3Joint* pChild = NULL;
+	CN3Joint* pChild = nullptr;
 	it_Joint it = m_Children.begin();
 	int iSize = m_Children.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -325,7 +325,7 @@ BOOL CN3Joint::FindIndex(const std::string& szName, int &nIndex)
 	if(m_szName == szName) return TRUE;
 	nIndex++;
 		
-	CN3Joint* pChild = NULL;
+	CN3Joint* pChild = nullptr;
 	it_Joint it = m_Children.begin();
 	int iSize = m_Children.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -349,7 +349,7 @@ void CN3Joint::Tick(float fFrm)
 
 	CN3Joint::ReCalcMatrix();
 
-	CN3Joint* pChild = NULL;
+	CN3Joint* pChild = nullptr;
 	it_Joint it = m_Children.begin();
 	int iSize = m_Children.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -417,7 +417,7 @@ void CN3Joint::MatricesGet(__Matrix44 *pMtxs, int &nJointIndex)
 	memcpy(&(pMtxs[nJointIndex]), &m_Matrix, sizeof(__Matrix44));
 	nJointIndex++;
 
-	CN3Joint* pChild = NULL;
+	CN3Joint* pChild = nullptr;
 	it_Joint it = m_Children.begin();
 	int iSize = m_Children.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -488,7 +488,7 @@ void CN3Joint::KeyDelete(CN3Joint *pJoint, int nKS, int nKE)
 
 			delete [] pAKs[i]->m_pDatas;
 			pAKs[i]->m_nCount = 0;
-			pAKs[i]->m_pDatas = NULL;
+			pAKs[i]->m_pDatas = nullptr;
 
 			pAKs[i]->Alloc(nKS + nKE2, pAKs[i]->SamplingRate(), pAKs[i]->Type());
 
@@ -561,7 +561,7 @@ void CN3Joint::CopyExceptAnimationKey(CN3Joint *pJSrc)
 	if(m_KeyRot.Count() <= 0) m_KeyRot.m_eType = pJSrc->m_KeyRot.m_eType;
 	if(m_KeyScale.Count() <= 0) m_KeyScale.m_eType = pJSrc->m_KeyScale.m_eType;
 
-	CN3Joint* pChild = NULL;
+	CN3Joint* pChild = nullptr;
 	it_Joint it = m_Children.begin(), itEnd = m_Children.end();
 	for(; it != itEnd; )
 	{

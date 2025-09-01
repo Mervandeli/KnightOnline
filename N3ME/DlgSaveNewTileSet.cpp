@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgSaveNewTileSet dialog
 
 
-CDlgSaveNewTileSet::CDlgSaveNewTileSet(CWnd* pParent /*=NULL*/)
+CDlgSaveNewTileSet::CDlgSaveNewTileSet(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgSaveNewTileSet::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgSaveNewTileSet)
@@ -52,11 +52,11 @@ BOOL CDlgSaveNewTileSet::OnInitDialog()
 
 	char szDrive[_MAX_DRIVE], szDir[_MAX_DIR];
 	char szModuleFilePath[_MAX_PATH];
-	GetModuleFileName(NULL, szModuleFilePath, _MAX_PATH);
+	GetModuleFileName(nullptr, szModuleFilePath, _MAX_PATH);
 
 	char szNewPath[_MAX_PATH];
-	_splitpath(szModuleFilePath, szDrive, szDir, NULL, NULL);
-	_makepath(szNewPath, szDrive, szDir, NULL, NULL);
+	_splitpath(szModuleFilePath, szDrive, szDir, nullptr, nullptr);
+	_makepath(szNewPath, szDrive, szDir, nullptr, nullptr);
 	SetCurrentDirectory(szNewPath);
 	m_ListTileSet.Dir(DDL_READONLY, "dtex\\*.dtx");
 
@@ -68,7 +68,7 @@ BOOL CDlgSaveNewTileSet::OnInitDialog()
 		m_ListTileSet.GetText(0, str);
 
 		char szFileName[MAX_PATH];
-		_splitpath((LPCTSTR)str, NULL, NULL, szFileName, NULL);
+		_splitpath((LPCTSTR)str, nullptr, nullptr, szFileName, nullptr);
 
 		str.Format(szFileName);
 		m_ListTileSet.InsertString(count, str);

@@ -620,7 +620,7 @@ bool CDBAgent::LoadCharInfo(char* charId_, char* buff, int& buffIndex)
 			auto weak_result = proc.execute(charId.c_str(), &rowCount);
 			auto result = weak_result.lock();
 
-			// Officially this requests all 3, but we pre-emptively skip the NULL/empty character names,
+			// Officially this requests all 3, but we pre-emptively skip the nullptr/empty character names,
 			// so at this point we're only requesting character names that we expect to exist.
 			if (result == nullptr)
 			{

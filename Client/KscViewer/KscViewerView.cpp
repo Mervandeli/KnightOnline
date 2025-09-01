@@ -97,10 +97,10 @@ void CKscViewerView::OnDropFiles(HDROP hDropInfo)
 	ASSERT_VALID(pDoc);
 
 	char szFile[MAX_PATH];
-	char* szExt = NULL;
+	char* szExt = nullptr;
 	UINT uiFiles;
 
-	uiFiles = DragQueryFile(hDropInfo,0xFFFF,NULL,0);
+	uiFiles = DragQueryFile(hDropInfo,0xFFFF,nullptr,0);
 
 	::DragQueryFile(hDropInfo, 0, szFile, MAX_PATH - 1);
 	::DragFinish(hDropInfo);
@@ -119,10 +119,10 @@ BOOL CKscViewerView::DrawImage()
 	CKscViewerDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	if(pDoc == NULL) return FALSE;
+	if(pDoc == nullptr) return FALSE;
 	CN3JpegFile* pFile = pDoc->GetJpegFile();
 
-	if(pFile == NULL) return FALSE;
+	if(pFile == nullptr) return FALSE;
 
 
 	CDC *theDC = GetDC();

@@ -17,8 +17,8 @@ static char THIS_FILE[]=__FILE__;
 
 CN3GlobalEffectMng::CN3GlobalEffectMng()
 {
-	m_pGERain = NULL;
-	m_pGESnow = NULL;
+	m_pGERain = nullptr;
+	m_pGESnow = nullptr;
 	CN3GlobalEffectMng::Release();
 }
 
@@ -33,8 +33,8 @@ void CN3GlobalEffectMng::Release()
 	m_fCellSize = 0.0f;
 	m_CurCellPos.x = m_CurCellPos.y = -1;
 
-	if (m_pGERain) {delete m_pGERain; m_pGERain = NULL;}
-	if (m_pGESnow) {delete m_pGESnow; m_pGESnow = NULL;}
+	if (m_pGERain) {delete m_pGERain; m_pGERain = nullptr;}
+	if (m_pGESnow) {delete m_pGESnow; m_pGESnow = nullptr;}
 }
 
 void CN3GlobalEffectMng::Tick()
@@ -56,12 +56,12 @@ void CN3GlobalEffectMng::Tick()
 	if (m_pGERain)
 	{
 		m_pGERain->Tick();
-		if(m_pGERain->NeedDelete()) { delete m_pGERain; m_pGERain = NULL; }
+		if(m_pGERain->NeedDelete()) { delete m_pGERain; m_pGERain = nullptr; }
 	}
 	if (m_pGESnow)
 	{
 		m_pGESnow->Tick();
-		if(m_pGESnow->NeedDelete()) { delete m_pGESnow; m_pGESnow = NULL; }
+		if(m_pGESnow->NeedDelete()) { delete m_pGESnow; m_pGESnow = nullptr; }
 	}
 
 }
@@ -143,7 +143,7 @@ void CN3GlobalEffectMng::SetWeather(int iWeather)
 	
 	if (bRainy)
 	{
-		if (m_pGERain == NULL) m_pGERain = new CN3GERain;
+		if (m_pGERain == nullptr) m_pGERain = new CN3GERain;
 
 		m_fCellSize = 20.0f;
 		m_pGERain->Create(fDensity, m_fCellSize, fHeight, fRainLength, vVelocity);	// 비
@@ -152,7 +152,7 @@ void CN3GlobalEffectMng::SetWeather(int iWeather)
 	}
 	else
 	{
-		if (m_pGESnow == NULL) m_pGESnow = new CN3GESnow;
+		if (m_pGESnow == nullptr) m_pGESnow = new CN3GESnow;
 
 		m_fCellSize = 10.0f;
 		m_pGESnow->Create(fDensity, m_fCellSize, fHeight, fSnowSize, vVelocity);	// 눈
@@ -170,7 +170,7 @@ void CN3GlobalEffectMng::WeatherSetClean()
 void CN3GlobalEffectMng::WeatherSetRainy(int iPercent)
 {
 	if (m_pGESnow) m_pGESnow->FadeSet(3.0f, false);
-	if (m_pGERain == NULL) m_pGERain = new CN3GERain;
+	if (m_pGERain == nullptr) m_pGERain = new CN3GERain;
 
 	float fHeight = 20.0f;
 	float fPercent = iPercent / 100.0f;
@@ -186,7 +186,7 @@ void CN3GlobalEffectMng::WeatherSetRainy(int iPercent)
 void CN3GlobalEffectMng::WeatherSetSnow(int iPercent)
 {
 	if (m_pGERain) m_pGERain->FadeSet(3.0f, false);
-	if (m_pGESnow == NULL) m_pGESnow = new CN3GESnow;
+	if (m_pGESnow == nullptr) m_pGESnow = new CN3GESnow;
 
 	float fHeight = 20.0f;
 	float fPercent = iPercent / 100.0f;

@@ -1,4 +1,4 @@
-#ifndef __STLMAP_H_
+﻿#ifndef __STLMAP_H_
 #define __STLMAP_H_
 
 #include <map>
@@ -26,7 +26,7 @@ public:
 
 	T* GetData(uint32_t key) {
 		auto itor = m_UserTypeMap.find(key);
-		return (itor != m_UserTypeMap.end()) ? itor->second : NULL;
+		return (itor != m_UserTypeMap.end()) ? itor->second : nullptr;
 	}
 
 	void DeleteData(uint32_t key) {

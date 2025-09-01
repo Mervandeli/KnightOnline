@@ -15,7 +15,7 @@ class CDlgDelGroup : public CDialog
 // Construction
 public:
 	int		m_SelGroupID;
-	CDlgDelGroup(CWnd* pParent = NULL);   // standard constructor
+	CDlgDelGroup(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgDelGroup)

@@ -33,7 +33,7 @@ CWallMgr::CWallMgr()
 	m_BaseCube[6].Set(0, 0, 1); // 뒤쪽 LB
 	m_BaseCube[7].Set(1, 0, 1);	// 뒤쪽 RB
 	
-	m_pRefMapMng = NULL;	// 지형 참조 포인터..
+	m_pRefMapMng = nullptr;	// 지형 참조 포인터..
 	m_pWalls.clear();		// 벽들...
 
 	m_pDlg = new CDlgMakeWall;
@@ -42,7 +42,7 @@ CWallMgr::CWallMgr()
 	m_pDlg->m_pRefWallMgr = this;
 
 	m_bActive = false; // 이기능이 활성화 되어 있는지...1:활성화, 0:비활성화..
-	m_pCurrWall = NULL;
+	m_pCurrWall = nullptr;
 }
 
 CWallMgr::~CWallMgr()
@@ -51,21 +51,21 @@ CWallMgr::~CWallMgr()
 	for(it = m_pWalls.begin(); it != m_pWalls.end(); it++)
 	{
 		delete (*it);
-		(*it) = NULL;
+		(*it) = nullptr;
 	}
 	m_pWalls.clear();
 
 	if(m_pCurrWall)
 	{
 		delete m_pCurrWall;
-		m_pCurrWall = NULL;
+		m_pCurrWall = nullptr;
 	}
 
 	if(m_pDlg) 
 	{
 		m_pDlg->DestroyWindow();
 		delete m_pDlg;
-		m_pDlg = NULL;
+		m_pDlg = nullptr;
 	}
 }
 
@@ -176,7 +176,7 @@ void CWallMgr::SetActive(bool active)
 		if(m_pCurrWall)
 		{
 			delete m_pCurrWall;
-			m_pCurrWall = NULL;
+			m_pCurrWall = nullptr;
 		}
 		m_pCurrWall = pWall;
 	}
@@ -187,7 +187,7 @@ void CWallMgr::SetActive(bool active)
 		if(m_pCurrWall)
 		{
 			delete m_pCurrWall;
-			m_pCurrWall = NULL;
+			m_pCurrWall = nullptr;
 		}
 	}
 }
@@ -205,7 +205,7 @@ BOOL CWallMgr::MouseMsgFilter(LPMSG pMsg)
 			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 
 			m_pCurrWall->AddVertex(vec);			
 		}
@@ -231,7 +231,7 @@ void CWallMgr::Render()
 	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx); // 월드 행렬 적용..
 	
 	// set texture
-	hr = s_lpD3DDev->SetTexture(0, NULL);
+	hr = s_lpD3DDev->SetTexture(0, nullptr);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 
@@ -336,7 +336,7 @@ void CWallMgr::SetCurrWall(CWall* pWall)
 	if(m_pCurrWall)
 	{
 		delete m_pCurrWall;
-		m_pCurrWall = NULL;
+		m_pCurrWall = nullptr;
 	}
 
 	std::list<CWall*>::iterator itWall;
@@ -409,7 +409,7 @@ bool CWallMgr::Load(HANDLE hFile)
 	if(m_pCurrWall)
 	{
 		delete m_pCurrWall;
-		m_pCurrWall = NULL;
+		m_pCurrWall = nullptr;
 	}
 	m_pCurrWall = new CWall;
 
@@ -421,7 +421,7 @@ bool CWallMgr::Load(HANDLE hFile)
 	
 	DWORD dwRWC;
 	int NumWall;
-	ReadFile(hFile, &NumWall, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &NumWall, sizeof(int), &dwRWC, nullptr);
 
 	m_pWalls.clear();
 	for(int i=0;i<NumWall;i++)
@@ -440,7 +440,7 @@ bool CWallMgr::Save(HANDLE hFile)
 {
 	DWORD dwRWC;
 	int NumWall = m_pWalls.size();
-	WriteFile(hFile, &NumWall, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &NumWall, sizeof(int), &dwRWC, nullptr);
 
 	std::list<CWall*>::iterator itWall;
 

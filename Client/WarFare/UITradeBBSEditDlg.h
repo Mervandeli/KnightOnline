@@ -23,7 +23,7 @@ protected:
 public:
 	bool OnKeyPress(int iChar);
 	void SetVisible(bool bVisible);
-	void ShowWindow(int iID = -1, CN3UIBase* pParent = NULL);
+	void ShowWindow(int iID = -1, CN3UIBase* pParent = nullptr);
 	bool Load(HANDLE hFile);
 	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg);
 

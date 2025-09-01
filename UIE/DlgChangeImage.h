@@ -17,7 +17,7 @@ public:
 	CString m_szFN_New;
 // Construction
 public:
-	CDlgChangeImage(CWnd* pParent = NULL);   // standard constructor
+	CDlgChangeImage(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgChangeImage)

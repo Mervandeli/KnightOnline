@@ -54,7 +54,7 @@ BOOL CRotDummy::MouseMsgFilter(LPMSG pMsg)
 						q.RotationAxis(1, 0, 0, fDelta*iDiff);
 //						m_qRot *= q;
 
-						this->TransDiff(NULL, &q, NULL);
+						this->TransDiff(nullptr, &q, nullptr);
 					}
 					break;
 				case DUMMY_Y:
@@ -63,7 +63,7 @@ BOOL CRotDummy::MouseMsgFilter(LPMSG pMsg)
 						q.RotationAxis(0, 1, 0, fDelta*iDiff);
 //						m_qRot *= q;
 
-						this->TransDiff(NULL, &q, NULL);
+						this->TransDiff(nullptr, &q, nullptr);
 					}
 					break;
 				case DUMMY_Z:
@@ -72,7 +72,7 @@ BOOL CRotDummy::MouseMsgFilter(LPMSG pMsg)
 						q.RotationAxis(0, 0, 1, fDelta*iDiff);
 //						m_qRot *= q;
 
-						this->TransDiff(NULL, &q, NULL);
+						this->TransDiff(nullptr, &q, nullptr);
 					}
 					break;
 				}

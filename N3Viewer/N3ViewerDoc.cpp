@@ -45,7 +45,7 @@ END_MESSAGE_MAP()
 CN3ViewerDoc::CN3ViewerDoc()
 {
 	// TODO: add one-time construction code here
-	m_pSelectedObj = NULL;
+	m_pSelectedObj = nullptr;
 }
 
 CN3ViewerDoc::~CN3ViewerDoc()
@@ -61,11 +61,11 @@ BOOL CN3ViewerDoc::OnNewDocument()
 	m_Scene.DefaultCameraAdd();
 	m_Scene.DefaultLightAdd();
 
-	m_pSelectedObj = NULL;
+	m_pSelectedObj = nullptr;
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	if(pFrm) pFrm->m_DlgPMeshEdit.m_pShapeRef = NULL;
+	if(pFrm) pFrm->m_DlgPMeshEdit.m_pShapeRef = nullptr;
 
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 	
 	return TRUE;
 }
@@ -116,12 +116,12 @@ BOOL CN3ViewerDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	if(m_Scene.CameraCount() <= 0) m_Scene.DefaultCameraAdd();
 	if(m_Scene.LightCount() <= 0) m_Scene.DefaultLightAdd();
 
-	m_pSelectedObj = NULL;
+	m_pSelectedObj = nullptr;
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	if(pFrm) pFrm->m_DlgPMeshEdit.m_pShapeRef = NULL;
+	if(pFrm) pFrm->m_DlgPMeshEdit.m_pShapeRef = nullptr;
 
 
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 	return TRUE;
 }
 
@@ -144,18 +144,18 @@ void CN3ViewerDoc::OnFileImport()
 	CString FileName;
 	char szBuff[512000] = "";
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, szExt, NULL, dwFlags, szFilter, NULL);
+	CFileDialog dlg(TRUE, szExt, nullptr, dwFlags, szFilter, nullptr);
 	dlg.m_ofn.nMaxFile = 512000;
 	dlg.m_ofn.lpstrFile = szBuff;
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	POSITION pos = dlg.GetStartPosition();
-	for(int i = 0; pos != NULL; i++)
+	for(int i = 0; pos != nullptr; i++)
 	{
 		FileName = dlg.GetNextPathName(pos);
 		CString szExt = FileName.Right(FileName.GetLength() - FileName.ReverseFind('.') - 1);
 
-		CN3BaseFileAccess* pBase = NULL;
+		CN3BaseFileAccess* pBase = nullptr;
 
 		if(lstrcmpi(szExt, "N3Camera") == 0)
 		{
@@ -232,16 +232,16 @@ void CN3ViewerDoc::OnFileImport()
 			pPart->MeshSet(pBase->FileName());
 			m_pSelectedObj = pShape;
 
-			delete pBase; pBase = NULL;
+			delete pBase; pBase = nullptr;
 		}
 	}
 
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 }
 
 void CN3ViewerDoc::OnFileExport()
 {
-	if(NULL == m_pSelectedObj) return;
+	if(nullptr == m_pSelectedObj) return;
 	DWORD dwType = m_pSelectedObj->Type();
 	if(!(dwType & OBJ_BASE_FILEACCESS)) return;
 
@@ -260,7 +260,7 @@ void CN3ViewerDoc::OnFileExport()
 	else if(dwType & OBJ_CHARACTER) { szExt = "N3Chr"; szFilter = "Character Data(*.N3Chr)|*.N3Chr||"; }
 
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(FALSE, szExt, NULL, dwFlags, szFilter, NULL);
+	CFileDialog dlg(FALSE, szExt, nullptr, dwFlags, szFilter, nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	std::string szOldFN = pBase->FileName();
@@ -278,17 +278,17 @@ void CN3ViewerDoc::OnFileExport()
 	}
 
 	pBase->FileNameSet(szOldFN);
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 }
 
 void CN3ViewerDoc::OnFileSaveToSameFolder() 
 {
-	if(NULL == m_pSelectedObj) return;
+	if(nullptr == m_pSelectedObj) return;
 	DWORD dwType = m_pSelectedObj->Type();
 	if(!(dwType & OBJ_SHAPE)) return;
 
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(FALSE, ".N3Shape", NULL, dwFlags, "Shape Data(*.N3Shape)|*.N3Shape||", NULL);
+	CFileDialog dlg(FALSE, ".N3Shape", nullptr, dwFlags, "Shape Data(*.N3Shape)|*.N3Shape||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	CString szFullPath = dlg.GetPathName();
@@ -305,7 +305,7 @@ void CN3ViewerDoc::OnFileSaveToIndoor()
 		return;
 
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(FALSE, ".N3Scene", NULL, dwFlags, "Scene Data(*.N3Scene)|*.N3Scene||", NULL);
+	CFileDialog dlg(FALSE, ".N3Scene", nullptr, dwFlags, "Scene Data(*.N3Scene)|*.N3Scene||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	CString szFullPath = dlg.GetPathName();
 
@@ -328,7 +328,7 @@ void CN3ViewerDoc::OnEditInsertCamera()
 	m_Scene.CameraAdd(pCamera);
 
 	m_pSelectedObj = pCamera;
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 }
 
 void CN3ViewerDoc::OnEditInsertLight() 
@@ -342,7 +342,7 @@ void CN3ViewerDoc::OnEditInsertLight()
 	m_Scene.LightAdd(pLight);
 
 	m_pSelectedObj = pLight;
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 }
 
 void CN3ViewerDoc::OnEditInsertShape() 
@@ -356,7 +356,7 @@ void CN3ViewerDoc::OnEditInsertShape()
 	m_Scene.ShapeAdd(pShape);
 
 	m_pSelectedObj = pShape;
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 }
 
 void CN3ViewerDoc::OnEditInsertCharacter() 
@@ -370,20 +370,20 @@ void CN3ViewerDoc::OnEditInsertCharacter()
 	m_Scene.ChrAdd(pChr);
 
 	m_pSelectedObj = pChr;
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 }
 
 void CN3ViewerDoc::OnEditDeleteFromScene() 
 {
-	if(NULL == m_pSelectedObj) return;
+	if(nullptr == m_pSelectedObj) return;
 
 	if(m_pSelectedObj->Type() & OBJ_CAMERA) m_Scene.CameraDelete((CN3Camera*)m_pSelectedObj);
 	else if(m_pSelectedObj->Type() & OBJ_LIGHT) m_Scene.LightDelete((CN3Light*)m_pSelectedObj);
 	else if(m_pSelectedObj->Type() & OBJ_SHAPE) m_Scene.ShapeDelete((CN3Shape*)m_pSelectedObj);
 	else if(m_pSelectedObj->Type() & OBJ_CHARACTER) m_Scene.ChrDelete((CN3Chr*)m_pSelectedObj);
 
-	m_pSelectedObj = NULL;
-	this->UpdateAllViews(NULL);
+	m_pSelectedObj = nullptr;
+	this->UpdateAllViews(nullptr);
 }
 
 
@@ -401,13 +401,13 @@ void CN3ViewerDoc::OnViewAmbientLight()
 	if (IDCANCEL == dlg.DoModal()) return;
 	COLORREF colorref = dlg.GetColor();
 	m_Scene.m_AmbientLightColor = D3DCOLOR_ARGB(0xff, GetRValue(colorref), GetGValue(colorref), GetBValue(colorref));
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 }
 
 void CN3ViewerDoc::OnViewDisableDefaultLight() 
 {
 	m_Scene.m_bDisableDefaultLight = !m_Scene.m_bDisableDefaultLight;
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 }
 
 void CN3ViewerDoc::OnUpdateViewDisableDefaultLight(CCmdUI* pCmdUI) 

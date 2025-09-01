@@ -190,7 +190,7 @@ public:
 	//
 	SIZE GetPatchNum(float fSize);
 	BOOL MouseMsgFilter(LPMSG pMsg);	// 지형 고칠때 마우스 메세지 처리
-	bool Pick(int x, int y, __Vector3* vec, POINT* pHeightMapPos = NULL);
+	bool Pick(int x, int y, __Vector3* vec, POINT* pHeightMapPos = nullptr);
 	void Import(LPCTSTR pFileName, float fSize);
 	void ImportHeight(LPCTSTR pFileName);
 	void SaveServerData(HANDLE hFile);

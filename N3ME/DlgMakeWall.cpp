@@ -16,15 +16,15 @@ static char THIS_FILE[] = __FILE__;
 // CDlgMakeWall dialog
 
 
-CDlgMakeWall::CDlgMakeWall(CWnd* pParent /*=NULL*/)
+CDlgMakeWall::CDlgMakeWall(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgMakeWall::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgMakeWall)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 
-	m_pRefWallMgr = NULL;
-	m_pSelWall = NULL;
+	m_pRefWallMgr = nullptr;
+	m_pSelWall = nullptr;
 }
 
 
@@ -57,7 +57,7 @@ void CDlgMakeWall::OnBtnDelete()
 	m_WallList.DeleteString(idx);
 
 	if(pWall) m_pRefWallMgr->DelWall(pWall);
-	m_pSelWall = NULL;
+	m_pSelWall = nullptr;
 }
 
 void CDlgMakeWall::OnBtnWallEdit() 

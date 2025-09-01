@@ -32,21 +32,24 @@ static char THIS_FILE[]=__FILE__;
 
 CUIStateBar::CUIStateBar()
 {
-	m_pText_Position = NULL;
-	m_pProgress_HP = NULL;
-	m_pProgress_MSP = NULL;
-	m_pProgress_ExpC = NULL;
-	m_pProgress_ExpP = NULL;
+	m_pText_Position = nullptr;
+	m_pProgress_HP = nullptr;
+	m_pProgress_HP_slow = nullptr;
+	m_pProgress_HP_drop = nullptr;
+	m_pProgress_HP_lasting = nullptr;
+	m_pProgress_MSP = nullptr;
+	m_pProgress_ExpC = nullptr;
+	m_pProgress_ExpP = nullptr;
 
-	m_pText_FPS = NULL;
+	m_pText_FPS = nullptr;
 
 	// 미니맵...
-	m_pGroup_MiniMap = NULL;
-	m_pImage_Map = NULL;
-	m_pBtn_ZoomIn = NULL;
-	m_pBtn_ZoomOut = NULL;
-	m_pBtn_Quest = NULL;
-	m_pBtn_Power = NULL;
+	m_pGroup_MiniMap = nullptr;
+	m_pImage_Map = nullptr;
+	m_pBtn_ZoomIn = nullptr;
+	m_pBtn_ZoomOut = nullptr;
+	m_pBtn_Quest = nullptr;
+	m_pBtn_Power = nullptr;
 
 	memset(m_vArrows, 0, sizeof(m_vArrows));
 
@@ -95,19 +98,22 @@ void CUIStateBar::Release()
 
 	CN3UIBase::Release();
 
-	m_pText_Position = NULL;
-	m_pProgress_HP = NULL;
-	m_pProgress_MSP = NULL;
-	m_pProgress_ExpC = NULL;
-	m_pProgress_ExpP = NULL;
+	m_pText_Position = nullptr;
+	m_pProgress_HP = nullptr;
+	m_pProgress_HP_slow = nullptr;
+	m_pProgress_HP_drop = nullptr;
+	m_pProgress_HP_lasting = nullptr;
+	m_pProgress_MSP = nullptr;
+	m_pProgress_ExpC = nullptr;
+	m_pProgress_ExpP = nullptr;
 
 	// 미니맵...
-	m_pGroup_MiniMap = NULL;
-	m_pImage_Map = NULL;
-	m_pBtn_ZoomIn = NULL;
-	m_pBtn_ZoomOut = NULL; 
-	m_pBtn_Power = NULL;
-	m_pBtn_Quest = NULL;
+	m_pGroup_MiniMap = nullptr;
+	m_pImage_Map = nullptr;
+	m_pBtn_ZoomIn = nullptr;
+	m_pBtn_ZoomOut = nullptr; 
+	m_pBtn_Power = nullptr;
+	m_pBtn_Quest = nullptr;
 
 	memset(m_vArrows, 0, sizeof(m_vArrows));
 
@@ -124,19 +130,20 @@ bool CUIStateBar::Load(HANDLE hFile)
 	if (!CN3UIBase::Load(hFile))
 		return false;
 
-	CN3UIString* pText = (CN3UIString*) (this->GetChildByID("Text_Version")); __ASSERT(pText, "NULL UI Component!!");
+	CN3UIString* pText = nullptr;
+	N3_VERIFY_UI_COMPONENT(pText, GetChildByID<CN3UIString>("Text_Version"));
 	if (pText != nullptr)
 	{
 		std::string version = fmt::format("Ver. {:.3f}", CURRENT_VERSION / 1000.0f);
 		pText->SetString(version);
 	}
 
-	m_pText_Position =	(CN3UIString*)(this->GetChildByID("Text_Position"));	__ASSERT(m_pText_Position, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pText_Position, GetChildByID<CN3UIString>("Text_Position"));
 
-	m_pProgress_HP =	(CN3UIProgress*)(this->GetChildByID("Progress_HP"));	__ASSERT(m_pProgress_HP, "NULL UI Component!!");
-	m_pProgress_MSP =	(CN3UIProgress*)(this->GetChildByID("Progress_MSP"));	__ASSERT(m_pProgress_MSP, "NULL UI Component!!");
-	m_pProgress_ExpC =	(CN3UIProgress*)(this->GetChildByID("Progress_ExpC"));	__ASSERT(m_pProgress_ExpC, "NULL UI Component!!");
-	m_pProgress_ExpP =	(CN3UIProgress*)(this->GetChildByID("Progress_ExpP"));	__ASSERT(m_pProgress_ExpP, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pProgress_HP, GetChildByID<CN3UIProgress>("Progress_HP"));
+	N3_VERIFY_UI_COMPONENT(m_pProgress_MSP, GetChildByID<CN3UIProgress>("Progress_MSP"));
+	N3_VERIFY_UI_COMPONENT(m_pProgress_ExpC, GetChildByID<CN3UIProgress>("Progress_ExpC"));
+	N3_VERIFY_UI_COMPONENT(m_pProgress_ExpP, GetChildByID<CN3UIProgress>("Progress_ExpP"));
 	
 	if(m_pProgress_HP) m_pProgress_HP->SetRange(0, 100);
 	if(m_pProgress_MSP) m_pProgress_MSP->SetRange(0, 100);
@@ -145,55 +152,50 @@ bool CUIStateBar::Load(HANDLE hFile)
 
 	// NOTE: new components not previously used
 
-	//CN3UIProgress* m_pProgress_HP_poison = (CN3UIProgress*)(this->GetChildByID("Progress_HP_poison"));	__ASSERT(m_pProgress_HP_poison, "NULL UI Component!!");
-	CN3UIProgress* m_pProgress_HP_poison = (CN3UIProgress*)(this->GetChildByID("Progress_HP_slow"));
-	__ASSERT(m_pProgress_HP_poison, "NULL UI Component!!");
-	if (m_pProgress_HP_poison) {
-		m_pProgress_HP_poison->SetRange(0, 100);
-		m_pProgress_HP_poison->SetVisible(false);
+	N3_VERIFY_UI_COMPONENT(m_pProgress_HP_slow, GetChildByID<CN3UIProgress>("Progress_HP_slow"));
+	if (m_pProgress_HP_slow != nullptr)
+	{
+		m_pProgress_HP_slow->SetRange(0, 100);
+		m_pProgress_HP_slow->SetVisible(false);
 	}
 
-	//CN3UIProgress* m_pProgress_HP_curse = (CN3UIProgress*)(this->GetChildByID("Progress_HP_curse"));	__ASSERT(m_pProgress_HP_curse, "NULL UI Component!!");
-	CN3UIProgress* m_pProgress_HP_curse = (CN3UIProgress*)(this->GetChildByID("Progress_HP_drop"));
-	__ASSERT(m_pProgress_HP_curse, "NULL UI Component!!");
-	if (m_pProgress_HP_curse) {
-		m_pProgress_HP_curse->SetRange(0, 100);
-		m_pProgress_HP_curse->SetVisible(false);
+	N3_VERIFY_UI_COMPONENT(m_pProgress_HP_drop, GetChildByID<CN3UIProgress>("Progress_HP_drop"));
+	if (m_pProgress_HP_drop != nullptr)
+	{
+		m_pProgress_HP_drop->SetRange(0, 100);
+		m_pProgress_HP_drop->SetVisible(false);
 	}
 
-	CN3UIProgress* m_pProgress_HP_lasting = (CN3UIProgress*)(this->GetChildByID("Progress_HP_lasting"));
-	__ASSERT(m_pProgress_HP_curse, "NULL UI Component!!");
-	if (m_pProgress_HP_lasting) {
+	N3_VERIFY_UI_COMPONENT(m_pProgress_HP_lasting, GetChildByID<CN3UIProgress>("Progress_HP_lasting"));
+	if (m_pProgress_HP_lasting != nullptr)
+	{
 		m_pProgress_HP_lasting->SetRange(0, 100);
 		m_pProgress_HP_lasting->SetVisible(false);
 	}
 
 	// NOTE: new components to display the text
-	m_pText_HP = (CN3UIString*)GetChildByID("Text_HP");
-	__ASSERT(m_pText_HP, "NULL UI Component!!");
-	m_pText_MP = (CN3UIString*)GetChildByID("Text_MSP");
-	__ASSERT(m_pText_MP, "NULL UI Component!!");
-	m_pText_Exp = (CN3UIString*)GetChildByID("Text_ExpP");
-	__ASSERT(m_pText_Exp, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pText_HP, GetChildByID<CN3UIString>("Text_HP"));
+	N3_VERIFY_UI_COMPONENT(m_pText_MP, GetChildByID<CN3UIString>("Text_MSP"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Exp, GetChildByID<CN3UIString>("Text_ExpP"));
 
-	CN3UIString* m_pText_SysTime = (CN3UIString*)GetChildByID("SystemTime");
+	CN3UIString* m_pText_SysTime = GetChildByID<CN3UIString>("SystemTime");
 	if (m_pText_SysTime) m_pText_SysTime->SetVisible(false);
 
-	m_pText_FPS = (CN3UIString*)GetChildByID("string_fps");
+	m_pText_FPS = GetChildByID<CN3UIString>("string_fps");
 
 	// MiniMap
-	m_pGroup_MiniMap = GetChildByID("Group_MiniMap"); __ASSERT(m_pGroup_MiniMap, "NULL UI Component!!");
-	if(m_pGroup_MiniMap)
+	N3_VERIFY_UI_COMPONENT(m_pGroup_MiniMap, GetChildByID("Group_MiniMap"));
+	if (m_pGroup_MiniMap != nullptr)
 	{
 		m_pGroup_MiniMap->SetVisible(false);
 
-		m_pImage_Map =		(CN3UIImage*)(m_pGroup_MiniMap->GetChildByID("Img_MiniMap"));	__ASSERT(m_pImage_Map, "NULL UI Component!!");
-		m_pBtn_ZoomIn =		(CN3UIButton*)(m_pGroup_MiniMap->GetChildByID("Btn_ZoomIn"));	__ASSERT(m_pBtn_ZoomIn, "NULL UI Component!!");
-		m_pBtn_ZoomOut =	(CN3UIButton*)(m_pGroup_MiniMap->GetChildByID("Btn_ZoomOut"));	__ASSERT(m_pBtn_ZoomOut, "NULL UI Component!!");
+		N3_VERIFY_UI_COMPONENT(m_pImage_Map,	m_pGroup_MiniMap->GetChildByID<CN3UIImage>("Img_MiniMap"));
+		N3_VERIFY_UI_COMPONENT(m_pBtn_ZoomIn,	m_pGroup_MiniMap->GetChildByID<CN3UIButton>("Btn_ZoomIn"));
+		N3_VERIFY_UI_COMPONENT(m_pBtn_ZoomOut,	m_pGroup_MiniMap->GetChildByID<CN3UIButton>("Btn_ZoomOut"));
 	}
 
-	m_pBtn_Quest = (CN3UIButton*)(GetChildByID("btn_quest"));
-	m_pBtn_Power = (CN3UIButton*)(GetChildByID("btn_power"));
+	m_pBtn_Quest = GetChildByID<CN3UIButton>("btn_quest");
+	m_pBtn_Power = GetChildByID<CN3UIButton>("btn_power");
 
 	return true;
 }
@@ -202,7 +204,7 @@ bool CUIStateBar::LoadMap(const std::string& szMiniMapFN, float fMapSizeX, float
 {
 	m_fMapSizeX = fMapSizeX;
 	m_fMapSizeZ = fMapSizeZ;
-	if(NULL == m_pImage_Map) return false;
+	if(nullptr == m_pImage_Map) return false;
 
 	m_pImage_Map->SetTex(szMiniMapFN);
 	return true;
@@ -319,8 +321,8 @@ void CUIStateBar::Render()
 
 	CN3UIBase::Render();
 
-	if(NULL == m_pGroup_MiniMap || false == m_pGroup_MiniMap->IsVisible()) return; // 미니맵이 안켜져 있음 돌아간다..
-	if(NULL == m_pImage_Map) return;
+	if(nullptr == m_pGroup_MiniMap || false == m_pGroup_MiniMap->IsVisible()) return; // 미니맵이 안켜져 있음 돌아간다..
+	if(nullptr == m_pImage_Map) return;
 	if(m_fMapSizeX <= 0 || m_fMapSizeZ <= 0) return;
 
 	__VertexTransformedColor vPositions[4], vOutLines[4];
@@ -497,7 +499,7 @@ void CUIStateBar::Tick()
 
 void CUIStateBar::TickMiniMap()
 {
-	if (NULL == m_pImage_Map) return;
+	if (nullptr == m_pImage_Map) return;
 	if (m_fMapSizeX <= 0 || m_fMapSizeZ <= 0) return;
 
 	m_vViewPos = m_vPosPlayer;
@@ -567,7 +569,7 @@ void CUIStateBar::TickMagicIcon()
 {
 	int cnt = m_pMagic.size();
 	it_MagicImg it = m_pMagic.begin();
-	__TABLE_UPC_SKILL* pRemoveSkill = NULL;
+	__TABLE_UPC_SKILL* pRemoveSkill = nullptr;
 
 	for (int i = 0; i < cnt; i++, it++)
 	{
@@ -697,7 +699,7 @@ void CUIStateBar::ZoomSet(float fZoom)
 
 bool CUIStateBar::ToggleMiniMap()
 {
-	if(NULL == m_pGroup_MiniMap) return false;
+	if(nullptr == m_pGroup_MiniMap) return false;
 
 	bool bVisible = m_pGroup_MiniMap->IsVisible();
 	m_pGroup_MiniMap->SetVisible(!bVisible);

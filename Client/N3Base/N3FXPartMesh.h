@@ -8,11 +8,10 @@
 #include "N3FXPartBase.h"
 
 class CN3FXShape;
-
 class CN3FXPartMesh : public CN3FXPartBase
 {
 public:
-	static constexpr int SUPPORTED_PART_VERSION = 5;
+	static constexpr int SUPPORTED_PART_VERSION = 9; // supported as far as reading only
 
 	CN3FXShape*	m_pShape;
 	CN3FXShape*	m_pRefShape;

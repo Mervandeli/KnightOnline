@@ -71,7 +71,7 @@ public:
 	void DownloadProcess();
 	void StartGame();
 
-	CLauncherDlg(CWnd* pParent = NULL);	// standard constructor
+	CLauncherDlg(CWnd* pParent = nullptr);	// standard constructor
 	
 	CString GetProgPath();
 	void PacketSend_VersionReq();

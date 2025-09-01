@@ -172,7 +172,7 @@ void CUIEDoc::Release()
 
 void CUIEDoc::SetSelectedUI(CN3UIBase* pUI)
 {
-	if(NULL == pUI) m_SelectedUIs.clear();
+	if(nullptr == pUI) m_SelectedUIs.clear();
 	else
 	{
 		it_UI it = m_SelectedUIs.begin(), itEnd = m_SelectedUIs.end();
@@ -193,7 +193,7 @@ void CUIEDoc::SetSelectedUI(CN3UIBase* pUI)
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	ASSERT(pFrm);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_NONE);
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnInsertImage() 
@@ -203,14 +203,14 @@ void CUIEDoc::OnInsertImage()
 //	pUI->Init(&m_RootUI);
 	if(this->GetSelectedUI()) pUI->Init(this->GetSelectedUI());
 	else pUI->Init(&m_RootUI);
-	SetSelectedUI(NULL);
+	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
 
 	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	if (FALSE == SetImageInfos(pUI))
 	{
-		if (IDYES == pFrm->MessageBox("Image 정보 지정이 취소되었습니다.\n생성된 이미지를 삭제하시겠습니까?", NULL, MB_YESNO)) OnEditDelete();
+		if (IDYES == pFrm->MessageBox("Image 정보 지정이 취소되었습니다.\n생성된 이미지를 삭제하시겠습니까?", nullptr, MB_YESNO)) OnEditDelete();
 		else pFrm->MessageBox("텍스쳐지정 및 기타 설정을 해야 이미지가 보일 것입니다.");
 		return;
 	}
@@ -218,7 +218,7 @@ void CUIEDoc::OnInsertImage()
 	pFrm->MessageBox("위치와 크기를 정해주세요");
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnInsertString()
@@ -228,14 +228,14 @@ void CUIEDoc::OnInsertString()
 //	pUI->Init(&m_RootUI);
 	if(this->GetSelectedUI()) pUI->Init(this->GetSelectedUI());
 	else pUI->Init(&m_RootUI);
-	SetSelectedUI(NULL);
+	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
 
 	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	if(FALSE == SetStringInfos(pUI))
 	{
-		if (IDYES == pFrm->MessageBox("Font 지정이 취소되었습니다.\n생성된 UIString을 삭제하시겠습니까?", NULL, MB_YESNO)) OnEditDelete();
+		if (IDYES == pFrm->MessageBox("Font 지정이 취소되었습니다.\n생성된 UIString을 삭제하시겠습니까?", nullptr, MB_YESNO)) OnEditDelete();
 		else pFrm->MessageBox("Font 지정 및 기타 설정을 해야 UIString이 보일 것입니다.");
 		return;
 	}
@@ -247,7 +247,7 @@ void CUIEDoc::OnInsertString()
 	pUI->SetRegion(rcRegion);
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnInsertButton() 
@@ -258,14 +258,14 @@ void CUIEDoc::OnInsertButton()
 	if(this->GetSelectedUI()) pUI->Init(this->GetSelectedUI());
 	else pUI->Init(&m_RootUI);
 	pUI->CreateImages();
-	SetSelectedUI(NULL);
+	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
 
 	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	if (FALSE == SetButtonInfos(pUI))
 	{
-		if (IDYES == pFrm->MessageBox("텍스쳐 지정이 취소되었습니다.\n생성된 버튼을 삭제하시겠습니까?", NULL, MB_YESNO)) OnEditDelete();
+		if (IDYES == pFrm->MessageBox("텍스쳐 지정이 취소되었습니다.\n생성된 버튼을 삭제하시겠습니까?", nullptr, MB_YESNO)) OnEditDelete();
 		else pFrm->MessageBox("텍스쳐지정 및 기타 설정을 해야 버튼이 보일 것입니다.");
 		return;
 	}
@@ -277,7 +277,7 @@ void CUIEDoc::OnInsertButton()
 	pFrm->MessageBox("1. 버튼의 위치와 영역을 지정해주세요.\n2. 네모 버튼이 아닐경우 click되는 영역을 지정해주세요.\n3. 체크버튼으로 만들고 싶으면 style을 지정해주세요.");
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 	// click 영역을 따로 지정할 필요가 있으면 지정한다.
 	// style 지정
 }
@@ -290,7 +290,7 @@ void CUIEDoc::OnInsertStatic()
 	if(this->GetSelectedUI()) pUI->Init(this->GetSelectedUI());
 	else pUI->Init(&m_RootUI);
 	pUI->CreateImageAndString();
-	SetSelectedUI(NULL);
+	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);	
 
 	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
@@ -307,7 +307,7 @@ void CUIEDoc::OnInsertStatic()
 
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnInsertEdit() 
@@ -318,7 +318,7 @@ void CUIEDoc::OnInsertEdit()
 	if(this->GetSelectedUI()) pUI->Init(this->GetSelectedUI());
 	else pUI->Init(&m_RootUI);
 	pUI->CreateImageAndString();
-	SetSelectedUI(NULL);
+	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);		
 
 	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
@@ -334,7 +334,7 @@ void CUIEDoc::OnInsertEdit()
 
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnInsertProgress() 
@@ -345,7 +345,7 @@ void CUIEDoc::OnInsertProgress()
 	if(this->GetSelectedUI()) pUI->Init(this->GetSelectedUI());
 	else pUI->Init(&m_RootUI);
 	pUI->CreateImages();
-	SetSelectedUI(NULL);
+	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
 
 	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
@@ -359,14 +359,14 @@ void CUIEDoc::OnInsertProgress()
 	{
 		if (FALSE == SelectTexture(szTexture))
 		{
-			if (IDYES == pFrm->MessageBox("텍스쳐 지정이 취소되었습니다.\nProgress를 삭제하시겠습니까?", NULL, MB_YESNO)) OnEditDelete();
+			if (IDYES == pFrm->MessageBox("텍스쳐 지정이 취소되었습니다.\nProgress를 삭제하시겠습니까?", nullptr, MB_YESNO)) OnEditDelete();
 			else pFrm->MessageBox("텍스쳐지정 및 기타 설정을 해야 progress가 보일 것입니다.");
 			return;
 		}
 		pUIImage->SetTex(szTexture);
-		if (NULL == pUIImage->GetTex())
+		if (nullptr == pUIImage->GetTex())
 		{
-			if (IDYES == pFrm->MessageBox("텍스쳐를 Load할 수 없습니다.\n다시 지정하시겠습니까?", NULL, MB_YESNO)) continue;
+			if (IDYES == pFrm->MessageBox("텍스쳐를 Load할 수 없습니다.\n다시 지정하시겠습니까?", nullptr, MB_YESNO)) continue;
 			else pFrm->MessageBox("텍스쳐지정 및 기타 설정을 해야 progress가 보일 것입니다.");
 			return;
 		}
@@ -380,7 +380,7 @@ void CUIEDoc::OnInsertProgress()
 	dlg.SetImageTypes(2, szImageTypeNames);
 	if (IDCANCEL == dlg.DoModal())
 	{	
-		if (IDYES == pFrm->MessageBox("텍스쳐 UV좌표 지정이 취소되었습니다.\n생성된 Progress를 삭제하시겠습니까?", NULL, MB_YESNO)) OnEditDelete();
+		if (IDYES == pFrm->MessageBox("텍스쳐 UV좌표 지정이 취소되었습니다.\n생성된 Progress를 삭제하시겠습니까?", nullptr, MB_YESNO)) OnEditDelete();
 		else pFrm->MessageBox("UV좌표 설정 및 기타 설정을 해야 Progress가 보일 것입니다.");
 		return;
 	}
@@ -390,7 +390,7 @@ void CUIEDoc::OnInsertProgress()
 	{
 		if (CN3UIProgress::IMAGETYPE_BKGND == i) pUIImage = pUI->GetBkGndImgRef();
 		else if (CN3UIProgress::IMAGETYPE_FRGND == i) pUIImage = pUI->GetFrGndImgRef();
-		else pUIImage = NULL;
+		else pUIImage = nullptr;
 		ASSERT(pUIImage);
 		__FLOAT_RECT frcUV;
 		rcRegion = dlg.GetImageRect(i, &frcUV);
@@ -407,7 +407,7 @@ void CUIEDoc::OnInsertProgress()
 
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnInsertTrackbar() 
@@ -418,14 +418,14 @@ void CUIEDoc::OnInsertTrackbar()
 	if(this->GetSelectedUI()) pUI->Init(this->GetSelectedUI());
 	else pUI->Init(&m_RootUI);
 	pUI->CreateImages();
-	SetSelectedUI(NULL);
+	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
 
 	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	if (FALSE == SetTrackBarInfos(pUI))
 	{
-		if (IDYES == pFrm->MessageBox("Trackbar 정보 지정이 취소되었습니다.\n생성된 Trackbar를 삭제하시겠습니까?", NULL, MB_YESNO)) OnEditDelete();
+		if (IDYES == pFrm->MessageBox("Trackbar 정보 지정이 취소되었습니다.\n생성된 Trackbar를 삭제하시겠습니까?", nullptr, MB_YESNO)) OnEditDelete();
 		else pFrm->MessageBox("텍스쳐지정 및 기타 설정을 해야 Trackbar가 보일 것입니다.");
 		return;
 	}
@@ -434,7 +434,7 @@ void CUIEDoc::OnInsertTrackbar()
 
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnInsertScrollbar() 
@@ -445,7 +445,7 @@ void CUIEDoc::OnInsertScrollbar()
 	if(this->GetSelectedUI()) pUI->Init(this->GetSelectedUI());
 	else pUI->Init(&m_RootUI);
 	pUI->CreateTrackBarAndBtns();
-	SetSelectedUI(NULL);
+	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);	
 	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
@@ -455,7 +455,7 @@ void CUIEDoc::OnInsertScrollbar()
 	ASSERT(pUIBtn);
 	if (FALSE == SetButtonInfos(pUIBtn))
 	{
-		if (IDYES == pFrm->MessageBox("텍스쳐 지정이 취소되었습니다.\n생성된 스크롤을 삭제하시겠습니까?", NULL, MB_YESNO)) OnEditDelete();
+		if (IDYES == pFrm->MessageBox("텍스쳐 지정이 취소되었습니다.\n생성된 스크롤을 삭제하시겠습니까?", nullptr, MB_YESNO)) OnEditDelete();
 		else pFrm->MessageBox("텍스쳐지정 및 기타 설정을 해야 스크롤이 보일 것입니다.");
 		return;
 	}
@@ -469,7 +469,7 @@ void CUIEDoc::OnInsertScrollbar()
 	ASSERT(pUIBtn);
 	if (FALSE == SetButtonInfos(pUIBtn))
 	{
-		if (IDYES == pFrm->MessageBox("텍스쳐 지정이 취소되었습니다.\n생성된 스크롤을 삭제하시겠습니까?", NULL, MB_YESNO)) OnEditDelete();
+		if (IDYES == pFrm->MessageBox("텍스쳐 지정이 취소되었습니다.\n생성된 스크롤을 삭제하시겠습니까?", nullptr, MB_YESNO)) OnEditDelete();
 		else pFrm->MessageBox("텍스쳐지정 및 기타 설정을 해야 스크롤이 보일 것입니다.");
 		return;
 	}
@@ -483,7 +483,7 @@ void CUIEDoc::OnInsertScrollbar()
 	CN3UITrackBar* pUITrackBar = pUI->GetTrackBarRef();
 	if (FALSE == SetTrackBarInfos(pUITrackBar))
 	{
-		if (IDYES == pFrm->MessageBox("Trackbar 정보 지정이 취소되었습니다.\n생성된 ScrollBar 삭제하시겠습니까?", NULL, MB_YESNO)) OnEditDelete();
+		if (IDYES == pFrm->MessageBox("Trackbar 정보 지정이 취소되었습니다.\n생성된 ScrollBar 삭제하시겠습니까?", nullptr, MB_YESNO)) OnEditDelete();
 		else pFrm->MessageBox("텍스쳐지정 및 기타 설정을 해야 ScrollBar가 보일 것입니다.");
 		return;
 	}
@@ -498,7 +498,7 @@ void CUIEDoc::OnInsertScrollbar()
 
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnInsertArea() 
@@ -510,13 +510,13 @@ void CUIEDoc::OnInsertArea()
 	else pUI->Init(&m_RootUI);
 	pUI->SetRegion(CRect(0,0,20,20));
 
-	SetSelectedUI(NULL);
+	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
 	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnInsertIconslot() 
@@ -533,7 +533,7 @@ void CUIEDoc::OnInsertIconslot()
 	pFrm->MessageBox("영역을 지정해 주세요.");
 	pFrm->GetRightPane()->SetMode(CUIEView::UIEMODE_EDIT);
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 #else
 	AfxGetMainWnd()->MessageBox("Repent만 지원되는 형식입니다.");
 #endif
@@ -548,7 +548,7 @@ void CUIEDoc::OnInsertList()
 	else pUI->Init(&m_RootUI);
 	pUI->SetRegion(CRect(0,0,100,50));
 
-	SetSelectedUI(NULL);
+	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
 	// 아래로 기본적으로 해주면 좋은 것들을 써놓았음.
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
@@ -560,7 +560,7 @@ void CUIEDoc::OnInsertList()
 
 void CUIEDoc::OnEditDelete()	// 선택된 ui 지우기
 {
-	CN3UIBase* pUI = NULL;
+	CN3UIBase* pUI = nullptr;
 	it_UI it = m_SelectedUIs.begin(), itEnd = m_SelectedUIs.end();
 	for(; it != itEnd; )
 	{
@@ -579,7 +579,7 @@ void CUIEDoc::OnEditDelete()	// 선택된 ui 지우기
 		}
 	}
 
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnUpdateEditDelete(CCmdUI* pCmdUI) 
@@ -594,12 +594,12 @@ void CUIEDoc::OnEditZorder()
 	m_RootUI.ArrangeZOrder();
 	CN3UIBase* pUI = this->GetSelectedUI();
 	if (pUI && UI_TYPE_IMAGE == pUI->UIType()) ((CN3UIImage*)pUI)->ReorderChildImage();
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 }
 
 BOOL CUIEDoc::SetImageInfos(CN3UIImage* pUI)
 {
-	if (NULL == pUI) return FALSE;
+	if (nullptr == pUI) return FALSE;
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	// texture 지정
 	char szTexture[_MAX_PATH];
@@ -607,9 +607,9 @@ BOOL CUIEDoc::SetImageInfos(CN3UIImage* pUI)
 	{
 		if (FALSE == SelectTexture(szTexture))	return FALSE;
 		pUI->SetTex(szTexture);
-		if (NULL == pUI->GetTex())
+		if (nullptr == pUI->GetTex())
 		{
-			if (IDYES == pFrm->MessageBox("텍스쳐를 Load할 수 없습니다.\n다시 지정하시겠습니까?", NULL, MB_YESNO)) continue;
+			if (IDYES == pFrm->MessageBox("텍스쳐를 Load할 수 없습니다.\n다시 지정하시겠습니까?", nullptr, MB_YESNO)) continue;
 			return FALSE;
 		}
 		else break;
@@ -663,7 +663,7 @@ BOOL CUIEDoc::SetTrackBarInfos(CN3UITrackBar* pUI)
 	{
 		if (FALSE == SelectTexture(szTexture))return FALSE;
 		pUIImage->SetTex(szTexture);
-		if (NULL == pUIImage->GetTex())	return FALSE;
+		if (nullptr == pUIImage->GetTex())	return FALSE;
 		else break;
 	}
 	// image의 normal on down disable그림 영역 설정
@@ -679,7 +679,7 @@ BOOL CUIEDoc::SetTrackBarInfos(CN3UITrackBar* pUI)
 	{
 		if (CN3UITrackBar::IMAGETYPE_BKGND == i) pUIImage = pUI->GetBkGndImgRef();
 		else if (CN3UITrackBar::IMAGETYPE_THUMB == i) pUIImage = pUI->GetThumbImgRef();
-		else pUIImage = NULL;
+		else pUIImage = nullptr;
 		ASSERT(pUIImage);
 		__FLOAT_RECT frcUV;
 		rcRegion = dlg.GetImageRect(i, &frcUV);
@@ -706,7 +706,7 @@ BOOL CUIEDoc::SetButtonInfos(CN3UIButton* pUI)
 	{
 		if (FALSE == SelectTexture(szTexture)) return FALSE;
 		pUIImage->SetTex(szTexture);
-		if (NULL == pUIImage->GetTex()) return FALSE;
+		if (nullptr == pUIImage->GetTex()) return FALSE;
 		else break;
 	}
 	// image의 normal on down disable그림 영역 설정
@@ -738,11 +738,11 @@ BOOL CUIEDoc::SetButtonInfos(CN3UIButton* pUI)
 void CUIEDoc::OnFileExportTooltip() 
 {
 	CN3UIBase* pUI = this->GetSelectedUI();
-	if (NULL == pUI) return;
+	if (nullptr == pUI) return;
 	ASSERT(UI_TYPE_STATIC == pUI->UIType());	// tooltip은 static에서 상속받고 따로 저장하는 정보가 없다.
 
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(FALSE, "uif", NULL, dwFlags, "UI Files(*.uif)|*.uif;||", NULL);
+	CFileDialog dlg(FALSE, "uif", nullptr, dwFlags, "UI Files(*.uif)|*.uif;||", nullptr);
 	if (IDCANCEL == dlg.DoModal()) return;
 
 	pUI->SaveToFile((LPCTSTR)dlg.GetPathName());
@@ -757,13 +757,13 @@ void CUIEDoc::OnUpdateFileExportTooltip(CCmdUI* pCmdUI)
 void CUIEDoc::OnFileImportTooltip() 
 {
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "uif", NULL, dwFlags, "UI Files(*.uif)|*.uif;||", NULL);
+	CFileDialog dlg(TRUE, "uif", nullptr, dwFlags, "UI Files(*.uif)|*.uif;||", nullptr);
 	if (IDCANCEL == dlg.DoModal()) return;
 
 	CN3UIStatic* pStatic = new CN3UIStatic();
 	pStatic->Init(&m_RootUI);
 	pStatic->LoadFromFile((LPCTSTR)dlg.GetPathName());
-	SetSelectedUI(NULL);
+	SetSelectedUI(nullptr);
 	SetSelectedUI(pStatic);
 }
 
@@ -771,16 +771,16 @@ void CUIEDoc::OnEditDuplicate()
 {
 	if(m_SelectedUIs.empty()) return;
 
-	CN3UIBase* pUISrc = NULL;
-	CN3UIBase* pUIDest = NULL;
+	CN3UIBase* pUISrc = nullptr;
+	CN3UIBase* pUIDest = nullptr;
 	it_UI it = m_SelectedUIs.begin(), itEnd = m_SelectedUIs.end();
 	for(; it != itEnd; it++)
 	{
 		pUISrc = *it;
 
-		if(NULL == pUISrc) continue;
+		if(nullptr == pUISrc) continue;
 
-		pUIDest = NULL;
+		pUIDest = nullptr;
 		switch(pUISrc->UIType())
 		{
 		case UI_TYPE_BASE:
@@ -878,7 +878,7 @@ void CUIEDoc::OnEditDuplicate()
 #endif
 		}
 
-		if(NULL == pUIDest) continue;
+		if(nullptr == pUIDest) continue;
 
 		if(pUISrc->GetParent())
 		{
@@ -891,14 +891,14 @@ void CUIEDoc::OnEditDuplicate()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
 
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 	SetModifiedFlag();
 }
 
 void CUIEDoc::OnEditMakeGroup() 
 {
-	CN3UIBase* pUI = NULL;
-	CN3UIBase* pUIFirst = NULL;
+	CN3UIBase* pUI = nullptr;
+	CN3UIBase* pUIFirst = nullptr;
 	it_UI it = m_SelectedUIs.begin(), itEnd = m_SelectedUIs.end();
 	bool bOverLapped = false;
 	int iUIC;
@@ -942,7 +942,7 @@ void CUIEDoc::OnEditMakeGroup()
 	}
 	pUIParentNew->SetRegion(rcP);
 
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnEditParent() 
@@ -957,13 +957,13 @@ void CUIEDoc::OnEditParent()
 		if(i == 0) continue;
 
 		CN3UIBase* pUI = pUI = *it;
-		if(pUI->GetParent() == NULL) continue;
+		if(pUI->GetParent() == nullptr) continue;
 
 		pUI->GetParent()->RemoveChild(pUI);
 		pUI->SetParent(pUIFirst);
 	}
 
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnEditUnparent() 
@@ -974,58 +974,58 @@ void CUIEDoc::OnEditUnparent()
 	for(; it != itEnd; it++)
 	{
 		CN3UIBase* pUI = *it;
-		if(pUI->GetParent() == NULL || pUI->GetParent() == &(m_RootUI)) continue;
+		if(pUI->GetParent() == nullptr || pUI->GetParent() == &(m_RootUI)) continue;
 
 		pUI->GetParent()->RemoveChild(pUI);
 		pUI->SetParent(&m_RootUI);
 	}
 
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnEditMoveToLowest() 
 {
 	CN3UIBase* pUI = this->GetSelectedUI();
-	if(NULL == pUI) return;
+	if(nullptr == pUI) return;
 	
 	CN3UIBase* pUIParent = pUI->GetParent();
-	if(NULL == pUIParent) return;
+	if(nullptr == pUIParent) return;
 
 	pUIParent->MoveToLowest(pUI);
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnEditMoveToLower() 
 {
 	CN3UIBase* pUI = this->GetSelectedUI();
-	if(NULL == pUI) return;
+	if(nullptr == pUI) return;
 	
 	CN3UIBase* pUIParent = pUI->GetParent();
-	if(NULL == pUIParent) return;
+	if(nullptr == pUIParent) return;
 
 	pUIParent->MoveToLower(pUI);
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnEditMoveToUpper() 
 {
 	CN3UIBase* pUI = this->GetSelectedUI();
-	if(NULL == pUI) return;
+	if(nullptr == pUI) return;
 	
 	CN3UIBase* pUIParent = pUI->GetParent();
-	if(NULL == pUIParent) return;
+	if(nullptr == pUIParent) return;
 
 	pUIParent->MoveToUpper(pUI);
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnFileExport() 
 {
 	CN3UIBase* pUI = this->GetSelectedUI();
-	if (NULL == pUI) return;
+	if (nullptr == pUI) return;
 
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(FALSE, "uif", NULL, dwFlags, "UI Files(*.uif)|*.uif;||", NULL);
+	CFileDialog dlg(FALSE, "uif", nullptr, dwFlags, "UI Files(*.uif)|*.uif;||", nullptr);
 	if (IDCANCEL == dlg.DoModal()) return;
 
 	std::string szFN(CT2A(dlg.GetPathName()));
@@ -1035,10 +1035,10 @@ void CUIEDoc::OnFileExport()
 void CUIEDoc::OnFileImport() 
 {
 	CN3UIBase* pUI = this->GetSelectedUI();
-	if (NULL == pUI) return;
+	if (nullptr == pUI) return;
 
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "uif", NULL, dwFlags, "UI Files(*.uif)|*.uif;||", NULL);
+	CFileDialog dlg(TRUE, "uif", nullptr, dwFlags, "UI Files(*.uif)|*.uif;||", nullptr);
 	if (IDCANCEL == dlg.DoModal()) return;
 
 	std::string szFN(CT2A(dlg.GetPathName()));
@@ -1069,17 +1069,17 @@ void CUIEDoc::OnInsertGroup()
 	CN3UIBase* pUI = new CN3UIBase();
 	if(this->GetSelectedUI()) pUI->Init(this->GetSelectedUI());
 	else pUI->Init(&m_RootUI);
-	SetSelectedUI(NULL);
+	SetSelectedUI(nullptr);
 	SetSelectedUI(pUI);
 
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 }
 
 void CUIEDoc::OnBatchToolChangeImagePath()
 {
 	char szBuff[102400] = "";
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "uif", NULL, dwFlags, "UI Files(*.uif)|*.uif;||", NULL);
+	CFileDialog dlg(TRUE, "uif", nullptr, dwFlags, "UI Files(*.uif)|*.uif;||", nullptr);
 	char szCurPath[256]; GetCurrentDirectory(256, szCurPath);
 	dlg.m_ofn.lpstrInitialDir = szCurPath;
 	dlg.m_ofn.nMaxFile = 102400;
@@ -1097,7 +1097,7 @@ void CUIEDoc::OnBatchToolChangeImagePath()
 	std::string szFNOld(CT2A(dlg2.m_szFN_Old));
 	std::string szFNNew(CT2A(dlg2.m_szFN_New));
 
-	while(pos != NULL)
+	while(pos != nullptr)
 	{
 		CN3UIBase base;
 		FileName = dlg.GetNextPathName(pos);
@@ -1112,7 +1112,7 @@ void CUIEDoc::OnBatchToolChangeFont()
 {
 	char szBuff[102400] = "";
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "uif", NULL, dwFlags, "UI Files(*.uif)|*.uif;||", NULL);
+	CFileDialog dlg(TRUE, "uif", nullptr, dwFlags, "UI Files(*.uif)|*.uif;||", nullptr);
 	char szCurPath[256]; GetCurrentDirectory(256, szCurPath);
 	dlg.m_ofn.lpstrInitialDir = szCurPath;
 	dlg.m_ofn.nMaxFile = 102400;
@@ -1127,7 +1127,7 @@ void CUIEDoc::OnBatchToolChangeFont()
 	POSITION pos = dlg.GetStartPosition();
 	CString FileName;
 	CString szFont = dlg2.GetFaceName();
-	while(pos != NULL)
+	while(pos != nullptr)
 	{
 		CN3UIBase base;
 		FileName = dlg.GetNextPathName(pos);
@@ -1142,7 +1142,7 @@ void CUIEDoc::OnBatchToolGatherImageFileName()
 {
 	char szBuff[102400] = "";
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "uif", NULL, dwFlags, "UI Files(*.uif)|*.uif;||", NULL);
+	CFileDialog dlg(TRUE, "uif", nullptr, dwFlags, "UI Files(*.uif)|*.uif;||", nullptr);
 	char szCurPath[256]; GetCurrentDirectory(256, szCurPath);
 	dlg.m_ofn.lpstrInitialDir = szCurPath;
 	dlg.m_ofn.nMaxFile = 102400;
@@ -1152,7 +1152,7 @@ void CUIEDoc::OnBatchToolGatherImageFileName()
 
 	std::set<std::string> setImgFNs;
 	POSITION pos = dlg.GetStartPosition();
-	while(pos != NULL)
+	while(pos != nullptr)
 	{
 		CN3UIBase base;
 		CString FileName = dlg.GetNextPathName(pos);
@@ -1165,11 +1165,11 @@ void CUIEDoc::OnBatchToolGatherImageFileName()
 	BROWSEINFO bi;
 	LPCITEMIDLIST lpidl;
     bi.hwndOwner = AfxGetMainWnd()->m_hWnd;
-    bi.pidlRoot=NULL;
+    bi.pidlRoot=nullptr;
     bi.pszDisplayName = szFolder;
     bi.lpszTitle="파일이름을 비교할 폴더를 선택해주세요";
     bi.ulFlags=BIF_RETURNONLYFSDIRS;
-    bi.lpfn=NULL;
+    bi.lpfn=nullptr;
     bi.lParam=0;
 
 	lpidl=SHBrowseForFolder(&bi);

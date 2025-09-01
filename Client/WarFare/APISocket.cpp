@@ -33,7 +33,7 @@ const uint16_t PACKET_TAIL = 0X55AA;
 CAPISocket::CAPISocket()
 {
 	m_hSocket = (void *)INVALID_SOCKET;
-	m_hWndTarget = NULL;
+	m_hWndTarget = nullptr;
 	m_szIP.clear();
 	m_dwPort = 0;
 
@@ -81,7 +81,7 @@ void CAPISocket::Disconnect()
 		closesocket((SOCKET)m_hSocket);
 	
 	m_hSocket = (void *)INVALID_SOCKET;
-	m_hWndTarget = NULL;
+	m_hWndTarget = nullptr;
 	m_szIP.clear();
 	m_dwPort = 0;
 
@@ -115,7 +115,7 @@ int CAPISocket::Connect(HWND hWnd, const char* pszIP, uint32_t dwPort)
 	}
 	else
 	{
-		if ( (hp = (hostent far *)gethostbyname(pszIP)) == NULL)
+		if ( (hp = (hostent far *)gethostbyname(pszIP)) == nullptr)
 		{
 #ifdef _DEBUG
 			std::string msg = fmt::format("Error: Connecting to {}.", pszIP);
@@ -272,7 +272,7 @@ BOOL CAPISocket::ReceiveProcess()
 			m_CB.HeadIncrease(iCount); // 환형 버퍼 인덱스 증가 시키기..
 		}
 
-		delete[] pData, pData = NULL;
+		delete[] pData, pData = nullptr;
 	}
 
 	return bFoundTail;

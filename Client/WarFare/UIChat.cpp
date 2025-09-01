@@ -24,24 +24,24 @@ static char THIS_FILE[]=__FILE__;
 
 CUIChat::CUIChat()													//생성자 와 파괴자에서 Release안 불러 주나??
 {
-	m_pChatOut = NULL;
-	m_pScrollbar = NULL;
+	m_pChatOut = nullptr;
+	m_pScrollbar = nullptr;
 	m_iChatLineCount = 0;
-	m_ppUILines = NULL;
+	m_ppUILines = nullptr;
 	m_iCurContinueMsg = 0;
 	ZeroMemory(&m_rcChatOutRegion, sizeof(m_rcChatOutRegion));
 
 	m_eChatMode = N3_CHAT_NORMAL;
 //	m_eChatBuffer = CHAT_BUFFER_NORMAL;
 
-	m_pBtn_Normal = NULL;
-	m_pBtn_Private = NULL;
-	m_pBtn_PartyOrForce = NULL;
-	m_pBtn_KnightsOrGuild = NULL;
-	m_pBtn_Shout = NULL;
-	m_pNoticeTitle = NULL;
-	m_pBtn_Fold = NULL;
-	m_pEdit = NULL;													//son, chat_in
+	m_pBtn_Normal = nullptr;
+	m_pBtn_Private = nullptr;
+	m_pBtn_PartyOrForce = nullptr;
+	m_pBtn_KnightsOrGuild = nullptr;
+	m_pBtn_Shout = nullptr;
+	m_pNoticeTitle = nullptr;
+	m_pBtn_Fold = nullptr;
+	m_pEdit = nullptr;													//son, chat_in
 
 	m_bChatNormal	= true;
 	m_bChatPrivate	= true;
@@ -54,7 +54,7 @@ CUIChat::CUIChat()													//생성자 와 파괴자에서 Release안 불러
 
 CUIChat::~CUIChat()
 {
-	if (m_ppUILines) {delete [] m_ppUILines; m_ppUILines = NULL;}	// m_ppUILines[n]의 포인터는 메모리 할당되어 있어도 부모가 해제될때 자동으로 해제하므로 안지워야 한다.
+	if (m_ppUILines) {delete [] m_ppUILines; m_ppUILines = nullptr;}	// m_ppUILines[n]의 포인터는 메모리 할당되어 있어도 부모가 해제될때 자동으로 해제하므로 안지워야 한다.
 
 	ChatListItor itor;
 //	for(int i = 0; i < CHAT_BUFFER_COUNT; i++)
@@ -85,12 +85,12 @@ void CUIChat::Release()
 {
 	CN3UIBase::Release();
 
-	m_pEdit = NULL;													//son, chat_in
+	m_pEdit = nullptr;													//son, chat_in
 
-	m_pChatOut = NULL;
-	m_pScrollbar = NULL;
+	m_pChatOut = nullptr;
+	m_pScrollbar = nullptr;
 	m_iChatLineCount = 0;
-	if (m_ppUILines) {delete [] m_ppUILines; m_ppUILines = NULL;}	// m_ppUILines[n]의 포인터는 메모리 할당되어 있어도 부모가 해제될때 자동으로 해제하므로 안지워야 한다.
+	if (m_ppUILines) {delete [] m_ppUILines; m_ppUILines = nullptr;}	// m_ppUILines[n]의 포인터는 메모리 할당되어 있어도 부모가 해제될때 자동으로 해제하므로 안지워야 한다.
 	ZeroMemory(&m_rcChatOutRegion, sizeof(m_rcChatOutRegion));
 
 	ChatListItor itor;
@@ -118,17 +118,17 @@ void CUIChat::Release()
 	m_eChatMode = N3_CHAT_NORMAL;
 //	m_eChatBuffer = CHAT_BUFFER_NORMAL;
 
-	m_pBtn_Normal = NULL;
-	m_pBtn_Private = NULL;
-	m_pBtn_PartyOrForce = NULL;
-	m_pBtn_KnightsOrGuild = NULL;
-	m_pBtn_Shout = NULL;
-	m_pBtn_Fold = NULL;
+	m_pBtn_Normal = nullptr;
+	m_pBtn_Private = nullptr;
+	m_pBtn_PartyOrForce = nullptr;
+	m_pBtn_KnightsOrGuild = nullptr;
+	m_pBtn_Shout = nullptr;
+	m_pBtn_Fold = nullptr;
 }
 
 bool CUIChat::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 
 	if(dwMsg == UIMSG_BUTTON_CLICK)
 	{
@@ -225,9 +225,9 @@ void CUIChat::CreateLines()
 	if (m_ppUILines) {
 		for (i=0; i<m_iChatLineCount; ++i)
 		{
-			if (m_ppUILines[i]) {delete m_ppUILines[i]; m_ppUILines[i] = NULL;}
+			if (m_ppUILines[i]) {delete m_ppUILines[i]; m_ppUILines[i] = nullptr;}
 		}
-		delete [] m_ppUILines; m_ppUILines = NULL;
+		delete [] m_ppUILines; m_ppUILines = nullptr;
 	}
 	SIZE size;
 	if (m_pChatOut && m_pChatOut->GetTextExtent("가", lstrlen("가"), &size) && size.cy>0)
@@ -258,9 +258,9 @@ void CUIChat::CreateLines()
 bool CUIChat::Load(HANDLE hFile)
 {
 	if (false == CN3UIBase::Load(hFile)) return false;
-	m_pChatOut		= (CN3UIString*)GetChildByID("text0");				__ASSERT(m_pChatOut, "NULL UI Component!!");
-	m_pScrollbar	= (CN3UIScrollBar*)GetChildByID("scroll");			__ASSERT(m_pScrollbar, "NULL UI Component!!");
-	m_pNoticeTitle	= (CN3UIString*)GetChildByID("text_notice_title");	__ASSERT(m_pNoticeTitle, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pChatOut, GetChildByID<CN3UIString>("text0"));
+	N3_VERIFY_UI_COMPONENT(m_pScrollbar, GetChildByID<CN3UIScrollBar>("scroll"));
+	N3_VERIFY_UI_COMPONENT(m_pNoticeTitle, GetChildByID<CN3UIString>("text_notice_title"));
 
 	m_rcChatOutRegion = m_pChatOut->GetRegion();
 	CreateLines();
@@ -268,18 +268,18 @@ bool CUIChat::Load(HANDLE hFile)
 	__ASSERT(0<m_iChatLineCount,"채팅창이 너무 작아요");
 
 	//son, chat_in
-	m_pEdit = (CN3UIEdit*)GetChildByID("edit0");				__ASSERT(m_pEdit, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pEdit, GetChildByID<CN3UIEdit>("edit0"));
 	m_pEdit->SetMaxString(256); // 채팅 문자열 길이 제한..
 	//son, chat_in
 
-	m_pBtn_Normal			= GetChildByID("btn_normal");			__ASSERT(m_pBtn_Normal, "NULL UI Component!!");
-	m_pBtn_Private			= GetChildByID("btn_private");			__ASSERT(m_pBtn_Private, "NULL UI Component!!");
-	m_pBtn_PartyOrForce		= GetChildByID("btn_party_force");		__ASSERT(m_pBtn_PartyOrForce, "NULL UI Component!!");
-	//m_pBtn_KnightsOrGuild = GetChildByID("btn_knights_guild");	__ASSERT(m_pBtn_KnightsOrGuild, "NULL UI Component!!");
-	m_pBtn_KnightsOrGuild	= GetChildByID("btn_knights");			__ASSERT(m_pBtn_KnightsOrGuild, "NULL UI Component!!");
-	m_pBtn_Shout			= GetChildByID("btn_shout");			__ASSERT(m_pBtn_Shout, "NULL UI Component!!");
-	m_pBtn_Check			= GetChildByID("btn_check_normal");		__ASSERT(m_pBtn_Check, "NULL UI Component!!");
-	m_pBtn_Fold				= GetChildByID("btn_off");				__ASSERT(m_pBtn_Fold, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Normal, GetChildByID("btn_normal"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Private, GetChildByID("btn_private"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_PartyOrForce, GetChildByID("btn_party_force"));
+	//N3_VERIFY_UI_COMPONENT(m_pBtn_KnightsOrGuild, GetChildByID("btn_knights_guild"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_KnightsOrGuild, GetChildByID("btn_knights"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Shout, GetChildByID("btn_shout"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Check, GetChildByID("btn_check_normal"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Fold, GetChildByID("btn_off"));
 
 	this->ChangeChattingMode(N3_CHAT_NORMAL); // 보통 채팅 모드이다..
 
@@ -434,7 +434,7 @@ void CUIChat::AddLineBuffer(const std::string& szString, D3DCOLOR color)
 				int iLineLength = iCount - iLineStart + 1;
 				std::string szLine;
 				pLineInfo->szChat = szString.substr(iLineStart, iLineLength);
-			}	// 연속된 \n일 경우 pszLine = NULL이 될 수 있다.
+			}	// 연속된 \n일 경우 pszLine = nullptr이 될 수 있다.
 
 			++iCount;
 			iLineStart = iCount;
@@ -519,13 +519,13 @@ void CUIChat::SetTopLine(int iTopLine)
 	for (i=0; i<iRealLine; ++i)
 	{
 		++iRealLineCount;
-		if (NULL == m_ppUILines[i]) continue;
+		if (nullptr == m_ppUILines[i]) continue;
 		m_ppUILines[i]->SetColor(ppLineInfos[i]->color);
 		m_ppUILines[i]->SetString(ppLineInfos[i]->szChat);
 	}
 	for (i=iRealLineCount; i<m_iChatLineCount; ++i)
 	{
-		if (NULL == m_ppUILines[i]) continue;
+		if (nullptr == m_ppUILines[i]) continue;
 		m_ppUILines[i]->SetString("");	// 나머지는 빈칸 만들기
 	}
 	delete [] ppLineInfos;
@@ -635,7 +635,7 @@ BOOL CUIChat::MoveOffset(int iOffsetX, int iOffsetY)
 	m_rcMovable.right += iOffsetX;		m_rcMovable.bottom += iOffsetY;
 
 	// children 좌표 갱신
-	CN3UIBase* pCUI = NULL; // Child UI...
+	CN3UIBase* pCUI = nullptr; // Child UI...
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
 		pCUI = (*itor);
@@ -709,7 +709,7 @@ void CUIChat::ChangeChattingMode(e_ChatMode eCM)
 
 	for(int i = 0; i < 5; i++)
 	{
-		if(NULL == pBtns[i]) continue;
+		if(nullptr == pBtns[i]) continue;
 		
 		if(bNBDs[i])
 		{
@@ -820,19 +820,19 @@ void CUIChat::SetNoticeTitle(const std::string& szString, D3DCOLOR color)
 
 CUIChat2::CUIChat2()
 {
-	m_pBtn_Fold = NULL;
+	m_pBtn_Fold = nullptr;
 }
 
 bool CUIChat2::Load(HANDLE hFile)
 {
 	if (false == CN3UIBase::Load(hFile)) return false;
-	m_pBtn_Fold = GetChildByID("btn_on");			__ASSERT(m_pBtn_Fold, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Fold, GetChildByID("btn_on"));
 	return true;
 }
 
 bool CUIChat2::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if (NULL == pSender) return false;
+	if (nullptr == pSender) return false;
 
 	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
@@ -849,5 +849,5 @@ bool CUIChat2::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 void CUIChat2::Release()
 {
 	CN3UIBase::Release();
-	m_pBtn_Fold = NULL;
+	m_pBtn_Fold = nullptr;
 }

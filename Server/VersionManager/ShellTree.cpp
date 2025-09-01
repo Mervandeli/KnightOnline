@@ -207,7 +207,7 @@ LPITEMIDLIST CShellPidl::CreatePidl(UINT cbSize)
 {
     LPMALLOC lpMalloc;
     HRESULT  hr;
-    LPITEMIDLIST pidl=NULL;
+    LPITEMIDLIST pidl=nullptr;
 
     hr=SHGetMalloc(&lpMalloc);
 
@@ -237,7 +237,7 @@ LPITEMIDLIST CShellPidl::ConcatPidls(LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2)
     UINT cb1;
     UINT cb2;
 
-    if (pidl1)  //May be NULL
+    if (pidl1)  //May be nullptr
        cb1 = GetSize(pidl1) - sizeof(pidl1->mkid.cb);
     else
        cb1 = 0;
@@ -315,12 +315,12 @@ LPITEMIDLIST CShellPidl::GetFullyQualPidl(LPSHELLFOLDER lpsf, LPITEMIDLIST lpi)
 	HRESULT hr;
 
 	if (!GetName(lpsf, lpi, SHGDN_FORPARSING, &szBuff))
-		return NULL;
+		return nullptr;
 
 	hr = SHGetDesktopFolder(&lpsfDeskTop);
 
 	if (FAILED(hr))
-		return NULL;
+		return nullptr;
 
 #if !defined(_UNICODE)
 	MultiByteToWideChar(
@@ -333,8 +333,8 @@ LPITEMIDLIST CShellPidl::GetFullyQualPidl(LPSHELLFOLDER lpsf, LPITEMIDLIST lpi)
 #endif
 
 	hr = lpsfDeskTop->ParseDisplayName(
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 #if defined(_UNICODE)
 		szBuff,
 #else
@@ -347,7 +347,7 @@ LPITEMIDLIST CShellPidl::GetFullyQualPidl(LPSHELLFOLDER lpsf, LPITEMIDLIST lpi)
 	lpsfDeskTop->Release();
 
 	if (FAILED(hr))
-		return NULL;
+		return nullptr;
 
 	return lpifq;
 }
@@ -401,7 +401,7 @@ BOOL CShellPidl::DoTheMenuThing(HWND hwnd, LPSHELLFOLDER lpsfParent,
 			{
 				idCmd=TrackPopupMenu(hMenu, 
 					TPM_LEFTALIGN | TPM_RETURNCMD | TPM_RIGHTBUTTON, 
-					lppt->x, lppt->y, 0, hwnd, NULL);
+					lppt->x, lppt->y, 0, hwnd, nullptr);
 
 				if (idCmd)
 				{
@@ -409,11 +409,11 @@ BOOL CShellPidl::DoTheMenuThing(HWND hwnd, LPSHELLFOLDER lpsfParent,
 					cmi.fMask  = 0;
 					cmi.hwnd   = hwnd;
 					cmi.lpVerb = MAKEINTRESOURCEA(idCmd-1);
-					cmi.lpParameters = NULL;
-					cmi.lpDirectory  = NULL;
+					cmi.lpParameters = nullptr;
+					cmi.lpDirectory  = nullptr;
 					cmi.nShow        = SW_SHOWNORMAL;
 					cmi.dwHotKey     = 0;
-					cmi.hIcon        = NULL;
+					cmi.hIcon        = nullptr;
 					hr=lpcm->InvokeCommand(&cmi);
 					if (!SUCCEEDED(hr))  
 					{
@@ -504,8 +504,8 @@ END_MESSAGE_MAP()
 void CShellTree::PopulateTree() 
 {
 
-    LPSHELLFOLDER lpsf=NULL;
-    LPITEMIDLIST  lpi=NULL;
+    LPSHELLFOLDER lpsf=nullptr;
+    LPITEMIDLIST  lpi=nullptr;
     HRESULT hr;
     TV_SORTCB      tvscb;
    
@@ -518,8 +518,8 @@ void CShellTree::PopulateTree()
        DeleteAllItems();
 
        // Fill in the tree view from the root.
-       FillTreeView(lpsf, NULL, TVI_ROOT);
-       //TunnelFillTree(lpsf, NULL, TVI_ROOT);
+       FillTreeView(lpsf, nullptr, TVI_ROOT);
+       //TunnelFillTree(lpsf, nullptr, TVI_ROOT);
        // Release the folder pointer.
        lpsf->Release();
     }
@@ -551,8 +551,8 @@ void CShellTree::PopulateTree()
 void CShellTree::PopulateTree(int nFolder) 
 {
 
-	LPSHELLFOLDER lpsf=NULL,lpsf2=NULL;
-    LPITEMIDLIST  lpi=NULL;
+	LPSHELLFOLDER lpsf=nullptr,lpsf2=nullptr;
+    LPITEMIDLIST  lpi=nullptr;
     HRESULT hr;
     TV_SORTCB      tvscb;
    
@@ -567,8 +567,8 @@ void CShellTree::PopulateTree(int nFolder)
 		if (!SUCCEEDED(SHGetSpecialFolderLocation( 
 				m_hWnd, nFolder, &lpi))) 
 		{ 
-			lpi=NULL;
-			FillTreeView(lpsf,NULL,TVI_ROOT);
+			lpi=nullptr;
+			FillTreeView(lpsf,nullptr,TVI_ROOT);
 		}
 		else
 		{
@@ -582,7 +582,7 @@ void CShellTree::PopulateTree(int nFolder)
 				lpsf2->Release();
 			}
 			else
-				FillTreeView(lpsf,NULL,TVI_ROOT);
+				FillTreeView(lpsf,nullptr,TVI_ROOT);
 		}
 
 		// Release the folder pointer.
@@ -629,12 +629,12 @@ void CShellTree::FillTreeView(LPSHELLFOLDER lpsf, LPITEMIDLIST  lpifq, HTREEITEM
 {
 	TV_ITEM         tvi;                          // TreeView Item.
 	TV_INSERTSTRUCT tvins;                        // TreeView Insert Struct.
-	HTREEITEM       hPrev = NULL;                 // Previous Item Added.
-	LPSHELLFOLDER   lpsf2=NULL;
-	LPENUMIDLIST    lpe=NULL;
-	LPITEMIDLIST    lpi=NULL, lpiTemp=NULL, lpifqThisItem=NULL;
-	LPTVITEMDATA    lptvid=NULL;
-	LPMALLOC        lpMalloc=NULL;
+	HTREEITEM       hPrev = nullptr;                 // Previous Item Added.
+	LPSHELLFOLDER   lpsf2=nullptr;
+	LPENUMIDLIST    lpe=nullptr;
+	LPITEMIDLIST    lpi=nullptr, lpiTemp=nullptr, lpifqThisItem=nullptr;
+	LPTVITEMDATA    lptvid=nullptr;
+	LPMALLOC        lpMalloc=nullptr;
 	ULONG           ulFetched;
 	UINT            uCount=0;
 	HRESULT         hr;
@@ -827,7 +827,7 @@ void CShellTree::OnFolderExpanding(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPTVITEMDATA   lptvid;  //Long pointer to TreeView item data
 	HRESULT        hr;
-	LPSHELLFOLDER  lpsf2=NULL;
+	LPSHELLFOLDER  lpsf2=nullptr;
 	static char    szBuff[MAX_PATH];
 	TV_SORTCB      tvscb;
 
@@ -874,7 +874,7 @@ void CShellTree::GetContextMenu(NMHDR* pNMHDR, LRESULT* pResult)
 	// TODO: Add your control notification handler code here
 	POINT			pt;
 	LPTVITEMDATA	lptvid;  //Long pointer to TreeView item data
-	LPSHELLFOLDER	lpsf2=NULL;
+	LPSHELLFOLDER	lpsf2=nullptr;
 	static char		szBuff[MAX_PATH];
 	TV_HITTESTINFO	tvhti;
 	TV_ITEM			tvi;
@@ -921,12 +921,12 @@ BOOL CShellTree::OnFolderSelected(NMHDR* pNMHDR, LRESULT* pResult, CString &szFo
 {
 	// TODO: Add your control notification handler code here
 	LPTVITEMDATA	lptvid;  //Long pointer to TreeView item data
-	LPSHELLFOLDER	lpsf2=NULL;
+	LPSHELLFOLDER	lpsf2=nullptr;
 	static TCHAR	szBuff[MAX_PATH + 1] = {};
 	HRESULT			hr;
 	BOOL			bRet=false;
 	TV_SORTCB		tvscb;
-	HTREEITEM		hItem=NULL;
+	HTREEITEM		hItem=nullptr;
 
 	if((hItem = GetSelectedItem()))
 	{
@@ -990,7 +990,7 @@ BOOL CShellTree::OnFolderSelected(NMHDR* pNMHDR, LRESULT* pResult, CString &szFo
 ****************************************************************************/
 void CShellTree::OnDeleteShellItem(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LPTVITEMDATA lptvid=NULL;
+	LPTVITEMDATA lptvid=nullptr;
 	HRESULT hr;
 	LPMALLOC lpMalloc;
 
@@ -1052,9 +1052,9 @@ void CShellTree::EnableImages()
 BOOL CShellTree::GetSelectedFolderPath(CString &szFolderPath)
 {
 	LPTVITEMDATA	lptvid;  //Long pointer to TreeView item data
-	LPSHELLFOLDER	lpsf2=NULL;
+	LPSHELLFOLDER	lpsf2=nullptr;
 	static TCHAR	szBuff[MAX_PATH + 1] = {};
-	HTREEITEM		hItem=NULL;
+	HTREEITEM		hItem=nullptr;
 	HRESULT			hr;
 	BOOL			bRet=false;
 
@@ -1108,7 +1108,7 @@ LPSHELLFOLDER CShellTree::GetParentShellFolder(HTREEITEM folderNode)
 	if(lptvid)
 		return lptvid->lpsfParent;
 	else
-		return NULL;
+		return nullptr;
 }
 
 /****************************************************************************
@@ -1130,7 +1130,7 @@ LPITEMIDLIST CShellTree::GetRelativeIDLIST(HTREEITEM folderNode)
 	if(lptvid)
 		return lptvid->lpifq;
 	else
-		return NULL;
+		return nullptr;
 }
 
 /****************************************************************************
@@ -1152,7 +1152,7 @@ LPITEMIDLIST CShellTree::GetFullyQualifiedID(HTREEITEM folderNode)
 	if(lptvid)
 		return lptvid->lpifq;
 	else
-		return NULL;
+		return nullptr;
 }
 
 /****************************************************************************
@@ -1173,7 +1173,7 @@ bool CShellTree::SearchTree(HTREEITEM treeNode,
 	FindAttribs attr)
 {
 	LPTVITEMDATA	lptvid;  //Long pointer to TreeView item data
-	LPSHELLFOLDER	lpsf2=NULL;
+	LPSHELLFOLDER	lpsf2=nullptr;
 	TCHAR	drive[_MAX_DRIVE + 1] = {};
 	TCHAR	dir[_MAX_DIR + 1] = {};
 	TCHAR	fname[_MAX_FNAME + 1] = {};
@@ -1277,9 +1277,9 @@ void CShellTree::TunnelTree(CString szFindPath)
 				subNode = GetSelectedItem();
 				subNode = GetChildItem(subNode);
 				if (SearchTree(subNode, p, CShellTree::type_folder))
-					p = _tcstok(NULL, delimiter);
+					p = _tcstok(nullptr, delimiter);
 				else
-					p = NULL;
+					p = nullptr;
 			}
 		}
 	}

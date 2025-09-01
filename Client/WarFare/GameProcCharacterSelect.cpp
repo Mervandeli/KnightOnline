@@ -32,10 +32,10 @@ static char THIS_FILE[]=__FILE__;
 
 CGameProcCharacterSelect::CGameProcCharacterSelect()
 {
-	m_pCamera = NULL;
-	for ( int i = 0; i < 8; i++ ) m_pLights[i] = NULL;
-	for ( int i = 0; i < MAX_AVAILABLE_CHARACTER; i++ )	{ m_pChrs[i] = NULL; }
-	m_pActiveBg = NULL;
+	m_pCamera = nullptr;
+	for ( int i = 0; i < 8; i++ ) m_pLights[i] = nullptr;
+	for ( int i = 0; i < MAX_AVAILABLE_CHARACTER; i++ )	{ m_pChrs[i] = nullptr; }
+	m_pActiveBg = nullptr;
 
 	m_eCurPos = POS_CENTER;
 	m_eDestPos = POS_CENTER;
@@ -45,9 +45,9 @@ CGameProcCharacterSelect::CGameProcCharacterSelect()
 	m_bFadeOutRender = false;
 
 	m_bReceivedCharacterSelect = false;
-	m_pUICharacterSelect = NULL;
+	m_pUICharacterSelect = nullptr;
 
-	m_pSnd_Rotate = NULL;
+	m_pSnd_Rotate = nullptr;
 }
 
 CGameProcCharacterSelect::~CGameProcCharacterSelect()
@@ -65,16 +65,16 @@ void CGameProcCharacterSelect::Release()
 {
 	CGameProcedure::Release();
 
-	delete m_pCamera; m_pCamera = NULL;
-	for ( int i = 0; i < 8; i++ ) { delete m_pLights[i]; m_pLights[i] = NULL; }
+	delete m_pCamera; m_pCamera = nullptr;
+	for ( int i = 0; i < 8; i++ ) { delete m_pLights[i]; m_pLights[i] = nullptr; }
 	for ( int i = 0; i < MAX_AVAILABLE_CHARACTER; i++ )
 	{
-		delete m_pChrs[i]; m_pChrs[i] = NULL;
+		delete m_pChrs[i]; m_pChrs[i] = nullptr;
 		m_InfoChrs[i].clear();
 	}
 
-	delete m_pActiveBg; m_pActiveBg = NULL;
-	delete m_pUICharacterSelect; m_pUICharacterSelect = NULL;
+	delete m_pActiveBg; m_pActiveBg = nullptr;
+	delete m_pUICharacterSelect; m_pUICharacterSelect = nullptr;
 	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Rotate);
 	
 	::ShowCursor(TRUE);
@@ -83,10 +83,10 @@ void CGameProcCharacterSelect::Release()
 void CGameProcCharacterSelect::Init()
 {
 //..
-	m_pCamera = NULL;
-	for ( int i = 0; i < 8; i++ ) m_pLights[i] = NULL;
-	for ( int i = 0; i < MAX_AVAILABLE_CHARACTER; i++ )	{ m_pChrs[i] = NULL; }
-	m_pActiveBg = NULL;
+	m_pCamera = nullptr;
+	for ( int i = 0; i < 8; i++ ) m_pLights[i] = nullptr;
+	for ( int i = 0; i < MAX_AVAILABLE_CHARACTER; i++ )	{ m_pChrs[i] = nullptr; }
+	m_pActiveBg = nullptr;
 
 	m_eCurPos = POS_CENTER;
 	m_eDestPos = POS_CENTER;
@@ -96,9 +96,9 @@ void CGameProcCharacterSelect::Init()
 	m_bFadeOutRender = false;
 
 	m_bReceivedCharacterSelect = false;
-	m_pUICharacterSelect = NULL;
+	m_pUICharacterSelect = nullptr;
 
-	m_pSnd_Rotate = NULL;
+	m_pSnd_Rotate = nullptr;
 //..
 
 	CGameProcedure::Init();
@@ -110,7 +110,7 @@ void CGameProcCharacterSelect::Init()
 
 	m_pCamera = new CN3Camera();
 	for ( int i = 0; i < 8; i++ ) m_pLights[i] = new CN3Light();
-	for ( int i = 0; i < MAX_AVAILABLE_CHARACTER; i++ )	m_pChrs[i] = NULL;
+	for ( int i = 0; i < MAX_AVAILABLE_CHARACTER; i++ )	m_pChrs[i] = nullptr;
 
 	m_eCurPos = POS_CENTER;
 	m_eDestPos = POS_CENTER;
@@ -345,7 +345,7 @@ void CGameProcCharacterSelect::AddChr(e_ChrPos eCP, __CharacterSelectInfo* pInfo
 			break;
 	}
 
-	if(NULL == m_pChrs[iPosIndex])
+	if(nullptr == m_pChrs[iPosIndex])
 		m_pChrs[iPosIndex] = new CN3Chr();
 	else
 		m_pChrs[iPosIndex]->Release();
@@ -598,21 +598,21 @@ void CGameProcCharacterSelect::AddChrPart(	int iPosIndex,
 											uint32_t dwItemID,
 											int iItemDurability)
 {
-	if(NULL == m_pChrs[iPosIndex] || NULL == pLooks)
+	if(nullptr == m_pChrs[iPosIndex] || nullptr == pLooks)
 	{
 		__ASSERT(0, "Invalid Chr Part");
 		return;
 	}
 
 	__TABLE_ITEM_BASIC* pItem = s_pTbl_Items_Basic.Find(dwItemID/1000*1000);
-	if(dwItemID && NULL == pItem)
+	if(dwItemID && nullptr == pItem)
 	{
 		__ASSERT(0, "NULL Item!!!");
 		return;
 	}
 
 	std::string szResrcFN;
-	CN3CPart* pPart = NULL;
+	CN3CPart* pPart = nullptr;
 	e_PartPosition ePartPosTmp = PART_POS_UNKNOWN;
 	e_PlugPosition ePlugPosTmp = PLUG_POS_UNKNOWN;
 	
@@ -640,15 +640,15 @@ void CGameProcCharacterSelect::MsgRecv_DeleteChr(Packet& pkt)
 	
 	if ( byResult == 0x01 )
 	{
-		if ( m_pChrs[byIndex] != NULL )
+		if ( m_pChrs[byIndex] != nullptr )
 		{
 			m_pChrs[byIndex]->Release();
 			delete m_pChrs[byIndex];
-			m_pChrs[byIndex] = NULL;
+			m_pChrs[byIndex] = nullptr;
 			m_InfoChrs[byIndex].clear();
 		}
 
-		if ( (m_pChrs[0] == NULL) && (m_pChrs[1] == NULL) && (m_pChrs[2] == NULL) )
+		if ( (m_pChrs[0] == nullptr) && (m_pChrs[1] == nullptr) && (m_pChrs[2] == nullptr) )
 			CGameProcedure::ProcActiveSet((CGameProcedure*)s_pProcNationSelect); // 국가 선택으로 간다..
 	}
 }
@@ -1171,7 +1171,7 @@ void CGameProcCharacterSelect::FadeOutRender()
 	CN3Base::s_lpD3DDev->SetRenderState( D3DRS_SRCBLEND,				D3DBLEND_SRCALPHA );
 	CN3Base::s_lpD3DDev->SetRenderState( D3DRS_DESTBLEND,				D3DBLEND_INVSRCALPHA );
 
-	CN3Base::s_lpD3DDev->SetTexture(0, NULL);
+	CN3Base::s_lpD3DDev->SetTexture(0, nullptr);
 
 	CN3Base::s_lpD3DDev->SetFVF(FVF_TRANSFORMEDCOLOR);
 	CN3Base::s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, pVertices, sizeof(__VertexTransformedColor));
@@ -1404,7 +1404,7 @@ void CGameProcCharacterSelect::CharacterSelectOrCreate()
 	CGameProcedure::MessageBoxClose(-1);
 
 	int iIndex = CGameProcedure::s_iChrSelectIndex;
-	if(NULL == m_pChrs[iIndex]) // 캐릭터가 없으면..
+	if(nullptr == m_pChrs[iIndex]) // 캐릭터가 없으면..
 	{
 		CGameProcedure::ProcActiveSet((CGameProcedure*)s_pProcCharacterCreate); // 캐릭터 생성 프로시저를 호출한다..
 	}

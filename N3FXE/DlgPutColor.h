@@ -16,7 +16,7 @@ class CDlgPutColor : public CDialog
 {
 // Construction
 public:
-	CDlgPutColor(CWnd* pParent = NULL);   // standard constructor
+	CDlgPutColor(CWnd* pParent = nullptr);   // standard constructor
 
 	DWORD	m_Color[NUM_KEY_COLOR];
 	DWORD	m_Opacity[NUM_KEY_COLOR];

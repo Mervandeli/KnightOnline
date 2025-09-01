@@ -427,7 +427,7 @@ void CN3AlphaPrimitiveManager::Render()
 __AlphaPrimitive* CN3AlphaPrimitiveManager::Add()
 {
 //	__ASSERT(m_nToDrawCount < MAX_ALPHAPRIMITIVE_BUFFER, "Alpha Primitive Manager : Overflow Buffer.");
-	if(m_nToDrawCount >= MAX_ALPHAPRIMITIVE_BUFFER) return NULL;
+	if(m_nToDrawCount >= MAX_ALPHAPRIMITIVE_BUFFER) return nullptr;
 	m_nToDrawCount++;
 	return &(m_Buffers[m_nToDrawCount-1]);
 }

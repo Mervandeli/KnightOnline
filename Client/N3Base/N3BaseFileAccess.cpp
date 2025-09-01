@@ -57,11 +57,11 @@ bool CN3BaseFileAccess::Load(HANDLE hFile)
 
 	DWORD dwRWC = 0;
 	int nL = 0;
-	ReadFile(hFile, &nL, 4, &dwRWC, NULL);
+	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 	if(nL > 0) 
 	{
-		std::vector<char> buffer(nL+1, NULL);
-		ReadFile(hFile, &buffer[0], nL, &dwRWC, NULL);
+		std::vector<char> buffer(nL+1, '\0');
+		ReadFile(hFile, &buffer[0], nL, &dwRWC, nullptr);
 		m_szName = &buffer[0];
 	}
 
@@ -85,12 +85,14 @@ bool CN3BaseFileAccess::LoadFromFile()
 	}
 	else
 	{
-		if(NULL != s_szPath.size() > 0) szFullPath = s_szPath;
+		if (!s_szPath.empty())
+			szFullPath = s_szPath;
+
 		szFullPath += m_szFileName;
 	}
 
 	DWORD dwRWC = 0;
-	HANDLE hFile = ::CreateFile(szFullPath.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = ::CreateFile(szFullPath.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	if(INVALID_HANDLE_VALUE == hFile)
 	{
@@ -139,7 +141,7 @@ bool CN3BaseFileAccess::SaveToFile()
 	}
 
 	DWORD dwRWC = 0;
-	HANDLE hFile = ::CreateFile(szFullPath.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = ::CreateFile(szFullPath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	if(hFile == INVALID_HANDLE_VALUE)
 	{
@@ -165,8 +167,8 @@ bool CN3BaseFileAccess::Save(HANDLE hFile)
 	DWORD dwRWC = 0;
 
 	int nL = m_szName.size();
-	WriteFile(hFile, &nL, 4, &dwRWC, NULL);
-	if(nL > 0) WriteFile(hFile, m_szName.c_str(), nL, &dwRWC, NULL);
+	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+	if(nL > 0) WriteFile(hFile, m_szName.c_str(), nL, &dwRWC, nullptr);
 
 	return true;
 }

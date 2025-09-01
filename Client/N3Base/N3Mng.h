@@ -34,7 +34,7 @@ public:
 
 	int Add(T* pData)
 	{
-		if(NULL == pData)
+		if(nullptr == pData)
 		{ 
 #ifdef _N3GAME
 			CLogWriter::Write("CN3Mng::Add - Null object pointer");
@@ -92,11 +92,11 @@ public:
 
 	T* 	Get(const std::string& szFN, bool bIncreaseRefCount = TRUE, int iLOD = 0)
 	{
-		if(szFN.empty()) return NULL;
+		if(szFN.empty()) return nullptr;
 		std::string szFN2 = szFN;
 		CharLower(&(szFN2[0]));
 
-		T* pData = NULL;
+		T* pData = nullptr;
 		it_Data it = m_Datas.find(szFN2);
 		if(it == m_Datas.end()) // 못 찾았다..
 		{
@@ -106,7 +106,7 @@ public:
 			if(false == pData->LoadFromFile(szFN2)) // 파일 읽기에 실패했다!!
 			{
 				delete pData;
-				pData = NULL;
+				pData = nullptr;
 			}
 			else 
 			{
@@ -128,7 +128,7 @@ public:
 					}
 
 					delete pBakData;	//	이번에 읽은 데이타는 필요가 없으므로 지움
-					pBakData = NULL;
+					pBakData = nullptr;
 				}
 				//	asm
 			}
@@ -163,7 +163,7 @@ public:
 #ifndef _N3GAME
 		bReleaseOrg = true; // 툴에서는 무조건 
 #endif
-		if(NULL == ppData || NULL == *ppData) return;
+		if(nullptr == ppData || nullptr == *ppData) return;
 
 		it_Data it = m_Datas.find((*ppData)->FileName());
 		if(it == m_Datas.end()) return; // 못 찾았다..
@@ -180,7 +180,7 @@ public:
 					m_Refs.erase(it2);
 				}
 			}
-			*ppData = NULL;
+			*ppData = nullptr;
 		}
 	}
 

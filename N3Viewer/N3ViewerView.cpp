@@ -95,7 +95,7 @@ void CN3ViewerView::OnDraw(CDC* pDC)
 	ASSERT_VALID(pDoc);
 
 	CN3Camera* pCamera = pDoc->m_Scene.CameraGetActive();
-	if(NULL == pCamera) return;
+	if(nullptr == pCamera) return;
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	
@@ -167,7 +167,7 @@ void CN3ViewerView::OnDraw(CDC* pDC)
 			nPart = pFrm->m_DlgPMeshEdit.m_CBPart.GetCurSel();
 			nPC = pShape->PartCount();
 
-			CN3SPart* pPD = NULL;
+			CN3SPart* pPD = nullptr;
 			for(int i = 0; i < nPC; i++)
 			{
 				pPD = pShape->Part(i);
@@ -274,7 +274,7 @@ void CN3ViewerView::OnLButtonDown(UINT nFlags, CPoint point)
 			pFrm->GetViewProperty()->m_CBShapePart.SetCurSel(nPart); // 파트 선택..
 		}
 		pFrm->GetViewProperty()->UpdateInfo();
-		this->InvalidateRect(NULL, FALSE);
+		this->InvalidateRect(nullptr, FALSE);
 	}
 	
 	CView::OnLButtonDown(nFlags, point);
@@ -351,7 +351,7 @@ int CN3ViewerView::SortByCameraDistance(const void *pArg1, const void *pArg2)
 
 void CN3ViewerView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint) 
 {
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CN3ViewerView::OnInitialUpdate() 
@@ -372,7 +372,7 @@ void CN3ViewerView::OnSize(UINT nType, int cx, int cy)
 		static bool bInitMainWnd = false;
 		if(bInitMainWnd && pFrm->m_Eng.Reset(TRUE, cx, cy, 0))
 		{
-			this->InvalidateRect(NULL, FALSE);
+			this->InvalidateRect(nullptr, FALSE);
 		}
 		bInitMainWnd = true;
 		CString strText;
@@ -384,7 +384,7 @@ void CN3ViewerView::OnSize(UINT nType, int cx, int cy)
 void CN3ViewerView::OnViewAxis() 
 {
 	m_bViewAxis = !m_bViewAxis;
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CN3ViewerView::OnUpdateViewAxis(CCmdUI* pCmdUI) 
@@ -395,7 +395,7 @@ void CN3ViewerView::OnUpdateViewAxis(CCmdUI* pCmdUI)
 void CN3ViewerView::OnViewGrid() 
 {
 	m_bViewGrid = !m_bViewGrid;
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CN3ViewerView::OnUpdateViewGrid(CCmdUI* pCmdUI) 
@@ -406,7 +406,7 @@ void CN3ViewerView::OnUpdateViewGrid(CCmdUI* pCmdUI)
 void CN3ViewerView::OnViewObjectAxis() 
 {
 	m_bViewObjectAxis = !m_bViewObjectAxis;
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CN3ViewerView::OnUpdateViewObjectAxis(CCmdUI* pCmdUI) 
@@ -417,7 +417,7 @@ void CN3ViewerView::OnUpdateViewObjectAxis(CCmdUI* pCmdUI)
 void CN3ViewerView::OnViewSolid() 
 {
 	m_bViewWireFrame = false;
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CN3ViewerView::OnUpdateViewSolid(CCmdUI* pCmdUI) 
@@ -428,7 +428,7 @@ void CN3ViewerView::OnUpdateViewSolid(CCmdUI* pCmdUI)
 void CN3ViewerView::OnViewWireframe() 
 {
 	m_bViewWireFrame = true;
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CN3ViewerView::OnUpdateViewWireframe(CCmdUI* pCmdUI) 
@@ -439,7 +439,7 @@ void CN3ViewerView::OnUpdateViewWireframe(CCmdUI* pCmdUI)
 void CN3ViewerView::OnViewCollisionMesh() 
 {
 	m_bViewCollisionMesh = !m_bViewCollisionMesh;
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CN3ViewerView::OnUpdateViewCollisionMesh(CCmdUI* pCmdUI) 
@@ -450,7 +450,7 @@ void CN3ViewerView::OnUpdateViewCollisionMesh(CCmdUI* pCmdUI)
 void CN3ViewerView::OnViewClimbMesh() 
 {
 	m_bViewClimbMesh = !m_bViewClimbMesh;
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CN3ViewerView::OnUpdateViewClimbMesh(CCmdUI* pCmdUI) 
@@ -462,7 +462,7 @@ void CN3ViewerView::SetFocusToSelectedObject()
 {
 	CN3ViewerDoc* pDoc = GetDocument();
 	CN3Camera* pCamera = pDoc->m_Scene.CameraGetActive();
-	if(NULL == pCamera) return;
+	if(nullptr == pCamera) return;
 
 	CN3Base* pBase = pDoc->m_pSelectedObj;
 	if(pBase && (pBase->Type() & OBJ_TRANSFORM))
@@ -501,7 +501,7 @@ void CN3ViewerView::SetFocusToSelectedObject()
 		pCamera->Tick();
 		pCamera->Apply();
 		
-		this->InvalidateRect(NULL, FALSE);
+		this->InvalidateRect(nullptr, FALSE);
 	}
 }
 
@@ -528,7 +528,7 @@ LRESULT CN3ViewerView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 void CN3ViewerView::OnViewWireframeSelectedMesh() 
 {
 	m_bViewSelectedMeshWireFrame = !m_bViewSelectedMeshWireFrame;
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CN3ViewerView::OnUpdateViewWireframeSelectedMesh(CCmdUI* pCmdUI) 
@@ -556,5 +556,5 @@ void CN3ViewerView::OnSetBackgroundColor()
 	DWORD dwColor = dlg.GetColor();
 	m_crBkg = D3DCOLOR_ARGB(0xff, (dwColor & 0x000000ff), (dwColor & 0x0000ff00) >> 8, (dwColor & 0x00ff0000) >> 16);
 
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }

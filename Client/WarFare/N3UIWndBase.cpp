@@ -25,34 +25,33 @@ static char THIS_FILE[]=__FILE__;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-__InfoSelectedIcon		CN3UIWndBase::m_sSelectedIconInfo;
-__RecoveryJobInfo		CN3UIWndBase::m_sRecoveryJobInfo;
-__SkillSelectInfo		CN3UIWndBase::m_sSkillSelectInfo;
+__InfoSelectedIcon		CN3UIWndBase::s_sSelectedIconInfo;
+__RecoveryJobInfo		CN3UIWndBase::s_sRecoveryJobInfo;
+__SkillSelectInfo		CN3UIWndBase::s_sSkillSelectInfo;
 
-CN3UIImage* CN3UIWndBase::m_pSelectionImage = NULL;
-CCountableItemEditDlg*	CN3UIWndBase::m_pCountableItemEdit = NULL;
+CN3UIImage* CN3UIWndBase::s_pSelectionImage = nullptr;
+CCountableItemEditDlg*	CN3UIWndBase::s_pCountableItemEdit = nullptr;
 
-CN3SndObj* CN3UIWndBase::s_pSnd_Item_Etc = NULL;
-CN3SndObj* CN3UIWndBase::s_pSnd_Item_Weapon = NULL;
-CN3SndObj* CN3UIWndBase::s_pSnd_Item_Armor = NULL;
-CN3SndObj* CN3UIWndBase::s_pSnd_Gold = NULL;
-CN3SndObj* CN3UIWndBase::s_pSnd_Repair = NULL;
+CN3SndObj* CN3UIWndBase::s_pSnd_Item_Etc = nullptr;
+CN3SndObj* CN3UIWndBase::s_pSnd_Item_Weapon = nullptr;
+CN3SndObj* CN3UIWndBase::s_pSnd_Item_Armor = nullptr;
+CN3SndObj* CN3UIWndBase::s_pSnd_Gold = nullptr;
+CN3SndObj* CN3UIWndBase::s_pSnd_Repair = nullptr;
 int CN3UIWndBase::s_iRefCount = 0;
 
 CN3UIWndBase::CN3UIWndBase()
 {
-	m_pSelectionImage = NULL;
-	m_pSelectionImage = new CN3UIImage;
-	m_pSelectionImage->Init(CGameProcedure::s_pUIMgr);
-	m_pSelectionImage->SetUVRect(0.0f, 0.0f, 1.0f, 1.0f);
+	s_pSelectionImage = new CN3UIImage();
+	s_pSelectionImage->Init(CGameProcedure::s_pUIMgr);
+	s_pSelectionImage->SetUVRect(0.0f, 0.0f, 1.0f, 1.0f);
 
 	if(s_iRefCount == 0)
 	{
-		s_pSnd_Item_Etc		= CN3Base::s_SndMgr.CreateObj(ID_SOUND_ITEM_ETC_IN_INVENTORY);
-		s_pSnd_Item_Weapon	= CN3Base::s_SndMgr.CreateObj(ID_SOUND_ITEM_WEAPON_IN_INVENTORY);
-		s_pSnd_Item_Armor	= CN3Base::s_SndMgr.CreateObj(ID_SOUND_ITEM_ARMOR_IN_INVENTORY);
-		s_pSnd_Gold		= CN3Base::s_SndMgr.CreateObj(ID_SOUND_GOLD_IN_INVENTORY);	
-		s_pSnd_Repair	= CN3Base::s_SndMgr.CreateObj(ID_SOUND_ITEM_IN_REPAIR);	
+		s_pSnd_Item_Etc		= s_SndMgr.CreateObj(ID_SOUND_ITEM_ETC_IN_INVENTORY);
+		s_pSnd_Item_Weapon	= s_SndMgr.CreateObj(ID_SOUND_ITEM_WEAPON_IN_INVENTORY);
+		s_pSnd_Item_Armor	= s_SndMgr.CreateObj(ID_SOUND_ITEM_ARMOR_IN_INVENTORY);
+		s_pSnd_Gold			= s_SndMgr.CreateObj(ID_SOUND_GOLD_IN_INVENTORY);	
+		s_pSnd_Repair		= s_SndMgr.CreateObj(ID_SOUND_ITEM_IN_REPAIR);	
 	}
 	s_iRefCount++; // 참조 카운트
 }

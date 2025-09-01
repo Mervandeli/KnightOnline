@@ -36,9 +36,6 @@
     <ClCompile Include="BirdMng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Catapult.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CountableItemEditDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -79,12 +76,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LocalInput.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MachineBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MachineMng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MagicSkillMng.cpp">
@@ -162,9 +153,6 @@
     <ClCompile Include="UIInventory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UIItemExchange.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UIKnightsOperation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -193,9 +181,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UINPCEvent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UINpcTalk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UIPartyBBS.cpp">
@@ -241,9 +226,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UITradeExplanation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UITradeList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UITradeSellBBS.cpp">
@@ -380,9 +362,6 @@
     <ClInclude Include="Bitset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Catapult.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CountableItemEditDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -420,12 +399,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LocalInput.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MachineBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MachineMng.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MagicSkillMng.h">
@@ -548,9 +521,6 @@
     <ClInclude Include="UIInventory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UIItemExchange.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UIKnightsOperation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -579,9 +549,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UINPCEvent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UINpcTalk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UIPartyBBS.h">
@@ -627,9 +594,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UITradeExplanation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UITradeList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UITradeSellBBS.h">

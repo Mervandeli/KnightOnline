@@ -25,8 +25,8 @@ CN3FXPartBottomBoard::CN3FXPartBottomBoard()
 
 	m_bTexLoop = false;
 
-	m_pVB = NULL;
-	m_vUnit = NULL;
+	m_pVB = nullptr;
+	m_vUnit = nullptr;
 
 	m_fScaleVelX = 0.0f;
 	m_fScaleVelZ = 0.0f;
@@ -42,13 +42,13 @@ CN3FXPartBottomBoard::~CN3FXPartBottomBoard()
 	if(m_pVB)
 	{
 		delete[] m_pVB;
-		m_pVB = NULL;
+		m_pVB = nullptr;
 	}
 
 	if(m_vUnit)
 	{
 		delete[] m_vUnit;
-		m_vUnit = NULL;
+		m_vUnit = nullptr;
 	}
 }
 
@@ -116,7 +116,7 @@ void CN3FXPartBottomBoard::CreateVB()
 	if(m_vUnit)
 	{
 		delete[] m_vUnit;
-		m_vUnit = NULL;
+		m_vUnit = nullptr;
 	}
 	m_vUnit = new __Vector3[NUM_VERTEX_BOTTOM];
 
@@ -134,7 +134,7 @@ void CN3FXPartBottomBoard::CreateVB()
 	if(m_pVB)
 	{
 		delete[] m_pVB;
-		m_pVB = NULL;
+		m_pVB = nullptr;
 	}
 	m_pVB = new	__VertexXyzColorT1[NUM_VERTEX_BOTTOM];
 	
@@ -235,16 +235,16 @@ bool CN3FXPartBottomBoard::Save(HANDLE hFile)
 
 	DWORD dwRWC = 0;
 
-	WriteFile(hFile, &m_fSizeX, sizeof(float), &dwRWC, NULL);
-	WriteFile(hFile, &m_fSizeZ, sizeof(float), &dwRWC, NULL);
+	WriteFile(hFile, &m_fSizeX, sizeof(float), &dwRWC, nullptr);
+	WriteFile(hFile, &m_fSizeZ, sizeof(float), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_fScaleVelX, sizeof(float), &dwRWC, NULL);
-	WriteFile(hFile, &m_fScaleVelZ, sizeof(float), &dwRWC, NULL);
+	WriteFile(hFile, &m_fScaleVelX, sizeof(float), &dwRWC, nullptr);
+	WriteFile(hFile, &m_fScaleVelZ, sizeof(float), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_bTexLoop, sizeof(bool), &dwRWC, NULL);	
+	WriteFile(hFile, &m_bTexLoop, sizeof(bool), &dwRWC, nullptr);	
 	
 	//version 1....
-	WriteFile(hFile, &m_fGap, sizeof(float), &dwRWC, NULL);	
+	WriteFile(hFile, &m_fGap, sizeof(float), &dwRWC, nullptr);	
 	return true;
 }
 
@@ -388,7 +388,7 @@ void CN3FXPartBottomBoard::Render()
 			pAP->fCameraDistance	= (m_pVB[0] - s_CameraData.vEye).Magnitude();
 			
 			if(m_ppRefTex[m_iTexIdx]) pAP->lpTex = m_ppRefTex[m_iTexIdx]->Get();
-			else pAP->lpTex = NULL;
+			else pAP->lpTex = nullptr;
 
 			__Matrix44 mtxWorld;
 			mtxWorld.Identity();
@@ -398,7 +398,7 @@ void CN3FXPartBottomBoard::Render()
 			pAP->nPrimitiveCount	= 8;
 			pAP->nVertexCount		= NUM_VERTEX_BOTTOM;
 			pAP->pVertices			= &(m_pVB[0]);
-			pAP->pwIndices			= NULL;
+			pAP->pwIndices			= nullptr;
 		}
 
 		return; // 렌더링 안하지롱.
@@ -409,7 +409,7 @@ void CN3FXPartBottomBoard::Render()
 
 		if(m_ppRefTex[m_iTexIdx]) 
 			CN3Base::s_lpD3DDev->SetTexture(0, m_ppRefTex[m_iTexIdx]->Get());
-		else CN3Base::s_lpD3DDev->SetTexture(0, NULL);
+		else CN3Base::s_lpD3DDev->SetTexture(0, nullptr);
 
 		s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
 		s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );		

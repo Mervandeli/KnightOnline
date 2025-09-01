@@ -25,9 +25,9 @@ static char THIS_FILE[]=__FILE__;
 
 CUITradeBBSSelector::CUITradeBBSSelector()
 {
-	m_pBtn_BBSSell		= NULL;
-	m_pBtn_BBSBuy		= NULL;
-	m_pBtn_BBSCancel	= NULL;
+	m_pBtn_BBSSell		= nullptr;
+	m_pBtn_BBSBuy		= nullptr;
+	m_pBtn_BBSCancel	= nullptr;
 }
 
 CUITradeBBSSelector::~CUITradeBBSSelector()
@@ -64,9 +64,9 @@ bool CUITradeBBSSelector::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-	m_pBtn_BBSSell	= (CN3UIButton*)GetChildByID("btn_sell");		__ASSERT(m_pBtn_BBSSell,	"NULL UI Component!!");
-	m_pBtn_BBSBuy	= (CN3UIButton*)GetChildByID("btn_buy");		__ASSERT(m_pBtn_BBSBuy,	"NULL UI Component!!");
-	m_pBtn_BBSCancel = (CN3UIButton*)GetChildByID("btn_cancel");	__ASSERT(m_pBtn_BBSCancel,	"NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_BBSSell, GetChildByID<CN3UIButton>("btn_sell"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_BBSBuy, GetChildByID<CN3UIButton>("btn_buy"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_BBSCancel, GetChildByID<CN3UIButton>("btn_cancel"));
 
 	return true;
 }

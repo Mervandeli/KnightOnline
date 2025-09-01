@@ -51,11 +51,11 @@ private:
 	bool CheckCollisionCameraWithTerrain(__Vector3& vEyeResult, const __Vector3& vAt, float fNP);
 	bool CheckCollisionCameraWithShape(__Vector3& vEyeResult, const __Vector3& vAt, float fNP);
 	float GetHeightWithTerrain(float x, float z, bool bWarp = false );
-	float GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal = NULL); 
+	float GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal = nullptr); 
 	bool IsInTerrainWithTerrain(float x, float z, __Vector3 vPosBefore = __Vector3());
-	float GetHeightWithShape(float fX, float fZ, __Vector3* pvNormal = NULL); 
+	float GetHeightWithShape(float fX, float fZ, __Vector3* pvNormal = nullptr); 
 	BOOL PickWideWithTerrain(int x, int y, __Vector3& vPick);
-	CN3Shape* PickWithShape(int iXScreen, int iYScreen, bool bMustHaveEvent, __Vector3* pvPick = NULL);
+	CN3Shape* PickWithShape(int iXScreen, int iYScreen, bool bMustHaveEvent, __Vector3* pvPick = nullptr);
 	CN3Shape* ShapeGetByIDWithShape(int iID);
 	bool CheckCollisionWithShape(	const __Vector3& vPos,				 // 충돌 위치
 														const __Vector3& vDir,				   // 방향 벡터

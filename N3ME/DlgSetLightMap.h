@@ -25,7 +25,7 @@ public:
 	DWORD GetColor();
 	int GetPenSize();
 	float	GetAlpha();
-	CDlgSetLightMap(CWnd* pParent = NULL);   // standard constructor
+	CDlgSetLightMap(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgSetLightMap)

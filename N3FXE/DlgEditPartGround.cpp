@@ -19,7 +19,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgEditPartGround dialog
 
 
-CDlgEditPartGround::CDlgEditPartGround(CWnd* pParent /*=NULL*/)
+CDlgEditPartGround::CDlgEditPartGround(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgEditPartGround::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgEditPartGround)
@@ -254,7 +254,7 @@ void CDlgEditPartGround::OnPartGroundBtnSave()
 void CDlgEditPartGround::OnPartGroundBtnLoadTex() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, NULL, NULL, dwFlags, "TGA (*.tga),BMP (*.bmp), DXT (*.dxt) |*.tga;*.bmp;*.dxt||", NULL);
+	CFileDialog dlg(TRUE, nullptr, nullptr, dwFlags, "TGA (*.tga),BMP (*.bmp), DXT (*.dxt) |*.tga;*.bmp;*.dxt||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	
 	CString PathName = dlg.GetPathName();

@@ -16,7 +16,7 @@ class CDlgLight : public CDialog
 {
 // Construction
 public:
-	CDlgLight(CWnd* pParent = NULL);   // standard constructor
+	CDlgLight(CWnd* pParent = nullptr);   // standard constructor
 
 	CLightObjMgr*	m_pRefLightObjMgr;
 	LPLIGHTOBJ		m_pSelLO;

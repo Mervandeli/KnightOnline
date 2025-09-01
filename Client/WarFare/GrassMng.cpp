@@ -73,7 +73,7 @@ void CGrassMng::Tick(CGameProcedure* pProc)
 		}
 
 /*
-	CGrassBoard*   pGrass = NULL; 
+	CGrassBoard*   pGrass = nullptr; 
 	__Vector3	  vPivot;		
 
 	uint8_t GrassIndex=0;
@@ -325,7 +325,7 @@ void CGrassMng::ChkThisZoneUseGrass(int nGrassUseOrder)
 	}
 	else if(nGrassUseOrder==GRASS_MAKEUSE)
 	{
-		CGrassBoard*   pGrass = NULL; 
+		CGrassBoard*   pGrass = nullptr; 
 		it_GrassBoard it = m_Grasses.begin();
 		int iSize = m_Grasses.size();
 		int nGrassCount=0,i;
@@ -375,7 +375,7 @@ bool CGrassMng::ChangeZone()
 #ifdef _DEBUG
 		m_strFileName[i][0] = '\0';
 #endif
-		m_txTexture[i] = NULL;
+		m_txTexture[i] = nullptr;
 	}
 
 

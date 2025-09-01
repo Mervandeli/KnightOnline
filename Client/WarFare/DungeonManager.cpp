@@ -31,7 +31,7 @@ CDungeonManager::~CDungeonManager()
 void CDungeonManager::InitWorld(int iZoneID, const __Vector3& vPosPlayer)
 {
 	__TABLE_ZONE* pZone = s_pTbl_Zones.Find(s_pPlayer->m_InfoExt.iZoneCur);
-	if(NULL == pZone) { CLogWriter::Write("Null Zone data : {}", iZoneID); return; }
+	if(nullptr == pZone) { CLogWriter::Write("Null Zone data : {}", iZoneID); return; }
 		
 	m_pvsmgr.LoadFromFile(pZone->szTerrainFN);
 }
@@ -52,12 +52,12 @@ void CDungeonManager::RenderShape()
 
 CN3Terrain* CDungeonManager::GetTerrainRef()
 {
-	return NULL;
+	return nullptr;
 }
 
 CN3SkyMng* CDungeonManager::GetSkyRef()
 {
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////

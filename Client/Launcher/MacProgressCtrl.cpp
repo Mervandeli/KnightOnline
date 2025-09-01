@@ -584,7 +584,7 @@ void CMacProgressCtrl::SetIndeterminate(BOOL bIndeterminate)
 		m_nIndOffset = 0;
 
 		RedrawWindow();
-		SetTimer(IDT_INDETERMINATE, 25, NULL);
+		SetTimer(IDT_INDETERMINATE, 25, nullptr);
 	}
 	else
 	{
@@ -629,6 +629,6 @@ void CMacProgressCtrl::OnTimer(UINT nIDEvent)
 			m_nIndOffset = 0;
 		RedrawWindow();
 
-		SetTimer(IDT_INDETERMINATE, 25, NULL);
+		SetTimer(IDT_INDETERMINATE, 25, nullptr);
 	}
 }	// OnTimer

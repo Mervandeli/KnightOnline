@@ -16,11 +16,11 @@ static char THIS_FILE[] = __FILE__;
 // CDlgRegenUser dialog
 
 
-CDlgRegenUser::CDlgRegenUser(CWnd* pParent /*=NULL*/)
+CDlgRegenUser::CDlgRegenUser(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgRegenUser::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgRegenUser)
-	m_pRefRegenUser = NULL;
+	m_pRefRegenUser = nullptr;
 	m_PathName = _T("");
 	//}}AFX_DATA_INIT
 }
@@ -53,7 +53,7 @@ END_MESSAGE_MAP()
 void CDlgRegenUser::OnBtnLoadPathset() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "trur", NULL, dwFlags, "trur파일(*.trur)|*.trur||", NULL);
+	CFileDialog dlg(TRUE, "trur", nullptr, dwFlags, "trur파일(*.trur)|*.trur||", nullptr);
 
 	if(dlg.DoModal() == IDCANCEL) return;
 
@@ -68,7 +68,7 @@ void CDlgRegenUser::OnBtnPathDelete()
 	int idx = m_LBRegion.GetCurSel();
 	if(idx<0) return;
 
-	m_LBRegion.SetItemDataPtr(idx, NULL);
+	m_LBRegion.SetItemDataPtr(idx, nullptr);
 	m_LBRegion.DeleteString(idx);
 	m_pRefRegenUser->DeleteSel();
 }

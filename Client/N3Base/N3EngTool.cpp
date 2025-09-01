@@ -35,17 +35,17 @@ CN3EngTool::CN3EngTool()
 	m_VDir[4].Set(0, 0, 10, 0xff0000ff);
 	m_VDir[5].Set(0, 3, 7, 0xff0000ff);
 	
-	m_pVGrids = NULL;
+	m_pVGrids = nullptr;
 	m_nGridLineCount = 0;
 	
-//	m_lpD3DDevExtra = NULL;
+//	m_lpD3DDevExtra = nullptr;
 }
 
 CN3EngTool::~CN3EngTool()
 {
-	delete [] m_pVGrids; m_pVGrids = NULL;
+	delete [] m_pVGrids; m_pVGrids = nullptr;
 //	if(m_lpD3DDevExtra) m_lpD3DDevExtra->Release();
-//	m_lpD3DDevExtra = NULL;
+//	m_lpD3DDevExtra = nullptr;
 }
 
 // ¿ùµå Ãà ±×¸®±â..
@@ -71,7 +71,7 @@ void CN3EngTool::RenderGrid(const __Matrix44& mtxWorld)
 	}
 
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtxWorld);
-	s_lpD3DDev->SetTexture(0, NULL);
+	s_lpD3DDev->SetTexture(0, nullptr);
 
 	s_lpD3DDev->SetFVF(FVF_CV); //s_lpD3DDev->SetVertexShader(FVF_CV);
 
@@ -117,7 +117,7 @@ void CN3EngTool::RenderAxis(bool bShowDir)
 	}
 
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &stm);
-	s_lpD3DDev->SetTexture(0, NULL);
+	s_lpD3DDev->SetTexture(0, nullptr);
 
 	s_lpD3DDev->SetFVF(FVF_CV); //s_lpD3DDev->SetVertexShader(FVF_CV);
 
@@ -139,10 +139,10 @@ void CN3EngTool::RenderAxis(bool bShowDir)
 //
 void CN3EngTool::RenderTexturePreview(CN3Texture *pTex, HWND hWndDiffuse, RECT* pRCSrc)
 {
-	//if(pTex == NULL) return;
-	if(hWndDiffuse == NULL) return;
+	//if(pTex == nullptr) return;
+	if(hWndDiffuse == nullptr) return;
 	
-	if(pTex == NULL)
+	if(pTex == nullptr)
 	{
 		RECT rcPreview;
 		::GetClientRect(hWndDiffuse, &rcPreview);
@@ -180,7 +180,7 @@ void CN3EngTool::RenderTexturePreview(CN3Texture *pTex, HWND hWndDiffuse, RECT* 
 		m_VPreview[4] = m_VPreview[2];
 		m_VPreview[5].Set((float)rcTex.left, (float)rcTex.bottom, 0.5f, 1.0f, 0xff000000, fU_Left, fV_Bottom);
 
-		s_lpD3DDev->SetTexture(0, NULL);
+		s_lpD3DDev->SetTexture(0, nullptr);
 		DWORD ColorOP;
 		s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLOROP, &ColorOP);
 
@@ -192,11 +192,11 @@ void CN3EngTool::RenderTexturePreview(CN3Texture *pTex, HWND hWndDiffuse, RECT* 
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, ColorOP);
 
 		s_lpD3DDev->EndScene();
-		s_lpD3DDev->Present(&rcPreview, &rcPreview, hWndDiffuse, NULL);
+		s_lpD3DDev->Present(&rcPreview, &rcPreview, hWndDiffuse, nullptr);
 		return;
 	}
 	
-//	if(hWndDiffuse != NULL)
+//	if(hWndDiffuse != nullptr)
 	{
 		// ÅØ½ºÃ³ ÇÁ¸®ºä
 		RECT rcPreview;
@@ -209,7 +209,7 @@ void CN3EngTool::RenderTexturePreview(CN3Texture *pTex, HWND hWndDiffuse, RECT* 
 		D3DRECT rcClear = { rcPreview.left, rcPreview.top, rcPreview.right, rcPreview.bottom };
 		hr = s_lpD3DDev->Clear(1, &rcClear, D3DCLEAR_ZBUFFER | D3DCLEAR_TARGET, D3DCOLOR_ARGB(255,64,64,64), 1.0f, 0);
 
-		if(pTex->Get() != NULL)
+		if(pTex->Get() != nullptr)
 		{
 			RECT rcTex = rcPreview;
 			float fRatioDest = (float)nW / (float)nH;
@@ -281,7 +281,7 @@ void CN3EngTool::RenderTexturePreview(CN3Texture *pTex, HWND hWndDiffuse, RECT* 
 			hr = s_lpD3DDev->EndScene();
 		}
 		
-		hr = s_lpD3DDev->Present(&rcPreview, &rcPreview, hWndDiffuse, NULL);
+		hr = s_lpD3DDev->Present(&rcPreview, &rcPreview, hWndDiffuse, nullptr);
 	}
 }
 

@@ -21,16 +21,16 @@ static char THIS_FILE[] = __FILE__;
 // CDlgSaveDivision dialog
 
 
-CDlgSaveDivision::CDlgSaveDivision(CWnd* pParent /*=NULL*/)
+CDlgSaveDivision::CDlgSaveDivision(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgSaveDivision::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgSaveDivision)
 	m_strTotalSize = _T("");
 	//}}AFX_DATA_INIT
 
-	m_pTerrain = NULL;
-	m_pMapMng = NULL;
-	m_pMiniMap = NULL;
+	m_pTerrain = nullptr;
+	m_pMapMng = nullptr;
+	m_pMiniMap = nullptr;
 
 	m_iTotalSize = 0;
 	m_iDivisionSize = 0;
@@ -87,7 +87,7 @@ BOOL CDlgSaveDivision::OnInitDialog()
 	m_cbDivision.SetCurSel(0);
 
 	CWnd* pView = GetDlgItem(IDC_STATIC_MINIMAP);
-	pView->SetWindowPos(NULL, 0, 0, TEX_VIEW_SIZE, TEX_VIEW_SIZE, SWP_DRAWFRAME|SWP_NOMOVE);
+	pView->SetWindowPos(nullptr, 0, 0, TEX_VIEW_SIZE, TEX_VIEW_SIZE, SWP_DRAWFRAME|SWP_NOMOVE);
 
 	SetTexView();
 

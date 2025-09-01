@@ -51,9 +51,9 @@ bool CN3Transform::Load(HANDLE hFile)
 	CN3BaseFileAccess::Load(hFile);
 
 	DWORD dwRWC = 0;
-	ReadFile(hFile, &m_vPos, sizeof(__Vector3), &dwRWC, NULL); // 위치, 스케일, 회전 벡터. 
-	ReadFile(hFile, &m_qRot, sizeof(__Quaternion), &dwRWC, NULL);
-	ReadFile(hFile, &m_vScale, sizeof(__Vector3), &dwRWC, NULL);
+	ReadFile(hFile, &m_vPos, sizeof(__Vector3), &dwRWC, nullptr); // 위치, 스케일, 회전 벡터. 
+	ReadFile(hFile, &m_qRot, sizeof(__Quaternion), &dwRWC, nullptr);
+	ReadFile(hFile, &m_vScale, sizeof(__Vector3), &dwRWC, nullptr);
 
 	// 에니메이션 키
 	m_KeyPos.Load(hFile);
@@ -83,9 +83,9 @@ bool CN3Transform::Save(HANDLE hFile)
 	CN3BaseFileAccess::Save(hFile);
 
 	DWORD dwRWC = 0;
-	WriteFile(hFile, &m_vPos, sizeof(__Vector3), &dwRWC, NULL); // 위치, 스케일, 회전 벡터. 
-	WriteFile(hFile, &m_qRot, sizeof(__Quaternion), &dwRWC, NULL);
-	WriteFile(hFile, &m_vScale, sizeof(__Vector3), &dwRWC, NULL);
+	WriteFile(hFile, &m_vPos, sizeof(__Vector3), &dwRWC, nullptr); // 위치, 스케일, 회전 벡터. 
+	WriteFile(hFile, &m_qRot, sizeof(__Quaternion), &dwRWC, nullptr);
+	WriteFile(hFile, &m_vScale, sizeof(__Vector3), &dwRWC, nullptr);
 
 	// 에니메이션 키
 	m_KeyPos.Save(hFile);
@@ -186,7 +186,7 @@ void CN3Transform::Render(const __Matrix44* pMtxParent, float fUnitSize)
 void CN3Transform::GenerateSelectBox(__Vector3 &vMin, __Vector3 &vMax)
 {
 	// Bounding Box Vertex Buffer 생성
-	if(m_lpVBBox != NULL) { m_lpVBBox->Release(); m_lpVBBox = NULL; }
+	if(m_lpVBBox != nullptr) { m_lpVBBox->Release(); m_lpVBBox = nullptr; }
 	HRESULT rval = m_lpDevRef->CreateVertexBuffer(54 * sizeof(__VertexColor), 0, FVF_CV, D3DPOOL_MANAGED, &m_lpVBBox);
 	if(rval != D3D_OK)
 	{
@@ -202,7 +202,7 @@ void CN3Transform::GenerateSelectBox(__Vector3 &vMin, __Vector3 &vMax)
 	float fW = (vMax.x - vMin.x)/5, fH = (vMax.y - vMin.y)/5, fL = (vMax.z - vMin.z)/5; // 길이 높이 너비 (x y z)
 
 	__VertexColor* pVC;
-	m_lpVBBox->Lock(0, 0, (uint8_t**)&pVC, NULL);
+	m_lpVBBox->Lock(0, 0, (uint8_t**)&pVC, nullptr);
 	
 	pVC[4] =  pVC[2] =  pVC[0] =  __VertexColor(vMin.x, vMax.y, vMin.z, 0xff7f7f7f);  // 정면 - 아래와 같은 선 리스트를 만든다.
 	pVC[10] = pVC[8] =  pVC[6] =  __VertexColor(vMax.x, vMax.y, vMin.z, 0xff7f7f7f);  //  /          /

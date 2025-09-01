@@ -28,13 +28,13 @@
 CZipAutoBuffer::CZipAutoBuffer()
 {
 	m_iSize = 0;
-	m_pBuffer = NULL;	
+	m_pBuffer = nullptr;	
 }
 
 CZipAutoBuffer::CZipAutoBuffer(DWORD iSize, bool bZeroMemory)
 {
 	m_iSize = 0;
-	m_pBuffer = NULL;
+	m_pBuffer = nullptr;
 	Allocate(iSize, bZeroMemory);
 }
 
@@ -50,7 +50,7 @@ void CZipAutoBuffer::Release()
 	{
 		delete [] m_pBuffer;
 		m_iSize = 0;
-		m_pBuffer = NULL;
+		m_pBuffer = nullptr;
 	}
 }
 
@@ -73,7 +73,7 @@ char* CZipAutoBuffer::Allocate(DWORD iSize, bool bZeroMemory)
 			m_iSize = iSize;
 	}
 	else 
-		m_pBuffer = NULL;
+		m_pBuffer = nullptr;
 
 	return m_pBuffer;
 }
@@ -81,7 +81,7 @@ char* CZipAutoBuffer::Allocate(DWORD iSize, bool bZeroMemory)
 
 CZipAutoBuffer::CZipAutoBuffer(const CZipAutoBuffer& buffer)
 {
-	m_pBuffer = NULL;
+	m_pBuffer = nullptr;
 	m_iSize = 0;
 
 	if (buffer.m_pBuffer)

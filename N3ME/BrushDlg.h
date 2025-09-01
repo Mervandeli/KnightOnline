@@ -14,7 +14,7 @@ class CBrushDlg : public CDialog
 {
 // Construction
 public:
-	CBrushDlg(CWnd* pParent = NULL);   // standard constructor
+	CBrushDlg(CWnd* pParent = nullptr);   // standard constructor
 
 // Attributes
 protected:

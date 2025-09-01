@@ -19,7 +19,7 @@ class CDlgPondProperty : public CDialog
 {
 // Construction
 public:
-	CDlgPondProperty(CPondMng* pPondMng, CWnd* pParent = NULL);   // standard constructor
+	CDlgPondProperty(CPondMng* pPondMng, CWnd* pParent = nullptr);   // standard constructor
 
 // Attributes
 public:

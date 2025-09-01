@@ -16,7 +16,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgEditWarp dialog
 
 
-CDlgEditWarp::CDlgEditWarp(CWnd* pParent /*=NULL*/)
+CDlgEditWarp::CDlgEditWarp(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgEditWarp::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgEditWarp)
@@ -31,7 +31,7 @@ CDlgEditWarp::CDlgEditWarp(CWnd* pParent /*=NULL*/)
 	m_AgreeState = _T("");
 	//}}AFX_DATA_INIT
 
-	m_pRefWarpMgr = NULL;
+	m_pRefWarpMgr = nullptr;
 }
 
 
@@ -191,7 +191,7 @@ void CDlgEditWarp::OnBtnExport()
 void CDlgEditWarp::OnBtnImport() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "wap", NULL, dwFlags, "Warp Info파일(*.wap)|*.wap||", NULL);
+	CFileDialog dlg(TRUE, "wap", nullptr, dwFlags, "Warp Info파일(*.wap)|*.wap||", nullptr);
 
 	if(dlg.DoModal() == IDCANCEL) return;
 

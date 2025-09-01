@@ -39,7 +39,7 @@ protected:
 
 public:
 	void		SetColor(uint32_t dwColor = 0xffffffff);
-	BOOL		IsLOD() { if(NULL == m_pCollapseUpTo) return FALSE; return TRUE; }
+	BOOL		IsLOD() { if(nullptr == m_pCollapseUpTo) return FALSE; return TRUE; }
 	bool		Create(CN3FXPMesh* pN3FXPMesh);
 	bool		Create(const std::string& szFN);
 	void		Release();

@@ -28,7 +28,7 @@ public:
 	bool NewBundle();
 	bool LoadBundle(CString& strPathName);
 	void SaveGameDataPartnBundle();
-	CDlgEditScript(CWnd* pParent = NULL);   // standard constructor
+	CDlgEditScript(CWnd* pParent = nullptr);   // standard constructor
 	void RefreshParts();
 	void ReloadCombo();
 	

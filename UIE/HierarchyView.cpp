@@ -106,14 +106,14 @@ void CHierarchyView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 void CHierarchyView::OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult) 
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
-	if(NULL == pNMTreeView->itemOld.hItem) return;
+	if(nullptr == pNMTreeView->itemOld.hItem) return;
 
 	HTREEITEM hItem = pNMTreeView->itemNew.hItem;
-	if(hItem == NULL) return;
+	if(hItem == nullptr) return;
 
 	CN3UIBase* pUI = (CN3UIBase*)GetTreeCtrl().GetItemData(hItem);
 	if(0 == ::_IsKeyDown(VK_CONTROL))
-		GetDocument()->SetSelectedUI(NULL); // 컨트롤 키를 안눌렀으면.. 단독 셀렉트..
+		GetDocument()->SetSelectedUI(nullptr); // 컨트롤 키를 안눌렀으면.. 단독 셀렉트..
 	GetDocument()->SetSelectedUI(pUI);
 	
 	*pResult = 0;
@@ -142,7 +142,7 @@ void CHierarchyView::UpdateAllInfo()
 // tree item 정보 갱신하기
 void CHierarchyView::UpdateTreeItem(HTREEITEM hParent, CN3UIBase *pUIBase)
 {
-	if(pUIBase == NULL) return;
+	if(pUIBase == nullptr) return;
 	eUI_TYPE eUIType = pUIBase->UIType();
 	CString str;
 
@@ -166,7 +166,7 @@ void CHierarchyView::UpdateTreeItem(HTREEITEM hParent, CN3UIBase *pUIBase)
 	case UI_TYPE_IMAGE:
 		{
 			str = _T("Image");
-			if (pParentUI == NULL) break;
+			if (pParentUI == nullptr) break;
 			if (UI_TYPE_IMAGE == pParentUI->UIType())
 			{
 				ASSERT(UISTYLE_IMAGE_ANIMATE & pParentUI->m_dwStyle);	// 부모는 반드시 Animate image여야 한다.
@@ -227,7 +227,7 @@ void CHierarchyView::UpdateTreeItem(HTREEITEM hParent, CN3UIBase *pUIBase)
 // UIBase 포인터로 tree item 선택하기
 void CHierarchyView::SelectObject(HTREEITEM hItem, CN3UIBase* pUIBase)
 {
-	if(NULL == pUIBase || NULL == hItem) return;
+	if(nullptr == pUIBase || nullptr == hItem) return;
 
 	if(hItem != TVI_ROOT)
 	{
@@ -239,7 +239,7 @@ void CHierarchyView::SelectObject(HTREEITEM hItem, CN3UIBase* pUIBase)
 	}
 
 	HTREEITEM hChild = GetTreeCtrl().GetChildItem(hItem);
-	while(hChild != NULL)
+	while(hChild != nullptr)
 	{
 		SelectObject(hChild, pUIBase);
 		hChild = GetTreeCtrl().GetNextItem(hChild, TVGN_NEXT);

@@ -23,11 +23,11 @@ public:
 	void AnsiOem(bool bAnsiToOem);
 // change slash to backslash or vice-versa	
 	void SlashChange(bool bWindowsStyle);
-// return the filename size in characters (without NULL);	
+// return the filename size in characters (without nullptr);	
 	WORD GetFileNameSize(){return (WORD)m_pszFileName.GetSize();}
-// return the comment size in characters (without NULL);		
+// return the comment size in characters (without nullptr);		
 	WORD GetCommentSize(){return (WORD)m_pszComment.GetSize();}
-// return the extra field size in characters (without NULL);		
+// return the extra field size in characters (without nullptr);		
 	WORD GetExtraFieldSize(){return (WORD)m_pExtraField.GetSize();}
 
 	CString GetFileName();

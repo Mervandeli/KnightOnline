@@ -66,7 +66,7 @@ void CN3TexViewerView::OnDraw(CDC* pDC)
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CMenu* pMenu = pFrm->GetMenu();
 
-	CN3Texture* pTex = NULL;
+	CN3Texture* pTex = nullptr;
 	
 	DWORD dwStat = pMenu->GetMenuState(ID_VIEW_ALPHA, MF_BYCOMMAND);
 	if(dwStat & MF_CHECKED) pTex = GetDocument()->m_pTexAlpha;
@@ -129,7 +129,7 @@ void CN3TexViewerView::OnViewAlpha()
 		else pMenu->CheckMenuItem(ID_VIEW_ALPHA, MF_CHECKED | MF_BYCOMMAND);
 	}
 
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CN3TexViewerView::OnUpdateViewAlpha(CCmdUI* pCmdUI) 

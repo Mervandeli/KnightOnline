@@ -68,9 +68,9 @@ public:
 	void	Init();
 	void	Release(); // 참조 카운트를 리턴 해준다.. 사운드 매니저에서는 이 참조 카운트를 보고 맵에서 지운다..
 	virtual bool Create(const std::string& szFN, e_SndType eType);
-	bool	Duplicate(CN3SndObj* pSrc, e_SndType eType, D3DVECTOR* pPos = NULL);
+	bool	Duplicate(CN3SndObj* pSrc, e_SndType eType, D3DVECTOR* pPos = nullptr);
 
-	void	Play(const D3DVECTOR* pvPos = NULL, float delay = 0.0f, float fFadeInTime = 0.0f, bool bImmediately = true);
+	void	Play(const D3DVECTOR* pvPos = nullptr, float delay = 0.0f, float fFadeInTime = 0.0f, bool bImmediately = true);
 	void	Stop(float fFadeOutTime = 0.0f);
 	void	Tick();
 

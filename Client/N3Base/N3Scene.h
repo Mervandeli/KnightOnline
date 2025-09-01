@@ -67,11 +67,11 @@ public:
 	int	 CameraAdd(CN3Camera *pCamera);
 	void CameraDelete(CN3Camera* pCamera);
 	void CameraDelete(int iIndex);
-	CN3Camera* CameraGet(int iIndex) { if(iIndex < 0 || iIndex >= m_nCameraCount) return NULL; return m_pCameras[iIndex]; }
+	CN3Camera* CameraGet(int iIndex) { if(iIndex < 0 || iIndex >= m_nCameraCount) return nullptr; return m_pCameras[iIndex]; }
 	
 	void CameraSetActive(int iIndex);
 	int	 CameraGetActiveNumber() { return m_nCameraActive; };
-	CN3Camera* CameraGetActive() { if(m_nCameraActive < 0 || m_nCameraActive >= m_nCameraCount) return NULL; return m_pCameras[m_nCameraActive]; }
+	CN3Camera* CameraGetActive() { if(m_nCameraActive < 0 || m_nCameraActive >= m_nCameraCount) return nullptr; return m_pCameras[m_nCameraActive]; }
 
 	int	 LightCount() const
 	{
@@ -81,7 +81,7 @@ public:
 	int	 LightAdd(CN3Light* pLight);
 	void LightDelete(CN3Light* pLight);
 	void LightDelete(int iIndex);
-	CN3Light* LightGet(int iIndex) { if(iIndex < 0 || iIndex >= m_nLightCount) return NULL; return m_pLights[iIndex]; }
+	CN3Light* LightGet(int iIndex) { if(iIndex < 0 || iIndex >= m_nLightCount) return nullptr; return m_pLights[iIndex]; }
 
 	int ShapeCount() const
 	{

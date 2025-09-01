@@ -27,10 +27,10 @@ static char THIS_FILE[]=__FILE__;
 
 CUIPointInitDlg::CUIPointInitDlg()
 {
-	m_pBtn_Ok			= NULL;
-	m_pBtn_Cancel		= NULL;
+	m_pBtn_Ok			= nullptr;
+	m_pBtn_Cancel		= nullptr;
 
-	m_pText_NeedGold	= NULL;
+	m_pText_NeedGold	= nullptr;
 }
 
 CUIPointInitDlg::~CUIPointInitDlg()
@@ -47,10 +47,10 @@ bool CUIPointInitDlg::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-	m_pBtn_Ok			= (CN3UIButton*)GetChildByID("btn_ok");			__ASSERT(m_pBtn_Ok,	"NULL UI Component!!");
-	m_pBtn_Cancel		= (CN3UIButton*)GetChildByID("btn_cancel");		__ASSERT(m_pBtn_Cancel, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Ok, GetChildByID<CN3UIButton>("btn_ok"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel, GetChildByID<CN3UIButton>("btn_cancel"));
 
-	m_pText_NeedGold	= (CN3UIString*)GetChildByID("string_gold");	__ASSERT(m_pText_NeedGold,	"NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pText_NeedGold, GetChildByID<CN3UIString>("string_gold"));
 
 	return true;
 }

@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgAddDTex dialog
 
 
-CDlgAddDTex::CDlgAddDTex(CWnd* pParent /*=NULL*/)
+CDlgAddDTex::CDlgAddDTex(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgAddDTex::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgAddDTex)
@@ -65,11 +65,11 @@ BOOL CDlgAddDTex::OnInitDialog()
 
 	char szDrive[_MAX_DRIVE], szDir[_MAX_DIR];
 	char szModuleFilePath[_MAX_PATH];
-	GetModuleFileName(NULL, szModuleFilePath, _MAX_PATH);
+	GetModuleFileName(nullptr, szModuleFilePath, _MAX_PATH);
 
 	char szNewPath[_MAX_PATH];
-	_splitpath(szModuleFilePath, szDrive, szDir, NULL, NULL);
-	_makepath(szNewPath, szDrive, szDir, NULL, NULL);
+	_splitpath(szModuleFilePath, szDrive, szDir, nullptr, nullptr);
+	_makepath(szNewPath, szDrive, szDir, nullptr, nullptr);
 	SetCurrentDirectory(szNewPath);
 	m_TexList.Dir(DDL_READONLY, "dtex\\*.bmp");
 	SetCurrentDirectory(szOldPath);

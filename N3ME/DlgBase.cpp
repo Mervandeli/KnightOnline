@@ -19,7 +19,7 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-CDlgBase::CDlgBase(CMapMng* pMapMng, CWnd* pParent /*=NULL*/)
+CDlgBase::CDlgBase(CMapMng* pMapMng, CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgBase::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgBase)
@@ -77,7 +77,7 @@ BOOL CDlgBase::OnInitDialog()
 
 	m_LPTransform.GetWindowRect(&rc);
 	nH = m_LPTransform.GetItemHeight(0) * m_LPTransform.GetCount() + 4;
-	m_LPTransform.SetWindowPos(NULL, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
+	m_LPTransform.SetWindowPos(nullptr, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
 	// Transform 등록 정보
 	/////////////////////////////////////
 
@@ -97,7 +97,7 @@ BOOL CDlgBase::OnInitDialog()
 
 	m_LPCamera.GetWindowRect(&rc);
 	nH = m_LPCamera.GetItemHeight(0) * m_LPCamera.GetCount() + 4;
-	m_LPCamera.SetWindowPos(NULL, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
+	m_LPCamera.SetWindowPos(nullptr, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
 	// Camera 등록 정보
 	/////////////////////////////////////
 
@@ -117,7 +117,7 @@ BOOL CDlgBase::OnInitDialog()
 
 	m_LPLight.GetWindowRect(&rc);
 	nH = m_LPLight.GetItemHeight(0) * m_LPLight.GetCount() + 4;
-	m_LPLight.SetWindowPos(NULL, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
+	m_LPLight.SetWindowPos(nullptr, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
 	// Light 등록 정보
 	/////////////////////////////////////
 
@@ -150,7 +150,7 @@ D3DTOP_BUMPENVMAP|D3DTOP_BUMPENVMAPLUMINANCE|D3DTOP_DOTPRODUCT|D3DTOP_MULTIPLYAD
 
 	m_LPMaterial.GetWindowRect(&rc);
 	nH = m_LPMaterial.GetItemHeight(0) * m_LPMaterial.GetCount() + 4;
-	m_LPMaterial.SetWindowPos(NULL, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
+	m_LPMaterial.SetWindowPos(nullptr, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
 	// Material 등록 정보
 	/////////////////////////////////////
 
@@ -178,7 +178,7 @@ D3DTOP_BUMPENVMAP|D3DTOP_BUMPENVMAPLUMINANCE|D3DTOP_DOTPRODUCT|D3DTOP_MULTIPLYAD
 
 	m_LPShape.GetWindowRect(&rc);
 	nH = m_LPShape.GetItemHeight(0) * m_LPShape.GetCount() + 4;
-	m_LPShape.SetWindowPos(NULL, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
+	m_LPShape.SetWindowPos(nullptr, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
 	// Shape
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -218,15 +218,15 @@ D3DTOP_BUMPENVMAP|D3DTOP_BUMPENVMAPLUMINANCE|D3DTOP_DOTPRODUCT|D3DTOP_MULTIPLYAD
 
 	m_LPChr.GetWindowRect(&rc);
 	nH = m_LPChr.GetItemHeight(0) * m_LPChr.GetCount() + 4;
-	m_LPChr.SetWindowPos(NULL, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
+	m_LPChr.SetWindowPos(nullptr, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
 
 	m_LPCPart.GetWindowRect(&rc);
 	nH = m_LPCPart.GetItemHeight(0) * m_LPCPart.GetCount() + 4;
-	m_LPCPart.SetWindowPos(NULL, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
+	m_LPCPart.SetWindowPos(nullptr, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
 
 	m_LPCPlug.GetWindowRect(&rc);
 	nH = m_LPCPlug.GetItemHeight(0) * m_LPCPlug.GetCount() + 4;
-	m_LPCPlug.SetWindowPos(NULL, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
+	m_LPCPlug.SetWindowPos(nullptr, 0, 0, rc.Width(), nH, SWP_NOZORDER | SWP_NOMOVE);
 	// 캐릭터
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -247,9 +247,9 @@ D3DTOP_BUMPENVMAP|D3DTOP_BUMPENVMAPLUMINANCE|D3DTOP_DOTPRODUCT|D3DTOP_MULTIPLYAD
 void CDlgBase::UpdateInfo()
 {
 	int iCount = m_pMapMng->GetSelOutputObjCount();
-	CN3Base* pBase = NULL;
+	CN3Base* pBase = nullptr;
 	if (iCount==1) pBase = m_pMapMng->GetSelOutputObj(0);
-	if(pBase == NULL)
+	if(pBase == nullptr)
 	{
 		SetDlgItemText(IDC_E_NAME, "Not Selected...");
 		m_LPTransform.ShowWindow(SW_HIDE);
@@ -287,7 +287,7 @@ void CDlgBase::UpdateInfo()
 	if(pBase->Type() & OBJ_TRANSFORM)
 	{
 		m_LPTransform.ShowWindow(SW_SHOW);
-		m_LPTransform.SetWindowPos(NULL, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+		m_LPTransform.SetWindowPos(nullptr, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
 		CN3Transform* pT = (CN3Transform*)pBase;
 		CPropertyItem* pItem;
@@ -312,7 +312,7 @@ void CDlgBase::UpdateInfo()
 	if(pBase->Type() & OBJ_CAMERA)
 	{
 		m_LPCamera.ShowWindow(SW_SHOW);
-		m_LPCamera.SetWindowPos(NULL, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+		m_LPCamera.SetWindowPos(nullptr, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
 		CN3Camera* pC = (CN3Camera*)pBase;
 		CPropertyItem* pItem;
@@ -358,7 +358,7 @@ void CDlgBase::UpdateInfo()
 	if(pBase->Type() & OBJ_LIGHT)
 	{
 		m_LPLight.ShowWindow(SW_SHOW);
-		m_LPLight.SetWindowPos(NULL, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+		m_LPLight.SetWindowPos(nullptr, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
 		CN3Light* pL = (CN3Light*)pBase;
 		CPropertyItem* pItem;
@@ -400,17 +400,17 @@ void CDlgBase::UpdateInfo()
 		m_LPLight.ShowWindow(SW_HIDE);
 	}
 
-	__Material* pMtl = NULL;
+	__Material* pMtl = nullptr;
 
 	if(pBase->Type() & OBJ_SHAPE)
 	{
-		m_CBShapePart.SetWindowPos(NULL, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+		m_CBShapePart.SetWindowPos(nullptr, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 		m_CBShapePart.ShowWindow(SW_SHOW);
 		m_CBShapePart.GetWindowRect(&rc);
 		pt.y += rc.Height() + 2;
 
 		m_LPShape.ShowWindow(SW_SHOW);
-		m_LPShape.SetWindowPos(NULL, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+		m_LPShape.SetWindowPos(nullptr, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
 		CN3Shape* pS = (CN3Shape*)pBase;
 		CPropertyItem* pItem;
@@ -490,32 +490,32 @@ void CDlgBase::UpdateInfo()
 
 	if(pBase->Type() & OBJ_CHARACTER)
 	{
-		m_LPChr.SetWindowPos(NULL, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+		m_LPChr.SetWindowPos(nullptr, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 		m_LPChr.ShowWindow(SW_SHOW);
 		m_LPChr.GetWindowRect(&rc);
 		pt.y += rc.Height() + 2;
 
 		CRect rc2; m_CBChrPart.GetWindowRect(&rc2);
-		m_CBChrPart.SetWindowPos(NULL, pt.x, pt.y, rc.Width() / 2, rc2.Height(), SWP_NOZORDER);
+		m_CBChrPart.SetWindowPos(nullptr, pt.x, pt.y, rc.Width() / 2, rc2.Height(), SWP_NOZORDER);
 		m_CBChrPart.ShowWindow(SW_SHOW);
 		m_CBChrPart.GetWindowRect(&rc);
 
-		m_CBChrLOD.SetWindowPos(NULL, pt.x + 3 + rc.Width(), pt.y, rc.Width() - 3, rc2.Height(), SWP_NOZORDER);
+		m_CBChrLOD.SetWindowPos(nullptr, pt.x + 3 + rc.Width(), pt.y, rc.Width() - 3, rc2.Height(), SWP_NOZORDER);
 		m_CBChrLOD.ShowWindow(SW_SHOW);
 		m_CBChrLOD.GetWindowRect(&rc);
 		pt.y += rc.Height() + 2;
 
-		m_LPCPart.SetWindowPos(NULL, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+		m_LPCPart.SetWindowPos(nullptr, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 		m_LPCPart.ShowWindow(SW_SHOW);
 		m_LPCPart.GetWindowRect(&rc);
 		pt.y += rc.Height() + 2;
 
-		m_CBChrPlug.SetWindowPos(NULL, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+		m_CBChrPlug.SetWindowPos(nullptr, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 		m_CBChrPlug.ShowWindow(SW_SHOW);
 		m_CBChrPlug.GetWindowRect(&rc);
 		pt.y += rc.Height() + 2;
 
-		m_LPCPlug.SetWindowPos(NULL, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+		m_LPCPlug.SetWindowPos(nullptr, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 		m_LPCPlug.ShowWindow(SW_SHOW);
 		m_LPCPlug.GetWindowRect(&rc);
 		pt.y += rc.Height() + 2;
@@ -665,9 +665,9 @@ void CDlgBase::UpdateInfo()
 	if(pMtl)
 	{
 		m_LPMaterial.ShowWindow(SW_SHOW);
-		m_LPMaterial.SetWindowPos(NULL, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+		m_LPMaterial.SetWindowPos(nullptr, pt.x, pt.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
-		CPropertyItem* pItem = NULL;
+		CPropertyItem* pItem = nullptr;
 
 		pItem = m_LPMaterial.GetPropItem("Render Flags");
 		if(pItem) pItem->m_curValue.Format("%d", pMtl->nRenderFlags);
@@ -718,9 +718,9 @@ void CDlgBase::UpdateInfo()
 BOOL CDlgBase::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult) 
 {
 	int iCount = m_pMapMng->GetSelOutputObjCount();
-	CN3Base* pBase = NULL;
+	CN3Base* pBase = nullptr;
 	if (iCount==1) pBase = m_pMapMng->GetSelOutputObj(0);
-	if(pBase != NULL)
+	if(pBase != nullptr)
 	{
 		if((void*)wParam == &m_LPTransform && (pBase->Type() & OBJ_TRANSFORM))
 		{
@@ -1006,7 +1006,7 @@ BOOL CDlgBase::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 
 		if((void*)wParam == &m_LPMaterial)
 		{
-			__Material* pMtl = NULL;
+			__Material* pMtl = nullptr;
 			if(pBase->Type() & OBJ_SHAPE)
 			{
 				int nPart = m_CBShapePart.GetCurSel();
@@ -1044,9 +1044,9 @@ BOOL CDlgBase::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 void CDlgBase::OnChangeEName() 
 {
 	int iCount = m_pMapMng->GetSelOutputObjCount();
-	CN3Base* pBase = NULL;
+	CN3Base* pBase = nullptr;
 	if (iCount==1) pBase = m_pMapMng->GetSelOutputObj(0);
-	if(pBase != NULL)
+	if(pBase != nullptr)
 	{
 		CString str;
 		GetDlgItemText(IDC_E_NAME, str); // 이름 바꾸기..

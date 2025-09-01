@@ -20,7 +20,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgEditPartParticle dialog
 
 
-CDlgEditPartParticle::CDlgEditPartParticle(CWnd* pParent /*=NULL*/)
+CDlgEditPartParticle::CDlgEditPartParticle(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgEditPartParticle::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgEditPartParticle)
@@ -480,7 +480,7 @@ void CDlgEditPartParticle::OnPartParticleBtnSaveAs()
 void CDlgEditPartParticle::OnPartParticleBtnLoadTex() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, NULL, NULL, dwFlags, "TGA (*.tga),BMP (*.bmp), DXT (*.dxt) |*.tga;*.bmp;*.dxt||", NULL);
+	CFileDialog dlg(TRUE, nullptr, nullptr, dwFlags, "TGA (*.tga),BMP (*.bmp), DXT (*.dxt) |*.tga;*.bmp;*.dxt||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	
 	CString PathName = dlg.GetPathName();
@@ -605,7 +605,7 @@ void CDlgEditPartParticle::OnPartParticleBtnPutColor()
 void CDlgEditPartParticle::OnPartParticleBtnLoadMesh() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "N3Shape", NULL, dwFlags, "N3Shape File(*.n3shape)|*.n3shape||", NULL);
+	CFileDialog dlg(TRUE, "N3Shape", nullptr, dwFlags, "N3Shape File(*.n3shape)|*.n3shape||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	
 	CString PathName = dlg.GetPathName();

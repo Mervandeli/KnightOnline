@@ -30,9 +30,9 @@ typedef struct __SoundSource
 	__SoundSource()
 	{
 		iID = 0;
-		ppObjs = NULL;
+		ppObjs = nullptr;
 		szFN = "";
-		pDSBuff = NULL;
+		pDSBuff = nullptr;
 		Size = 0;
 		Type = 0;
 		Count = 0;

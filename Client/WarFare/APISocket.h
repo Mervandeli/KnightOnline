@@ -41,7 +41,7 @@ public:
 	{
 		__ASSERT(m_pBuffer,"1");
 		if (m_pBuffer)
-			delete[] m_pBuffer, m_pBuffer = NULL;
+			delete[] m_pBuffer, m_pBuffer = nullptr;
 	}
 
 	void	PutData(uint8_t *pData, int len)
@@ -172,7 +172,7 @@ public:
 	DataPack()
 	{
 		m_Size = 0;
-		m_pData = NULL;
+		m_pData = nullptr;
 	}
 
 	DataPack(int size, uint8_t *pData)

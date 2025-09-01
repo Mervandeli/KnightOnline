@@ -140,7 +140,7 @@ CFormViewProperty* CMainFrame::GetViewProperty()
 void CMainFrame::OnImportObject() 
 {
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, ".N3Shape", NULL, dwFlags, "Shape Data(*.N3Shape)|*.N3Shape||", NULL);
+	CFileDialog dlg(TRUE, ".N3Shape", nullptr, dwFlags, "Shape Data(*.N3Shape)|*.N3Shape||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	CString szFullPath = dlg.GetPathName();
@@ -150,7 +150,7 @@ void CMainFrame::OnImportObject()
 	if(m_ObjectBundle.LoadFromFile((const char*)szFullPath)) // 배경으로 쓸 오브젝트 부르기..
 	{
 		CSkyViewerView* pView = (CSkyViewerView*)(m_wndSplitter.GetPane(0,1));
-		pView->InvalidateRect(NULL, FALSE);
+		pView->InvalidateRect(nullptr, FALSE);
 	}
 	else
 	{

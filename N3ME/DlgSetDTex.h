@@ -21,7 +21,7 @@ public:
 		
 // Construction
 public:
-	CDlgSetDTex(CWnd* pParent = NULL);   // standard constructor
+	CDlgSetDTex(CWnd* pParent = nullptr);   // standard constructor
 	
 // Dialog Data
 	//{{AFX_DATA(CDlgSetDTex)

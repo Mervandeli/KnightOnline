@@ -14,7 +14,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgPMeshCreateOption dialog
 
 
-CDlgPMeshCreateOption::CDlgPMeshCreateOption(CWnd* pParent /*=NULL*/)
+CDlgPMeshCreateOption::CDlgPMeshCreateOption(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgPMeshCreateOption::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgPMeshCreateOption)

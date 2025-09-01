@@ -26,14 +26,14 @@ CN3Mesh::CN3Mesh()
 	m_nVC = 0;
 	m_nIC = 0;
 
-	m_pVertices = NULL; // 점 버퍼
-	m_psnIndices = NULL; // 인덱스 버퍼
+	m_pVertices = nullptr; // 점 버퍼
+	m_psnIndices = nullptr; // 인덱스 버퍼
 }
 
 CN3Mesh::~CN3Mesh()
 {
-	delete [] m_pVertices; m_pVertices = NULL;
-	delete [] m_psnIndices; m_psnIndices = NULL;
+	delete [] m_pVertices; m_pVertices = nullptr;
+	delete [] m_psnIndices; m_psnIndices = nullptr;
 }
 
 void CN3Mesh::Release()
@@ -46,7 +46,7 @@ void CN3Mesh::Release()
 
 void CN3Mesh::ReleaseVertices()
 {
-	delete [] m_pVertices; m_pVertices = NULL;
+	delete [] m_pVertices; m_pVertices = nullptr;
 	
 	m_vMin.Set(0,0,0);
 	m_vMax.Set(0,0,0);
@@ -56,29 +56,29 @@ void CN3Mesh::ReleaseVertices()
 
 void CN3Mesh::ReleaseIndices()
 {
-	delete [] m_psnIndices; m_psnIndices = NULL;
+	delete [] m_psnIndices; m_psnIndices = nullptr;
 	m_nIC = 0;
 }
 
 bool CN3Mesh::Load(HANDLE hFile)
 {
-	if(m_pVertices != NULL || m_psnIndices != NULL) this->Release();
+	if(m_pVertices != nullptr || m_psnIndices != nullptr) this->Release();
 
 	DWORD dwRWC = 0;
 
-	ReadFile(hFile, &m_nVC, 4, &dwRWC, NULL); // 점갯수 읽기..
+	ReadFile(hFile, &m_nVC, 4, &dwRWC, nullptr); // 점갯수 읽기..
 	if(m_nVC > 0)
 	{
 		this->Create(m_nVC, 0); // Vertex Buffer 생성 및 데이터 채우기
-		ReadFile(hFile, m_pVertices, m_nVC * sizeof(__VertexT1), &dwRWC, NULL);
+		ReadFile(hFile, m_pVertices, m_nVC * sizeof(__VertexT1), &dwRWC, nullptr);
 		this->FindMinMax(); // 최대, 최소값을 찾는다.
 	}
 	
-	ReadFile(hFile, &m_nIC, 4, &dwRWC, NULL); // 인덱스 갯수 읽기..
+	ReadFile(hFile, &m_nIC, 4, &dwRWC, nullptr); // 인덱스 갯수 읽기..
 	if(m_nIC > 0)
 	{
 		this->Create(0, m_nIC); // 인덱스 버퍼 생성 및 데이터 채우기
-		ReadFile(hFile, m_psnIndices, m_nIC * 2, &dwRWC, NULL);
+		ReadFile(hFile, m_psnIndices, m_nIC * 2, &dwRWC, nullptr);
 	}
 
 	return true;
@@ -89,16 +89,16 @@ bool CN3Mesh::Save(HANDLE hFile)
 {
 	DWORD dwRWC = 0;
 
-	WriteFile(hFile, &m_nVC, 4, &dwRWC, NULL); // 점갯수 읽기..
+	WriteFile(hFile, &m_nVC, 4, &dwRWC, nullptr); // 점갯수 읽기..
 	if(m_nVC > 0) 
 	{
-		WriteFile(hFile, m_pVertices, m_nVC * sizeof(__VertexT1), &dwRWC, NULL);
+		WriteFile(hFile, m_pVertices, m_nVC * sizeof(__VertexT1), &dwRWC, nullptr);
 	}
 	
-	WriteFile(hFile, &m_nIC, 4, &dwRWC, NULL); // 인덱스 갯수 읽기..
+	WriteFile(hFile, &m_nIC, 4, &dwRWC, nullptr); // 인덱스 갯수 읽기..
 	if(m_nIC > 0)
 	{
-		WriteFile(hFile, m_psnIndices, m_nIC * 2, &dwRWC, NULL);
+		WriteFile(hFile, m_psnIndices, m_nIC * 2, &dwRWC, nullptr);
 	}
 
 	return true;
@@ -152,7 +152,7 @@ void CN3Mesh::MakeIndexed()
 	for(i = 0 ; i < m_nIC; i++)
 		m_psnIndices[i] = nIs[i];
 
-	delete [] pVs; pVs = NULL;
+	delete [] pVs; pVs = nullptr;
 }
 #endif // end of _N3TOOL
 
@@ -296,7 +296,7 @@ void CN3Mesh::Create_Axis(float fLength)
 
 bool CN3Mesh::Import(CN3PMesh* pPMesh)
 {
-	if(NULL == pPMesh) return false;
+	if(nullptr == pPMesh) return false;
 	int iNumIndices = pPMesh->GetMaxNumIndices();
 	if (0 >= iNumIndices) return false;
 	Release();	// 초기화
@@ -322,9 +322,9 @@ bool CN3Mesh::Import(CN3PMesh* pPMesh)
 #ifdef _N3TOOL
 bool CN3Mesh::Import(CN3IMesh *pIMesh)
 {
-	if(NULL == pIMesh) return false;
+	if(nullptr == pIMesh) return false;
 	__VertexT1* pvSrc = pIMesh->BuildVertexList();
-	if(NULL == pvSrc) return false;
+	if(nullptr == pvSrc) return false;
 	
 	int nFC = pIMesh->FaceCount();
 	this->Release();

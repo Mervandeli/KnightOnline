@@ -7,8 +7,6 @@
 #include "GameProcMain.h"
 #include "UIInventory.h"
 #include "UITransactionDlg.h"
-#include "UIItemExchange.h"
-#include "UINpcTalk.h"
 #include "SubProcPerTrade.h"
 #include "UISkillTreeDlg.h"
 #include "UIManager.h"
@@ -46,9 +44,9 @@ bool CUINPCEvent::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-	m_pBtn_Repair	= (CN3UIButton*)GetChildByID("Btn_Repair");		__ASSERT(m_pBtn_Repair, "NULL UI Component!!");
-	m_pText_Repair	= (CN3UIString*)GetChildByID("Text_Repair");	__ASSERT(m_pText_Repair, "NULL UI Component!!");
-	m_pText_Title	= (CN3UIString*)GetChildByID("Text_Title");		__ASSERT(m_pText_Title, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Repair, GetChildByID<CN3UIButton>("Btn_Repair"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Repair, GetChildByID<CN3UIString>("Text_Repair"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Title, GetChildByID<CN3UIString>("Text_Title"));
 
 	return true;
 }
@@ -88,17 +86,6 @@ bool CUINPCEvent::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 		}
 
-/*		if(pSender->m_szID == "Btn_Change")
-		{
-			Close();
-			CGameProcedure::s_pProcMain->m_pUIItemREDlg->Open();
-		}
-
-		if(pSender->m_szID == "Btn_Talk")
-		{
-			Close();
-			CGameProcedure::s_pProcMain->m_pUINpcTalk->Open(m_iIDTarget);
-		}*/
 
 		if(pSender->m_szID == "btn_close")
 			Close();

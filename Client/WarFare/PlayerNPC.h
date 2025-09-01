@@ -20,8 +20,9 @@ class CPlayerNPC : public CPlayerBase
 {
 	friend class CPlayerOtherMgr;
 public:
-	void			MoveTo(float fPosX, float fPosY, float fPosZ, float fMoveSpeed, int iMoveMode); // 이 위치로 이동..
-	virtual	void	Tick();
+	void	MoveTo(float fPosX, float fPosY, float fPosZ, float fMoveSpeed, int iMoveMode); // 이 위치로 이동..
+	void	Tick() override;
+	void	SetSoundAndInitFont(uint32_t dwFontFlag = 0UL) override;
 
 	CPlayerNPC();
 	virtual ~CPlayerNPC();

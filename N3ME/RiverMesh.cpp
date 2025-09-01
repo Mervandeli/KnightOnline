@@ -19,9 +19,9 @@ static char THIS_FILE[]=__FILE__;
 
 CRiverMesh::CRiverMesh()
 {
-	m_pTexture = NULL;
+	m_pTexture = nullptr;
 	m_iAnimTextureCount = 0;
-	m_pAnimTextures = NULL;
+	m_pAnimTextures = nullptr;
 	Release();
 }
 
@@ -54,19 +54,19 @@ void CRiverMesh::Release()
 	}
 	ZeroMemory(m_pVertices, sizeof(m_pVertices));
 	
-	if (m_pTexture) { s_MngTex.Delete(&m_pTexture); m_pTexture = NULL;}
+	if (m_pTexture) { s_MngTex.Delete(&m_pTexture); m_pTexture = nullptr;}
 	ReleaseAnimTextures();
 }
 
 void CRiverMesh::ReleaseAnimTextures()
 {
 	int i;
-	if (m_pAnimTextures == NULL) {m_iAnimTextureCount = 0; return;}
+	if (m_pAnimTextures == nullptr) {m_iAnimTextureCount = 0; return;}
 	for (i=0; i<m_iAnimTextureCount; ++i)
 	{
-		if (m_pAnimTextures[i]) {s_MngTex.Delete(&(m_pAnimTextures[i])); m_pAnimTextures[i] = NULL;}
+		if (m_pAnimTextures[i]) {s_MngTex.Delete(&(m_pAnimTextures[i])); m_pAnimTextures[i] = nullptr;}
 	}
-	delete [] m_pAnimTextures; m_pAnimTextures = NULL;
+	delete [] m_pAnimTextures; m_pAnimTextures = nullptr;
 	m_iAnimTextureCount = 0;
 }
 
@@ -76,41 +76,41 @@ bool CRiverMesh::Load(HANDLE hFile)
 	DWORD dwNum;
 	int iLen; char szTextueFName[_MAX_PATH];
 
-	ReadFile(hFile, &m_iRiverID, sizeof(m_iRiverID), &dwNum, NULL);		// 강 번호
-	ReadFile(hFile, &m_fSpeed1, sizeof(m_fSpeed1), &dwNum, NULL);			// 유속
-	ReadFile(hFile, &m_fSpeed2, sizeof(m_fSpeed2), &dwNum, NULL);			// 유속2
-	ReadFile(hFile, &m_fMeterPerV, sizeof(m_fMeterPerV), &dwNum, NULL);	// U좌표 1.0에 해당하는 강의 길이
-	ReadFile(hFile, &m_fMeterPerU, sizeof(m_fMeterPerU), &dwNum, NULL);	// V좌표 1.0에 해당하는 강의 길이
-	ReadFile(hFile, &m_fMeterPerV2, sizeof(m_fMeterPerV2), &dwNum, NULL);// U2좌표 1.0에 해당하는 강의 길이
-	ReadFile(hFile, &m_fMeterPerU2, sizeof(m_fMeterPerU2), &dwNum, NULL);// V2좌표 1.0에 해당하는 강의 길이
-	ReadFile(hFile, &m_dwAlphaFactor, sizeof(m_dwAlphaFactor), &dwNum, NULL);	// 강을 투명하게 하기 위한 알파값
+	ReadFile(hFile, &m_iRiverID, sizeof(m_iRiverID), &dwNum, nullptr);		// 강 번호
+	ReadFile(hFile, &m_fSpeed1, sizeof(m_fSpeed1), &dwNum, nullptr);			// 유속
+	ReadFile(hFile, &m_fSpeed2, sizeof(m_fSpeed2), &dwNum, nullptr);			// 유속2
+	ReadFile(hFile, &m_fMeterPerV, sizeof(m_fMeterPerV), &dwNum, nullptr);	// U좌표 1.0에 해당하는 강의 길이
+	ReadFile(hFile, &m_fMeterPerU, sizeof(m_fMeterPerU), &dwNum, nullptr);	// V좌표 1.0에 해당하는 강의 길이
+	ReadFile(hFile, &m_fMeterPerV2, sizeof(m_fMeterPerV2), &dwNum, nullptr);// U2좌표 1.0에 해당하는 강의 길이
+	ReadFile(hFile, &m_fMeterPerU2, sizeof(m_fMeterPerU2), &dwNum, nullptr);// V2좌표 1.0에 해당하는 강의 길이
+	ReadFile(hFile, &m_dwAlphaFactor, sizeof(m_dwAlphaFactor), &dwNum, nullptr);	// 강을 투명하게 하기 위한 알파값
 
-	ReadFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, NULL);			// 점 갯수
-	if (m_iVC>0) ReadFile(hFile, m_pVertices, m_iVC*sizeof(__VertexXyzT2), &dwNum, NULL);	// vertex buffer
-	ReadFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, NULL);			// IndexBufferCount.
-	ReadFile(hFile, &iLen, sizeof(iLen), &dwNum, NULL);				// texture name length
+	ReadFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, nullptr);			// 점 갯수
+	if (m_iVC>0) ReadFile(hFile, m_pVertices, m_iVC*sizeof(__VertexXyzT2), &dwNum, nullptr);	// vertex buffer
+	ReadFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, nullptr);			// IndexBufferCount.
+	ReadFile(hFile, &iLen, sizeof(iLen), &dwNum, nullptr);				// texture name length
 	if (iLen>0)
 	{
-		ReadFile(hFile, szTextueFName, iLen, &dwNum, NULL);	// texture name
-		szTextueFName[iLen] = NULL;
+		ReadFile(hFile, szTextueFName, iLen, &dwNum, nullptr);	// texture name
+		szTextueFName[iLen] = '\0';
 		m_pTexture = s_MngTex.Get(szTextueFName, TRUE);				// load texture
 	}
 
 	// Animation Texture Data
-	ReadFile(hFile, &m_fAnimTexFPS, sizeof(m_fAnimTexFPS), &dwNum, NULL);	// Anim Tex frame/sec
-	ReadFile(hFile, &m_iAnimTextureCount, sizeof(m_iAnimTextureCount), &dwNum, NULL);	// AnimTexture Count
+	ReadFile(hFile, &m_fAnimTexFPS, sizeof(m_fAnimTexFPS), &dwNum, nullptr);	// Anim Tex frame/sec
+	ReadFile(hFile, &m_iAnimTextureCount, sizeof(m_iAnimTextureCount), &dwNum, nullptr);	// AnimTexture Count
 
-	__ASSERT(m_pAnimTextures == NULL, "강물 텍스쳐 포인터가 NULL이야야 합니다.");
+	__ASSERT(m_pAnimTextures == nullptr, "강물 텍스쳐 포인터가 NULL이야야 합니다.");
 
 	if (m_iAnimTextureCount>0) m_pAnimTextures = new CN3Texture*[m_iAnimTextureCount];
 
 	int i;
 	for (i=0; i<m_iAnimTextureCount; ++i)
 	{
-		ReadFile(hFile, &iLen, sizeof(iLen), &dwNum, NULL);	// texture name length
-		if (iLen <=0) { m_pAnimTextures[i] = NULL; __ASSERT(0, "텍스쳐가 없다"); continue;}
-		ReadFile(hFile, szTextueFName, iLen, &dwNum, NULL);	// texture name
-		szTextueFName[iLen] = NULL;
+		ReadFile(hFile, &iLen, sizeof(iLen), &dwNum, nullptr);	// texture name length
+		if (iLen <=0) { m_pAnimTextures[i] = nullptr; __ASSERT(0, "텍스쳐가 없다"); continue;}
+		ReadFile(hFile, szTextueFName, iLen, &dwNum, nullptr);	// texture name
+		szTextueFName[iLen] = '\0';
 		m_pAnimTextures[i] = s_MngTex.Get(szTextueFName, TRUE);				// load texture
 	}
 	return 0;
@@ -120,40 +120,40 @@ bool CRiverMesh::Save(HANDLE hFile)
 {
 	DWORD dwNum;
 
-	WriteFile(hFile, &m_iRiverID, sizeof(m_iRiverID), &dwNum, NULL);		// 강 번호
-	WriteFile(hFile, &m_fSpeed1, sizeof(m_fSpeed1), &dwNum, NULL);			// 유속1
-	WriteFile(hFile, &m_fSpeed2, sizeof(m_fSpeed2), &dwNum, NULL);			// 유속2
-	WriteFile(hFile, &m_fMeterPerV, sizeof(m_fMeterPerV), &dwNum, NULL);	// U좌표 1.0에 해당하는 강의 길이
-	WriteFile(hFile, &m_fMeterPerU, sizeof(m_fMeterPerU), &dwNum, NULL);	// V좌표 1.0에 해당하는 강의 길이
-	WriteFile(hFile, &m_fMeterPerV2, sizeof(m_fMeterPerV2), &dwNum, NULL);	// U2좌표 1.0에 해당하는 강의 길이
-	WriteFile(hFile, &m_fMeterPerU2, sizeof(m_fMeterPerU2), &dwNum, NULL);	// V2좌표 1.0에 해당하는 강의 길이
-	WriteFile(hFile, &m_dwAlphaFactor, sizeof(m_dwAlphaFactor), &dwNum, NULL);	// 강을 투명하게 하기 위한 알파값
+	WriteFile(hFile, &m_iRiverID, sizeof(m_iRiverID), &dwNum, nullptr);		// 강 번호
+	WriteFile(hFile, &m_fSpeed1, sizeof(m_fSpeed1), &dwNum, nullptr);			// 유속1
+	WriteFile(hFile, &m_fSpeed2, sizeof(m_fSpeed2), &dwNum, nullptr);			// 유속2
+	WriteFile(hFile, &m_fMeterPerV, sizeof(m_fMeterPerV), &dwNum, nullptr);	// U좌표 1.0에 해당하는 강의 길이
+	WriteFile(hFile, &m_fMeterPerU, sizeof(m_fMeterPerU), &dwNum, nullptr);	// V좌표 1.0에 해당하는 강의 길이
+	WriteFile(hFile, &m_fMeterPerV2, sizeof(m_fMeterPerV2), &dwNum, nullptr);	// U2좌표 1.0에 해당하는 강의 길이
+	WriteFile(hFile, &m_fMeterPerU2, sizeof(m_fMeterPerU2), &dwNum, nullptr);	// V2좌표 1.0에 해당하는 강의 길이
+	WriteFile(hFile, &m_dwAlphaFactor, sizeof(m_dwAlphaFactor), &dwNum, nullptr);	// 강을 투명하게 하기 위한 알파값
 
-	WriteFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, NULL);				// 점 갯수
-	if (m_iVC>0) WriteFile(hFile, m_pVertices, m_iVC*sizeof(__VertexXyzT2), &dwNum, NULL);	// vertex buffer
-	WriteFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, NULL);				// IndexBuffer Count.
+	WriteFile(hFile, &m_iVC, sizeof(m_iVC), &dwNum, nullptr);				// 점 갯수
+	if (m_iVC>0) WriteFile(hFile, m_pVertices, m_iVC*sizeof(__VertexXyzT2), &dwNum, nullptr);	// vertex buffer
+	WriteFile(hFile, &m_iIC, sizeof(m_iIC), &dwNum, nullptr);				// IndexBuffer Count.
 
 	int iLen = 0;
 	if(m_pTexture) iLen = m_pTexture->FileName().size();
-	WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, NULL);				// texture file name length
+	WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, nullptr);				// texture file name length
 	if (iLen>0)
 	{
-		WriteFile(hFile, m_pTexture->FileName().c_str(), iLen, &dwNum, NULL);			// texture file name
+		WriteFile(hFile, m_pTexture->FileName().c_str(), iLen, &dwNum, nullptr);			// texture file name
 	}
 
 	// Animation Texture Data
-	WriteFile(hFile, &m_fAnimTexFPS, sizeof(m_fAnimTexFPS), &dwNum, NULL);	// Anim Tex frame/sec
-	WriteFile(hFile, &m_iAnimTextureCount, sizeof(m_iAnimTextureCount), &dwNum, NULL);	// AnimTexture Count
+	WriteFile(hFile, &m_fAnimTexFPS, sizeof(m_fAnimTexFPS), &dwNum, nullptr);	// Anim Tex frame/sec
+	WriteFile(hFile, &m_iAnimTextureCount, sizeof(m_iAnimTextureCount), &dwNum, nullptr);	// AnimTexture Count
 
 	int i;
 	for (i=0; i<m_iAnimTextureCount; ++i)
 	{
 		__ASSERT(m_pAnimTextures[i], "강물 텍스쳐 포인터가 NULL입니다.");
 		int iLen = m_pAnimTextures[i]->FileName().size();
-		WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, NULL);				// texture name length
+		WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, nullptr);				// texture name length
 		if (iLen>0)
 		{
-			WriteFile(hFile, m_pAnimTextures[i]->FileName().c_str(), iLen, &dwNum, NULL);	// texture name
+			WriteFile(hFile, m_pAnimTextures[i]->FileName().c_str(), iLen, &dwNum, nullptr);	// texture name
 		}
 	}
 	return 0;
@@ -207,7 +207,7 @@ void CRiverMesh::Render()
 		else
 		{
 			s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-			s_lpD3DDev->SetTexture(1, NULL);
+			s_lpD3DDev->SetTexture(1, nullptr);
 		}
 		
 
@@ -216,7 +216,7 @@ void CRiverMesh::Render()
 		s_lpD3DDev->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, m_iVC, m_iIC/3, m_wIndex, D3DFMT_INDEX16, m_pVertices, sizeof(__VertexXyzT2));
 
 		// restore
-		s_lpD3DDev->SetTexture(1, NULL);
+		s_lpD3DDev->SetTexture(1, nullptr);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAOP, dwAlphaOP);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAARG1, dwAlphaArg1);
 		s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlphaBlend);
@@ -228,7 +228,7 @@ void CRiverMesh::Render()
 	{
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
-		s_lpD3DDev->SetTexture(0, NULL);
+		s_lpD3DDev->SetTexture(0, nullptr);
 
 		// backup state
 		__Material BackupMtrl;
@@ -251,7 +251,7 @@ void CRiverMesh::Render()
 
 void CRiverMesh::RenderVertexPoint()	// 잘보이게 점만 다시 그리기
 {
-	if (m_iVC == 0 || m_pVertices == NULL) return;
+	if (m_iVC == 0 || m_pVertices == nullptr) return;
 	HRESULT hr;
 
 	// backup state
@@ -262,7 +262,7 @@ void CRiverMesh::RenderVertexPoint()	// 잘보이게 점만 다시 그리기
 	hr = s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 
 	// set texture
-	hr = s_lpD3DDev->SetTexture(0, NULL);
+	hr = s_lpD3DDev->SetTexture(0, nullptr);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 

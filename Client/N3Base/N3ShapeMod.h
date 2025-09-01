@@ -42,8 +42,8 @@ protected:
 		__ModPosRotScale*	pStateInfos;		// 움직일 상태 정보들(이동,회전,확대축소 정보 m_iStateCount개)
 		__ModPosRotScale	CurStateInfo;		// 현재 움직인 상태 정보(tick에 따라 변화한다)
 
-		__ModPart() {pPart = NULL; pStateInfos = NULL; bPos = false; bRot = false; bScale = false; }
-		~__ModPart() {pPart = NULL; if (pStateInfos) { delete [] pStateInfos; pStateInfos = NULL;}}
+		__ModPart() {pPart = nullptr; pStateInfos = nullptr; bPos = false; bRot = false; bScale = false; }
+		~__ModPart() {pPart = nullptr; if (pStateInfos) { delete [] pStateInfos; pStateInfos = nullptr;}}
 	};
 
 	struct __ModShape
@@ -53,8 +53,8 @@ protected:
 		bool				bShapeScale;		// Shape가 위치, 회전, 스케일 변화가 있는가?
 		__ModPosRotScale*	pShapeStateInfos;	// Shape 전체의 변화 정보
 		__ModPosRotScale	CurShapeStateInfo;	// 현재 움직인 상태 정보(tick에 따라 변화한다)
-		__ModShape() {pShapeStateInfos = NULL; bShapePos = false; bShapeRot = false; bShapeScale = false;}
-		~__ModShape() {if (pShapeStateInfos) {delete [] pShapeStateInfos; pShapeStateInfos = NULL;}}
+		__ModShape() {pShapeStateInfos = nullptr; bShapePos = false; bShapeRot = false; bShapeScale = false;}
+		~__ModShape() {if (pShapeStateInfos) {delete [] pShapeStateInfos; pShapeStateInfos = nullptr;}}
 	};
 
 // Attributes

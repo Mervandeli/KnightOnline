@@ -29,7 +29,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgShapeList dialog
 
 
-CDlgShapeList::CDlgShapeList(CWnd* pParent /*=NULL*/)
+CDlgShapeList::CDlgShapeList(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgShapeList::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgShapeList)
@@ -73,7 +73,7 @@ void CDlgShapeList::UpdateTree(CN3Scene* pScene)
 		if(pShape)
 		{
 			char szFName[MAX_PATH];
-			_splitpath(pShape->FileName().c_str(), NULL, NULL, szFName, NULL);
+			_splitpath(pShape->FileName().c_str(), nullptr, nullptr, szFName, nullptr);
 			m_ListShape.InsertString(i, szFName);
 			m_ListShape.SetItemDataPtr(i, pShape);
 		}
@@ -153,12 +153,12 @@ void CDlgShapeList::OnSize(UINT nType, int cx, int cy)
 
 	const int iPreviewCX = 200;	const int iPreviewCY = 150;
 	const int iButtonCY = 20;
-	if(m_ListShape.GetSafeHwnd() != NULL)
+	if(m_ListShape.GetSafeHwnd() != nullptr)
 	{
 		int iPreviewTop = cy-iPreviewCY;
 		int iPreviewLeft = (cx-iPreviewCX)/2; if (iPreviewLeft<0) iPreviewLeft = 0;
-		m_ListShape.SetWindowPos(NULL, 0, iButtonCY, cx, iPreviewTop-iButtonCY, SWP_NOZORDER);
-		GetDlgItem(IDC_PREVIEW)->SetWindowPos(NULL, iPreviewLeft, iPreviewTop, iPreviewCX, iPreviewCY, SWP_NOZORDER);
+		m_ListShape.SetWindowPos(nullptr, 0, iButtonCY, cx, iPreviewTop-iButtonCY, SWP_NOZORDER);
+		GetDlgItem(IDC_PREVIEW)->SetWindowPos(nullptr, iPreviewLeft, iPreviewTop, iPreviewCX, iPreviewCY, SWP_NOZORDER);
 	}
 }
 

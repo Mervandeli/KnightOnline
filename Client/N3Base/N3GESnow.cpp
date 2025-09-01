@@ -16,8 +16,8 @@ static char THIS_FILE[]=__FILE__;
 
 CN3GESnow::CN3GESnow()
 {
-	m_pTex = NULL;
-	m_pSnowParticle = NULL;
+	m_pTex = nullptr;
+	m_pSnowParticle = nullptr;
 	CN3GESnow::Release();
 }
 
@@ -31,13 +31,13 @@ void CN3GESnow::Release()
 	m_fWidth = m_fHeight = 0.0f;
 	m_vVelocity.Set(0,0,0);
 	s_MngTex.Delete(&m_pTex);
-	if (m_pSnowParticle) {delete [] m_pSnowParticle; m_pSnowParticle = NULL;}
+	if (m_pSnowParticle) {delete [] m_pSnowParticle; m_pSnowParticle = nullptr;}
 	CN3GlobalEffect::Release();
 }
 
 void CN3GESnow::Tick()
 {
-	if (m_bActive == FALSE || m_iVC <= 0 || m_pVB == NULL) return;
+	if (m_bActive == FALSE || m_iVC <= 0 || m_pVB == nullptr) return;
 	CN3GlobalEffect::Tick();
 
 	int iCount = m_iVC/3;
@@ -137,7 +137,7 @@ void CN3GESnow::Tick()
 
 void CN3GESnow::Render(__Vector3& vPos)
 {
-	if (m_bActive == FALSE || m_iVC <= 0 || m_pVB == NULL) return;
+	if (m_bActive == FALSE || m_iVC <= 0 || m_pVB == nullptr) return;
 	
 	CN3GlobalEffect::Render(vPos);
 
@@ -209,7 +209,7 @@ void CN3GESnow::Render(__Vector3& vPos)
 
 void CN3GESnow::Create(float fDensity, float fWidth, float fHeight, float fSnowSize, const __Vector3& vVelocity, float fTimeToFade)
 {
-	if(NULL == s_lpD3DDev) return;
+	if(nullptr == s_lpD3DDev) return;
 
 	Release();
 
@@ -224,7 +224,7 @@ void CN3GESnow::Create(float fDensity, float fWidth, float fHeight, float fSnowS
 	// m_pVB, m_pIB 만들기
 	__ASSERT(s_lpD3DDev, "D3D Device pointer is NULL!");
 	m_iVC = iSnowCount*3;
-	HRESULT hr = s_lpD3DDev->CreateVertexBuffer(m_iVC*sizeof(__VertexXyzT1), D3DUSAGE_DYNAMIC, FVF_XYZT1, D3DPOOL_DEFAULT, &m_pVB, NULL);
+	HRESULT hr = s_lpD3DDev->CreateVertexBuffer(m_iVC*sizeof(__VertexXyzT1), D3DUSAGE_DYNAMIC, FVF_XYZT1, D3DPOOL_DEFAULT, &m_pVB, nullptr);
 	if (FAILED(hr)) return;
 	__VertexXyzT1* pVertices;
 	hr = m_pVB->Lock(0, iSnowCount*3*sizeof(__VertexXyzT1), (void**)&pVertices, D3DLOCK_NOSYSLOCK);

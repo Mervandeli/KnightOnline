@@ -23,9 +23,9 @@ CN3UIStatic::CN3UIStatic()
 {
 	m_eType = UI_TYPE_STATIC;
 
-	m_pBuffOutRef = NULL;
-	m_pImageBkGnd = NULL;
-	m_pSnd_Click = NULL;
+	m_pBuffOutRef = nullptr;
+	m_pImageBkGnd = nullptr;
+	m_pSnd_Click = nullptr;
 }
 
 CN3UIStatic::~CN3UIStatic()
@@ -36,8 +36,8 @@ CN3UIStatic::~CN3UIStatic()
 void CN3UIStatic::Release()
 {
 	CN3UIBase::Release();
-	m_pBuffOutRef = NULL;
-	m_pImageBkGnd = NULL;
+	m_pBuffOutRef = nullptr;
+	m_pImageBkGnd = nullptr;
 	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Click);
 }
 
@@ -81,13 +81,13 @@ bool CN3UIStatic::Load(HANDLE hFile)
 	// 이전 uif파일을 컨버팅 하려면 사운드 로드 하는 부분 막기
 	int iSndFNLen = 0;
 	DWORD dwNum;
-	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, NULL);		//	사운드 파일 문자열 길이
+	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
 	if (iSndFNLen>0)
 	{
-		std::vector<char> buffer(iSndFNLen+1, NULL);
-		ReadFile(hFile, &buffer[0], iSndFNLen, &dwNum, NULL);
+		std::vector<char> buffer(iSndFNLen+1, '\0');
+		ReadFile(hFile, &buffer[0], iSndFNLen, &dwNum, nullptr);
 
-		__ASSERT(NULL == m_pSnd_Click, "memory leak");
+		__ASSERT(nullptr == m_pSnd_Click, "memory leak");
 		m_pSnd_Click = s_SndMgr.CreateObj(&buffer[0], SNDTYPE_2D);
 	}
 
@@ -153,8 +153,8 @@ bool CN3UIStatic::Save(HANDLE hFile)
 	DWORD dwNum;
 	int iSndFNLen = 0;
 	if (m_pSnd_Click) iSndFNLen = m_pSnd_Click->m_szFileName.size();
-	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, NULL);		//	사운드 파일 문자열 길이
-	if (iSndFNLen>0) WriteFile(hFile, m_pSnd_Click->m_szFileName.c_str(), iSndFNLen, &dwNum, NULL);
+	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
+	if (iSndFNLen>0) WriteFile(hFile, m_pSnd_Click->m_szFileName.c_str(), iSndFNLen, &dwNum, nullptr);
 	return true;
 }
 
@@ -171,7 +171,7 @@ void CN3UIStatic::CreateImageAndString()
 
 void CN3UIStatic::DeleteImage()
 {
-	if (m_pImageBkGnd) {delete m_pImageBkGnd; m_pImageBkGnd = NULL;}
+	if (m_pImageBkGnd) {delete m_pImageBkGnd; m_pImageBkGnd = nullptr;}
 }
 
 void CN3UIStatic::SetSndClick(const std::string& strFileName)

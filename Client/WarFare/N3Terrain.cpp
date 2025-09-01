@@ -34,7 +34,7 @@ CN3Terrain::CN3Terrain()
 	m_FillMode = D3DFILL_SOLID;
 	m_iLodLevel = MIN_LOD_LEVEL;
 
-	m_ppPatch = NULL;
+	m_ppPatch = nullptr;
 
 	m_pat_CenterPos.x = m_pat_CenterPos.y = 0;
 	m_pat_LBPos.x = m_pat_LBPos.y = 0;
@@ -43,18 +43,18 @@ CN3Terrain::CN3Terrain()
 	SetRectEmpty(&m_pat_BoundRect);
 	m_iNumPatch = 0;
 
-	m_pMapData = NULL;
+	m_pMapData = nullptr;
 	m_ti_MapSize = 0;
 	m_pat_MapSize = 0;
 
-	//m_ppIsLightMap = NULL;
-	//m_pppLightMapTex = NULL;
+	//m_ppIsLightMap = nullptr;
+	//m_pppLightMapTex = nullptr;
 
 	m_ti_CenterPos.x = m_ti_CenterPos.y = 0;
 	m_ti_PrevCenterPos = m_ti_CenterPos;
 
-	m_ppPatchRadius = NULL;
-	m_ppPatchMiddleY = NULL;
+	m_ppPatchRadius = nullptr;
+	m_ppPatchMiddleY = nullptr;
 
 	ZeroMemory(m_pGrassFileName, MAX_PATH);
 
@@ -63,8 +63,8 @@ CN3Terrain::CN3Terrain()
 	m_iNumGrass = 0;
 
 	m_NumTileTex = 0;
-	m_pTileTex = NULL;
-	m_ppColorMapTex = NULL;
+	m_pTileTex = nullptr;
+	m_ppColorMapTex = nullptr;
 	m_iNumColorMap = 0;
 
 	float TileDirU[8][4] = {
@@ -95,12 +95,12 @@ CN3Terrain::CN3Terrain()
 
 	MakeDistanceTable();
 
-	m_pGrassAttr = NULL;
-	m_pGrassNum = NULL;
+	m_pGrassAttr = nullptr;
+	m_pGrassNum = nullptr;
 
-	m_pRiver = NULL;
-	m_pPond = NULL;
-	m_pNormal = NULL;
+	m_pRiver = nullptr;
+	m_pPond = nullptr;
+	m_pNormal = nullptr;
 
 	m_bAvailableTile = true;
 }
@@ -142,14 +142,14 @@ void CN3Terrain::Release()
 	{
 		//free(m_pGrassAttr);
 		GlobalFree(m_pGrassAttr);
-		m_pGrassAttr = NULL;
+		m_pGrassAttr = nullptr;
 	}
 
 	if (m_pGrassNum)
 	{
 		//free(m_pGrassAttr);
 		GlobalFree(m_pGrassNum);
-		m_pGrassNum = NULL;
+		m_pGrassNum = nullptr;
 	}
 
 //	{
@@ -158,24 +158,24 @@ void CN3Terrain::Release()
 //			if(m_ppGrassAttr[x])
 //			{
 //				delete[] m_ppGrassAttr[x];
-//				m_ppGrassAttr[x] = NULL;
+//				m_ppGrassAttr[x] = nullptr;
 //			}
 //		}
 //		delete[] m_ppGrassAttr;
-//		m_ppGrassAttr = NULL;
+//		m_ppGrassAttr = nullptr;
 //	}
 
 	if (m_pRiver)
 	{
 		m_pRiver->Release();
 		delete m_pRiver;
-		m_pRiver = NULL;
+		m_pRiver = nullptr;
 	}
 
 	if (m_pPond)
 	{
 		delete m_pPond;
-		m_pPond = NULL;
+		m_pPond = nullptr;
 	}
 
 	if (m_pTileTex)
@@ -183,7 +183,7 @@ void CN3Terrain::Release()
 //		for(x=0;x<m_NumTileTex;x++)
 //			m_pTileTex[x].Release();
 		delete[] m_pTileTex;
-		m_pTileTex = NULL;
+		m_pTileTex = nullptr;
 	}
 
 	if (m_ppColorMapTex)
@@ -195,10 +195,10 @@ void CN3Terrain::Release()
 //				m_ppColorMapTex[x][z].Release();
 //			}
 			delete[] m_ppColorMapTex[x];
-			m_ppColorMapTex[x] = NULL;
+			m_ppColorMapTex[x] = nullptr;
 		}
 		delete[] m_ppColorMapTex;
-		m_ppColorMapTex = NULL;
+		m_ppColorMapTex = nullptr;
 	}
 
 	if (m_ppPatch)
@@ -210,23 +210,23 @@ void CN3Terrain::Release()
 //				m_ppPatch[x][z].Release();
 //			}
 			delete[] m_ppPatch[x];
-			m_ppPatch[x] = NULL;
+			m_ppPatch[x] = nullptr;
 		}
 		delete[] m_ppPatch;
-		m_ppPatch = NULL;
+		m_ppPatch = nullptr;
 	}
 
 	if (m_pMapData)
 	{
 		//free(m_pMapData);
 		GlobalFree(m_pMapData);
-		m_pMapData = NULL;
+		m_pMapData = nullptr;
 	}
 
 	if (m_pNormal)
 	{
 		GlobalFree(m_pNormal);
-		m_pNormal = NULL;
+		m_pNormal = nullptr;
 	}
 
 	if (m_ppPatchRadius)
@@ -234,10 +234,10 @@ void CN3Terrain::Release()
 		for (x = 0;x < m_pat_MapSize;x++)
 		{
 			delete[] m_ppPatchRadius[x];
-			m_ppPatchRadius[x] = NULL;
+			m_ppPatchRadius[x] = nullptr;
 		}
 		delete[] m_ppPatchRadius;
-		m_ppPatchRadius = NULL;
+		m_ppPatchRadius = nullptr;
 	}
 
 	if (m_ppPatchMiddleY)
@@ -245,10 +245,10 @@ void CN3Terrain::Release()
 		for (x = 0;x < m_pat_MapSize;x++)
 		{
 			delete[] m_ppPatchMiddleY[x];
-			m_ppPatchMiddleY[x] = NULL;
+			m_ppPatchMiddleY[x] = nullptr;
 		}
 		delete[] m_ppPatchMiddleY;
-		m_ppPatchMiddleY = NULL;
+		m_ppPatchMiddleY = nullptr;
 	}
 
 	int z;
@@ -318,8 +318,8 @@ void CN3Terrain::Init()
 	m_iLodLevel = MIN_LOD_LEVEL;
 	SetLODLevel(3);
 
-	m_pMapData = NULL;
-	m_pNormal = NULL;
+	m_pMapData = nullptr;
+	m_pNormal = nullptr;
 	m_ti_MapSize = 0;
 	m_pat_MapSize = 0;
 
@@ -332,12 +332,12 @@ void CN3Terrain::Init()
 	m_iNumGrass = 0;
 
 	m_NumTileTex = 0;
-	m_pTileTex = NULL;
-	m_ppColorMapTex = NULL;
+	m_pTileTex = nullptr;
+	m_ppColorMapTex = nullptr;
 	m_iNumColorMap = 0;
 
-	m_pGrassAttr = NULL;
-	m_pGrassNum = NULL;
+	m_pGrassAttr = nullptr;
+	m_pGrassNum = nullptr;
 
 	m_pRiver = new CN3River();
 	m_pPond = new CN3Pond();
@@ -429,27 +429,27 @@ bool CN3Terrain::Load(HANDLE hFile)
 	if (m_iFileFormatVersion >= N3FORMAT_VER_1264)
 	{
 		int iIdk0;
-		ReadFile(hFile, &iIdk0, sizeof(int), &dwRWC, NULL);
+		ReadFile(hFile, &iIdk0, sizeof(int), &dwRWC, nullptr);
 
 		int iNL;
-		ReadFile(hFile, &iNL, sizeof(int), &dwRWC, NULL);
+		ReadFile(hFile, &iNL, sizeof(int), &dwRWC, nullptr);
 		if (iNL > 0)
 		{
-			std::vector<char> buffer(iNL + 1, NULL);
-			ReadFile(hFile, &buffer[0], iNL, &dwRWC, NULL);
+			std::vector<char> buffer(iNL + 1, '\0');
+			ReadFile(hFile, &buffer[0], iNL, &dwRWC, nullptr);
 			m_szName = &buffer[0];
 		}
 	}
 
 	m_szFileName = szFNBackup;
 
-	CUILoading* pUILoading = NULL;
+	CUILoading* pUILoading = nullptr;
 #ifdef _N3GAME
 	pUILoading = CGameProcedure::s_pUILoading; // 로딩바..
 #endif
 	if (pUILoading) pUILoading->Render("Allocating Terrain...", 0);
 
-	ReadFile(hFile, &(m_ti_MapSize), sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &(m_ti_MapSize), sizeof(int), &dwRWC, nullptr);
 	m_pat_MapSize = (m_ti_MapSize - 1) / PATCH_TILE_SIZE;
 
 	int x, z;
@@ -457,14 +457,14 @@ bool CN3Terrain::Load(HANDLE hFile)
 	//m_pMapData = (LPMAPDATA)malloc(sizeof(MAPDATA)*m_ti_MapSize*m_ti_MapSize);
 	m_pMapData = (LPMAPDATA) GlobalAlloc(GMEM_FIXED, sizeof(MAPDATA) * m_ti_MapSize * m_ti_MapSize);
 #ifdef _N3GAME
-	if (m_pMapData == NULL) CLogWriter::Write("Terrain Error : MapData Memory Allocation Failed..-.-");
+	if (m_pMapData == nullptr) CLogWriter::Write("Terrain Error : MapData Memory Allocation Failed..-.-");
 #endif
 	__ASSERT(m_pMapData, "MapData Memory Allocation Failed..-.-");
-	ReadFile(hFile, m_pMapData, sizeof(MAPDATA) * m_ti_MapSize * m_ti_MapSize, &dwRWC, NULL);
+	ReadFile(hFile, m_pMapData, sizeof(MAPDATA) * m_ti_MapSize * m_ti_MapSize, &dwRWC, nullptr);
 
 	m_pNormal = (__Vector3*) GlobalAlloc(GMEM_FIXED, sizeof(__Vector3) * m_ti_MapSize * m_ti_MapSize);
 #ifdef _N3GAME
-	if (m_pNormal == NULL) CLogWriter::Write("Terrain Error : Normal Vector Memory Allocation Failed..-.-");
+	if (m_pNormal == nullptr) CLogWriter::Write("Terrain Error : Normal Vector Memory Allocation Failed..-.-");
 #endif
 	__ASSERT(m_pNormal, "Normal Vector Memory Allocation Failed..-.-");
 	SetNormals();
@@ -503,7 +503,7 @@ bool CN3Terrain::Load(HANDLE hFile)
 //	for(x=0; x<m_ti_MapSize; x++)
 //	{
 //		m_ppGrassAttr[x] = new uint8_t[m_ti_MapSize];
-//		ReadFile(hFile, m_ppGrassAttr[x], sizeof(uint8_t)*m_ti_MapSize, &dwRWC, NULL);
+//		ReadFile(hFile, m_ppGrassAttr[x], sizeof(uint8_t)*m_ti_MapSize, &dwRWC, nullptr);
 //
 //		if(!(x%256))
 //		{
@@ -516,22 +516,22 @@ bool CN3Terrain::Load(HANDLE hFile)
 	//m_pGrassAttr = (uint8_t*)malloc(sizeof(uint8_t)*m_ti_MapSize*m_ti_MapSize);
 	m_pGrassAttr = (uint8_t*) GlobalAlloc(GMEM_FIXED, sizeof(uint8_t) * m_ti_MapSize * m_ti_MapSize);
 #ifdef _N3GAME
-	if (m_pGrassAttr == NULL) CLogWriter::Write("Terrain Error : GrassAttr Data Memory Allocation Failed..-.-");
+	if (m_pGrassAttr == nullptr) CLogWriter::Write("Terrain Error : GrassAttr Data Memory Allocation Failed..-.-");
 #endif
 	__ASSERT(m_pGrassAttr, "GrassAttr Data Memory Allocation Failed..-.-");
-	ReadFile(hFile, m_pGrassAttr, sizeof(uint8_t) * m_ti_MapSize * m_ti_MapSize, &dwRWC, NULL);
+	ReadFile(hFile, m_pGrassAttr, sizeof(uint8_t) * m_ti_MapSize * m_ti_MapSize, &dwRWC, nullptr);
 
 	//^^v풀갯수 정보 넣기...(조만간 넣어라..)
 	m_pGrassNum = (uint8_t*) GlobalAlloc(GMEM_FIXED, sizeof(uint8_t) * m_ti_MapSize * m_ti_MapSize);
 #ifdef _N3GAME
-	if (m_pGrassNum == NULL) CLogWriter::Write("Terrain Error : GrassNum Data Memory Allocation Failed..-.-");
+	if (m_pGrassNum == nullptr) CLogWriter::Write("Terrain Error : GrassNum Data Memory Allocation Failed..-.-");
 #endif
 	__ASSERT(m_pGrassNum, "GrassNum Data Memory Allocation Failed..-.-");
-	//ReadFile(hFile, m_pGrassNum, sizeof(uint8_t)*m_ti_MapSize*m_ti_MapSize, &dwRWC, NULL);	
+	//ReadFile(hFile, m_pGrassNum, sizeof(uint8_t)*m_ti_MapSize*m_ti_MapSize, &dwRWC, nullptr);	
 	memset(m_pGrassNum, 5, sizeof(uint8_t) * m_ti_MapSize * m_ti_MapSize);
 
 	//load colormap....
-	ReadFile(hFile, m_pGrassFileName, MAX_PATH, &dwRWC, NULL);
+	ReadFile(hFile, m_pGrassFileName, MAX_PATH, &dwRWC, nullptr);
 	LoadGrassInfo();
 
 	LoadTileInfo(hFile);
@@ -540,7 +540,7 @@ bool CN3Terrain::Load(HANDLE hFile)
 	if (pUILoading) pUILoading->Render("Loading Lightmap Data...", 0);
 
 	int NumLightMap = 0;
-	ReadFile(hFile, &NumLightMap, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &NumLightMap, sizeof(int), &dwRWC, nullptr);
 
 	int16_t sx, sz;
 	CN3Texture* pTmpTex = new CN3Texture;
@@ -651,7 +651,7 @@ MAPDATA	CN3Terrain::GetMapData(int x, int z)
 //
 void CN3Terrain::LoadGrassInfo()
 {
-	CUILoading* pUILoading = NULL;
+	CUILoading* pUILoading = nullptr;
 #ifdef _N3GAME
 	pUILoading = CGameProcedure::s_pUILoading; // 로딩바..
 #endif
@@ -668,8 +668,8 @@ void CN3Terrain::LoadGrassInfo()
 	char szDir[_MAX_DIR];
 	char szGrassDir[_MAX_DIR] = {};
 	char szModuleFilePath[_MAX_PATH];
-	GetModuleFileName(NULL, szModuleFilePath, _MAX_PATH);
-	_splitpath(szModuleFilePath, szDrive, szDir, NULL, NULL);
+	GetModuleFileName(nullptr, szModuleFilePath, _MAX_PATH);
+	_splitpath(szModuleFilePath, szDrive, szDir, nullptr, nullptr);
 
 	// strcpy(szGrassDir, szDir);
 	// strcat(szGrassDir, "misc\\grass");
@@ -720,7 +720,7 @@ void CN3Terrain::LoadGrassInfo()
 		}
 
 		szDxtFullPath = fmt::format(".\\{}\\{}", szGrassDir, FileName);
-		//_makepath(szDxtFullPath, szDrive, szGrassDir, FileName, NULL);
+		//_makepath(szDxtFullPath, szDrive, szGrassDir, FileName, nullptr);
 
 		strcpy(m_pGrassTextureName[Log2(id)], szDxtFullPath.c_str());
 
@@ -739,14 +739,14 @@ void CN3Terrain::LoadGrassInfo()
 //
 void CN3Terrain::LoadTileInfo(HANDLE hFile)
 {
-	CUILoading* pUILoading = NULL;
+	CUILoading* pUILoading = nullptr;
 #ifdef _N3GAME
 	pUILoading = CGameProcedure::s_pUILoading; // 로딩바..
 #endif
 	if (pUILoading) pUILoading->Render("Loading Terrain Tile Data...", 0);
 
 	DWORD dwRWC;
-	ReadFile(hFile, &m_NumTileTex, sizeof(uint32_t), &dwRWC, NULL);
+	ReadFile(hFile, &m_NumTileTex, sizeof(uint32_t), &dwRWC, nullptr);
 	if (m_NumTileTex == 0) return;
 
 	m_pTileTex = new CN3Texture[m_NumTileTex];
@@ -758,7 +758,7 @@ void CN3Terrain::LoadTileInfo(HANDLE hFile)
 	}
 
 	int NumTileTexSrc;
-	ReadFile(hFile, &NumTileTexSrc, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &NumTileTexSrc, sizeof(int), &dwRWC, nullptr);
 	if (NumTileTexSrc == 0)
 		return;
 
@@ -766,7 +766,7 @@ void CN3Terrain::LoadTileInfo(HANDLE hFile)
 	for (int i = 0; i < NumTileTexSrc; i++)
 	{
 		SrcName[i] = new char[MAX_PATH];
-		ReadFile(hFile, SrcName[i], MAX_PATH, &dwRWC, NULL);
+		ReadFile(hFile, SrcName[i], MAX_PATH, &dwRWC, nullptr);
 	}
 
 	int16_t SrcIdx, TileIdx;
@@ -981,7 +981,7 @@ void CN3Terrain::DispositionPatch()
 
 			cx = px * PATCH_PIXEL_SIZE / COLORMAPTEX_SIZE;
 			cz = pz * PATCH_PIXEL_SIZE / COLORMAPTEX_SIZE;
-			if (cx < 0 || cz < 0 || cx >= m_iNumColorMap || cz >= m_iNumColorMap) m_ppPatch[x][z].m_pRefColorTex = NULL;
+			if (cx < 0 || cz < 0 || cx >= m_iNumColorMap || cz >= m_iNumColorMap) m_ppPatch[x][z].m_pRefColorTex = nullptr;
 			else m_ppPatch[x][z].m_pRefColorTex = &(m_ppColorMapTex[cx][cz]);
 		}
 	}
@@ -1029,14 +1029,14 @@ void CN3Terrain::SetLightMap(int dir)
 	__TABLE_ZONE* pZoneData = CGameBase::s_pTbl_Zones.Find(CGameBase::s_pPlayer->m_InfoExt.iZoneCur);
 	if (!pZoneData) return;
 
-	HANDLE hFile = CreateFile(pZoneData->szLightMapFN.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(pZoneData->szLightMapFN.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if (!hFile) return;
 
 	DWORD dwRWC;
 	int* Addr = new int[m_pat_MapSize * m_pat_MapSize];
 	int iVersion;
-	BOOL b = ReadFile(hFile, &(iVersion), sizeof(int), &dwRWC, NULL);
-	b = ReadFile(hFile, &(Addr[0]), sizeof(int) * m_pat_MapSize * m_pat_MapSize, &dwRWC, NULL);
+	BOOL b = ReadFile(hFile, &(iVersion), sizeof(int), &dwRWC, nullptr);
+	b = ReadFile(hFile, &(Addr[0]), sizeof(int) * m_pat_MapSize * m_pat_MapSize, &dwRWC, nullptr);
 
 	//DIR_LT = 0, DIR_CT = 1, DIR_RT = 2,
 	//DIR_LM = 3, DIR_CM = 4, DIR_RM = 5,
@@ -1232,17 +1232,17 @@ void CN3Terrain::SetLightMapPatch(int x, int z, HANDLE hFile, int* pAddr)
 
 	int jump = pAddr[px + (m_pat_MapSize * pz)];
 	if (jump <= 0) return;
-	uint32_t dwPtr = SetFilePointer(hFile, jump, NULL, FILE_BEGIN);
+	uint32_t dwPtr = SetFilePointer(hFile, jump, nullptr, FILE_BEGIN);
 
 	int TexCount;
-	ReadFile(hFile, &TexCount, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &TexCount, sizeof(int), &dwRWC, nullptr);
 
 	int tx, tz;
 	int rtx, rtz;
 	for (int i = 0; i < TexCount; i++)
 	{
-		ReadFile(hFile, &tx, sizeof(int), &dwRWC, NULL);
-		ReadFile(hFile, &tz, sizeof(int), &dwRWC, NULL);
+		ReadFile(hFile, &tx, sizeof(int), &dwRWC, nullptr);
+		ReadFile(hFile, &tz, sizeof(int), &dwRWC, nullptr);
 
 		CN3Texture* pTex = new CN3Texture;
 		pTex->m_iFileFormatVersion = m_iFileFormatVersion;
@@ -1268,7 +1268,7 @@ CN3Texture* CN3Terrain::GetLightMap(int tx, int tz)
 
 	px -= (m_pat_CenterPos.x - 1);
 	pz -= (m_pat_CenterPos.y - 1);
-	if (px < 0 || px>2 || pz < 0 || pz>2) return NULL;
+	if (px < 0 || px>2 || pz < 0 || pz>2) return nullptr;
 
 	uint32_t key = tx * 10000 + tz;
 	stlMap_N3TexIt it = m_LightMapPatch[px][pz].find(key);
@@ -1276,7 +1276,7 @@ CN3Texture* CN3Terrain::GetLightMap(int tx, int tz)
 	{
 		return (*it).second;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1474,9 +1474,9 @@ void CN3Terrain::Render()
 	hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, ColorOP2);
 	hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG1, ColorArg21);
 	hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG2, ColorArg22);
-	hr = CN3Base::s_lpD3DDev->SetTexture(0, NULL);
-	hr = CN3Base::s_lpD3DDev->SetTexture(1, NULL);
-	hr = CN3Base::s_lpD3DDev->SetTexture(2, NULL);
+	hr = CN3Base::s_lpD3DDev->SetTexture(0, nullptr);
+	hr = CN3Base::s_lpD3DDev->SetTexture(1, nullptr);
+	hr = CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
 
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, CullMode);
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, ZEnable);
@@ -2193,7 +2193,7 @@ bool CN3Terrain::CheckCollision(__Vector3& vPos, __Vector3& vDir, float fVelocit
 
 bool CN3Terrain::LoadColorMap(const std::string& szFN)
 {
-	CUILoading* pUILoading = NULL;
+	CUILoading* pUILoading = nullptr;
 #ifdef _N3GAME
 	pUILoading = CGameProcedure::s_pUILoading; // 로딩바..
 #endif
@@ -2212,7 +2212,7 @@ bool CN3Terrain::LoadColorMap(const std::string& szFN)
 		}
 	}
 
-	HANDLE hColorMapFile = CreateFile(szFN.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hColorMapFile = CreateFile(szFN.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if (INVALID_HANDLE_VALUE == hColorMapFile)
 	{
 #ifdef _N3GAME
@@ -2241,7 +2241,7 @@ bool CN3Terrain::LoadColorMap(const std::string& szFN)
 
 CN3Texture* CN3Terrain::GetTileTex(int x, int z)
 {
-	if (x < 0 || x >= m_ti_MapSize || z < 0 || z >= m_ti_MapSize) return NULL;
+	if (x < 0 || x >= m_ti_MapSize || z < 0 || z >= m_ti_MapSize) return nullptr;
 
 	MAPDATA MapData;
 	MapData = m_pMapData[(x * m_ti_MapSize) + z];
@@ -2261,7 +2261,7 @@ bool CN3Terrain::GetTileTexInfo(float x, float z, TERRAINTILETEXINFO& TexInfo1, 
 
 	if (MapData.Tex1Idx >= m_NumTileTex)
 	{
-		TexInfo1.pTex = NULL;
+		TexInfo1.pTex = nullptr;
 		TexInfo1.u = TexInfo1.v = 0.0f;
 	}
 	else
@@ -2292,7 +2292,7 @@ bool CN3Terrain::GetTileTexInfo(float x, float z, TERRAINTILETEXINFO& TexInfo1, 
 
 	if (MapData.Tex2Idx >= m_NumTileTex)
 	{
-		TexInfo2.pTex = NULL;
+		TexInfo2.pTex = nullptr;
 		TexInfo2.u = TexInfo2.v = 0.0f;
 	}
 	else

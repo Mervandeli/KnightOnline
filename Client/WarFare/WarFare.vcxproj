@@ -103,7 +103,6 @@
     <ClCompile Include="APISocket.cpp" />
     <ClCompile Include="Bird.cpp" />
     <ClCompile Include="BirdMng.cpp" />
-    <ClCompile Include="Catapult.cpp" />
     <ClCompile Include="ClientResourceFormatter.cpp" />
     <ClCompile Include="CountableItemEditDlg.cpp" />
     <ClCompile Include="DungeonManager.cpp" />
@@ -125,8 +124,6 @@
     <ClCompile Include="ItemRepairMgr.cpp" />
     <ClCompile Include="LightMgr.cpp" />
     <ClCompile Include="LocalInput.cpp" />
-    <ClCompile Include="MachineBase.cpp" />
-    <ClCompile Include="MachineMng.cpp" />
     <ClCompile Include="MagicSkillMng.cpp" />
     <ClCompile Include="N3ClientShapeMgr.cpp" />
     <ClCompile Include="N3FXBundleGame.cpp" />
@@ -173,7 +170,6 @@
     <ClCompile Include="UIImageTooltipDlg.cpp" />
     <ClCompile Include="UIInn.cpp" />
     <ClCompile Include="UIInventory.cpp" />
-    <ClCompile Include="UIItemExchange.cpp" />
     <ClCompile Include="UIKnightsOperation.cpp" />
     <ClCompile Include="UILevelGuide.cpp" />
     <ClCompile Include="UILoading.cpp" />
@@ -188,7 +184,6 @@
     <ClCompile Include="UINotice.cpp" />
     <ClCompile Include="UINPCChangeEvent.cpp" />
     <ClCompile Include="UINPCEvent.cpp" />
-    <ClCompile Include="UINpcTalk.cpp" />
     <ClCompile Include="UIPartyBBS.cpp" />
     <ClCompile Include="UIPartyBBSSelector.cpp" />
     <ClCompile Include="UIPartyOrForce.cpp" />
@@ -204,7 +199,6 @@
     <ClCompile Include="UITradeBBSSelector.cpp" />
     <ClCompile Include="UITradeEditDlg.cpp" />
     <ClCompile Include="UITradeExplanation.cpp" />
-    <ClCompile Include="UITradeList.cpp" />
     <ClCompile Include="UITradeSellBBS.cpp" />
     <ClCompile Include="UITransactionDlg.cpp" />
     <ClCompile Include="UIUpgradeSelect.cpp" />
@@ -220,7 +214,6 @@
     <ClInclude Include="Bird.h" />
     <ClInclude Include="BirdMng.h" />
     <ClInclude Include="Bitset.h" />
-    <ClInclude Include="Catapult.h" />
     <ClInclude Include="ClientResourceFormatter.h" />
     <ClInclude Include="CountableItemEditDlg.h" />
     <ClInclude Include="DungeonManager.h" />
@@ -251,8 +244,6 @@
     <ClInclude Include="ItemRepairMgr.h" />
     <ClInclude Include="LightMgr.h" />
     <ClInclude Include="LocalInput.h" />
-    <ClInclude Include="MachineBase.h" />
-    <ClInclude Include="MachineMng.h" />
     <ClInclude Include="MagicSkillMng.h" />
     <ClInclude Include="N3EffectWave2.h" />
     <ClInclude Include="N3FXBundleGame.h" />
@@ -295,7 +286,6 @@
     <ClInclude Include="UIImageTooltipDlg.h" />
     <ClInclude Include="UIInn.h" />
     <ClInclude Include="UIInventory.h" />
-    <ClInclude Include="UIItemExchange.h" />
     <ClInclude Include="UIKnightsOperation.h" />
     <ClInclude Include="UILevelGuide.h" />
     <ClInclude Include="UILoading.h" />
@@ -310,7 +300,6 @@
     <ClInclude Include="UINotice.h" />
     <ClInclude Include="UINPCChangeEvent.h" />
     <ClInclude Include="UINPCEvent.h" />
-    <ClInclude Include="UINpcTalk.h" />
     <ClInclude Include="UIPartyBBS.h" />
     <ClInclude Include="UIPartyBBSSelector.h" />
     <ClInclude Include="UIPartyOrForce.h" />
@@ -326,7 +315,6 @@
     <ClInclude Include="UITradeBBSSelector.h" />
     <ClInclude Include="UITradeEditDlg.h" />
     <ClInclude Include="UITradeExplanation.h" />
-    <ClInclude Include="UITradeList.h" />
     <ClInclude Include="UITradeSellBBS.h" />
     <ClInclude Include="UITransactionDlg.h" />
     <ClInclude Include="UIUpgradeSelect.h" />

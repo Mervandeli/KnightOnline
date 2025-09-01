@@ -38,7 +38,7 @@ public:
 
 	void		TexSet(int index, const std::string& szFN);
 	void		TexAlloc(int nCount);
-	CN3Texture* Tex(int index) { if(m_TexRefs.empty() || index < 0 || index >= m_TexRefs.size()) return NULL; return m_TexRefs[index]; }
+	CN3Texture* Tex(int index) { if(m_TexRefs.empty() || index < 0 || index >= m_TexRefs.size()) return nullptr; return m_TexRefs[index]; }
 
 	void		Init(__Vector3 vPos, uint32_t dwBoardType, float fW, float fH);
 	void		Tick(float fFrm);

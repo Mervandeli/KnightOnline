@@ -39,7 +39,7 @@ public:
 	public:
 		__Particle()
 		{
-			memset(this, NULL, sizeof(__Particle));
+			memset(this, 0, sizeof(__Particle));
 		}
 		~__Particle(){}
 

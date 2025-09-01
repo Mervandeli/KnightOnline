@@ -38,44 +38,46 @@ CUIInn::~CUIInn()
 
 bool CUIInn::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if (dwMsg == UIMSG_BUTTON_CLICK)					
+	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
-		if(pSender->m_szID == "btn_warehouse")	//창고이용..
+		if (pSender->m_szID == "btn_warehouse")	//창고이용..
 		{
 			MsgSend_OpenWareHouse();
 			SetVisible(false);
 			return true;
 		}
 
-		if(pSender->m_szID == "btn_makeclan")	//clan 생성..
+		if (pSender->m_szID == "btn_makeclan")	//clan 생성..
 		{
-			__InfoPlayerBase* pInfo = &(CGameProcedure::s_pPlayer->m_InfoBase);
-			__InfoPlayerMySelf* pInfoExt = &(CGameProcedure::s_pPlayer->m_InfoExt);
+			__InfoPlayerBase* pInfo = &CGameBase::s_pPlayer->m_InfoBase;
+			__InfoPlayerMySelf* pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
 
-			if(pInfo->iLevel < CLAN_LEVEL_LIMIT)
+			if (pInfo->iLevel < CLAN_LEVEL_LIMIT)
 			{
-				Message(/*IDS_CLAN_DENY_LOWLEVEL*/6500);
-				SetVisible(false);
-				return true;
-			}
-			if(pInfoExt->iGold < CLAN_COST)
-			{
-				Message(/*IDS_CLAN_DENY_LOWGOLD*/6501);
-				SetVisible(false);
-				return true;
-			}
-			if(pInfoExt->iKnightsID!=0)
-			{
-				Message(/*IDS_CLAN_DENY_ALREADYJOINED*/6503);
+				Message(IDS_CLAN_DENY_LOWLEVEL);
 				SetVisible(false);
 				return true;
 			}
 
-			CGameProcedure::s_pProcMain->m_pUICreateClanName->Open(/*IDS_CLAN_INPUT_NAME*/6507);
+			if (pInfoExt->iGold < CLAN_COST)
+			{
+				Message(IDS_CLAN_DENY_LOWGOLD);
+				SetVisible(false);
+				return true;
+			}
+
+			if (pInfoExt->iKnightsID != 0)
+			{
+				Message(IDS_CLAN_DENY_ALREADYJOINED);
+				SetVisible(false);
+				return true;
+			}
+
+			CGameProcedure::s_pProcMain->m_pUICreateClanName->Open(IDS_CLAN_INPUT_NAME);
 			SetVisible(false);
 			return true;
 		}
-		else if(pSender->m_szID == "btn_sale")
+		else if (pSender->m_szID == "btn_sale")
 		{
 			CGameProcedure::s_pProcMain->m_pUITradeBBSSelector->MsgSend_OpenTradeSellBBS();
 			SetVisible(false);

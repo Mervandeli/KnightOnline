@@ -22,14 +22,14 @@ const float LIGHTNING_DURATION = 2.0f;
 //////////////////////////////////////////////////////////////////////
 CGameEng::CGameEng()
 {
-	m_pActiveCam	= NULL;
+	m_pActiveCam	= nullptr;
 
 	// 프로그램이 실행된 경로..
 	char szBuf[_MAX_PATH];
 	char szDrive[_MAX_DRIVE], szDir[_MAX_DIR];
-	::GetModuleFileName(NULL, szBuf, _MAX_PATH);
-	_splitpath(szBuf, szDrive, szDir, NULL, NULL);
-	_makepath(szBuf, szDrive, szDir, NULL, NULL);
+	::GetModuleFileName(nullptr, szBuf, _MAX_PATH);
+	_splitpath(szBuf, szDrive, szDir, nullptr, nullptr);
+	_makepath(szBuf, szDrive, szDir, nullptr, nullptr);
 
 	///////////////////////////////////////////////////////////////
 	// 기본 카메라 세팅..
@@ -80,9 +80,9 @@ CGameEng::CGameEng()
 	*/
 	// 기본 라이트 세팅
 	///////////////////////////////////////////////////////////////
-	m_pRefLightSun = NULL;
-	m_pRefLightSupport = NULL;
-	m_pRefLightCam = NULL;
+	m_pRefLightSun = nullptr;
+	m_pRefLightSupport = nullptr;
+	m_pRefLightCam = nullptr;
 
 	m_fFPDeltaCur = 1.0f; // 현재 
 	m_fFPDeltaToReach = 1.0f; // 이값을 목표로 해서 변한다.
@@ -164,7 +164,7 @@ void CGameEng::Tick(const D3DCOLOR* crDiffuses,			// Diffuse 라이트 색깔.. 
 					float fHeightPlayer,				// 키를 인수로 넣으면 카메라와 라이트 처리..
 					float fSunRadianZ)					// 해의 Z 각도..
 {
-	if(NULL == m_pActiveCam) return;
+	if(nullptr == m_pActiveCam) return;
 
 	float fRadius = fHeightPlayer * 2.0f;
 	float fYaw = 0;
@@ -456,7 +456,7 @@ void CGameEng::ViewPointChange(e_ViewPoint eVP)
 
 void CGameEng::CameraPitchAdd(float fRotXPerSec)
 {
-	if(NULL == m_pActiveCam) return;
+	if(nullptr == m_pActiveCam) return;
 	float fPitchMax = D3DXToRadian(70.0f);
 	float fPitchMin = -D3DXToRadian(50.0f);
 	if(VP_BACKWARD == m_eViewPoint)
@@ -498,7 +498,7 @@ void CGameEng::CameraYawAdd(float fRotYPerSec)
 
 void CGameEng::CameraZoom(float fDelta)
 {
-	if(NULL == m_pActiveCam) return;
+	if(nullptr == m_pActiveCam) return;
 	if(VP_BACKWARD == m_eViewPoint || VP_FOWARD == m_eViewPoint)
 	{
 		m_fZoomBackwardOrFoward -= fDelta * s_fSecPerFrm; // 1.5인칭, 앞에서 본 시점일때 카메라 Zoom 1.0f 가 기준이다.

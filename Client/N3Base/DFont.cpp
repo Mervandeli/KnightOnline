@@ -10,15 +10,15 @@ const float RHW_DEFAULT = 1.0f;
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-HDC CDFont::s_hDC = NULL;
+HDC CDFont::s_hDC = nullptr;
 int CDFont::s_iInstanceCount = 0;
-HFONT CDFont::s_hFontOld = NULL;
+HFONT CDFont::s_hFontOld = nullptr;
 
 CDFont::CDFont(const std::string& szFontName, uint32_t dwHeight, uint32_t dwFlags)
 {
 	if(0 == s_iInstanceCount)
 	{
-		s_hDC = CreateCompatibleDC(NULL);
+		s_hDC = CreateCompatibleDC(nullptr);
 		// 임시 폰트를 만들고 s_hFontOld를 얻는다.
 		HFONT hFont			= CreateFont( 0, 0, 0, 0, 0, FALSE,
 							  FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
@@ -39,14 +39,14 @@ CDFont::CDFont(const std::string& szFontName, uint32_t dwHeight, uint32_t dwFlag
     m_dwFontHeight		= dwHeight;
     m_dwFontFlags       = dwFlags;
 
-    m_pd3dDevice		= NULL;
-    m_pTexture			= NULL;
-    m_pVB				= NULL;
+    m_pd3dDevice		= nullptr;
+    m_pTexture			= nullptr;
+    m_pVB				= nullptr;
 
 	m_iPrimitiveCount = 0;
 	m_PrevLeftTop.x = m_PrevLeftTop.y = 0;
 
-	m_hFont = NULL;
+	m_hFont = nullptr;
 	m_dwFontColor = 0xffffffff;
 	m_Size.cx = 0; m_Size.cy = 0;
 	m_Is2D = (dwFlags & D3DFONT_3D) ? FALSE : TRUE;
@@ -62,14 +62,14 @@ CDFont::~CDFont()
 	{
 		if (s_hFontOld) SelectObject(s_hDC, s_hFontOld);
 		DeleteDC(s_hDC);
-		s_hDC = NULL;
+		s_hDC = nullptr;
 	}
 }
 
 HRESULT CDFont::SetFont(const std::string& szFontName, uint32_t dwHeight, uint32_t dwFlags)
 {
 	__ASSERT(!szFontName.empty(), "");
-	if(NULL == s_hDC)
+	if(nullptr == s_hDC)
 	{
 		__ASSERT(0, "NULL DC Handle");
 		return E_FAIL;
@@ -83,7 +83,7 @@ HRESULT CDFont::SetFont(const std::string& szFontName, uint32_t dwHeight, uint32
 	{
 		if(s_hFontOld) SelectObject(s_hDC, s_hFontOld);
 		DeleteObject(m_hFont);
-		m_hFont = NULL;
+		m_hFont = nullptr;
 	}
 
     // Create a font.  By specifying ANTIALIASED_QUALITY, we might get an
@@ -95,7 +95,7 @@ HRESULT CDFont::SetFont(const std::string& szFontName, uint32_t dwHeight, uint32
                           FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
                           CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY,
                           VARIABLE_PITCH, m_szFontName.c_str() );
-    if( NULL== m_hFont )
+    if( nullptr== m_hFont )
 	{
 		__ASSERT(0, "NULL Font Handle");
 		return E_FAIL;
@@ -118,11 +118,11 @@ HRESULT CDFont::RestoreDeviceObjects()
 
 	m_iPrimitiveCount = 0;
 
-//	__ASSERT(NULL == s_hDC && NULL == m_hFont, "??");
-//	m_hDC = CreateCompatibleDC(NULL);
-	__ASSERT(NULL == m_hFont, "??");
+//	__ASSERT(nullptr == s_hDC && nullptr == m_hFont, "??");
+//	m_hDC = CreateCompatibleDC(nullptr);
+	__ASSERT(nullptr == m_hFont, "??");
 
-	if( NULL==s_hDC )
+	if( nullptr==s_hDC )
 	{
 		__ASSERT(0, "Can't Create DC");
 		return E_FAIL;
@@ -139,10 +139,10 @@ HRESULT CDFont::RestoreDeviceObjects()
                           FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
                           CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY,
                           VARIABLE_PITCH, m_szFontName.c_str() );
-    if( NULL == m_hFont ) return E_FAIL;
+    if( nullptr == m_hFont ) return E_FAIL;
 
     // Create vertex buffer for the letters
-	__ASSERT(m_pVB == NULL, "??");
+	__ASSERT(m_pVB == nullptr, "??");
 	int iVBSize = 0;
 	uint32_t dwFVF = 0;
 	if (m_Is2D)
@@ -159,7 +159,7 @@ HRESULT CDFont::RestoreDeviceObjects()
 //    if( FAILED( hr = m_pd3dDevice->CreateVertexBuffer( iVBSize,
 //                                                     D3DUSAGE_WRITEONLY, 0,
 //                                                      D3DPOOL_MANAGED, &m_pVB ) ) )
-    if( FAILED( hr = m_pd3dDevice->CreateVertexBuffer( iVBSize, 0, dwFVF, D3DPOOL_MANAGED, &m_pVB, NULL ) ) )
+    if( FAILED( hr = m_pd3dDevice->CreateVertexBuffer( iVBSize, 0, dwFVF, D3DPOOL_MANAGED, &m_pVB, nullptr ) ) )
     {
         return hr;
     }
@@ -169,33 +169,33 @@ HRESULT CDFont::RestoreDeviceObjects()
 
 HRESULT CDFont::InvalidateDeviceObjects()
 {
-    if (m_pVB) {m_pVB->Release(); m_pVB = NULL;}
+    if (m_pVB) {m_pVB->Release(); m_pVB = nullptr;}
 
 	if (m_hFont)
 	{
 		if(s_hDC && s_hFontOld) SelectObject(s_hDC, s_hFontOld);
 		DeleteObject(m_hFont);
-		m_hFont = NULL;
+		m_hFont = nullptr;
 	}
 	return S_OK;
 }
 
 HRESULT CDFont::DeleteDeviceObjects()
 {
-	if (m_pTexture) {m_pTexture->Release(); m_pTexture = NULL;}
-	m_pd3dDevice = NULL;
+	if (m_pTexture) {m_pTexture->Release(); m_pTexture = nullptr;}
+	m_pd3dDevice = nullptr;
 
 	return S_OK;
 }
 
 HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
 {
-	if(NULL == s_hDC || NULL == m_hFont) return E_FAIL;
+	if(nullptr == s_hDC || nullptr == m_hFont) return E_FAIL;
 
 	if (szText.empty())
 	{
 		m_iPrimitiveCount = 0;
-		if (m_pTexture) {m_pTexture->Release(); m_pTexture = NULL;}
+		if (m_pTexture) {m_pTexture->Release(); m_pTexture = nullptr;}
 		return S_OK;
 	}
 
@@ -286,19 +286,19 @@ HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
 		if (sd.Width != m_dwTexWidth)
 		{
 			m_pTexture->Release();
-			m_pTexture = NULL;
+			m_pTexture = nullptr;
 		}
 	}
 
     // Create a new texture for the font
-	if (NULL == m_pTexture)
+	if (nullptr == m_pTexture)
 	{
 		int iMipMapCount = 1;
 		if( dwFlags & D3DFONT_FILTERED ) iMipMapCount = 0; // 필터링 텍스트는 밉맵을 만든다..
 
 		hr = m_pd3dDevice->CreateTexture( m_dwTexWidth, m_dwTexHeight, iMipMapCount,
 										0, D3DFMT_A4R4G4B4,
-										D3DPOOL_MANAGED, &m_pTexture, NULL );
+										D3DPOOL_MANAGED, &m_pTexture, nullptr );
 		if( FAILED(hr) )
 			return hr;
 	}
@@ -315,12 +315,12 @@ HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
     bmi.bmiHeader.biBitCount    = 32;
 
     // Create a DC and a bitmap for the font
-    HBITMAP hbmBitmap = CreateDIBSection( s_hDC, &bmi, DIB_RGB_COLORS, (VOID**)&pBitmapBits, NULL, 0 );
+    HBITMAP hbmBitmap = CreateDIBSection( s_hDC, &bmi, DIB_RGB_COLORS, (VOID**)&pBitmapBits, nullptr, 0 );
 
-	if (NULL == hbmBitmap)
+	if (nullptr == hbmBitmap)
 	{
 		__ASSERT(0, "CreateDIBSection 실패");
-		if (m_pTexture) {m_pTexture->Release(); m_pTexture = NULL;}
+		if (m_pTexture) {m_pTexture->Release(); m_pTexture = nullptr;}
 		return E_FAIL;
 	}
 
@@ -380,14 +380,14 @@ HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
 		int iMMC = m_pTexture->GetLevelCount();
 		for(int i = 1; i < iMMC; i++)
 		{
-			LPDIRECT3DSURFACE9 lpSurfSrc = NULL;
-			LPDIRECT3DSURFACE9 lpSurfDest = NULL;
+			LPDIRECT3DSURFACE9 lpSurfSrc = nullptr;
+			LPDIRECT3DSURFACE9 lpSurfDest = nullptr;
 			m_pTexture->GetSurfaceLevel(i-1, &lpSurfSrc);
 			m_pTexture->GetSurfaceLevel(i, &lpSurfDest);
 
 			if(lpSurfSrc && lpSurfDest)
 			{
-				::D3DXLoadSurfaceFromSurface(lpSurfDest, NULL, NULL, lpSurfSrc, NULL, NULL, D3DX_FILTER_TRIANGLE, 0); // 서피스 복사
+				::D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr, D3DX_FILTER_TRIANGLE, 0); // 서피스 복사
 			}
 
 			if(lpSurfSrc) lpSurfSrc->Release();
@@ -403,7 +403,7 @@ HRESULT CDFont::SetText(const std::string& szText, uint32_t dwFlags)
 
 void CDFont::Make2DVertex(const int iFontHeight, const std::string& szText)
 {
-	if(NULL == m_pVB || NULL == s_hDC || NULL == m_hFont)
+	if(nullptr == m_pVB || nullptr == s_hDC || nullptr == m_hFont)
 	{
 		__ASSERT(0, "NULL Vertex Buffer or DC or Font Handle ");
 		return;
@@ -412,7 +412,7 @@ void CDFont::Make2DVertex(const int iFontHeight, const std::string& szText)
 	int iStrLen = szText.size();
 
 	// lock vertex buffer
-	__VertexTransformed* pVertices = NULL;
+	__VertexTransformed* pVertices = nullptr;
 	uint32_t         dwNumTriangles = 0;
 	if (FAILED(m_pVB->Lock(0, 0, (void**) &pVertices, 0)))
 		return;
@@ -525,7 +525,7 @@ void CDFont::Make2DVertex(const int iFontHeight, const std::string& szText)
 		
 		// dc에 찍기
 		SelectObject(s_hDC, m_hFont);
-		ExtTextOut( s_hDC, x, y, ETO_OPAQUE, NULL, szTempChar, lstrlen(szTempChar), NULL );		
+		ExtTextOut( s_hDC, x, y, ETO_OPAQUE, nullptr, szTempChar, lstrlen(szTempChar), nullptr );		
 		x += size.cx;
 	}
 
@@ -565,7 +565,7 @@ void CDFont::Make2DVertex(const int iFontHeight, const std::string& szText)
 
 void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint32_t dwFlags)
 {
-	if(NULL == m_pVB || NULL == s_hDC || NULL == m_hFont) 
+	if(nullptr == m_pVB || nullptr == s_hDC || nullptr == m_hFont) 
 	{
 		__ASSERT(0, "NULL Vertex Buffer or DC or Font Handle ");
 		return;
@@ -681,7 +681,7 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 		
 		// dc에 찍기
 		SelectObject(s_hDC, m_hFont);
-		ExtTextOut( s_hDC, x, y, ETO_OPAQUE, NULL, szTempChar, lstrlen(szTempChar), NULL );		
+		ExtTextOut( s_hDC, x, y, ETO_OPAQUE, nullptr, szTempChar, lstrlen(szTempChar), nullptr );		
 		x += size.cx;
 	}
 
@@ -775,14 +775,14 @@ void CDFont::Make3DVertex(const int iFontHeight, const std::string& szText, uint
 
 HRESULT CDFont::DrawText( FLOAT sx, FLOAT sy, uint32_t dwColor, uint32_t dwFlags, FLOAT fZ )
 {
-	if(NULL == m_pVB || NULL == s_hDC || NULL == m_hFont)
+	if(nullptr == m_pVB || nullptr == s_hDC || nullptr == m_hFont)
 	{
 		//__ASSERT(0, "NULL Vertex Buffer or DC or Font Handle ");
 		return E_FAIL;
 	}
 
 	if (m_iPrimitiveCount <= 0) return S_OK;
-    if( m_pd3dDevice == NULL || !m_Is2D)
+    if( m_pd3dDevice == nullptr || !m_Is2D)
         return E_FAIL;
 
 	// 위치 색 조정
@@ -918,14 +918,14 @@ HRESULT CDFont::DrawText( FLOAT sx, FLOAT sy, uint32_t dwColor, uint32_t dwFlags
 
 HRESULT CDFont::DrawText3D(uint32_t dwColor, uint32_t dwFlags )
 {
-	if(NULL == m_pVB || NULL == s_hDC || NULL == m_hFont)
+	if(nullptr == m_pVB || nullptr == s_hDC || nullptr == m_hFont)
 	{
 		__ASSERT(0, "NULL Vertex Buffer or DC or Font Handle ");
 		return E_FAIL;
 	}
 
 	if (m_iPrimitiveCount <= 0) return S_OK;
-    if( m_pd3dDevice == NULL || m_Is2D)
+    if( m_pd3dDevice == nullptr || m_Is2D)
         return E_FAIL;
 
 
@@ -1035,7 +1035,7 @@ HRESULT CDFont::DrawText3D(uint32_t dwColor, uint32_t dwFlags )
 
 BOOL CDFont::GetTextExtent(const std::string& szString, int iStrLen, SIZE* pSize )
 {
-	if (NULL == s_hDC) return FALSE;
+	if (nullptr == s_hDC) return FALSE;
 
 	SelectObject(s_hDC, m_hFont);
 	return ::GetTextExtentPoint32( s_hDC, szString.c_str(), iStrLen, pSize );
@@ -1043,7 +1043,7 @@ BOOL CDFont::GetTextExtent(const std::string& szString, int iStrLen, SIZE* pSize
 
 HRESULT	CDFont::SetFontColor(uint32_t dwColor)
 {
-	if (m_iPrimitiveCount <= 0 || NULL == m_pVB) return E_FAIL;
+	if (m_iPrimitiveCount <= 0 || nullptr == m_pVB) return E_FAIL;
 
 	if (dwColor != m_dwFontColor)
 	{
@@ -1079,11 +1079,11 @@ HRESULT	CDFont::SetFontColor(uint32_t dwColor)
 
 void CDFont::AddToAlphaManager(uint32_t dwColor, float fDist, __Matrix44& mtxWorld, uint32_t dwFlags)
 {
-	if (NULL == m_pVB || 0 >= m_iPrimitiveCount) return;
+	if (nullptr == m_pVB || 0 >= m_iPrimitiveCount) return;
 	SetFontColor(dwColor);
 	
 	__AlphaPrimitive* pAP = s_AlphaMgr.Add();
-	if(NULL == pAP) return;
+	if(nullptr == pAP) return;
 
 	
 	uint32_t dwFVF = FVF_XYZCOLORT1;
@@ -1156,7 +1156,7 @@ void CDFont::AddToAlphaManager(uint32_t dwColor, float fDist, __Matrix44& mtxWor
 	pAP->nRenderFlags		= RF_NOTZWRITE|RF_NOTUSELIGHT|RF_NOTUSEFOG;
 	pAP->nVertexCount		= MAX_NUM_VERTICES;
 	pAP->pVertices			= m_pVB;
-	pAP->pwIndices			= NULL;
+	pAP->pwIndices			= nullptr;
 	pAP->MtxWorld			= mtxWorld;
 
 	if(!(dwFlags & D3DFONT_FILTERED)) pAP->nRenderFlags |= RF_POINTSAMPLING; // 필터링 텍스트를 쓰지 않는다.

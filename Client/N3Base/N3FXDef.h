@@ -101,7 +101,7 @@ typedef struct __FXPartWithStartTime	// 번들에서 파트들 관리할때..
 	
 	__FXPartWithStartTime()
 	{
-		pPart = NULL;
+		pPart = nullptr;
 		fStartTime = 0.0f;
 	}
 } FXPARTWITHSTARTTIME, *LPFXPARTWITHSTARTTIME;

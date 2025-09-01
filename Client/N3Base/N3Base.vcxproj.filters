@@ -54,9 +54,6 @@
     <ClInclude Include="N3AlphaPrimitiveManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="N3AnimatedTexures.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="N3AnimControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>

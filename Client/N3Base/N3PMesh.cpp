@@ -18,12 +18,12 @@ CN3PMesh::CN3PMesh()
 {
 	m_dwType |= OBJ_MESH_PROGRESSIVE;
 
-	m_pVertices = NULL;
-	m_pVertices2 = NULL;
-	m_pIndices = NULL;
-	m_pCollapses = NULL;
-	m_pAllIndexChanges = NULL;
-	m_pLODCtrlValues = NULL;
+	m_pVertices = nullptr;
+	m_pVertices2 = nullptr;
+	m_pIndices = nullptr;
+	m_pCollapses = nullptr;
+	m_pAllIndexChanges = nullptr;
+	m_pLODCtrlValues = nullptr;
 
 	m_iNumCollapses = 0;
 	m_iTotalIndexChanges = 0;
@@ -38,22 +38,22 @@ CN3PMesh::CN3PMesh()
 
 CN3PMesh::~CN3PMesh()
 {
-	delete [] m_pVertices; m_pVertices = NULL;
-	delete [] m_pVertices2; m_pVertices2 = NULL;
-	delete [] m_pIndices; m_pIndices = NULL;
-	delete [] m_pCollapses; m_pCollapses = NULL;
-	delete [] m_pAllIndexChanges; m_pAllIndexChanges = NULL;
-	delete [] m_pLODCtrlValues;	m_pLODCtrlValues = NULL;
+	delete [] m_pVertices; m_pVertices = nullptr;
+	delete [] m_pVertices2; m_pVertices2 = nullptr;
+	delete [] m_pIndices; m_pIndices = nullptr;
+	delete [] m_pCollapses; m_pCollapses = nullptr;
+	delete [] m_pAllIndexChanges; m_pAllIndexChanges = nullptr;
+	delete [] m_pLODCtrlValues;	m_pLODCtrlValues = nullptr;
 }
 
 void CN3PMesh::Release()
 {
-	if (m_pVertices) { delete[] m_pVertices; m_pVertices = NULL;}
-	if (m_pVertices2) { delete[] m_pVertices2; m_pVertices2 = NULL;}
-	if (m_pIndices) { delete[] m_pIndices; m_pIndices = NULL;}
-	if (m_pCollapses) {	delete[] m_pCollapses; m_pCollapses = NULL;}
-	if (m_pAllIndexChanges)	{ delete[] m_pAllIndexChanges; m_pAllIndexChanges = NULL;}
-	if (m_pLODCtrlValues) {	delete [] m_pLODCtrlValues;	m_pLODCtrlValues = NULL;}
+	if (m_pVertices) { delete[] m_pVertices; m_pVertices = nullptr;}
+	if (m_pVertices2) { delete[] m_pVertices2; m_pVertices2 = nullptr;}
+	if (m_pIndices) { delete[] m_pIndices; m_pIndices = nullptr;}
+	if (m_pCollapses) {	delete[] m_pCollapses; m_pCollapses = nullptr;}
+	if (m_pAllIndexChanges)	{ delete[] m_pAllIndexChanges; m_pAllIndexChanges = nullptr;}
+	if (m_pLODCtrlValues) {	delete [] m_pLODCtrlValues;	m_pLODCtrlValues = nullptr;}
 
 	m_iNumCollapses = 0;
 	m_iTotalIndexChanges = 0;
@@ -73,13 +73,13 @@ bool CN3PMesh::Load(HANDLE hFile)
 	CN3BaseFileAccess::Load(hFile);
 
 	DWORD dwNum;
-	ReadFile(hFile, &m_iNumCollapses, sizeof(m_iNumCollapses), &dwNum, NULL);
-	ReadFile(hFile, &m_iTotalIndexChanges, sizeof(m_iTotalIndexChanges), &dwNum, NULL);
+	ReadFile(hFile, &m_iNumCollapses, sizeof(m_iNumCollapses), &dwNum, nullptr);
+	ReadFile(hFile, &m_iTotalIndexChanges, sizeof(m_iTotalIndexChanges), &dwNum, nullptr);
 
-	ReadFile(hFile, &m_iMaxNumVertices, sizeof(int), &dwNum, NULL);
-	ReadFile(hFile, &m_iMaxNumIndices , sizeof(int), &dwNum, NULL);
-	ReadFile(hFile, &m_iMinNumVertices, sizeof(int), &dwNum, NULL);
-	ReadFile(hFile, &m_iMinNumIndices , sizeof(int), &dwNum, NULL);
+	ReadFile(hFile, &m_iMaxNumVertices, sizeof(int), &dwNum, nullptr);
+	ReadFile(hFile, &m_iMaxNumIndices , sizeof(int), &dwNum, nullptr);
+	ReadFile(hFile, &m_iMinNumVertices, sizeof(int), &dwNum, nullptr);
+	ReadFile(hFile, &m_iMinNumIndices , sizeof(int), &dwNum, nullptr);
 
 	HRESULT hr = Create(m_iMaxNumVertices, m_iMaxNumIndices);
 	__ASSERT(SUCCEEDED(hr), "Failed to create progressive mesh");
@@ -87,19 +87,19 @@ bool CN3PMesh::Load(HANDLE hFile)
 	if (m_iMaxNumVertices>0)
 	{
 //		m_pVertices = new __VertexT1[m_iMaxNumVertices];
-		ReadFile(hFile, m_pVertices, m_iMaxNumVertices*sizeof(__VertexT1), &dwNum, NULL);
+		ReadFile(hFile, m_pVertices, m_iMaxNumVertices*sizeof(__VertexT1), &dwNum, nullptr);
 	}
 
 	if (m_iMaxNumIndices>0)
 	{
 //		m_pIndices = new uint16_t[m_iMaxNumIndices];
-		ReadFile(hFile, m_pIndices, m_iMaxNumIndices*sizeof(uint16_t), &dwNum, NULL);
+		ReadFile(hFile, m_pIndices, m_iMaxNumIndices*sizeof(uint16_t), &dwNum, nullptr);
 	}
 
 	if (m_iNumCollapses>0)
 	{
 		m_pCollapses = new __EdgeCollapse[m_iNumCollapses+1];	// +1을 한 이유 : PMeshInstance::SplitOne() 함수에서 부득이하게 포인터가 경계선을 가르키게 해야 하는 경우가 있어서.
-		ReadFile(hFile, m_pCollapses, m_iNumCollapses*sizeof(__EdgeCollapse), &dwNum, NULL);
+		ReadFile(hFile, m_pCollapses, m_iNumCollapses*sizeof(__EdgeCollapse), &dwNum, nullptr);
 		ZeroMemory(m_pCollapses + m_iNumCollapses, sizeof(__EdgeCollapse));	// 위의 +1을 한이유와 같음. 만약을 대비해 마지막 데이타를 초기화 해둠
 
 		bool bFixed = false;
@@ -119,15 +119,15 @@ bool CN3PMesh::Load(HANDLE hFile)
 	if (m_iTotalIndexChanges>0)
 	{
 		m_pAllIndexChanges = new int[m_iTotalIndexChanges];
-		ReadFile(hFile, m_pAllIndexChanges, m_iTotalIndexChanges*sizeof(int), &dwNum, NULL);
+		ReadFile(hFile, m_pAllIndexChanges, m_iTotalIndexChanges*sizeof(int), &dwNum, nullptr);
 	}
 
-	__ASSERT(m_pLODCtrlValues == NULL && m_iLODCtrlValueCount == 0, "Invalid Level of detail control value");
-	ReadFile(hFile, &m_iLODCtrlValueCount, sizeof(m_iLODCtrlValueCount), &dwNum, NULL);
+	__ASSERT(m_pLODCtrlValues == nullptr && m_iLODCtrlValueCount == 0, "Invalid Level of detail control value");
+	ReadFile(hFile, &m_iLODCtrlValueCount, sizeof(m_iLODCtrlValueCount), &dwNum, nullptr);
 	if (m_iLODCtrlValueCount>0)
 	{
 		m_pLODCtrlValues = new __LODCtrlValue[m_iLODCtrlValueCount];
-		ReadFile(hFile, m_pLODCtrlValues, m_iLODCtrlValueCount*sizeof(__LODCtrlValue), &dwNum, NULL);
+		ReadFile(hFile, m_pLODCtrlValues, m_iLODCtrlValueCount*sizeof(__LODCtrlValue), &dwNum, nullptr);
 	}
 
 	FindMinMax();
@@ -141,27 +141,27 @@ bool CN3PMesh::Save(HANDLE hFile)
 	CN3BaseFileAccess::Save(hFile);
 
 	DWORD dwNum;
-	WriteFile(hFile, &m_iNumCollapses, sizeof(m_iNumCollapses), &dwNum, NULL);
-	WriteFile(hFile, &m_iTotalIndexChanges, sizeof(m_iTotalIndexChanges), &dwNum, NULL);
+	WriteFile(hFile, &m_iNumCollapses, sizeof(m_iNumCollapses), &dwNum, nullptr);
+	WriteFile(hFile, &m_iTotalIndexChanges, sizeof(m_iTotalIndexChanges), &dwNum, nullptr);
 
-	WriteFile(hFile, &(m_iMaxNumVertices), sizeof(int), &dwNum, NULL);
-	WriteFile(hFile, &(m_iMaxNumIndices), sizeof(int), &dwNum, NULL);
-	WriteFile(hFile, &(m_iMinNumVertices), sizeof(int), &dwNum, NULL);
-	WriteFile(hFile, &(m_iMinNumIndices), sizeof(int), &dwNum, NULL);
+	WriteFile(hFile, &(m_iMaxNumVertices), sizeof(int), &dwNum, nullptr);
+	WriteFile(hFile, &(m_iMaxNumIndices), sizeof(int), &dwNum, nullptr);
+	WriteFile(hFile, &(m_iMinNumVertices), sizeof(int), &dwNum, nullptr);
+	WriteFile(hFile, &(m_iMinNumIndices), sizeof(int), &dwNum, nullptr);
 
-	if (m_iMaxNumVertices>0) WriteFile(hFile, m_pVertices, m_iMaxNumVertices*sizeof(__VertexT1), &dwNum, NULL);
-	if (m_iMaxNumIndices>0) WriteFile(hFile, m_pIndices, m_iMaxNumIndices*sizeof(uint16_t), &dwNum, NULL);
+	if (m_iMaxNumVertices>0) WriteFile(hFile, m_pVertices, m_iMaxNumVertices*sizeof(__VertexT1), &dwNum, nullptr);
+	if (m_iMaxNumIndices>0) WriteFile(hFile, m_pIndices, m_iMaxNumIndices*sizeof(uint16_t), &dwNum, nullptr);
 
 	if (m_iNumCollapses>0)
 	{
 		for(int i = 0; i < m_iNumCollapses; i++)
 			if(m_pCollapses[i].iIndexChanges < 0) m_pCollapses[i].iIndexChanges = 0; // 저장..
-		WriteFile(hFile, m_pCollapses, m_iNumCollapses*sizeof(__EdgeCollapse), &dwNum, NULL);
+		WriteFile(hFile, m_pCollapses, m_iNumCollapses*sizeof(__EdgeCollapse), &dwNum, nullptr);
 	}
-	if (m_iTotalIndexChanges>0) WriteFile(hFile, m_pAllIndexChanges, m_iTotalIndexChanges*sizeof(m_pAllIndexChanges[0]), &dwNum, NULL);
+	if (m_iTotalIndexChanges>0) WriteFile(hFile, m_pAllIndexChanges, m_iTotalIndexChanges*sizeof(m_pAllIndexChanges[0]), &dwNum, nullptr);
 
-	WriteFile(hFile, &m_iLODCtrlValueCount, sizeof(m_iLODCtrlValueCount), &dwNum, NULL);
-	if (m_iLODCtrlValueCount>0) WriteFile(hFile, m_pLODCtrlValues, m_iLODCtrlValueCount*sizeof(__LODCtrlValue), &dwNum, NULL);
+	WriteFile(hFile, &m_iLODCtrlValueCount, sizeof(m_iLODCtrlValueCount), &dwNum, nullptr);
+	if (m_iLODCtrlValueCount>0) WriteFile(hFile, m_pLODCtrlValues, m_iLODCtrlValueCount*sizeof(__LODCtrlValue), &dwNum, nullptr);
 
 	return true;
 }
@@ -260,8 +260,8 @@ HRESULT CN3PMesh::Create(int iNumVertices, int iNumIndices)
 	m_iMaxNumVertices = iNumVertices;
 	m_iMaxNumIndices = iNumIndices;
 
-	if (m_pVertices) {delete m_pVertices; m_pVertices = NULL;}
-	if (m_pIndices) {delete m_pIndices; m_pIndices = NULL;}
+	if (m_pVertices) {delete m_pVertices; m_pVertices = nullptr;}
+	if (m_pIndices) {delete m_pIndices; m_pIndices = nullptr;}
 
 	if (m_iMaxNumVertices>0)
 	{
@@ -277,7 +277,7 @@ HRESULT CN3PMesh::Create(int iNumVertices, int iNumIndices)
 
 HRESULT CN3PMesh::GenerateSecondUV()
 {
-	if (m_pVertices2) {delete m_pVertices2; m_pVertices2 = NULL;}
+	if (m_pVertices2) {delete m_pVertices2; m_pVertices2 = nullptr;}
 
 	if (m_iMaxNumVertices>0)
 	{
@@ -303,8 +303,8 @@ HRESULT CN3PMesh::GenerateSecondUV()
 void CN3PMesh::LODCtrlSet(__LODCtrlValue *pLODCtrls, int nCount)
 {
 	m_iLODCtrlValueCount = 0;
-	delete [] m_pLODCtrlValues; m_pLODCtrlValues = NULL;
-	if(NULL == pLODCtrls || nCount <= 0) return;
+	delete [] m_pLODCtrlValues; m_pLODCtrlValues = nullptr;
+	if(nullptr == pLODCtrls || nCount <= 0) return;
 
 	m_iLODCtrlValueCount = nCount;
 	if(nCount > 0)

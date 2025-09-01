@@ -50,7 +50,7 @@ END_MESSAGE_MAP()
 
 CUIEView::CUIEView()
 {
-	m_hAccelTable = NULL;
+	m_hAccelTable = nullptr;
 
 	CWinApp* pApp = AfxGetApp();
 	ASSERT(pApp);
@@ -101,7 +101,7 @@ void CUIEView::OnDraw(CDC* pDC)
 	for(int i = 0 ; i < iUIC; i++)
 	{
 		CN3UIBase* pUI = pDoc->GetSelectedUI(i);
-		if (NULL == pUI) continue;
+		if (nullptr == pUI) continue;
 		pDC->SelectStockObject(NULL_BRUSH);
 
 		CN3UIBase* pUIP = pUI->GetParent();
@@ -297,10 +297,10 @@ void CUIEView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		if (DRAGTYPE_NONE == m_eDragType)
 		{	// m_RootUI의 자식중에서 point에 위치한 ui 선택하기
-			if(!(nFlags & MK_CONTROL)) pDoc->SetSelectedUI(NULL); // 컨트롤 키를 누르지 않으면 멀티 셀렉트 해제후..
+			if(!(nFlags & MK_CONTROL)) pDoc->SetSelectedUI(nullptr); // 컨트롤 키를 누르지 않으면 멀티 셀렉트 해제후..
 			
 			CN3UIBase* pRootUI = GetDocument()->GetRootUI();
-			CN3UIBase* pUISelected = NULL;
+			CN3UIBase* pUISelected = nullptr;
 			for(UIListItor itor = pRootUI->m_Children.begin(); pRootUI->m_Children.end() != itor; ++itor)
 			{
 				CN3UIBase* pUI = (*itor);
@@ -308,7 +308,7 @@ void CUIEView::OnLButtonDown(UINT nFlags, CPoint point)
 				if(pUISelected) break;
 			}
 
-			if(NULL == pUISelected && pRootUI->IsIn(point.x, point.y)) pUISelected = pRootUI; // 암것도 못찍으면 루트UI를 찍어본다.
+			if(nullptr == pUISelected && pRootUI->IsIn(point.x, point.y)) pUISelected = pRootUI; // 암것도 못찍으면 루트UI를 찍어본다.
 			if(pUISelected) pDoc->SetSelectedUI(pUISelected);
 		}
 		else SetCapture();
@@ -403,7 +403,7 @@ BOOL CUIEView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {
 	if (UIEMODE_EDIT == m_eMode && RT_NONE != m_eSelectedRectType)
 	{
-		char* pszRsrcID = NULL;
+		char* pszRsrcID = nullptr;
 		eDRAGTYPE		eDT = m_eDragType;
 		if (DRAGTYPE_NONE == m_eDragType)	// 드레그 중이 아니면 cursor의 위치를 얻어서 테스트하기
 		{
@@ -434,9 +434,9 @@ BOOL CUIEView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 			pszRsrcID=IDC_SIZENESW;			break;
 		}
 
-		if (NULL != pszRsrcID)
+		if (nullptr != pszRsrcID)
 		{
-			HCURSOR hCur = LoadCursor(NULL, pszRsrcID);
+			HCURSOR hCur = LoadCursor(nullptr, pszRsrcID);
 			if (hCur) {	SetCursor(hCur); return TRUE;}
 		}
 	}
@@ -456,7 +456,7 @@ void CUIEView::SetMode(eUIE_MODE eMode)
 void CUIEView::RenderPreview()
 {
 	CUIEDoc* pDoc = GetDocument();
-	if (NULL == pDoc) return;
+	if (nullptr == pDoc) return;
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3EngTool* pEng = &(pFrm->m_Eng);
 	LPDIRECT3DDEVICE9 lpD3DDev = pEng->s_lpD3DDev;
@@ -502,7 +502,7 @@ void CUIEView::RenderPreview()
 void CUIEView::RenderEditview()
 {
 	CUIEDoc* pDoc = GetDocument();
-	if (NULL == pDoc) return;
+	if (nullptr == pDoc) return;
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3EngTool* pEng = &(pFrm->m_Eng);
 	LPDIRECT3DDEVICE9 lpD3DDev = pEng->s_lpD3DDev;
@@ -558,7 +558,7 @@ void CUIEView::SelectRectType(eRECTTYPE eRectType)
 	CN3UIBase* pSelectedUI = GetDocument()->GetSelectedUI();
 
 	// 선택된 UI가 없으면 RT_NONE으로 만들고 리턴
-	if (NULL == pSelectedUI){	m_eSelectedRectType = RT_NONE;	Invalidate(); return;}
+	if (nullptr == pSelectedUI){	m_eSelectedRectType = RT_NONE;	Invalidate(); return;}
 
 	// 선택된 UI에서 RectType에 맞는 사각형 가져오기
 	switch(m_eSelectedRectType)
@@ -697,7 +697,7 @@ void CUIEView::UpdateUIInfo_SelectedRect()
 				for(int i = 0; i < iUIC; i++)
 				{
 					pSelectedUI = pDoc->GetSelectedUI(i);
-					if(NULL == pSelectedUI) continue;
+					if(nullptr == pSelectedUI) continue;
 
 					if(DRAGTYPE_MOVE == m_eDragType)
 					{
@@ -769,8 +769,8 @@ void CUIEView::ChangeBkgndColor()
 
 CN3UIBase* CUIEView::Pick(const POINT &point, CN3UIBase* pUI)
 {
-	if(NULL == pUI) return NULL;
-	if(pUI->IsVisible() == false) return NULL;
+	if(nullptr == pUI) return nullptr;
+	if(pUI->IsVisible() == false) return nullptr;
 
 	for(UIListItor itor = pUI->m_Children.begin(); pUI->m_Children.end() != itor; ++itor)
 	{
@@ -794,19 +794,19 @@ CN3UIBase* CUIEView::Pick(const POINT &point, CN3UIBase* pUI)
 			return pUI;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void CUIEView::OnEditModeMoveAndResize() 
 {
 	this->SelectRectType(CUIEView::RT_REGION);
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CUIEView::OnEditModeSelect() 
 {
 	this->SelectRectType(CUIEView::RT_NONE);
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 BOOL CUIEView::PreTranslateMessage(MSG* pMsg) 
@@ -818,7 +818,7 @@ BOOL CUIEView::PreTranslateMessage(MSG* pMsg)
 void CUIEView::OnViewGrid() 
 {
 	m_bViewGrid = !m_bViewGrid; // 그리드 보기..
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CUIEView::OnUpdateViewGrid(CCmdUI* pCmdUI) 
@@ -841,10 +841,10 @@ void CUIEView::OnDropFiles(HDROP hDropInfo)
 	ASSERT_VALID(pDoc);
 
 	char szFile[MAX_PATH];
-	char* szExt = NULL;
+	char* szExt = nullptr;
 	UINT uiFiles;
 
-	uiFiles = DragQueryFile(hDropInfo,0xFFFF,NULL,0);
+	uiFiles = DragQueryFile(hDropInfo,0xFFFF,nullptr,0);
 
 	::DragQueryFile(hDropInfo, 0, szFile, MAX_PATH - 1);
 	::DragFinish(hDropInfo);
@@ -856,7 +856,7 @@ void CUIEView::OnDropFiles(HDROP hDropInfo)
 	if(0 == lstrcmpi(szExt,"uif") && pDoc)
 	{
 		pDoc->OnOpenDocument(szFile);
-		pDoc->UpdateAllViews(NULL);
+		pDoc->UpdateAllViews(nullptr);
 	}
 
 	CView::OnDropFiles(hDropInfo);

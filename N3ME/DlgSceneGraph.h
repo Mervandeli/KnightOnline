@@ -32,7 +32,7 @@ public:
 	void ExpandTree(HTREEITEM hItem);
 	void UpdateTree(CN3Scene* pScene);
 	// standard constructor
-	CDlgSceneGraph(CWnd* pParent = NULL, DWORD dwFlag = 
+	CDlgSceneGraph(CWnd* pParent = nullptr, DWORD dwFlag = 
 		OBJ_CAMERA|OBJ_LIGHT|OBJ_SHAPE|OBJ_CHARACTER|OBJ_MESH|OBJ_MESH_PROGRESSIVE|
 		OBJ_MESH_INDEXED|OBJ_JOINT|OBJ_SKIN);   
 

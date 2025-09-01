@@ -48,7 +48,7 @@ public:
 	void	SetWholeClipped();
 	void	SetMinMaxY();
 	void	SetCenterPoint(int x, int z);
-	void	Init(int level = 0, CLyTerrain* pTerrain=NULL);
+	void	Init(int level = 0, CLyTerrain* pTerrain=nullptr);
 	void	Release();
 	void	LinkFriend();	
 	

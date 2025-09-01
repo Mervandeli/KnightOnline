@@ -16,7 +16,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgChangeImage dialog
 
 
-CDlgChangeImage::CDlgChangeImage(CWnd* pParent /*=NULL*/)
+CDlgChangeImage::CDlgChangeImage(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgChangeImage::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgChangeImage)
@@ -47,7 +47,7 @@ END_MESSAGE_MAP()
 void CDlgChangeImage::OnBBrowseOldFile() 
 {
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "dxt", NULL, dwFlags, "Generic Image Files(*.dxt, *.bmp, *.tga)|*.dxt;*.bmp;*.tga;||", NULL);
+	CFileDialog dlg(TRUE, "dxt", nullptr, dwFlags, "Generic Image Files(*.dxt, *.bmp, *.tga)|*.dxt;*.bmp;*.tga;||", nullptr);
 
 	if (IDCANCEL == dlg.DoModal()) return;
 	CString szFN_Old = dlg.GetPathName();
@@ -64,7 +64,7 @@ void CDlgChangeImage::OnBBrowseOldFile()
 void CDlgChangeImage::OnBBrowseNewFile() 
 {
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "dxt", NULL, dwFlags, "Generic Image Files(*.dxt, *.bmp, *.tga)|*.dxt;*.bmp;*.tga;||", NULL);
+	CFileDialog dlg(TRUE, "dxt", nullptr, dwFlags, "Generic Image Files(*.dxt, *.bmp, *.tga)|*.dxt;*.bmp;*.tga;||", nullptr);
 
 	if (IDCANCEL == dlg.DoModal()) return;
 	CString szFN_New = dlg.GetPathName();

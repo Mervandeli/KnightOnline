@@ -96,7 +96,7 @@ BOOL CSkyViewerDoc::OnSaveDocument(LPCTSTR lpszPathName)
 void CSkyViewerDoc::OnFileSaveAsGameFormat() 
 {
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(FALSE, "N3Sky", NULL, dwFlags, "Sky Binary File(*.N3Sky)|*.N3Sky||", NULL);
+	CFileDialog dlg(FALSE, "N3Sky", nullptr, dwFlags, "Sky Binary File(*.N3Sky)|*.N3Sky||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	
 	CT2A szFN(dlg.GetPathName());

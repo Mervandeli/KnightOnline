@@ -22,17 +22,17 @@ static char THIS_FILE[]=__FILE__;
 
 CUIMessageWnd::CUIMessageWnd()
 {
-	m_pChatOut = NULL;
-	m_pScrollbar = NULL;
-	m_pBtn_Fold = NULL;
+	m_pChatOut = nullptr;
+	m_pScrollbar = nullptr;
+	m_pBtn_Fold = nullptr;
 	m_iChatLineCount = 0;
-	m_ppUILines = NULL;
+	m_ppUILines = nullptr;
 	ZeroMemory(&m_rcChatOutRegion, sizeof(m_rcChatOutRegion));
 }
 
 CUIMessageWnd::~CUIMessageWnd()
 {
-	if (m_ppUILines) {delete [] m_ppUILines; m_ppUILines = NULL;}	// m_ppUILines[n]의 포인터는 메모리 할당되어 있어도 부모가 해제될때 자동으로 해제하므로 안지워야 한다.
+	if (m_ppUILines) {delete [] m_ppUILines; m_ppUILines = nullptr;}	// m_ppUILines[n]의 포인터는 메모리 할당되어 있어도 부모가 해제될때 자동으로 해제하므로 안지워야 한다.
 
 	ChatListItor itor;
 	for(itor = m_ChatBuffer.begin(); m_ChatBuffer.end() != itor; ++itor)
@@ -54,11 +54,11 @@ void CUIMessageWnd::Release()
 {
 	CN3UIBase::Release();
 
-	m_pChatOut = NULL;
-	m_pScrollbar = NULL;
-	m_pBtn_Fold = NULL;
+	m_pChatOut = nullptr;
+	m_pScrollbar = nullptr;
+	m_pBtn_Fold = nullptr;
 	m_iChatLineCount = 0;
-	if (m_ppUILines) {delete [] m_ppUILines; m_ppUILines = NULL;}	// m_ppUILines[n]의 포인터는 메모리 할당되어 있어도 부모가 해제될때 자동으로 해제하므로 안지워야 한다.
+	if (m_ppUILines) {delete [] m_ppUILines; m_ppUILines = nullptr;}	// m_ppUILines[n]의 포인터는 메모리 할당되어 있어도 부모가 해제될때 자동으로 해제하므로 안지워야 한다.
 	ZeroMemory(&m_rcChatOutRegion, sizeof(m_rcChatOutRegion));
 
 	ChatListItor itor;
@@ -89,7 +89,7 @@ BOOL CUIMessageWnd::MoveOffset(int iOffsetX, int iOffsetY)
 	m_rcMovable.right += iOffsetX;		m_rcMovable.bottom += iOffsetY;
 
 	// children 좌표 갱신
-	CN3UIBase* pCUI = NULL; // Child UI...
+	CN3UIBase* pCUI = nullptr; // Child UI...
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
 		pCUI = (*itor);
@@ -118,9 +118,9 @@ BOOL CUIMessageWnd::MoveOffset(int iOffsetX, int iOffsetY)
 bool CUIMessageWnd::Load(HANDLE hFile)
 {
 	if (false == CN3UIBase::Load(hFile)) return false;
-	m_pChatOut = (CN3UIString*)GetChildByID("text_message");	__ASSERT(m_pChatOut, "NULL UI Component!!");
-	m_pScrollbar = (CN3UIScrollBar*)GetChildByID("scroll");		__ASSERT(m_pScrollbar, "NULL UI Component!!");
-	m_pBtn_Fold = (CN3UIBase*)GetChildByID("btn_off");	__ASSERT(m_pBtn_Fold, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pChatOut, GetChildByID<CN3UIString>("text_message"));
+	N3_VERIFY_UI_COMPONENT(m_pScrollbar, GetChildByID<CN3UIScrollBar>("scroll"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Fold, GetChildByID("btn_off"));
 
 	m_rcChatOutRegion = m_pChatOut->GetRegion();
 	CreateLines();
@@ -136,7 +136,7 @@ bool CUIMessageWnd::Load(HANDLE hFile)
 
 bool CUIMessageWnd::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 
 	if (dwMsg == UIMSG_SCROLLBAR_POS)
 	{
@@ -163,9 +163,9 @@ void CUIMessageWnd::CreateLines()
 	if (m_ppUILines) {
 		for (i=0; i<m_iChatLineCount; ++i)
 		{
-			if (m_ppUILines[i]) {delete m_ppUILines[i]; m_ppUILines[i] = NULL;}
+			if (m_ppUILines[i]) {delete m_ppUILines[i]; m_ppUILines[i] = nullptr;}
 		}
-		delete [] m_ppUILines; m_ppUILines = NULL;
+		delete [] m_ppUILines; m_ppUILines = nullptr;
 	}
 	SIZE size;
 	if (m_pChatOut && m_pChatOut->GetTextExtent("가", lstrlen("가"), &size) && size.cy>0)
@@ -276,7 +276,7 @@ void CUIMessageWnd::AddLineBuffer(const std::string& szString, D3DCOLOR color)
 				int iLineLength = iCount - iLineStart + 1;
 				std::string szLine;
 				pLineInfo->szChat = szString.substr(iLineStart, iLineLength);
-			}	// 연속된 \n일 경우 pszLine = NULL이 될 수 있다.
+			}	// 연속된 \n일 경우 pszLine = nullptr이 될 수 있다.
 
 			++iCount;
 			iLineStart = iCount;
@@ -357,13 +357,13 @@ void CUIMessageWnd::SetTopLine(int iTopLine)
 	for (i=0; i<iRealLine; ++i)
 	{
 		++iRealLineCount;
-		if (NULL == m_ppUILines[i]) continue;
+		if (nullptr == m_ppUILines[i]) continue;
 		m_ppUILines[i]->SetColor(ppLineInfos[i]->color);
 		m_ppUILines[i]->SetString(ppLineInfos[i]->szChat);
 	}
 	for (i=iRealLineCount; i<m_iChatLineCount; ++i)
 	{
-		if (NULL == m_ppUILines[i]) continue;
+		if (nullptr == m_ppUILines[i]) continue;
 		m_ppUILines[i]->SetString("");	// 나머지는 빈칸 만들기
 	}
 	delete [] ppLineInfos;
@@ -439,19 +439,19 @@ bool CUIMessageWnd::OnKeyPress(int iKey)
 
 CUIMessageWnd2::CUIMessageWnd2()
 {
-	m_pBtn_Fold = NULL;
+	m_pBtn_Fold = nullptr;
 }
 
 bool CUIMessageWnd2::Load(HANDLE hFile)
 {
 	if (false == CN3UIBase::Load(hFile)) return false;
-	m_pBtn_Fold = GetChildByID("btn_on");			__ASSERT(m_pBtn_Fold, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Fold, GetChildByID("btn_on"));
 	return true;
 }
 
 bool CUIMessageWnd2::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if (NULL == pSender) return false;
+	if (nullptr == pSender) return false;
 
 	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
@@ -468,5 +468,5 @@ bool CUIMessageWnd2::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 void CUIMessageWnd2::Release()
 {
 	CN3UIBase::Release();
-	m_pBtn_Fold = NULL;
+	m_pBtn_Fold = nullptr;
 }

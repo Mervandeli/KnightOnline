@@ -16,8 +16,8 @@ static char THIS_FILE[]=__FILE__;
 
 CN3GlobalEffect::CN3GlobalEffect()
 {
-	m_pVB = NULL;
-	m_pIB = NULL;
+	m_pVB = nullptr;
+	m_pIB = nullptr;
 	m_bActive = FALSE;
 	m_iVC = 0;
 	m_iIC = 0;
@@ -28,14 +28,14 @@ CN3GlobalEffect::CN3GlobalEffect()
 
 CN3GlobalEffect::~CN3GlobalEffect()
 {
-	if (m_pVB) { m_pVB->Release(); m_pVB = NULL;}
-	if (m_pIB) { m_pIB->Release(); m_pIB = NULL;}
+	if (m_pVB) { m_pVB->Release(); m_pVB = nullptr;}
+	if (m_pIB) { m_pIB->Release(); m_pIB = nullptr;}
 }
 
 void CN3GlobalEffect::Release()
 {
-	if (m_pVB) { m_pVB->Release(); m_pVB = NULL;}
-	if (m_pIB) { m_pIB->Release(); m_pIB = NULL;}
+	if (m_pVB) { m_pVB->Release(); m_pVB = nullptr;}
+	if (m_pIB) { m_pIB->Release(); m_pIB = nullptr;}
 	m_bActive = FALSE;
 	m_iVC = 0;
 	m_iIC = 0;

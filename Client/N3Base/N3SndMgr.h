@@ -42,7 +42,7 @@ public:
 	void		ReleaseStreamObj(CN3SndObjStream** ppObj);
 //	void		DeleteObjWithSource(CN3SndObj* pObj);
 //	CN3SndObj*	GetObj(int iID);
-	bool		PlayOnceAndRelease(int iSndID, const D3DVECTOR* pPos = NULL);
+	bool		PlayOnceAndRelease(int iSndID, const D3DVECTOR* pPos = nullptr);
 		
 	void		SetDuplicated(bool bDuplicate) { m_bSndDuplicated = bDuplicate; }
 	bool		GetDuplicated() { return m_bSndDuplicated; }

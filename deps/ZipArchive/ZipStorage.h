@@ -46,7 +46,7 @@ public:
 	void* m_pCallbackData;
 
 // function used to change disks during writing to the disk spanning archive
-	void NextDisk(int iNeeded, LPCTSTR lpszFileName = NULL);
+	void NextDisk(int iNeeded, LPCTSTR lpszFileName = nullptr);
 
 	void Close(bool bAfterException);
 
@@ -112,7 +112,7 @@ protected:
 	DWORD m_iBytesWritten;
 
 // construct the name of the volume in tdSpan mode
-	CString GetTdVolumeName(bool bLast, LPCTSTR lpszZipName = NULL);
+	CString GetTdVolumeName(bool bLast, LPCTSTR lpszZipName = nullptr);
 
 // change the disk in tdSpan mode
 	CString ChangeTdRead();

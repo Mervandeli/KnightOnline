@@ -21,7 +21,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgMapView dialog
 
 
-CDlgMapView::CDlgMapView(CWnd* pParent /*=NULL*/)
+CDlgMapView::CDlgMapView(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgMapView::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgMapView)
@@ -79,7 +79,7 @@ void CDlgMapView::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
 
-	if( m_pFrame->GetMapMng()->GetTerrain() != NULL)
+	if( m_pFrame->GetMapMng()->GetTerrain() != nullptr)
 	{
 
 		CWnd* pWnd = GetDlgItem(IDC_MAP_VIEW);
@@ -103,13 +103,13 @@ void CDlgMapView::OnPaint()
 
 		for( int i = 0; i < Map_View_Size/2 ; i+= Brush_Size)
 		{
-			MoveToEx(dc,i,Map_View_Size/2,NULL);
+			MoveToEx(dc,i,Map_View_Size/2,nullptr);
 			LineTo(dc,i,0);
 		}
 
 		for( i = 0; i < Map_View_Size/2 ; i+= Brush_Size)
 		{
-			MoveToEx(dc,Map_View_Size/2,i,NULL);
+			MoveToEx(dc,Map_View_Size/2,i,nullptr);
 			LineTo(dc,0,i);
 		}
 */
@@ -119,7 +119,7 @@ void CDlgMapView::OnPaint()
 void CDlgMapView::OnMapUpdata() 
 {
 	// TODO: Add your control notification handler code here
-	if( m_pFrame->GetMapMng()->GetTerrain() != NULL)
+	if( m_pFrame->GetMapMng()->GetTerrain() != nullptr)
 	{
 		CWnd* pWnd = GetDlgItem(IDC_MAP_VIEW);
 		ColorMapTemp();
@@ -151,7 +151,7 @@ void CDlgMapView::ColorMapTemp(void)
 		for(x=0;x<m_iNumColorMap;x++)
 		{
 
-			if(	m_pFrame->GetMapMng()->GetTerrain()->m_pColorTexture[x][z].Get() == NULL ||
+			if(	m_pFrame->GetMapMng()->GetTerrain()->m_pColorTexture[x][z].Get() == nullptr ||
 				m_pFrame->GetMapMng()->GetTerrain()->m_pColorTexture[x][z].PixelFormat() != D3DFMT_X8R8G8B8 ||
 				m_pFrame->GetMapMng()->GetTerrain()->m_pColorTexture[x][z].Width() != m_iColorMapTexSize ||
 				m_pFrame->GetMapMng()->GetTerrain()->m_pColorTexture[x][z].Height() != m_iColorMapTexSize ) 
@@ -162,7 +162,7 @@ void CDlgMapView::ColorMapTemp(void)
 			char*	pPixelDest = (char*)(BMF.Pixels(x * m_iColorMapTexSize, (m_iNumColorMap - z - 1) * m_iColorMapTexSize));
 			int		nPitchDest = BMF.Pitch();
 			D3DLOCKED_RECT lr;
-			m_pFrame->GetMapMng()->GetTerrain()->m_pColorTexture[x][z].Get()->LockRect(0, &lr, NULL, 0);
+			m_pFrame->GetMapMng()->GetTerrain()->m_pColorTexture[x][z].Get()->LockRect(0, &lr, nullptr, 0);
 			char*	pPixelSrc = (char*)(lr.pBits);
 
 			for(z2 = 0; z2 < m_iColorMapTexSize; z2++)
@@ -308,7 +308,7 @@ void CDlgMapView::SetMapView(void)
 	DragRect.bottom= DragRect.top+ Brush_Size;
 
 	CN3Camera* pCamera = m_pFrame->GetMapMng()->GetSceneOutput()->CameraGetActive();
-	if (m_pFrame->GetMapMng()->GetTerrain() == NULL || pCamera == NULL) 
+	if (m_pFrame->GetMapMng()->GetTerrain() == nullptr || pCamera == nullptr) 
 		return;
 
 	__Vector3 vPos,vAt,vUp;
@@ -330,7 +330,7 @@ void CDlgMapView::SetMapView(void)
 
 void CDlgMapView::Tick(void)
 {
-	if( m_pFrame->GetMapMng()->GetTerrain() != NULL)
+	if( m_pFrame->GetMapMng()->GetTerrain() != nullptr)
 	{
 	}
 };

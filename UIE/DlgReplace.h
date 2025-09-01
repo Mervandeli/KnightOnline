@@ -14,7 +14,7 @@ class CDlgReplace : public CDialog
 {
 // Construction
 public:
-	CDlgReplace(CWnd* pParent = NULL);   // standard constructor
+	CDlgReplace(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgReplace)

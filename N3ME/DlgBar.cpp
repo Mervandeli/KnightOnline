@@ -88,7 +88,7 @@ void CDlgBar::UpdateInfo()
 {
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 
-	if(NULL == pFrm->GetMapMng()) return;
+	if(nullptr == pFrm->GetMapMng()) return;
 
 	int nSelCount = pFrm->GetMapMng()->GetSelOutputObjCount();
 	if (nSelCount <= 0) return;
@@ -96,7 +96,7 @@ void CDlgBar::UpdateInfo()
 	m_bUpdateingNow = TRUE;
 	CN3TransformCollision* pTrans = (CN3TransformCollision*)pFrm->GetMapMng()->GetSelOutputObj(0);
 	int nCM = pFrm->GetMapMng()->GetCursorMode();
-	if(nSelCount == 1 && NULL != pTrans && (CM_POS == nCM || CM_SCALE == nCM))
+	if(nSelCount == 1 && nullptr != pTrans && (CM_POS == nCM || CM_SCALE == nCM))
 	{
 		__Vector3 v;
 		
@@ -131,12 +131,12 @@ void CDlgBar::UpdateDataFromControl()
 	if(TRUE == m_bUpdateingNow) return;
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 
-	if(NULL == pFrm->GetMapMng()) return;
+	if(nullptr == pFrm->GetMapMng()) return;
 
 	int nSelCount = pFrm->GetMapMng()->GetSelOutputObjCount();
 	CN3Transform* pTrans = pFrm->GetMapMng()->GetSelOutputObj(0);
 	int nCM = pFrm->GetMapMng()->GetCursorMode();
-	if(nSelCount != 1 || NULL == pTrans && CM_POS != nCM && CM_SCALE != nCM)
+	if(nSelCount != 1 || nullptr == pTrans && CM_POS != nCM && CM_SCALE != nCM)
 	{
 		return;
 	}
@@ -157,7 +157,7 @@ void CDlgBar::UpdateDataFromControl()
 			pTrans->ScaleSet(v);
 		}
 
-		pFrm->GetActiveView()->InvalidateRect(NULL, FALSE);
+		pFrm->GetActiveView()->InvalidateRect(nullptr, FALSE);
 	}
 
 	m_bUpdateingNow = FALSE;

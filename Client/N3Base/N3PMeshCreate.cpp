@@ -137,11 +137,11 @@ void CN3PMeshCreate::combine_modified(float &sofar, uint16_t *tri, int which, in
 
 CN3PMeshCreate::CN3PMeshCreate()
 {
-	m_pVertices = NULL;
-	m_pIndices = NULL;
+	m_pVertices = nullptr;
+	m_pIndices = nullptr;
 
-	m_pCollapses = NULL;
-	m_pAllIndexChanges = NULL;
+	m_pCollapses = nullptr;
+	m_pAllIndexChanges = nullptr;
 
 	Release();
 }
@@ -153,13 +153,13 @@ CN3PMeshCreate::~CN3PMeshCreate()
 
 void CN3PMeshCreate::Release()
 {
-	if (m_pVertices) { delete[] m_pVertices; m_pVertices = NULL;}
-	if (m_pIndices) { delete[] m_pIndices; m_pIndices = NULL; }
+	if (m_pVertices) { delete[] m_pVertices; m_pVertices = nullptr;}
+	if (m_pIndices) { delete[] m_pIndices; m_pIndices = nullptr; }
 
-	if (m_pCollapses) { delete[] m_pCollapses; m_pCollapses = NULL;}
-	if (m_pAllIndexChanges) { delete[] m_pAllIndexChanges; m_pAllIndexChanges = NULL;}
+	if (m_pCollapses) { delete[] m_pCollapses; m_pCollapses = nullptr;}
+	if (m_pAllIndexChanges) { delete[] m_pAllIndexChanges; m_pAllIndexChanges = nullptr;}
 
-	m_pCollapseUpTo = NULL;
+	m_pCollapseUpTo = nullptr;
 	m_iTotalIndexChanges = 0;
 	m_iNumVertices = 0; m_iNumIndices = 0;
 }
@@ -176,7 +176,7 @@ void CN3PMeshCreate::Collapse(uint16_t& pt_to, uint16_t& pt_from, float edge_val
 	// Run through uncollapsed triangles to find ones that
 	// refer to this vertex, and count up the ones that disappear.
 	m_pCollapseUpTo->NumTrianglesToLose = 0;
-	m_pCollapseUpTo->IndexChanges = NULL;
+	m_pCollapseUpTo->IndexChanges = nullptr;
 	m_pCollapseUpTo->NumIndicesToChange = 0;
 
 	// step through the triangle list
@@ -651,7 +651,7 @@ CN3PMesh *CN3PMeshCreate::CreateRendererMesh()
 
 int CN3PMeshCreate::ReGenerate(CN3PMesh *pPMesh)
 {
-	if(NULL == pPMesh) return -1;
+	if(nullptr == pPMesh) return -1;
 	
 	this->Release();
 	this->ConvertFromN3PMesh(pPMesh); // Mesh 로 부터 만들기..
@@ -788,7 +788,7 @@ void CN3PMeshCreate::SwapToEnd(uint16_t swapper, __PMCEdgeCollapse *collapses, _
 
 bool CN3PMeshCreate::ConvertFromN3Mesh(CN3Mesh* pN3Mesh)	// N3Mesh -> CN3PMeshCreate 로 컨버팅..
 {
-	if (pN3Mesh == NULL) return false;
+	if (pN3Mesh == nullptr) return false;
 	Release();
 
 	// get vertices count , indices count
@@ -820,7 +820,7 @@ bool CN3PMeshCreate::ConvertFromN3Mesh(CN3Mesh* pN3Mesh)	// N3Mesh -> CN3PMeshCr
 
 bool CN3PMeshCreate::ConvertFromN3PMesh(CN3PMesh* pN3PMesh)
 {
-	if (pN3PMesh == NULL) return false;
+	if (pN3PMesh == nullptr) return false;
 	Release();
 
 	CN3PMesh* pPMeshTmp = CN3Base::s_MngPMesh.Get(pN3PMesh->FileName()); // 이래야 참조 카운트가 하나 늘어서 포인터가 안없어진다.

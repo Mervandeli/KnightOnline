@@ -39,7 +39,7 @@ void CPick::SetPickXY(long x, long y)
     // Get the inverse view matrix
     D3DXMATRIX matView, m;
     lpD3DDev->GetTransform( D3DTS_VIEW, &matView );
-    D3DXMatrixInverse( &m, NULL, &matView );
+    D3DXMatrixInverse( &m, nullptr, &matView );
 
     // Transform the screen space pick ray into 3D space
     m_vPickRayDir.x  = v.x*m._11 + v.y*m._21 + v.z*m._31;
@@ -55,7 +55,7 @@ BOOL CPick::PickByBox(__Vector3 &vMin, __Vector3 &vMax, __Vector3& vIntersect)
 	m_MeshBox.Create_Cube(vMin, vMax);
 
 	__VertexT1* pVs = m_MeshBox.Vertices();
-	if(pVs == NULL) return FALSE;
+	if(pVs == nullptr) return FALSE;
 
 	float fT, fU, fV;
 	__Vector3 vTri[3];

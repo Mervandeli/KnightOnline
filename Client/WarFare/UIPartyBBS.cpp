@@ -29,17 +29,17 @@ static char THIS_FILE[]=__FILE__;
 
 CUIPartyBBS::CUIPartyBBS()
 {
-//	m_pList_Infos			= NULL;		
-	m_pBtn_PageUp			= NULL;
-	m_pBtn_PageDown			= NULL;
-	m_pBtn_Refresh			= NULL;
+//	m_pList_Infos			= nullptr;		
+	m_pBtn_PageUp			= nullptr;
+	m_pBtn_PageDown			= nullptr;
+	m_pBtn_Refresh			= nullptr;
 	
-	m_pBtn_Close			= NULL;
-	m_pBtn_Register			= NULL;
-	m_pBtn_RegisterCancel	= NULL;
-	m_pBtn_Whisper			= NULL;
-	m_pBtn_Party			= NULL;
-	m_pText_Page			= NULL;
+	m_pBtn_Close			= nullptr;
+	m_pBtn_Register			= nullptr;
+	m_pBtn_RegisterCancel	= nullptr;
+	m_pBtn_Whisper			= nullptr;
+	m_pBtn_Party			= nullptr;
+	m_pText_Page			= nullptr;
 
 	m_iCurPage				= 0;
 	m_bProcessing			= false;
@@ -48,7 +48,7 @@ CUIPartyBBS::CUIPartyBBS()
 
 	for(int i = 0 ; i < PARTY_BBS_MAXSTRING ; i++)
 	{
-		m_pText[i] = NULL;
+		m_pText[i] = nullptr;
 	}
 
 }
@@ -59,28 +59,30 @@ CUIPartyBBS::~CUIPartyBBS()
 
 bool CUIPartyBBS::Load(HANDLE hFile)
 {
-	if(CN3UIBase::Load(hFile)==false) return false;
+	if (!CN3UIBase::Load(hFile))
+		return false;
 
-//	m_pList_Infos = (CN3UIList*)(this->GetChildByID("List_Friends"));					__ASSERT(m_pList_Infos, "NULL UI Component!!!");
-	m_pBtn_PageUp = (CN3UIButton*)(this->GetChildByID("btn_page_up"));					__ASSERT(m_pBtn_PageUp, "NULL UI Component!!!");
-	m_pBtn_PageDown = (CN3UIButton*)(this->GetChildByID("btn_page_down"));				__ASSERT(m_pBtn_PageDown, "NULL UI Component!!!");
-	m_pBtn_Refresh = (CN3UIButton*)(this->GetChildByID("btn_refresh"));					__ASSERT(m_pBtn_Refresh, "NULL UI Component!!!");
+	// NOTE: This entire UI is outdated. It no longer remotely resembles the original UI.
+#if 0
+	N3_VERIFY_UI_COMPONENT(m_pBtn_PageUp,			GetChildByID<CN3UIButton>("btn_page_up"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_PageDown,			GetChildByID<CN3UIButton>("btn_page_down"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Refresh,			GetChildByID<CN3UIButton>("btn_refresh"));
 	
-	m_pBtn_Close = (CN3UIButton*)(this->GetChildByID("btn_exit"));						__ASSERT(m_pBtn_Close, "NULL UI Component!!!");
-	m_pBtn_Register = (CN3UIButton*)(this->GetChildByID("btn_add"));					__ASSERT(m_pBtn_Register, "NULL UI Component!!!");
-	m_pBtn_RegisterCancel = (CN3UIButton*)(this->GetChildByID("btn_delete"));			__ASSERT(m_pBtn_RegisterCancel, "NULL UI Component!!!");
-	m_pBtn_Whisper = (CN3UIButton*)(this->GetChildByID("btn_whisper"));					__ASSERT(m_pBtn_Whisper, "NULL UI Component!!!");
-	m_pBtn_Party = (CN3UIButton*)(this->GetChildByID("btn_Party"));						__ASSERT(m_pBtn_Party, "NULL UI Component!!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Close,			GetChildByID<CN3UIButton>("btn_exit"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Register,			GetChildByID<CN3UIButton>("btn_add"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_RegisterCancel,	GetChildByID<CN3UIButton>("btn_delete"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Whisper,			GetChildByID<CN3UIButton>("btn_whisper"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Party,			GetChildByID<CN3UIButton>("btn_Party"));
 
-
-	m_pText_Page = (CN3UIString*)(this->GetChildByID("string_page"));					__ASSERT(m_pText_Page, "NULL UI Component!!!");
+	N3_VERIFY_UI_COMPONENT(m_pText_Page,			GetChildByID<CN3UIString>("string_page"));
 
 	std::string szID;
 	for (int i = 0; i < PARTY_BBS_MAXSTRING; i++)
 	{
 		szID = fmt::format("text_{:02}", i);
-		m_pText[i] = (CN3UIString*) GetChildByID(szID);
+		N3_VERIFY_UI_COMPONENT(m_pText[i],			GetChildByID<CN3UIString>(szID));
 	}
+#endif
 
 	m_iCurPage = 0; // 현재 페이지..
 
@@ -289,7 +291,7 @@ void CUIPartyBBS::RefreshPage()
 		if(it==m_Datas.end()) return;
 
 		__InfoPartyBBS IPB = (*it);
-		CGameProcedure::GetTextByClass(IPB.eClass, szClass);
+		CGameBase::GetTextByClass(IPB.eClass, szClass);
 		SetContentString(i, IPB.szID.c_str(), IPB.iLevel, szClass.c_str());
 		it++;
 	}
@@ -300,28 +302,28 @@ void CUIPartyBBS::PartyStringSet(uint8_t byType)
 	switch(byType)
 	{
 	case N3_SP_PARTY_REGISTER:
-		CGameProcedure::s_pPlayer->m_bRecruitParty = true;
+		CGameBase::s_pPlayer->m_bRecruitParty = true;
 		break;
 	case N3_SP_PARTY_REGISTER_CANCEL:
-		CGameProcedure::s_pPlayer->m_bRecruitParty = false;
+		CGameBase::s_pPlayer->m_bRecruitParty = false;
 		break;
 	}
 
-	if(CGameProcedure::s_pPlayer->m_bRecruitParty)
+	if (CGameBase::s_pPlayer->m_bRecruitParty)
 	{
-		int iLevel = CGameProcedure::s_pPlayer->m_InfoBase.iLevel;
+		int iLevel = CGameBase::s_pPlayer->m_InfoBase.iLevel;
 		int iLMin = iLevel - 8;
 		if(iLMin < 0) iLMin = 0;
 		int iLMax = iLevel + 8;
 		if(iLMax > 80) iLMax = 80;
 
 		std::string szMsg = fmt::format_text_resource(IDS_WANT_PARTY_MEMBER, iLMin, iLMax);
-		CGameProcedure::s_pPlayer->InfoStringSet(szMsg, 0xff00ff00);
+		CGameBase::s_pPlayer->InfoStringSet(szMsg, 0xff00ff00);
 		CGameProcedure::s_pProcMain->MsgSend_StateChange(N3_SP_STATE_CHANGE_RECRUIT_PARTY, 0x02); // 파티 요청.. 취소
 	}
 	else
 	{
-		CGameProcedure::s_pPlayer->InfoStringSet("", 0);
+		CGameBase::s_pPlayer->InfoStringSet("", 0);
 		CGameProcedure::s_pProcMain->MsgSend_StateChange(N3_SP_STATE_CHANGE_RECRUIT_PARTY, 0x01); // 파티 요청..
 	}
 }
@@ -451,10 +453,9 @@ void CUIPartyBBS::RequestWhisper()
 		if( i == m_iCurIndex )
 		{
 			__InfoPartyBBS IPB = (*it);
-			if(0 != lstrcmpi(IPB.szID.c_str(), CGameProcedure::s_pPlayer->m_InfoBase.szID.c_str()))
-			{//나 자신에게는 귓속말을 못하게 한다...
+			//나 자신에게는 귓속말을 못하게 한다...
+			if (lstrcmpi(IPB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) != 0)
 				CGameProcedure::s_pProcMain->MsgSend_ChatSelectTarget(IPB.szID);
-			}
 			break;
 		}
 	}
@@ -475,7 +476,7 @@ void CUIPartyBBS::RequestParty()
 			__InfoPartyBBS IPB = (*it);
 
 			// 나 자신에게는 파티 신청을 못하게 한다...
-			if(0 != lstrcmpi(IPB.szID.c_str(), CGameProcedure::s_pPlayer->m_InfoBase.szID.c_str()))
+			if (lstrcmpi(IPB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) != 0)
 			{
 				std::string szMsg;
 				if (CGameProcedure::s_pProcMain->MsgSend_PartyOrForceCreate(0, IPB.szID))

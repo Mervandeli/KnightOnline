@@ -72,68 +72,68 @@ public:
 
 	void Load(HANDLE hFile)
 	{
-		if(NULL == hFile || INVALID_HANDLE_VALUE == hFile) return;
+		if(nullptr == hFile || INVALID_HANDLE_VALUE == hFile) return;
 
 		DWORD dwRWC = 0;
 
 		int nL = 0;
-		ReadFile(hFile, &nL, 4, &dwRWC, NULL); // 원래는 문자열 포인터가 있던자리이다.. 호환성을 위헤서.. 걍...
+		ReadFile(hFile, &nL, 4, &dwRWC, nullptr); // 원래는 문자열 포인터가 있던자리이다.. 호환성을 위헤서.. 걍...
 
-		ReadFile(hFile, &fFrmStart, 4, &dwRWC, NULL); // 상체 시작
-		ReadFile(hFile, &fFrmEnd, 4, &dwRWC, NULL); // 상체 끝
-		ReadFile(hFile, &fFrmPerSec, 4, &dwRWC, NULL); // 초당 30프레임이 표준이다..
+		ReadFile(hFile, &fFrmStart, 4, &dwRWC, nullptr); // 상체 시작
+		ReadFile(hFile, &fFrmEnd, 4, &dwRWC, nullptr); // 상체 끝
+		ReadFile(hFile, &fFrmPerSec, 4, &dwRWC, nullptr); // 초당 30프레임이 표준이다..
 
-		ReadFile(hFile, &fFrmPlugTraceStart, 4, &dwRWC, NULL);
-		ReadFile(hFile, &fFrmPlugTraceEnd, 4, &dwRWC, NULL);
+		ReadFile(hFile, &fFrmPlugTraceStart, 4, &dwRWC, nullptr);
+		ReadFile(hFile, &fFrmPlugTraceEnd, 4, &dwRWC, nullptr);
 		
-		ReadFile(hFile, &fFrmSound0, 4, &dwRWC, NULL);
-		ReadFile(hFile, &fFrmSound1, 4, &dwRWC, NULL);
+		ReadFile(hFile, &fFrmSound0, 4, &dwRWC, nullptr);
+		ReadFile(hFile, &fFrmSound1, 4, &dwRWC, nullptr);
 
-		ReadFile(hFile, &fTimeBlend, 4, &dwRWC, NULL);
-		ReadFile(hFile, &iBlendFlags, 4, &dwRWC, NULL); // 블렌딩 플래그 0 이면 걍 블렌딩.. 1이면 루핑시 블렌딩 타임만큼 시간 지연
+		ReadFile(hFile, &fTimeBlend, 4, &dwRWC, nullptr);
+		ReadFile(hFile, &iBlendFlags, 4, &dwRWC, nullptr); // 블렌딩 플래그 0 이면 걍 블렌딩.. 1이면 루핑시 블렌딩 타임만큼 시간 지연
 		
-		ReadFile(hFile, &fFrmStrike0, 4, &dwRWC, NULL);
-		ReadFile(hFile, &fFrmStrike1, 4, &dwRWC, NULL);
+		ReadFile(hFile, &fFrmStrike0, 4, &dwRWC, nullptr);
+		ReadFile(hFile, &fFrmStrike1, 4, &dwRWC, nullptr);
 
 		// 이름 읽기..
 		szName = "";
-		ReadFile(hFile, &nL, 4, &dwRWC, NULL);
+		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 		if(nL > 0)
 		{
-			std::vector<char> buffer(nL+1, NULL);
-			ReadFile(hFile, &buffer[0], nL, &dwRWC, NULL);
+			std::vector<char> buffer(nL+1, '\0');
+			ReadFile(hFile, &buffer[0], nL, &dwRWC, nullptr);
 			szName = &buffer[0];
 		}
 	}
 	void Save(HANDLE hFile)
 	{
-		if(NULL == hFile || INVALID_HANDLE_VALUE == hFile) return;
+		if(nullptr == hFile || INVALID_HANDLE_VALUE == hFile) return;
 
 		DWORD dwRWC = 0;
 
 		int nL = 0;
-		WriteFile(hFile, &nL, 4, &dwRWC, NULL); // 원래는 문자열 포인터가 있던자리이다.. 호환성을 위헤서.. 걍...
+		WriteFile(hFile, &nL, 4, &dwRWC, nullptr); // 원래는 문자열 포인터가 있던자리이다.. 호환성을 위헤서.. 걍...
 
-		WriteFile(hFile, &fFrmStart, 4, &dwRWC, NULL); // 상체 시작
-		WriteFile(hFile, &fFrmEnd, 4, &dwRWC, NULL); // 상체 끝
-		WriteFile(hFile, &fFrmPerSec, 4, &dwRWC, NULL); // 초당 30프레임이 표준이다..
+		WriteFile(hFile, &fFrmStart, 4, &dwRWC, nullptr); // 상체 시작
+		WriteFile(hFile, &fFrmEnd, 4, &dwRWC, nullptr); // 상체 끝
+		WriteFile(hFile, &fFrmPerSec, 4, &dwRWC, nullptr); // 초당 30프레임이 표준이다..
 
-		WriteFile(hFile, &fFrmPlugTraceStart, 4, &dwRWC, NULL);
-		WriteFile(hFile, &fFrmPlugTraceEnd, 4, &dwRWC, NULL);
+		WriteFile(hFile, &fFrmPlugTraceStart, 4, &dwRWC, nullptr);
+		WriteFile(hFile, &fFrmPlugTraceEnd, 4, &dwRWC, nullptr);
 		
-		WriteFile(hFile, &fFrmSound0, 4, &dwRWC, NULL);
-		WriteFile(hFile, &fFrmSound1, 4, &dwRWC, NULL);
+		WriteFile(hFile, &fFrmSound0, 4, &dwRWC, nullptr);
+		WriteFile(hFile, &fFrmSound1, 4, &dwRWC, nullptr);
 
-		WriteFile(hFile, &fTimeBlend, 4, &dwRWC, NULL);
-		WriteFile(hFile, &iBlendFlags, 4, &dwRWC, NULL); // 블렌딩 플래그 0 이면 걍 블렌딩.. 1이면 루핑시 블렌딩 타임만큼 시간 지연
+		WriteFile(hFile, &fTimeBlend, 4, &dwRWC, nullptr);
+		WriteFile(hFile, &iBlendFlags, 4, &dwRWC, nullptr); // 블렌딩 플래그 0 이면 걍 블렌딩.. 1이면 루핑시 블렌딩 타임만큼 시간 지연
 		
-		WriteFile(hFile, &fFrmStrike0, 4, &dwRWC, NULL);
-		WriteFile(hFile, &fFrmStrike1, 4, &dwRWC, NULL);
+		WriteFile(hFile, &fFrmStrike0, 4, &dwRWC, nullptr);
+		WriteFile(hFile, &fFrmStrike1, 4, &dwRWC, nullptr);
 
 		// 이름 읽기..
 		nL = szName.size();
-		WriteFile(hFile, &nL, 4, &dwRWC, NULL);
-		if(nL > 0) WriteFile(hFile, szName.c_str(), nL, &dwRWC, NULL);
+		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+		if(nL > 0) WriteFile(hFile, szName.c_str(), nL, &dwRWC, nullptr);
 	}
 
 #ifdef _N3TOOL
@@ -187,7 +187,7 @@ public:
 		{
 			if(szName == m_Datas[i].szName) return &(m_Datas[i]);
 		}
-		return NULL;
+		return nullptr;
 	}
 	void			Swap(int nAni1, int nAni2);
 	void			Delete(int nIndex);

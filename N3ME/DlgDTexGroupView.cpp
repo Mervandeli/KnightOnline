@@ -23,12 +23,12 @@ static char THIS_FILE[]=__FILE__;
 // CDlgDTexGroupView dialog
 
 
-CDlgDTexGroupView::CDlgDTexGroupView(CWnd* pParent /*=NULL*/)
+CDlgDTexGroupView::CDlgDTexGroupView(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgDTexGroupView::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgDTexGroupView)
 	m_fTexSurfaceSize = 128.0f;
-	m_pPrevTex = NULL;
+	m_pPrevTex = nullptr;
 	//}}AFX_DATA_INIT
 
 	m_iRadioState = 0;
@@ -62,7 +62,7 @@ END_MESSAGE_MAP()
 
 void CDlgDTexGroupView::AddGroup(CDTexGroup *pGroup)
 {
-	HTREEITEM hGroup = m_Tree.InsertItem(pGroup->m_Name, NULL);
+	HTREEITEM hGroup = m_Tree.InsertItem(pGroup->m_Name, nullptr);
 	m_Tree.SetItemData(hGroup,(DWORD)pGroup);
 
 	int i;
@@ -137,7 +137,7 @@ void CDlgDTexGroupView::OnSelchangedTreeDtexGroup(NMHDR* pNMHDR, LRESULT* pResul
 	HTREEITEM hChild = m_Tree.GetChildItem(hTree);
 	HTREEITEM hParent = m_Tree.GetParentItem(hTree);
 
-	if(hParent==NULL)// 그 그룹의 대표적인 썸네일만 보여주자..
+	if(hParent==nullptr)// 그 그룹의 대표적인 썸네일만 보여주자..
 	{
 		hTree = m_Tree.GetChildItem(hTree);
 		hTree = m_Tree.GetChildItem(hTree);
@@ -145,7 +145,7 @@ void CDlgDTexGroupView::OnSelchangedTreeDtexGroup(NMHDR* pNMHDR, LRESULT* pResul
 	}
 	
 
-	if(NULL == hChild)
+	if(nullptr == hChild)
 	{
 		LPDTEXTILEATTR pDTTAttr = (LPDTEXTILEATTR)m_Tree.GetItemData(hTree);
 		if((int)pDTTAttr>10)
@@ -168,7 +168,7 @@ void CDlgDTexGroupView::OnSelchangedTreeDtexGroup(NMHDR* pNMHDR, LRESULT* pResul
 					CDTexMng* pDTexMng = pFrm->GetDTexMng();
 
 					CDTex* pDTex = pDTexMng->GetDTexByID(pDTTAttr->TexID);
-					m_pPrevTex = NULL;
+					m_pPrevTex = nullptr;
 					if(pDTex)
 					{
 						m_pPrevTex = pDTex->m_pTex;
@@ -188,7 +188,7 @@ void CDlgDTexGroupView::OnSelchangedTreeDtexGroup(NMHDR* pNMHDR, LRESULT* pResul
 	}
 	else
 	{
-		m_pPrevTex = NULL;
+		m_pPrevTex = nullptr;
 		SetRect(&m_PrevTexRect, 0,0,0,0);
 	}
 	Invalidate(FALSE);
@@ -226,7 +226,7 @@ void CDlgDTexGroupView::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
 
-	BOOL b = m_Tree.SortChildren(NULL);
+	BOOL b = m_Tree.SortChildren(nullptr);
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	if(!pFrm) return;
@@ -242,7 +242,7 @@ BOOL CDlgDTexGroupView::OnInitDialog()
 	CDialog::OnInitDialog();
 	
 //	CWnd* pView = GetDlgItem(IDC_PREVIEW_DTEX_GROUP);
-//	pView->SetWindowPos(NULL, 0, 0, (int)m_fTexSurfaceSize, (int)m_fTexSurfaceSize, SWP_DRAWFRAME|SWP_NOMOVE);
+//	pView->SetWindowPos(nullptr, 0, 0, (int)m_fTexSurfaceSize, (int)m_fTexSurfaceSize, SWP_DRAWFRAME|SWP_NOMOVE);
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 

@@ -36,7 +36,7 @@ CPondMng::CPondMng(CMainFrame* pMainFrm)
 CPondMng::~CPondMng()
 {
 	Release();
-	if (m_pDlgProperty) {	m_pDlgProperty->DestroyWindow(); delete m_pDlgProperty; m_pDlgProperty = NULL;}
+	if (m_pDlgProperty) {	m_pDlgProperty->DestroyWindow(); delete m_pDlgProperty; m_pDlgProperty = nullptr;}
 }
 
 void CPondMng::Release()
@@ -96,7 +96,7 @@ void CPondMng::SelPondRelease()
 		CPondMesh* pRM = *it;
 		if(pRM)
 		{
-			pRM=NULL;
+			pRM=nullptr;
 		}
 	}
 	m_pSelPonds.clear();
@@ -122,12 +122,12 @@ bool CPondMng::Load(HANDLE hFile)
 	DWORD dwNum;
 
 	int iVersion;
-	ReadFile(hFile, &iVersion, sizeof(iVersion), &dwNum,NULL);	//	GetVersion
+	ReadFile(hFile, &iVersion, sizeof(iVersion), &dwNum,nullptr);	//	GetVersion
 
 	int i, iPondMeshCount;
 	if(iVersion==1001)
 	{
-		ReadFile(hFile, &iPondMeshCount, sizeof(iPondMeshCount), &dwNum, NULL);
+		ReadFile(hFile, &iPondMeshCount, sizeof(iPondMeshCount), &dwNum, nullptr);
 		for (i=0; i<iPondMeshCount; ++i)
 		{
 			CPondMesh* pPondMesh = new CPondMesh;
@@ -137,7 +137,7 @@ bool CPondMng::Load(HANDLE hFile)
 	}
 	else if(iVersion==1000)
 	{
-		ReadFile(hFile, &iPondMeshCount, sizeof(iPondMeshCount), &dwNum, NULL);
+		ReadFile(hFile, &iPondMeshCount, sizeof(iPondMeshCount), &dwNum, nullptr);
 		for (i=0; i<iPondMeshCount; ++i)
 		{
 			CPondMesh* pPondMesh = new CPondMesh;
@@ -166,10 +166,10 @@ bool CPondMng::Save(HANDLE hFile)
 
 	//	version 1000 - alpha input
 	int nFileVersion = 1001;
-	WriteFile(hFile, &nFileVersion, sizeof(nFileVersion), &dwNum, NULL);		// 연못 번호
+	WriteFile(hFile, &nFileVersion, sizeof(nFileVersion), &dwNum, nullptr);		// 연못 번호
 
 	int iSize = m_PondMeshes.size();
-	WriteFile(hFile, &iSize, 4, &dwNum, NULL);
+	WriteFile(hFile, &iSize, 4, &dwNum, nullptr);
 	
 	it_PondMesh it = m_PondMeshes.begin();
 	for(int i = 0; i < iSize; i++, it++)
@@ -217,7 +217,7 @@ void CPondMng::Render()
 			s_lpD3DDev->SetTransform(D3DTS_WORLD, &matWorld);
 
 			// set texture
-			hr = s_lpD3DDev->SetTexture(0, NULL);
+			hr = s_lpD3DDev->SetTexture(0, nullptr);
 			hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 			hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 
@@ -264,7 +264,7 @@ void CPondMng::Render()
 			for (int i=0; i<iSize; ++i)
 			{
 				__VertexXyzT2* pVtx = m_SelVtxArray.GetAt(i);
-				if (pVtx == NULL) continue;
+				if (pVtx == nullptr) continue;
 				D3DXVECTOR4 v;
 				D3DXVec3Transform(&v, (D3DXVECTOR3*)(pVtx), &matVP);
 
@@ -324,7 +324,7 @@ CPondMesh*	CPondMng::CreateNewPondMesh()
 	if (dlg.DoModal() == IDCANCEL)	//	지금 만든연못지우기
 	{
 		SelPondDelete(pRM);
-		pRM = NULL;
+		pRM = nullptr;
 	}
 	if (pRM)	//	만들려는 연못
 	{
@@ -348,7 +348,7 @@ void CPondMng::RemovePondMesh(int iPondID)	//	연못을 만들거나 선택하�
 			delete pRM;
 			it = m_PondMeshes.erase(it);
 			m_SelVtxArray.RemoveAll();
-			m_VtxPosDummy.SetSelVtx(NULL);
+			m_VtxPosDummy.SetSelVtx(nullptr);
 			SelPondRelease();
 			m_pMainFrm->Invalidate();
 			return;
@@ -359,7 +359,7 @@ void CPondMng::RemovePondMesh(int iPondID)	//	연못을 만들거나 선택하�
 void CPondMng::GoPond(int iPondID)
 {
 	CPondMesh* pPond = GetPondMesh(iPondID);
-	if(pPond == NULL) return;
+	if(pPond == nullptr) return;
 
 	__Vector3 vPondPos = pPond->GetCenter();
 	CN3Camera* pCamera = m_pMainFrm->GetMapMng()->CameraGet();
@@ -647,13 +647,13 @@ CPondMesh* CPondMng::GetPondMesh(int iPondID)
 		CPondMesh* pRM = *it;
 		if (pRM->GetPondID() == iPondID) return pRM;
 	}
-	return NULL;
+	return nullptr;
 }
 
 CPondMesh* CPondMng::GetSelPond()
 {
 	int iSize = m_pSelPonds.size();
-	if(iSize==0) return NULL;
+	if(iSize==0) return nullptr;
 
 	return *(m_pSelPonds.begin());
 }
@@ -670,17 +670,17 @@ it_PondMesh CPondMng::GetDrawPond()
 void CPondMng::SetSelPond(CPondMesh* pPondMesh,BOOL bChooseGroup)
 {
 	int iSize = m_pSelPonds.size();
-	if(iSize==0&&pPondMesh!=NULL)
+	if(iSize==0&&pPondMesh!=nullptr)
 	{
-		m_VtxPosDummy.SetSelVtx(NULL);	
+		m_VtxPosDummy.SetSelVtx(nullptr);	
 		m_pSelPonds.push_back(pPondMesh);
 	}
-	else if(pPondMesh==NULL && bChooseGroup==FALSE && m_bChooseEditPond == FALSE)
+	else if(pPondMesh==nullptr && bChooseGroup==FALSE && m_bChooseEditPond == FALSE)
 	{
 		SelPondRelease();
 	}
 
-	if(bChooseGroup==TRUE && pPondMesh!=NULL && m_bChooseEditPond == FALSE)
+	if(bChooseGroup==TRUE && pPondMesh!=nullptr && m_bChooseEditPond == FALSE)
 	{
 		SetSelPonds(pPondMesh);
 	}
@@ -689,9 +689,9 @@ void CPondMng::SetSelPond(CPondMesh* pPondMesh,BOOL bChooseGroup)
 
 BOOL CPondMng::SetPondID(CPondMesh* pPondMesh, int iPondID)
 {
-	if (pPondMesh == NULL) return FALSE;
+	if (pPondMesh == nullptr) return FALSE;
 	if (pPondMesh->GetPondID() == iPondID) return TRUE;
-	if (GetPondMesh(iPondID) == NULL)
+	if (GetPondMesh(iPondID) == nullptr)
 	{
 		pPondMesh->SetPondID(iPondID);
 		return TRUE;
@@ -708,7 +708,7 @@ void CPondMng::SetEditMode(BOOL bEditMode)
 	}
 	else
 	{
-		SetSelPond(NULL);
+		SetSelPond(nullptr);
 		if (m_pDlgProperty) m_pDlgProperty->ShowWindow(FALSE);
 		m_PCursorMode = PCM_NONE;
 	}
@@ -716,7 +716,7 @@ void CPondMng::SetEditMode(BOOL bEditMode)
 
 void CPondMng::ClearSelectRcAllPond()
 {
-	CPondMesh* pRM = NULL;
+	CPondMesh* pRM = nullptr;
 	it_PondMesh it = m_PondMeshes.begin();
 	int iSize = m_PondMeshes.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -732,11 +732,11 @@ BOOL CPondMng::SelectVtxByDragRect(RECT* pRect, BOOL bAdd,BOOL bSelectPond)
 	if(bSelectPond == TRUE) m_SelVtxArray.RemoveAll();
 	else
 	{
-		if (pRect == NULL) return FALSE;
+		if (pRect == nullptr) return FALSE;
 		if (bAdd == FALSE)
 		{
 			m_SelVtxArray.RemoveAll();
-			SetSelPond(NULL);	// 선택한연못 해제..
+			SetSelPond(nullptr);	// 선택한연못 해제..
 		}
 	}
 
@@ -750,20 +750,20 @@ BOOL CPondMng::SelectVtxByDragRect(RECT* pRect, BOOL bAdd,BOOL bSelectPond)
 
 	D3DVIEWPORT9 vp = pEng->s_CameraData.vp;
 
-	CPondMesh* pSelPond=NULL;
+	CPondMesh* pSelPond=nullptr;
 	int iSize = m_pSelPonds.size();
 	it_PondMesh it = m_pSelPonds.begin();
 	int i,k;
 	for(i = 0; i < iSize; ++i, ++it) 	// 이미 선택된 연못이 있다면..
 	{
 		pSelPond= *it;
-		if(pSelPond==NULL) continue;
+		if(pSelPond==nullptr) continue;
 
 		int iVC = pSelPond->VertexCount();	// 그연못의 점 숫자를 구하기
 		for (k=0; k<iVC;++k)
 		{
 			__VertexXyzT2* pVtx = pSelPond->GetVertex(k);	// 점 하나 구하기
-			if (pVtx == NULL) continue;
+			if (pVtx == nullptr) continue;
 
 			if(bSelectPond == FALSE)
 			{
@@ -809,15 +809,15 @@ BOOL CPondMng::SelectVtxByDragRect(RECT* pRect, BOOL bAdd,BOOL bSelectPond)
 		for(i = 0; i < iSize; ++i, ++it)
 		{
 			CPondMesh* pRM = *it;
-			if (pRM == NULL) continue;
+			if (pRM == nullptr) continue;
 
 			int j, iVC = pRM->VertexCount();				// 이연못의 점 갯수
-			pSelPond = NULL;
+			pSelPond = nullptr;
 			bChkSamePond=TRUE;
 			for (j=0; j<iVC; ++j)
 			{
 				__VertexXyzT2* pVtx = pRM->GetVertex(j);	// 점 하나 구하기
-				if (pVtx == NULL) continue;
+				if (pVtx == nullptr) continue;
 
 				D3DXVECTOR4 v;
 				D3DXVec3Transform(&v, (D3DXVECTOR3*)(pVtx), &matVP);
@@ -846,8 +846,8 @@ BOOL CPondMng::SelectVtxByDragRect(RECT* pRect, BOOL bAdd,BOOL bSelectPond)
 	iSize = m_SelVtxArray.GetSize();
 	if ( iSize == 0)
 	{
-		SetSelPond(NULL);
-		m_VtxPosDummy.SetSelVtx(NULL);
+		SetSelPond(nullptr);
+		m_VtxPosDummy.SetSelVtx(nullptr);
 	}
 	else
 	{
@@ -882,21 +882,21 @@ void CPondMng::MakeGameFiles(HANDLE hFile, float fSize)
 	DWORD dwNum;
 
 	it_PondMesh it = m_PondMeshes.begin();
-	WriteFile(hFile, &iPondCount, sizeof(int), &dwNum, NULL);
+	WriteFile(hFile, &iPondCount, sizeof(int), &dwNum, nullptr);
 	for (int i=0;i<iPondCount;i++, it++)
 	{
 		CPondMesh *pRM =  *it;
 		ASSERT(pRM);
 
 		int iVC = pRM->VertexCount();
-		__VertexXyzT2* pVtx0 = pRM->GetVertex(0), *pSrcVtx=NULL;
+		__VertexXyzT2* pVtx0 = pRM->GetVertex(0), *pSrcVtx=nullptr;
 		ASSERT(pVtx0);
-		WriteFile(hFile, &iVC, sizeof(iVC), &dwNum, NULL);				// 점 갯수
+		WriteFile(hFile, &iVC, sizeof(iVC), &dwNum, nullptr);				// 점 갯수
 
 		if(iVC<=0) continue;
 
 		int iWidthVtxNum = pRM->GetWaterScaleWidht();
-		WriteFile(hFile, &iWidthVtxNum, sizeof(int), &dwNum, NULL);				// 점 갯수
+		WriteFile(hFile, &iWidthVtxNum, sizeof(int), &dwNum, nullptr);				// 점 갯수
 
 		CN3Texture* pPondTex = pRM->TexGet();
 		int iLen = 0;
@@ -915,15 +915,15 @@ void CPondMng::MakeGameFiles(HANDLE hFile, float fSize)
 					i = 0;
 				}
 			}
-			WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, NULL);				// texture file name length
+			WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, nullptr);				// texture file name length
 			if (iLen>0)
 			{
-				WriteFile(hFile, szFindName, iLen, &dwNum, NULL);			// texture file name
+				WriteFile(hFile, szFindName, iLen, &dwNum, nullptr);			// texture file name
 			}
 		}
 		else
 		{
-			WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, NULL);				// texture file name length
+			WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, nullptr);				// texture file name length
 		}
 
 		// XyxT2 -> XyzColorT2 Converting.
@@ -933,11 +933,11 @@ void CPondMng::MakeGameFiles(HANDLE hFile, float fSize)
 		{
 			pSrcVtx = pVtx0+k;
 			__vTemp.Set(*pSrcVtx,0.0f, 1.0f, 0.0f,dwAplha);
-			WriteFile(hFile, &__vTemp, sizeof(__VertexPond), &dwNum, NULL);	// vertex buffer
+			WriteFile(hFile, &__vTemp, sizeof(__VertexPond), &dwNum, nullptr);	// vertex buffer
 		}
 		
 		int iIC = pRM->IndexCount();
-		WriteFile(hFile, &iIC, sizeof(iIC), &dwNum, NULL);				// IndexBuffer Count.
+		WriteFile(hFile, &iIC, sizeof(iIC), &dwNum, nullptr);				// IndexBuffer Count.
 	}	
 
 }
@@ -1033,7 +1033,7 @@ void CPondMng::SetVtxCenter()	//	연못(들)의 중간점을 찾아 세팅,예�
 	}
 
 	delete []pvCenter;
-	pvCenter=NULL;
+	pvCenter=nullptr;
 }
 
 void CPondMng::SetRotatePonds(float fMove)
@@ -1139,7 +1139,7 @@ void CPondMng::InputDummyMovePos(__Vector3 vMovePos)
 
 void CPondMng::StationPond()
 {
-	CPondMesh* pRM = NULL;
+	CPondMesh* pRM = nullptr;
 	it_PondMesh it = m_pSelPonds.begin();
 	int iSize = m_pSelPonds.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -1153,7 +1153,7 @@ void CPondMng::StationPond()
 
 void CPondMng::MovePond()
 {
-	SelectVtxByDragRect(NULL,FALSE,TRUE);	//	일단 현재 선택된 모든 연못의 점들 전부 선택
+	SelectVtxByDragRect(nullptr,FALSE,TRUE);	//	일단 현재 선택된 모든 연못의 점들 전부 선택
 	m_bMovePond = TRUE;
 	MainInvalidate();
 }

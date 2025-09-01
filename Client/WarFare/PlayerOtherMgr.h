@@ -67,12 +67,12 @@ public:
 
 
 	//.. Picking된 PlayerOther 계산..
-	CPlayerNPC*			Pick(int ixScreen, int iyScreen, int& iIDResult, __Vector3* pvPick = NULL);
-	CPlayerNPC*			PickNPC(int ixScreen, int iyScreen, int& iIDResult, __Vector3* pvPick = NULL);
-	CPlayerOther*		PickUPC(int ixScreen, int iyScreen, int& iIDResult, __Vector3* pvPick = NULL);
-	CPlayerNPC*			PickPrecisely(int ixScreen, int iyScreen, int& iIDResult, __Vector3* pvPick = NULL);
-	CPlayerNPC*			PickNPCPrecisely(int ixScreen, int iyScreen, int& iIDResult, __Vector3* pvPick = NULL);
-	CPlayerOther*		PickUPCPrecisely(int ixScreen, int iyScreen, int& iIDResult, __Vector3* pvPick = NULL);
+	CPlayerNPC*			Pick(int ixScreen, int iyScreen, int& iIDResult, __Vector3* pvPick = nullptr);
+	CPlayerNPC*			PickNPC(int ixScreen, int iyScreen, int& iIDResult, __Vector3* pvPick = nullptr);
+	CPlayerOther*		PickUPC(int ixScreen, int iyScreen, int& iIDResult, __Vector3* pvPick = nullptr);
+	CPlayerNPC*			PickPrecisely(int ixScreen, int iyScreen, int& iIDResult, __Vector3* pvPick = nullptr);
+	CPlayerNPC*			PickNPCPrecisely(int ixScreen, int iyScreen, int& iIDResult, __Vector3* pvPick = nullptr);
+	CPlayerOther*		PickUPCPrecisely(int ixScreen, int iyScreen, int& iIDResult, __Vector3* pvPick = nullptr);
 	CPlayerNPC*			PickAllPrecisely(int ixScreen, int iyScreen, int &iIDResult, __Vector3* pvPick);
 	CPlayerNPC*			PickCorpse(int ixScreen, int iyScreen, int& iIDResult); // 시체중 클릭..
 	static int			SortByCameraDistance(const void* pArg1, const void* pArg2);
@@ -95,11 +95,11 @@ inline CPlayerOther* CPlayerOtherMgr::UPCGetByID(int iID, bool bFromAliveOnly)
 		if(bFromAliveOnly)
 		{
 			if(PSA_DEATH != pUPC->m_eState) return pUPC;
-			else return NULL;
+			else return nullptr;
 		}
 		else return pUPC;
 	}
-	else return NULL;
+	else return nullptr;
 }
 
 inline CPlayerNPC* CPlayerOtherMgr::NPCGetByID(int iID, bool bFromAliveOnly)
@@ -111,18 +111,18 @@ inline CPlayerNPC* CPlayerOtherMgr::NPCGetByID(int iID, bool bFromAliveOnly)
 		if(bFromAliveOnly)
 		{
 			if(PSA_DEATH != pNPC->m_eState) return pNPC;
-			else return NULL;
+			else return nullptr;
 		}
 		else return pNPC;
 	}
-	else return NULL;
+	else return nullptr;
 }
 
 inline CPlayerBase* CPlayerOtherMgr::CorpseGetByID(int iID)
 {
 	it_NPC it = m_Corpses.find(iID);
 	if(it != m_Corpses.end()) return it->second;
-	else return NULL;
+	else return nullptr;
 }
 
 inline CPlayerNPC* CPlayerOtherMgr::CharacterGetByID(int iID, bool bFromAliveOnly)
@@ -130,7 +130,7 @@ inline CPlayerNPC* CPlayerOtherMgr::CharacterGetByID(int iID, bool bFromAliveOnl
 	if(iID < 0) return 0;
 
 	CPlayerNPC* pBPC = this->NPCGetByID(iID, bFromAliveOnly);		// 먼저  NPC 중에서 찾아보고..
-	if(NULL == pBPC) pBPC = this->UPCGetByID(iID, bFromAliveOnly);			// 없음 User 들도 찾아본다..
+	if(nullptr == pBPC) pBPC = this->UPCGetByID(iID, bFromAliveOnly);			// 없음 User 들도 찾아본다..
 
 	return pBPC;
 }

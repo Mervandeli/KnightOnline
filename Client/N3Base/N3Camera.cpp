@@ -66,13 +66,13 @@ bool CN3Camera::Load(HANDLE hFile)
 	CN3Transform::Load(hFile);
 
 	DWORD dwRWC = 0;
-	ReadFile(hFile, &m_vAt, sizeof(__Vector3), &dwRWC, NULL); // At position
-	ReadFile(hFile, &m_Data, sizeof(__CameraData), &dwRWC, NULL); // CameraData
-	ReadFile(hFile, &m_bFogUse, 4, &dwRWC, NULL);
-	ReadFile(hFile, &m_FogColor, 4, &dwRWC, NULL);
-//	ReadFile(hFile, &m_fFogDensity, 4, &dwRWC, NULL);
-//	ReadFile(hFile, &m_fFogStart, 4, &dwRWC, NULL);
-//	ReadFile(hFile, &m_fFogEnd, 4, &dwRWC, NULL);
+	ReadFile(hFile, &m_vAt, sizeof(__Vector3), &dwRWC, nullptr); // At position
+	ReadFile(hFile, &m_Data, sizeof(__CameraData), &dwRWC, nullptr); // CameraData
+	ReadFile(hFile, &m_bFogUse, 4, &dwRWC, nullptr);
+	ReadFile(hFile, &m_FogColor, 4, &dwRWC, nullptr);
+//	ReadFile(hFile, &m_fFogDensity, 4, &dwRWC, nullptr);
+//	ReadFile(hFile, &m_fFogStart, 4, &dwRWC, nullptr);
+//	ReadFile(hFile, &m_fFogEnd, 4, &dwRWC, nullptr);
 
 	return true;
 }
@@ -361,13 +361,13 @@ bool CN3Camera::Save(HANDLE hFile)
 	CN3Transform::Save(hFile);
 
 	DWORD dwRWC = 0;
-	WriteFile(hFile, &m_vAt, sizeof(__Vector3), &dwRWC, NULL); // At position
-	WriteFile(hFile, &m_Data, sizeof(__CameraData), &dwRWC, NULL); // CameraData
-	WriteFile(hFile, &m_bFogUse, 4, &dwRWC, NULL);
-	WriteFile(hFile, &m_FogColor, 4, &dwRWC, NULL);
-//	WriteFile(hFile, &m_fFogStart, 4, &dwRWC, NULL);
-//	WriteFile(hFile, &m_fFogEnd, 4, &dwRWC, NULL);
-//	WriteFile(hFile, &m_fFogDensity, 4, &dwRWC, NULL);
+	WriteFile(hFile, &m_vAt, sizeof(__Vector3), &dwRWC, nullptr); // At position
+	WriteFile(hFile, &m_Data, sizeof(__CameraData), &dwRWC, nullptr); // CameraData
+	WriteFile(hFile, &m_bFogUse, 4, &dwRWC, nullptr);
+	WriteFile(hFile, &m_FogColor, 4, &dwRWC, nullptr);
+//	WriteFile(hFile, &m_fFogStart, 4, &dwRWC, nullptr);
+//	WriteFile(hFile, &m_fFogEnd, 4, &dwRWC, nullptr);
+//	WriteFile(hFile, &m_fFogDensity, 4, &dwRWC, nullptr);
 
 	return true;
 }
@@ -436,7 +436,7 @@ void CN3Camera::Tick(float fFrm)
 //	m_Data.fInverse_SineHalfOfFOV = 1.0f/sinf(m_Data.fFOV*0.5f);
 
 	::D3DXMatrixLookAtLH(&m_Data.mtxView, &m_Data.vEye, &m_Data.vAt, &m_Data.vUp); // Look At 적용
-	::D3DXMatrixInverse(&m_Data.mtxViewInverse, NULL, &m_Data.mtxView); // View Inverse 행렬 구하기..
+	::D3DXMatrixInverse(&m_Data.mtxViewInverse, nullptr, &m_Data.mtxView); // View Inverse 행렬 구하기..
 	CN3Base::s_lpD3DDev->GetViewport(&m_Data.vp); // View port 가져오기...
 	
 	m_Data.fAspect = (float)m_Data.vp.Width / (float)m_Data.vp.Height; // 종횡비

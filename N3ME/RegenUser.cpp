@@ -23,7 +23,7 @@ static char THIS_FILE[]=__FILE__;
 
 CRegenUser::CRegenUser()
 {
-	m_pRefMapMng = NULL;				// 지형 참조 포인터..
+	m_pRefMapMng = nullptr;				// 지형 참조 포인터..
 	m_bActive = false;
 
 	m_vrListRegion.clear();
@@ -37,7 +37,7 @@ CRegenUser::CRegenUser()
 	m_pDlg->ShowWindow(FALSE);
 	m_pDlg->m_pRefRegenUser = this;
 
-	m_vrSelRegion = NULL;
+	m_vrSelRegion = nullptr;
 }
 
 CRegenUser::~CRegenUser()
@@ -48,7 +48,7 @@ CRegenUser::~CRegenUser()
 	{
 		m_pDlg->DestroyWindow();
 		delete m_pDlg;
-		m_pDlg = NULL;
+		m_pDlg = nullptr;
 	}
 }
 
@@ -62,7 +62,7 @@ void CRegenUser::Render()
 	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx); // 월드 행렬 적용..
 	
 	// set texture
-	hr = s_lpD3DDev->SetTexture(0, NULL);
+	hr = s_lpD3DDev->SetTexture(0, nullptr);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 
@@ -129,7 +129,7 @@ void CRegenUser::Render()
 
 void CRegenUser::SetActive(bool active)
 {
-	m_vrSelRegion = NULL;
+	m_vrSelRegion = nullptr;
 	if(m_bActive==active) return;
 	m_bActive = active;
 
@@ -150,7 +150,7 @@ BOOL CRegenUser::MouseMsgFilter(LPMSG pMsg)
 			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 
 			m_vCurrEnd = vec;
 			SetCurrRECT(m_vCurrStart, m_vCurrEnd);
@@ -161,7 +161,7 @@ BOOL CRegenUser::MouseMsgFilter(LPMSG pMsg)
 			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 
 			m_vCurrEnd = m_vCurrStart = vec;
 			SetCurrRECT(m_vCurrStart, m_vCurrEnd);
@@ -177,7 +177,7 @@ BOOL CRegenUser::MouseMsgFilter(LPMSG pMsg)
 
 			if(nFlags & MK_LBUTTON)
 			{
-				if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+				if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 
 				m_vCurrEnd = vec;
 				SetCurrRECT(m_vCurrStart, m_vCurrEnd);
@@ -210,7 +210,7 @@ void CRegenUser::SaveServerData(HANDLE hFile)
 	int NumRegion = m_vrListRegion.size();
 
 	DWORD dwNum;
-	WriteFile(hFile, &NumRegion, sizeof(int), &dwNum, NULL);
+	WriteFile(hFile, &NumRegion, sizeof(int), &dwNum, nullptr);
 
 	std::list<VERTEXRECT*>::iterator it, ite;
 
@@ -219,16 +219,16 @@ void CRegenUser::SaveServerData(HANDLE hFile)
 	{
 		VERTEXRECT* pVR = (*it);
 
-		WriteFile(hFile, &(pVR->m_vLB.x), sizeof(float), &dwNum, NULL);
-		WriteFile(hFile, &(pVR->m_vLB.y), sizeof(float), &dwNum, NULL);
-		WriteFile(hFile, &(pVR->m_vLB.z), sizeof(float), &dwNum, NULL);
+		WriteFile(hFile, &(pVR->m_vLB.x), sizeof(float), &dwNum, nullptr);
+		WriteFile(hFile, &(pVR->m_vLB.y), sizeof(float), &dwNum, nullptr);
+		WriteFile(hFile, &(pVR->m_vLB.z), sizeof(float), &dwNum, nullptr);
 
 		float Height, Width;
 		Height = pVR->m_vLT.z - pVR->m_vLB.z;
 		Width = pVR->m_vRB.x - pVR->m_vLB.x;
 
-		WriteFile(hFile, &Height, sizeof(float), &dwNum, NULL);
-		WriteFile(hFile, &Width, sizeof(float), &dwNum, NULL);
+		WriteFile(hFile, &Height, sizeof(float), &dwNum, nullptr);
+		WriteFile(hFile, &Width, sizeof(float), &dwNum, nullptr);
 	}	
 }
 
@@ -291,7 +291,7 @@ void CRegenUser::DeleteSel()
 			break;
 		}
 	}
-	m_vrSelRegion = NULL;
+	m_vrSelRegion = nullptr;
 }
 
 void CRegenUser::LoadFromFile(LPCTSTR pFullFileName)
@@ -317,7 +317,7 @@ void CRegenUser::LoadFromFile(LPCTSTR pFullFileName)
 		VERTEXRECT* pVR = new VERTEXRECT;
 
 		pResult = fgets(szLine, 512, stream);
-		if(pResult == NULL) break;		
+		if(pResult == nullptr) break;		
 		ZeroMemory(szCommand,80);
 		ZeroMemory(szBuf[0],80);
 		ZeroMemory(szBuf[1],80);
@@ -329,7 +329,7 @@ void CRegenUser::LoadFromFile(LPCTSTR pFullFileName)
 		pVR->m_vLB.z = atof(szBuf[2]);
 
 		pResult = fgets(szLine, 512, stream);
-		if(pResult == NULL) break;
+		if(pResult == nullptr) break;
 		ZeroMemory(szCommand,80);
 		ZeroMemory(szBuf[0],80);
 		ZeroMemory(szBuf[1],80);
@@ -341,7 +341,7 @@ void CRegenUser::LoadFromFile(LPCTSTR pFullFileName)
 		pVR->m_vLT.z = atof(szBuf[2]);
 
 		pResult = fgets(szLine, 512, stream);
-		if(pResult == NULL) break;
+		if(pResult == nullptr) break;
 		ZeroMemory(szCommand,80);
 		ZeroMemory(szBuf[0],80);
 		ZeroMemory(szBuf[1],80);
@@ -353,7 +353,7 @@ void CRegenUser::LoadFromFile(LPCTSTR pFullFileName)
 		pVR->m_vRB.z = atof(szBuf[2]);
 
 		pResult = fgets(szLine, 512, stream);
-		if(pResult == NULL) break;
+		if(pResult == nullptr) break;
 		ZeroMemory(szCommand,80);
 		ZeroMemory(szBuf[0],80);
 		ZeroMemory(szBuf[1],80);
@@ -372,7 +372,7 @@ void CRegenUser::LoadFromFile(LPCTSTR pFullFileName)
 	m_vCurrEnd.Set(0,0,0);
 	m_vCurrStart = m_vCurrEnd;
 	SetCurrRECT(m_vCurrStart, m_vCurrEnd);
-	m_vrSelRegion = NULL;
+	m_vrSelRegion = nullptr;
 }
 
 void CRegenUser::SaveToFile(LPCTSTR pFullFileName)

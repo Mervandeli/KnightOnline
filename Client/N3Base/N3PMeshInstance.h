@@ -36,7 +36,7 @@ protected:
 	CN3PMesh*	m_pPMesh;	// 참조 포인터
 
 public:
-	BOOL		IsLOD() { if(NULL == m_pCollapseUpTo) return FALSE; return TRUE; }
+	BOOL		IsLOD() { if(nullptr == m_pCollapseUpTo) return FALSE; return TRUE; }
 	bool		Create(CN3PMesh* pN3Mesh);
 	bool		Create(const std::string& szFN);
 	void		Release();

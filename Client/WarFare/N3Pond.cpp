@@ -23,8 +23,8 @@ static char THIS_FILE[]=__FILE__;
 CN3Pond::CN3Pond()
 {
 	m_iPondMeshNum = 0;
-	m_pCPondMesh=NULL;
-	m_pfMaxVtx=NULL;
+	m_pCPondMesh=nullptr;
+	m_pfMaxVtx=nullptr;
 
 	memset(m_pTexPond, 0, sizeof(m_pTexPond));
 }
@@ -38,10 +38,10 @@ void CN3Pond::Release()
 {
 	if(m_iPondMeshNum>0)
 	{
-		if(m_pCPondMesh!=NULL)
+		if(m_pCPondMesh!=nullptr)
 		{
 			delete []m_pCPondMesh;
-			m_pCPondMesh=NULL;
+			m_pCPondMesh=nullptr;
 		}
 		m_iPondMeshNum=0;
 	}
@@ -51,7 +51,7 @@ void CN3Pond::Release()
 		if(m_pfMaxVtx)
 		{
 			delete [] m_pfMaxVtx;
-			m_pfMaxVtx = NULL;
+			m_pfMaxVtx = nullptr;
 		}
 	
 		m_iMaxVtxNum=0;
@@ -69,7 +69,7 @@ bool CN3Pond::Load(HANDLE hFile)
 
 	DWORD dwNum;
 
-	ReadFile(hFile, &m_iPondMeshNum, sizeof(int), &dwNum, NULL);	///
+	ReadFile(hFile, &m_iPondMeshNum, sizeof(int), &dwNum, nullptr);	///
 //	if(m_iPondMeshNum<=0) {m_iPondMeshNum=0;return 1;}
 	if(true) {m_iPondMeshNum=0;return 1;}
 
@@ -81,17 +81,17 @@ bool CN3Pond::Load(HANDLE hFile)
 		ptmpPondMesh = &m_pCPondMesh[i];
 
 		int iVC;
-		ReadFile(hFile, &iVC, sizeof(iVC), &dwNum, NULL);				// 점 갯수
+		ReadFile(hFile, &iVC, sizeof(iVC), &dwNum, nullptr);				// 점 갯수
 		ptmpPondMesh->m_iVC = iVC;	///
 		ptmpPondMesh->m_bTick2Rand = FALSE;		///
 		if(iVC<=0) 
 		{
-			ptmpPondMesh->m_pVertices=NULL;
+			ptmpPondMesh->m_pVertices=nullptr;
 			continue;
 		}
 
 		int iWidthVertex;
-		ReadFile(hFile, &iWidthVertex, sizeof(iWidthVertex), &dwNum, NULL);				// 한 라인당 점 갯수
+		ReadFile(hFile, &iWidthVertex, sizeof(iWidthVertex), &dwNum, nullptr);				// 한 라인당 점 갯수
 		ptmpPondMesh->m_iWidthVtx = iWidthVertex;		///
 		ptmpPondMesh->m_iHeightVtx = iVC/iWidthVertex;	///
 
@@ -112,7 +112,7 @@ bool CN3Pond::Load(HANDLE hFile)
 
 		// XyxT2 -> XyzColorT2 Converting.
 		ptmpPondMesh->m_pVertices = new __VertexPond[iVC];	///
-		ReadFile(hFile,ptmpPondMesh->m_pVertices,iVC*sizeof(__VertexPond),&dwNum,NULL);
+		ReadFile(hFile,ptmpPondMesh->m_pVertices,iVC*sizeof(__VertexPond),&dwNum,nullptr);
 		ptmpPondMesh->m_pVertices[0].y += 0.2f;				//	수치가 높으면 물결이 크게 요동친다
 		ptmpPondMesh->m_pVertices[iWidthVertex].y += 0.2f;	//	수치가 높으면 물결이 크게 요동친다
 		ptmpPondMesh->m_pfMaxHeight = ptmpPondMesh->m_pVertices[0].y += 0.3f;		//	물결의 최대치
@@ -122,7 +122,7 @@ bool CN3Pond::Load(HANDLE hFile)
 
 		
 		int iIC;
-		ReadFile(hFile, &iIC, sizeof(iIC), &dwNum, NULL);				// IndexBuffer Count.
+		ReadFile(hFile, &iIC, sizeof(iIC), &dwNum, nullptr);				// IndexBuffer Count.
 		ptmpPondMesh->m_iIC = iIC;		///
 		ptmpPondMesh->m_wpIndex = new uint16_t [iVC*6];		///
 
@@ -278,7 +278,7 @@ void CN3Pond::Render()
 
 	int iTex = (int)m_fTexIndex;
 	__ASSERT(iTex < MAX_POND_TEX, "Pond Texture index overflow..");
-	if(iTex >= MAX_POND_TEX || NULL == m_pTexPond[iTex]) return;
+	if(iTex >= MAX_POND_TEX || nullptr == m_pTexPond[iTex]) return;
 
 	// Backup
 	__Matrix44 matWorld, matOld;	matWorld.Identity();
@@ -305,7 +305,7 @@ void CN3Pond::Render()
 
 	// texture state 세팅 (alpha)
 	s_lpD3DDev->SetTexture(0, m_pTexPond[iTex]->Get());
-	s_lpD3DDev->SetTexture(2, NULL);
+	s_lpD3DDev->SetTexture(2, nullptr);
 
 	s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
     s_lpD3DDev->SetRenderState( D3DRS_SRCBLEND,   D3DBLEND_SRCALPHA );
@@ -327,7 +327,7 @@ void CN3Pond::Render()
 		if(m_pCPondMesh[i].m_bTick2Rand)
 		{
 			if(m_pCPondMesh[i].m_pTexWave) s_lpD3DDev->SetTexture(1, m_pCPondMesh[i].m_pTexWave->Get());
-			else s_lpD3DDev->SetTexture(1, NULL);
+			else s_lpD3DDev->SetTexture(1, nullptr);
 
 			s_lpD3DDev->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST
 												, 0

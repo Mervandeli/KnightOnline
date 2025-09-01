@@ -61,7 +61,7 @@ BOOL CAPISocket::Disconnect()
 {
 	if (m_hSocket != INVALID_SOCKET)
 		closesocket(m_hSocket);
-	m_hSocket = NULL;
+	m_hSocket = INVALID_SOCKET;
 
 	return TRUE;
 }
@@ -90,7 +90,7 @@ BOOL CAPISocket::Connect(HWND hWnd, const char* pszIP, DWORD port)
 	}
 	else
 	{ 
-		if ( (hp = (hostent far *)gethostbyname(pszIP)) == NULL)
+		if ( (hp = (hostent far *)gethostbyname(pszIP)) == nullptr)
 		{
 #ifdef _DEBUG
 			TCHAR msg[256] = {};
@@ -193,7 +193,7 @@ BOOL CAPISocket::ReceiveProcess()
 			}
 		}
 
-		delete[] pData, pData = NULL;
+		delete[] pData, pData = nullptr;
 	}
 
 	return bFoundTail;

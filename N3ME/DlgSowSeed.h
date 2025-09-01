@@ -21,7 +21,7 @@ typedef struct __SeedTex
 	__SeedTex()
 	{
 		ID = 0;
-		pTex = NULL;
+		pTex = nullptr;
 	}
 	~__SeedTex()
 	{
@@ -36,7 +36,7 @@ class CDlgSowSeed : public CDialog
 {
 // Construction
 public:
-	CDlgSowSeed(CWnd* pParent = NULL);   // standard constructor
+	CDlgSowSeed(CWnd* pParent = nullptr);   // standard constructor
 	
 public:
 	CMainFrame*	m_pRefFrm;

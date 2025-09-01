@@ -16,68 +16,68 @@ static char THIS_FILE[]=__FILE__;
 
 CN3FXPMeshInstance::CN3FXPMeshInstance()
 {
-	m_pFXPMesh			= NULL;
-	m_pIndices			= NULL;
-	m_pColorVertices	= NULL;
+	m_pFXPMesh			= nullptr;
+	m_pIndices			= nullptr;
+	m_pColorVertices	= nullptr;
 	m_iNumVertices		= 0;
 	m_iNumIndices		= 0;
-	m_pCollapseUpTo		= NULL;
+	m_pCollapseUpTo		= nullptr;
 }
 
 CN3FXPMeshInstance::CN3FXPMeshInstance(CN3FXPMesh* pN3FXPMesh)
 {
-	m_pFXPMesh			= NULL;
-	m_pIndices			= NULL;
-	m_pColorVertices	= NULL;
+	m_pFXPMesh			= nullptr;
+	m_pIndices			= nullptr;
+	m_pColorVertices	= nullptr;
 	m_iNumVertices		= 0;
 	m_iNumIndices		= 0;
-	m_pCollapseUpTo		= NULL;
+	m_pCollapseUpTo		= nullptr;
 
 	CN3FXPMeshInstance::Create(pN3FXPMesh);
 }
 
 CN3FXPMeshInstance::CN3FXPMeshInstance(const std::string& szFN)
 {
-	m_pFXPMesh			= NULL;
-	m_pIndices			= NULL;
-	m_pColorVertices	= NULL;
+	m_pFXPMesh			= nullptr;
+	m_pIndices			= nullptr;
+	m_pColorVertices	= nullptr;
 	m_iNumVertices		= 0;
 	m_iNumIndices		= 0;
-	m_pCollapseUpTo		= NULL;
+	m_pCollapseUpTo		= nullptr;
 
 	this->Create(szFN);
 }
 
 CN3FXPMeshInstance::~CN3FXPMeshInstance()
 {
-	if (m_pColorVertices)	{ delete[] m_pColorVertices;m_pColorVertices = NULL;}
-	if (m_pIndices)			{ delete[] m_pIndices;m_pIndices = NULL;}
+	if (m_pColorVertices)	{ delete[] m_pColorVertices;m_pColorVertices = nullptr;}
+	if (m_pIndices)			{ delete[] m_pIndices;m_pIndices = nullptr;}
 
 	s_MngFXPMesh.Delete(&m_pFXPMesh);				//레퍼런스 카운트를 줄이기 위해
 }
 
 void CN3FXPMeshInstance::Release()
 {
-	if (m_pColorVertices)	{ delete[] m_pColorVertices;m_pColorVertices = NULL;}
-	if (m_pIndices)			{ delete[] m_pIndices;m_pIndices = NULL;}
+	if (m_pColorVertices)	{ delete[] m_pColorVertices;m_pColorVertices = nullptr;}
+	if (m_pIndices)			{ delete[] m_pIndices;m_pIndices = nullptr;}
 
 	s_MngFXPMesh.Delete(&m_pFXPMesh);				//레퍼런스 카운트를 줄이기 위해
 
-	m_pCollapseUpTo = NULL;
+	m_pCollapseUpTo = nullptr;
 	m_iNumVertices = 0;
 	m_iNumIndices = 0;
 }
 
 bool CN3FXPMeshInstance::Create(CN3FXPMesh* pN3FXPMesh)
 {
-	if(pN3FXPMesh == NULL)
+	if(pN3FXPMesh == nullptr)
 	{
 		CN3FXPMeshInstance::Release();
 		return false;
 	}
 
 	m_pFXPMesh = pN3FXPMesh;
-	if(m_pFXPMesh == NULL)
+	if(m_pFXPMesh == nullptr)
 	{
 		__ASSERT(m_pFXPMesh, "Failed new CN3FXPMesh");
 		return false;
@@ -88,7 +88,7 @@ bool CN3FXPMeshInstance::Create(CN3FXPMesh* pN3FXPMesh)
 	int iMaxNumVertices = m_pFXPMesh->GetMaxNumVertices();
 	if (iMaxNumVertices>0)
 	{
-		if(m_pColorVertices) { delete[] m_pColorVertices;m_pColorVertices = NULL;}
+		if(m_pColorVertices) { delete[] m_pColorVertices;m_pColorVertices = nullptr;}
 		m_pColorVertices = new __VertexXyzColorT1[iMaxNumVertices];
 		__ASSERT(m_pColorVertices, "Failed to create Vertex buffer");
 		CopyMemory(m_pColorVertices, m_pFXPMesh->m_pColorVertices, iMaxNumVertices * sizeof(__VertexXyzColorT1));
@@ -99,7 +99,7 @@ bool CN3FXPMeshInstance::Create(CN3FXPMesh* pN3FXPMesh)
 	int iMaxNumIndices = m_pFXPMesh->GetMaxNumIndices();
 	if (iMaxNumIndices>0)
 	{
-		if(m_pIndices) { delete[] m_pIndices;m_pIndices = NULL;}
+		if(m_pIndices) { delete[] m_pIndices;m_pIndices = nullptr;}
 		m_pIndices = new uint16_t[m_pFXPMesh->m_iMaxNumIndices];
 		__ASSERT(m_pIndices, "Failed to create index buffer");
 		CopyMemory(m_pIndices, m_pFXPMesh->m_pIndices, m_pFXPMesh->m_iMaxNumIndices * sizeof(uint16_t));
@@ -126,7 +126,7 @@ bool CN3FXPMeshInstance::Create(const std::string& szFN)
 
 void CN3FXPMeshInstance::SetLODByNumVertices(int iNumVertices)
 {
-	if(m_pCollapseUpTo == NULL) return;
+	if(m_pCollapseUpTo == nullptr) return;
 
 	int iDiff = iNumVertices - m_iNumVertices;
 
@@ -162,7 +162,7 @@ void CN3FXPMeshInstance::SetLOD(float value)
 #define _USE_LODCONTROL_VALUE
 #ifdef _USE_LODCONTROL_VALUE
 	// value는 distance * FOV이다.
-	if (m_pFXPMesh == NULL ) return;
+	if (m_pFXPMesh == nullptr ) return;
 
 	if (m_pFXPMesh->m_iLODCtrlValueCount == 0)
 	{	// LODCtrlValue가 없으면 모두 그린다.
@@ -199,7 +199,7 @@ void CN3FXPMeshInstance::SetLOD(float value)
 	}
 #else
 	// value는 distance * FOV이다.
-	if (m_pCollapseUpTo == NULL || m_pFXPMesh == NULL) return;
+	if (m_pCollapseUpTo == nullptr || m_pFXPMesh == nullptr) return;
 
 	const int iLODCtrlValueCount = 5;
 	__PMLODCtrlValue LODCtrlValues[iLODCtrlValueCount];
@@ -266,7 +266,7 @@ bool CN3FXPMeshInstance::SplitOne()
 
 void CN3FXPMeshInstance::Render()
 {
-	if (m_pFXPMesh == NULL) return;
+	if (m_pFXPMesh == nullptr) return;
 	s_lpD3DDev->SetFVF(FVF_VNT1);
 
 	const int iPCToRender = 1000;	// primitive count to render
@@ -288,12 +288,12 @@ void CN3FXPMeshInstance::Render()
 
 void CN3FXPMeshInstance::RenderTwoUV()
 {
-	if(NULL == m_pFXPMesh) return;
-	if(NULL == m_pFXPMesh->GetVertices2())
+	if(nullptr == m_pFXPMesh) return;
+	if(nullptr == m_pFXPMesh->GetVertices2())
 	{
 		m_pFXPMesh->GenerateSecondUV(); // 두번째 UV 가 없음 새로 만든다..
 	}
-	if(NULL == m_pFXPMesh->GetVertices2()) return;
+	if(nullptr == m_pFXPMesh->GetVertices2()) return;
 	
 	s_lpD3DDev->SetFVF(FVF_VNT2);
 
@@ -321,7 +321,7 @@ __VertexXyzColorT1*	CN3FXPMeshInstance::GetVertices() const
 
 void CN3FXPMeshInstance::SetColor(uint32_t dwColor)
 {
-	if (m_pColorVertices == NULL)	return;
+	if (m_pColorVertices == nullptr)	return;
 	if (m_iNumVertices <= 0)		return;
 
 	for(int i=0;i<m_iNumVertices;i++)

@@ -16,7 +16,7 @@ static char THIS_FILE[]=__FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgDelGroup dialog
-CDlgDelGroup::CDlgDelGroup(CWnd* pParent /*=NULL*/)
+CDlgDelGroup::CDlgDelGroup(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgDelGroup::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgDelGroup)

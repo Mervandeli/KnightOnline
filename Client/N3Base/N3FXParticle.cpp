@@ -21,7 +21,7 @@ CN3FXParticle::CN3FXParticle()
 	m_fCurrLife = 0.0f;
 	m_iTexIdx = 0;
 
-	m_pRefParent = NULL;
+	m_pRefParent = nullptr;
 
 	m_vCreatePoint.Set(0.0f, 0.0f, 0.0f);
 	m_vAxis.Set(0.0f, 0.0f, 1.0f);
@@ -39,7 +39,7 @@ CN3FXParticle::CN3FXParticle()
 
 	m_fDropY = m_fDropVel = 0.0f;
 
-	m_pVB = NULL;
+	m_pVB = nullptr;
 	/*
 	m_pVB = new __VertexXyzColorT1[NUM_VERTEX_PARTICLE];
 	m_pVB[0].Set(0,0,0,0xffffffff, 0.0f, -1.0f);
@@ -52,7 +52,7 @@ CN3FXParticle::CN3FXParticle()
 CN3FXParticle::~CN3FXParticle()
 {
 	//delete[] m_pVB;
-	m_pVB = NULL;
+	m_pVB = nullptr;
 }
 
 bool CN3FXParticle::Tick()

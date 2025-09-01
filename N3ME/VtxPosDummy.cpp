@@ -64,7 +64,7 @@ void CVtxPosDummy::Render()
 	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &m_Matrix); // 월드 행렬 적용..
 
 	// set texture
-	hr = s_lpD3DDev->SetTexture(0, NULL);
+	hr = s_lpD3DDev->SetTexture(0, nullptr);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 
@@ -156,7 +156,7 @@ BOOL CVtxPosDummy::MouseMsgFilter(LPMSG pMsg)				// 마우스 메세지 처리
 						vPos = vRayOrig + vRayDir*fT;
 
 						__Vector3 vDiffPos = vPos - m_vPos;
-						TransDiff(&vDiffPos, NULL, NULL);
+						TransDiff(&vDiffPos, nullptr, nullptr);
 						m_vPos = vPos;
 					}
 					break;
@@ -171,7 +171,7 @@ BOOL CVtxPosDummy::MouseMsgFilter(LPMSG pMsg)				// 마우스 메세지 처리
 						vPos += ((m_pSelectedCube->vCenterPos*(-1.0f))*mat);
 
 						__Vector3 vDiffPos;	vDiffPos.Set(vPos.x - m_vPos.x, 0, 0);
-						TransDiff(&vDiffPos, NULL, NULL);
+						TransDiff(&vDiffPos, nullptr, nullptr);
 						m_vPos.x = vPos.x;
 					}
 					break;
@@ -186,7 +186,7 @@ BOOL CVtxPosDummy::MouseMsgFilter(LPMSG pMsg)				// 마우스 메세지 처리
 						vPos += ((m_pSelectedCube->vCenterPos*(-1.0f))*mat);
 
 						__Vector3 vDiffPos;	vDiffPos.Set(0, vPos.y - m_vPos.y, 0);
-						TransDiff(&vDiffPos, NULL, NULL);
+						TransDiff(&vDiffPos, nullptr, nullptr);
 						m_vPos.y = vPos.y;
 					}
 					break;
@@ -201,7 +201,7 @@ BOOL CVtxPosDummy::MouseMsgFilter(LPMSG pMsg)				// 마우스 메세지 처리
 						vPos += ((m_pSelectedCube->vCenterPos*(-1.0f))*mat);
 
 						__Vector3 vDiffPos;	vDiffPos.Set(0, 0, vPos.z - m_vPos.z);
-						TransDiff(&vDiffPos, NULL, NULL);
+						TransDiff(&vDiffPos, nullptr, nullptr);
 						m_vPos.z = vPos.z;
 					}
 					break;
@@ -231,7 +231,7 @@ BOOL CVtxPosDummy::MouseMsgFilter(LPMSG pMsg)				// 마우스 메세지 처리
 			if (m_pSelectedCube)
 			{
 				ReleaseCapture();
-				m_pSelectedCube = NULL;
+				m_pSelectedCube = nullptr;
 				return TRUE;
 			}
 		}
@@ -241,12 +241,12 @@ BOOL CVtxPosDummy::MouseMsgFilter(LPMSG pMsg)				// 마우스 메세지 처리
 			if (m_pSelectedCube)
 			{
 				__Vector3 vDiffPos = m_vPrevPos - m_vPos;
-				TransDiff(&vDiffPos, NULL, NULL);
+				TransDiff(&vDiffPos, nullptr, nullptr);
 
 				m_vPos = m_vPrevPos;
 
 				ReleaseCapture();
-				m_pSelectedCube = NULL;
+				m_pSelectedCube = nullptr;
 				return TRUE;
 			}
 		}

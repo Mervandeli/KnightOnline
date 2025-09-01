@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgUnusedFileList dialog
 
 
-CDlgUnusedFileList::CDlgUnusedFileList(CWnd* pParent /*=NULL*/)
+CDlgUnusedFileList::CDlgUnusedFileList(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgUnusedFileList::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgUnusedFileList)

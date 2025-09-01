@@ -14,7 +14,7 @@ static char THIS_FILE[] = __FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgPutColor dialog
-CDlgPutColor::CDlgPutColor(CWnd* pParent /*=NULL*/)
+CDlgPutColor::CDlgPutColor(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgPutColor::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgPutColor)

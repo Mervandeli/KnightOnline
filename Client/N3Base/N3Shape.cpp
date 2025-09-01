@@ -69,13 +69,13 @@ void CN3SPart::TexAlloc(int nCount)
 	for(int i = 0; i < iTC; i++) s_MngTex.Delete(&m_TexRefs[i]);
 	m_TexRefs.clear();
 
-	m_TexRefs.assign(nCount, NULL);
+	m_TexRefs.assign(nCount, nullptr);
 }
 
 void CN3SPart::Tick(const __Matrix44& mtxParent, const __Quaternion& qRot, float fScale) // timeGetTime 으로 얻은 값을 넣으면 Texture Animation 을 컨트롤 한다..
 {
 	CN3PMesh* pPMesh = m_PMInst.GetMesh();
-	if(NULL == pPMesh) return;
+	if(nullptr == pPMesh) return;
 
 	m_bOutOfCameraRange = FALSE;
 
@@ -176,7 +176,7 @@ void CN3SPart::Render()
 	CN3Base::s_RenderInfo.nShape_Part++; // Rendering Information Update...
 #endif
 
-	LPDIRECT3DTEXTURE9 lpTex = NULL;
+	LPDIRECT3DTEXTURE9 lpTex = nullptr;
 	int iTC = m_TexRefs.size();
 	if(iTC > 0)
 	{
@@ -232,7 +232,7 @@ void CN3SPart::Render()
 
 	s_lpD3DDev->SetMaterial(&m_Mtl); // 재질 설정..
 	s_lpD3DDev->SetTexture(0, lpTex);
-	if(NULL != lpTex)
+	if(nullptr != lpTex)
 	{
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP,   m_Mtl.dwColorOp);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, m_Mtl.dwColorArg1);
@@ -264,7 +264,7 @@ void CN3SPart::RenderSelected(bool bWireFrame)
 	CN3Base::s_RenderInfo.nShape_Polygon += m_PMInst.GetNumIndices() / 3;
 #endif _DEBUG
 
-	LPDIRECT3DTEXTURE9 lpTex = NULL;
+	LPDIRECT3DTEXTURE9 lpTex = nullptr;
 	int iTC = m_TexRefs.size();
 	if(iTC > 0)
 	{
@@ -274,7 +274,7 @@ void CN3SPart::RenderSelected(bool bWireFrame)
 
 	s_lpD3DDev->SetTexture(0, lpTex);
 	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP,   D3DTOP_SELECTARG1);
-	if(lpTex != NULL) s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	if(lpTex != nullptr) s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 	else s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &m_Matrix);
@@ -317,25 +317,25 @@ bool CN3SPart::Load(HANDLE hFile)
 	int nL = 0;
 	char szFN[256];
 
-	ReadFile(hFile, &m_vPivot, sizeof(__Vector3), &dwRWC, NULL);
+	ReadFile(hFile, &m_vPivot, sizeof(__Vector3), &dwRWC, nullptr);
 
-	ReadFile(hFile, &nL, 4, &dwRWC, NULL); // Mesh FileName
-	ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL; // 메시 파일 이름..
+	ReadFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
+	ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 메시 파일 이름..
 	this->MeshSet(szFN);
 
-	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, NULL); // 재질
+	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질
 
 	int iTC = 0;
-	ReadFile(hFile, &iTC, 4, &dwRWC, NULL);
-	ReadFile(hFile, &m_fTexFPS, 4, &dwRWC, NULL);
+	ReadFile(hFile, &iTC, 4, &dwRWC, nullptr);
+	ReadFile(hFile, &m_fTexFPS, 4, &dwRWC, nullptr);
 	m_TexRefs.clear();
 	this->TexAlloc(iTC); // Texture Pointer Pointer 할당..
 	for(int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기..
 	{
-		ReadFile(hFile, &nL, 4, &dwRWC, NULL);
+		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 		if(nL > 0)
 		{
-			ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL; // 텍스처 파일 이름..
+			ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 텍스처 파일 이름..
 			m_TexRefs[j] = s_MngTex.Get(szFN, true, s_Options.iTexLOD_Shape);
 		}
 	}
@@ -348,7 +348,7 @@ bool CN3SPart::Save(HANDLE hFile)
 {
 	DWORD dwRWC;
 
-	WriteFile(hFile, &m_vPivot, sizeof(__Vector3), &dwRWC, NULL);
+	WriteFile(hFile, &m_vPivot, sizeof(__Vector3), &dwRWC, nullptr);
 
 	CN3PMesh* pPMesh = m_PMInst.GetMesh();
 	__ASSERT(pPMesh, "Progressive mesh pointer is NULL!");
@@ -356,7 +356,7 @@ bool CN3SPart::Save(HANDLE hFile)
 	if (pPMesh) nL = pPMesh->FileName().size();
 	else MessageBox(s_hWndBase, "Progressive mesh pointer is NULL! : object가 제대로 보이지 않을 수 있습니다.(리소스 파일이 Load되지 않았을 가능성이 큼)", "warning", MB_OK);
 
-	WriteFile(hFile, &nL, 4, &dwRWC, NULL); // Mesh FileName
+	WriteFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
 	if(nL > 0)
 	{
 		
@@ -367,26 +367,26 @@ bool CN3SPart::Save(HANDLE hFile)
 //
 //			SetFilePointer(hFile, -4, 0, FILE_CURRENT);
 //			nL = pPMesh->FileName().size();
-//			WriteFile(hFile, &nL, 4, &dwRWC, NULL); // Mesh FileName
+//			WriteFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
 //		}
 
 
 
 
-		WriteFile(hFile, pPMesh->FileName().c_str(), nL, &dwRWC, NULL); // 메시 파일 이름..
+		WriteFile(hFile, pPMesh->FileName().c_str(), nL, &dwRWC, nullptr); // 메시 파일 이름..
 	}
 
-	WriteFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, NULL); // 재질
+	WriteFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질
 
 	int iTC = m_TexRefs.size();
-	WriteFile(hFile, &iTC, 4, &dwRWC, NULL);
-	WriteFile(hFile, &m_fTexFPS, 4, &dwRWC, NULL);
+	WriteFile(hFile, &iTC, 4, &dwRWC, nullptr);
+	WriteFile(hFile, &m_fTexFPS, 4, &dwRWC, nullptr);
 	for(int j = 0; j < iTC; j++) // Texture File 이름 쓰기...
 	{
 		if(m_TexRefs[j]) nL = m_TexRefs[j]->FileName().size();
 		else nL = 0;
 
-		WriteFile(hFile, &nL, 4, &dwRWC, NULL);
+		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
 		if(nL > 0)
 		{
 			
@@ -401,14 +401,14 @@ bool CN3SPart::Save(HANDLE hFile)
 //
 //				SetFilePointer(hFile, -4, 0, FILE_CURRENT);
 //				nL = lstrlen(m_TexRefs[j]->FileName());
-//				WriteFile(hFile, &nL, 4, &dwRWC, NULL); // Mesh FileName
+//				WriteFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
 //			}
 
 			
 			
 			
 			
-			WriteFile(hFile, m_TexRefs[j]->FileName().c_str(), nL, &dwRWC, NULL); // 택스처 파일 이름..
+			WriteFile(hFile, m_TexRefs[j]->FileName().c_str(), nL, &dwRWC, nullptr); // 택스처 파일 이름..
 		}
 	}
 
@@ -424,7 +424,7 @@ void CN3SPart::PartialRender(int iCount, uint16_t* pIndices)
 	CN3Base::s_RenderInfo.nShape_Part++; // Rendering Information Update...
 #endif
 
-	LPDIRECT3DTEXTURE9 lpTex = NULL;
+	LPDIRECT3DTEXTURE9 lpTex = nullptr;
 	int iTC = m_TexRefs.size();
 	if(iTC > 0)
 	{
@@ -475,7 +475,7 @@ void CN3SPart::PartialRender(int iCount, uint16_t* pIndices)
 
 	s_lpD3DDev->SetMaterial(&m_Mtl); // 재질 설정..
 	s_lpD3DDev->SetTexture(0, lpTex);
-	if(NULL != lpTex)
+	if(nullptr != lpTex)
 	{
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP,   m_Mtl.dwColorOp);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, m_Mtl.dwColorArg1);
@@ -573,11 +573,11 @@ void CN3Shape::Tick(float fFrm)
 
 	CN3TransformCollision::Tick(fFrm);
 
-	CN3SPart* pPD = NULL;
+	CN3SPart* pPD = nullptr;
 	int iPC = m_Parts.size();
 	for(int i = 0; i < iPC; i++)
 	{
-		if(NULL == m_Parts[i]) continue;
+		if(nullptr == m_Parts[i]) continue;
 
 		m_Parts[i]->Tick(m_Matrix, m_qRot, fScale);
 	}
@@ -597,7 +597,7 @@ void CN3Shape::Render()
 	int iPC = m_Parts.size();
 	for(int i = 0; i < iPC; i++)
 	{
-		if(NULL == m_Parts[i]) continue;
+		if(nullptr == m_Parts[i]) continue;
 
 		m_Parts[i]->Render();
 	}
@@ -607,9 +607,9 @@ void CN3Shape::Render()
 void CN3Shape::RenderSelected(bool bWireFrame)
 {
 	// 축그리기..
-	CN3Transform::Render(NULL, m_fRadius * 3.0f);
+	CN3Transform::Render(nullptr, m_fRadius * 3.0f);
 
-	CN3SPart* pPD = NULL;
+	CN3SPart* pPD = nullptr;
 	int iPC = m_Parts.size();
 	for(int i = 0; i < iPC; i++)
 	{
@@ -628,10 +628,10 @@ bool CN3Shape::Load(HANDLE hFile)
 	for(int i = 0; i < iPC; i++) delete m_Parts[i];
 	m_Parts.clear();
 
-	ReadFile(hFile, &iPC, 4, &dwRWC, NULL); // Part Count
+	ReadFile(hFile, &iPC, 4, &dwRWC, nullptr); // Part Count
 	if(iPC > 0)
 	{
-		m_Parts.assign(iPC, NULL);
+		m_Parts.assign(iPC, nullptr);
 		for(int i = 0; i < iPC; i++)
 		{
 			m_Parts[i] = new CN3SPart();
@@ -640,11 +640,11 @@ bool CN3Shape::Load(HANDLE hFile)
 		}
 	}
 		
-	ReadFile(hFile, &m_iBelong, 4, &dwRWC, NULL);	// 소속
-	ReadFile(hFile, &m_iEventID, 4, &dwRWC, NULL);	// Event ID
-	ReadFile(hFile, &m_iEventType, 4, &dwRWC, NULL); // Event Type - 바인드 포인트, 성문, 레버 등등...
-	ReadFile(hFile, &m_iNPC_ID, 4, &dwRWC, NULL);	// NPC 로 쓰는 오브젝트일 경우 NPC ID
-	ReadFile(hFile, &m_iNPC_Status, 4, &dwRWC, NULL); // NPC 로 쓰는 오브젝트일 경우 NPC Status
+	ReadFile(hFile, &m_iBelong, 4, &dwRWC, nullptr);	// 소속
+	ReadFile(hFile, &m_iEventID, 4, &dwRWC, nullptr);	// Event ID
+	ReadFile(hFile, &m_iEventType, 4, &dwRWC, nullptr); // Event Type - 바인드 포인트, 성문, 레버 등등...
+	ReadFile(hFile, &m_iNPC_ID, 4, &dwRWC, nullptr);	// NPC 로 쓰는 오브젝트일 경우 NPC ID
+	ReadFile(hFile, &m_iNPC_Status, 4, &dwRWC, nullptr); // NPC 로 쓰는 오브젝트일 경우 NPC Status
 
 	this->FindMinMax();
 
@@ -665,19 +665,19 @@ bool CN3Shape::Save(HANDLE hFile)
 	
 	int nL = 0;
 	
-	CN3SPart* pPD = NULL;
+	CN3SPart* pPD = nullptr;
 	int iPC = m_Parts.size();
-	WriteFile(hFile, &iPC, 4, &dwRWC, NULL); // Mesh FileName
+	WriteFile(hFile, &iPC, 4, &dwRWC, nullptr); // Mesh FileName
 	for(int i = 0; i < iPC; i++)
 	{
 		m_Parts[i]->Save(hFile);
 	}
 
-	WriteFile(hFile, &m_iBelong, 4, &dwRWC, NULL);		// 소속
-	WriteFile(hFile, &m_iEventID, 4, &dwRWC, NULL);		// Event ID
-	WriteFile(hFile, &m_iEventType, 4, &dwRWC, NULL);		// Event Type - 바인드 포인트, 성문, 레버 등등...
-	WriteFile(hFile, &m_iNPC_ID, 4, &dwRWC, NULL);		// NPC 로 쓰는 오브젝트일 경우 NPC ID
-	WriteFile(hFile, &m_iNPC_Status, 4, &dwRWC, NULL);	// NPC 로 쓰는 오브젝트일 경우 NPC Status
+	WriteFile(hFile, &m_iBelong, 4, &dwRWC, nullptr);		// 소속
+	WriteFile(hFile, &m_iEventID, 4, &dwRWC, nullptr);		// Event ID
+	WriteFile(hFile, &m_iEventType, 4, &dwRWC, nullptr);		// Event Type - 바인드 포인트, 성문, 레버 등등...
+	WriteFile(hFile, &m_iNPC_ID, 4, &dwRWC, nullptr);		// NPC 로 쓰는 오브젝트일 경우 NPC ID
+	WriteFile(hFile, &m_iNPC_Status, 4, &dwRWC, nullptr);	// NPC 로 쓰는 오브젝트일 경우 NPC Status
 
 	return true;
 }
@@ -712,11 +712,11 @@ bool CN3Shape::IsPMeshProcessed()
 	int iPC = m_Parts.size();
 	if(iPC <= 0) return false;
 
-	CN3SPart* pPD = NULL;
+	CN3SPart* pPD = nullptr;
 	for(int i = 0; i < iPC; i++)
 	{
 		pPD = m_Parts[i];
-		if(NULL == pPD || NULL == pPD->MeshInstance()) continue;
+		if(nullptr == pPD || nullptr == pPD->MeshInstance()) continue;
 
 		if(false == pPD->MeshInstance()->IsLOD())
 		{
@@ -762,7 +762,7 @@ void CN3Shape::FindMinMax()
 
 	// 가장 큰 지점찾기..
 	static __Matrix44 mtxWI;
-	D3DXMatrixInverse(&mtxWI, NULL, &m_Matrix); // World Matrix Inverse
+	D3DXMatrixInverse(&mtxWI, nullptr, &m_Matrix); // World Matrix Inverse
 	for(int i = 0; i < iPC; i++)
 	{
 		vMinTmp = m_Parts[i]->Min() * mtxWI; // 월드 상의 최소값을 로컬 좌표로 바꾸어준다..
@@ -809,7 +809,7 @@ int CN3Shape::CheckCollisionPrecisely(bool bIgnoreBoxCheck, const __Vector3& vPo
 	for(int i = 0; i < iPC; i++)
 	{
 		CN3PMeshInstance* pPMI = m_Parts[i]->MeshInstance();
-		if(NULL == pPMI) continue;
+		if(nullptr == pPMI) continue;
 
 		__VertexT1* pVs = pPMI->GetVertices();
 		uint16_t* pwIs = pPMI->GetIndices();
@@ -819,7 +819,7 @@ int CN3Shape::CheckCollisionPrecisely(bool bIgnoreBoxCheck, const __Vector3& vPo
 		if(nFC > 64 && false == ::_CheckCollisionByBox(vPos, vDir, m_Parts[i]->Min(), m_Parts[i]->Max())) continue;  // Face 수가 24 개보다 많은 경우 일단 박스체크를 한다..
 		
 		static __Matrix44 mtxWI;
-		D3DXMatrixInverse(&mtxWI, NULL, &(m_Parts[i]->m_Matrix)); // World Matrix Inverse
+		D3DXMatrixInverse(&mtxWI, nullptr, &(m_Parts[i]->m_Matrix)); // World Matrix Inverse
 
 		vPos2 = vPos * mtxWI;
 		mtxWI.PosSet(0,0,0);
@@ -844,7 +844,7 @@ int CN3Shape::CheckCollisionPrecisely(bool bIgnoreBoxCheck, const __Vector3& vPo
 				(*pVNormal).Cross(pVs[nCI1] - pVs[nCI0], pVs[nCI2] - pVs[nCI1]);
 				(*pVNormal).Normalize();
 
-				D3DXMatrixInverse(&mtxWI, NULL, &(m_Parts[i]->m_Matrix)); // World Matrix Inverse
+				D3DXMatrixInverse(&mtxWI, nullptr, &(m_Parts[i]->m_Matrix)); // World Matrix Inverse
 				mtxWI.PosSet(0,0,0); // 역행렬로 회전..
 				(*pVNormal) *= mtxWI; // 역행렬로 회전..
 			}
@@ -862,7 +862,7 @@ bool CN3Shape::MakeCollisionMeshByParts()  // 충돌 메시를 박스로 만든�
 	for(int i = 0; i < iPC; i++)
 	{
 		CN3PMesh* pPMesh = m_Parts[i]->Mesh();
-		if(NULL == pPMesh) continue;
+		if(nullptr == pPMesh) continue;
 
 		iVC += 8;
 		iIC += 36;
@@ -878,14 +878,14 @@ bool CN3Shape::MakeCollisionMeshByParts()  // 충돌 메시를 박스로 만든�
 	uint16_t* pwIDest = pVMesh->Indices();
 
 	__Matrix44 mtxI = m_Matrix;
-	D3DXMatrixInverse(&mtxI, NULL, &m_Matrix);
+	D3DXMatrixInverse(&mtxI, nullptr, &m_Matrix);
 	CN3VMesh VMTmp;
 
 	iVC = 0; iIC = 0;
 	for(int i = 0; i < iPC; i++)
 	{
 		CN3PMesh* pPMesh = m_Parts[i]->Mesh();
-		if(NULL == pPMesh) continue;
+		if(nullptr == pPMesh) continue;
 
 		VMTmp.CreateCube(pPMesh->Min(), pPMesh->Max());
 
@@ -930,7 +930,7 @@ bool CN3Shape::MakeCollisionMeshByPartsDetail()  // 현재 모습 그대로... �
 	{
 		CN3PMesh* pPMesh = m_Parts[i]->Mesh();
 		CN3PMeshInstance* pPMI = m_Parts[i]->MeshInstance();
-		if(NULL == pPMesh || NULL == pPMI) continue;
+		if(nullptr == pPMesh || nullptr == pPMI) continue;
 
 		iMaxNumVertices = pPMesh->GetMaxNumVertices();
 		iMaxNumIndices = pPMesh->GetMaxNumIndices();
@@ -948,25 +948,25 @@ bool CN3Shape::MakeCollisionMeshByPartsDetail()  // 현재 모습 그대로... �
 	__Vector3* pVDest = pVMesh->Vertices();
 	uint16_t* pwIDest = pVMesh->Indices();
 
-	__VertexT1* pVSrc = NULL;
-	uint16_t* pwISrc = NULL;
+	__VertexT1* pVSrc = nullptr;
+	uint16_t* pwISrc = nullptr;
 	
 	iVC = 0; iIC = 0;
 	__Matrix44 mtxI = m_Matrix;
-	D3DXMatrixInverse(&mtxI, NULL, &m_Matrix);
+	D3DXMatrixInverse(&mtxI, nullptr, &m_Matrix);
 
 	for(int i = 0; i < iPC; i++)
 	{
 		CN3PMesh* pPMesh = m_Parts[i]->Mesh();
 		CN3PMeshInstance* pPMI = m_Parts[i]->MeshInstance();
-		if(NULL == pPMesh || NULL == pPMI) continue;
+		if(nullptr == pPMesh || nullptr == pPMI) continue;
 
 		iMaxNumVertices = pPMesh->GetMaxNumVertices();
 		iMaxNumIndices = pPMesh->GetMaxNumIndices();
 		pPMI->SetLODByNumVertices(iMaxNumVertices);
 		pVSrc = pPMesh->GetVertices();
 		pwISrc = pPMI->GetIndices();
-		if(NULL == pVSrc || NULL == pwISrc) continue;
+		if(nullptr == pVSrc || nullptr == pwISrc) continue;
 
 		m_Parts[i]->Tick(m_Matrix, m_qRot, 1.0f);
 		__Matrix44 mtxPart = m_Parts[i]->m_Matrix;

@@ -32,15 +32,15 @@ CUICharacterCreate::CUICharacterCreate()
 	memset(m_pImg_Disable_Classes, 0, sizeof(m_pImg_Disable_Classes));
 	memset(m_pStr_Stats, 0, sizeof(m_pStr_Stats));
 	memset(m_pArea_Stats, 0, sizeof(m_pArea_Stats));
-	m_pStr_Desc = NULL;
-	m_pStr_Bonus = NULL;
+	m_pStr_Desc = nullptr;
+	m_pStr_Bonus = nullptr;
 
-	m_pBtn_Face_Left = NULL;
-	m_pBtn_Face_Right = NULL;
-	m_pBtn_Hair_Left = NULL;
-	m_pBtn_Hair_Right = NULL;
+	m_pBtn_Face_Left = nullptr;
+	m_pBtn_Face_Right = nullptr;
+	m_pBtn_Hair_Left = nullptr;
+	m_pBtn_Hair_Right = nullptr;
 
-	m_pArea_Character = NULL;
+	m_pArea_Character = nullptr;
 
 	m_iBonusPoint = m_iMaxBonusPoint = 0;
 }
@@ -59,15 +59,15 @@ void CUICharacterCreate::Release()
 	memset(m_pStr_Stats, 0, sizeof(m_pStr_Stats));
 	memset(m_pArea_Stats, 0, sizeof(m_pArea_Stats));
 
-	m_pStr_Desc = NULL;
-	m_pStr_Bonus = NULL;
+	m_pStr_Desc = nullptr;
+	m_pStr_Bonus = nullptr;
 
-	m_pBtn_Face_Left = NULL;
-	m_pBtn_Face_Right = NULL;
-	m_pBtn_Hair_Left = NULL;
-	m_pBtn_Hair_Right = NULL;
+	m_pBtn_Face_Left = nullptr;
+	m_pBtn_Face_Right = nullptr;
+	m_pBtn_Hair_Left = nullptr;
+	m_pBtn_Hair_Right = nullptr;
 
-	m_pArea_Character = NULL;
+	m_pArea_Character = nullptr;
 
 	m_iBonusPoint = m_iMaxBonusPoint = 0;
 }
@@ -83,10 +83,10 @@ bool CUICharacterCreate::Load(HANDLE hFile)
 	pInfoBase->eRace = RACE_UNKNOWN;
 	pInfoBase->eClass = CLASS_UNKNOWN;
 
-	m_pEdit_Name = (CN3UIEdit*)(this->GetChildByID("edit_name")); __ASSERT(m_pEdit_Name, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pEdit_Name, GetChildByID<CN3UIEdit>("edit_name"));
 	if(m_pEdit_Name) m_pEdit_Name->SetString("");
 	
-	m_pStr_Desc = (CN3UIString*)(this->GetChildByID("text_desc")); __ASSERT(m_pStr_Desc, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pStr_Desc, GetChildByID<CN3UIString>("text_desc"));
 	e_Nation eNation = pInfoBase->eNation;
 	if(m_pStr_Desc)
 	{
@@ -102,7 +102,7 @@ bool CUICharacterCreate::Load(HANDLE hFile)
 		}
 	}
 
-	m_pArea_Character = (CN3UIArea*)(this->GetChildByID("area_character")); __ASSERT(m_pArea_Character, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pArea_Character, GetChildByID<CN3UIArea>("area_character"));
 	
 	std::string szTexts[MAX_STATS] = { "text_str", "text_sta", "text_dex", "text_int", "text_map" };
 	std::string szAreas[MAX_STATS] = { "area_str", "area_sta", "area_dex", "area_int", "area_map" };
@@ -110,26 +110,26 @@ bool CUICharacterCreate::Load(HANDLE hFile)
 	uint32_t dwResrcIDs[MAX_STATS] = { IDS_NEWCHR_POW, IDS_NEWCHR_STA, IDS_NEWCHR_DEX, IDS_NEWCHR_INT, IDS_NEWCHR_MAP };
 	for(int i = 0; i < MAX_STATS; i++)
 	{
-		m_pStr_Stats[i] = (CN3UIString*)(this->GetChildByID(szTexts[i])); __ASSERT(m_pStr_Stats[i], "NULL UI Component!!");
-		m_pArea_Stats[i] = (CN3UIArea*)(this->GetChildByID(szAreas[i])); __ASSERT(m_pArea_Stats[i], "NULL UI Component!!");
-		m_pImg_Stats[i] = (CN3UIImage*)(this->GetChildByID(szImgs[i]));	__ASSERT(m_pImg_Stats[i], "NULL UI Component!!");
+		N3_VERIFY_UI_COMPONENT(m_pStr_Stats[i],		GetChildByID<CN3UIString>(szTexts[i]));
+		N3_VERIFY_UI_COMPONENT(m_pArea_Stats[i],	GetChildByID<CN3UIArea>(szAreas[i]));
+		N3_VERIFY_UI_COMPONENT(m_pImg_Stats[i],		GetChildByID<CN3UIImage>(szImgs[i]));
 
 		if (m_pArea_Stats[i] != nullptr)
 			m_pArea_Stats[i]->SetTooltipText(fmt::format_text_resource(dwResrcIDs[i]));
 	}
 
-	m_pStr_Bonus = (CN3UIString*)(this->GetChildByID("text_bonus")); __ASSERT(m_pStr_Bonus, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pStr_Bonus, GetChildByID<CN3UIString>("text_bonus"));
 	
 
-	m_pBtn_Face_Left =	(CN3UIButton*)(this->GetChildByID("btn_face_left"));	__ASSERT(m_pBtn_Face_Left, "NULL UI Component!!");
-	m_pBtn_Face_Right = (CN3UIButton*)(this->GetChildByID("btn_face_right"));	__ASSERT(m_pBtn_Face_Right, "NULL UI Component!!");
-	m_pBtn_Hair_Left =	(CN3UIButton*)(this->GetChildByID("btn_hair_left"));	__ASSERT(m_pBtn_Hair_Left, "NULL UI Component!!");
-	m_pBtn_Hair_Right = (CN3UIButton*)(this->GetChildByID("btn_hair_right"));	__ASSERT(m_pBtn_Hair_Right, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Face_Left, GetChildByID<CN3UIButton>("btn_face_left"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Face_Right, GetChildByID<CN3UIButton>("btn_face_right"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Hair_Left, GetChildByID<CN3UIButton>("btn_hair_left"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Hair_Right, GetChildByID<CN3UIButton>("btn_hair_right"));
 	
 	std::string szBtnIDs[MAX_RACE_SELECT];
 	uint32_t dwResrcID_Races[MAX_RACE_SELECT];
 
-	if(eNation==NATION_KARUS)
+	if (eNation == NATION_KARUS)
 	{
 		szBtnIDs[0] = "btn_race_ka_at";
 		szBtnIDs[1] = "btn_race_ka_tu";
@@ -140,7 +140,7 @@ bool CUICharacterCreate::Load(HANDLE hFile)
 		dwResrcID_Races[2] = IDS_NEWCHR_KA_WRINKLETUAREK; // 3218
 		dwResrcID_Races[3] = IDS_NEWCHR_KA_PURITUAREK; // 3214
 	}
-	else if(eNation==NATION_ELMORAD)
+	else // if (eNation == NATION_ELMORAD)
 	{
 		szBtnIDs[0] = "btn_race_el_ba";
 		szBtnIDs[1] = "btn_race_el_rm";
@@ -155,7 +155,7 @@ bool CUICharacterCreate::Load(HANDLE hFile)
 	for(int i = 0; i < MAX_RACE_SELECT; i++)
 	{
 		if(szBtnIDs[i].empty()) continue;
-		m_pBtn_Races[i] = (CN3UIButton*)(this->GetChildByID(szBtnIDs[i])); __ASSERT(m_pBtn_Races[i], "NULL UI Component!!");
+		N3_VERIFY_UI_COMPONENT(m_pBtn_Races[i], GetChildByID<CN3UIButton>(szBtnIDs[i]));
 
 		if (m_pBtn_Races[i] != nullptr)
 			m_pBtn_Races[i]->SetTooltipText(fmt::format_text_resource(dwResrcID_Races[i]));
@@ -164,25 +164,25 @@ bool CUICharacterCreate::Load(HANDLE hFile)
 	std::string szBtns[MAX_CLASS_SELECT] = { "btn_class_warrior", "btn_class_rogue", "btn_class_mage", "btn_class_priest" };
 	std::string szImgs2[MAX_CLASS_SELECT] = { "img_warrior", "img_rogue", "img_mage", "img_priest" };
 	uint32_t dwResrcID_Classes[MAX_CLASS_SELECT];
-	if(eNation==NATION_ELMORAD)
-	{
-		dwResrcID_Classes[0] = IDS_NEWCHR_EL_WARRIOR;
-		dwResrcID_Classes[1] = IDS_NEWCHR_EL_ROGUE;
-		dwResrcID_Classes[2] = IDS_NEWCHR_EL_MAGE;
-		dwResrcID_Classes[3] = IDS_NEWCHR_EL_PRIEST;
-	}
-	else if(eNation==NATION_KARUS)
+	if (eNation == NATION_KARUS)
 	{
 		dwResrcID_Classes[0] = IDS_NEWCHR_KA_WARRIOR;
 		dwResrcID_Classes[1] = IDS_NEWCHR_KA_ROGUE;
 		dwResrcID_Classes[2] = IDS_NEWCHR_KA_MAGE;
 		dwResrcID_Classes[3] = IDS_NEWCHR_KA_PRIEST;
 	}
+	else // if (eNation == NATION_ELMORAD)
+	{
+		dwResrcID_Classes[0] = IDS_NEWCHR_EL_WARRIOR;
+		dwResrcID_Classes[1] = IDS_NEWCHR_EL_ROGUE;
+		dwResrcID_Classes[2] = IDS_NEWCHR_EL_MAGE;
+		dwResrcID_Classes[3] = IDS_NEWCHR_EL_PRIEST;
+	}
 
 	for(int i = 0; i < MAX_CLASS_SELECT; i++)
 	{
-		m_pBtn_Classes[i] =	(CN3UIButton*)(this->GetChildByID(szBtns[i]));	__ASSERT(m_pBtn_Classes[i], "NULL UI Component!!");
-		m_pImg_Disable_Classes[i] = (CN3UIImage*)(this->GetChildByID(szImgs2[i]));	__ASSERT(m_pImg_Disable_Classes[i], "NULL UI Component!!");
+		N3_VERIFY_UI_COMPONENT(m_pBtn_Classes[i],			GetChildByID<CN3UIButton>(szBtns[i]));
+		N3_VERIFY_UI_COMPONENT(m_pImg_Disable_Classes[i],	GetChildByID<CN3UIImage>(szImgs2[i]));
 
 		if (m_pBtn_Classes[i] != nullptr)
 			m_pBtn_Classes[i]->SetTooltipText(fmt::format_text_resource(dwResrcID_Classes[i]));

@@ -25,12 +25,12 @@ static char THIS_FILE[] = __FILE__;
 // CDlgSowSeed dialog
 
 
-CDlgSowSeed::CDlgSowSeed(CWnd* pParent /*=NULL*/)
+CDlgSowSeed::CDlgSowSeed(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgSowSeed::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgSowSeed)
 	//}}AFX_DATA_INIT
-	m_pRefFrm = NULL;
+	m_pRefFrm = nullptr;
 	//ZeroMemory(m_FileName, MAX_PATH);
 	//m_SeedGroupList.clear();
 }
@@ -238,10 +238,10 @@ void CDlgSowSeed::Release()
 		{
 			pSeed->pTex->Release();
 			delete pSeed->pTex;
-			pSeed->pTex = NULL;
+			pSeed->pTex = nullptr;
 		}
 		delete pSeed;
-		pSeed = NULL;
+		pSeed = nullptr;
 	}	
 }
 
@@ -272,7 +272,7 @@ void CDlgSowSeed::OnBtnGrassRead()
 	}
 
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "dxt", NULL, dwFlags, "풀 텍스쳐(*.dxt)|*.dxt||", NULL);
+	CFileDialog dlg(TRUE, "dxt", nullptr, dwFlags, "풀 텍스쳐(*.dxt)|*.dxt||", nullptr);
 
 	if(dlg.DoModal() == IDCANCEL) return;
 
@@ -320,9 +320,9 @@ void CDlgSowSeed::OnBtnGrassDelete()
 
 	pSeed->pTex->Release();
 	delete pSeed->pTex;
-	pSeed->pTex = NULL;
+	pSeed->pTex = nullptr;
 	delete pSeed;
-	pSeed = NULL;
+	pSeed = nullptr;
 
 	this->Invalidate(FALSE);
 }

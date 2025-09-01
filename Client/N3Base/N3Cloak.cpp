@@ -20,13 +20,13 @@ static char THIS_FILE[]=__FILE__;
 
 CN3Cloak::CN3Cloak()
 {
-//	m_pPMesh = NULL;
-	m_pTex = NULL;
-	m_pParticle = NULL;
+//	m_pPMesh = nullptr;
+	m_pTex = nullptr;
+	m_pParticle = nullptr;
 	m_nLOD = -1;
-	m_pPMesh = NULL;
-	m_pIndex = NULL;
-	m_pVertex = NULL;
+	m_pPMesh = nullptr;
+	m_pIndex = nullptr;
+	m_pVertex = nullptr;
 	m_fOffsetRecoveryTime = 0.0f;
 	m_fPrevYaw = 0.0f;
 	m_eAnchorPattern = AMP_NONE;
@@ -122,7 +122,7 @@ void CN3Cloak::Render(__Matrix44 &mtx)
 		s_lpD3DDev->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE);
 
 	s_lpD3DDev->SetTexture(0, m_pTex->Get());
-	s_lpD3DDev->SetTexture(1, NULL);
+	s_lpD3DDev->SetTexture(1, nullptr);
 	
 	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP,   D3DTOP_MODULATE);
 	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
@@ -314,7 +314,7 @@ void CN3Cloak::SetLOD(int nLevel)
 	if (nLevel == m_nLOD)	return;
 
 	if (m_pIndex)
-		delete[] m_pIndex, m_pIndex = NULL;
+		delete[] m_pIndex, m_pIndex = nullptr;
 
 	memset(m_vOffset, 0, sizeof(D3DXVECTOR3)*CLOAK_MAX_WIDTH);
 

@@ -17,14 +17,13 @@
 
 class CUINPCChangeEvent : public CN3UIBase
 {
-	CN3UIButton*		m_pBtn_Change;
 	CN3UIButton*		m_pBtn_Repoint0;
 	CN3UIButton*		m_pBtn_Repoint1;
 	CN3UIButton*		m_pBtn_Close;
 
 	CUIPointInitDlg*	m_pDlg;
 
-	bool					 m_bSendedAllPoint;
+	bool				 m_bSendedAllPoint;
 
 public:
 	bool OnKeyPress(int iKey);
@@ -40,7 +39,6 @@ public:
 	void	Open();
 	void	Close();
 
-	void	ClassChange();
 	void	PointChangePriceQuery(bool bAllPoint);
 	void	ReceivePriceFromServer(int iGold);
 };

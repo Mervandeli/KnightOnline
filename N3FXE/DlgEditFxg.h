@@ -18,7 +18,7 @@ class CDlgEditFxg : public CDialog
 {
 // Construction
 public:
-	CDlgEditFxg(CWnd* pParent = NULL);   // standard constructor
+	CDlgEditFxg(CWnd* pParent = nullptr);   // standard constructor
 
 	CMainFrame*			m_pRefFrm;
 	CComboBox*			m_pJoint[MAX_FXB];

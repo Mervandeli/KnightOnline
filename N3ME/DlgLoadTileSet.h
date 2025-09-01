@@ -14,7 +14,7 @@ class CDlgLoadTileSet : public CDialog
 {
 // Construction
 public:
-	CDlgLoadTileSet(CWnd* pParent = NULL);   // standard constructor
+	CDlgLoadTileSet(CWnd* pParent = nullptr);   // standard constructor
 
 	CString		m_SelFileName;
 

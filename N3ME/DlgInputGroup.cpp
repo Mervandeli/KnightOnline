@@ -13,7 +13,7 @@ static char THIS_FILE[]=__FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgInputGroup dialog
-CDlgInputGroup::CDlgInputGroup(CWnd* pParent /*=NULL*/)
+CDlgInputGroup::CDlgInputGroup(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgInputGroup::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgInputGroup)

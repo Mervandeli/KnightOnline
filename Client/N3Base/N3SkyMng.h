@@ -70,19 +70,19 @@ struct		__SKY_DAYCHANGE
 
 		DWORD dwRWC = 0;
 		int nL = 0;
-		ReadFile(hFile, &nL, 4, &dwRWC, NULL);
+		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
 		if(nL > 0) 
 		{
-			std::vector<char> buffer(nL+1, NULL);
-			ReadFile(hFile, &buffer[0], nL, &dwRWC, NULL);
+			std::vector<char> buffer(nL+1, '\0');
+			ReadFile(hFile, &buffer[0], nL, &dwRWC, nullptr);
 			szName = &buffer[0];
 		}
 
-		ReadFile(hFile, &eSkyDayChange, 4, &dwRWC, NULL);
-		ReadFile(hFile, &dwWhen, 4, &dwRWC, NULL);
-		ReadFile(hFile, &dwParam1, 4, &dwRWC, NULL);
-		ReadFile(hFile, &dwParam2, 4, &dwRWC, NULL);
-		ReadFile(hFile, &fHowLong, 4, &dwRWC, NULL);
+		ReadFile(hFile, &eSkyDayChange, 4, &dwRWC, nullptr);
+		ReadFile(hFile, &dwWhen, 4, &dwRWC, nullptr);
+		ReadFile(hFile, &dwParam1, 4, &dwRWC, nullptr);
+		ReadFile(hFile, &dwParam2, 4, &dwRWC, nullptr);
+		ReadFile(hFile, &fHowLong, 4, &dwRWC, nullptr);
 
 		return true;
 	}
@@ -92,14 +92,14 @@ struct		__SKY_DAYCHANGE
 		DWORD dwRWC = 0;
 
 		int nL = szName.size();
-		WriteFile(hFile, &nL, 4, &dwRWC, NULL);
-		if(nL > 0) WriteFile(hFile, szName.c_str(), nL, &dwRWC, NULL);
+		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+		if(nL > 0) WriteFile(hFile, szName.c_str(), nL, &dwRWC, nullptr);
 
-		WriteFile(hFile, &eSkyDayChange, 4, &dwRWC, NULL);
-		WriteFile(hFile, &dwWhen, 4, &dwRWC, NULL);
-		WriteFile(hFile, &dwParam1, 4, &dwRWC, NULL);
-		WriteFile(hFile, &dwParam2, 4, &dwRWC, NULL);
-		WriteFile(hFile, &fHowLong, 4, &dwRWC, NULL);
+		WriteFile(hFile, &eSkyDayChange, 4, &dwRWC, nullptr);
+		WriteFile(hFile, &dwWhen, 4, &dwRWC, nullptr);
+		WriteFile(hFile, &dwParam1, 4, &dwRWC, nullptr);
+		WriteFile(hFile, &dwParam2, 4, &dwRWC, nullptr);
+		WriteFile(hFile, &fHowLong, 4, &dwRWC, nullptr);
 
 		return true;
 	}

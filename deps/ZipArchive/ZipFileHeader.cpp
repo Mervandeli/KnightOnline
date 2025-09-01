@@ -64,7 +64,7 @@ bool CZipFileHeader::Read(CZipStorage *pStorage)
 		return false;
 
 	int iCurDsk = pStorage->GetCurrentDisk();
-	m_pszFileName.Allocate(uFileNameSize); // don't add NULL at the end
+	m_pszFileName.Allocate(uFileNameSize); // don't add nullptr at the end
 	pStorage->m_pFile->Read(m_pszFileName, uFileNameSize);
 	if (uExtraFieldSize)
 	{

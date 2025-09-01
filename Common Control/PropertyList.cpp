@@ -389,7 +389,7 @@ void CPropertyList::OnButton()
 	else if (pItem->m_nItemType == PIT_FILE)
 	{
 		CString SelectedFile; 
-		CFileDialog FileDlg(TRUE, NULL, NULL, NULL, pItem->m_szCBItemsOrFilter.GetAt(0));
+		CFileDialog FileDlg(TRUE, nullptr, nullptr, 0, pItem->m_szCBItemsOrFilter.GetAt(0));
 		
 		CString currPath = pItem->m_curValue;
 		FileDlg.m_ofn.lpstrTitle = "Select file";
@@ -415,7 +415,7 @@ void CPropertyList::OnButton()
 	{
 		char szBuff[10240] = "";
 		DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-		CFileDialog dlg(TRUE, NULL, NULL, dwFlags, pItem->m_szCBItemsOrFilter.GetAt(0));
+		CFileDialog dlg(TRUE, nullptr, nullptr, dwFlags, pItem->m_szCBItemsOrFilter.GetAt(0));
 		dlg.m_ofn.nMaxFile = 10240;
 		dlg.m_ofn.lpstrFile = szBuff;
 
@@ -424,7 +424,7 @@ void CPropertyList::OnButton()
 			POSITION pos = dlg.GetStartPosition();
 			CStringArray szFNs;
 			
-			while(pos != NULL)
+			while(pos != nullptr)
 			{
 				szFNs.Add(dlg.GetNextPathName(pos));
 			}
@@ -455,7 +455,7 @@ void CPropertyList::OnButton()
 	}
 	else if (pItem->m_nItemType == PIT_FONT)
 	{	
-		CFontDialog FontDlg(NULL,CF_EFFECTS | CF_SCREENFONTS,NULL,this);
+		CFontDialog FontDlg(nullptr,CF_EFFECTS | CF_SCREENFONTS,nullptr,this);
 		
 		if(IDOK == FontDlg.DoModal())
 		{
@@ -490,7 +490,7 @@ void CPropertyList::OnLButtonUp(UINT nFlags, CPoint point)
 		if (GetCapture()==this)
 			::ReleaseCapture();
 
-		::ClipCursor(NULL);
+		::ClipCursor(nullptr);
 
 		CClientDC dc(this);
 		InvertLine(&dc,CPoint(point.x,m_nDivTop),CPoint(point.x,m_nDivBtm));
@@ -598,11 +598,11 @@ CPropertyItem* CPropertyList::GetPropItem(const char *szPropName)
 	for(int i = 0; i < nC; i++)
 	{
 		CPropertyItem* pItem = (CPropertyItem*)GetItemDataPtr(i);
-		if(pItem == NULL) continue;
+		if(pItem == nullptr) continue;
 		if(lstrcmpi(pItem->m_propName, szPropName) == 0) return pItem;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void CPropertyList::SetDividerWidth(int x)
@@ -688,7 +688,7 @@ void CPropertyItem::D3DColorSet(D3DCOLOR color)
 void CPropertyList::DeleteItem(LPDELETEITEMSTRUCT lpDeleteItemStruct)
 {
 	CPropertyItem* pItem = (CPropertyItem*)(lpDeleteItemStruct->itemData);
-	delete pItem; pItem = NULL;
+	delete pItem; pItem = nullptr;
 	
 	CListBox::DeleteItem(lpDeleteItemStruct);
 }

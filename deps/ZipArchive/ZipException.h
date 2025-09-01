@@ -57,7 +57,7 @@ public:
 	};
 	// cause - takes one of the codes above
 	int m_iCause;
-	CZipException(int iCause = generic, LPCTSTR lpszZipName = NULL);
+	CZipException(int iCause = generic, LPCTSTR lpszZipName = nullptr);
 	virtual ~CZipException();
 
 };
@@ -66,6 +66,6 @@ public:
 // Parameters:
 //		iZipError	- zlib or internal error code
 //		lpszZipName - name of the file where the error occured
-void AfxThrowZipException(int iZipError = 1000, LPCTSTR lpszZipName = NULL);
+void AfxThrowZipException(int iZipError = 1000, LPCTSTR lpszZipName = nullptr);
 
 #endif // !defined(AFX_ZIPEXCEPTION_H__E3546921_D728_11D3_B7C7_E77339672847__INCLUDED_)

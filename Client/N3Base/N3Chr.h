@@ -75,7 +75,7 @@ public:
 		if(m_pSkinsRef && nLOD >= 0 && nLOD < MAX_CHR_LOD)
 			return &(m_pSkinsRef->m_Skins[nLOD]);
 		else
-			return NULL;
+			return nullptr;
 	}
 	CN3CPartSkins*	Skins() { return m_pSkinsRef; }
 	CN3CPartSkins*	SkinsSet(const std::string& szFN);
@@ -263,7 +263,7 @@ protected:
 
 		void Init()
 		{
-			pAniData = NULL;
+			pAniData = nullptr;
 			iAni = -1;						// 현재 에니메이션
 			bOnceAndFreeze = false;			// 돌아갈 에니메이션..
 			bProcessingDelayNow = false;	// 지금 지연시간을 처리하는가??
@@ -285,8 +285,8 @@ protected:
 	float			m_fAniSpeedDelta; // 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다..
 
 public:
-	int				CheckCollisionPrecisely(const __Vector3& vPos, const __Vector3& vDir, __Vector3* pvPick = NULL);
-	int				CheckCollisionPrecisely(int ixScreen, int iyScreen, __Vector3* pvPick = NULL);
+	int				CheckCollisionPrecisely(const __Vector3& vPos, const __Vector3& vDir, __Vector3* pvPick = nullptr);
+	int				CheckCollisionPrecisely(int ixScreen, int iyScreen, __Vector3* pvPick = nullptr);
 	static void		LODDeltaSet(int iLODDelta) { if(s_iLODDelta >= 0 && iLODDelta <= 3) s_iLODDelta = iLODDelta; }
 	static int 		LODDelta() { return s_iLODDelta; }
 
@@ -442,7 +442,7 @@ inline float CN3Chr::AniBlendDelta()
 // Sound Player 관련 함수
 inline bool	CN3Chr::NeedPlaySound0()
 {
-	if(NULL == m_FrmCtrl.pAniData) return false;
+	if(nullptr == m_FrmCtrl.pAniData) return false;
 	
 	if(	m_FrmCtrlUpper.pAniData)
 	{
@@ -461,7 +461,7 @@ inline bool	CN3Chr::NeedPlaySound0()
 
 inline bool CN3Chr::IsLoopingAgain()	// 루핑이 다시 시작되는 타이밍인가?
 {
-	if(NULL == m_FrmCtrl.pAniData) return false;
+	if(nullptr == m_FrmCtrl.pAniData) return false;
 
 	if(	m_FrmCtrlUpper.pAniData)
 	{
@@ -477,7 +477,7 @@ inline bool CN3Chr::IsLoopingAgain()	// 루핑이 다시 시작되는 타이밍�
 
 inline bool CN3Chr::NeedPlaySound1()
 {
-	if(NULL == m_FrmCtrl.pAniData) return false;
+	if(nullptr == m_FrmCtrl.pAniData) return false;
 
 	if(	m_FrmCtrlUpper.pAniData)
 	{
@@ -496,7 +496,7 @@ inline bool CN3Chr::NeedPlaySound1()
 
 inline bool	CN3Chr::NeedStrike0()
 {
-	if(NULL == m_FrmCtrl.pAniData) return false;
+	if(nullptr == m_FrmCtrl.pAniData) return false;
 
 	if(	m_FrmCtrlUpper.pAniData)
 	{
@@ -515,7 +515,7 @@ inline bool	CN3Chr::NeedStrike0()
 
 inline bool	CN3Chr::NeedStrike1()
 {
-	if(NULL == m_FrmCtrl.pAniData) return false;
+	if(nullptr == m_FrmCtrl.pAniData) return false;
 
 	if(	m_FrmCtrlUpper.pAniData)
 	{

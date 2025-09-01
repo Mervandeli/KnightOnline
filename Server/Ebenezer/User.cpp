@@ -2609,13 +2609,17 @@ void CUser::SendTimeStatus()
 
 void CUser::SetDetailData()
 {
-	C3DMap* pMap = nullptr;
-
 	SetSlotItemValue();
 	SetUserAbility();
 
-	if (m_pUserData->m_bLevel >= MAX_LEVEL)
+	if (m_pUserData->m_bLevel > MAX_LEVEL)
+	{
+		spdlog::error("User::SetDetailData: user exceeds max level [accountId={} charId={} level={}]",
+			m_pUserData->m_Accountid, m_pUserData->m_id, m_pUserData->m_bLevel);
+
 		Close();
+		return;
+	}
 
 	m_iMaxExp = m_pMain->m_LevelUpTableArray[m_pUserData->m_bLevel - 1]->RequiredExp;
 	m_iMaxWeight = (m_pUserData->m_bStr + m_sItemStr) * 50;
@@ -4619,6 +4623,15 @@ void CUser::NpcEvent(char* pBuf)
 			Send(send_buff, send_index);
 			break;
 
+		case NPC_RENTAL:
+			SetByte(send_buff, WIZ_RENTAL, send_index);
+			SetByte(send_buff, RENTAL_NPC, send_index);
+			// 1 = enabled, -1 = disabled
+			SetShort(send_buff, 1, send_index);
+			SetDWORD(send_buff, pNpc->m_iSellingGroup, send_index);
+			Send(send_buff, send_index);
+			break;
+
 #if 0 // not typically available
 		case NPC_COUPON:
 			if (m_pMain->m_byNationID == 1
@@ -4832,6 +4845,14 @@ void CUser::ItemTrade(char* pBuf)
 			goto fail_return;
 		}
 
+		// Non-stackable items should only ever have a stack of 1.
+		if (pTable->Countable == 0
+			&& count != 1)
+		{
+			result = 2;
+			goto fail_return;
+		}
+
 		if (m_pUserData->m_sItemArray[SLOT_MAX + pos].nNum != 0)
 		{
 			if (m_pUserData->m_sItemArray[SLOT_MAX + pos].nNum == itemid)
@@ -4856,9 +4877,18 @@ void CUser::ItemTrade(char* pBuf)
 				goto fail_return;
 			}
 		}
-		if (m_pUserData->m_iGold < (pTable->BuyPrice * count))
+
+		int64_t buyPrice = static_cast<int64_t>(pTable->BuyPrice) * count;
+		if (buyPrice < 0
+			|| buyPrice > MAX_GOLD)
 		{
-			result = 0x03;
+			result = 3;
+			goto fail_return;
+		}
+
+		if (m_pUserData->m_iGold < buyPrice)
+		{
+			result = 3;
 			goto fail_return;
 		}
 
@@ -4884,25 +4914,26 @@ void CUser::ItemTrade(char* pBuf)
 		m_pUserData->m_sItemArray[SLOT_MAX + pos].nNum = itemid;
 		m_pUserData->m_sItemArray[SLOT_MAX + pos].sDuration = pTable->Durability;
 
+		m_pUserData->m_iGold -= static_cast<int>(buyPrice);
+
 		// count 개념이 있는 아이템
 		if (pTable->Countable
 			&& count > 0)
 		{
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].sCount += count;
-			m_pUserData->m_iGold -= (pTable->BuyPrice * count);
 		}
 		else
 		{
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].sCount = 1;
-			m_pUserData->m_iGold -= pTable->BuyPrice;
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].nSerialNum = m_pMain->GenerateItemSerial();
 		}
 
 		SendItemWeight();
 		ItemLogToAgent(m_pUserData->m_id, pNpc->m_strName, ITEM_LOG_MERCHANT_BUY, m_pUserData->m_sItemArray[SLOT_MAX + pos].nSerialNum, itemid, count, pTable->Durability);
 	}
+	// sell sequence
 	else
-	{		// sell sequence
+	{
 		if (m_pUserData->m_sItemArray[SLOT_MAX + pos].nNum != itemid)
 		{
 			result = 0x02;
@@ -4920,7 +4951,24 @@ void CUser::ItemTrade(char* pBuf)
 		if (pTable->Countable != 0
 			&& count > 0)
 		{
-			m_pUserData->m_iGold += (pTable->SellPrice * count);
+			int64_t salePrice = static_cast<int64_t>(pTable->BuyPrice) * count;
+			if (pTable->SellPrice != SALE_TYPE_FULL)
+			{
+				if (m_pUserData->m_byPremiumType != 0)
+					salePrice /= 6;
+				else
+					salePrice /= 4;
+			}
+
+			if (salePrice < 0
+				|| salePrice > MAX_GOLD)
+			{
+				result = 3;
+				goto fail_return;
+			}
+
+			m_pUserData->m_iGold += static_cast<int>(salePrice);
+
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].sCount -= count;
 
 			if (m_pUserData->m_sItemArray[SLOT_MAX + pos].sCount <= 0)
@@ -4932,7 +4980,24 @@ void CUser::ItemTrade(char* pBuf)
 		}
 		else
 		{
-			m_pUserData->m_iGold += pTable->SellPrice;
+			int64_t salePrice = static_cast<int64_t>(pTable->BuyPrice);
+			if (pTable->SellPrice != SALE_TYPE_FULL)
+			{
+				if (m_pUserData->m_byPremiumType != 0)
+					salePrice /= 6;
+				else
+					salePrice /= 4;
+			}
+
+			if (salePrice < 0
+				|| salePrice > MAX_GOLD)
+			{
+				result = 3;
+				goto fail_return;
+			}
+
+			m_pUserData->m_iGold += static_cast<int>(salePrice);
+
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].nNum = 0;
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].sDuration = 0;
 			m_pUserData->m_sItemArray[SLOT_MAX + pos].sCount = 0;
@@ -9177,8 +9242,8 @@ void CUser::GoldChange(short tid, int gold)
 		// Source is NOT in a party.
 		if (m_sPartyIndex == -1)
 		{
-			s_type = 1;
-			t_type = 2;
+			s_type = GOLD_CHANGE_GAIN;
+			t_type = GOLD_CHANGE_LOSE;
 
 			s_temp_gold = (pTUser->m_pUserData->m_iGold * 4) / 10;
 			t_temp_gold = pTUser->m_pUserData->m_iGold / 2;
@@ -9193,8 +9258,8 @@ void CUser::GoldChange(short tid, int gold)
 			if (pParty == nullptr)
 				return;
 
-			s_type = 1;
-			t_type = 2;
+			s_type = GOLD_CHANGE_GAIN;
+			t_type = GOLD_CHANGE_LOSE;
 
 			s_temp_gold = (pTUser->m_pUserData->m_iGold * 4) / 10;
 			t_temp_gold = pTUser->m_pUserData->m_iGold / 2;
@@ -9239,7 +9304,7 @@ void CUser::GoldChange(short tid, int gold)
 					send_index = 0;
 					memset(send_buff, 0, sizeof(send_buff));
 					SetByte(send_buff, WIZ_GOLD_CHANGE, send_index);
-					SetByte(send_buff, 1, send_index);
+					SetByte(send_buff, GOLD_CHANGE_GAIN, send_index);
 					SetDWORD(send_buff, money, send_index);
 					SetDWORD(send_buff, pUser->m_pUserData->m_iGold, send_index);
 					pUser->Send(send_buff, send_index);
@@ -9255,8 +9320,8 @@ void CUser::GoldChange(short tid, int gold)
 		// Source gains money.
 		if (gold > 0)
 		{
-			s_type = 1;
-			t_type = 2;
+			s_type = GOLD_CHANGE_GAIN;
+			t_type = GOLD_CHANGE_LOSE;
 
 			s_temp_gold = gold;
 			t_temp_gold = gold;
@@ -9267,8 +9332,8 @@ void CUser::GoldChange(short tid, int gold)
 		// Source loses money.
 		else
 		{
-			s_type = 2;
-			t_type = 1;
+			s_type = GOLD_CHANGE_LOSE;
+			t_type = GOLD_CHANGE_GAIN;
 
 			s_temp_gold = gold;
 			t_temp_gold = gold;
@@ -9278,7 +9343,6 @@ void CUser::GoldChange(short tid, int gold)
 		}
 	}
 
-	// First the source...
 	SetByte(send_buff, WIZ_GOLD_CHANGE, send_index);
 	SetByte(send_buff, s_type, send_index);
 	SetDWORD(send_buff, s_temp_gold, send_index);
@@ -9315,6 +9379,16 @@ void CUser::SelectWarpList(char* pBuf)
 
 	pWarp = pCurrentMap->m_WarpArray.GetData(warpid);
 	if (pWarp == nullptr)
+		return;
+
+	// We cannot use warp gates when invading.
+	if (m_pUserData->m_bNation != pWarp->sZone
+		&& pWarp->sZone <= ZONE_ELMORAD)
+		return;
+
+	// We cannot use warp gates belonging to another nation.
+	if (pWarp->sNation != 0
+		&& pWarp->sNation != m_pUserData->m_bNation)
 		return;
 
 	pTargetMap = m_pMain->GetMapByID(pWarp->sZone);
@@ -9512,7 +9586,7 @@ BOOL CUser::BindObjectEvent(short objectindex, short nid)
 	}
 
 	SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);
-	SetByte(send_buff, pEvent->sType, send_index);
+	SetByte(send_buff, static_cast<uint8_t>(pEvent->sType), send_index);
 	SetByte(send_buff, result, send_index);
 	Send(send_buff, send_index);
 
@@ -9562,7 +9636,7 @@ BOOL CUser::GateObjectEvent(short objectindex, short nid)
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 	SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);
-	SetByte(send_buff, pEvent->sType, send_index);
+	SetByte(send_buff, static_cast<uint8_t>(pEvent->sType), send_index);
 	SetByte(send_buff, result, send_index);
 	SetShort(send_buff, nid, send_index);
 	SetByte(send_buff, pNpc->m_byGateOpen, send_index);
@@ -9635,7 +9709,7 @@ BOOL CUser::GateLeverObjectEvent(short objectindex, short nid)
 			memset(send_buff, 0, sizeof(send_buff));
 			send_index = 0;
 			SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);
-			SetByte(send_buff, pGateEvent->sType, send_index);
+			SetByte(send_buff, static_cast<uint8_t>(pGateEvent->sType), send_index);
 			SetByte(send_buff, result, send_index);
 			SetShort(send_buff, pGateNpc->m_sNid, send_index);
 			SetByte(send_buff, pGateNpc->m_byGateOpen, send_index);
@@ -9650,7 +9724,7 @@ BOOL CUser::GateLeverObjectEvent(short objectindex, short nid)
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 	SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);
-	SetByte(send_buff, pEvent->sType, send_index);
+	SetByte(send_buff, static_cast<uint8_t>(pEvent->sType), send_index);
 	SetByte(send_buff, result, send_index);
 	SetShort(send_buff, nid, send_index);
 	SetByte(send_buff, pNpc->m_byGateOpen, send_index);
@@ -9732,7 +9806,7 @@ BOOL CUser::FlagObjectEvent(short objectindex, short nid)
 			send_index = 0;
 
 			SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);		// (Send to Region...)
-			SetByte(send_buff, pFlagEvent->sType, send_index);
+			SetByte(send_buff, static_cast<uint8_t>(pFlagEvent->sType), send_index);
 			SetByte(send_buff, result, send_index);
 			SetShort(send_buff, pFlagNpc->m_sNid, send_index);
 			SetByte(send_buff, pFlagNpc->m_byGateOpen, send_index);
@@ -9756,7 +9830,7 @@ BOOL CUser::FlagObjectEvent(short objectindex, short nid)
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 	SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);
-	SetByte(send_buff, pEvent->sType, send_index);
+	SetByte(send_buff, static_cast<uint8_t>(pEvent->sType), send_index);
 	SetByte(send_buff, result, send_index);
 	SetShort(send_buff, nid, send_index);
 	SetByte(send_buff, pNpc->m_byGateOpen, send_index);
@@ -9778,6 +9852,16 @@ BOOL CUser::WarpListObjectEvent(short objectindex, short nid)
 	if (pEvent == nullptr)
 		return FALSE;
 
+	// We cannot use warp gates belonging to another nation.
+	if (pEvent->sBelong != 0
+		&& pEvent->sBelong != m_pUserData->m_bNation)
+		return FALSE;
+
+	// We cannot use warp gates when invading.
+	if (m_pUserData->m_bNation != m_pUserData->m_bZone
+		&& m_pUserData->m_bZone <= ZONE_ELMORAD)
+		return FALSE;
+
 	if (!GetWarpList(pEvent->sControlNpcID))
 		return FALSE;
 
@@ -9788,6 +9872,7 @@ void CUser::ObjectEvent(char* pBuf)
 {
 	int index = 0, objectindex = 0, send_index = 0, result = 0, nid = 0;
 	char send_buff[128] = {};
+	uint8_t objectType = 0;
 
 	C3DMap* pMap = nullptr;
 	_OBJECT_EVENT* pEvent = nullptr;
@@ -9802,6 +9887,8 @@ void CUser::ObjectEvent(char* pBuf)
 	pEvent = pMap->GetObjectEvent(objectindex);
 	if (pEvent == nullptr)
 		goto fail_return;
+
+	objectType = static_cast<uint8_t>(pEvent->sType);
 
 	switch (pEvent->sType)
 	{
@@ -9843,6 +9930,7 @@ void CUser::ObjectEvent(char* pBuf)
 
 fail_return:
 	SetByte(send_buff, WIZ_OBJECT_EVENT, send_index);
+	SetByte(send_buff, objectType, send_index);
 	SetByte(send_buff, 0, send_index);
 	Send(send_buff, send_index);
 }
@@ -10277,8 +10365,8 @@ void CUser::MarketBBSRegister(char* pBuf)
 	if (result == 0)
 		goto fail_return;
 
-	SetByte(send_buff, WIZ_GOLD_CHANGE, send_index);		// Money removal packet...
-	SetByte(send_buff, 2, send_index);
+	SetByte(send_buff, WIZ_GOLD_CHANGE, send_index);
+	SetByte(send_buff, GOLD_CHANGE_LOSE, send_index);
 
 	if (buysell_index == MARKET_BBS_BUY)
 	{
@@ -10602,7 +10690,7 @@ void CUser::MarketBBSRemotePurchase(char* pBuf)
 		m_pUserData->m_iGold -= REMOTE_PURCHASE_PRICE;
 
 		SetByte(send_buff, WIZ_GOLD_CHANGE, send_index);
-		SetByte(send_buff, 0x02, send_index);
+		SetByte(send_buff, GOLD_CHANGE_LOSE, send_index);
 		SetDWORD(send_buff, REMOTE_PURCHASE_PRICE, send_index);
 		SetDWORD(send_buff, m_pUserData->m_iGold, send_index);
 		Send(send_buff, send_index);
@@ -10660,7 +10748,7 @@ void CUser::MarketBBSTimeCheck()
 					memset(send_buff, 0, sizeof(send_buff));
 					send_index = 0;
 					SetByte(send_buff, WIZ_GOLD_CHANGE, send_index);
-					SetByte(send_buff, 0x02, send_index);
+					SetByte(send_buff, GOLD_CHANGE_LOSE, send_index);
 					SetDWORD(send_buff, BUY_POST_PRICE, send_index);
 					SetDWORD(send_buff, pUser->m_pUserData->m_iGold, send_index);
 					pUser->Send(send_buff, send_index);
@@ -10693,7 +10781,7 @@ void CUser::MarketBBSTimeCheck()
 					memset(send_buff, 0, sizeof(send_buff));
 					send_index = 0;
 					SetByte(send_buff, WIZ_GOLD_CHANGE, send_index);
-					SetByte(send_buff, 0x02, send_index);
+					SetByte(send_buff, GOLD_CHANGE_LOSE, send_index);
 					SetDWORD(send_buff, SELL_POST_PRICE, send_index);
 					SetDWORD(send_buff, pUser->m_pUserData->m_iGold, send_index);
 					pUser->Send(send_buff, send_index);
@@ -11603,34 +11691,61 @@ void CUser::GoldGain(int gold)
 {
 	int send_index = 0;
 	char send_buff[256] = {};
+	int64_t iTotalGold = 0;
 
-	m_pUserData->m_iGold += gold;	// Add gold.
+	if (m_pUserData->m_iGold < 0)
+	{
+		spdlog::error("User::GoldGain: user has negative gold [charId={} existingGold={}]",
+			m_pUserData->m_id, m_pUserData->m_iGold);
+		return;
+	}	
 
-	SetByte(send_buff, WIZ_GOLD_CHANGE, send_index);	// First the source...
-	SetByte(send_buff, 1, send_index);	// 1 -> Get gold    2 -> Lose gold
+	if (gold < 0)
+		gold = 0;
+	
+	iTotalGold = static_cast<int64_t>(m_pUserData->m_iGold) + static_cast<int64_t>(gold);
+
+	if (iTotalGold > MAX_GOLD)
+		iTotalGold = MAX_GOLD;
+
+	// set user gold as iTotalGold
+	m_pUserData->m_iGold = static_cast<int>(iTotalGold);
+
+	SetByte(send_buff, WIZ_GOLD_CHANGE, send_index);
+	SetByte(send_buff, GOLD_CHANGE_GAIN, send_index);
 	SetDWORD(send_buff, gold, send_index);
 	SetDWORD(send_buff, m_pUserData->m_iGold, send_index);
 	Send(send_buff, send_index);
 }
 
-BOOL CUser::GoldLose(int gold)
+bool CUser::GoldLose(int gold)
 {
 	int send_index = 0;
 	char send_buff[256] = {};
 
+	if (m_pUserData->m_iGold < 0)
+	{
+		spdlog::error("User::GoldLose: user has negative gold [charId={} existingGold={}]",
+			m_pUserData->m_id, m_pUserData->m_iGold);
+		return false;
+	}
+
+	if (gold < 0)
+		gold = 0;
+
 	// Insufficient gold!
 	if (m_pUserData->m_iGold < gold)
-		return FALSE;
+		return false;
 
 	m_pUserData->m_iGold -= gold;	// Subtract gold.
 
-	SetByte(send_buff, WIZ_GOLD_CHANGE, send_index);	// First the source...
-	SetByte(send_buff, 2, send_index);	// 1 -> Get gold    2 -> Lose gold
+	SetByte(send_buff, WIZ_GOLD_CHANGE, send_index);
+	SetByte(send_buff, GOLD_CHANGE_LOSE, send_index);
 	SetDWORD(send_buff, gold, send_index);
 	SetDWORD(send_buff, m_pUserData->m_iGold, send_index);
 	Send(send_buff, send_index);
 
-	return TRUE;
+	return true;
 }
 
 BOOL CUser::CheckSkillPoint(BYTE skillnum, BYTE min, BYTE max)

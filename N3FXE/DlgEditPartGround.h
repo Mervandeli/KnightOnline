@@ -16,7 +16,7 @@ class CDlgEditPartGround : public CDialog
 {
 // Construction
 public:
-	CDlgEditPartGround(CWnd* pParent = NULL);   // standard constructor
+	CDlgEditPartGround(CWnd* pParent = nullptr);   // standard constructor
 
 	CMainFrame*			m_pRefFrm;
 

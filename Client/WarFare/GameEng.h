@@ -118,7 +118,7 @@ public:
 /*
 inline CN3Light* CGameEng::Light(int index)
 {
-	if(index < 0 || index >= m_Lights.size()) return NULL;
+	if(index < 0 || index >= m_Lights.size()) return nullptr;
 	it_Light itLgt = m_Lights.begin();
 	for(int i = 0; i < index; i++, itLgt++);
 

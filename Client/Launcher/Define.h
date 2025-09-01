@@ -12,10 +12,10 @@
 #define SM_PACKETPENDING_SEND		0
 #define	SM_PACKETPENDING_RECEIVE	1
 
-#define SAFE_DELETE(p)  { if(p) { delete (p);     (p)=NULL; } }
-#define SAFE_DELETES(p) { if(p) { delete[] (p);	  (p)=NULL; } }
-#define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=NULL; } }
-#define INIT_PTR(p)		{ (p) = NULL;}
+#define SAFE_DELETE(p)  { if(p) { delete (p);     (p)=nullptr; } }
+#define SAFE_DELETES(p) { if(p) { delete[] (p);	  (p)=nullptr; } }
+#define SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=nullptr; } }
+#define INIT_PTR(p)		{ (p) = nullptr;}
 
 #define WM_PACKET_ARRIVED			(WM_USER+1)
 #define WM_MESSAGE_RESTOREALL		(WM_USER+2)

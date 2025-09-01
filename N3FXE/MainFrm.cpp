@@ -64,7 +64,7 @@ static UINT indicators[] =
 
 CMainFrame::CMainFrame()
 {
-	m_pCurrFX = NULL;
+	m_pCurrFX = nullptr;
 	m_pEditWndList.clear();
 	m_pEditGroup.clear();
 
@@ -74,12 +74,12 @@ CMainFrame::CMainFrame()
 	m_bRenderFloor = true;
 	m_dwBGColor = 0xff404040;
 
-	m_pGround = NULL;
+	m_pGround = nullptr;
 }
 
 CMainFrame::~CMainFrame()
 {
-	m_pCurrFX = NULL;
+	m_pCurrFX = nullptr;
 
 	std::list<CDlgEditScript*>::iterator it;
 	it = m_pEditWndList.begin();
@@ -285,7 +285,7 @@ int CMainFrame::GetPartType(CString& PathName)
 	int PartType = FX_PART_TYPE_NONE;
 
 	FILE* stream = fopen((LPCTSTR)PathName, "r");
-	if(!stream) return NULL;
+	if(!stream) return 0;
 	
 	char szLine[512] = "", szCommand[80] = "", szBuf[4][80] = { "", "", "", ""};
 	char* pResult = fgets(szLine, 512, stream);
@@ -300,7 +300,7 @@ int CMainFrame::GetPartType(CString& PathName)
 	while(!feof(stream))
 	{
 		char* pResult = fgets(szLine, 512, stream);
-		if(pResult == NULL) continue;
+		if(pResult == nullptr) continue;
 
 		ZeroMemory(szCommand,80);
 		ZeroMemory(szBuf[0],80);
@@ -329,12 +329,12 @@ int CMainFrame::GetPartType(CString& PathName)
 void CMainFrame::OnFileLoadPart() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "N3FXPart", NULL, dwFlags, "N3FXPart File(*.n3fxpart)|*.n3fxpart||", NULL);
+	CFileDialog dlg(TRUE, "N3FXPart", nullptr, dwFlags, "N3FXPart File(*.n3fxpart)|*.n3fxpart||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	POSITION pos = dlg.GetStartPosition();
 
-	while(pos != NULL)
+	while(pos != nullptr)
 	{
 		CString PathName = dlg.GetNextPathName(pos);
 
@@ -427,19 +427,19 @@ void CMainFrame::OnFileLoadPart()
 void CMainFrame::OnFileLoadBundle() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "N3FXBundle", NULL, dwFlags, "N3FXBundle File(*.n3fxbundle)|*.n3fxbundle||", NULL);
+	CFileDialog dlg(TRUE, "N3FXBundle", nullptr, dwFlags, "N3FXBundle File(*.n3fxbundle)|*.n3fxbundle||", nullptr);
 	
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	POSITION pos = dlg.GetStartPosition();
 
-	while(pos != NULL)
+	while(pos != nullptr)
 	{
 		CString PathName = dlg.GetNextPathName(pos);
 
 		//스크립트 에디트 창 만들고, 스크립트 정보들 읽고, 셋팅..
 		CDlgEditScript*	pEditWnd = new CDlgEditScript;
-		pEditWnd->Create(IDD_DLG_SCRIPTEDITOR, NULL);
+		pEditWnd->Create(IDD_DLG_SCRIPTEDITOR, nullptr);
 		pEditWnd->m_pRefFrm = this;
 
 		// load 해서 성공하면 그대로 하고 실패하면 다 지워버려..
@@ -720,7 +720,7 @@ void CMainFrame::OnFileNewBundle()
 {
 	//스크립트 에디트 창 만들고, 스크립트 정보들 읽고, 셋팅..
 	CDlgEditScript*	pEditWnd = new CDlgEditScript;
-	pEditWnd->Create(IDD_DLG_SCRIPTEDITOR, NULL);
+	pEditWnd->Create(IDD_DLG_SCRIPTEDITOR, nullptr);
 	pEditWnd->m_pRefFrm = this;
 
 	// load 해서 성공하면 그대로 하고 실패하면 다 지워버려..
@@ -741,7 +741,7 @@ void CMainFrame::OnFileNewBundle()
 void CMainFrame::OnFileOpenFloorTex() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, NULL, NULL, dwFlags, "tga(*.tga),bmp(*.bmp),dxt(*.dxt)|*.tga;*.bmp;*.dxt||", NULL);
+	CFileDialog dlg(TRUE, nullptr, nullptr, dwFlags, "tga(*.tga),bmp(*.bmp),dxt(*.dxt)|*.tga;*.bmp;*.dxt||", nullptr);
 	
 	if(dlg.DoModal() == IDCANCEL) return;
 
@@ -753,7 +753,7 @@ void CMainFrame::OnFileNewGroup()
 {
 	//스크립트 에디트 창 만들고, 스크립트 정보들 읽고, 셋팅..
 	CDlgEditFxg* pEditWnd = new CDlgEditFxg;
-	pEditWnd->Create(IDD_DLG_GROUP, NULL);
+	pEditWnd->Create(IDD_DLG_GROUP, nullptr);
 	pEditWnd->m_pRefFrm = this;
 
 	pEditWnd->ShowWindow(TRUE);
@@ -763,19 +763,19 @@ void CMainFrame::OnFileNewGroup()
 void CMainFrame::OnFileLoadGroup() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "N3FXGroup", NULL, dwFlags, "N3FXGroup File(*.n3fxgroup)|*.n3fxgroup||", NULL);
+	CFileDialog dlg(TRUE, "N3FXGroup", nullptr, dwFlags, "N3FXGroup File(*.n3fxgroup)|*.n3fxgroup||", nullptr);
 	
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	POSITION pos = dlg.GetStartPosition();
 
-	while(pos != NULL)
+	while(pos != nullptr)
 	{
 		CString PathName = dlg.GetNextPathName(pos);
 
 		//스크립트 에디트 창 만들고, 스크립트 정보들 읽고, 셋팅..
 		CDlgEditFxg* pEditWnd = new CDlgEditFxg;
-		pEditWnd->Create(IDD_DLG_GROUP, NULL);
+		pEditWnd->Create(IDD_DLG_GROUP, nullptr);
 		pEditWnd->m_pRefFrm = this;
 
 		// load 해서 성공하면 그대로 하고 실패하면 다 지워버려..

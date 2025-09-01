@@ -27,7 +27,7 @@ static char THIS_FILE[]=__FILE__;
 //////////////////////////////////////////////////////////////////////
 CGameProcCharacterCreate::CGameProcCharacterCreate()
 {
-	m_pUICharacterCreate = NULL;
+	m_pUICharacterCreate = nullptr;
 
 	s_pPlayer->m_InfoBase.eRace = RACE_UNKNOWN;
 	s_pPlayer->m_InfoBase.eClass = CLASS_UNKNOWN;
@@ -42,7 +42,7 @@ void CGameProcCharacterCreate::Release()
 {
 	CGameProcedure::Release();
 
-	delete m_pUICharacterCreate; m_pUICharacterCreate = NULL;
+	delete m_pUICharacterCreate; m_pUICharacterCreate = nullptr;
 
 	SetRect(&m_rcChr, 0, 0, 0, 0);
 	m_Tbl_InitValue.Release();
@@ -93,7 +93,7 @@ void CGameProcCharacterCreate::SetChr()
 	__InfoPlayerBase*	pInfoBase = &(s_pPlayer->m_InfoBase);
 
 	__TABLE_PLAYER_LOOKS* pLooks = s_pTbl_UPC_Looks.Find(s_pPlayer->m_InfoBase.eRace);	// User Player Character Skin 구조체 포인터..;
-	if(NULL == pLooks) return;
+	if(nullptr == pLooks) return;
 
 	s_pPlayer->InitChr(pLooks);
 	s_pPlayer->m_ChrInv.ScaleSet(1,1,1); // 스케일을 원래대로 돌린다.
@@ -104,7 +104,7 @@ void CGameProcCharacterCreate::SetChr()
 		{
 			if(i == PART_POS_FACE) { s_pPlayer->InitFace(); continue; }
 			if(i == PART_POS_HAIR_HELMET) { s_pPlayer->InitHair(); continue; }
-			s_pPlayer->PartSet((e_PartPosition)i, pLooks->szPartFNs[i], NULL, NULL);
+			s_pPlayer->PartSet((e_PartPosition)i, pLooks->szPartFNs[i], nullptr, nullptr);
 		}
 	}
 	
@@ -113,14 +113,14 @@ void CGameProcCharacterCreate::SetChr()
 	m_pUICharacterCreate->UpdateClassButtons(pInfoBase->eClass);
 
 	s_pPlayer->InventoryChrAnimationInitialize();
-	s_pPlayer->Action(PSA_BASIC, true, NULL, true);
+	s_pPlayer->Action(PSA_BASIC, true, nullptr, true);
 }
 
 void CGameProcCharacterCreate::SetStats()
 {
 	__InfoPlayerBase*	pInfoBase = &(s_pPlayer->m_InfoBase);
 	__InfoPlayerMySelf*	pInfoExt = &(s_pPlayer->m_InfoExt);
-	__TABLE_NEW_CHR* pTbl = NULL;
+	__TABLE_NEW_CHR* pTbl = nullptr;
 	// dwID of InitValue is a concatenation of the race and the class
 	uint32_t dwID = pInfoBase->eRace * 10000 + pInfoBase->eClass;
 	

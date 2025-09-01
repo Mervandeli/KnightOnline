@@ -29,8 +29,8 @@ protected:
 public:
 	__Vector3	Min() { return m_vMin; }
 	__Vector3	Max() { return m_vMax; }
-	bool		Pick(const __Matrix44& MtxWorld, const __Vector3& vPos, const __Vector3& vDir, __Vector3* pVCol = NULL, __Vector3* pVNormal = NULL);
-	bool		CheckCollision(const __Matrix44& MtxWorld, const __Vector3& v0, const __Vector3& v1, __Vector3* pVCol = NULL, __Vector3* pVNormal = NULL); // Local 좌표를 통한 충돌 체크 판정..
+	bool		Pick(const __Matrix44& MtxWorld, const __Vector3& vPos, const __Vector3& vDir, __Vector3* pVCol = nullptr, __Vector3* pVNormal = nullptr);
+	bool		CheckCollision(const __Matrix44& MtxWorld, const __Vector3& v0, const __Vector3& v1, __Vector3* pVCol = nullptr, __Vector3* pVNormal = nullptr); // Local 좌표를 통한 충돌 체크 판정..
 	float		Radius() { return m_fRadius; }
 	void		FindMinMax();
 	void		Render(D3DCOLOR crLine);

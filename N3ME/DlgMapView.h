@@ -16,7 +16,7 @@ class CDlgMapView : public CDialog
 {
 // Construction
 public:
-	CDlgMapView(CWnd* pParent = NULL);   // standard constructor
+	CDlgMapView(CWnd* pParent = nullptr);   // standard constructor
 
 	void UpData(void);
 	void ColorMapTemp(void);

@@ -17,17 +17,17 @@ CN3Skin::CN3Skin()
 {
 	m_dwType |= OBJ_SKIN;
 
-	m_pSkinVertices = NULL;
+	m_pSkinVertices = nullptr;
 }
 
 CN3Skin::~CN3Skin()
 {
-	delete [] m_pSkinVertices; m_pSkinVertices = NULL;
+	delete [] m_pSkinVertices; m_pSkinVertices = nullptr;
 }
 
 void CN3Skin::Release()
 {
-	delete [] m_pSkinVertices; m_pSkinVertices = NULL;
+	delete [] m_pSkinVertices; m_pSkinVertices = nullptr;
 
 	CN3IMesh::Release();
 }
@@ -39,9 +39,9 @@ bool CN3Skin::Load(HANDLE hFile)
 	DWORD dwRWC = 0;
 	for(int i = 0; i < m_nVC; i++)
 	{
-		ReadFile(hFile, &m_pSkinVertices[i], sizeof(__VertexSkinned), &dwRWC, NULL);
-		m_pSkinVertices[i].pnJoints = NULL;
-		m_pSkinVertices[i].pfWeights = NULL;
+		ReadFile(hFile, &m_pSkinVertices[i], sizeof(__VertexSkinned), &dwRWC, nullptr);
+		m_pSkinVertices[i].pnJoints = nullptr;
+		m_pSkinVertices[i].pfWeights = nullptr;
 		
 		int nAffect = m_pSkinVertices[i].nAffect;
 		if(nAffect > 1)
@@ -49,13 +49,13 @@ bool CN3Skin::Load(HANDLE hFile)
 			m_pSkinVertices[i].pnJoints = new int[nAffect];
 			m_pSkinVertices[i].pfWeights = new float[nAffect];
 
-			ReadFile(hFile, m_pSkinVertices[i].pnJoints, 4 * nAffect, &dwRWC, NULL);
-			ReadFile(hFile, m_pSkinVertices[i].pfWeights, 4 * nAffect, &dwRWC, NULL);
+			ReadFile(hFile, m_pSkinVertices[i].pnJoints, 4 * nAffect, &dwRWC, nullptr);
+			ReadFile(hFile, m_pSkinVertices[i].pfWeights, 4 * nAffect, &dwRWC, nullptr);
 		}
 		else if(nAffect == 1)
 		{
 			m_pSkinVertices[i].pnJoints = new int[1];
-			ReadFile(hFile, m_pSkinVertices[i].pnJoints, 4, &dwRWC, NULL);
+			ReadFile(hFile, m_pSkinVertices[i].pnJoints, 4, &dwRWC, nullptr);
 		}
 	}
 
@@ -70,16 +70,16 @@ bool CN3Skin::Save(HANDLE hFile)
 	DWORD dwRWC = 0;
 	for(int i = 0; i < m_nVC; i++)
 	{
-		WriteFile(hFile, &m_pSkinVertices[i], sizeof(__VertexSkinned), &dwRWC, NULL);
+		WriteFile(hFile, &m_pSkinVertices[i], sizeof(__VertexSkinned), &dwRWC, nullptr);
 		int nAffect = m_pSkinVertices[i].nAffect;
 		if(nAffect > 1)
 		{
-			WriteFile(hFile, m_pSkinVertices[i].pnJoints, 4 * nAffect, &dwRWC, NULL);
-			WriteFile(hFile, m_pSkinVertices[i].pfWeights, 4 * nAffect, &dwRWC, NULL);
+			WriteFile(hFile, m_pSkinVertices[i].pnJoints, 4 * nAffect, &dwRWC, nullptr);
+			WriteFile(hFile, m_pSkinVertices[i].pfWeights, 4 * nAffect, &dwRWC, nullptr);
 		}
 		else if(nAffect == 1)
 		{
-			WriteFile(hFile, m_pSkinVertices[i].pnJoints, 4, &dwRWC, NULL);
+			WriteFile(hFile, m_pSkinVertices[i].pnJoints, 4, &dwRWC, nullptr);
 		}
 	}
 
@@ -110,7 +110,7 @@ int CN3Skin::SortWeightsProc(const void *pArg1, const void *pArg2)
 
 void CN3Skin::RecalcWeight()
 {
-	if (NULL == m_pSkinVertices) return;
+	if (nullptr == m_pSkinVertices) return;
 	int i, j;
 	for (i=0; i<m_nVC; ++i)
 	{
@@ -133,7 +133,7 @@ bool CN3Skin::CheckCollisionPrecisely(const __Vector3 &vPos, const __Vector3 &vD
 	pVs	 = Vertices();
 	pwIs = VertexInices();
 
-	if(pVs == NULL || pwIs == NULL) return false;
+	if(pVs == nullptr || pwIs == nullptr) return false;
 
 	nFC = FaceCount();
 	for(int j = 0; j < nFC; j++) // 각각의 Face 마다 충돌체크..

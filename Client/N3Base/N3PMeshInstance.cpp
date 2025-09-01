@@ -19,56 +19,56 @@ static char THIS_FILE[]=__FILE__;
 // Each instance is tied to the original mesh that it represents.
 CN3PMeshInstance::CN3PMeshInstance()
 {
-	m_pPMesh = NULL;
-	m_pIndices = NULL;
+	m_pPMesh = nullptr;
+	m_pIndices = nullptr;
 	m_iNumVertices = 0;
 	m_iNumIndices  = 0;
-	m_pCollapseUpTo = NULL;
+	m_pCollapseUpTo = nullptr;
 }
 
 CN3PMeshInstance::CN3PMeshInstance(CN3PMesh *pN3PMesh)
 {
-	m_pPMesh = NULL;
+	m_pPMesh = nullptr;
 
-	m_pIndices = NULL;
+	m_pIndices = nullptr;
 	m_iNumVertices = 0;
 	m_iNumIndices  = 0;
-	m_pCollapseUpTo = NULL;
+	m_pCollapseUpTo = nullptr;
 
 	CN3PMeshInstance::Create(pN3PMesh);
 }
 
 CN3PMeshInstance::CN3PMeshInstance(const std::string& szFN)
 {
-	m_pPMesh = NULL;
+	m_pPMesh = nullptr;
 
-	m_pIndices = NULL;
+	m_pIndices = nullptr;
 	m_iNumVertices = 0;
 	m_iNumIndices  = 0;
-	m_pCollapseUpTo = NULL;
+	m_pCollapseUpTo = nullptr;
 
 	this->Create(szFN);
 }
 
 CN3PMeshInstance::~CN3PMeshInstance()
 {
-	delete [] m_pIndices; m_pIndices = NULL;
+	delete [] m_pIndices; m_pIndices = nullptr;
 	s_MngPMesh.Delete(&m_pPMesh);
 }
 
 void CN3PMeshInstance::Release()
 {
-	if (m_pIndices)	{ delete[] m_pIndices;m_pIndices = NULL;}
+	if (m_pIndices)	{ delete[] m_pIndices;m_pIndices = nullptr;}
 
 	s_MngPMesh.Delete(&m_pPMesh);
-	m_pCollapseUpTo = NULL;
+	m_pCollapseUpTo = nullptr;
 	m_iNumVertices = 0;
 	m_iNumIndices = 0;
 }
 
 bool CN3PMeshInstance::Create(CN3PMesh* pN3PMesh)
 {
-	if(pN3PMesh == NULL)
+	if(pN3PMesh == nullptr)
 	{
 		CN3PMeshInstance::Release();
 		return false;
@@ -82,7 +82,7 @@ bool CN3PMeshInstance::Create(CN3PMesh* pN3PMesh)
 	int iMaxNumIndices = m_pPMesh->GetMaxNumIndices();
 	if (iMaxNumIndices>0)
 	{
-		if(m_pIndices) delete [] m_pIndices; m_pIndices = NULL;
+		if(m_pIndices) delete [] m_pIndices; m_pIndices = nullptr;
 		m_pIndices = new uint16_t[m_pPMesh->m_iMaxNumIndices];
 		__ASSERT(m_pIndices, "Failed to create index buffer");
 		CopyMemory(m_pIndices, m_pPMesh->m_pIndices, m_pPMesh->m_iMaxNumIndices * sizeof(uint16_t));
@@ -109,7 +109,7 @@ bool CN3PMeshInstance::Create(const std::string& szFN)
 
 void CN3PMeshInstance::SetLODByNumVertices(int iNumVertices)
 {
-	if(m_pCollapseUpTo == NULL) return;
+	if(m_pCollapseUpTo == nullptr) return;
 
 	int iDiff = iNumVertices - m_iNumVertices;
 
@@ -145,7 +145,7 @@ void CN3PMeshInstance::SetLOD(float value)
 #define _USE_LODCONTROL_VALUE
 #ifdef _USE_LODCONTROL_VALUE
 	// value는 distance * FOV이다.
-	if (m_pPMesh == NULL ) return;
+	if (m_pPMesh == nullptr ) return;
 
 	if (m_pPMesh->m_iLODCtrlValueCount == 0)
 	{	// LODCtrlValue가 없으면 모두 그린다.
@@ -182,7 +182,7 @@ void CN3PMeshInstance::SetLOD(float value)
 	}
 #else
 	// value는 distance * FOV이다.
-	if (m_pCollapseUpTo == NULL || m_pPMesh == NULL) return;
+	if (m_pCollapseUpTo == nullptr || m_pPMesh == nullptr) return;
 
 	const int iLODCtrlValueCount = 5;
 	__PMLODCtrlValue LODCtrlValues[iLODCtrlValueCount];
@@ -249,7 +249,7 @@ bool CN3PMeshInstance::SplitOne()
 
 void CN3PMeshInstance::Render()
 {
-	if (m_pPMesh == NULL) return;
+	if (m_pPMesh == nullptr) return;
 	s_lpD3DDev->SetFVF(FVF_VNT1);
 
 	const int iPCToRender = 1000;	// primitive count to render
@@ -272,12 +272,12 @@ void CN3PMeshInstance::Render()
 
 void CN3PMeshInstance::RenderTwoUV()
 {
-	if(NULL == m_pPMesh) return;
-	if(NULL == m_pPMesh->GetVertices2())
+	if(nullptr == m_pPMesh) return;
+	if(nullptr == m_pPMesh->GetVertices2())
 	{
 		m_pPMesh->GenerateSecondUV(); // 두번째 UV 가 없음 새로 만든다..
 	}
-	if(NULL == m_pPMesh->GetVertices2()) return;
+	if(nullptr == m_pPMesh->GetVertices2()) return;
 	
 	s_lpD3DDev->SetFVF(FVF_VNT2);
 
@@ -301,7 +301,7 @@ void CN3PMeshInstance::RenderTwoUV()
 
 __VertexT1*	CN3PMeshInstance::GetVertices() const
 {
-	if (m_pPMesh == NULL) return NULL;
+	if (m_pPMesh == nullptr) return nullptr;
 	return m_pPMesh->m_pVertices;
 }
 
@@ -309,7 +309,7 @@ __VertexT1*	CN3PMeshInstance::GetVertices() const
 //
 void CN3PMeshInstance::PartialRender(int iCount, uint16_t* pIndices)
 {
-	if (m_pPMesh == NULL) return;
+	if (m_pPMesh == nullptr) return;
 	s_lpD3DDev->SetFVF(FVF_VNT1);
 	const int iPCToRender = 1000;	// primitive count to render
 

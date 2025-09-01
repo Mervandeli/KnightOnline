@@ -30,7 +30,7 @@ static char THIS_FILE[]=__FILE__;
 // CDlgSetDTex dialog
 
 
-CDlgSetDTex::CDlgSetDTex(CWnd* pParent /*=NULL*/)
+CDlgSetDTex::CDlgSetDTex(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgSetDTex::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgSetDTex)
@@ -38,8 +38,8 @@ CDlgSetDTex::CDlgSetDTex(CWnd* pParent /*=NULL*/)
 	m_TileSetName = _T("");
 	//}}AFX_DATA_INIT
 
-	m_pTex = NULL;
-	m_pTexVB = NULL;
+	m_pTex = nullptr;
+	m_pTexVB = nullptr;
 	m_fTexSurfaceSize = 512.0f;
 }
 
@@ -117,12 +117,12 @@ BOOL CDlgSetDTex::OnInitDialog()
 	}
 
 	CWnd* pView = GetDlgItem(IDC_TEXTUREVIEW);
-	pView->SetWindowPos(NULL, 0, 0, (int)m_fTexSurfaceSize, (int)m_fTexSurfaceSize, SWP_DRAWFRAME|SWP_NOMOVE);
+	pView->SetWindowPos(nullptr, 0, 0, (int)m_fTexSurfaceSize, (int)m_fTexSurfaceSize, SWP_DRAWFRAME|SWP_NOMOVE);
 
 	//	texture 그리는 버퍼..
 	pFrm->m_pEng->s_lpD3DDev->CreateVertexBuffer( 4*sizeof(__VertexTransformed), 0, FVF_TRANSFORMED, D3DPOOL_MANAGED, &m_pTexVB, nullptr );
 	
-	__VertexTransformed* pVertices = NULL;
+	__VertexTransformed* pVertices = nullptr;
 	m_pTexVB->Lock( 0, 0, (void**)&pVertices, 0 );
 	float DTexSize = (float)DTEX_SIZE;
 	pVertices[0].Set(0.0f,						0.0f,					0.1f, 0.5f, 0x00000000, 1.0f/DTexSize,		1.0f/DTexSize);
@@ -134,7 +134,7 @@ BOOL CDlgSetDTex::OnInitDialog()
 	//	Grid 그리는 버퍼..
 	pFrm->m_pEng->s_lpD3DDev->CreateVertexBuffer( ((NUM_DTEXTILE-1)<<2)*sizeof(__VertexTransformedColor), 0, FVF_TRANSFORMEDCOLOR, D3DPOOL_MANAGED, &m_pGridVB, nullptr );
 
-	__VertexTransformedColor* pVerticesC = NULL;
+	__VertexTransformedColor* pVerticesC = nullptr;
 	m_pGridVB->Lock(0,0, (void**)&pVerticesC, 0);
 
 	int GridInterval = (int)m_fTexSurfaceSize / NUM_DTEXTILE;
@@ -158,12 +158,12 @@ void CDlgSetDTex::OnDestroy()
 	if(m_pTexVB)
 	{
 		m_pTexVB->Release();
-		m_pTexVB = NULL;
+		m_pTexVB = nullptr;
 	}
 	if(m_pGridVB)
 	{
 		m_pGridVB->Release();
-		m_pGridVB = NULL;
+		m_pGridVB = nullptr;
 	}
 
 	CDialog::OnDestroy();
@@ -175,7 +175,7 @@ void CDlgSetDTex::RenderTex(LPDIRECT3DDEVICE9 lpDDev)
 	if(!m_pTexVB) return;
 	
 	HRESULT hr;	
-	LPDIRECT3DTEXTURE9 lpTex = NULL;
+	LPDIRECT3DTEXTURE9 lpTex = nullptr;
 	int CurrTex = m_FileList.GetCurSel();
 	if(CurrTex<0) return;
 
@@ -259,7 +259,7 @@ void CDlgSetDTex::OnSelchangeComboFilelist()
 void CDlgSetDTex::RenderGrid(LPDIRECT3DDEVICE9 lpDDev)
 {
 	HRESULT hr;
-	hr = lpDDev->SetTexture(0, NULL);
+	hr = lpDDev->SetTexture(0, nullptr);
 
 	DWORD ColorOp, ColorArg1;
 	hr = lpDDev->GetTextureStageState( 0, D3DTSS_COLOROP, &ColorOp);
@@ -574,7 +574,7 @@ void CDlgSetDTex::OnBtnDeldtex()
 	CDTexMng* pDTexMng = pFrm->GetDTexMng();
 	pDTexMng->DelDTexByID(DelDTexID);
 
-	m_FileList.SetItemDataPtr(index, NULL);
+	m_FileList.SetItemDataPtr(index, nullptr);
 	m_FileList.DeleteString(index);
 	if(index==count-1) m_FileList.SetCurSel(index-1);
 	else m_FileList.SetCurSel(index);

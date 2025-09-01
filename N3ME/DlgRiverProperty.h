@@ -16,7 +16,7 @@ class CDlgRiverProperty : public CDialog
 {
 // Construction
 public:
-	CDlgRiverProperty(CRiverMng* pRiverMng, CWnd* pParent = NULL);   // standard constructor
+	CDlgRiverProperty(CRiverMng* pRiverMng, CWnd* pParent = nullptr);   // standard constructor
 
 // Attributes
 public:

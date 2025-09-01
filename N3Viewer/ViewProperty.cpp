@@ -86,7 +86,7 @@ CN3ViewerDoc* CViewProperty::GetDocument() // non-debug version is inline
 
 void CViewProperty::UpdateInfo()
 {
-	if(m_LPTransform.GetSafeHwnd() == NULL) return;
+	if(m_LPTransform.GetSafeHwnd() == nullptr) return;
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3Base* pBase = GetDocument()->m_pSelectedObj;
@@ -99,10 +99,10 @@ void CViewProperty::UpdateInfo()
 	CWnd* pWnd = GetDlgItem(IDC_E_NAME);
 	pWnd->GetWindowRect(&rc);
 	this->ScreenToClient(&rc);
-	pWnd->SetWindowPos(NULL, 0, 0, nW, rc.Height(), SWP_NOMOVE | SWP_NOZORDER);
+	pWnd->SetWindowPos(nullptr, 0, 0, nW, rc.Height(), SWP_NOMOVE | SWP_NOZORDER);
 	nH = rc.Height();
 
-	if(pBase == NULL)
+	if(pBase == nullptr)
 	{
 		SetDlgItemText(IDC_E_NAME, "Not Selected...");
 		m_LPTransform.ShowWindow(SW_HIDE);
@@ -133,7 +133,7 @@ void CViewProperty::UpdateInfo()
 	{
 		nH = m_LPTransform.GetItemHeight(0) * m_LPTransform.GetCount() + 4;
 		m_LPTransform.ShowWindow(SW_SHOW);
-		m_LPTransform.SetWindowPos(NULL, pt.x, pt.y, nW, nH, SWP_NOZORDER);
+		m_LPTransform.SetWindowPos(nullptr, pt.x, pt.y, nW, nH, SWP_NOZORDER);
 		pt.y += nH + 3;
 
 		CN3Transform* pT = (CN3Transform*)pBase;
@@ -157,7 +157,7 @@ void CViewProperty::UpdateInfo()
 	{
 		nH = m_LPCamera.GetItemHeight(0) * m_LPCamera.GetCount() + 4;
 		m_LPCamera.ShowWindow(SW_SHOW);
-		m_LPCamera.SetWindowPos(NULL, pt.x, pt.y, nW, nH, SWP_NOZORDER);
+		m_LPCamera.SetWindowPos(nullptr, pt.x, pt.y, nW, nH, SWP_NOZORDER);
 		pt.y += nH + 3;
 
 		CN3Camera* pC = (CN3Camera*)pBase;
@@ -201,7 +201,7 @@ void CViewProperty::UpdateInfo()
 	{
 		nH = m_LPLight.GetItemHeight(0) * m_LPLight.GetCount() + 4;
 		m_LPLight.ShowWindow(SW_SHOW);
-		m_LPLight.SetWindowPos(NULL, pt.x, pt.y, nW, nH, SWP_NOZORDER);
+		m_LPLight.SetWindowPos(nullptr, pt.x, pt.y, nW, nH, SWP_NOZORDER);
 		pt.y += nH + 3;
 
 		CN3Light* pL = (CN3Light*)pBase;
@@ -241,19 +241,19 @@ void CViewProperty::UpdateInfo()
 		m_LPLight.ShowWindow(SW_HIDE);
 	}
 
-	__Material* pMtl = NULL;
+	__Material* pMtl = nullptr;
 
 	if(pBase->Type() & OBJ_SHAPE)
 	{
 		m_CBShapePart.GetWindowRect(&rc);
 		nH = rc.Height();
-		m_CBShapePart.SetWindowPos(NULL, pt.x, pt.y, nW, nH, SWP_NOZORDER);
+		m_CBShapePart.SetWindowPos(nullptr, pt.x, pt.y, nW, nH, SWP_NOZORDER);
 		m_CBShapePart.ShowWindow(SW_SHOW);
 		pt.y += nH + 3;
 
 		nH = m_LPShape.GetItemHeight(0) * m_LPShape.GetCount() + 4;
 		m_LPShape.ShowWindow(SW_SHOW);
-		m_LPShape.SetWindowPos(NULL, pt.x, pt.y, nW, nH, SWP_NOZORDER);
+		m_LPShape.SetWindowPos(nullptr, pt.x, pt.y, nW, nH, SWP_NOZORDER);
 		pt.y += nH + 3;
 
 		CN3Shape* pS = (CN3Shape*)pBase;
@@ -338,32 +338,32 @@ void CViewProperty::UpdateInfo()
 	{
 		nH = m_LPChr.GetItemHeight(0) * m_LPChr.GetCount() + 4;
 		m_LPChr.ShowWindow(SW_SHOW);
-		m_LPChr.SetWindowPos(NULL, pt.x, pt.y, nW, nH, SWP_NOZORDER);
+		m_LPChr.SetWindowPos(nullptr, pt.x, pt.y, nW, nH, SWP_NOZORDER);
 		pt.y += nH + 3;
 
 		m_CBChrPart.GetWindowRect(&rc);
-		m_CBChrPart.SetWindowPos(NULL, pt.x, pt.y, (nW/2) - 2, rc.Height(), SWP_NOZORDER);
+		m_CBChrPart.SetWindowPos(nullptr, pt.x, pt.y, (nW/2) - 2, rc.Height(), SWP_NOZORDER);
 		m_CBChrPart.ShowWindow(SW_SHOW);
 
 		m_CBChrLOD.GetWindowRect(&rc);
-		m_CBChrLOD.SetWindowPos(NULL, pt.x + (nW/2) + 2, pt.y, (nW/2) - 2, rc.Height(), SWP_NOZORDER);
+		m_CBChrLOD.SetWindowPos(nullptr, pt.x + (nW/2) + 2, pt.y, (nW/2) - 2, rc.Height(), SWP_NOZORDER);
 		m_CBChrLOD.ShowWindow(SW_SHOW);
 		pt.y += rc.Height() + 2;
 
 		nH = m_LPCPart.GetItemHeight(0) * m_LPCPart.GetCount() + 4;
 		m_LPCPart.ShowWindow(SW_SHOW);
-		m_LPCPart.SetWindowPos(NULL, pt.x, pt.y, nW, nH, SWP_NOZORDER);
+		m_LPCPart.SetWindowPos(nullptr, pt.x, pt.y, nW, nH, SWP_NOZORDER);
 		pt.y += nH + 3;
 
 		m_CBChrPlug.GetWindowRect(&rc);
 		nH = rc.Height();
-		m_CBChrPlug.SetWindowPos(NULL, pt.x, pt.y, nW, nH, SWP_NOZORDER);
+		m_CBChrPlug.SetWindowPos(nullptr, pt.x, pt.y, nW, nH, SWP_NOZORDER);
 		m_CBChrPlug.ShowWindow(SW_SHOW);
 		pt.y += nH + 3;
 
 		nH = m_LPCPlug.GetItemHeight(0) * m_LPCPlug.GetCount() + 4;
 		m_LPCPlug.ShowWindow(SW_SHOW);
-		m_LPCPlug.SetWindowPos(NULL, pt.x, pt.y, nW, nH, SWP_NOZORDER);
+		m_LPCPlug.SetWindowPos(nullptr, pt.x, pt.y, nW, nH, SWP_NOZORDER);
 		pt.y += nH + 3;
 
 		CN3Chr* pC = (CN3Chr*)pBase;
@@ -500,10 +500,10 @@ void CViewProperty::UpdateInfo()
 	{
 		nH = m_LPMaterial.GetItemHeight(0) * m_LPMaterial.GetCount() + 4;
 		m_LPMaterial.ShowWindow(SW_SHOW);
-		m_LPMaterial.SetWindowPos(NULL, pt.x, pt.y, nW, nH, SWP_NOZORDER);
+		m_LPMaterial.SetWindowPos(nullptr, pt.x, pt.y, nW, nH, SWP_NOZORDER);
 		pt.y += nH + 3;
 
-		CPropertyItem* pItem = NULL;
+		CPropertyItem* pItem = nullptr;
 
 		pItem = m_LPMaterial.GetPropItem("Render Flags");
 		if(pItem) pItem->m_curValue.Format("%d", pMtl->nRenderFlags);
@@ -547,7 +547,7 @@ BOOL CViewProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3Base* pBase = GetDocument()->m_pSelectedObj;
-	if(pBase != NULL)
+	if(pBase != nullptr)
 	{
 		if((void*)wParam == &m_LPTransform && (pBase->Type() & OBJ_TRANSFORM))
 		{
@@ -838,7 +838,7 @@ BOOL CViewProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 
 		if((void*)wParam == &m_LPMaterial)
 		{
-			__Material* pMtl = NULL;
+			__Material* pMtl = nullptr;
 			if(pBase->Type() & OBJ_SHAPE)
 			{
 				int nPart = m_CBShapePart.GetCurSel();
@@ -868,7 +868,7 @@ BOOL CViewProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		}
 	}
 
-	pFrm->GetView()->InvalidateRect(NULL, FALSE);
+	pFrm->GetView()->InvalidateRect(nullptr, FALSE);
 
 	return TRUE;	
 //	return CFormView::OnNotify(wParam, lParam, pResult);
@@ -1047,7 +1047,7 @@ void CViewProperty::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 void CViewProperty::OnSelchangeCbPartShape() 
 {
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetView()->InvalidateRect(NULL, FALSE);
+	pFrm->GetView()->InvalidateRect(nullptr, FALSE);
 
 	this->UpdateInfo();
 }

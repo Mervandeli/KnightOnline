@@ -17,7 +17,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgTexture dialog
 
 
-CDlgTexture::CDlgTexture(CWnd* pParent /*=NULL*/)
+CDlgTexture::CDlgTexture(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgTexture::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgTexture)
@@ -26,12 +26,12 @@ CDlgTexture::CDlgTexture(CWnd* pParent /*=NULL*/)
 	m_pTexViewer = new CTexViewer;
 	m_iImageTypeCount = 0;
 	ZeroMemory(m_szImageTypeNames, sizeof(char)*MAX_IMAGETYPE*_MAX_PATH);
-	m_hAccelTable = NULL;
+	m_hAccelTable = nullptr;
 }
 
 CDlgTexture::~CDlgTexture()
 {
-	if (m_pTexViewer) {delete m_pTexViewer; m_pTexViewer = NULL;}
+	if (m_pTexViewer) {delete m_pTexViewer; m_pTexViewer = nullptr;}
 }
 
 void CDlgTexture::DoDataExchange(CDataExchange* pDX)
@@ -69,7 +69,7 @@ int CDlgTexture::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 	
 	ASSERT(m_pTexViewer);
-	if (FALSE == m_pTexViewer->Create(NULL, "TexViewer", WS_CHILD|WS_VISIBLE, CRect(0,0,0,0), this, 1000)) return -1;
+	if (FALSE == m_pTexViewer->Create(nullptr, "TexViewer", WS_CHILD|WS_VISIBLE, CRect(0,0,0,0), this, 1000)) return -1;
 	
 	return 0;
 }
@@ -149,7 +149,7 @@ void CDlgTexture::SetTexture(LPCTSTR pszFileName)
 
 void CDlgTexture::OnRadioSelect() 
 {
-	if (NULL == m_pTexViewer) return;
+	if (nullptr == m_pTexViewer) return;
 	CTexViewer::eEDITMODE eEditMode = m_pTexViewer->SetEditMode(CTexViewer::EDITMODE_SELECT);
 	if (CTexViewer::EDITMODE_SELECT != eEditMode)
 	{	// 모드 바꾸기 실패
@@ -161,7 +161,7 @@ void CDlgTexture::OnRadioSelect()
 
 void CDlgTexture::OnRadioZoom() 
 {
-	if (NULL == m_pTexViewer) return;
+	if (nullptr == m_pTexViewer) return;
 	CTexViewer::eEDITMODE eEditMode = m_pTexViewer->SetEditMode(CTexViewer::EDITMODE_ZOOM);
 	if (CTexViewer::EDITMODE_ZOOM != eEditMode)
 	{	// 모드 바꾸기 실패
@@ -173,13 +173,13 @@ void CDlgTexture::OnRadioZoom()
 
 void CDlgTexture::OnDoubleclickedRadioZoom() 
 {
-	if (NULL == m_pTexViewer) return;
+	if (nullptr == m_pTexViewer) return;
 	if (m_pTexViewer) m_pTexViewer->Zoom(1.0f);
 }
 
 void CDlgTexture::OnRadioHand() 
 {
-	if (NULL == m_pTexViewer) return;
+	if (nullptr == m_pTexViewer) return;
 	CTexViewer::eEDITMODE eEditMode = m_pTexViewer->SetEditMode(CTexViewer::EDITMODE_HAND);
 	if (CTexViewer::EDITMODE_HAND != eEditMode)
 	{	// 모드 바꾸기 실패
@@ -191,9 +191,9 @@ void CDlgTexture::OnRadioHand()
 
 LRESULT	CDlgTexture::OnUpdateInfo(WPARAM wParam, LPARAM lParam)
 {
-	if (NULL == m_pTexViewer) return 0;
+	if (nullptr == m_pTexViewer) return 0;
 	CWnd* pStatic = GetDlgItem(IDC_STATIC_INFO);
-	if (NULL == pStatic) return 0;
+	if (nullptr == pStatic) return 0;
 
 	CPoint	ptImage = CPoint((short)HIWORD(lParam), (short)LOWORD(lParam) );
 	CRect	rcSelected = m_pTexViewer->GetSelectedRect();
@@ -224,7 +224,7 @@ void CDlgTexture::Resize()
 		const int iOffset = 3;
 		CRect rc, rcClient;
 		GetClientRect(&rcClient);
-		CWnd* pWnd = NULL;
+		CWnd* pWnd = nullptr;
 		pWnd = GetDlgItem(IDC_STATIC_INFO);
 		pWnd->GetWindowRect(&rc);
 
@@ -284,26 +284,26 @@ void CDlgTexture::Resize()
 
 BOOL CDlgTexture::GetSelectedUVRect(struct __FLOAT_RECT* pFRect) const
 {
-	if (NULL == m_pTexViewer) return FALSE;
+	if (nullptr == m_pTexViewer) return FALSE;
 	return m_pTexViewer->GetSelectedUVRect(pFRect);
 }
 
 void CDlgTexture::SetSelectedUVRect(const __FLOAT_RECT* pFRect)	// 현재 선택된 UV좌표 넣기
 {
-	if (NULL == m_pTexViewer) return;
+	if (nullptr == m_pTexViewer) return;
 	m_pTexViewer->SetSelectedUVRect(pFRect);
 }
 
 CRect CDlgTexture::GetSelectedRect() const
 {
-	if (NULL == m_pTexViewer) return CRect(-1,-1,-1,-1);
+	if (nullptr == m_pTexViewer) return CRect(-1,-1,-1,-1);
 	return m_pTexViewer->GetSelectedRect();
 }
 
 void CDlgTexture::SetImageTypes(int iCount, char** pszNames)
 {
 	ASSERT(0 == m_iImageTypeCount && iCount<=MAX_IMAGETYPE && m_pTexViewer);
-	if (0 > iCount || NULL == pszNames) return;
+	if (0 > iCount || nullptr == pszNames) return;
 	m_pTexViewer->SetImageTypeCount(iCount);
 	m_iImageTypeCount = iCount;
 

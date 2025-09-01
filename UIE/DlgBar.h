@@ -14,7 +14,7 @@ class CDlgBar : public CDialog
 {
 // Construction
 public:
-	CDlgBar(CWnd* pParent = NULL);   // standard constructor
+	CDlgBar(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgBar)

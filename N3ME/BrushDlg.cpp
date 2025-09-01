@@ -14,7 +14,7 @@ static char THIS_FILE[]=__FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // CBrushDlg dialog
-CBrushDlg::CBrushDlg(CWnd* pParent /*=NULL*/)
+CBrushDlg::CBrushDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CBrushDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CBrushDlg)
@@ -24,7 +24,7 @@ CBrushDlg::CBrushDlg(CWnd* pParent /*=NULL*/)
 	m_bFlat = FALSE;
 	m_rdoFlatMode = -1;
 	//}}AFX_DATA_INIT
-	m_pTerrain = NULL;
+	m_pTerrain = nullptr;
 }
 
 

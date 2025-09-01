@@ -150,7 +150,7 @@ typedef struct __SeedGroup
 	{
 		Obj_Id = 0;
 		Seed_Count = 0;
-		SeedGroup_Sub = NULL;
+		SeedGroup_Sub = nullptr;
 	}
 } SEEDGROUP, *LPSEEDGROUP;
 

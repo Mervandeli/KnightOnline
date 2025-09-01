@@ -15,7 +15,7 @@ class CDlgPMeshCreateOption : public CDialog
 {
 // Construction
 public:
-	CDlgPMeshCreateOption(CWnd* pParent = NULL);   // standard constructor
+	CDlgPMeshCreateOption(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgPMeshCreateOption)

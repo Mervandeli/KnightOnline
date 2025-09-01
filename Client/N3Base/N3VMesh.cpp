@@ -18,8 +18,8 @@ CN3VMesh::CN3VMesh()
 {
 	m_dwType |= OBJ_MESH_VECTOR3;
 	
-	m_pVertices = NULL; // 점 버퍼
-	m_pwIndices = NULL; // Index...
+	m_pVertices = nullptr; // 점 버퍼
+	m_pwIndices = nullptr; // Index...
 
 	m_nVC = 0;
 	m_nIC = 0;
@@ -33,17 +33,17 @@ CN3VMesh::~CN3VMesh()
 {
 	if(m_nVC > 32768) ::GlobalFree((HGLOBAL)(m_pVertices));
 	else delete [] m_pVertices;
-	delete [] m_pwIndices; m_pwIndices = NULL;
+	delete [] m_pwIndices; m_pwIndices = nullptr;
 }
 
 void CN3VMesh::Release()
 {
 	if(m_nVC > 32768) ::GlobalFree((HGLOBAL)(m_pVertices));
 	else delete [] m_pVertices;
-	m_pVertices = NULL;
+	m_pVertices = nullptr;
 	m_nVC = 0;
 
-	delete [] m_pwIndices; m_pwIndices = NULL;
+	delete [] m_pwIndices; m_pwIndices = nullptr;
 	m_nIC = 0;
 
 	m_vMin.Zero();
@@ -58,19 +58,19 @@ bool CN3VMesh::Load(HANDLE hFile)
 	DWORD dwRWC = 0;
 
 	int nVC;
-	ReadFile(hFile, &nVC, 4, &dwRWC, NULL); // 점갯수 읽기..
+	ReadFile(hFile, &nVC, 4, &dwRWC, nullptr); // 점갯수 읽기..
 	if(nVC > 0)
 	{
 		this->CreateVertices(nVC); // Vertex Buffer 생성 및 데이터 채우기
-		ReadFile(hFile, m_pVertices, nVC * sizeof(__Vector3), &dwRWC, NULL);
+		ReadFile(hFile, m_pVertices, nVC * sizeof(__Vector3), &dwRWC, nullptr);
 	}
 
 	int nIC;
-	ReadFile(hFile, &nIC, 4, &dwRWC, NULL); // Index Count..
+	ReadFile(hFile, &nIC, 4, &dwRWC, nullptr); // Index Count..
 	if(nIC > 0)
 	{
 		this->CreateIndex(nIC); // Vertex Buffer 생성 및 데이터 채우기
-		ReadFile(hFile, m_pwIndices, nIC * 2, &dwRWC, NULL);
+		ReadFile(hFile, m_pwIndices, nIC * 2, &dwRWC, nullptr);
 	}
 
 	this->FindMinMax(); // 최대 최소점과 중심점과 반지름을 계산해 준다..
@@ -85,16 +85,16 @@ bool CN3VMesh::Save(HANDLE hFile)
 
 	DWORD dwRWC = 0;
 
-	WriteFile(hFile, &m_nVC, 4, &dwRWC, NULL); // 점갯수 읽기..
+	WriteFile(hFile, &m_nVC, 4, &dwRWC, nullptr); // 점갯수 읽기..
 	if(m_nVC > 0) 
 	{
-		WriteFile(hFile, m_pVertices, m_nVC * sizeof(__Vector3), &dwRWC, NULL);
+		WriteFile(hFile, m_pVertices, m_nVC * sizeof(__Vector3), &dwRWC, nullptr);
 	}
 
-	WriteFile(hFile, &m_nIC, 4, &dwRWC, NULL); // Index Count..
+	WriteFile(hFile, &m_nIC, 4, &dwRWC, nullptr); // Index Count..
 	if(m_nIC > 0)
 	{
-		WriteFile(hFile, m_pwIndices, m_nIC * 2, &dwRWC, NULL); // Index Buffer 데이터 쓰기..
+		WriteFile(hFile, m_pwIndices, m_nIC * 2, &dwRWC, nullptr); // Index Buffer 데이터 쓰기..
 	}
 
 	return true;
@@ -108,7 +108,7 @@ void CN3VMesh::CreateVertices(int nVC)
 	if(m_nVC > 32768) ::GlobalFree((HGLOBAL)(m_pVertices));
 	else delete [] m_pVertices;
 
-	m_pVertices = NULL;
+	m_pVertices = nullptr;
 
 	if(nVC > 32768)
 	{
@@ -182,7 +182,7 @@ void CN3VMesh::Render(D3DCOLOR crLine)
 
 	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
-	s_lpD3DDev->SetTexture(0, NULL);
+	s_lpD3DDev->SetTexture(0, nullptr);
 	s_lpD3DDev->SetFVF(FVF_CV);
 
 	__VertexColor vTs[3];
@@ -249,7 +249,7 @@ bool CN3VMesh::CheckCollision(const __Matrix44& MtxWorld, const __Vector3& v0, c
 	static float fT, fU, fV, fDistTmp, fDistClosest;
 	fDistClosest = FLT_MAX;
 
-	D3DXMatrixInverse(&mtxWI, NULL, &MtxWorld); // World Matrix Inverse
+	D3DXMatrixInverse(&mtxWI, nullptr, &MtxWorld); // World Matrix Inverse
 	mtxWIRot = mtxWI;
 	mtxWIRot.PosSet(0,0,0);
 	mtxRot = MtxWorld;
@@ -313,7 +313,7 @@ bool CN3VMesh::Pick(const __Matrix44& MtxWorld, const __Vector3& vPos, const __V
 	if(m_nVC <= 0) return false;
 
 	static __Matrix44 mtxWI, mtxWIRot, mtxRot;
-	D3DXMatrixInverse(&mtxWI, NULL, &MtxWorld); // World Matrix Inverse
+	D3DXMatrixInverse(&mtxWI, nullptr, &MtxWorld); // World Matrix Inverse
 	mtxWIRot = mtxWI;
 	mtxWIRot.PosSet(0,0,0);
 	mtxRot = MtxWorld;
@@ -358,9 +358,9 @@ bool CN3VMesh::Pick(const __Matrix44& MtxWorld, const __Vector3& vPos, const __V
 #ifdef _N3TOOL
 bool CN3VMesh::Import(CN3IMesh *pIMesh)
 {
-	if(NULL == pIMesh) return false;
+	if(nullptr == pIMesh) return false;
 	__VertexT1* pvSrc = pIMesh->BuildVertexList();
-	if(NULL == pvSrc) return false;
+	if(nullptr == pvSrc) return false;
 
 	int nFC = pIMesh->FaceCount();
 	this->Release();
@@ -407,7 +407,7 @@ void CN3VMesh::PartialColRender(int iCount, int* piIndices)
 
 	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
-	s_lpD3DDev->SetTexture(0, NULL);
+	s_lpD3DDev->SetTexture(0, nullptr);
 	s_lpD3DDev->SetFVF(FVF_CV);
 
 	__VertexColor vTs[3];

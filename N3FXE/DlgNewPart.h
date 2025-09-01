@@ -14,7 +14,7 @@ class CDlgNewPart : public CDialog
 {
 // Construction
 public:
-	CDlgNewPart(CWnd* pParent = NULL);   // standard constructor
+	CDlgNewPart(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgNewPart)

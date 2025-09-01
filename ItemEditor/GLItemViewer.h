@@ -1,4 +1,4 @@
-#ifndef __GLITEMVIEWER_H_
+﻿#ifndef __GLITEMVIEWER_H_
 #define __GLITEMVIEWER_H_
 
 #include "defines.h"
@@ -43,7 +43,7 @@ public:
 	void RenderItem(ItemInfo* item, e_Race race);
 
 public:
-	GLItemViewer(int x, int y, int w, int h, const char* l = NULL);
+	GLItemViewer(int x, int y, int w, int h, const char* l = nullptr);
 };
 
 #endif

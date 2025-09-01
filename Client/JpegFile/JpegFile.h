@@ -65,7 +65,7 @@
    dataBuf=JpegFile::JpegFileToRGB(fileName,
 								&width,
 								&height);
-	if (dataBuf==NULL) {
+	if (dataBuf==nullptr) {
 		return;
 	}
 
@@ -96,7 +96,7 @@
 	// if you have a 1,4,8,15/16 or 32 bit DIB, you'll have to 
 	// do some work to get it into a 24-bit RGB state.
 
-	BYTE *tmp=NULL;
+	BYTE *tmp=nullptr;
 
 	// assume buf is a DWORD-aligned BGR buffer, vertically flipped
 	// as if read from a BMP file.
@@ -113,7 +113,7 @@
 	// reverse BGR
 	JpegFile::BGRFromRGB(tmp, widthPix, height);
 
-	if (tmp==NULL) {
+	if (tmp==nullptr) {
 		AfxMessageBox("~DWORD Memory Error");
 		return;
 	}

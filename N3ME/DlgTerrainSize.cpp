@@ -14,7 +14,7 @@ static char THIS_FILE[]=__FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgTerrainSize dialog
 
-CDlgTerrainSize::CDlgTerrainSize(CWnd* pParent /*=NULL*/)
+CDlgTerrainSize::CDlgTerrainSize(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgTerrainSize::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgTerrainSize)

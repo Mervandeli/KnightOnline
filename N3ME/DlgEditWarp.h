@@ -16,7 +16,7 @@ class CDlgEditWarp : public CDialog
 {
 // Construction
 public:
-	CDlgEditWarp(CWnd* pParent = NULL);   // standard constructor
+	CDlgEditWarp(CWnd* pParent = nullptr);   // standard constructor
 
 // variables...
 	CWarpMgr*	m_pRefWarpMgr;

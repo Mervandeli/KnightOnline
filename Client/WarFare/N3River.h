@@ -57,17 +57,17 @@ public:
 		CN3Texture			*m_pTexWave;
 
 		_RIVER_INFO() {
-			pVertices = NULL; pwIndex = NULL; pDiff = NULL;
-			m_pTexWave = NULL;
+			pVertices = nullptr; pwIndex = nullptr; pDiff = nullptr;
+			m_pTexWave = nullptr;
 		}
 		~_RIVER_INFO() {
 			if (pVertices)
-				delete[] pVertices, pVertices = NULL;
+				delete[] pVertices, pVertices = nullptr;
 			if (pwIndex)
-				delete[] pwIndex, pwIndex = NULL;
+				delete[] pwIndex, pwIndex = nullptr;
 			if (pDiff)
-				delete[] pDiff, pDiff = NULL;
-			m_pTexWave = NULL;
+				delete[] pDiff, pDiff = nullptr;
+			m_pTexWave = nullptr;
 		}
 	};
 

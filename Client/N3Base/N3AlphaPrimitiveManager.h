@@ -28,7 +28,7 @@ struct __AlphaPrimitive
 	int					nPrimitiveCount;	// PrimitiveCount
 	uint32_t				dwPrimitiveSize;	// Primitive Size .. stream 0 stride
 	BOOL				bUseVB;				// 버텍스 버퍼, 인덱스 버퍼를 사용할 것인가 아닌가
-	const void*			pwIndices;			// 만약 Index 기반이면... NULL 이 아닌것을 넣으면 된다.
+	const void*			pwIndices;			// 만약 Index 기반이면... nullptr 이 아닌것을 넣으면 된다.
 	int					nVertexCount;
 	const void*			pVertices;			// 삼각형.. 벡터 형이지만.. 강제 형변환을 통해 다양한 점형식이 들어오도록 써야 한다..
 	__Matrix44			MtxWorld;			// Matrix

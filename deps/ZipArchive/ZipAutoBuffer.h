@@ -48,7 +48,7 @@ public:
 	}
 	bool IsAllocated() const
 	{
-		return (m_pBuffer != NULL);
+		return (m_pBuffer != nullptr);
 	}
 	CZipAutoBuffer(DWORD iSize, bool bZeroMemory = false);
 	CZipAutoBuffer();

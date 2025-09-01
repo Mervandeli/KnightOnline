@@ -47,7 +47,7 @@ bool CN3UIArea::Load(HANDLE hFile)
 	// 추가사항이 있으면 이곳에 추가하기
 	DWORD dwNum;
 	int iAreaType;
-	ReadFile(hFile, &iAreaType, sizeof(int), &dwNum, NULL);	// click 영역
+	ReadFile(hFile, &iAreaType, sizeof(int), &dwNum, nullptr);	// click 영역
 	m_eAreaType = (eUI_AREA_TYPE)iAreaType;
 #endif
 	return true;
@@ -95,7 +95,7 @@ bool CN3UIArea::Save(HANDLE hFile)
 #ifndef _REPENT
 	DWORD dwNum;
 	int iAreaType = (int)m_eAreaType;
-	WriteFile(hFile, &iAreaType, sizeof(int), &dwNum, NULL);	// click 영역
+	WriteFile(hFile, &iAreaType, sizeof(int), &dwNum, nullptr);	// click 영역
 #endif
 	return true;
 }

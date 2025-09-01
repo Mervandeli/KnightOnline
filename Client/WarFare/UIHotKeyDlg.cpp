@@ -36,12 +36,12 @@ CUIHotKeyDlg::CUIHotKeyDlg()
 
 	for( int i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++ )
 		for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
-			m_pMyHotkey[i][j] = NULL;
+			m_pMyHotkey[i][j] = nullptr;
 
 	for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
 	{
-		m_pCountStr[j] = NULL;
-		m_pTooltipStr[j] = NULL;
+		m_pCountStr[j] = nullptr;
+		m_pTooltipStr[j] = nullptr;
 	}
 }
 
@@ -56,18 +56,18 @@ void CUIHotKeyDlg::Release()
 	{
 		for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
 		{
-			if ( m_pMyHotkey[i][j] != NULL )
+			if ( m_pMyHotkey[i][j] != nullptr )
 			{
 				delete m_pMyHotkey[i][j];
-				m_pMyHotkey[i][j] = NULL;
+				m_pMyHotkey[i][j] = nullptr;
 			}
 		}
 	}
 
 	for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
 	{
-		m_pCountStr[j] = NULL;
-		m_pTooltipStr[j] = NULL;
+		m_pCountStr[j] = nullptr;
+		m_pTooltipStr[j] = nullptr;
 	}
 
 	m_iCurPage		= 0;
@@ -83,18 +83,18 @@ void CUIHotKeyDlg::ReleaseItem()
 	{
 		for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
 		{
-			if ( m_pMyHotkey[i][j] != NULL )
+			if ( m_pMyHotkey[i][j] != nullptr )
 			{
 				if ( m_pMyHotkey[i][j]->pUIIcon )
 				{
 					RemoveChild(m_pMyHotkey[i][j]->pUIIcon);
 					m_pMyHotkey[i][j]->pUIIcon->Release();
 					delete m_pMyHotkey[i][j]->pUIIcon;
-					m_pMyHotkey[i][j]->pUIIcon = NULL;
+					m_pMyHotkey[i][j]->pUIIcon = nullptr;
 				}
 
 				delete m_pMyHotkey[i][j];
-				m_pMyHotkey[i][j] = NULL;
+				m_pMyHotkey[i][j] = nullptr;
 			}
 		}
 	}
@@ -112,10 +112,10 @@ uint32_t CUIHotKeyDlg::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POI
 	// 드래그 되는 아이콘 갱신..
 	if ( GetState() == UI_STATE_ICON_MOVING ) 
 	{
-		if(CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo)
+		if(CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo)
 		{
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
 		}
 	}
 
@@ -142,9 +142,9 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			spSkill = GetHighlightIconItem((CN3UIIcon* )pSender);
 
 			// Save Select Info..
-			CN3UIWndBase::m_sSkillSelectInfo.UIWnd = UIWND_HOTKEY;
-			CN3UIWndBase::m_sSkillSelectInfo.iOrder = GetAreaiOrder();
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = spSkill;
+			CN3UIWndBase::s_sSkillSelectInfo.UIWnd = UIWND_HOTKEY;
+			CN3UIWndBase::s_sSkillSelectInfo.iOrder = GetAreaiOrder();
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = spSkill;
 
 			// Calc Move Rect Offset..
 			if ( !CalcMoveOffset() )
@@ -154,8 +154,8 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		case UIMSG_ICON_DOWN:
 			if ( GetState()  == UI_STATE_ICON_MOVING )
 			{
-				CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
-				CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
+				CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
+				CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
 			}
 			break;
 
@@ -178,7 +178,7 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			if ( IsIn(ptCur.x, ptCur.y) )
 			{
 				int iOrder = GetAreaiOrder();
-				if ( CN3UIWndBase::m_sSkillSelectInfo.iOrder == iOrder )	// 실행..
+				if ( CN3UIWndBase::s_sSkillSelectInfo.iOrder == iOrder )	// 실행..
 				{
 					CN3UIArea* pArea;
 					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iOrder);
@@ -195,7 +195,7 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					if ( iOrder == -1 )
 					{
 						// 리소스 Free..
-						spSkill = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
+						spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 
 						// 매니저에서 제거..
 						RemoveChild(spSkill->pUIIcon);
@@ -203,11 +203,11 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 						// 리소스 제거..
 						spSkill->pUIIcon->Release();
 						delete spSkill->pUIIcon;
-						spSkill->pUIIcon = NULL;
+						spSkill->pUIIcon = nullptr;
 						delete spSkill;
-						spSkill = NULL;
-						m_pMyHotkey[m_iCurPage][CN3UIWndBase::m_sSkillSelectInfo.iOrder] = NULL;
-						if(m_iCurPage == m_iSelectPage && CN3UIWndBase::m_sSkillSelectInfo.iOrder == m_iSelectIndex)
+						spSkill = nullptr;
+						m_pMyHotkey[m_iCurPage][CN3UIWndBase::s_sSkillSelectInfo.iOrder] = nullptr;
+						if(m_iCurPage == m_iSelectPage && CN3UIWndBase::s_sSkillSelectInfo.iOrder == m_iSelectIndex)
 						{
 							m_iSelectPage	= -1;
 							m_iSelectIndex	= -1;
@@ -229,17 +229,17 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 							// 리소스 제거..
 							spSkill->pUIIcon->Release();
 							delete spSkill->pUIIcon;
-							spSkill->pUIIcon = NULL;
+							spSkill->pUIIcon = nullptr;
 							delete spSkill;
-							spSkill = NULL;
-							m_pMyHotkey[m_iCurPage][iOrder] = NULL;
+							spSkill = nullptr;
+							m_pMyHotkey[m_iCurPage][iOrder] = nullptr;
 						}
 
-						spSkill = m_pMyHotkey[m_iCurPage][CN3UIWndBase::m_sSkillSelectInfo.iOrder];
+						spSkill = m_pMyHotkey[m_iCurPage][CN3UIWndBase::s_sSkillSelectInfo.iOrder];
 						m_pMyHotkey[m_iCurPage][iOrder] = spSkill;
-						m_pMyHotkey[m_iCurPage][CN3UIWndBase::m_sSkillSelectInfo.iOrder] = NULL;
+						m_pMyHotkey[m_iCurPage][CN3UIWndBase::s_sSkillSelectInfo.iOrder] = nullptr;
 
-						if(m_iCurPage == m_iSelectPage && CN3UIWndBase::m_sSkillSelectInfo.iOrder == m_iSelectIndex)
+						if(m_iCurPage == m_iSelectPage && CN3UIWndBase::s_sSkillSelectInfo.iOrder == m_iSelectIndex)
 						{
 							m_iSelectPage	= -1;
 							m_iSelectIndex	= -1;
@@ -260,7 +260,7 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			else		// 삭제..
 			{
 				// 리소스 Free..
-				spSkill = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
+				spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 
 				// 매니저에서 제거..
 				RemoveChild(spSkill->pUIIcon);
@@ -268,12 +268,12 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				// 리소스 제거..
 				spSkill->pUIIcon->Release();
 				delete spSkill->pUIIcon;
-				spSkill->pUIIcon = NULL;
+				spSkill->pUIIcon = nullptr;
 				delete spSkill;
-				spSkill = NULL;
-				m_pMyHotkey[m_iCurPage][CN3UIWndBase::m_sSkillSelectInfo.iOrder] = NULL;
+				spSkill = nullptr;
+				m_pMyHotkey[m_iCurPage][CN3UIWndBase::s_sSkillSelectInfo.iOrder] = nullptr;
 
-				if(m_iCurPage == m_iSelectPage && CN3UIWndBase::m_sSkillSelectInfo.iOrder == m_iSelectIndex)
+				if(m_iCurPage == m_iSelectPage && CN3UIWndBase::s_sSkillSelectInfo.iOrder == m_iSelectIndex)
 				{
 					m_iSelectPage	= -1;
 					m_iSelectIndex	= -1;
@@ -281,7 +281,7 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 				CloseIconRegistry();
 			}
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = nullptr;
 			SetState(UI_STATE_COMMON_NONE);
 			break;
 
@@ -295,7 +295,7 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 void CUIHotKeyDlg::Render()
 {
 	bool bTooltipRender = false;
-	__IconItemSkill* pSkill = NULL;
+	__IconItemSkill* pSkill = nullptr;
 
 	if (!m_bVisible) return;	// 보이지 않으면 자식들을 render하지 않는다.
 	DisableTooltipDisplay();
@@ -304,13 +304,13 @@ void CUIHotKeyDlg::Render()
 	for(UIListReverseItor itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
-		if ( (GetState() == UI_STATE_ICON_MOVING) && (pChild->UIType() == UI_TYPE_ICON) && (CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo) &&
-			((CN3UIIcon *)pChild == CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon) )	continue;
+		if ( (GetState() == UI_STATE_ICON_MOVING) && (pChild->UIType() == UI_TYPE_ICON) && (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo) &&
+			((CN3UIIcon *)pChild == CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon) )	continue;
 			pChild->Render();
 	}
 
-	if ( (GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo) )
-		CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->Render();		
+	if ( (GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo) )
+		CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->Render();		
 
 	if(m_iCurPage == m_iSelectPage && m_pMyHotkey[m_iSelectPage][m_iSelectIndex])
 	{
@@ -349,9 +349,9 @@ void CUIHotKeyDlg::Render()
 
 	for(k = 0; k < MAX_SKILL_IN_HOTKEY; k++ )
 	{
-		if (m_pMyHotkey[m_iCurPage][k] != NULL) 
+		if (m_pMyHotkey[m_iCurPage][k] != nullptr) 
 		{
-			pArea = NULL;
+			pArea = nullptr;
 			pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, k);
 			if (pArea && pArea->IsIn(ptCur.x, ptCur.y)) 
 			{
@@ -434,7 +434,9 @@ void CUIHotKeyDlg::InitIconUpdate()
 			spSkill->pUIIcon->SetUIType(UI_TYPE_ICON);
 			spSkill->pUIIcon->SetStyle(UISTYLE_ICON_SKILL);
 
-			CN3UIArea* pArea = NULL;
+			SetHotKeyTooltip(spSkill);
+
+			CN3UIArea* pArea = nullptr;
 			pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, HD.column);
 			if ( pArea )
 			{
@@ -460,7 +462,7 @@ void CUIHotKeyDlg::UpdateDisableCheck()
 	{
 		for( j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
 		{
-			if ( m_pMyHotkey[i][j] != NULL )
+			if ( m_pMyHotkey[i][j] != nullptr )
 			{
 				bitMask = UISTYLE_ICON_SKILL;
 				if (!CGameProcedure::s_pProcMain->m_pMagicSkillMng->CheckValidSkillMagic(m_pMyHotkey[i][j]->pSkill))
@@ -483,7 +485,7 @@ void CUIHotKeyDlg::CloseIconRegistry()
 	{
 		for( j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
 		{
-			if ( m_pMyHotkey[i][j] != NULL )
+			if ( m_pMyHotkey[i][j] != nullptr )
 				iHCount++;
 		}
 	}
@@ -512,23 +514,23 @@ __IconItemSkill* CUIHotKeyDlg::GetHighlightIconItem(CN3UIIcon* pUIIcon)
 {
 	for( int k = 0; k < MAX_SKILL_IN_HOTKEY; k++ )
 	{
-		if ( (m_pMyHotkey[m_iCurPage][k] != NULL) && 
+		if ( (m_pMyHotkey[m_iCurPage][k] != nullptr) && 
 			(m_pMyHotkey[m_iCurPage][k]->pUIIcon == pUIIcon) )
 			return m_pMyHotkey[m_iCurPage][k];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void CUIHotKeyDlg::AllFactorClear()
 {
-	__IconItemSkill *spSkill = NULL;
+	__IconItemSkill *spSkill = nullptr;
 
 	for( int i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++ )
 	{
 		for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
 		{
-			if ( m_pMyHotkey[i][j] != NULL )
+			if ( m_pMyHotkey[i][j] != nullptr )
 			{
 				// 리소스 Free..
 				spSkill = m_pMyHotkey[i][j];
@@ -539,10 +541,10 @@ void CUIHotKeyDlg::AllFactorClear()
 				// 리소스 제거..
 				spSkill->pUIIcon->Release();
 				delete spSkill->pUIIcon;
-				spSkill->pUIIcon = NULL;
+				spSkill->pUIIcon = nullptr;
 				delete spSkill;
-				spSkill = NULL;
-				m_pMyHotkey[i][j] = NULL;
+				spSkill = nullptr;
+				m_pMyHotkey[i][j] = nullptr;
 			}
 		}
 	}
@@ -576,7 +578,7 @@ bool CUIHotKeyDlg::IsSelectedSkillInRealIconArea()
 			|| !pArea->IsIn(ptCur.x, ptCur.y))
 			continue;
 
-		if (m_sSkillSelectInfo.pSkillDoneInfo == nullptr)
+		if (s_sSkillSelectInfo.pSkillDoneInfo == nullptr)
 			return false;
 
 		SetReceiveSelectedSkill(i);
@@ -588,7 +590,7 @@ bool CUIHotKeyDlg::IsSelectedSkillInRealIconArea()
 
 bool CUIHotKeyDlg::GetEmptySlotIndex(int &iIndex)
 {
-	__IconItemSkill *spSkill = NULL;
+	__IconItemSkill *spSkill = nullptr;
 
 	for( int i = 0; i < MAX_SKILL_IN_HOTKEY; i++ )
 	{
@@ -604,9 +606,9 @@ bool CUIHotKeyDlg::GetEmptySlotIndex(int &iIndex)
 
 void CUIHotKeyDlg::SetReceiveSelectedSkill(int iIndex)
 {
-	__IconItemSkill *spSkill = NULL;
+	__IconItemSkill *spSkill = nullptr;
 
-	if (m_pMyHotkey[m_iCurPage][iIndex] != NULL)
+	if (m_pMyHotkey[m_iCurPage][iIndex] != nullptr)
 	{
 		// 리소스 Free..
 		spSkill = m_pMyHotkey[m_iCurPage][iIndex];
@@ -617,21 +619,23 @@ void CUIHotKeyDlg::SetReceiveSelectedSkill(int iIndex)
 		// 리소스 제거..
 		spSkill->pUIIcon->Release();
 		delete spSkill->pUIIcon;
-		spSkill->pUIIcon = NULL;
+		spSkill->pUIIcon = nullptr;
 		delete spSkill;
-		spSkill = NULL;
-		m_pMyHotkey[m_iCurPage][iIndex] = NULL;
+		spSkill = nullptr;
+		m_pMyHotkey[m_iCurPage][iIndex] = nullptr;
 	}
 
 	CN3UIArea* pArea;
 	pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iIndex);
 
 	// 그 다음에.. 그 자리에 
-	m_pMyHotkey[m_iCurPage][iIndex] = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
-	m_pMyHotkey[m_iCurPage][iIndex]->szIconFN = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->szIconFN;
+	m_pMyHotkey[m_iCurPage][iIndex] = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
+	m_pMyHotkey[m_iCurPage][iIndex]->szIconFN = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->szIconFN;
 	m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->SetRegion(pArea->GetRegion());
 	m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->SetMoveRect(pArea->GetRegion());
 	m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->SetParent(this);
+
+	SetHotKeyTooltip(m_pMyHotkey[m_iCurPage][iIndex]);
 }
 
 RECT CUIHotKeyDlg::GetSampleRect()
@@ -673,13 +677,13 @@ void CUIHotKeyDlg::SetHotKeyPage(int iPageNum)
 		if ( i != iPageNum )
 		{
 			for( j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
-				if ( m_pMyHotkey[i][j] != NULL )
+				if ( m_pMyHotkey[i][j] != nullptr )
 					m_pMyHotkey[i][j]->pUIIcon->SetVisible(false);
 		}
 		else
 		{
 			for( j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
-				if ( m_pMyHotkey[i][j] != NULL )
+				if ( m_pMyHotkey[i][j] != nullptr )
 					m_pMyHotkey[i][j]->pUIIcon->SetVisible(true);
 		}
 	}
@@ -732,7 +736,7 @@ void CUIHotKeyDlg::ClassChangeHotkeyFlush()
 	{
 		for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
 		{
-			if ( m_pMyHotkey[i][j] != NULL )
+			if ( m_pMyHotkey[i][j] != nullptr )
 			{
 				// 리소스 Free..
 				spSkill = m_pMyHotkey[i][j];
@@ -743,10 +747,10 @@ void CUIHotKeyDlg::ClassChangeHotkeyFlush()
 				// 리소스 제거..
 				spSkill->pUIIcon->Release();
 				delete spSkill->pUIIcon;
-				spSkill->pUIIcon = NULL;
+				spSkill->pUIIcon = nullptr;
 				delete spSkill;
-				spSkill = NULL;
-				m_pMyHotkey[i][j] = NULL;
+				spSkill = nullptr;
+				m_pMyHotkey[i][j] = nullptr;
 			}
 		}
 	}
@@ -755,14 +759,16 @@ void CUIHotKeyDlg::ClassChangeHotkeyFlush()
 CN3UIString* CUIHotKeyDlg::GetTooltipStrControl(int iIndex)
 {
 	std::string str = std::to_string(iIndex + 10);
-	CN3UIString* pStr = (CN3UIString*) GetChildByID(str);	 __ASSERT(pStr, "NULL UI Component!!");
+	CN3UIString* pStr = nullptr;
+	N3_VERIFY_UI_COMPONENT(pStr, GetChildByID<CN3UIString>(str));
 	return pStr;
 }
 
 CN3UIString* CUIHotKeyDlg::GetCountStrControl(int iIndex)
 {
 	std::string str = std::to_string(iIndex);
-	CN3UIString* pStr = (CN3UIString*) GetChildByID(str);	 __ASSERT(pStr, "NULL UI Component!!");
+	CN3UIString* pStr = nullptr;
+	N3_VERIFY_UI_COMPONENT(pStr, GetChildByID<CN3UIString>(str));
 	return pStr;
 }
 
@@ -815,7 +821,7 @@ int CUIHotKeyDlg::GetTooltipCurPageIndex(__IconItemSkill* pSkill)
 {
 	for( int k = 0; k < MAX_SKILL_IN_HOTKEY; k++ )
 	{
-		if ( (m_pMyHotkey[m_iCurPage][k] != NULL) && 
+		if ( (m_pMyHotkey[m_iCurPage][k] != nullptr) && 
 			(m_pMyHotkey[m_iCurPage][k] == pSkill) )
 			return k;
 	}
@@ -835,11 +841,11 @@ bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 {
 	bool bFound = false;
 	// 내가 가졌던 아이콘이 아니면..
-	if ( CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd != UIWND_INVENTORY )
+	if ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd != UIWND_INVENTORY )
 		return false;
 	else
 	{
-		CN3UIArea* pArea = NULL;
+		CN3UIArea* pArea = nullptr;
 
 		int iOrder;
 		for( int i = 0; i < ITEM_SLOT_COUNT; i++ )
@@ -869,16 +875,16 @@ bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 			// 리소스 제거..
 			spSkill->pUIIcon->Release();
 			delete spSkill->pUIIcon;
-			spSkill->pUIIcon = NULL;
+			spSkill->pUIIcon = nullptr;
 			delete spSkill;
-			spSkill = NULL;
-			m_pMyHotkey[m_iCurPage][iOrder] = NULL;
+			spSkill = nullptr;
+			m_pMyHotkey[m_iCurPage][iOrder] = nullptr;
 		}
 
-		spItem = CN3UIWndBase::m_sSelectedIconInfo.pItemSelect;
+		spItem = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect;
 
 		__TABLE_UPC_SKILL* pUSkill = CGameBase::s_pTbl_Skill.Find(spItem->pItemBasic->dwEffectID1);
-		if ( pUSkill == NULL ) return false;
+		if ( pUSkill == nullptr ) return false;
 		if ( pUSkill->dwID < UIITEM_TYPE_USABLE_ID_MIN) return false;
 
 		spSkill = new __IconItemSkill();
@@ -895,6 +901,8 @@ bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 		spSkill->pUIIcon->SetUVRect(0,0,1.0f, 1.0f);
 		spSkill->pUIIcon->SetUIType(UI_TYPE_ICON);
 		spSkill->pUIIcon->SetStyle(UISTYLE_ICON_SKILL);
+
+		SetHotKeyTooltip(spSkill);
 
 		uint32_t bitMask = UISTYLE_ICON_SKILL;
 		if (!CGameProcedure::s_pProcMain->m_pMagicSkillMng->CheckValidSkillMagic(spSkill->pSkill))
@@ -917,10 +925,10 @@ bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 
 bool CUIHotKeyDlg::SetReceiveSelectedItem(int iIndex)
 {
-	if (CN3UIWndBase::m_sSelectedIconInfo.UIWndSelect.UIWnd != UIWND_INVENTORY)
+	if (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd != UIWND_INVENTORY)
 		return false;
 
-	__IconItemSkill* spItem = CN3UIWndBase::m_sSelectedIconInfo.pItemSelect;
+	__IconItemSkill* spItem = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect;
 
 	__TABLE_UPC_SKILL* pUSkill = CGameBase::s_pTbl_Skill.Find(spItem->pItemBasic->dwEffectID1);
 	if (pUSkill == nullptr)
@@ -945,6 +953,8 @@ bool CUIHotKeyDlg::SetReceiveSelectedItem(int iIndex)
 	spSkill->pUIIcon->SetTex(spSkill->szIconFN);
 	spSkill->pUIIcon->SetUVRect(0, 0, 1.0f, 1.0f);
 	spSkill->pUIIcon->SetUIType(UI_TYPE_ICON);
+
+	SetHotKeyTooltip(spSkill);
 
 	uint32_t bitMask = UISTYLE_ICON_SKILL;
 	if (!CGameProcedure::s_pProcMain->m_pMagicSkillMng->CheckValidSkillMagic(spSkill->pSkill))
@@ -1154,3 +1164,15 @@ bool CUIHotKeyDlg::OnKeyPress(int iKey)
 	return CN3UIBase::OnKeyPress(iKey);
 }
 //this_ui_add_end
+
+void CUIHotKeyDlg::SetHotKeyTooltip(__IconItemSkill* spSkill)
+{
+	if (spSkill == nullptr
+		|| spSkill->pSkill == nullptr
+		|| spSkill->pUIIcon == nullptr)
+		return;
+
+	std::string szTooltip = fmt::format("[{}] {}", spSkill->pSkill->szName, spSkill->pSkill->szDesc);
+	spSkill->pUIIcon->SetTooltipText(szTooltip);
+	spSkill->pUIIcon->SetTooltipColor(D3DCOLOR_XRGB(0x80, 0x80, 0xFF));
+}

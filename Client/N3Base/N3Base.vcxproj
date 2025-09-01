@@ -49,7 +49,6 @@
     <ClInclude Include="LogWriter.h" />
     <ClInclude Include="My_3DStruct.h" />
     <ClInclude Include="N3AlphaPrimitiveManager.h" />
-    <ClInclude Include="N3AnimatedTexures.h" />
     <ClInclude Include="N3AnimControl.h" />
     <ClInclude Include="N3AnimKey.h" />
     <ClInclude Include="N3Base.h" />

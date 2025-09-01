@@ -17,7 +17,7 @@ static char THIS_FILE[]=__FILE__;
 CN3UIString::CN3UIString()
 {
 	m_eType = UI_TYPE_STRING;
-	m_pDFont = NULL;
+	m_pDFont = nullptr;
 
 	m_Color = 0xffffffff;
 	ZeroMemory(&m_ptDrawPos, sizeof(m_ptDrawPos));
@@ -28,7 +28,7 @@ CN3UIString::CN3UIString()
 
 CN3UIString::~CN3UIString()
 {
-	delete m_pDFont;	m_pDFont = NULL;
+	delete m_pDFont;	m_pDFont = nullptr;
 }
 
 void CN3UIString::Release()
@@ -36,7 +36,7 @@ void CN3UIString::Release()
 	CN3UIBase::Release();
 
 	m_szString = "";
-	delete m_pDFont;	m_pDFont = NULL;
+	delete m_pDFont;	m_pDFont = nullptr;
 	m_Color = 0xffffffff;
 
 	ZeroMemory(&m_ptDrawPos, sizeof(m_ptDrawPos));
@@ -59,7 +59,7 @@ void CN3UIString::Init(CN3UIBase* pParent)
 {
 	CN3UIBase::Init(pParent);
 
-	if(m_pDFont) delete m_pDFont; m_pDFont = NULL;
+	if(m_pDFont) delete m_pDFont; m_pDFont = nullptr;
 	m_pDFont = new CDFont("굴림", 16);	// default 로 굴림 16으로 설정
 	m_pDFont->InitDeviceObjects( CN3Base::s_lpD3DDev );
 	m_pDFont->RestoreDeviceObjects();
@@ -125,7 +125,7 @@ void CN3UIString::WordWrap()
 {
 	m_iLineCount = 0;
 
-	if (NULL == m_pDFont) return;
+	if (nullptr == m_pDFont) return;
 	int iStrLen = m_szString.size();
 
 	if (0 == iStrLen)
@@ -230,7 +230,7 @@ void CN3UIString::WordWrap()
 				}
 			}
 			// strDisplayString 에 iCount 만큼만 카피하기
-			szNewBuff = m_szString.substr(0, iCount);	// +1은 맨 마지막에 NULL 넣기 위해
+			szNewBuff = m_szString.substr(0, iCount);	// +1은 맨 마지막에 nullptr 넣기 위해
 			m_iLineCount = 1;
 		}
 		m_pDFont->SetText(szNewBuff);
@@ -364,15 +364,15 @@ bool CN3UIString::Load(HANDLE hFile)
 	DWORD dwNum;
 	// font 정보
 	int iStrLen = 0;
-	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, NULL);			// font 이름 길이 
+	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이 
 	if (iStrLen>0)
 	{
 		std::string szFontName(iStrLen, '?');
-		ReadFile(hFile, &(szFontName[0]), iStrLen, &dwNum, NULL);				// string
+		ReadFile(hFile, &(szFontName[0]), iStrLen, &dwNum, nullptr);				// string
 
 		uint32_t dwFontFlags = 0, dwFontHeight = 0;
-		ReadFile(hFile, &dwFontHeight, sizeof(dwFontHeight), &dwNum, NULL);	// font height
-		ReadFile(hFile, &dwFontFlags, sizeof(dwFontFlags), &dwNum, NULL);	// font flag (bold, italic)
+		ReadFile(hFile, &dwFontHeight, sizeof(dwFontHeight), &dwNum, nullptr);	// font height
+		ReadFile(hFile, &dwFontFlags, sizeof(dwFontFlags), &dwNum, nullptr);	// font flag (bold, italic)
 
 		SetFont(szFontName, dwFontHeight, dwFontFlags & D3DFONT_BOLD, dwFontFlags & D3DFONT_ITALIC);	// 글꼴 지정
 	}
@@ -387,12 +387,12 @@ bool CN3UIString::Load(HANDLE hFile)
 #endif
 
 	// string
-	ReadFile(hFile, &m_Color, sizeof(m_Color), &dwNum, NULL);			// 글자 색
-	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, NULL);			// string 길이 
+	ReadFile(hFile, &m_Color, sizeof(m_Color), &dwNum, nullptr);			// 글자 색
+	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// string 길이 
 	if (iStrLen>0)
 	{
 		std::string szString(iStrLen, '?');
-		ReadFile(hFile, &(szString[0]), iStrLen, &dwNum, NULL);				// string
+		ReadFile(hFile, &(szString[0]), iStrLen, &dwNum, nullptr);				// string
 		SetString(szString);
 	}
 
@@ -424,33 +424,33 @@ bool CN3UIString::Save(HANDLE hFile)
 	if (false == CN3UIBase::Save(hFile)) return false;
 	DWORD dwNum;
 	// font 정보
-	char* pszFontName = NULL;
+	char* pszFontName = nullptr;
 	__ASSERT(m_pDFont, "no font");
 	const std::string strFontName(m_pDFont->GetFontName());
 	int iStrLen = strFontName.size();
 	__ASSERT(iStrLen>0, "No font name");
-	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, NULL);			// font 이름 길이 
+	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이 
 	if (iStrLen>0)
 	{
-		WriteFile(hFile, strFontName.c_str(), iStrLen, &dwNum, NULL);				// string
+		WriteFile(hFile, strFontName.c_str(), iStrLen, &dwNum, nullptr);				// string
 		uint32_t dwFontFlags = 0, dwFontHeight = 0;
 		if (m_pDFont)
 		{
 			dwFontHeight = m_pDFont->GetFontHeight();
 			dwFontFlags = m_pDFont->GetFontFlags();
 		}
-		WriteFile(hFile, &dwFontHeight, sizeof(dwFontHeight), &dwNum, NULL);	// font height
-		WriteFile(hFile, &dwFontFlags, sizeof(dwFontFlags), &dwNum, NULL);	// font flag (bold, italic)
+		WriteFile(hFile, &dwFontHeight, sizeof(dwFontHeight), &dwNum, nullptr);	// font height
+		WriteFile(hFile, &dwFontFlags, sizeof(dwFontFlags), &dwNum, nullptr);	// font flag (bold, italic)
 	}
 
 	// string
-	WriteFile(hFile, &m_Color, sizeof(m_Color), &dwNum, NULL);			// 글자 색
+	WriteFile(hFile, &m_Color, sizeof(m_Color), &dwNum, nullptr);			// 글자 색
 	iStrLen = 0;
 	iStrLen = m_szString.size();
-	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, NULL);			// string 길이 
+	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// string 길이 
 	if (iStrLen>0)
 	{
-		WriteFile(hFile, m_szString.c_str(), iStrLen, &dwNum, NULL);				// string
+		WriteFile(hFile, m_szString.c_str(), iStrLen, &dwNum, nullptr);				// string
 	}
 
 	if (m_iFileFormatVersion >= N3FORMAT_VER_1264)
@@ -473,7 +473,7 @@ void CN3UIString::ChangeFont(const std::string& szFont)
 }
 #endif
 
-int CN3UIString::GetStringRealWidth(int iNum)
+int CN3UIString::GetStringRealWidth(int iNum) const
 {
 	SIZE size;
 	BOOL bFlag = m_pDFont->GetTextExtent("가", lstrlen("가"), &size);
@@ -484,12 +484,32 @@ int CN3UIString::GetStringRealWidth(int iNum)
 	return (size.cx*iNum) / 2;
 }
 
-int CN3UIString::GetStringRealWidth(std::string& szText)
+int	CN3UIString::GetStringRealWidth(const std::string& szText) const
 {
-	SIZE size;
-	BOOL bFlag = m_pDFont->GetTextExtent(szText, szText.length(), &size);
-	__ASSERT(bFlag, "cannot get size of dfont");
-	return size.cx;
+	if (szText.empty())
+		return 0;
+
+	int iRealWidth = 0;
+	for (size_t i = 0; i < szText.size();)
+	{
+		char c = szText[i];
+
+		SIZE size = { 0, 0 };
+		if (c & 0x80)
+		{
+			m_pDFont->GetTextExtent(&szText[i], 2, &size);
+			i += 2;
+		}
+		else
+		{
+			m_pDFont->GetTextExtent(&szText[i], 1, &size);
+			i += 1;
+		}
+
+		iRealWidth += size.cx;
+	}
+
+	return iRealWidth;
 }
 
 void CN3UIString::SetStyle(uint32_t dwType, uint32_t dwStyleEx)

@@ -19,10 +19,10 @@ CN3UIImage::CN3UIImage()
 {
 	m_eType = UI_TYPE_IMAGE;
 
-	m_pVB = NULL;
-	m_pTexRef = NULL;
+	m_pVB = nullptr;
+	m_pTexRef = nullptr;
 	m_szTexFN = "";
-	m_pAnimImagesRef = NULL;
+	m_pAnimImagesRef = nullptr;
 
 	ZeroMemory(&m_frcUVRect, sizeof(m_frcUVRect));
 	m_Color = D3DCOLOR_ARGB(0xff,0xff,0xff,0xff);
@@ -33,15 +33,15 @@ CN3UIImage::CN3UIImage()
 
 CN3UIImage::~CN3UIImage()
 {
-	if(m_pVB) {	m_pVB->Release();	m_pVB = NULL;}
+	if(m_pVB) {	m_pVB->Release();	m_pVB = nullptr;}
 	s_MngTex.Delete(&m_pTexRef);
-	if (m_pAnimImagesRef) {delete [] m_pAnimImagesRef; m_pAnimImagesRef = NULL;}
+	if (m_pAnimImagesRef) {delete [] m_pAnimImagesRef; m_pAnimImagesRef = nullptr;}
 }
 
 void CN3UIImage::Release()
 {
 	CN3UIBase::Release();
-	if(m_pVB) {	m_pVB->Release();	m_pVB = NULL;}
+	if(m_pVB) {	m_pVB->Release();	m_pVB = nullptr;}
 	s_MngTex.Delete(&m_pTexRef);
 	m_szTexFN = "";
 
@@ -50,7 +50,7 @@ void CN3UIImage::Release()
 	m_fAnimFrame = 30.0f;
 	m_iAnimCount = 0;
 	m_fCurAnimFrame = 0.0f;
-	if (m_pAnimImagesRef) {delete [] m_pAnimImagesRef; m_pAnimImagesRef = NULL;}
+	if (m_pAnimImagesRef) {delete [] m_pAnimImagesRef; m_pAnimImagesRef = nullptr;}
 }
 
 void CN3UIImage::Init(CN3UIBase* pParent)
@@ -62,8 +62,8 @@ void CN3UIImage::Init(CN3UIBase* pParent)
 bool CN3UIImage::CreateVB()
 {
 	HRESULT hr;
-	if (m_pVB) {m_pVB->Release(); m_pVB = NULL;}
-	hr = s_lpD3DDev->CreateVertexBuffer( 4*sizeof(__VertexTransformed), 0, FVF_TRANSFORMED, D3DPOOL_MANAGED, &m_pVB , NULL);
+	if (m_pVB) {m_pVB->Release(); m_pVB = nullptr;}
+	hr = s_lpD3DDev->CreateVertexBuffer( 4*sizeof(__VertexTransformed), 0, FVF_TRANSFORMED, D3DPOOL_MANAGED, &m_pVB , nullptr);
 	return SUCCEEDED(hr);
 }
 
@@ -71,7 +71,7 @@ void CN3UIImage::SetVB()
 {
 	if (UISTYLE_IMAGE_ANIMATE & m_dwStyle)	// animate image이면 vertex buffer release하기
 	{
-		if (m_pVB) {m_pVB->Release(); m_pVB = NULL;}
+		if (m_pVB) {m_pVB->Release(); m_pVB = nullptr;}
 	}
 	else
 	{
@@ -170,7 +170,7 @@ void CN3UIImage::RenderIconWrapper()
 	{
 		s_lpD3DDev->SetStreamSource( 0, m_pVB, 0, sizeof(__VertexTransformed) );
 		s_lpD3DDev->SetFVF(FVF_TRANSFORMED);
-		s_lpD3DDev->SetTexture( 0, NULL);
+		s_lpD3DDev->SetTexture( 0, nullptr);
 
 		s_lpD3DDev->DrawPrimitive( D3DPT_TRIANGLEFAN, 0, 2);
 	}
@@ -202,19 +202,19 @@ bool CN3UIImage::Load(HANDLE hFile)
 	if (false == CN3UIBase::Load(hFile)) return false;
 	DWORD dwNum;
 	// texture 정보
-	__ASSERT(NULL == m_pTexRef, "load 하기 전에 초기화가 되지 않았습니다.");
+	__ASSERT(nullptr == m_pTexRef, "load 하기 전에 초기화가 되지 않았습니다.");
 	int	iStrLen = 0;
-	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, NULL);			// 파일 이름 길이
+	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// 파일 이름 길이
 	char szFName[MAX_PATH] = "";
 	if (iStrLen>0)
 	{
-		ReadFile(hFile, szFName, iStrLen, &dwNum, NULL);		// 파일 이름
+		ReadFile(hFile, szFName, iStrLen, &dwNum, nullptr);		// 파일 이름
 		szFName[iStrLen]='\0';
 		this->SetTex(szFName);
 	} 
 
-	ReadFile(hFile, &m_frcUVRect, sizeof(m_frcUVRect), &dwNum, NULL);	// uv좌표
-	ReadFile(hFile, &m_fAnimFrame, sizeof(m_fAnimFrame), &dwNum, NULL);
+	ReadFile(hFile, &m_frcUVRect, sizeof(m_frcUVRect), &dwNum, nullptr);	// uv좌표
+	ReadFile(hFile, &m_fAnimFrame, sizeof(m_fAnimFrame), &dwNum, nullptr);
 
 	// Animate 되는 image이면 관련된 변수 세팅
 	m_iAnimCount = 0; // animate image 수 정하기
@@ -281,11 +281,11 @@ bool CN3UIImage::Save(HANDLE hFile)
 	// texture 정보
 	if (m_pTexRef) m_szTexFN = m_pTexRef->FileName();
 	int iStrLen = m_szTexFN.size();
-	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, NULL);			// 파일 길이
-	if (iStrLen>0)	WriteFile(hFile, m_szTexFN.c_str(), iStrLen, &dwNum, NULL);	// 파일 이름
+	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// 파일 길이
+	if (iStrLen>0)	WriteFile(hFile, m_szTexFN.c_str(), iStrLen, &dwNum, nullptr);	// 파일 이름
 
-	WriteFile(hFile, &m_frcUVRect, sizeof(m_frcUVRect), &dwNum, NULL);		// uv좌표
-	WriteFile(hFile, &m_fAnimFrame, sizeof(m_fAnimFrame), &dwNum, NULL);	// Animate frame
+	WriteFile(hFile, &m_frcUVRect, sizeof(m_frcUVRect), &dwNum, nullptr);		// uv좌표
+	WriteFile(hFile, &m_fAnimFrame, sizeof(m_fAnimFrame), &dwNum, nullptr);	// Animate frame
 
 	return true;
 }
@@ -334,12 +334,12 @@ void CN3UIImage::ReorderChildImage()
 	int i;
 	for (i=0; i<m_iAnimCount; ++i)
 	{
-		CN3UIBase* pSelChild = NULL;
+		CN3UIBase* pSelChild = nullptr;
 		for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 		{
 			CN3UIBase* pChild = (*itor);
 			__ASSERT(UI_TYPE_IMAGE == pChild->UIType(), "image가 아닌 child가 있습니다.");
-			if (NULL == pSelChild) pSelChild = pChild;
+			if (nullptr == pSelChild) pSelChild = pChild;
 			else if (pSelChild->GetReserved() > pChild->GetReserved()) pSelChild = pChild;
 		}
 		__ASSERT(pSelChild,"제일 작은 m_dwReserved를 가진 child가 없다.");
@@ -355,7 +355,7 @@ void CN3UIImage::ReorderChildImage()
 CN3UIImage* CN3UIImage::GetChildImage(int iIndex)
 {
 	if (iIndex>=0 && iIndex < m_iAnimCount)	return m_pAnimImagesRef[iIndex];
-	return NULL;
+	return nullptr;
 }
 
 void CN3UIImage::SetAnimImage(int iAnimCount)
@@ -366,9 +366,9 @@ void CN3UIImage::SetAnimImage(int iAnimCount)
 	{
 		for (i=0; i<m_iAnimCount; ++i)
 		{	// 자식 지우기
-			if (m_pAnimImagesRef[i]) {delete m_pAnimImagesRef[i]; m_pAnimImagesRef[i] = NULL;}
+			if (m_pAnimImagesRef[i]) {delete m_pAnimImagesRef[i]; m_pAnimImagesRef[i] = nullptr;}
 		}
-		delete [] m_pAnimImagesRef; m_pAnimImagesRef = NULL;
+		delete [] m_pAnimImagesRef; m_pAnimImagesRef = nullptr;
 	}
 	m_iAnimCount = iAnimCount;
 
@@ -405,9 +405,9 @@ bool CN3UIImage::ReplaceAllTextures(const std::string& strFind, const std::strin
 		char szFindDir[_MAX_DIR], szFindFName[_MAX_FNAME], szFindExt[_MAX_EXT];
 		char szReplaceDir[_MAX_DIR], szReplaceFName[_MAX_FNAME], szReplaceExt[_MAX_EXT];
 		char szTexDir[_MAX_DIR], szTexFName[_MAX_FNAME], szTexExt[_MAX_EXT];
-		_splitpath(strFind.c_str(), NULL, szFindDir, szFindFName, szFindExt);
-		_splitpath(strReplace.c_str(), NULL, szReplaceDir, szReplaceFName, szReplaceExt);
-		_splitpath(m_pTexRef->FileName().c_str(), NULL, szTexDir, szTexFName, szTexExt);
+		_splitpath(strFind.c_str(), nullptr, szFindDir, szFindFName, szFindExt);
+		_splitpath(strReplace.c_str(), nullptr, szReplaceDir, szReplaceFName, szReplaceExt);
+		_splitpath(m_pTexRef->FileName().c_str(), nullptr, szTexDir, szTexFName, szTexExt);
 
 		if (lstrlen(szFindFName) == 0 || lstrlen(szFindExt) == 0 ||
 			lstrlen(szReplaceFName) == 0 || lstrlen(szReplaceExt) == 0) return false;

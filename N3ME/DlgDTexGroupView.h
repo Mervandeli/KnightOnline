@@ -29,7 +29,7 @@ public:
 	void AddGroup(CDTexGroup* pGroup);
 	void ResetAll();
 
-	CDlgDTexGroupView(CWnd* pParent = NULL);   // standard constructor
+	CDlgDTexGroupView(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgDTexGroupView)

@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgLoadNPCPath dialog
 
 
-CDlgLoadNPCPath::CDlgLoadNPCPath(CWnd* pParent /*=NULL*/)
+CDlgLoadNPCPath::CDlgLoadNPCPath(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgLoadNPCPath::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgLoadNPCPath)
@@ -64,11 +64,11 @@ BOOL CDlgLoadNPCPath::OnInitDialog()
 
 	char szDrive[_MAX_DRIVE], szDir[_MAX_DIR];
 	char szModuleFilePath[_MAX_PATH];
-	GetModuleFileName(NULL, szModuleFilePath, _MAX_PATH);
+	GetModuleFileName(nullptr, szModuleFilePath, _MAX_PATH);
 
 	char szNewPath[_MAX_PATH];
-	_splitpath(szModuleFilePath, szDrive, szDir, NULL, NULL);
-	_makepath(szNewPath, szDrive, szDir, NULL, NULL);
+	_splitpath(szModuleFilePath, szDrive, szDir, nullptr, nullptr);
+	_makepath(szNewPath, szDrive, szDir, nullptr, nullptr);
 	SetCurrentDirectory(szNewPath);
 	m_NPCPathFileList.Dir(DDL_READONLY, "NPCPath\\*.npi");
 
@@ -81,7 +81,7 @@ BOOL CDlgLoadNPCPath::OnInitDialog()
 
 		char szFileName[MAX_PATH];
 		char szExt[_MAX_EXT];
-		_splitpath((LPCTSTR)str, NULL, NULL, szFileName, szExt);
+		_splitpath((LPCTSTR)str, nullptr, nullptr, szFileName, szExt);
 
 		//str.Format("%s%s",szFileName,szExt);
 		str.Format("%s",szFileName);

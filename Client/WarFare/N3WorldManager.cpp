@@ -29,7 +29,7 @@ static char THIS_FILE[]=__FILE__;
 
 CN3WorldManager::CN3WorldManager()
 {
-	m_pActiveWorld = NULL;
+	m_pActiveWorld = nullptr;
 	m_bIndoor = true;
 }
 
@@ -37,7 +37,7 @@ CN3WorldManager::~CN3WorldManager()
 {
 	if (m_pActiveWorld)
 		delete m_pActiveWorld;
-	m_pActiveWorld = NULL;
+	m_pActiveWorld = nullptr;
 }
 
 void CN3WorldManager::InitWorld(int iZoneID, const __Vector3& vPosPlayer)

@@ -22,8 +22,8 @@ CN3TransformCollision::CN3TransformCollision()
 	m_vMin.Set(0,0,0);
 	m_vMax.Set(0,0,0);
 
-	m_pMeshCollision = NULL;
-	m_pMeshClimb = NULL;
+	m_pMeshCollision = nullptr;
+	m_pMeshClimb = nullptr;
 }
 
 CN3TransformCollision::~CN3TransformCollision()
@@ -52,17 +52,17 @@ bool CN3TransformCollision::Load(HANDLE hFile)
 	char szFN[512] = "";
 
 	DWORD dwRWC;
-	ReadFile(hFile, &nL, 4, &dwRWC, NULL); // Mesh FileName
+	ReadFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
 	if(nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL; // 메시 파일 이름..
+		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 메시 파일 이름..
 		m_pMeshCollision = s_MngVMesh.Get(szFN);
 	}
 
-	ReadFile(hFile, &nL, 4, &dwRWC, NULL); // Mesh FileName
+	ReadFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
 	if(nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, NULL); szFN[nL] = NULL; // 메시 파일 이름..
+		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 메시 파일 이름..
 		m_pMeshClimb = s_MngVMesh.Get(szFN);
 	}
 	return true;
@@ -77,7 +77,7 @@ bool CN3TransformCollision::Save(HANDLE hFile)
 
 	int nL = 0;
 	if(m_pMeshCollision) nL = m_pMeshCollision->FileName().size();
-	WriteFile(hFile, &nL, 4, &dwRWC, NULL); // Mesh FileName
+	WriteFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
 	if(nL > 0) 
 	{
 		if(m_pMeshCollision->FileName().find("object\\") < 0) // 임시로 경로를 바꾸려고 넣었다.. 나중에 필요없음 지운다..
@@ -87,15 +87,15 @@ bool CN3TransformCollision::Save(HANDLE hFile)
 
 			SetFilePointer(hFile, -4, 0, FILE_CURRENT);
 			nL = m_pMeshCollision->FileName().size();
-			WriteFile(hFile, &nL, 4, &dwRWC, NULL); // Mesh FileName
+			WriteFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
 		}
 
-		WriteFile(hFile, m_pMeshCollision->FileName().c_str(), nL, &dwRWC, NULL);
+		WriteFile(hFile, m_pMeshCollision->FileName().c_str(), nL, &dwRWC, nullptr);
 	}
 
 	nL = 0;
 	if(m_pMeshClimb) nL = m_pMeshClimb->FileName().size();
-	WriteFile(hFile, &nL, 4, &dwRWC, NULL); // Mesh FileName
+	WriteFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
 	if(nL > 0) 
 	{
 		if(-1 == m_pMeshClimb->FileName().find("object\\")) // 임시로 경로를 바꾸려고 넣었다.. 나중에 필요없음 지운다..
@@ -105,10 +105,10 @@ bool CN3TransformCollision::Save(HANDLE hFile)
 
 			SetFilePointer(hFile, -4, 0, FILE_CURRENT);
 			nL = m_pMeshClimb->FileName().size();
-			WriteFile(hFile, &nL, 4, &dwRWC, NULL); // Mesh FileName
+			WriteFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
 		}
 
-		WriteFile(hFile, m_pMeshClimb->FileName().c_str(), nL, &dwRWC, NULL);
+		WriteFile(hFile, m_pMeshClimb->FileName().c_str(), nL, &dwRWC, nullptr);
 	}
 	return true;
 }
@@ -140,7 +140,7 @@ int CN3TransformCollision::CheckCollisionPrecisely(bool bIgnoreBoxCheck, int ixS
 #if defined(_DEBUG) || defined(_N3TOOL)
 void CN3TransformCollision::RenderCollisionMesh()
 {
-	if(NULL == m_pMeshCollision) return;
+	if(nullptr == m_pMeshCollision) return;
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &m_Matrix);
 
 	m_pMeshCollision->Render(0xffff0000); // 빨간색.
@@ -148,7 +148,7 @@ void CN3TransformCollision::RenderCollisionMesh()
 
 void CN3TransformCollision::RenderClimbMesh()
 {
-	if(NULL == m_pMeshClimb) return;
+	if(nullptr == m_pMeshClimb) return;
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &m_Matrix);
 
 	m_pMeshClimb->Render(0xff0000ff); // 파란색..
@@ -159,7 +159,7 @@ void CN3TransformCollision::RenderClimbMesh()
 #ifdef _N3TOOL
 BOOL CN3TransformCollision::CheckClimb(__Vector3 &vPos, __Vector3 &vDir, __Vector3* pVCol, __Vector3* pVNormal, __Vector3* pVPolygon)
 {
-	if(NULL == m_pMeshClimb) return FALSE;
+	if(nullptr == m_pMeshClimb) return FALSE;
 	
 	int nIC = m_pMeshClimb->IndexCount();
 	int nFC = 0;
@@ -231,7 +231,7 @@ BOOL CN3TransformCollision::CheckClimb(__Vector3 &vPos, __Vector3 &vDir, __Vecto
 #ifdef _N3TOOL
 BOOL CN3TransformCollision::CheckClimb(int x, int y, __Vector3* pVCol, __Vector3* pVNormal, __Vector3* pVPolygon)
 {
-	if(NULL == m_pMeshClimb || NULL == m_pMeshClimb->Vertices()) return FALSE;
+	if(nullptr == m_pMeshClimb || nullptr == m_pMeshClimb->Vertices()) return FALSE;
 
 	// Compute the vector of the pick ray in screen space
 	__Vector3 vTmp;
@@ -258,7 +258,7 @@ void CN3TransformCollision::FindMinMax()
 	m_vMax.Set(0,0,0);
 	m_fRadius = 0.0f;
 
-	if(NULL == m_pMeshCollision || m_pMeshCollision->VertexCount() <= 0) return;
+	if(nullptr == m_pMeshCollision || m_pMeshCollision->VertexCount() <= 0) return;
 
 	m_vMin.Set(FLT_MAX, FLT_MAX, FLT_MAX);
 	m_vMax.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);

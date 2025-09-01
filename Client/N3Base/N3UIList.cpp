@@ -285,16 +285,16 @@ bool CN3UIList::Load(HANDLE hFile)
 	// font 정보
 	DWORD dwNum;
 	int iStrLen = 0;
-	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, NULL);			// font 이름 길이 
+	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이 
 	__ASSERT(iStrLen>0, "No font name");
 	if (iStrLen>0)
 	{
 		m_szFontName.assign(iStrLen, ' ');
-		ReadFile(hFile, &(m_szFontName[0]), iStrLen, &dwNum, NULL);				// string
-		ReadFile(hFile, &m_dwFontHeight, 4, &dwNum, NULL);	// font height
-		ReadFile(hFile, &m_crFont, 4, &dwNum, NULL);	// font color
-		ReadFile(hFile, &m_bFontBold, 4, &dwNum, NULL);	// font flag (bold, italic)
-		ReadFile(hFile, &m_bFontItalic, 4, &dwNum, NULL);	// font flag (bold, italic)
+		ReadFile(hFile, &(m_szFontName[0]), iStrLen, &dwNum, nullptr);				// string
+		ReadFile(hFile, &m_dwFontHeight, 4, &dwNum, nullptr);	// font height
+		ReadFile(hFile, &m_crFont, 4, &dwNum, nullptr);	// font color
+		ReadFile(hFile, &m_bFontBold, 4, &dwNum, nullptr);	// font flag (bold, italic)
+		ReadFile(hFile, &m_bFontItalic, 4, &dwNum, nullptr);	// font flag (bold, italic)
 	}
 
 	// Child 중에 Scroll Bar 가 있는지 찾아본다.
@@ -331,14 +331,14 @@ bool CN3UIList::Save(HANDLE hFile)
 	// font 정보
 	int iStrLen = m_szFontName.size();
 	__ASSERT(iStrLen>0, "No font name");
-	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, NULL);			// font 이름 길이 
+	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이 
 	if (iStrLen>0)
 	{
-		WriteFile(hFile, m_szFontName.c_str(), iStrLen, &dwNum, NULL);				// string
-		WriteFile(hFile, &m_dwFontHeight, 4, &dwNum, NULL);	// font height
-		WriteFile(hFile, &m_crFont, 4, &dwNum, NULL);	// font color
-		WriteFile(hFile, &m_bFontBold, 4, &dwNum, NULL);	// font flag (bold, italic)
-		WriteFile(hFile, &m_bFontItalic, 4, &dwNum, NULL);	// font flag (bold, italic)
+		WriteFile(hFile, m_szFontName.c_str(), iStrLen, &dwNum, nullptr);				// string
+		WriteFile(hFile, &m_dwFontHeight, 4, &dwNum, nullptr);	// font height
+		WriteFile(hFile, &m_crFont, 4, &dwNum, nullptr);	// font color
+		WriteFile(hFile, &m_bFontBold, 4, &dwNum, nullptr);	// font flag (bold, italic)
+		WriteFile(hFile, &m_bFontItalic, 4, &dwNum, nullptr);	// font flag (bold, italic)
 	}
 
 	return true;

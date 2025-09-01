@@ -16,8 +16,15 @@ constexpr int MAX_IP_SIZE		= 15;	// IPv4 addresses are max ###.###.###.### (3*4 
 constexpr int MAX_ITEM_COUNT	= 9999;	// 한 슬롯에 가지는 최대 화살/송편 개수
 constexpr int MAX_QUEST			= 100;
 constexpr int MAX_LEVEL			= 80;	// 최고렙...
-
+constexpr int MAX_GOLD			= 2'100'000'000;
 constexpr int VIEW_DISTANCE		= 48;
+
+enum e_ItemSaleType
+{
+	SALE_TYPE_LOW			= 0, // sells lower than purchase price
+	SALE_TYPE_FULL			= 1, // sells equal to purchase price
+	SALE_TYPE_LOW_NO_REPAIR	= 2, // irreparable items sell for lower price than purchase
+};
 
 enum e_NpcState
 {

@@ -274,6 +274,13 @@ BOOL CServerDlg::OnInitDialog()
 		return FALSE;
 	}
 
+	if (!GetMagicType7Data())
+	{
+		spdlog::error("ServerDlg::OnInitDialog: failed to load MAGIC_TYPE7, closing server");
+		EndDialog(IDCANCEL);
+		return FALSE;
+	}
+
 	//----------------------------------------------------------------------
 	//	Load NPC Item Table
 	//----------------------------------------------------------------------
@@ -985,7 +992,7 @@ void CServerDlg::ResumeAI()
 /*	m_EventNpcThreadArray[0]->m_ThreadInfo.hWndMsg = this->GetSafeHwnd();
 	for(j = 0; j < NPC_NUM; j++)
 	{
-		m_EventNpcThreadArray[0]->m_ThreadInfo.pNpc[j] = nullptr;	// 초기 소환 몹이 당연히 없으므로 NULL로 작동을 안시킴
+		m_EventNpcThreadArray[0]->m_ThreadInfo.pNpc[j] = nullptr;	// 초기 소환 몹이 당연히 없으므로 nullptr로 작동을 안시킴
 		m_EventNpcThreadArray[0]->m_ThreadInfo.m_byNpcUsed[j] = 0;
 	}
 	m_EventNpcThreadArray[0]->m_ThreadInfo.pIOCP = &m_Iocport;
@@ -1081,6 +1088,9 @@ BOOL CServerDlg::DestroyWindow()
 
 	if (!m_MagicType4TableMap.IsEmpty())
 		m_MagicType4TableMap.DeleteAllData();
+
+	if (!m_MagicType7TableMap.IsEmpty())
+		m_MagicType7TableMap.DeleteAllData();
 
 	// Npc Array Delete
 	if (!m_NpcMap.IsEmpty())
@@ -1963,6 +1973,19 @@ BOOL CServerDlg::GetMagicType4Data()
 	}
 
 	spdlog::info("ServerDlg::GetMagicType4Data: MAGIC_TYPE4 loaded");
+	return TRUE;
+}
+
+BOOL CServerDlg::GetMagicType7Data()
+{
+	recordset_loader::STLMap loader(m_MagicType7TableMap);
+	if (!loader.Load_ForbidEmpty())
+	{
+		ReportTableLoadError(loader.GetError(), __func__);
+		return FALSE;
+	}
+
+	spdlog::info("ServerDlg::GetMagicType7Data: MAGIC_TYPE7 loaded");
 	return TRUE;
 }
 

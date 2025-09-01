@@ -26,7 +26,7 @@ static char THIS_FILE[]=__FILE__;
 
 CItemRepairMgr::CItemRepairMgr()
 {
-	m_pspItemBack = NULL;	
+	m_pspItemBack = nullptr;	
 }
 
 CItemRepairMgr::~CItemRepairMgr()
@@ -48,7 +48,7 @@ void CItemRepairMgr::Tick()
 	POINT ptCur			= CGameProcedure::s_pLocalInput->MouseGetPos();
 
 	// 위치를 구해서 
-	int i;	int iArm = 0x00; int iOrder = -1; __IconItemSkill* spItem = NULL;
+	int i;	int iArm = 0x00; int iOrder = -1; __IconItemSkill* spItem = nullptr;
 	for (i = 0; i < ITEM_SLOT_COUNT; i++)
 	{
 		if (spItem) break;

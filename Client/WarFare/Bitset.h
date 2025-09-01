@@ -22,7 +22,7 @@ public:
 		if(m_bits) 
 		{
 			delete m_bits;
-			m_bits = NULL;
+			m_bits = nullptr;
 		}
 	}
 

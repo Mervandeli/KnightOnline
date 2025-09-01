@@ -41,10 +41,10 @@ public:
 	bool Reset(bool bWindowed, uint32_t dwWidth, uint32_t dwHeight, uint32_t dwBPP);
 	void SetProjection(float fNear, float fFar, float fLens, float fAspect);
 
-	static void ClearAuto(RECT* pRC = NULL);
-	static void ClearZBuffer(const RECT* pRC = NULL);
-	static void Clear(D3DCOLOR crFill, RECT* pRC = NULL);
-	static void Present(HWND hWnd, RECT* pRC = NULL);
+	static void ClearAuto(RECT* pRC = nullptr);
+	static void ClearZBuffer(const RECT* pRC = nullptr);
+	static void Clear(D3DCOLOR crFill, RECT* pRC = nullptr);
+	static void Present(HWND hWnd, RECT* pRC = nullptr);
 	static void WaitForDeviceRestoration();
 
 	bool Init(
