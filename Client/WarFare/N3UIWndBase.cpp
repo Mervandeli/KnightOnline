@@ -51,7 +51,7 @@ CN3UIWndBase::CN3UIWndBase()
 		s_pSnd_Item_Etc		= CN3Base::s_SndMgr.CreateObj(ID_SOUND_ITEM_ETC_IN_INVENTORY);
 		s_pSnd_Item_Weapon	= CN3Base::s_SndMgr.CreateObj(ID_SOUND_ITEM_WEAPON_IN_INVENTORY);
 		s_pSnd_Item_Armor	= CN3Base::s_SndMgr.CreateObj(ID_SOUND_ITEM_ARMOR_IN_INVENTORY);
-		s_pSnd_Gold		= CN3Base::s_SndMgr.CreateObj(ID_SOUND_GOLD_IN_INVENTORY);	
+		s_pSnd_Gold		= CN3Base::s_SndMgr.CreateObj(ID_SOUND_GOLD_IN_INVENTORY);
 		s_pSnd_Repair	= CN3Base::s_SndMgr.CreateObj(ID_SOUND_ITEM_IN_REPAIR);	
 	}
 	s_iRefCount++; // 참조 카운트

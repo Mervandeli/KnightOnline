@@ -89,7 +89,6 @@ private:
 	void				HandleInventoryIconRightClick(POINT ptCur);
 	void				ShowItemCount(__IconItemSkill* spItem, int iorder);
 	bool				OnKeyPress(int iKey) override;
-	void				UpdateBackupUpgradeInv();
 	bool				Load(HANDLE hFile) override;
 	
 	uint32_t			MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
@@ -101,7 +100,7 @@ private:
 	bool				ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur) override;
 	void				ItemMoveFromInvToThis();
 	void				ItemMoveFromThisToInv();
-	void                RestoreInventoryFromBackup();
+	void                UpdateInventory();
 	void				GoldUpdate();
 	void				InitIconUpdate(){};
 	bool				IsUpgradeScroll(uint32_t dwEffectID2) const;
