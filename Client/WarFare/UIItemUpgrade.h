@@ -103,7 +103,6 @@ private:
 	void                UpdateInventory();
 	void				GoldUpdate();
 	void				InitIconUpdate(){};
-	bool				IsUpgradeScroll(uint32_t dwEffectID2) const;
 	bool				IsTrina(uint32_t dwID) const;
 	bool				IsAllowedUpgradeItem(__IconItemSkill* spItem) const;
 	void				SendToServerUpgradeMsg();

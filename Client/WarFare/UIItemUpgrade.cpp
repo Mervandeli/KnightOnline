@@ -661,8 +661,8 @@ void CUIItemUpgrade::UpdateInventory()
 		{
 			__IconItemSkill* spItem = m_pUpgradeScrollSlots[i];
 			int iOrder = m_iUpgradeScrollSlotInvPos[i];
-			if (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE ||
-					spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
+			if (m_pMyUpgradeInv[iOrder] != nullptr && (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE ||
+					spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
 			{
 				if (spItem->pUIIcon != nullptr)
 				{
@@ -684,14 +684,6 @@ void CUIItemUpgrade::UpdateInventory()
 			m_iUpgradeScrollSlotInvPos[i] = -1;
 		}
 	}
-
-}
-
-bool CUIItemUpgrade::IsUpgradeScroll(uint32_t dwEffectID2) const
-{
-	if (dwEffectID2 == UpgradeMaterial)
-		return true;
-	return false;
 }
 
 bool CUIItemUpgrade::IsTrina(uint32_t dwID) const
@@ -908,7 +900,7 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 void CUIItemUpgrade::UpdateCoverAnimation()
 {
     m_fAnimationTimer += CN3Base::s_fSecPerFrm;
-	static const float COVER_ANIMATION_DURATION = 0.8f;
+	constexpr float COVER_ANIMATION_DURATION = 0.8f;
     float t = m_fAnimationTimer / COVER_ANIMATION_DURATION;
 
     // Only handle opening (covers move outward and hide)
@@ -1002,7 +994,7 @@ void CUIItemUpgrade::CreateUIIconForItem(__IconItemSkill* spItem)
 	spItem->pUIIcon = new CN3UIIcon();
 	spItem->pUIIcon->Init(this);
 
-	static const float UV_ASPECT_RATIO = 45.0f / 64.0f;
+	constexpr float UV_ASPECT_RATIO = 45.0f / 64.0f;
 	std::string iconFile = spItem->szIconFN;
 	spItem->pUIIcon->SetTex(iconFile);
 	spItem->pUIIcon->SetUVRect(0, 0, UV_ASPECT_RATIO, UV_ASPECT_RATIO);
@@ -1052,29 +1044,29 @@ bool CUIItemUpgrade::HandleUpgradeAreaDrop(__IconItemSkill* spItem)
 
 bool CUIItemUpgrade::IsSlotCompatible(__IconItemSkill* pSrc) const
 {
-	if (!IsUpgradeScroll(pSrc->pItemBasic->dwEffectID2))
+	if (!pSrc->pItemBasic->dwEffectID2 == UpgradeMaterial)
 		return false;
 
-	bool m_bhasTrina = false;
-	bool m_bhasScroll = false;
+	bool bhasTrina = false;
+	bool bhasScroll = false;
 
-	for (int k = 0; k < MAX_ITEM_UPGRADE_SLOT; ++k)
+	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
 	{
-		if (m_pUpgradeScrollSlots[k] != nullptr)
+		if (m_pUpgradeScrollSlots[i] != nullptr)
 		{
-			if (IsTrina(m_pUpgradeScrollSlots[k]->pItemBasic->dwID))
+			if (IsTrina(m_pUpgradeScrollSlots[i]->pItemBasic->dwID))
 			{
-				m_bhasTrina = true;
+				bhasTrina = true;
 			}
 			else 
-				m_bhasScroll = true;
+				bhasScroll = true;
 		}
 	}
-	if (m_bhasTrina && IsTrina(pSrc->pItemBasic->dwID))
+	if (bhasTrina && IsTrina(pSrc->pItemBasic->dwID))
 		return false;
-	if (m_bhasScroll && !IsTrina(pSrc->pItemBasic->dwID))
+	if (bhasScroll && !IsTrina(pSrc->pItemBasic->dwID))
 		return false;
-	if (m_bhasTrina && m_bhasScroll)
+	if (bhasTrina && bhasScroll)
 		return false;
 	return true;
 }
@@ -1088,6 +1080,7 @@ bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 	if (iSourceOrder == -1)
 		return false;
 
+	CN3UIArea* pSlotArea = m_pSlotArea[iDestiOrder];
 	__IconItemSkill* pSrc = m_pMyUpgradeInv[iSourceOrder];
 	if (!IsSlotCompatible(pSrc))
 		return false;
@@ -1115,7 +1108,7 @@ bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 			// If the last one, move directly
 			m_pUpgradeScrollSlots[iDestiOrder] = pSrc;
 			m_pMyUpgradeInv[iSourceOrder] = nullptr;
-			CN3UIArea* pSlotArea = m_pSlotArea[iDestiOrder];
+			m_pInvString[iSourceOrder] = nullptr;
 			SetupIconArea(pSrc, pSlotArea);
 		}
 	}
@@ -1124,7 +1117,6 @@ bool CUIItemUpgrade::HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder)
 		// If is not countable item, just move it
 		m_pUpgradeScrollSlots[iDestiOrder] = pSrc;
 		m_pMyUpgradeInv[iSourceOrder] = nullptr;
-		CN3UIArea* pSlotArea = m_pSlotArea[iDestiOrder];
 		SetupIconArea(pSrc, pSlotArea);
 	}
 	m_iUpgradeScrollSlotInvPos[iDestiOrder] = iSourceOrder;
@@ -1242,7 +1234,7 @@ void CUIItemUpgrade::ShowItemCount(__IconItemSkill* spItem,int iorder)
 		CN3UIString* pStr = m_pInvString[iorder];
 		if (pStr != nullptr)
 		{		
-			if (spItem->pUIIcon->IsVisible())
+			if (spItem->iCount > 1)
 			{
 				pStr->SetStringAsInt(spItem->iCount);
 				if (GetState() == UI_STATE_ICON_MOVING && CN3UIWndBase::m_sSelectedIconInfo.pItemSelect)
