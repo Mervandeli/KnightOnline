@@ -16,7 +16,7 @@ class CDlgRegenUser : public CDialog
 {
 // Construction
 public:
-	CDlgRegenUser(CWnd* pParent = NULL);   // standard constructor
+	CDlgRegenUser(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgRegenUser)

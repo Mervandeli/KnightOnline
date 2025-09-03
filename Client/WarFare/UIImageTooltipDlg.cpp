@@ -59,10 +59,10 @@ void CUIImageTooltipDlg::InitPos()
 	for (int i = 0; i < MAX_TOOLTIP_COUNT; i++)
 	{
 		str = "string_" + std::to_string(i);
-		m_pStr[i] = (CN3UIString*) GetChildByID(str);	 __ASSERT(m_pStr[i], "NULL UI Component!!");
+		N3_VERIFY_UI_COMPONENT(m_pStr[i], GetChildByID<CN3UIString>(str));
 	}
 
-	m_pImg = (CN3UIImage*) GetChildByID("mins");	 __ASSERT(m_pImg, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pImg, GetChildByID<CN3UIImage>("mins"));
 }
 
 void CUIImageTooltipDlg::DisplayTooltipsDisable()

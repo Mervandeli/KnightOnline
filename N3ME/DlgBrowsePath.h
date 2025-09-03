@@ -27,7 +27,7 @@ class CDlgBrowsePath : public CDialog
 public:
 	CString m_szPath;
 	CString GetPath() { return m_szPath; }
-	CDlgBrowsePath(CWnd* pParent = NULL);	// standard constructor
+	CDlgBrowsePath(CWnd* pParent = nullptr);	// standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgBrowsePath)

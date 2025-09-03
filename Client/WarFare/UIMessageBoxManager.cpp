@@ -18,7 +18,7 @@ static char THIS_FILE[]=__FILE__;
 
 CUIMessageBoxManager::CUIMessageBoxManager()
 {
-	m_pMsgBoxLatestRef = NULL;
+	m_pMsgBoxLatestRef = nullptr;
 }
 
 CUIMessageBoxManager::~CUIMessageBoxManager()
@@ -33,8 +33,8 @@ int CUIMessageBoxManager::GetCount()
 
 std::string CUIMessageBoxManager::MessageBoxPost(const std::string& szMsg, const std::string& szTitle, int iStyle, e_Behavior eBehavior)
 {
-	CUIMessageBox*		pMB		= NULL;
-	__TABLE_UI_RESRC*	pTblUI	= NULL;
+	CUIMessageBox*		pMB		= nullptr;
+	__TABLE_UI_RESRC*	pTblUI	= nullptr;
 
 	it_UBM it, it_e;
 
@@ -44,7 +44,7 @@ std::string CUIMessageBoxManager::MessageBoxPost(const std::string& szMsg, const
 	if( it == it_e )
 	{
 		pMB = new CUIMessageBox();
-		if( pMB == NULL )
+		if( pMB == nullptr )
 			return szMsg;
 
 		pTblUI = CGameBase::s_pTbl_UI.Find(NATION_ELMORAD);
@@ -103,7 +103,7 @@ void CUIMessageBoxManager::MessageBoxClose(const std::string& szMsg)
 	if(it_f != it_e)
 	{
 		if(m_pMsgBoxLatestRef == it_f->second)
-			m_pMsgBoxLatestRef = NULL;
+			m_pMsgBoxLatestRef = nullptr;
 
 		CUIMessageBox* pMB = it_f->second;
 		if(pMB) pMB->SetVisible(false);
@@ -116,7 +116,7 @@ void CUIMessageBoxManager::Render()
 	for(; it != it_e; it++)
 	{
 		CUIMessageBox* pMB = it->second;
-		if(pMB == NULL || pMB == m_pMsgBoxLatestRef) continue;
+		if(pMB == nullptr || pMB == m_pMsgBoxLatestRef) continue;
 		if(!pMB->IsVisible()) continue;
 		CUIManager::RenderStateSet();
 		pMB->Render(); // 메시지 박스 렌더링..
@@ -140,7 +140,7 @@ void CUIMessageBoxManager::MessageBoxCloseAll()
 		if(pMB) pMB->SetVisible(false);
 	}
 
-	m_pMsgBoxLatestRef = NULL;
+	m_pMsgBoxLatestRef = nullptr;
 }
 
 uint32_t CUIMessageBoxManager::MouseProcAndTick(uint32_t &dwFlags, const POINT &ptCur, const POINT &ptOld)
@@ -177,7 +177,7 @@ void CUIMessageBoxManager::Release()
 		delete it->second;
 	m_UBMs.clear();
 
-	m_pMsgBoxLatestRef = NULL;
+	m_pMsgBoxLatestRef = nullptr;
 }
 
 CUIMessageBox* CUIMessageBoxManager::ReFocusMsgBox()
@@ -192,6 +192,6 @@ CUIMessageBox* CUIMessageBoxManager::ReFocusMsgBox()
 		}
 	}
 
-	m_pMsgBoxLatestRef = NULL;
-	return NULL;
+	m_pMsgBoxLatestRef = nullptr;
+	return nullptr;
 }

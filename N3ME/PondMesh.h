@@ -91,8 +91,8 @@ public:
 
 	__Vector3		GetCenter();
 	float			SettingDrawPos(__Vector3 vPos1,__Vector3 vPos2,__Vector3 vPos3,__Vector3 vPos4,int iLinePosNum);
-	__VertexXyzT2*	const GetVertex(int iIndex) {if (iIndex<0 || iIndex>=m_iVC) return NULL; return m_pViewVts+iIndex;}
-	__VertexXyzT2*	const GetRcVertex(int iIndex) {if (iIndex<0 || iIndex>=m_iRectVC) return NULL; return m_pRectVts+iIndex;}
+	__VertexXyzT2*	const GetVertex(int iIndex) {if (iIndex<0 || iIndex>=m_iVC) return nullptr; return m_pViewVts+iIndex;}
+	__VertexXyzT2*	const GetRcVertex(int iIndex) {if (iIndex<0 || iIndex>=m_iRectVC) return nullptr; return m_pRectVts+iIndex;}
 
 	BOOL			SetTextureName(LPCTSTR pszFName);
 

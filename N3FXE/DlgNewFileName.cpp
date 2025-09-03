@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgNewFileName dialog
 
 
-CDlgNewFileName::CDlgNewFileName(CWnd* pParent /*=NULL*/)
+CDlgNewFileName::CDlgNewFileName(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgNewFileName::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgNewFileName)

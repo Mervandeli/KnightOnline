@@ -19,7 +19,7 @@ class CDlgShapeList : public CDialog
 {
 // Construction
 public:
-	CDlgShapeList(CWnd* pParent = NULL);   // standard constructor
+	CDlgShapeList(CWnd* pParent = nullptr);   // standard constructor
 
 	CN3Scene* m_pSceneRef;
 	BOOL	m_IsSourceObj;		// Display용이냐? (툴에서 오브젝트 목록)

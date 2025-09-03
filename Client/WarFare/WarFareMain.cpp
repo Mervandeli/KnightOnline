@@ -142,7 +142,7 @@ int APIENTRY WinMain(
 	CGameProcedure::ProcActiveSet((CGameProcedure*)CGameProcedure::s_pProcLogIn);
 
 #if _DEBUG
-	HACCEL hAccel = LoadAccelerators( NULL, MAKEINTRESOURCE(IDR_MAIN_ACCELATOR) );
+	HACCEL hAccel = LoadAccelerators( nullptr, MAKEINTRESOURCE(IDR_MAIN_ACCELATOR) );
 	HDC hDC = GetDC(hWndMain);
 #endif // #if _DEBUG
 
@@ -288,8 +288,7 @@ LRESULT CALLBACK WndProcMain(
 				} break;
 				case FD_CLOSE:
 				{
-					if (CGameProcedure::s_bNeedReportConnectionClosed)
-						CGameProcedure::ReportServerConnectionClosed(true);
+					CGameProcedure::ReportServerConnectionClosed(true);
 					//TRACE("Socket closed..\n");
 				}  break;
 				case FD_READ:

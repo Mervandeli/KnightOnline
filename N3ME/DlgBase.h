@@ -18,7 +18,7 @@ class CDlgBase : public CDialog
 // Construction
 public:
 	void UpdateInfo();
-	CDlgBase(CMapMng* pMapMng, CWnd* pParent = NULL);   // standard constructor
+	CDlgBase(CMapMng* pMapMng, CWnd* pParent = nullptr);   // standard constructor
 
 	CMapMng* m_pMapMng;
 

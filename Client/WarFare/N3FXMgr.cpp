@@ -300,12 +300,12 @@ void CN3FXMgr::Tick()
 			pBundle->m_dwState==FX_BUNDLE_STATE_LIVE &&
 			( s_pPlayer->IDNumber()==pBundle->m_iSourceID ||
 			( s_pPlayer->IDNumber()==pBundle->m_iTargetID &&
-			s_pOPMgr->UPCGetByID(pBundle->m_iSourceID, true)==NULL)))
+			s_pOPMgr->UPCGetByID(pBundle->m_iSourceID, true)==nullptr)))
 */
 		if(pBundle->m_iMoveType != FX_BUNDLE_MOVE_NONE && pBundle->m_dwState==FX_BUNDLE_STATE_LIVE)
 		{
-			if(s_pOPMgr->UPCGetByID(pBundle->m_iSourceID, true)==NULL &&
-				s_pOPMgr->NPCGetByID(pBundle->m_iSourceID, true)==NULL &&
+			if(s_pOPMgr->UPCGetByID(pBundle->m_iSourceID, true)==nullptr &&
+				s_pOPMgr->NPCGetByID(pBundle->m_iSourceID, true)==nullptr &&
 				s_pPlayer->IDNumber()!=pBundle->m_iSourceID	)
 			{
 				pBundle->Stop();
@@ -314,7 +314,7 @@ void CN3FXMgr::Tick()
 			uint32_t dwToMe = 0; //dwToMe==1이면 내가 쏜거.. dwToMe==2이면 내가 타겟..
 			if(s_pPlayer->IDNumber()==pBundle->m_iSourceID) dwToMe = 1;
 			else if( s_pPlayer->IDNumber()==pBundle->m_iTargetID &&
-					s_pOPMgr->UPCGetByID(pBundle->m_iSourceID, true)==NULL) dwToMe = 2;
+					s_pOPMgr->UPCGetByID(pBundle->m_iSourceID, true)==nullptr) dwToMe = 2;
 			
 			if(dwToMe == 1 || dwToMe == 2)
 			{
@@ -325,12 +325,12 @@ void CN3FXMgr::Tick()
 				bool bCol = false;
 				it_UPC it = s_pOPMgr->m_UPCs.begin();
 				it_UPC itEnd = s_pOPMgr->m_UPCs.end();
-				CPlayerOther* pUPC = NULL;
+				CPlayerOther* pUPC = nullptr;
 
 				if( dwToMe==2 && ((pBundle->m_vPos - s_pPlayer->Position()).Magnitude()<16.0f) )
 				{
 					__Vector3 vCp = s_pPlayer->Center();
-					if( true == s_pPlayer->CheckCollisionByBox(pBundle->m_vPos, pBundle->m_vPos + pBundle->m_vDir*pBundle->m_fVelocity*CN3Base::s_fSecPerFrm, &vCol, NULL) )
+					if( true == s_pPlayer->CheckCollisionByBox(pBundle->m_vPos, pBundle->m_vPos + pBundle->m_vDir*pBundle->m_fVelocity*CN3Base::s_fSecPerFrm, &vCol, nullptr) )
 					//if( true == CheckCollisionSphere(pBundle->m_vPos, pBundle->m_vPos + pBundle->m_vDir*pBundle->m_fVelocity*CN3Base::s_fSecPerFrm, vCp, s_pPlayer->Radius(), &vCol) )
 					{
 						bCol = true;
@@ -386,7 +386,7 @@ void CN3FXMgr::Tick()
 
 					__Vector3 vCp = pUPC->Center();
 					//if( true == CheckCollisionSphere(pBundle->m_vPos, pBundle->m_vPos + pBundle->m_vDir*pBundle->m_fVelocity*CN3Base::s_fSecPerFrm, vCp, pUPC->Radius(), &vCol) )
-					if ( true == pUPC->CheckCollisionByBox(pBundle->m_vPos, pBundle->m_vPos + pBundle->m_vDir*pBundle->m_fVelocity*CN3Base::s_fSecPerFrm, &vCol, NULL) )
+					if ( true == pUPC->CheckCollisionByBox(pBundle->m_vPos, pBundle->m_vPos + pBundle->m_vDir*pBundle->m_fVelocity*CN3Base::s_fSecPerFrm, &vCol, nullptr) )
 					{
 						bCol = true;
 						pBundle->m_vPos = vCol;
@@ -439,7 +439,7 @@ void CN3FXMgr::Tick()
 					it_NPC it2 = s_pOPMgr->m_NPCs.begin();
 					it_NPC itEnd2 = s_pOPMgr->m_NPCs.end();
 					CPlayerNPC* pSNPC = s_pOPMgr->NPCGetByID(pBundle->m_iSourceID, FALSE);
-					CPlayerNPC* pNPC = NULL;
+					CPlayerNPC* pNPC = nullptr;
 					for(; it2 != itEnd2; it2++)
 					{
 						pNPC = (*it2).second;
@@ -504,7 +504,7 @@ void CN3FXMgr::Tick()
 
 						__Vector3 vCp = pNPC->Center();
 						//if( true == CheckCollisionSphere(pBundle->m_vPos, vNext, vCp, pNPC->Radius(), &vCol) )
-						if ( true == pNPC->CheckCollisionByBox(pBundle->m_vPos, vNext, &vCol, NULL) )
+						if ( true == pNPC->CheckCollisionByBox(pBundle->m_vPos, vNext, &vCol, nullptr) )
 						{
 							bCol = true;
 							pBundle->m_vPos = vCol;

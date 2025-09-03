@@ -44,19 +44,19 @@ CN3TerrainManager::CN3TerrainManager()
 CN3TerrainManager::~CN3TerrainManager()
 {
 	// N3Terrain..
-	delete m_pTerrain;  m_pTerrain = NULL;
+	delete m_pTerrain;  m_pTerrain = nullptr;
 
 	// Shape..
-	delete m_pShapes; m_pShapes = NULL;
+	delete m_pShapes; m_pShapes = nullptr;
 
 	// Sky..
-	delete m_pSky;		m_pSky = NULL;
+	delete m_pSky;		m_pSky = nullptr;
 
 	// Bird..
-	delete m_pBirdMng; m_pBirdMng = NULL;
+	delete m_pBirdMng; m_pBirdMng = nullptr;
 
 	// Grass..
-//	delete m_pGrasses; m_pGrasses = NULL;
+//	delete m_pGrasses; m_pGrasses = nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ void CN3TerrainManager::InitWorld(int iZoneID, const __Vector3& vPosPlayer)
 	
 
 	char szFName[_MAX_PATH];
-	_splitpath(pZone->szTerrainFN.c_str(), NULL, NULL, szFName, NULL);
+	_splitpath(pZone->szTerrainFN.c_str(), nullptr, nullptr, szFName, nullptr);
 	std::string szFName2 = fmt::format("{}_Bird",szFName);
 
 	char szFullPathName[_MAX_PATH];
@@ -244,7 +244,7 @@ CN3Shape* CN3TerrainManager::ShapeGetByIDWithShape(int iID)
 	if (m_pShapes) 
 		return m_pShapes->ShapeGetByID(iID);
 	else
-		return NULL;
+		return nullptr;
 }
 
 CN3Shape* CN3TerrainManager::PickWithShape(int iXScreen, int iYScreen, bool bMustHaveEvent, __Vector3* pvPick)
@@ -252,7 +252,7 @@ CN3Shape* CN3TerrainManager::PickWithShape(int iXScreen, int iYScreen, bool bMus
 	if (m_pShapes) 
 		return m_pShapes->Pick(iXScreen, iYScreen, bMustHaveEvent, pvPick);
 	else
-		return NULL;
+		return nullptr;
 }
 
 bool CN3TerrainManager::CheckCollisionWithShape(	  const __Vector3& vPos,				 // 충돌 위치
@@ -330,7 +330,7 @@ CN3Sun*	CN3TerrainManager::GetSunPointerWithSky()
 	if (m_pSky)
 		return m_pSky->GetSunPointer();
 	else
-		return NULL;
+		return nullptr;
 }
 */
 

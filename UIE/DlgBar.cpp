@@ -17,7 +17,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgBar dialog
 
 
-CDlgBar::CDlgBar(CWnd* pParent /*=NULL*/)
+CDlgBar::CDlgBar(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgBar::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgBar)
@@ -46,7 +46,7 @@ END_MESSAGE_MAP()
 void CDlgBar::OnButtonBasepath() 
 {
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	if (NULL==pFrm) return;
+	if (nullptr==pFrm) return;
 
 	CWnd* pWnd = GetDlgItem(IDC_EDIT_BASEPATH);
 	CString strPath;
@@ -57,11 +57,11 @@ void CDlgBar::OnButtonBasepath()
     BROWSEINFO bi;
 	LPCITEMIDLIST lpidl;
     bi.hwndOwner=pFrm->m_hWnd;
-    bi.pidlRoot=NULL;
+    bi.pidlRoot=nullptr;
     bi.pszDisplayName = szFolder;
     bi.lpszTitle=szTitle;
     bi.ulFlags=BIF_RETURNONLYFSDIRS;
-    bi.lpfn=NULL;
+    bi.lpfn=nullptr;
     bi.lParam=0;
     
     lpidl=SHBrowseForFolder(&bi);

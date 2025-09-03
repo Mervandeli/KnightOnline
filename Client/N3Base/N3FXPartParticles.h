@@ -12,18 +12,17 @@
 
 class CN3FXParticle;
 class CN3FXShape;
-
 class CN3FXPartParticles : public CN3FXPartBase  
 {
 public:
-	static constexpr int SUPPORTED_PART_VERSION = 5;
+	static constexpr int SUPPORTED_PART_VERSION = 11; // supported as far as reading only
 
 	//related whole particle system...
 	__VertexXyzColorT1			m_vUnit[NUM_VERTEX_PARTICLE];
-	//uint16_t						m_wUnitIB[6];
+	//uint16_t					m_wUnitIB[6];
 
 	__VertexXyzColorT1*			m_pVB;
-	//uint16_t*						m_pIB;
+	//uint16_t*					m_pIB;
 
 	__Matrix44					m_mtxVI;				//	inverse view mtx..
 
@@ -44,7 +43,7 @@ public:
 	__Vector3					m_MaxCreateRange;		//	파티클 생성 자유도 범위..max..
 
 	//emitter...
-	uint32_t						m_dwEmitType;			//	발사형태..(spread, gather)..
+	uint32_t					m_dwEmitType;			//	발사형태..(spread, gather)..
 	PARTICLEEMITCONDITION		m_uEmitCon;				//	발사형태에 따른 필요 데이타..
 	__Vector3					m_vEmitterDir;
 	__Vector3					m_vPrevShapePos;
@@ -58,7 +57,7 @@ public:
 	float		m_fPtGravity;		//중력가속도..
 
 	//related particle color....
-	uint32_t		m_dwChangeColor[NUM_KEY_COLOR];
+	uint32_t	m_dwChangeColor[NUM_KEY_COLOR];
 	bool		m_bChangeColor;
 
 	//related animation key
@@ -80,6 +79,7 @@ public:
 	float m_fPtRangeMin;
 	float m_fPtRangeMax;
 	// N3FXParticle needs implementation of these methods
+
 protected:
 	void	Rotate();
 	void	Scaling();

@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgReplace dialog
 
 
-CDlgReplace::CDlgReplace(CWnd* pParent /*=NULL*/)
+CDlgReplace::CDlgReplace(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgReplace::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgReplace)

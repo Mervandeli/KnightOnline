@@ -30,7 +30,7 @@ static char THIS_FILE[] = __FILE__;
 // This code is free for all to use. Mutatilate it as much as you want
 // See MFCENUM sample from microsoft
 
-CDlgBrowsePath::CDlgBrowsePath(CWnd* pParent /*=NULL*/)
+CDlgBrowsePath::CDlgBrowsePath(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgBrowsePath::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgBrowsePath)
@@ -79,7 +79,7 @@ BOOL CDlgBrowsePath::OnInitDialog()
 		for(int i = 0; i < 10; i++)
 		{
 			szKey.Format("Folder%.1d", i);
-			LONG success = RegQueryValueEx(hKey, szKey, NULL, &dwKeyType, (BYTE*)szInitDir, &dwLength);
+			LONG success = RegQueryValueEx(hKey, szKey, nullptr, &dwKeyType, (BYTE*)szInitDir, &dwLength);
 			if(success == ERROR_SUCCESS && lstrlen(szInitDir) != 0)
 			{
 				m_CBPath.AddString(szInitDir);
@@ -204,7 +204,7 @@ void CDlgBrowsePath::OnOK()
 			int nLength = m_CBPath.GetLBTextLen(i);
 			if(nLength > 0)
 			{
-				LONG success = RegSetValueEx(hKey, szKey, NULL, dwKeyType, (CONST BYTE*)szInitDir, nLength);
+				LONG success = RegSetValueEx(hKey, szKey, 0, dwKeyType, (CONST BYTE*)szInitDir, nLength);
 			}
 		}
 	}

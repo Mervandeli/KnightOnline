@@ -39,7 +39,7 @@ typedef struct tagShapeInfo	: public CN3Transform
 	{
 		m_iID = -1;
 		m_strShapeFile = "";
-		m_pShape = NULL;		
+		m_pShape = nullptr;		
 
 		m_iBelong = 0;
 		m_iEventID = 0;	
@@ -118,7 +118,7 @@ typedef struct tagVisPortalPriority
 
 	tagVisPortalPriority()
 	{
-		m_pVol = NULL;
+		m_pVol = nullptr;
 		m_iPriority = 100;
 	}
 }	VisPortalPriority;
@@ -171,10 +171,10 @@ private:
 	bool CheckCollisionCameraWithTerrain(__Vector3& vEyeResult, const __Vector3& vAt, float fNP);
 	bool CheckCollisionCameraWithShape(__Vector3& vEyeResult, const __Vector3& vAt, float fNP);
 	bool GetHeightWithTerrain(float fx, float fz, float& fy);
-	float GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal = NULL); 
+	float GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal = nullptr); 
 	bool IsInTerrainWithTerrain(__Vector3& vec);
 	BOOL PickWideWithTerrain(int x, int y, __Vector3& vPick);
-	CN3Shape* PickWithShape(int iXScreen, int iYScreen, bool bMustHaveEvent, __Vector3* pvPick = NULL);
+	CN3Shape* PickWithShape(int iXScreen, int iYScreen, bool bMustHaveEvent, __Vector3* pvPick = nullptr);
 	CN3Shape* ShapeGetByIDWithShape(int iID);
 	bool CheckCollisionWithShape(	const __Vector3& vPos,				 // 충돌 위치
 														const __Vector3& vDir,				   // 방향 벡터

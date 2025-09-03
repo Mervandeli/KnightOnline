@@ -41,7 +41,7 @@ void CPlayerOther::Tick()
 
 bool CPlayerOther::Init(e_Race eRace, int iFace, int iHair, uint32_t* pdwItemIDs, int* piItenDurabilities)
 {
-	if(NULL == pdwItemIDs || NULL == piItenDurabilities) return false;
+	if(nullptr == pdwItemIDs || nullptr == piItenDurabilities) return false;
 
 	m_InfoBase.eRace = eRace;
 	m_InfoExt.iFace = iFace;
@@ -49,7 +49,7 @@ bool CPlayerOther::Init(e_Race eRace, int iFace, int iHair, uint32_t* pdwItemIDs
 
 	// 이제 패킷에 따라 캐릭터를 치장..(?) 시켜준다.. 아이템장착, 무기 장착등...
 	__TABLE_PLAYER_LOOKS* pLooks = s_pTbl_UPC_Looks.Find(eRace);	// 테이블에서 기본 스킨 ..
-	if(NULL == pLooks) 
+	if(nullptr == pLooks) 
 	{
 		CLogWriter::Write("CPlayerOther::Init() Basic Resource Pointer is NULL Race({})",
 			static_cast<int>(eRace));
@@ -63,8 +63,8 @@ bool CPlayerOther::Init(e_Race eRace, int iFace, int iHair, uint32_t* pdwItemIDs
 		e_PartPosition ePart = PART_POS_UNKNOWN;
 		e_PlugPosition ePlug = PLUG_POS_UNKNOWN;
 		e_ItemSlot eSlot = ITEM_SLOT_UNKNOWN;
-		__TABLE_ITEM_BASIC* pItem = NULL;
-		__TABLE_ITEM_EXT* pItemExt = NULL;
+		__TABLE_ITEM_BASIC* pItem = nullptr;
+		__TABLE_ITEM_EXT* pItemExt = nullptr;
 
 		if(0 == pdwItemIDs[i]) 
 		{
@@ -82,7 +82,7 @@ bool CPlayerOther::Init(e_Race eRace, int iFace, int iHair, uint32_t* pdwItemIDs
 			pItem = s_pTbl_Items_Basic.Find(pdwItemIDs[i]/1000*1000);	// 유저 플레이어 아이템 얻기..
 			if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
 				pItemExt = s_pTbl_Items_Exts[pItem->byExtIndex].Find(pdwItemIDs[i]%1000);
-			if(NULL == pItem || NULL == pItemExt)
+			if(nullptr == pItem || nullptr == pItemExt)
 			{
 				__ASSERT(0, "NULL Item!!!");
 				continue;

@@ -34,7 +34,7 @@ void CN3GERain::Release()
 
 void CN3GERain::Tick()
 {
-	if (m_bActive == FALSE || m_iVC <= 0 || m_pVB == NULL) return;
+	if (m_bActive == FALSE || m_iVC <= 0 || m_pVB == nullptr) return;
 
 	CN3GlobalEffect::Tick();
 
@@ -115,7 +115,7 @@ void CN3GERain::Tick()
 
 void CN3GERain::Render(__Vector3& vPos)
 {
-	if (m_bActive == FALSE || m_iVC <= 0 || m_pVB == NULL) return;
+	if (m_bActive == FALSE || m_iVC <= 0 || m_pVB == nullptr) return;
 	
 	CN3GlobalEffect::Render(vPos);
 	
@@ -161,7 +161,7 @@ void CN3GERain::Render(__Vector3& vPos)
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &m_Matrix);
 
 	// set texture 
-	s_lpD3DDev->SetTexture(0, NULL);
+	s_lpD3DDev->SetTexture(0, nullptr);
 
 	// render
 	s_lpD3DDev->SetFVF(FVF_XYZCOLOR);
@@ -188,7 +188,7 @@ void CN3GERain::Create(float fDensity,
 // fRainLength : 빗줄기의 길이
 // vVelocity : 빗줄기의 속도
 {
-	if(NULL == s_lpD3DDev) return;
+	if(nullptr == s_lpD3DDev) return;
 
 	Release();
 
@@ -207,7 +207,7 @@ void CN3GERain::Create(float fDensity,
 
 	// m_pVB, m_pIB 만들기
 	m_iVC = iRainCount*2;
-	HRESULT hr = s_lpD3DDev->CreateVertexBuffer(m_iVC*sizeof(__VertexXyzColor), 0, FVF_XYZCOLOR, D3DPOOL_MANAGED, &m_pVB, NULL);
+	HRESULT hr = s_lpD3DDev->CreateVertexBuffer(m_iVC*sizeof(__VertexXyzColor), 0, FVF_XYZCOLOR, D3DPOOL_MANAGED, &m_pVB, nullptr);
 
 	if (FAILED(hr)) return;
 	__VertexXyzColor* pVertices;

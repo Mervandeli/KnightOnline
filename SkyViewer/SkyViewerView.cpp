@@ -190,7 +190,7 @@ void CSkyViewerView::OnSize(UINT nType, int cx, int cy)
 	
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	if(pFrm && pFrm->m_Eng.Reset(TRUE, cx, cy, 0))
-		this->InvalidateRect(NULL, FALSE);
+		this->InvalidateRect(nullptr, FALSE);
 }
 
 void CSkyViewerView::OnLButtonDown(UINT nFlags, CPoint point) 
@@ -211,7 +211,7 @@ void CSkyViewerView::OnLButtonDown(UINT nFlags, CPoint point)
 			pFrm->m_Camera.AtPosSet(vCol);
 			pFrm->m_Camera.EyePosSet(vCol + (vDir * fDist));
 
-			this->InvalidateRect(NULL, FALSE);
+			this->InvalidateRect(nullptr, FALSE);
 		}
 	}
 		

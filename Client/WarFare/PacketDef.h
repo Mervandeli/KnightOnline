@@ -7,11 +7,6 @@ const int SOCKET_PORT_LOGIN = 15100;
 #include "shared/types.h"
 #include "shared/packets.h"
 
-#define N3_ACCOUNT_LOGIN			0xf3
-#define N3_ACCOUNT_LOGIN_MGAME		0xf4	// !!! LOGIN_REQ !!! 와 동일
-#define N3_GAMESERVER_GROUP_LIST	0xf5	// Recv - b1(ServerCount) loop(	s1(IP길이), str1(IP문자열), s1(서버이름길이), str1(서버이름문자열), s1(서버접속인원) )
-#define N3_NEWS						0xf6	//notice messages on login screen
-
 	enum e_ChatMode {	N3_CHAT_NORMAL = 1,
 						N3_CHAT_PRIVATE,
 						N3_CHAT_PARTY,
@@ -141,11 +136,6 @@ const int SOCKET_PORT_LOGIN = 15100;
 									N3_SP_WARE_INV_MOVE =			0x05,	// 이동..
 									N3_SP_WARE_INN =				0x10,	// 맨처음..여관주인임을 받음..
 									N3_SP_WARE_UNKNOWN };
-
-	enum e_SubPacket_NoahChange {	N3_SP_NOAH_GET = 0x01,	// 노아 습득,
-									N3_SP_NOAH_LOST	= 0x02,	// 노아 분실..
-									N3_SP_NOAH_SPEND = 0x03	// 노아 소비..
-								};		
 
 	enum e_Party_BBS {	N3_SP_PARTY_REGISTER						= 0x01,		// 파티 게시판에 등록
 						N3_SP_PARTY_REGISTER_CANCEL					= 0x02,		// 파티 게시판에서 등록 취소

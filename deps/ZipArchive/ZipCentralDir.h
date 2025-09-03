@@ -26,7 +26,7 @@ struct CZipFindFast
 	CZipFindFast()
 	{
 		m_uIndex = 0;
-		m_pHeader= NULL;
+		m_pHeader= nullptr;
 	}
 	CZipFindFast(CZipFileHeader* pHeader, WORD uIndex):m_pHeader(pHeader), m_uIndex(uIndex){}
 	/**
@@ -119,11 +119,11 @@ public:
 	\param	bAfterOpen
 		if \c true, called after opening the archive or before closing
 	\param	pHeader		
-		the header to have filename converted; if \c NULL convert the currently
+		the header to have filename converted; if \c nullptr convert the currently
 		opened file
 	\see m_bConvertAfterOpen
 */
-	void ConvertFileName(bool bFromZip, bool bAfterOpen, CZipFileHeader* pHeader = NULL)
+	void ConvertFileName(bool bFromZip, bool bAfterOpen, CZipFileHeader* pHeader = nullptr)
 	{
 		if (bAfterOpen != m_bConvertAfterOpen)
 			return;

@@ -14,7 +14,7 @@ class CDlgSaveNewTileSet : public CDialog
 {
 // Construction
 public:
-	CDlgSaveNewTileSet(CWnd* pParent = NULL);   // standard constructor
+	CDlgSaveNewTileSet(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgSaveNewTileSet)

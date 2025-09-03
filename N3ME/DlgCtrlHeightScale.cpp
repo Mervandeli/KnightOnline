@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgCtrlHeightScale dialog
 
 
-CDlgCtrlHeightScale::CDlgCtrlHeightScale(CWnd* pParent /*=NULL*/)
+CDlgCtrlHeightScale::CDlgCtrlHeightScale(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgCtrlHeightScale::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgCtrlHeightScale)

@@ -141,13 +141,13 @@ void CFormViewAnimation::OnBDelete()
 void CFormViewAnimation::OnBSetFrameStart() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 
 	int iAni = m_ListAnim0.GetCurSel();
 	__AnimData* pAniData = pAniCtrl->DataGet(iAni);
-	if(NULL == pAniData) return;
+	if(nullptr == pAniData) return;
 
 	pAniData->fFrmStart = GetDocument()->m_Scene.m_fFrmCur;
 	this->UpdateInfo();
@@ -156,13 +156,13 @@ void CFormViewAnimation::OnBSetFrameStart()
 void CFormViewAnimation::OnBSetFrameEnd() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 
 	int iAni = m_ListAnim0.GetCurSel();
 	__AnimData* pAniData = pAniCtrl->DataGet(iAni);
-	if(NULL == pAniData) return;
+	if(nullptr == pAniData) return;
 
 	pAniData->fFrmEnd = GetDocument()->m_Scene.m_fFrmCur;
 	this->UpdateInfo();
@@ -200,9 +200,9 @@ void CFormViewAnimation::UpdateFrameSliderAndOther()
 void CFormViewAnimation::UpdateInfo()
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 	if(TRUE == m_bUpdatingNow) return;
 
 	m_bUpdatingNow = TRUE;
@@ -274,10 +274,10 @@ void CFormViewAnimation::UpdateInfo()
 void CFormViewAnimation::UpdateAllInfo()
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
-	if(m_ListAnim0.GetSafeHwnd() == NULL) return;
+	if(nullptr == pAniCtrl) return;
+	if(m_ListAnim0.GetSafeHwnd() == nullptr) return;
 
 	int iCount = pAniCtrl->Count();
 
@@ -312,14 +312,14 @@ void CFormViewAnimation::UpdateAllInfo()
 void CFormViewAnimation::GetData()
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 	if(TRUE == m_bUpdatingNow) return;
 
 	int iAni = m_ListAnim0.GetCurSel();
 	__AnimData* pAniData = pAniCtrl->DataGet(iAni);
-	if(NULL == pAniData) return;
+	if(nullptr == pAniData) return;
 
 	CString szTmp = "";
 	GetDlgItemText(IDC_E_ANI_NAME, szTmp); pAniData->szName = szTmp;
@@ -357,7 +357,7 @@ void CFormViewAnimation::OnCPlay()
 		CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
 		pFrm->GetPaneRender()->m_bPlayingNow = true;
 		
-		SetTimer(0, 10, NULL);
+		SetTimer(0, 10, nullptr);
 	}
 	else
 	{
@@ -383,7 +383,7 @@ void CFormViewAnimation::OnTimer(UINT nIDEvent)
 		SetDlgItemText(IDC_E_FRAME_CUR, szFrm);
 
 		CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-		pFrm->GetPaneRender()->InvalidateRect(NULL, FALSE); // 렌더링..
+		pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE); // 렌더링..
 	}
 	
 	CFormView::OnTimer(nIDEvent);
@@ -420,13 +420,13 @@ void CFormViewAnimation::OnSelchangeListAnimation0()
 	this->UpdateInfo();
 	
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 
 	int iAni = this->m_ListAnim0.GetCurSel();
 	__AnimData* pAniData = pAniCtrl->DataGet(iAni);
-	if(NULL == pAniData) return;
+	if(nullptr == pAniData) return;
 
 	// Playe 중에는 큐에 쌓인다..
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
@@ -443,20 +443,20 @@ void CFormViewAnimation::OnSelchangeListAnimation0()
 	::SetFocus(GetDlgItem(IDC_E_ANI_NAME)->m_hWnd);
 
 	GetDocument()->m_Scene.m_fFrmCur = pAniData->fFrmStart; // 프레임 맞추고..
-	pView->InvalidateRect(NULL, FALSE);
+	pView->InvalidateRect(nullptr, FALSE);
 }
 
 void CFormViewAnimation::OnSelchangeListAnimation1() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 
 	int iAni = this->m_ListAnim1.GetCurSel();
 	CString szBlend;
 	pChr->AniUpperSet(iAni);
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetPaneRender()->InvalidateRect(NULL, FALSE);
+	pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE);
 }
 
 void CFormViewAnimation::OnChangeEAniName() 
@@ -497,7 +497,7 @@ void CFormViewAnimation::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollB
 
 	GetDocument()->m_Scene.m_fFrmCur = fFrm;
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetPaneRender()->InvalidateRect(NULL, FALSE);
+	pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE);
 
 	CFormView::OnHScroll(nSBCode, nPos, pScrollBar);
 }
@@ -506,7 +506,7 @@ void CFormViewAnimation::OnSize(UINT nType, int cx, int cy)
 {
 	CFormView::OnSize(nType, cx, cy);
 	
-	if(m_SldSceneFrm.GetSafeHwnd() != NULL)
+	if(m_SldSceneFrm.GetSafeHwnd() != nullptr)
 	{
 		CRect rcOrg, rcClient;
 		m_SldSceneFrm.GetWindowRect(rcOrg); // 그래프 컨트롤의 원래 화면 좌표를 
@@ -516,10 +516,10 @@ void CFormViewAnimation::OnSize(UINT nType, int cx, int cy)
 		int cx2 = rcClient.right - rcOrg.left - 5;
 		int cy2 = rcOrg.Height();
 
-		m_SldSceneFrm.SetWindowPos(NULL, 0, 0, cx2, cy2, SWP_NOMOVE | SWP_NOZORDER);
+		m_SldSceneFrm.SetWindowPos(nullptr, 0, 0, cx2, cy2, SWP_NOMOVE | SWP_NOZORDER);
 	}
 
-//	if(m_SldFrm.GetSafeHwnd() != NULL)
+//	if(m_SldFrm.GetSafeHwnd() != nullptr)
 //	{
 //		CRect rcOrg, rcClient;
 //		m_SldFrm.GetWindowRect(rcOrg); // 그래프 컨트롤의 원래 화면 좌표를 
@@ -529,10 +529,10 @@ void CFormViewAnimation::OnSize(UINT nType, int cx, int cy)
 //		int cx2 = rcClient.right - rcOrg.left - 5;
 //		int cy2 = rcOrg.Height();
 //
-//		m_SldFrm.SetWindowPos(NULL, 0, 0, cx2, cy2, SWP_NOMOVE | SWP_NOZORDER);
+//		m_SldFrm.SetWindowPos(nullptr, 0, 0, cx2, cy2, SWP_NOMOVE | SWP_NOZORDER);
 //	}
 
-	if(m_ListAnim0.GetSafeHwnd() != NULL)
+	if(m_ListAnim0.GetSafeHwnd() != nullptr)
 	{
 		CRect rcOrg, rcClient;
 		m_ListAnim0.GetWindowRect(rcOrg); // 그래프 컨트롤의 원래 화면 좌표를 
@@ -542,10 +542,10 @@ void CFormViewAnimation::OnSize(UINT nType, int cx, int cy)
 		int cx2 = rcOrg.Width();
 		int cy2 = rcClient.bottom - rcOrg.top - 5;
 
-		m_ListAnim0.SetWindowPos(NULL, 0, 0, cx2, cy2, SWP_NOMOVE | SWP_NOZORDER);
+		m_ListAnim0.SetWindowPos(nullptr, 0, 0, cx2, cy2, SWP_NOMOVE | SWP_NOZORDER);
 	}
 
-	if(m_ListAnim1.GetSafeHwnd() != NULL)
+	if(m_ListAnim1.GetSafeHwnd() != nullptr)
 	{
 		CRect rcOrg, rcClient;
 		m_ListAnim1.GetWindowRect(rcOrg); // 그래프 컨트롤의 원래 화면 좌표를 
@@ -555,16 +555,16 @@ void CFormViewAnimation::OnSize(UINT nType, int cx, int cy)
 		int cx2 = rcOrg.Width();
 		int cy2 = rcClient.bottom - rcOrg.top - 5;
 
-		m_ListAnim1.SetWindowPos(NULL, 0, 0, cx2, cy2, SWP_NOMOVE | SWP_NOZORDER);
+		m_ListAnim1.SetWindowPos(nullptr, 0, 0, cx2, cy2, SWP_NOMOVE | SWP_NOZORDER);
 	}
 }
 
 void CFormViewAnimation::OnBNew() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 
 	pAniCtrl->Release();
 	this->UpdateAllInfo();
@@ -573,14 +573,14 @@ void CFormViewAnimation::OnBNew()
 void CFormViewAnimation::OnBLoad() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 
 	CString FileName;
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
 
-	CFileDialog dlg(TRUE, "N3Anim", NULL, dwFlags, "Animation Data(*.N3Anim)|*.n3Anim||", NULL);
+	CFileDialog dlg(TRUE, "N3Anim", nullptr, dwFlags, "Animation Data(*.N3Anim)|*.n3Anim||", nullptr);
 	char szCurPath[_MAX_PATH]; GetCurrentDirectory(_MAX_PATH, szCurPath);
 	dlg.m_ofn.lpstrInitialDir = szCurPath;
 	if(dlg.DoModal() == IDCANCEL) return;
@@ -595,9 +595,9 @@ void CFormViewAnimation::OnBLoad()
 void CFormViewAnimation::OnBSave() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 
 	pAniCtrl->SaveToFile();
 }
@@ -605,14 +605,14 @@ void CFormViewAnimation::OnBSave()
 void CFormViewAnimation::OnBSaveAs() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 
 	CString FileName;
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
 
-	CFileDialog dlg(FALSE, "N3Anim", NULL, dwFlags, "Animation Data(*.N3Anim)|*.n3Anim||", NULL);
+	CFileDialog dlg(FALSE, "N3Anim", nullptr, dwFlags, "Animation Data(*.N3Anim)|*.n3Anim||", nullptr);
 	char szCurPath[_MAX_PATH]; GetCurrentDirectory(_MAX_PATH, szCurPath);
 	dlg.m_ofn.lpstrInitialDir = szCurPath;
 	if(dlg.DoModal() == IDCANCEL) return;
@@ -653,7 +653,7 @@ void CFormViewAnimation::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 void CFormViewAnimation::OnBSetFramePlugTraceStart() 
 {
 	__AnimData* pAniData = this->GetCurAniData();
-	if(NULL == pAniData) return;
+	if(nullptr == pAniData) return;
 
 	pAniData->fFrmPlugTraceStart = GetDocument()->m_Scene.m_fFrmCur;
 	this->UpdateInfo();
@@ -662,7 +662,7 @@ void CFormViewAnimation::OnBSetFramePlugTraceStart()
 void CFormViewAnimation::OnBSetFramePlugTraceEnd() 
 {
 	__AnimData* pAniData = this->GetCurAniData();
-	if(NULL == pAniData) return;
+	if(nullptr == pAniData) return;
 
 	pAniData->fFrmPlugTraceEnd = GetDocument()->m_Scene.m_fFrmCur;
 	this->UpdateInfo();
@@ -671,7 +671,7 @@ void CFormViewAnimation::OnBSetFramePlugTraceEnd()
 void CFormViewAnimation::OnBSetFrameSound0() 
 {
 	__AnimData* pAniData = this->GetCurAniData();
-	if(NULL == pAniData) return;
+	if(nullptr == pAniData) return;
 
 	pAniData->fFrmSound0 = GetDocument()->m_Scene.m_fFrmCur;
 	this->UpdateInfo();
@@ -680,7 +680,7 @@ void CFormViewAnimation::OnBSetFrameSound0()
 void CFormViewAnimation::OnBSetFrameSound1() 
 {
 	__AnimData* pAniData = this->GetCurAniData();
-	if(NULL == pAniData) return;
+	if(nullptr == pAniData) return;
 
 	pAniData->fFrmSound1 = GetDocument()->m_Scene.m_fFrmCur;
 	this->UpdateInfo();
@@ -689,7 +689,7 @@ void CFormViewAnimation::OnBSetFrameSound1()
 void CFormViewAnimation::OnBSetFrameStrike0() 
 {
 	__AnimData* pAniData = this->GetCurAniData();
-	if(NULL == pAniData) return;
+	if(nullptr == pAniData) return;
 
 	pAniData->fFrmStrike0 = GetDocument()->m_Scene.m_fFrmCur;
 	this->UpdateInfo();
@@ -698,7 +698,7 @@ void CFormViewAnimation::OnBSetFrameStrike0()
 void CFormViewAnimation::OnBSetFrameStrike1() 
 {
 	__AnimData* pAniData = this->GetCurAniData();
-	if(NULL == pAniData) return;
+	if(nullptr == pAniData) return;
 
 	pAniData->fFrmStrike1 = GetDocument()->m_Scene.m_fFrmCur;
 	this->UpdateInfo();
@@ -770,13 +770,13 @@ void CFormViewAnimation::OnInitialUpdate()
 __AnimData* CFormViewAnimation::GetCurAniData()
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return NULL;
+	if(nullptr == pChr) return nullptr;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return NULL;
+	if(nullptr == pAniCtrl) return nullptr;
 
 	int iAni = m_ListAnim0.GetCurSel();
 	int iCount = pAniCtrl->Count();
-	__AnimData* pAniData = NULL;
+	__AnimData* pAniData = nullptr;
 	if(iAni >= 0 && iAni < iCount) pAniData = pAniCtrl->DataGet(iAni);
 	return pAniData;
 }
@@ -784,9 +784,9 @@ __AnimData* CFormViewAnimation::GetCurAniData()
 void CFormViewAnimation::OnEditAnimationDataAdd() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 
 	pAniCtrl->Add();
 	int iAniCount = pAniCtrl->Count();
@@ -799,9 +799,9 @@ void CFormViewAnimation::OnEditAnimationDataAdd()
 void CFormViewAnimation::OnEditAnimationDataInsert() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 
 	int iAni = m_ListAnim0.GetCurSel();
 	pAniCtrl->Insert(iAni);
@@ -814,9 +814,9 @@ void CFormViewAnimation::OnEditAnimationDataInsert()
 void CFormViewAnimation::OnEditAnimationDataDelete() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 
 	int iAni = m_ListAnim0.GetCurSel();
 	pAniCtrl->Delete(iAni);
@@ -827,9 +827,9 @@ void CFormViewAnimation::OnEditAnimationDataDelete()
 void CFormViewAnimation::OnEditAnimationDataCopy() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 
 	int iAni = m_ListAnim0.GetCurSel();
 	__AnimData* pAniData = pAniCtrl->DataGet(iAni);
@@ -840,9 +840,9 @@ void CFormViewAnimation::OnEditAnimationDataCopy()
 void CFormViewAnimation::OnEditAnimationDataPaste() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 
 	int iAni = m_ListAnim0.GetCurSel();
 	__AnimData* pAniData = pAniCtrl->DataGet(iAni);
@@ -854,9 +854,9 @@ void CFormViewAnimation::OnEditAnimationDataPaste()
 void CFormViewAnimation::OnEditAnimationDataMoveUp() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl || pAniCtrl->Count() <= 0) return;
+	if(nullptr == pAniCtrl || pAniCtrl->Count() <= 0) return;
 	int iAni = m_ListAnim0.GetCurSel();
 	int iAniToChange = iAni - 1;
 	pAniCtrl->Swap(iAni, iAniToChange); // 위거랑 아래꺼랑 바꾼다.
@@ -868,9 +868,9 @@ void CFormViewAnimation::OnEditAnimationDataMoveUp()
 void CFormViewAnimation::OnEditAnimationDataMoveDown() 
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl || pAniCtrl->Count() <= 0) return;
+	if(nullptr == pAniCtrl || pAniCtrl->Count() <= 0) return;
 	int iAni = m_ListAnim0.GetCurSel();
 	int iAniToChange = iAni + 1;
 	pAniCtrl->Swap(iAni, iAniToChange); // 위거랑 아래꺼랑 바꾼다.
@@ -900,16 +900,16 @@ void CFormViewAnimation::OnBCalculateDelayTimeWithLowerAnimation()
 void CFormViewAnimation::CalculateDelayTimeAndUpdate(int iAnimationIndexOffset)
 {
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl) return;
+	if(nullptr == pAniCtrl) return;
 
 	int iAni = m_ListAnim0.GetCurSel();
 	int iCount = pAniCtrl->Count();
 	__AnimData* pAniData = pAniCtrl->DataGet(iAni);
 	__AnimData* pAniData2 = pAniCtrl->DataGet(iAni + iAnimationIndexOffset);
 
-	if(NULL == pAniData || NULL == pAniData2) return;
+	if(nullptr == pAniData || nullptr == pAniData2) return;
 
 	float fAttackCount = 1.0f;
 	if(IsDlgButtonChecked(IDC_C_DOUBLE_ATTACK)) fAttackCount = 2.0f;

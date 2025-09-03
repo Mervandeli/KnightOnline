@@ -16,7 +16,7 @@ class CDlgEditPartMesh : public CDialog
 {
 // Construction
 public:
-	CDlgEditPartMesh(CWnd* pParent = NULL);   // standard constructor
+	CDlgEditPartMesh(CWnd* pParent = nullptr);   // standard constructor
 
 	CMainFrame*			m_pRefFrm;
 

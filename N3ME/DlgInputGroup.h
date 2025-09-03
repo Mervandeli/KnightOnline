@@ -14,7 +14,7 @@ class CDlgInputGroup : public CDialog
 {
 // Construction
 public:
-	CDlgInputGroup(CWnd* pParent = NULL);   // standard constructor
+	CDlgInputGroup(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgInputGroup)

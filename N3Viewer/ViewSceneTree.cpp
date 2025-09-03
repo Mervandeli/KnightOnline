@@ -119,12 +119,12 @@ void CViewSceneTree::UpdateAllInfo()
 
 void CViewSceneTree::ExpandTree(HTREEITEM hItem)
 {
-	if(hItem == NULL) return;
+	if(hItem == nullptr) return;
 
 	GetTreeCtrl().Expand(hItem, TVE_EXPAND);
 
 	HTREEITEM hChild = GetTreeCtrl().GetChildItem(hItem);
-	while(hChild != NULL)
+	while(hChild != nullptr)
 	{
 		this->ExpandTree(hChild);
 		hChild = GetTreeCtrl().GetNextItem(hChild, TVGN_NEXT);
@@ -133,7 +133,7 @@ void CViewSceneTree::ExpandTree(HTREEITEM hItem)
 
 void CViewSceneTree::UpdateTreeItem(HTREEITEM hParent, CN3Base *pBase)
 {
-	if(pBase == NULL) return;
+	if(pBase == nullptr) return;
 	
 	DWORD dwType = pBase->Type();
 	int nItem = 0;
@@ -154,12 +154,12 @@ void CViewSceneTree::UpdateTreeItem(HTREEITEM hParent, CN3Base *pBase)
 	else if(dwType & OBJ_SKIN) nItem = 14;
 	else if(dwType & OBJ_TRANSFORM) nItem = 0;
 
-	CN3BaseFileAccess* pBFA = NULL;
+	CN3BaseFileAccess* pBFA = nullptr;
 	if(pBase->Type() & OBJ_BASE_FILEACCESS) pBFA = (CN3BaseFileAccess*)pBase;
 	
-	HTREEITEM hItem = NULL;
-	if(pBFA) hItem = GetTreeCtrl().InsertItem(pBFA->FileName().c_str(), nItem, nItem, hParent, NULL);
-	else hItem = GetTreeCtrl().InsertItem(pBase->m_szName.c_str(), nItem, nItem, hParent, NULL);
+	HTREEITEM hItem = nullptr;
+	if(pBFA) hItem = GetTreeCtrl().InsertItem(pBFA->FileName().c_str(), nItem, nItem, hParent, nullptr);
+	else hItem = GetTreeCtrl().InsertItem(pBase->m_szName.c_str(), nItem, nItem, hParent, nullptr);
 	GetTreeCtrl().SetItemData(hItem, (DWORD)pBase);
 
 	if(dwType & OBJ_SCENE)
@@ -171,7 +171,7 @@ void CViewSceneTree::UpdateTreeItem(HTREEITEM hParent, CN3Base *pBase)
 		GetTreeCtrl().SetItemText(hItem, str);
 
 		int i = 0;
-		HTREEITEM hItem2 = NULL;
+		HTREEITEM hItem2 = nullptr;
 
 		hItem2 = GetTreeCtrl().InsertItem("Camera", 3, 3, hItem);
 		int nCC = pScene->CameraCount();
@@ -216,24 +216,24 @@ void CViewSceneTree::UpdateTreeItem(HTREEITEM hParent, CN3Base *pBase)
 	{
 		CN3Chr* pChr = (CN3Chr*)pBase;
 
-		HTREEITEM hItem2 = NULL, hItem3;
+		HTREEITEM hItem2 = nullptr, hItem3;
 		CString str, szTmp;
 
 		for(int i = 0; i < MAX_CHR_LOD; i++)
 		{
 			str.Format("Level Of Detail %d", i); hItem2 = GetTreeCtrl().InsertItem(str, hItem);
 
-			if(pChr->JointGet(i) != NULL) szTmp = pChr->JointGet(i)->Name(); else szTmp = "";
+			if(pChr->JointGet(i) != nullptr) szTmp = pChr->JointGet(i)->Name(); else szTmp = "";
 			str.Format("Joint : %s", szTmp);
 			hItem3 = GetTreeCtrl().InsertItem(str, hItem2); GetTreeCtrl().SetItemData(hItem3, (DWORD)pChr->JointGet(i));
 			
 			for(int j = 0; j < MAX_CHR_PART; j++)
 			{
-				if(pChr->MeshGet(i, j) != NULL) szTmp = pChr->MeshGet(i, j)->Name(); else szTmp = "";
+				if(pChr->MeshGet(i, j) != nullptr) szTmp = pChr->MeshGet(i, j)->Name(); else szTmp = "";
 				str .Format("Mesh : %s", szTmp);
 				hItem3 = GetTreeCtrl().InsertItem(str, hItem2); GetTreeCtrl().SetItemData(hItem3, (DWORD)pChr->MeshGet(i, j));
 				
-				if(pChr->SkinGet(i, j) != NULL) szTmp = pChr->SkinGet(i, j)->Name(); else szTmp = "";
+				if(pChr->SkinGet(i, j) != nullptr) szTmp = pChr->SkinGet(i, j)->Name(); else szTmp = "";
 				str .Format("Skin : %s", szTmp);
 				hItem3 = GetTreeCtrl().InsertItem(str, hItem2); GetTreeCtrl().SetItemData(hItem3, (DWORD)pChr->SkinGet(i, j));
 			}
@@ -244,11 +244,11 @@ void CViewSceneTree::UpdateTreeItem(HTREEITEM hParent, CN3Base *pBase)
 		CN3Shape* pShape = (CN3Shape*)pBase;
 
 		CString str;
-		HTREEITEM hItem2 = NULL;
+		HTREEITEM hItem2 = nullptr;
 		for(int i = 0; i < MAX_SHAPE_OBJECT; i++)
 		{
 			CN3PMeshInstance* pPMeshInstance = pShape->MeshGet(i);
-			if(pPMeshInstance == NULL) continue;
+			if(pPMeshInstance == nullptr) continue;
 			
 			str.Format("Mesh : %s", pPMeshInstance->Name());
 			hItem2 = GetTreeCtrl().InsertItem(str, hItem); GetTreeCtrl().SetItemData(hItem2, (DWORD)pPMeshInstance);
@@ -265,9 +265,9 @@ void CViewSceneTree::SelectTree(HTREEITEM hParent, int nDepth, int* nSeq)
 	if(hParent == TVI_ROOT) nTmp = 0;
 	if(nTmp == nDepth) return;
 
-	HTREEITEM hChild = NULL;
+	HTREEITEM hChild = nullptr;
 	for(	int i = 0, HTREEITEM hChild = GetTreeCtrl().GetChildItem(hParent);
-			hChild != NULL && nSeq[nDepth] != i;
+			hChild != nullptr && nSeq[nDepth] != i;
 			i++, hChild = GetTreeCtrl().GetNextItem(hChild, TVGN_NEXT))
 	{
 		if(
@@ -284,7 +284,7 @@ void CViewSceneTree::GetSeq(HTREEITEM hParent, HTREEITEM hItem, int& nDepth, int
 
 void CViewSceneTree::SelectObject(HTREEITEM hItem, void *pItemData)
 {
-	if(NULL == pItemData || NULL == hItem) return;
+	if(nullptr == pItemData || nullptr == hItem) return;
 
 	if(hItem != TVI_ROOT)
 	{
@@ -296,7 +296,7 @@ void CViewSceneTree::SelectObject(HTREEITEM hItem, void *pItemData)
 	}
 
 	HTREEITEM hChild = GetTreeCtrl().GetChildItem(hItem);
-	while(hChild != NULL)
+	while(hChild != nullptr)
 	{
 		this->SelectObject(hChild, pItemData);
 		hChild = GetTreeCtrl().GetNextItem(hChild, TVGN_NEXT);
@@ -309,7 +309,7 @@ void CViewSceneTree::OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult)
 	
 	// TODO: Add your control notification handler code here
 	HTREEITEM hItem = pNMTreeView->itemNew.hItem;
-	if(hItem == NULL) return;
+	if(hItem == nullptr) return;
 
 	CN3Base* pBaseOld = GetDocument()->m_pSelectedObj;
 	CN3Base* pBase = (CN3Base*)GetTreeCtrl().GetItemData(hItem);
@@ -319,7 +319,7 @@ void CViewSceneTree::OnSelchanged(NMHDR* pNMHDR, LRESULT* pResult)
 	if(pBaseOld != pBase)
 	{
 		pFrm->GetViewProperty()->UpdateInfo();
-		pFrm->GetView()->InvalidateRect(NULL, FALSE);
+		pFrm->GetView()->InvalidateRect(nullptr, FALSE);
 
 		if(pFrm->m_DlgPMeshEdit.GetSafeHwnd() && (pBase->Type() & OBJ_SHAPE))
 		{
@@ -338,11 +338,11 @@ void CViewSceneTree::OnRclick(NMHDR* pNMHDR, LRESULT* pResult)
 	GetCursorPos(&point);
 	CPoint pt = point; GetTreeCtrl().ScreenToClient(&pt);
 	HTREEITEM hItem = GetTreeCtrl().HitTest(pt);
-	if(hItem == NULL) return;
+	if(hItem == nullptr) return;
 
 	GetTreeCtrl().SelectItem(hItem);
 	CN3Base* pBase = (CN3Base*)(GetTreeCtrl().GetItemData(hItem));
-	if(pBase != NULL)
+	if(pBase != nullptr)
 	{
 		CMenu popup;
 		popup.LoadMenu(IDR_POPUP_SCENE);
@@ -386,10 +386,10 @@ void CViewSceneTree::OnBeginlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 1;
 
 	HTREEITEM hI = pTDI->item.hItem;
-	if(NULL == hI) return;
+	if(nullptr == hI) return;
 
 	CN3Base* pBase = (CN3Base*)GetTreeCtrl().GetItemData(hI);
-	if(NULL == pBase) return;
+	if(nullptr == pBase) return;
 
 	*pResult = 0;
 }
@@ -400,10 +400,10 @@ void CViewSceneTree::OnEndlabeledit(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 
 	HTREEITEM hI = pTDI->item.hItem;
-	if(NULL == hI) return;
+	if(nullptr == hI) return;
 
 	CN3Base* pBase = (CN3Base*)GetTreeCtrl().GetItemData(hI);
-	if(NULL == pBase || !(pBase->Type() & OBJ_BASE_FILEACCESS)) return;
+	if(nullptr == pBase || !(pBase->Type() & OBJ_BASE_FILEACCESS)) return;
 
 	CN3BaseFileAccess* pBFA = (CN3BaseFileAccess*)pBase;
 	if(pTDI->item.pszText)

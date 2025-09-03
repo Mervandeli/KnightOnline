@@ -24,7 +24,7 @@ class CN3Joint : public CN3Transform
 	friend class CN3Joint; // Position, Rotation, Scale 값들을 자유롭게 다룰수 있어야 한다..
 public:
 	__Quaternion			m_qOrient;		// Joint Orient Quaternion
-	CN3AnimKey				m_KeyOrient;	// Joint Orient 키값... NULL 이면 없는거다..
+	CN3AnimKey				m_KeyOrient;	// Joint Orient 키값... nullptr 이면 없는거다..
 
 protected:
 	CN3Joint*				m_pParent;
@@ -75,7 +75,7 @@ public:
 	BOOL FindPointerByName(const std::string& szName, CN3Joint*& pJoint); // 이름을 넣으면 해당 노드의 포인터를 돌려준다..
 	void RotSet(const __Quaternion& qtRot) { m_qRot = qtRot; this->ReCalcMatrix(); }
 	void RotSet(float x, float y, float z, float w) { m_qRot.x = x; m_qRot.y = y; m_qRot.z = z; m_qRot.w = w; this->ReCalcMatrix(); }
-	void Render(const __Matrix44* pMtxParent = NULL, float fUnitSize = 0.1f);
+	void Render(const __Matrix44* pMtxParent = nullptr, float fUnitSize = 0.1f);
 #endif // end of _N3TOOL
 
 	void Release();

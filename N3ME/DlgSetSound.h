@@ -17,7 +17,7 @@ class CDlgSetSound : public CDialog
 {
 // Construction
 public:
-	CDlgSetSound(CWnd* pParent = NULL);   // standard constructor
+	CDlgSetSound(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgSetSound)

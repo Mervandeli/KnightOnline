@@ -16,7 +16,7 @@ class CDlgEditPartBillBoard : public CDialog
 {
 // Construction
 public:
-	CDlgEditPartBillBoard(CWnd* pParent = NULL);   // standard constructor
+	CDlgEditPartBillBoard(CWnd* pParent = nullptr);   // standard constructor
 
 	CMainFrame*			m_pRefFrm;
 

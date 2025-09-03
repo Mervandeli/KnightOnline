@@ -18,7 +18,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgLight dialog
 
 
-CDlgLight::CDlgLight(CWnd* pParent /*=NULL*/)
+CDlgLight::CDlgLight(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgLight::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgLight)
@@ -26,8 +26,8 @@ CDlgLight::CDlgLight(CWnd* pParent /*=NULL*/)
 	m_strLightObjName = _T("");
 	//}}AFX_DATA_INIT
 
-	m_pRefLightObjMgr = NULL;
-	m_pSelLO = NULL;
+	m_pRefLightObjMgr = nullptr;
+	m_pSelLO = nullptr;
 }
 
 
@@ -78,7 +78,7 @@ BOOL CDlgLight::OnInitDialog()
 	m_strLightObjName.Empty();
 
 	m_pLOColor = (COLORREF)(0x00ffffff);
-	m_pSelLO = NULL;
+	m_pSelLO = nullptr;
 
 	UpdateData(FALSE);
 
@@ -111,7 +111,7 @@ void CDlgLight::OnBtnExport()
 void CDlgLight::OnBtnImport() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "LightObjs", NULL, dwFlags, "Light Obejct Data File(*.LightObjs)|*.LightObjs||", NULL);
+	CFileDialog dlg(TRUE, "LightObjs", nullptr, dwFlags, "Light Obejct Data File(*.LightObjs)|*.LightObjs||", nullptr);
 
 	if(dlg.DoModal() == IDCANCEL) return;
 
@@ -182,7 +182,7 @@ void CDlgLight::OnBtnDownload()
 	
 	m_ListLO.DeleteString(idx);
 	idx = m_ListLO.GetCurSel();
-	if(idx<0) m_pSelLO = NULL;
+	if(idx<0) m_pSelLO = nullptr;
 	else m_pSelLO = (LPLIGHTOBJ)m_ListLO.GetItemDataPtr(idx);
 	
 	LPLIGHTOBJ pLO = m_pRefLightObjMgr->m_pCurrLO;
@@ -221,7 +221,7 @@ void CDlgLight::OnBtnDelete()
 	if(idx<0) return;
 	m_ListLO.DeleteString(idx);
 	idx = m_ListLO.GetCurSel();
-	if(idx<0) m_pSelLO = NULL;
+	if(idx<0) m_pSelLO = nullptr;
 	else m_pSelLO = (LPLIGHTOBJ)m_ListLO.GetItemDataPtr(idx);
 
 	Invalidate();

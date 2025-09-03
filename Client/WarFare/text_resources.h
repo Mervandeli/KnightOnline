@@ -218,21 +218,21 @@ enum e_TextResourceID
 	IDS_NEWCHR_STA								= 3220,
 	IDS_NPCEVENT_TITLE_REPAIR					= 3301,
 	IDS_NPC_EVENT_TITLE_TRADE					= 3302,
-	IDS_PARTY_CONFIRM_DESTROY					= 3401,
+	IDS_PARTY_CONFIRM_DESTROY					= 3401,	// Are you sure you want to disband the party?
 	IDS_PARTY_CONFIRM_DISCHARGE					= 3402,
-	IDS_PARTY_CONFIRM_LEAVE						= 3403,
-	IDS_PARTY_DESTROY							= 3404,
-	IDS_PARTY_INSERT							= 3405,
-	IDS_PARTY_INSERT_ERR						= 3406,
-	IDS_PARTY_INSERT_ERR_INVALID_NATION			= 3407,
-	IDS_PARTY_INSERT_ERR_LEVEL_DIFFERENCE		= 3408,
-	IDS_PARTY_INSERT_ERR_REJECTED				= 3409,
+	IDS_PARTY_CONFIRM_LEAVE						= 3403,	// Would you like to quit the party?
+	IDS_PARTY_DESTROY							= 3404,	// The party has been disbanded.
+	IDS_PARTY_INSERT							= 3405,	//  has joined the party.
+	IDS_PARTY_INSERT_ERR						= 3406,	// The invitation to the party has been declined.
+	IDS_PARTY_INSERT_ERR_INVALID_NATION			= 3407,	// You cannot form a party with a user from the other nation.
+	IDS_PARTY_INSERT_ERR_LEVEL_DIFFERENCE		= 3408,	// You cannot form a party because of the Level difference.
+	IDS_PARTY_INSERT_ERR_REJECTED				= 3409,	// The invitation to the party has been declined.
 	IDS_PARTY_INSERT_FAILED						= 3410,
-	IDS_PARTY_INVITE							= 3411,
+	IDS_PARTY_INVITE							= 3411,	// Player was invited into the party. Waiting for a response.
 	IDS_PARTY_INVITE_FAILED						= 3412,
 	IDS_PARTY_ITEM_GET							= 3413,
-	IDS_PARTY_LEAVE								= 3414,
-	IDS_PARTY_PERMIT							= 3415,
+	IDS_PARTY_LEAVE								= 3414,	// You've quit the party.
+	IDS_PARTY_PERMIT							= 3415,	// has invited you to join the party. Will you join? 
 	IDS_PERSONAL_TRADE_FMT_WAIT					= 3501,
 	IDS_PERSONAL_TRADE_PERMIT					= 3502,
 	IDS_PERSONAL_TRADE_REQUEST					= 3503,
@@ -519,6 +519,7 @@ enum e_TextResourceID
 	IDS_CANNOT_EXIT_DURING_A_BATTLE				= 7634,
 
 	IDS_WARP_LEVEL_30_TO_50						= 7657, // Only characters with level 30~50 can enter.
+	IDS_SKILL_FAIL_PLEASE_EQUIP_YOUR_WEAPON		= 7658, // Please equip your weapon. 
 	IDS_WARP_DO_NOT_QUALIFY						= 7659, // You cannot enter because you do not qualify. 
 
 	IDS_PRIVATE_CMD_CAT							= 7800,

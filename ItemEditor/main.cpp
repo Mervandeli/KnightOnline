@@ -1,4 +1,4 @@
-/*
+﻿/*
 - want to separate a KO item from a KO mesh to allow for easy swapping
 */
 
@@ -81,7 +81,7 @@ public:
 	void SetCellFGColor(Fl_Color color) {cell_fgcolor = color;}
 
 public:
-	ItemTableView(int x, int y, int w, int h, const char* l = NULL):
+	ItemTableView(int x, int y, int w, int h, const char* l = nullptr):
 	Fl_Table_Row(x, y, w, h, l) {
 		cell_bgcolor = FL_WHITE;
 		cell_fgcolor = FL_BLACK;
@@ -174,8 +174,8 @@ void ItemTableView::draw_cell(TableContext context,
 	static char s[(NAME_LENGTH+1)];
 	memset(s, 0x00, (NAME_LENGTH+1)*sizeof(char));
 
-	_ITEM_TABLE* item = NULL;
-	__TABLE_ITEM_BASIC* item_tbl = NULL;
+	_ITEM_TABLE* item = nullptr;
+	__TABLE_ITEM_BASIC* item_tbl = nullptr;
 
 	ItemInfo* item_info;
 
@@ -392,7 +392,7 @@ void mesh_cb(Fl_Widget* w, void*) {
 
 	while(chooser.shown()) {Fl::wait();}
 
-	if(chooser.value() == NULL) {
+	if(chooser.value() == nullptr) {
 		printf("Nothing selected\n");
 		return;
 	}

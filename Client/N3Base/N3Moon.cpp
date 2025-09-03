@@ -18,7 +18,7 @@ static char THIS_FILE[]=__FILE__;
 
 CN3Moon::CN3Moon()
 {
-	m_pTexture = NULL;
+	m_pTexture = nullptr;
 	m_fCurRadian = D3DX_PI;
 	m_iMoonPhaseIndex = 0;
 }
@@ -91,7 +91,7 @@ void CN3Moon::Render(__Matrix44& matView, __Matrix44& matProj)
 	m_pVertices[3].x = (float)rcMoon.left;		m_pVertices[3].y = (float)rcMoon.bottom;
 
 	if(m_pTexture) s_lpD3DDev->SetTexture(0, m_pTexture->Get());
-	else s_lpD3DDev->SetTexture(0, NULL);
+	else s_lpD3DDev->SetTexture(0, nullptr);
 	s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
 	s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
 	s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );

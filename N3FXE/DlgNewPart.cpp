@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgNewPart dialog
 
 
-CDlgNewPart::CDlgNewPart(CWnd* pParent /*=NULL*/)
+CDlgNewPart::CDlgNewPart(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgNewPart::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgNewPart)

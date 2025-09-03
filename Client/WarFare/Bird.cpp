@@ -20,8 +20,8 @@ static char THIS_FILE[]=__FILE__;
 
 CBird::CBird()
 {
-	m_pSnd = NULL;
-	m_pShape = NULL;
+	m_pSnd = nullptr;
+	m_pShape = nullptr;
 
 	Release();	
 }
@@ -34,7 +34,7 @@ CBird::~CBird()
 void CBird::Release()
 {
 	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd);
-	if (m_pShape) {delete m_pShape; m_pShape = NULL;}
+	if (m_pShape) {delete m_pShape; m_pShape = nullptr;}
 	m_vPivot.Set(0,0,0);
 	m_fRadius = 0.0f;
 	m_fRadian = 0.0f;
@@ -48,7 +48,7 @@ void CBird::Release()
 
 void CBird::Tick()
 {
-	if (m_pShape == NULL) return;
+	if (m_pShape == nullptr) return;
 
 	m_fRadian += (m_fRadianSpeed*s_fSecPerFrm);
 
@@ -101,7 +101,7 @@ void CBird::Tick()
 
 void CBird::Render()
 {
-	if (m_pShape == NULL) return;
+	if (m_pShape == nullptr) return;
 	m_pShape->Render();
 }
 
@@ -109,7 +109,7 @@ int CBird::LoadBird(const std::string& szFN)
 {
 	Release();
 	FILE* stream = fopen(szFN.c_str(), "r"); //text파일로 만든다 
-	if(NULL == stream)
+	if(nullptr == stream)
 	{
 #if _DEBUG
 		std::string szErr = fmt::format("failed to open file - {}", szFN);
@@ -128,7 +128,7 @@ int CBird::LoadBird(const std::string& szFN)
 
 	fclose(stream);
 
-	__ASSERT(m_pShape == NULL, "Bird memory leak 가능성");
+	__ASSERT(m_pShape == nullptr, "Bird memory leak 가능성");
 	m_pShape = new CN3Shape;
 	m_pShape->LoadFromFile(szRrcName);
 
@@ -140,7 +140,7 @@ int CBird::LoadBird(const std::string& szFN)
 	m_fFactorYSpeed1 = 0.35f + ((rand()%3000)/10000.0f);
 	m_fFactorYSpeed2 = 0.18f + ((rand()%3500)/10000.0f);
 
-	if(NULL == m_pSnd) m_pSnd = CN3Base::s_SndMgr.CreateObj(1000);
+	if(nullptr == m_pSnd) m_pSnd = CN3Base::s_SndMgr.CreateObj(1000);
 	m_fSndInterval = 0.0f;
 
 	return true;

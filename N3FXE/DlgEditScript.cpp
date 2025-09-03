@@ -18,7 +18,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgEditScript dialog
 
 
-CDlgEditScript::CDlgEditScript(CWnd* pParent /*=NULL*/)
+CDlgEditScript::CDlgEditScript(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgEditScript::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgEditScript)
@@ -71,8 +71,8 @@ CDlgEditScript::CDlgEditScript(CWnd* pParent /*=NULL*/)
 	m_pPartStartTime[15] = &m_fStartTime15;
 
 
-	m_pRefFrm = NULL;
-	m_pFXBundle = NULL;
+	m_pRefFrm = nullptr;
+	m_pFXBundle = nullptr;
 }
 
 
@@ -274,7 +274,7 @@ bool CDlgEditScript::LoadBundle(CString &strPathName)
 	if(m_pFXBundle)
 	{
 		delete m_pFXBundle;
-		m_pFXBundle = NULL;
+		m_pFXBundle = nullptr;
 	}
 
 	///////////////////////////////////////////////////
@@ -314,7 +314,7 @@ bool CDlgEditScript::LoadBundle(CString &strPathName)
 				//콤보박스 셋팅..
 				char szComboName[_MAX_PATH];
 				_splitpath(szScriptFullPath, szDrive, szDir, szFName, szExt);
-				_makepath(szComboName, NULL, NULL, szFName, szExt);
+				_makepath(szComboName, nullptr, nullptr, szFName, szExt);
 
 				int ComboCount = m_pPartName[i]->GetCount();
 				for(int j=0;j<ComboCount;j++)
@@ -339,7 +339,7 @@ bool CDlgEditScript::LoadBundle(CString &strPathName)
 	}
 
 	delete m_pFXBundle;
-	m_pFXBundle = NULL;
+	m_pFXBundle = nullptr;
 
 	return false;
 }
@@ -349,7 +349,7 @@ bool CDlgEditScript::NewBundle()
 	if(m_pFXBundle)
 	{
 		delete m_pFXBundle;
-		m_pFXBundle = NULL;
+		m_pFXBundle = nullptr;
 	}
 
 	///////////////////////////////////////////////////
@@ -567,7 +567,7 @@ void CDlgEditScript::OnBtnSaveAs()
 		char szDir[_MAX_DIR];
 		char szDrive[_MAX_DRIVE];
 		sprintf(szGameFileName, m_pFXBundle->FileName().c_str());
-		_splitpath(szGameFileName, szDrive, szDir, NULL, szExt);
+		_splitpath(szGameFileName, szDrive, szDir, nullptr, szExt);
 		sprintf(szGameFileName,"%s%s%s%s",szDrive, szDir, dlg.m_strNewFileName.GetString(),szExt);		
 		m_pFXBundle->FileNameSet(szGameFileName);
 
@@ -604,11 +604,11 @@ void CDlgEditScript::OnDestroy()
 {
 	OnBtnStop();
 
-	if(m_pRefFrm->m_pCurrFX == m_pFXBundle) m_pRefFrm->m_pCurrFX = NULL;
+	if(m_pRefFrm->m_pCurrFX == m_pFXBundle) m_pRefFrm->m_pCurrFX = nullptr;
 	if(m_pFXBundle)
 	{
 		delete m_pFXBundle;
-		m_pFXBundle = NULL;
+		m_pFXBundle = nullptr;
 	}
 
 	CDialog::OnDestroy();	

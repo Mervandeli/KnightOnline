@@ -72,10 +72,10 @@ public:
 #ifdef _N3TOOL
 	void*	DataGet(int index) 
 	{
-		if(index < 0 || index >= m_nCount) return NULL;
+		if(index < 0 || index >= m_nCount) return nullptr;
 		else if(KEY_VECTOR3 == m_eType) return &(((__Vector3*)m_pDatas)[index]);
 		else if(KEY_QUATERNION == m_eType) return &(((__Quaternion*)m_pDatas)[index]);
-		else return NULL;
+		else return nullptr;
 	}
 	bool Save(HANDLE hFile);
 #endif // end of

@@ -16,7 +16,7 @@ class CDlgSaveDivision : public CDialog
 {
 // Construction
 public:
-	CDlgSaveDivision(CWnd* pParent = NULL);   // standard constructor
+	CDlgSaveDivision(CWnd* pParent = nullptr);   // standard constructor
 
 // Variables...
 	class CLyTerrain*	m_pTerrain;

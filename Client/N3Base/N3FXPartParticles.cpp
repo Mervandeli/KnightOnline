@@ -64,15 +64,15 @@ CN3FXPartParticles::CN3FXPartParticles()
 	for(i=0;i<NUM_KEY_COLOR;i++) m_dwChangeColor[i] = 0xffffffff;
 	m_bChangeColor = false;
 
-	m_pRefShape = m_pShape = NULL;
+	m_pRefShape = m_pShape = nullptr;
 	m_fMeshFPS = 30.0f;
 
 	m_vPrevShapePos.Set(0.0f, 0.0f, 0.0f);
 
 	m_bAnimKey = false;
 
-	m_pVB = NULL;
-	//m_pIB = NULL;
+	m_pVB = nullptr;
+	//m_pIB = nullptr;
 
 	m_fTexRotateVelocity = 0.0f;
 	m_fScaleVelX = m_fScaleVelY = 0.0f;
@@ -111,18 +111,18 @@ CN3FXPartParticles::~CN3FXPartParticles()
 	{
 		m_pShape->Release();
 		delete m_pShape;
-		m_pShape = NULL;
+		m_pShape = nullptr;
 	}
 
 	if(m_pVB) 
 	{
 		delete[] m_pVB;
-		m_pVB = NULL;
+		m_pVB = nullptr;
 	}
 	//if(m_pIB)
 	//{
 	//	delete[] m_pIB;
-	//	m_pIB = NULL;
+	//	m_pIB = nullptr;
 	//}
 }
 
@@ -724,7 +724,7 @@ void CN3FXPartParticles::Render()
 				pAP->fCameraDistance	= CameraDist(pParticle->m_pVB[0], pParticle->m_pVB[1], pParticle->m_pVB[2]);
 
 				if(m_ppRefTex[pParticle->m_iTexIdx]) pAP->lpTex = m_ppRefTex[pParticle->m_iTexIdx]->Get();
-				else pAP->lpTex = NULL;
+				else pAP->lpTex = nullptr;
 
 				__Matrix44 mtxWorld;
 				mtxWorld.Identity();
@@ -734,7 +734,7 @@ void CN3FXPartParticles::Render()
 				pAP->nPrimitiveCount	= 2;
 				pAP->nVertexCount		= NUM_VERTEX_PARTICLE;
 				pAP->pVertices			= pParticle->m_pVB;
-				pAP->pwIndices			= NULL;
+				pAP->pwIndices			= nullptr;
 			}
 		}		
 
@@ -899,7 +899,7 @@ void CN3FXPartParticles::Render()
 
 		if(m_ppRefTex[TexIdx]) CN3Base::s_lpD3DDev->SetTexture(0, m_ppRefTex[TexIdx]->Get());
 		else
-			CN3Base::s_lpD3DDev->SetTexture(0, NULL);
+			CN3Base::s_lpD3DDev->SetTexture(0, nullptr);
 
 		HRESULT hr;
 		hr = CN3Base::s_lpD3DDev->DrawPrimitiveUP( D3DPT_TRIANGLELIST, m_pNumTex[TexIdx], &(m_pVB[VBIdx]), sizeof(__VertexXyzColorT1));
@@ -1406,7 +1406,7 @@ void CN3FXPartParticles::Duplicate(CN3FXPartParticles* pSrc)
 		if(m_pShape)
 		{
 			delete m_pShape;
-			m_pShape = NULL;
+			m_pShape = nullptr;
 		}
 
 		m_pShape = new CN3FXShape;

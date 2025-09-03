@@ -67,7 +67,7 @@ typedef struct __TerrainTileTexInfo
 	
 	__TerrainTileTexInfo()
 	{
-		pTex = NULL;
+		pTex = nullptr;
 		u = v = 0.0f;
 	}
 } TERRAINTILETEXINFO, *LPTERRAINTILETEXINFO;

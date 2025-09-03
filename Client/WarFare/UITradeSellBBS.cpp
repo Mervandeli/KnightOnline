@@ -35,22 +35,22 @@ static char THIS_FILE[]=__FILE__;
 
 CUITradeSellBBS::CUITradeSellBBS()
 {
-//	m_pList_Infos			= NULL;
-	m_pBtn_PageUp			= NULL;
-	m_pBtn_PageDown			= NULL;
-	m_pBtn_Refresh			= NULL;
-	m_pBtn_Close			= NULL;
-	m_pBtn_Register			= NULL;
-	m_pBtn_RegisterCancel	= NULL;
-	m_pBtn_Whisper			= NULL;
-	m_pBtn_Trade			= NULL;
+//	m_pList_Infos			= nullptr;
+	m_pBtn_PageUp			= nullptr;
+	m_pBtn_PageDown			= nullptr;
+	m_pBtn_Refresh			= nullptr;
+	m_pBtn_Close			= nullptr;
+	m_pBtn_Register			= nullptr;
+	m_pBtn_RegisterCancel	= nullptr;
+	m_pBtn_Whisper			= nullptr;
+	m_pBtn_Trade			= nullptr;
 
-	m_pImage_Sell			= NULL;
-	m_pImage_Buy			= NULL;
-	m_pImage_Sell_Title		= NULL;
-	m_pImage_Buy_Title		= NULL;
+	m_pImage_Sell			= nullptr;
+	m_pImage_Buy			= nullptr;
+	m_pImage_Sell_Title		= nullptr;
+	m_pImage_Buy_Title		= nullptr;
 
-	m_pString_Page			= NULL;
+	m_pString_Page			= nullptr;
 
 	m_byBBSKind				= 0;
 	m_iCurPage				= 0;
@@ -69,33 +69,32 @@ bool CUITradeSellBBS::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 
-//	m_pList_Infos			= (CN3UIList*)(this->GetChildByID("List_Friends"));		__ASSERT(m_pList_Infos, "NULL UI Component!!!");
-	m_pBtn_PageUp			= (CN3UIButton*)(this->GetChildByID("btn_page_up"));	__ASSERT(m_pBtn_PageUp, "NULL UI Component!!!");
-	m_pBtn_PageDown			= (CN3UIButton*)(this->GetChildByID("btn_page_down"));	__ASSERT(m_pBtn_PageDown, "NULL UI Component!!!");
-	m_pBtn_Refresh			= (CN3UIButton*)(this->GetChildByID("btn_refresh"));	__ASSERT(m_pBtn_Refresh, "NULL UI Component!!!");
-	m_pBtn_Close			= (CN3UIButton*)(this->GetChildByID("btn_exit"));		__ASSERT(m_pBtn_Close, "NULL UI Component!!!");
-	m_pBtn_Register			= (CN3UIButton*)(this->GetChildByID("btn_add"));		__ASSERT(m_pBtn_Register, "NULL UI Component!!!");
-	m_pBtn_Whisper			= (CN3UIButton*)(this->GetChildByID("btn_whisper"));	__ASSERT(m_pBtn_Whisper, "NULL UI Component!!!");
-	m_pBtn_Trade			= (CN3UIButton*)(this->GetChildByID("btn_sale"));		__ASSERT(m_pBtn_Trade, "NULL UI Component!!!");
-	m_pBtn_RegisterCancel	= (CN3UIButton*)(this->GetChildByID("btn_delete"));		__ASSERT(m_pBtn_RegisterCancel, "NULL UI Component!!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_PageUp, GetChildByID<CN3UIButton>("btn_page_up"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_PageDown, GetChildByID<CN3UIButton>("btn_page_down"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Refresh, GetChildByID<CN3UIButton>("btn_refresh"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Close, GetChildByID<CN3UIButton>("btn_exit"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Register, GetChildByID<CN3UIButton>("btn_add"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Whisper, GetChildByID<CN3UIButton>("btn_whisper"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Trade, GetChildByID<CN3UIButton>("btn_sale"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_RegisterCancel, GetChildByID<CN3UIButton>("btn_delete"));
 
-	m_pImage_Sell			= (CN3UIImage*)(this->GetChildByID("img_sell gold"));	__ASSERT(m_pImage_Sell, "NULL UI Component!!!");
-	m_pImage_Buy			= (CN3UIImage*)(this->GetChildByID("img_buy gold"));	__ASSERT(m_pImage_Buy, "NULL UI Component!!!");
-	m_pImage_Sell_Title		= (CN3UIImage*)(this->GetChildByID("img_sell"));		__ASSERT(m_pImage_Sell_Title, "NULL UI Component!!!");
-	m_pImage_Buy_Title		= (CN3UIImage*)(this->GetChildByID("img_buy"));			__ASSERT(m_pImage_Buy_Title, "NULL UI Component!!!");
+	N3_VERIFY_UI_COMPONENT(m_pImage_Sell, GetChildByID<CN3UIImage>("img_sell gold"));
+	N3_VERIFY_UI_COMPONENT(m_pImage_Buy, GetChildByID<CN3UIImage>("img_buy gold"));
+	N3_VERIFY_UI_COMPONENT(m_pImage_Sell_Title, GetChildByID<CN3UIImage>("img_sell"));
+	N3_VERIFY_UI_COMPONENT(m_pImage_Buy_Title, GetChildByID<CN3UIImage>("img_buy"));
 
-	m_pString_Page			= (CN3UIString*)(this->GetChildByID("string_page"));	__ASSERT(m_pString_Page, "NULL UI Component!!!");
+	N3_VERIFY_UI_COMPONENT(m_pString_Page, GetChildByID<CN3UIString>("string_page"));
 
 	std::string szID;
 	for(int i = 0; i < TRADE_BBS_MAXSTRING; i++)
 	{
 		szID = fmt::format("text_{:02}", i);
-		m_pText[i] = (CN3UIString*) GetChildByID(szID);
+		N3_VERIFY_UI_COMPONENT(m_pText[i], GetChildByID<CN3UIString>(szID));
 	}
 
 	m_iCurPage = 0; // 현재 페이지..
 
-	__TABLE_UI_RESRC*	pTblUI	= NULL;
+	__TABLE_UI_RESRC*	pTblUI	= nullptr;
 	pTblUI = CGameBase::s_pTbl_UI.Find(NATION_ELMORAD);
 
 	m_MsgBox.LoadFromFile(pTblUI->szMessageBox);
@@ -507,12 +506,12 @@ void CUITradeSellBBS::OnButtonRegisterCancel()
 		{
 			__InfoTradeSellBBS ITSB = (*it);
 
-			if(0 == lstrcmpi(ITSB.szID.c_str(), CGameProcedure::s_pPlayer->m_InfoBase.szID.c_str()))
+			if (lstrcmpi(ITSB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) == 0)
 			{//자기것만 등록해제하게..
 				MsgSend_RegisterCancel(ITSB.sIndex);
 				break;
 			}
-			else if(AUTHORITY_MANAGER == CGameProcedure::s_pProcMain->s_pPlayer->m_InfoBase.iAuthority)
+			else if (CGameProcedure::s_pProcMain->s_pPlayer->m_InfoBase.iAuthority == AUTHORITY_MANAGER)
 			{//운영자에게는 해제 권한을 준다...(도배나 욕설등의 게시물 삭제를 위해서...)
 				MsgSend_RegisterCancel(ITSB.sIndex);
 				break;
@@ -533,10 +532,9 @@ void CUITradeSellBBS::OnButtonWhisper()
 		if( i == m_iCurIndex )
 		{
 			__InfoTradeSellBBS ITSB = (*it);
-			if(0 != lstrcmpi(ITSB.szID.c_str(), CGameProcedure::s_pPlayer->m_InfoBase.szID.c_str()))
-			{//나 자신에게는 귓속말을 못하게 한다...
+			//나 자신에게는 귓속말을 못하게 한다...
+			if (lstrcmpi(ITSB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) != 0)
 				CGameProcedure::s_pProcMain->MsgSend_ChatSelectTarget(ITSB.szID);
-			}
 			break;
 		}
 	}
@@ -566,7 +564,7 @@ void CUITradeSellBBS::OnButtonTrade()
 		{
 			__InfoTradeSellBBS ITSB = (*it);
 
-			if (0 != lstrcmpi(ITSB.szID.c_str(), CGameProcedure::s_pPlayer->m_InfoBase.szID.c_str()))
+			if (lstrcmpi(ITSB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) != 0)
 			{
 				std::string szMsg = fmt::format_text_resource(IDS_TRADE_BBS_PER_TRADE, 5000);
 
@@ -635,9 +633,13 @@ void CUITradeSellBBS::OnListExplanation()
 
 void CUITradeSellBBS::MsgSend_PerTrade()
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
-	if(0 == lstrcmpi(m_ITSB.szID.c_str(), CGameProcedure::s_pPlayer->m_InfoBase.szID.c_str()))
-		return; //자기 자신에게는 거래를 하지 못하게
+	// 전에 보낸 패킷 응답이 없으면
+	if (m_bProcessing)
+		return;
+
+	// 자기 자신에게는 거래를 하지 못하게
+	if (lstrcmpi(m_ITSB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) == 0)
+		return;
 
 	uint8_t byBuff[10];
 

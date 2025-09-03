@@ -19,7 +19,7 @@ CN3Cloud::CN3Cloud()
 {
 	for(int i = 0; i < NUM_CLOUD; i++) 
 	{
-		m_pTextures[i] = NULL;
+		m_pTextures[i] = nullptr;
 		m_szTextures[i] = "";
 	}
 
@@ -222,10 +222,10 @@ void CN3Cloud::Render()
 
 LPDIRECT3DTEXTURE9	CN3Cloud::GetTex(e_CLOUDTEX tex)
 {
-	if (NULL == m_pTextures[tex])
+	if (nullptr == m_pTextures[tex])
 	{
 		m_pTextures[tex] = s_MngTex.Get(m_szTextures[tex]);
-		if (NULL == m_pTextures[tex]) return NULL;
+		if (nullptr == m_pTextures[tex]) return nullptr;
 	}
 
 	return m_pTextures[tex]->Get();

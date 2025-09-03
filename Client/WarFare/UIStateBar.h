@@ -38,6 +38,10 @@ protected:
 
 	CN3UIString*	m_pText_Position;
 	CN3UIProgress*	m_pProgress_HP;
+	CN3UIProgress*	m_pProgress_HP_slow;
+	CN3UIProgress*	m_pProgress_HP_drop;
+	CN3UIProgress*	m_pProgress_HP_lasting;
+
 	CN3UIProgress*	m_pProgress_MSP;
 	CN3UIProgress*	m_pProgress_ExpC;
 	CN3UIProgress*	m_pProgress_ExpP;

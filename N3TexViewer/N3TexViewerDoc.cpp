@@ -33,7 +33,7 @@ CN3TexViewerDoc::CN3TexViewerDoc()
 	m_pTex = new CN3Texture();
 	m_pTexAlpha = new CN3Texture();
 
-	m_nCurFile = NULL;
+	m_nCurFile = 0;
 }
 
 CN3TexViewerDoc::~CN3TexViewerDoc()
@@ -84,7 +84,7 @@ BOOL CN3TexViewerDoc::OnNewDocument()
 	m_pTex->Release();
 	m_pTexAlpha->Release();
 
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 
 	return TRUE;
 }
@@ -98,7 +98,8 @@ BOOL CN3TexViewerDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	
 	// TODO: Add your specialized creation code here
 	m_pTexAlpha->Release();
-	if(NULL == m_pTex->LoadFromFile(lpszPathName)) return FALSE;
+	if (!m_pTex->LoadFromFile(lpszPathName))
+		return FALSE;
 	
 	////////////////////////////////////////////////////////////////////////////////
 	// Alpha Texture 생성...
@@ -108,14 +109,14 @@ BOOL CN3TexViewerDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	{
 		m_pTexAlpha->Get()->GetSurfaceLevel(0, &lpSurf);
 		m_pTex->Get()->GetSurfaceLevel(0, &lpSurf2);
-		::D3DXLoadSurfaceFromSurface(lpSurf, NULL, NULL, lpSurf2, NULL, NULL, D3DX_FILTER_TRIANGLE, 0);
-		lpSurf2->Release(); lpSurf2 = NULL;
+		::D3DXLoadSurfaceFromSurface(lpSurf, nullptr, nullptr, lpSurf2, nullptr, nullptr, D3DX_FILTER_TRIANGLE, 0);
+		lpSurf2->Release(); lpSurf2 = nullptr;
 
 		D3DLOCKED_RECT LR;
-		lpSurf->LockRect(&LR, NULL, 0);
+		lpSurf->LockRect(&LR, nullptr, 0);
 		int width = m_pTexAlpha->Width(), height = m_pTexAlpha->Height();
 		DWORD dwAlpha = 0;
-		DWORD* pPixel = NULL;
+		DWORD* pPixel = nullptr;
 		for(int y = 0; y < height; y++)
 		{
 			for(int x = 0; x < width; x++)
@@ -126,7 +127,7 @@ BOOL CN3TexViewerDoc::OnOpenDocument(LPCTSTR lpszPathName)
 			}
 		}
 		lpSurf->UnlockRect();
-		lpSurf->Release(); lpSurf = NULL;
+		lpSurf->Release(); lpSurf = nullptr;
 	}
 	// Alpha Texture 생성...
 	////////////////////////////////////////////////////////////////////////////////
@@ -137,7 +138,7 @@ BOOL CN3TexViewerDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	szFileName += szExt;
 
 	this->SetTitle(szFileName);
-	this->UpdateAllViews(NULL);
+	this->UpdateAllViews(nullptr);
 
 	return TRUE;
 }
@@ -270,10 +271,10 @@ void CN3TexViewerDoc::OpenLastFile()
 
 void CN3TexViewerDoc::OnFileSaveAsBitmap() 
 {
-	if(NULL == m_pTex || NULL == m_pTex->Get()) return;
+	if(nullptr == m_pTex || nullptr == m_pTex->Get()) return;
 
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
-	CFileDialog dlg(FALSE, "bmp", NULL, dwFlags, "Bitmap file(*.bmp)|*.bmp||", NULL);
+	CFileDialog dlg(FALSE, "bmp", nullptr, dwFlags, "Bitmap file(*.bmp)|*.bmp||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	CString szPath = dlg.GetPathName();

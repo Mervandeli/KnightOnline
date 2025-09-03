@@ -18,16 +18,16 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CLauncherDlg dialog
 
-CLauncherDlg::CLauncherDlg(CWnd* pParent /*=NULL*/)
+CLauncherDlg::CLauncherDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CLauncherDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CLauncherDlg)
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	
-	m_pSocket = NULL;
+	m_pSocket = nullptr;
 
-	memset( m_strServiceName, NULL, 256 );
+	memset(m_strServiceName, 0, sizeof(m_strServiceName));
 	m_nCurVersion = 0;
 	m_nServerVersion = 0;
 	m_nGetFileNum = 0;
@@ -73,7 +73,7 @@ BOOL CLauncherDlg::OnInitDialog()
 	szProduct.LoadString(IDS_PRODUCT);
 	szKey += szProduct;
 
-	m_hRegistryKey = NULL;
+	m_hRegistryKey = nullptr;
 	long lStatus = RegOpenKey(HKEY_CURRENT_USER, szKey, &m_hRegistryKey);
 	if(ERROR_SUCCESS != lStatus) { CString szErr; szErr.LoadString(IDS_ERR_REGISTRY_OPEN); MessageBox(szErr); exit(-1); }
 
@@ -81,24 +81,24 @@ BOOL CLauncherDlg::OnInitDialog()
 	TCHAR szBuff[256] = {};
 
 	dwType = REG_DWORD; dwBytes = 4;
-	lStatus = RegQueryValueEx(m_hRegistryKey, _T("VERSION"), NULL, &dwType, (BYTE*)(&m_nCurVersion), &dwBytes);
+	lStatus = RegQueryValueEx(m_hRegistryKey, _T("VERSION"), nullptr, &dwType, (BYTE*)(&m_nCurVersion), &dwBytes);
 	if(ERROR_SUCCESS != lStatus) { CString szErr; szErr.LoadString(IDS_ERR_REGISTRY_READ_VERSION); MessageBox(szErr); exit(-1); }
 
 	for(int j = 0 ; j < MAX_DOWNLOAD_FILE ; j++)
 		m_nVersionNum[j] = m_nCurVersion;
 
 	dwType = REG_SZ; dwBytes = 256;
-	lStatus = RegQueryValueEx(m_hRegistryKey, _T("PATH"), NULL, &dwType, (BYTE*)szBuff, &dwBytes); // 인스톨 경로
+	lStatus = RegQueryValueEx(m_hRegistryKey, _T("PATH"), nullptr, &dwType, (BYTE*)szBuff, &dwBytes); // 인스톨 경로
 	if(ERROR_SUCCESS != lStatus) { CString szErr; szErr.LoadString(IDS_ERR_REGISTRY_READ_PATH); MessageBox(szErr); exit(-1); }
 	m_szInstalledPath = szBuff;
 
 	dwType = REG_SZ; dwBytes = 256;
-	lStatus = RegQueryValueEx(m_hRegistryKey, _T("EXE"), NULL, &dwType, (BYTE*)szBuff, &dwBytes); // 실행파일 이름
+	lStatus = RegQueryValueEx(m_hRegistryKey, _T("EXE"), nullptr, &dwType, (BYTE*)szBuff, &dwBytes); // 실행파일 이름
 	if(ERROR_SUCCESS != lStatus) { CString szErr; szErr.LoadString(IDS_ERR_REGISTRY_READ_EXE); MessageBox(szErr); exit(-1); }
 	m_szExeName = szBuff;
 
 	dwType = REG_SZ; dwBytes = 256;
-	lStatus = RegQueryValueEx(m_hRegistryKey, _T("SERVICE"), NULL, &dwType, (BYTE*)m_strServiceName, &dwBytes); // 서비스 이름..
+	lStatus = RegQueryValueEx(m_hRegistryKey, _T("SERVICE"), nullptr, &dwType, (BYTE*)m_strServiceName, &dwBytes); // 서비스 이름..
 	if(ERROR_SUCCESS != lStatus) { CString szErr; szErr.LoadString(IDS_ERR_REGISTRY_READ_SERVICE); MessageBox(szErr); exit(-1); }
 
 
@@ -168,7 +168,7 @@ BOOL CLauncherDlg::DestroyWindow()
 	if(m_pSocket) {
 		m_pSocket->Disconnect();
 		delete m_pSocket;
-		m_pSocket = NULL;
+		m_pSocket = nullptr;
 	}
 	
 	return CDialog::DestroyWindow();
@@ -210,7 +210,7 @@ void CLauncherDlg::PacketSend_DownloadInfo()
 
 void CLauncherDlg::PacketProcess(BYTE *pBuf, int size)
 {
-	if (NULL==pBuf) return;
+	if (nullptr==pBuf) return;
 
 	BYTE command;
 	int iIndex = 0;
@@ -281,7 +281,7 @@ void CLauncherDlg::StartGame()
 {
 	CString szCmd = GetCommandLine(); // 커맨드 라인을 가져오고..
 	TCHAR szApp[_MAX_PATH] = {};
-	GetModuleFileName(NULL, szApp, _MAX_PATH);
+	GetModuleFileName(nullptr, szApp, _MAX_PATH);
 	int iML = lstrlen(szApp);
 
 	CString szParam;
@@ -293,7 +293,7 @@ void CLauncherDlg::StartGame()
 	}
 
 	CString szExeFN = m_szInstalledPath + _T("\\") + m_szExeName; // 실행 파일 이름 만들고..
-	::ShellExecute(NULL, _T("open"), szExeFN, szParam, m_szInstalledPath, SW_SHOWNORMAL); // 게임 실행..
+	::ShellExecute(nullptr, _T("open"), szExeFN, szParam, m_szInstalledPath, SW_SHOWNORMAL); // 게임 실행..
 
 	PostQuitMessage(0);
 }
@@ -346,13 +346,13 @@ void CLauncherDlg::DownloadProcess()
 			if(false == ArchiveClose()) { bExtractSuccess = false; break; }
 
 			CFile file;
-			if( file.Open( szLocalFName, CFile::modeRead | CFile::shareDenyNone , NULL ) )
+			if( file.Open( szLocalFName, CFile::modeRead | CFile::shareDenyNone , nullptr ) )
 			{
 				file.Close();
 				file.Remove(szLocalFName);
 				if(m_hRegistryKey) // 압축 풀기와 쓰기, 압축 파일 삭제에 성공하면 버전을 쓰고..
 				{
-					RegSetValueEx(m_hRegistryKey, _T("VERSION"), NULL, REG_DWORD, ((BYTE*)(&m_nVersionNum[i])), 4);
+					RegSetValueEx(m_hRegistryKey, _T("VERSION"), 0, REG_DWORD, ((BYTE*)(&m_nVersionNum[i])), 4);
 				}
 			}
 			else
@@ -386,7 +386,7 @@ void CLauncherDlg::DownloadProcess()
 
 	if(true == bExtractSuccess && m_hRegistryKey) // 압축 풀기와 쓰기, 압축 파일 삭제에 성공하면 버전을 쓰고..
 	{
-		long lStatus = RegSetValueEx(m_hRegistryKey, _T("VERSION"), NULL, REG_DWORD, ((BYTE*)(&m_nServerVersion)), 4);
+		long lStatus = RegSetValueEx(m_hRegistryKey, _T("VERSION"), 0, REG_DWORD, ((BYTE*)(&m_nServerVersion)), 4);
 		this->StartGame(); // 게임 실행..
 	}
 	else
@@ -402,8 +402,8 @@ BOOL CLauncherDlg::FTP_Open()
 	m_hInetSession = InternetOpen(
 		_T("3DOnline"),
 		INTERNET_OPEN_TYPE_PRECONFIG,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
 		0);
 	if (!m_hInetSession)
 	{
@@ -441,13 +441,13 @@ void CLauncherDlg::FTP_Close()
 	if (m_hFtpConnection)
 	{
 		InternetCloseHandle(m_hFtpConnection);
-		m_hFtpConnection = NULL;
+		m_hFtpConnection = nullptr;
 	}
 
 	if (m_hInetSession)
 	{
 		InternetCloseHandle(m_hInetSession);
-		m_hInetSession = NULL;
+		m_hInetSession = nullptr;
 	}
 }
 
@@ -478,7 +478,7 @@ BOOL CLauncherDlg::GetDownloadFile(const std::string& szFtpUrl, const std::strin
 		szFileName.c_str());
 
 	FILE *fp = _tfopen(szLocalFName, _T("wb"));
-	if (fp == NULL)
+	if (fp == nullptr)
 	{
 		MessageBox(_T("Can`t open local file"));
 
@@ -515,7 +515,7 @@ BOOL CLauncherDlg::GetDownloadFile(const std::string& szFtpUrl, const std::strin
 		szInfo.Format(_T("%hs Downloading..."), szFileName.c_str());
 		m_Status.SetWindowText(szInfo);
 
-		bPeekMessage = ::PeekMessage(&pMsg, NULL, NULL, NULL, PM_REMOVE);
+		bPeekMessage = ::PeekMessage(&pMsg, nullptr, 0, 0, PM_REMOVE);
 		if(bPeekMessage)
 		{
 			TranslateMessage(&pMsg);
@@ -542,7 +542,7 @@ BOOL CLauncherDlg::GetDownloadFile(const std::string& szFtpUrl, const std::strin
 			//// added by manseek for DOWNLOAD
 			CString sLink;
 			sLink.Format("http://download.mgame.com/download/%s.exe", (LPCTSTR)m_strGameID );
-			HINSTANCE t = ShellExecute(GetSafeHwnd(), "open", sLink, NULL,  NULL, SW_SHOWNORMAL);
+			HINSTANCE t = ShellExecute(GetSafeHwnd(), "open", sLink, nullptr,  nullptr, SW_SHOWNORMAL);
 			//// 2001.5.23
 
 			return FALSE;
@@ -717,7 +717,7 @@ bool CLauncherDlg::ArchiveExtract( CString ExtractFolder )
 	{	
 		for (int i = 0; i < nZipCount; i++)
 		{
-			m_zip.ExtractFile((WORD)i, ExtractFolder, true, NULL);//, Callback, (void*) &p);
+			m_zip.ExtractFile((WORD)i, ExtractFolder, true, nullptr);//, Callback, (void*) &p);
 		}
 	}
 	catch (CException* e)
@@ -732,7 +732,7 @@ bool CLauncherDlg::ArchiveExtract( CString ExtractFolder )
 	}
 	if (bErr)
 	{
-		m_zip.CloseFile(NULL, true);
+		m_zip.CloseFile(nullptr, true);
 		MessageBox(_T("Extract failed"), _T(""), MB_ICONSTOP);
 		return false;
 	}

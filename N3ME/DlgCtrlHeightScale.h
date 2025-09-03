@@ -14,7 +14,7 @@ class CDlgCtrlHeightScale : public CDialog
 {
 // Construction
 public:
-	CDlgCtrlHeightScale(CWnd* pParent = NULL);   // standard constructor
+	CDlgCtrlHeightScale(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgCtrlHeightScale)

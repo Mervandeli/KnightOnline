@@ -19,7 +19,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgEditPartMesh dialog
 
 
-CDlgEditPartMesh::CDlgEditPartMesh(CWnd* pParent /*=NULL*/)
+CDlgEditPartMesh::CDlgEditPartMesh(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgEditPartMesh::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgEditPartMesh)
@@ -374,7 +374,7 @@ void CDlgEditPartMesh::OnOK()
 void CDlgEditPartMesh::OnPartMeshBtnLoadShape() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "N3Shape", NULL, dwFlags, "N3Shape File(*.n3shape)|*.n3shape||", NULL);
+	CFileDialog dlg(TRUE, "N3Shape", nullptr, dwFlags, "N3Shape File(*.n3shape)|*.n3shape||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	
 	CString PathName = dlg.GetPathName();

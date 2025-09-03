@@ -19,8 +19,8 @@ CN3UIProgress::CN3UIProgress()
 {
 	m_eType = UI_TYPE_PROGRESS;
 
-	m_pBkGndImgRef = NULL;
-	m_pFrGndImgRef = NULL;
+	m_pBkGndImgRef = nullptr;
+	m_pFrGndImgRef = nullptr;
 	ZeroMemory(&m_frcFrGndImgUV, sizeof(m_frcFrGndImgUV));
 	m_iMaxValue = m_iMinValue = 0;
 	m_iValueToReach = 0;
@@ -37,8 +37,8 @@ void CN3UIProgress::Release()
 {
 	CN3UIBase::Release();
 
-	m_pBkGndImgRef = NULL;
-	m_pFrGndImgRef = NULL;
+	m_pBkGndImgRef = nullptr;
+	m_pFrGndImgRef = nullptr;
 	ZeroMemory(&m_frcFrGndImgUV, sizeof(m_frcFrGndImgUV));
 	m_iMaxValue = m_iMinValue = 0;
 	m_fCurValue = 0;
@@ -90,7 +90,7 @@ void CN3UIProgress::SetStyle(uint32_t dwStyle)
 
 void CN3UIProgress::UpdateFrGndImage()
 {
-	if (NULL == m_pFrGndImgRef) return;
+	if (nullptr == m_pFrGndImgRef) return;
 	int iDiff = m_iMaxValue - m_iMinValue;
 	if (0 == iDiff) return;
 	const float fPercentage = ((float)(m_fCurValue - m_iMinValue)) / ((float)(m_iMaxValue - m_iMinValue));
@@ -158,7 +158,7 @@ void CN3UIProgress::SetFrGndUVFromFrGndImage()
 // m_pFrGndImgRef로부터 uv좌표를 얻어와서 m_frcFrGndImgUV를 세팅한다.
 {
 	__ASSERT(m_pFrGndImgRef, "not found foreground image in N3UIProgress");
-	if (NULL == m_pFrGndImgRef) return;
+	if (nullptr == m_pFrGndImgRef) return;
 	m_frcFrGndImgUV = *(m_pFrGndImgRef->GetUVRect());
 	UpdateFrGndImage();
 }
@@ -249,7 +249,7 @@ void CN3UIProgress::CreateImages()
 
 void CN3UIProgress::DeleteBkGndImage()	// Back ground이미지는 필요 없는 경우가 있다.
 {
-	if (m_pBkGndImgRef)	{ delete m_pBkGndImgRef; m_pBkGndImgRef = NULL;}
+	if (m_pBkGndImgRef)	{ delete m_pBkGndImgRef; m_pBkGndImgRef = nullptr;}
 }
 
 #endif

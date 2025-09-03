@@ -17,7 +17,7 @@ class CDlgEditEventAttr : public CDialog
 // Construction
 public:
 	void SetEventCell(CEventCell* pEvent);
-	CDlgEditEventAttr(CWnd* pParent = NULL);   // standard constructor
+	CDlgEditEventAttr(CWnd* pParent = nullptr);   // standard constructor
 
 // Variables..
 	CEventCell*		m_pRefEvent;

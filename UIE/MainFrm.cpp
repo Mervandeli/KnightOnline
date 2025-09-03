@@ -54,7 +54,7 @@ static UINT indicators[] =
 
 CMainFrame::CMainFrame()
 {
-	m_hDefaultAccelTable = NULL;	
+	m_hDefaultAccelTable = nullptr;	
 }
 
 CMainFrame::~CMainFrame()
@@ -110,9 +110,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	char szPath[_MAX_PATH];
 	char szDrive[_MAX_DRIVE];
 	char szDir[_MAX_DIR];
-	GetModuleFileName(NULL, szPath, _MAX_PATH);
-	_splitpath(szPath, szDrive, szDir, NULL, NULL);
-	_makepath(szPath, szDrive, szDir, NULL, NULL);
+	GetModuleFileName(nullptr, szPath, _MAX_PATH);
+	_splitpath(szPath, szDrive, szDir, nullptr, nullptr);
+	_makepath(szPath, szDrive, szDir, nullptr, nullptr);
 //	SetCurrentDirectory(szPath);
 //	SetBasePath(szPath);
 
@@ -233,7 +233,7 @@ void CMainFrame::OnUpdateViewEdit(CCmdUI* pCmdUI)
 void CMainFrame::SetBasePath(LPCTSTR pszPath)
 {
 	m_Eng.PathSet(pszPath);
-	if (NULL == pszPath) m_wndDlgBar.SetDlgItemText(IDC_EDIT_BASEPATH, _T(""));
+	if (nullptr == pszPath) m_wndDlgBar.SetDlgItemText(IDC_EDIT_BASEPATH, _T(""));
 	else m_wndDlgBar.SetDlgItemText(IDC_EDIT_BASEPATH, m_Eng.PathGet().c_str());
 }
 
@@ -291,11 +291,11 @@ void CMainFrame::OnDestroy()
 void CMainFrame::EnableAccelerator(BOOL bEnable)
 {
 	// 처음 호출되면 원래 Accel table 저장해놓기
-	if (NULL == m_hDefaultAccelTable) m_hDefaultAccelTable = m_hAccelTable;
+	if (nullptr == m_hDefaultAccelTable) m_hDefaultAccelTable = m_hAccelTable;
 	ASSERT(m_hDefaultAccelTable);
 
 	if (bEnable) m_hAccelTable = m_hDefaultAccelTable;
-	else m_hAccelTable = NULL;
+	else m_hAccelTable = nullptr;
 }
 
 void CMainFrame::OnOptionBkcolor() 

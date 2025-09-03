@@ -196,12 +196,12 @@ public:
 	e_StateAction	State() { return m_eState; } // 행동 상태...
 	e_StateMove		StateMove() { return m_eStateMove; } // 움직이는 상태
 
-	e_ItemClass		ItemClass_RightHand()
+	e_ItemClass		ItemClass_RightHand() const
 	{
 		if(m_pItemPlugBasics[PLUG_POS_RIGHTHAND]) return (e_ItemClass)(m_pItemPlugBasics[PLUG_POS_RIGHTHAND]->byClass); // 아이템 타입 - 오른손
 		else return ITEM_CLASS_UNKNOWN;
 	}
-	e_ItemClass		ItemClass_LeftHand()
+	e_ItemClass		ItemClass_LeftHand() const
 	{
 		if(m_pItemPlugBasics[PLUG_POS_LEFTHAND]) return (e_ItemClass)(m_pItemPlugBasics[PLUG_POS_LEFTHAND]->byClass); // 아이템 타입 - 오른손
 		else return ITEM_CLASS_UNKNOWN;
@@ -226,7 +226,7 @@ public:
 	int				AnimationCountRemain() { return m_AnimationDeque.size() + 1; }
 	bool			IsAnimationChange() { return m_bAnimationChanged; }	// 큐에 넣은 에니메이션이 변하는 순간만 세팅된다..
 
-	bool			Action(e_StateAction eState, bool bLooping, CPlayerBase* pTarget = NULL, bool bForceSet = false); // 행동 테이블에 따른 행동을 한다..
+	bool			Action(e_StateAction eState, bool bLooping, CPlayerBase* pTarget = nullptr, bool bForceSet = false); // 행동 테이블에 따른 행동을 한다..
 	bool			ActionMove(e_StateMove eMove); // 움직이기..
 	void			ActionDying(e_StateDying eSD, const __Vector3& vDir); // 죽는 방법 결정하기..
 

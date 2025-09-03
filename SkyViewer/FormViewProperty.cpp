@@ -139,7 +139,7 @@ void CFormViewProperty::OnInitialUpdate()
 	pDoc->m_Sky.SetGameTime(Time.wYear, Time.wMonth, Time.wDay, Time.wHour, Time.wMinute);
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetViewRender()->InvalidateRect(NULL, FALSE);
+	pFrm->GetViewRender()->InvalidateRect(nullptr, FALSE);
 
 	this->UpdateAllInfo();
 }
@@ -152,7 +152,7 @@ BOOL CFormViewProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 
 		int iIndex = m_ListDayChanges.GetCurSel();
 		__SKY_DAYCHANGE* pSDC = pDoc->m_Sky.DayChangeGet(iIndex);
-		if(NULL == pSDC) return FALSE;
+		if(nullptr == pSDC) return FALSE;
 		CPropertyItem* pItem = (CPropertyItem*)lParam;
 
 		if(pItem->m_propName == "이름") pSDC->szName = pItem->m_curValue;
@@ -174,7 +174,7 @@ BOOL CFormViewProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		pDoc->m_Sky.SetGameTime(iYear, iMonth, iDay, iHour, iMin);
 		
 		CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-		pFrm->GetViewRender()->InvalidateRect(NULL, FALSE);
+		pFrm->GetViewRender()->InvalidateRect(nullptr, FALSE);
 
 
 		return TRUE;
@@ -223,7 +223,7 @@ void CFormViewProperty::UpdateInfo()
 	
 	CPropertyItem* pItem7 = m_LPProperty.GetPropItem("지연시간");
 
-	if(NULL == pSDC)
+	if(nullptr == pSDC)
 	{
 		SetDlgItemInt(IDC_E_NUMBER, iIndex);
 		SetDlgItemText(IDC_E_NAME, "");
@@ -345,7 +345,7 @@ void CFormViewProperty::OnChangeEName()
 	int iIndex = m_ListDayChanges.GetCurSel();
 	CSkyViewerDoc* pDoc = GetDocument();
 	__SKY_DAYCHANGE* pSDC = pDoc->m_Sky.DayChangeGet(iIndex);
-	if(NULL == pSDC) return;
+	if(nullptr == pSDC) return;
 
 	CString szName;
 	GetDlgItemText(IDC_E_NAME, szName);
@@ -359,7 +359,7 @@ void CFormViewProperty::OnChangeEName()
 void CFormViewProperty::OnCPlay() 
 {
 	m_bPlayingNow = !m_bPlayingNow;
-	if(m_bPlayingNow) SetTimer(0, 20, NULL);
+	if(m_bPlayingNow) SetTimer(0, 20, nullptr);
 	else
 	{
 		SetDlgItemText(IDC_C_PLAY, "Play");
@@ -374,7 +374,7 @@ void CFormViewProperty::OnTimer(UINT nIDEvent)
 		this->UpdateTime();
 
 		CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-		pFrm->GetViewRender()->InvalidateRect(NULL, FALSE);
+		pFrm->GetViewRender()->InvalidateRect(nullptr, FALSE);
 	}
 	
 	CFormView::OnTimer(nIDEvent);
@@ -384,7 +384,7 @@ void CFormViewProperty::OnDblclkListCloudTextures()
 {
 	CString FileName;
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "DXT", NULL, dwFlags, "Texture 로 쓸수 있는 그림 파일(*.DXT; *.BMP; *.TGA)|*.DXT; *.BMP; *.TGA||", NULL);
+	CFileDialog dlg(TRUE, "DXT", nullptr, dwFlags, "Texture 로 쓸수 있는 그림 파일(*.DXT; *.BMP; *.TGA)|*.DXT; *.BMP; *.TGA||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	
 	int iIndex = m_ListCloudTextures.GetCurSel();
@@ -398,14 +398,14 @@ void CFormViewProperty::OnDblclkListCloudTextures()
 	m_ListCloudTextures.SetCurSel(iIndex);
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetViewRender()->InvalidateRect(NULL, FALSE);
+	pFrm->GetViewRender()->InvalidateRect(nullptr, FALSE);
 }
 
 void CFormViewProperty::OnDblclkListSunTextures() 
 {
 	CString FileName;
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "DXT", NULL, dwFlags, "Texture 로 쓸수 있는 그림 파일(*.DXT; *.BMP; *.TGA)|*.DXT; *.BMP; *.TGA||", NULL);
+	CFileDialog dlg(TRUE, "DXT", nullptr, dwFlags, "Texture 로 쓸수 있는 그림 파일(*.DXT; *.BMP; *.TGA)|*.DXT; *.BMP; *.TGA||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	
 	int iIndex = m_ListSunTextures.GetCurSel();
@@ -419,14 +419,14 @@ void CFormViewProperty::OnDblclkListSunTextures()
 	m_ListSunTextures.SetCurSel(iIndex);
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetViewRender()->InvalidateRect(NULL, FALSE);
+	pFrm->GetViewRender()->InvalidateRect(nullptr, FALSE);
 }
 
 void CFormViewProperty::OnBBrowseMoonTexture() 
 {
 	CString FileName;
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "DXT", NULL, dwFlags, "Texture 로 쓸수 있는 그림 파일(*.DXT; *.BMP; *.TGA)|*.DXT; *.BMP; *.TGA||", NULL);
+	CFileDialog dlg(TRUE, "DXT", nullptr, dwFlags, "Texture 로 쓸수 있는 그림 파일(*.DXT; *.BMP; *.TGA)|*.DXT; *.BMP; *.TGA||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	
 	FileName = dlg.GetPathName();
@@ -436,7 +436,7 @@ void CFormViewProperty::OnBBrowseMoonTexture()
 	SetDlgItemText(IDC_E_MOON_TEXTURE, pTex->FileName().c_str());
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetViewRender()->InvalidateRect(NULL, FALSE);
+	pFrm->GetViewRender()->InvalidateRect(nullptr, FALSE);
 }
 
 void CFormViewProperty::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
@@ -448,11 +448,11 @@ void CFormViewProperty::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBa
 		int iYear = 0, iMonth = 0, iDay = 0;
 
 		CSkyViewerDoc* pDoc = GetDocument();
-		pDoc->m_Sky.GetGameTime(&iYear, &iMonth, &iDay, NULL, NULL);
+		pDoc->m_Sky.GetGameTime(&iYear, &iMonth, &iDay, nullptr, nullptr);
 		pDoc->m_Sky.SetGameTime(iYear, iMonth, iDay, iHour, iMin);
 
 		CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-		pFrm->GetViewRender()->InvalidateRect(NULL, FALSE);
+		pFrm->GetViewRender()->InvalidateRect(nullptr, FALSE);
 
 		this->UpdateTime();
 	}
@@ -513,29 +513,29 @@ void CFormViewProperty::OnApplyDate()
 	pDoc->m_Sky.SetGameTime(iYear, iMonth, iDay, iHour, iMin);
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetViewRender()->InvalidateRect(NULL, FALSE);
+	pFrm->GetViewRender()->InvalidateRect(nullptr, FALSE);
 }
 
 void CFormViewProperty::OnSize(UINT nType, int cx, int cy) 
 {
 	CFormView::OnSize(nType, cx, cy);
 
-	if(NULL == m_LPProperty.GetSafeHwnd()) return;
+	if(nullptr == m_LPProperty.GetSafeHwnd()) return;
 
 	CRect rc, rc2, rcLP;
 
 	m_LPProperty.GetWindowRect(&rc);
 	rcLP = rc; this->ScreenToClient(&rcLP);
 	int y = cy - (rcLP.Height() + 5);
-	m_LPProperty.SetWindowPos(NULL, rcLP.left, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+	m_LPProperty.SetWindowPos(nullptr, rcLP.left, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 
 	m_ListDayChanges.GetWindowRect(&rc);
 	rc2 = rc; this->ScreenToClient(&rc2);
 	int cy2 = cy - rc2.top - rcLP.Height() - 3;
-	m_ListDayChanges.SetWindowPos(NULL, 0, 0, rc.Width(), cy2, SWP_NOMOVE | SWP_NOZORDER);
+	m_ListDayChanges.SetWindowPos(nullptr, 0, 0, rc.Width(), cy2, SWP_NOMOVE | SWP_NOZORDER);
 
 	m_SldTime.GetWindowRect(&rc);
 	rc2 = rc; this->ScreenToClient(&rc2);
 	cy2 = cy - rc2.top - 5;
-	m_SldTime.SetWindowPos(NULL, 0, 0, rc.Width(), cy2, SWP_NOMOVE | SWP_NOZORDER);
+	m_SldTime.SetWindowPos(nullptr, 0, 0, rc.Width(), cy2, SWP_NOMOVE | SWP_NOZORDER);
 }

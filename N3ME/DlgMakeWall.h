@@ -18,7 +18,7 @@ class CDlgMakeWall : public CDialog
 // Construction
 public:
 	void ResetAll();
-	CDlgMakeWall(CWnd* pParent = NULL);   // standard constructor
+	CDlgMakeWall(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgMakeWall)

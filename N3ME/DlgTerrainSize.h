@@ -16,7 +16,7 @@ class CDlgTerrainSize : public CDialog
 {
 // Construction
 public:
-	CDlgTerrainSize(CWnd* pParent = NULL);   // standard constructor
+	CDlgTerrainSize(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgTerrainSize)

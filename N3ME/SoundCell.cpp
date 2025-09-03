@@ -23,7 +23,7 @@ CSoundCell::CSoundCell()
 {
 	m_iVersion = 1;
 	m_dwSoundGroupID = 0;
-	m_pRefTerrain = NULL;
+	m_pRefTerrain = nullptr;
 
 	m_Rect.left = m_Rect.right = m_Rect.top = m_Rect.bottom = 0;
 	m_BasePoint.x = m_BasePoint.y = 0;
@@ -145,15 +145,15 @@ void CSoundCell::Render(DWORD color)
 void CSoundCell::Load(HANDLE hFile)
 {
 	DWORD dwRWC;
-	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, NULL);
-	ReadFile(hFile, &m_dwSoundGroupID, sizeof(DWORD), &dwRWC, NULL);
-	ReadFile(hFile, &m_Rect, sizeof(RECT), &dwRWC, NULL);
+	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
+	ReadFile(hFile, &m_dwSoundGroupID, sizeof(DWORD), &dwRWC, nullptr);
+	ReadFile(hFile, &m_Rect, sizeof(RECT), &dwRWC, nullptr);
 }
 
 void CSoundCell::Save(HANDLE hFile)
 {
 	DWORD dwRWC;
-	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, NULL);
-	WriteFile(hFile, &m_dwSoundGroupID, sizeof(DWORD), &dwRWC, NULL);
-	WriteFile(hFile, &m_Rect, sizeof(RECT), &dwRWC, NULL);
+	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
+	WriteFile(hFile, &m_dwSoundGroupID, sizeof(DWORD), &dwRWC, nullptr);
+	WriteFile(hFile, &m_Rect, sizeof(RECT), &dwRWC, nullptr);
 }

@@ -24,11 +24,11 @@ static char THIS_FILE[]=__FILE__;
 CEventMgr::CEventMgr()
 {
 	m_MapSize = 0;
-	m_ppEvent = NULL;
-	m_pRefMapMng = NULL;
+	m_ppEvent = nullptr;
+	m_pRefMapMng = nullptr;
 	m_bActive = false;
 	m_pEvents.clear();
-	m_pCurrEvent = NULL;
+	m_pCurrEvent = nullptr;
 	
 	m_pDlgEventList = new CDlgEditEvent;
 	m_pDlgEventList->Create(IDD_EDIT_EVENT);
@@ -46,37 +46,37 @@ CEventMgr::~CEventMgr()
 			{
 				GlobalFree(m_ppEvent[i]);
 				//delete[] m_ppEvent[i];
-				m_ppEvent[i] = NULL;
+				m_ppEvent[i] = nullptr;
 			}
 		}
 		GlobalFree(m_ppEvent);
 		//delete[] m_ppEvent;
-		m_ppEvent = NULL;
+		m_ppEvent = nullptr;
 	}
 
 	std::list<CEventCell*>::iterator it;
 	for(it = m_pEvents.begin(); it != m_pEvents.end(); it++)
 	{
 		delete (*it);
-		(*it) = NULL;
+		(*it) = nullptr;
 	}
 	m_pEvents.clear();
 
 	if(m_pCurrEvent)
 	{
 		delete m_pCurrEvent;
-		m_pCurrEvent = NULL;
+		m_pCurrEvent = nullptr;
 	}
 
 	if(m_pDlgEventList) 
 	{
 		m_pDlgEventList->DestroyWindow();
 		delete m_pDlgEventList;
-		m_pDlgEventList = NULL;
+		m_pDlgEventList = nullptr;
 	}
 
 	m_MapSize = 0;
-	m_pRefMapMng = NULL;
+	m_pRefMapMng = nullptr;
 	m_bActive = false;	
 }
 
@@ -93,7 +93,7 @@ BOOL CEventMgr::MouseMsgFilter(LPMSG pMsg)
 			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 
 			m_pCurrEvent->InitRect(vec);		
 		}
@@ -103,7 +103,7 @@ BOOL CEventMgr::MouseMsgFilter(LPMSG pMsg)
 			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 
 			m_pCurrEvent->AddRect(vec);		
 		}
@@ -115,7 +115,7 @@ BOOL CEventMgr::MouseMsgFilter(LPMSG pMsg)
 			if(nFlags & MK_LBUTTON)	
 			{
 				__Vector3 vec;
-				if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+				if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 				m_pCurrEvent->AddRect(vec);
 			}
 		}
@@ -143,7 +143,7 @@ void CEventMgr::Render()
 	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx); // 월드 행렬 적용..
 	
 	// set texture
-	hr = s_lpD3DDev->SetTexture(0, NULL);
+	hr = s_lpD3DDev->SetTexture(0, nullptr);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 
@@ -215,7 +215,7 @@ void CEventMgr::SetCurrEvent(CEventCell* pEvent)
 	if(m_pCurrEvent)
 	{
 		delete m_pCurrEvent;
-		m_pCurrEvent = NULL;
+		m_pCurrEvent = nullptr;
 	}
 
 	m_pCurrEvent = pEvent;
@@ -269,7 +269,7 @@ void CEventMgr::SetActive(bool active)
 		if(m_pCurrEvent)
 		{
 			delete m_pCurrEvent;
-			m_pCurrEvent = NULL;
+			m_pCurrEvent = nullptr;
 		}
 		m_pCurrEvent = pEvent;
 		m_pDlgEventList->SetCurrName(m_pCurrEvent->m_Name);
@@ -281,7 +281,7 @@ void CEventMgr::SetActive(bool active)
 		if(m_pCurrEvent)
 		{
 			delete m_pCurrEvent;
-			m_pCurrEvent = NULL;
+			m_pCurrEvent = nullptr;
 		}
 	}
 }
@@ -292,7 +292,7 @@ void CEventMgr::LoadFromFile(const char* RealFileName)
 	wsprintf(szNPCPathFileName, "%sevent\\%s.evt", s_szPath.c_str(), (LPCTSTR)RealFileName);
 	
 	//DWORD dwRWC;
-	HANDLE hFile = CreateFile(szNPCPathFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(szNPCPathFileName, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 	Load(hFile);
 	CloseHandle(hFile);
 }
@@ -303,12 +303,12 @@ void CEventMgr::SaveToFile(const char* RealFileName)
 	GetCurrentDirectory(_MAX_PATH, szOldPath);	
 	SetCurrentDirectory(s_szPath.c_str());
 
-	CreateDirectory("event", NULL); // 경로 만들고..
+	CreateDirectory("event", nullptr); // 경로 만들고..
 	char szNPCPathFileName[_MAX_PATH];
 	wsprintf(szNPCPathFileName, "%sevent\\%s.evt", s_szPath.c_str(), (LPCTSTR)RealFileName);
 
 	//DWORD dwRWC;
-	HANDLE hFile = CreateFile(szNPCPathFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(szNPCPathFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 	Save(hFile);	
 	CloseHandle(hFile);
 	SetCurrentDirectory(szOldPath);
@@ -319,7 +319,7 @@ bool CEventMgr::Load(HANDLE hFile)
 	if(m_pCurrEvent)
 	{
 		delete m_pCurrEvent;
-		m_pCurrEvent = NULL;
+		m_pCurrEvent = nullptr;
 	}
 	CLyTerrain* pRefTerrain = m_pRefMapMng->GetTerrain();
 	m_pCurrEvent = new CEventCell(pRefTerrain);
@@ -333,7 +333,7 @@ bool CEventMgr::Load(HANDLE hFile)
 	
 	DWORD dwRWC;
 	int NumEvent;
-	ReadFile(hFile, &NumEvent, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &NumEvent, sizeof(int), &dwRWC, nullptr);
 
 	m_pEvents.clear();
 	for(int i=0;i<NumEvent;i++)
@@ -352,7 +352,7 @@ bool CEventMgr::Save(HANDLE hFile)
 {
 	DWORD dwRWC;
 	int NumEvent = m_pEvents.size();
-	WriteFile(hFile, &NumEvent, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &NumEvent, sizeof(int), &dwRWC, nullptr);
 
 	std::list<CEventCell*>::iterator itEvent;
 
@@ -507,7 +507,7 @@ void CEventMgr::SaveInfoTextFile(char* szEvent)
 
 bool CEventMgr::MakeGameFile(char *szEventName, int iSize)
 {
-	HANDLE hGevFile = CreateFile(szEventName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hGevFile = CreateFile(szEventName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if(INVALID_HANDLE_VALUE == hGevFile)
 	{
 		return false;
@@ -526,12 +526,12 @@ bool CEventMgr::MakeGameFile(char *szEventName, int iSize)
 bool CEventMgr::MakeGameFile(HANDLE hFile, int iSize)
 {
 	DWORD dwNum = 0;
-//	WriteFile(hFile, &iSize, sizeof(int), &dwNum, NULL);
+//	WriteFile(hFile, &iSize, sizeof(int), &dwNum, nullptr);
 //	for(int x=0;x<iSize;x++)
-//		WriteFile(hFile, m_ppEvent[x], sizeof(short)*iSize, &dwNum, NULL);
+//		WriteFile(hFile, m_ppEvent[x], sizeof(short)*iSize, &dwNum, nullptr);
 
 	int nEventCellCount = m_pEvents.size();
-	WriteFile(hFile, &nEventCellCount, sizeof(int), &dwNum, NULL);
+	WriteFile(hFile, &nEventCellCount, sizeof(int), &dwNum, nullptr);
 
 	std::list<CEventCell*>::iterator itEvent;
 
@@ -542,16 +542,16 @@ bool CEventMgr::MakeGameFile(HANDLE hFile, int iSize)
 		if(pEvent)
 		{
 			RECT rt = pEvent->m_Rect;
-			WriteFile(hFile, &rt, sizeof(RECT), &dwNum, NULL);
-			WriteFile(hFile, &pEvent->m_EventType, sizeof(short), &dwNum, NULL);
+			WriteFile(hFile, &rt, sizeof(RECT), &dwNum, nullptr);
+			WriteFile(hFile, &pEvent->m_EventType, sizeof(short), &dwNum, nullptr);
 		}
 		else
 		{
 			short sEventType = -1;
 			RECT rt;
 			memset(&rt,0x00,sizeof(rt));
-			WriteFile(hFile, &rt, sizeof(RECT), &dwNum, NULL);
-			WriteFile(hFile, &sEventType, sizeof(short), &dwNum, NULL);
+			WriteFile(hFile, &rt, sizeof(RECT), &dwNum, nullptr);
+			WriteFile(hFile, &sEventType, sizeof(short), &dwNum, nullptr);
 		}
 	}
 

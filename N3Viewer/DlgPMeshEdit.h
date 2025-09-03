@@ -20,7 +20,7 @@ public:
 	void SavePMeshes();
 	void UpdateAllInfo();
 	void UpdateInfo();
-	CDlgPMeshEdit(CWnd* pParent = NULL);   // standard constructor
+	CDlgPMeshEdit(CWnd* pParent = nullptr);   // standard constructor
 
 	CN3Shape* m_pShapeRef;
 

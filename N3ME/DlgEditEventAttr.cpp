@@ -16,13 +16,13 @@ static char THIS_FILE[] = __FILE__;
 // CDlgEditEventAttr dialog
 
 
-CDlgEditEventAttr::CDlgEditEventAttr(CWnd* pParent /*=NULL*/)
+CDlgEditEventAttr::CDlgEditEventAttr(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgEditEventAttr::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgEditEventAttr)
 	m_EventType = 0;
 	m_EventID = 0;
-	m_pRefEvent = NULL;
+	m_pRefEvent = nullptr;
 	m_ZoneID = 0;
 	//}}AFX_DATA_INIT
 }

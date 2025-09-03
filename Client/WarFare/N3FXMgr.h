@@ -21,7 +21,7 @@ typedef struct __FXBundleOrigin	// 번들에서 파트들 관리할때..
 	
 	__FXBundleOrigin()
 	{
-		pBundle = NULL;
+		pBundle = nullptr;
 		iNum = 0;
 		fLimitedTime = 0.0f;
 	}

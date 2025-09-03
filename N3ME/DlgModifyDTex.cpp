@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgModifyDTex dialog
 
 
-CDlgModifyDTex::CDlgModifyDTex(CWnd* pParent /*=NULL*/)
+CDlgModifyDTex::CDlgModifyDTex(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgModifyDTex::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgModifyDTex)
@@ -55,7 +55,7 @@ BOOL CDlgModifyDTex::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 	
-	SetWindowPos(NULL, m_Pos.x, m_Pos.y,0,0, SWP_NOSIZE );
+	SetWindowPos(nullptr, m_Pos.x, m_Pos.y,0,0, SWP_NOSIZE );
 	m_State = 0;
 		
 	return TRUE;  // return TRUE unless you set the focus to a control

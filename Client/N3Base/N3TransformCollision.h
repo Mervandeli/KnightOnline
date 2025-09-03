@@ -42,9 +42,9 @@ public:
 	bool			IsInRadiusXZ(float fX, float fZ) {fX -= m_vPos.x; fZ -= m_vPos.z; return (sqrtf(fX*fX + fZ*fZ) > m_fRadius ? FALSE : TRUE);}
 //	~(By Dino On 2001-08-27 오후 9:15:24 )
 
-	virtual int		CheckCollisionPrecisely(bool bIgnoreBoxCheck, int ixScreen, int iyScreen, __Vector3* pVCol = NULL, __Vector3* pVNormal = NULL);
-//	BOOL CheckClimb(int x, int y, __Vector3* pVCol = NULL, __Vector3* pVNormal = NULL, __Vector3* pVPolygon = NULL);
-//	BOOL CheckClimb(__Vector3 &vPos, __Vector3 &vDir, __Vector3* pVCol = NULL, __Vector3* pVNormal = NULL, __Vector3* pVPolygon = NULL);
+	virtual int		CheckCollisionPrecisely(bool bIgnoreBoxCheck, int ixScreen, int iyScreen, __Vector3* pVCol = nullptr, __Vector3* pVNormal = nullptr);
+//	BOOL CheckClimb(int x, int y, __Vector3* pVCol = nullptr, __Vector3* pVNormal = nullptr, __Vector3* pVPolygon = nullptr);
+//	BOOL CheckClimb(__Vector3 &vPos, __Vector3 &vDir, __Vector3* pVCol = nullptr, __Vector3* pVNormal = nullptr, __Vector3* pVPolygon = nullptr);
 
 #if defined(_DEBUG) || defined(_N3TOOL)
 	void			RenderCollisionMesh();

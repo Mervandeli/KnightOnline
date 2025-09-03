@@ -5,9 +5,9 @@
 
 CN3Eng::CN3Eng()
 {
-	m_lpDD          = NULL;
-	m_lpD3D         = NULL;
-	s_lpD3DDev      = NULL;
+	m_lpDD          = nullptr;
+	m_lpD3D         = nullptr;
+	s_lpD3DDev      = nullptr;
 	m_nModeActive   = -1;
 	m_nAdapterCount =  1;
 
@@ -22,7 +22,7 @@ CN3Eng::CN3Eng()
 
 	m_lpD3D = Direct3DCreate9(D3D_SDK_VERSION);
 
-	if(m_lpD3D == NULL)
+	if(m_lpD3D == nullptr)
 	{
 #ifdef _N3GAME
 		CLogWriter::Write("Direct3D9 is not installed or lower version");
@@ -54,7 +54,7 @@ CN3Eng::~CN3Eng()
 		int nRefCount = s_lpD3DDev->Release();
 
 		if (nRefCount == 0) {
-			s_lpD3DDev = NULL;
+			s_lpD3DDev = nullptr;
 		} else {
 #ifdef _N3GAME
 			CLogWriter::Write("CNEng::~CN3Eng - Device reference count is bigger than 0");
@@ -62,8 +62,8 @@ CN3Eng::~CN3Eng()
 		}
 	}
 
-	if(m_lpD3D) if(m_lpD3D->Release() == 0) m_lpD3D = NULL;
-	if(m_lpDD) m_lpDD->Release(); m_lpDD = NULL;
+	if(m_lpD3D) if(m_lpD3D->Release() == 0) m_lpD3D = nullptr;
+	if(m_lpDD) m_lpDD->Release(); m_lpDD = nullptr;
 
 #ifdef _N3GAME
 	CLogWriter::Close();
@@ -83,7 +83,7 @@ void CN3Eng::Release()
 		int nRefCount = s_lpD3DDev->Release();
 
 		if (nRefCount == 0) {
-			s_lpD3DDev = NULL;
+			s_lpD3DDev = nullptr;
 		} else {
 #ifdef _N3GAME
 			CLogWriter::Write("CNEng::Release Device reference count is bigger than 0");
@@ -91,13 +91,13 @@ void CN3Eng::Release()
 		}
 	}
 
-	if(m_lpDD) m_lpDD->Release(); m_lpDD = NULL;
+	if(m_lpDD) m_lpDD->Release(); m_lpDD = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 void CN3Eng::SetViewPort(RECT& rc)
 {
-	if (s_lpD3DDev == NULL) return;
+	if (s_lpD3DDev == nullptr) return;
 
 	D3DVIEWPORT9 vp;
 	vp.X      = rc.left;
@@ -132,7 +132,7 @@ void CN3Eng::SetDefaultEnvironment()
 	float fMipMapLODBias = -1.0f;
 
 	for (int i = 0; i < 8; ++i) {
-		s_lpD3DDev->SetTexture(i, NULL);
+		s_lpD3DDev->SetTexture(i, nullptr);
 		s_lpD3DDev->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 		s_lpD3DDev->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 		s_lpD3DDev->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
@@ -159,7 +159,7 @@ void CN3Eng::LookAt(const __Vector3& vEye, const __Vector3& vAt, const __Vector3
 //-----------------------------------------------------------------------------
 bool CN3Eng::Reset(bool bWindowed, uint32_t dwWidth, uint32_t dwHeight, uint32_t dwBPP)
 {
-	if (s_lpD3DDev == NULL) return false;
+	if (s_lpD3DDev == nullptr) return false;
 	if (dwWidth <= 0 || dwHeight <= 0) return false;
 
 	if (dwWidth == s_DevParam.BackBufferWidth && dwHeight == s_DevParam.BackBufferHeight)
@@ -444,7 +444,7 @@ LRESULT WINAPI CN3Eng::MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 
         case WM_PAINT:
 //          Render();
-//          ValidateRect( hWnd, NULL );
+//          ValidateRect( hWnd, nullptr );
             return 0;
     }
 
@@ -543,7 +543,7 @@ void CN3Eng::Present(HWND hWnd, RECT* pRC)
 		pRC = &rc;
 	}
 
-	HRESULT rval = s_lpD3DDev->Present(pRC, pRC, hWnd, NULL);
+	HRESULT rval = s_lpD3DDev->Present(pRC, pRC, hWnd, nullptr);
 	if (D3D_OK == rval)
 	{
 		s_hWndPresent = hWnd; // Present window handle 을 저장해 놓는다.
@@ -555,7 +555,7 @@ void CN3Eng::Present(HWND hWnd, RECT* pRC)
 		if (D3D_OK != rval)
 			WaitForDeviceRestoration();
 
-		rval = s_lpD3DDev->Present(pRC, pRC, hWnd, NULL);
+		rval = s_lpD3DDev->Present(pRC, pRC, hWnd, nullptr);
 	}
 
 	s_fSecPerFrm = CN3Base::TimerProcess(TIMER_GETELAPSEDTIME);
@@ -673,6 +673,6 @@ void CN3Eng::ClearZBuffer(const RECT* pRC)
 	}
 	else
 	{
-		s_lpD3DDev->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+		s_lpD3DDev->Clear(0, nullptr, D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
 	}
 }

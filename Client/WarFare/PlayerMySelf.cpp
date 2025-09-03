@@ -55,7 +55,7 @@ CPlayerMySelf::CPlayerMySelf()
 
 	m_dwMagicID = 0xffffffff;
 	m_fCastingTime = 0.0f;
-	m_pObjectTarget = NULL; // 타겟 오브젝트 포인터..
+	m_pObjectTarget = nullptr; // 타겟 오브젝트 포인터..
 }
 
 CPlayerMySelf::~CPlayerMySelf()
@@ -94,7 +94,7 @@ void CPlayerMySelf::Release()
 	m_ChrInv.PartAlloc(PART_POS_COUNT);
 	m_ChrInv.PlugAlloc(PLUG_POS_COUNT);
 
-	m_pObjectTarget = NULL; // 타겟 오브젝트 포인터..
+	m_pObjectTarget = nullptr; // 타겟 오브젝트 포인터..
 
 	CPlayerBase::Release();
 }
@@ -265,14 +265,14 @@ void CPlayerMySelf::Tick()
 						{
 							if(CGameProcedure::s_pEng->ViewPoint() == VP_THIRD_PERSON)
 							{
-								CGameProcedure::s_pPlayer->RotateTo(pTarget); // 방향을 돌린다.
+								RotateTo(pTarget); // 방향을 돌린다.
 
 								float fDist = (pTarget->Position() - m_Chr.Pos()).Magnitude(); // 공격 거리를 구하고..
 								float fDistLimit = this->AttackableDistance(pTarget);
 
 								if(fDist > fDistLimit && !m_bTargetOrPosMove)
 								{
-									CGameProcedure::s_pProcMain->CommandMove(MD_FOWARD, true);
+									CGameProcedure::s_pProcMain->CommandMove(MD_FORWARD, true);
 									s_pPlayer->SetMoveTargetID(pTarget->IDNumber());
 								}
 							}
@@ -495,8 +495,8 @@ void CPlayerMySelf::InventoryChrRender(const RECT& Rect)
 	vPos.y = (fHeight - vPos.y)/fHeight;
 
 	__Matrix44 mtxProjInv, mtxViewInv;
-	D3DXMatrixInverse(&mtxProjInv, NULL, &mtxproj);
-	D3DXMatrixInverse(&mtxViewInv, NULL, &mtxview);
+	D3DXMatrixInverse(&mtxProjInv, nullptr, &mtxproj);
+	D3DXMatrixInverse(&mtxViewInv, nullptr, &mtxview);
 
 	vPos *= mtxProjInv;
 	vPos *= mtxViewInv;
@@ -506,7 +506,7 @@ void CPlayerMySelf::InventoryChrRender(const RECT& Rect)
 	qt.RotationAxis(0.0f, 1.0f, 0.0f, D3DXToRadian(198.0f));
 	m_ChrInv.RotSet(qt);
 
-	CGameProcedure::s_pEng->ClearZBuffer(NULL);
+	CGameProcedure::s_pEng->ClearZBuffer(nullptr);
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 	m_ChrInv.m_nLOD = 0;
 	m_ChrInv.Render();
@@ -610,7 +610,7 @@ CN3CPlugBase* CPlayerMySelf::PlugSet(e_PlugPosition ePos, const std::string& szF
 	else { __ASSERT(0, "Invalid Plug Item position"); }
 
 	CN3CPlugBase* pPlug = m_ChrInv.PlugSet(ePos, szFN);
-	if(NULL == pPlug) return NULL;
+	if(nullptr == pPlug) return nullptr;
 
 	if(PLUG_POS_LEFTHAND == ePos || PLUG_POS_RIGHTHAND == ePos) // 키에 비례해서 크게 키운다. 기본키는 1.8 미터이다. 
 	{
@@ -633,7 +633,7 @@ CN3CPart* CPlayerMySelf::PartSet(e_PartPosition ePos, const std::string& szFN, _
 	if(ePos < PART_POS_UPPER || ePos >= PART_POS_COUNT)
 	{
 		__ASSERT(0, "Invalid Item Position");
-		return NULL;
+		return nullptr;
 	}
 
 	if(PART_POS_UPPER == ePos) // 상체일 경우 특별한 처리가 필요..
@@ -678,11 +678,11 @@ CN3CPart* CPlayerMySelf::PartSet(e_PartPosition ePos, const std::string& szFN, _
 			m_pItemPartExts[ePos] = pItemExt;
 			m_ChrInv.PartSet(ePos, "");
 			m_Chr.PartSet(ePos, ""); // 하체는 벗기고(?)..
-			return NULL; // 돌아간다.
+			return nullptr; // 돌아간다.
 		}
 	}
 
-	CN3CPart* pPart = NULL;
+	CN3CPart* pPart = nullptr;
 	if(szFN.empty()) // 파일 이름이 없는거면.. 기본 착용..
 	{
 		if(PART_POS_HAIR_HELMET == ePos)
@@ -733,7 +733,7 @@ bool CPlayerMySelf::InitChr(__TABLE_PLAYER_LOOKS* pTbl)
 
 float CPlayerMySelf::AttackableDistance(CPlayerBase* pTarget)
 {
-	if(NULL == pTarget) return 0;
+	if(nullptr == pTarget) return 0;
 
 	float fDistLimit = (m_Chr.Radius() + pTarget->Radius())/2.0f; // 공격 거리제한..
 	if(m_pItemPlugBasics[0])
@@ -746,7 +746,7 @@ float CPlayerMySelf::AttackableDistance(CPlayerBase* pTarget)
 
 float CPlayerMySelf::DistanceExceptRadius(CPlayerBase* pTarget)
 {
-	if(NULL == pTarget) return 0;
+	if(nullptr == pTarget) return 0;
 
 	float fDist = (pTarget->Position() - m_Chr.Pos()).Magnitude();
 	float fDistRadius = (m_Chr.Radius() + pTarget->Radius())/2.0f; // 공격 거리제한..
@@ -838,7 +838,7 @@ bool CPlayerMySelf::CheckCollision()
 
 	//////////////////////////////////
 	// 다른 플레이어와 체크..
-	CPlayerOther* pUPC = NULL;
+	CPlayerOther* pUPC = nullptr;
 	float fHeightSum, fMag;
 	it_UPC it = s_pOPMgr->m_UPCs.begin(), itEnd = s_pOPMgr->m_UPCs.end();
 	for(; it != itEnd; it++)
@@ -880,7 +880,7 @@ bool CPlayerMySelf::CheckCollision()
 //	if(pZoneInfo && pZoneInfo->bNPCCollisionCheck) //this_zone
 
 	//적국 엔피씨는 충돌 체크를 한다.
-	CPlayerNPC* pNPC = NULL;
+	CPlayerNPC* pNPC = nullptr;
 	it_NPC it_N = s_pOPMgr->m_NPCs.begin(),	it_NEnd	= s_pOPMgr->m_NPCs.end();
 	for(; it_N != it_NEnd; it_N++)
 	{
@@ -1196,4 +1196,14 @@ void CPlayerMySelf::TargetOrPosMove()
 			CGameProcedure::s_pProcMain->MsgSend_Move(false, false); // 정지 패킷 보내기..
 		}
 	}
+}
+
+bool CPlayerMySelf::HasWeaponEquipped() const
+{
+	// TODO: Handle transformations (should use the inventory in that case)
+	if (IsItemClassWeapon(ItemClass_RightHand())
+		|| IsItemClassWeapon(ItemClass_LeftHand()))
+		return true;
+
+	return false;
 }

@@ -64,7 +64,7 @@ BOOL CBackgroundUtil::GetBitmapAndPalette(UINT nIDResource, CBitmap & bitmap, CP
 	HBITMAP hBmp = (HBITMAP)::LoadImage( AfxGetInstanceHandle(), 
 		lpszResourceName, IMAGE_BITMAP, 0,0, LR_CREATEDIBSECTION);
 
-	if (hBmp == NULL) return FALSE;
+	if (hBmp == nullptr) return FALSE;
 
 	bitmap.Attach(hBmp);
 
@@ -76,7 +76,7 @@ BOOL CBackgroundUtil::GetBitmapAndPalette(UINT nIDResource, CBitmap & bitmap, CP
 	int nColors = bmInfo.biClrUsed ? bmInfo.biClrUsed : 1 << bmInfo.biBitCount;
 
 	// Create a halftone palette if colors > 256. 
-	CClientDC dc(NULL); // Desktop DC
+	CClientDC dc(nullptr); // Desktop DC
 
 	if(nColors > 256)
 		pal.CreateHalftonePalette(&dc);
@@ -114,7 +114,7 @@ BOOL CBackgroundUtil::TileBitmap(CDC* pDC, CRect rc)
 	int x = 0, y = 0;
 
 	// If there is a bitmap loaded
-	if (m_BmpPattern.m_hObject != NULL)
+	if (m_BmpPattern.m_hObject != nullptr)
 	{
 		MemDC.CreateCompatibleDC(pDC);
 		CBitmap* pOldBitmap = MemDC.SelectObject(&m_BmpPattern);

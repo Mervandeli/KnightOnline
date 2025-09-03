@@ -34,7 +34,7 @@ END_MESSAGE_MAP()
 
 CN3MEView::CN3MEView()
 {
-	m_pMapMng = NULL;
+	m_pMapMng = nullptr;
 }
 
 CN3MEView::~CN3MEView()
@@ -113,7 +113,7 @@ LRESULT CN3MEView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 		m_CurrMousePos.x = (short)(LOWORD(lParam));
 		m_CurrMousePos.y = (short)(HIWORD(lParam));
 	}
-	if (WM_DESTROY == message) m_pMapMng = NULL;
+	if (WM_DESTROY == message) m_pMapMng = nullptr;
 	if (m_pMapMng)
 	{
 		MSG	msg;	msg.hwnd = m_hWnd;	msg.message = message;	msg.wParam = wParam;	msg.lParam = lParam;
@@ -161,14 +161,14 @@ void CN3MEView::OnSize(UINT nType, int cx, int cy)
 	if(cx <= 0 || cy <= 0) return;
 
 	CWnd* pMainWnd = AfxGetMainWnd();
-	CWnd* pWndParent = NULL;
+	CWnd* pWndParent = nullptr;
 	if(pMainWnd)
 	{
 		pWndParent = pMainWnd->GetParent();
 	}
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	if(pFrm && pWndParent == NULL && pFrm->m_pEng)
+	if(pFrm && pWndParent == nullptr && pFrm->m_pEng)
 	{
 		pFrm->m_pEng->Reset(TRUE, cx, cy, 0);
 	}

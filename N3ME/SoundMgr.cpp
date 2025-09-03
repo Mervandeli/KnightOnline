@@ -24,11 +24,11 @@ CSoundMgr::CSoundMgr()
 {
 	m_iVersion = 1;
 	m_pSound.clear();
-	m_pCurrSound = NULL;
+	m_pCurrSound = nullptr;
 
 	m_MapSize = 0;
 		
-	m_pRefMapMng = NULL;
+	m_pRefMapMng = nullptr;
 	m_bActive = false;
 	
 	m_pDlgSound = new CDlgSetSound;
@@ -43,25 +43,25 @@ CSoundMgr::~CSoundMgr()
 	for(it = m_pSound.begin(); it != m_pSound.end(); it++)
 	{
 		delete (*it);
-		(*it) = NULL;
+		(*it) = nullptr;
 	}
 	m_pSound.clear();
 
 	if(m_pCurrSound)
 	{
 		delete m_pCurrSound;
-		m_pCurrSound = NULL;
+		m_pCurrSound = nullptr;
 	}
 
 	if(m_pDlgSound) 
 	{
 		m_pDlgSound->DestroyWindow();
 		delete m_pDlgSound;
-		m_pDlgSound = NULL;
+		m_pDlgSound = nullptr;
 	}
 
 	m_MapSize = 0;
-	m_pRefMapMng = NULL;
+	m_pRefMapMng = nullptr;
 	m_bActive = false;	
 }
 
@@ -85,7 +85,7 @@ void CSoundMgr::SetCurrSound(CSoundCell* pSound)
 	if(m_pCurrSound)
 	{
 		delete m_pCurrSound;
-		m_pCurrSound = NULL;
+		m_pCurrSound = nullptr;
 	}
 
 	m_pCurrSound = pSound;
@@ -124,7 +124,7 @@ BOOL CSoundMgr::MouseMsgFilter(LPMSG pMsg)
 			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 
 			m_pCurrSound->InitRect(vec);		
 		}
@@ -134,7 +134,7 @@ BOOL CSoundMgr::MouseMsgFilter(LPMSG pMsg)
 			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 
 			m_pCurrSound->AddRect(vec);		
 		}
@@ -146,7 +146,7 @@ BOOL CSoundMgr::MouseMsgFilter(LPMSG pMsg)
 			if(nFlags & MK_LBUTTON)	
 			{
 				__Vector3 vec;
-				if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+				if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 				m_pCurrSound->AddRect(vec);
 			}
 		}
@@ -169,7 +169,7 @@ void CSoundMgr::SetActive(bool active)
 		if(m_pCurrSound)
 		{
 			delete m_pCurrSound;
-			m_pCurrSound = NULL;
+			m_pCurrSound = nullptr;
 		}
 		m_pCurrSound = pSound;		
 	}
@@ -180,7 +180,7 @@ void CSoundMgr::SetActive(bool active)
 		if(m_pCurrSound)
 		{
 			delete m_pCurrSound;
-			m_pCurrSound = NULL;
+			m_pCurrSound = nullptr;
 		}
 	}
 }
@@ -195,7 +195,7 @@ void CSoundMgr::Render()
 	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx); // 월드 행렬 적용..
 	
 	// set texture
-	hr = s_lpD3DDev->SetTexture(0, NULL);
+	hr = s_lpD3DDev->SetTexture(0, nullptr);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 
@@ -243,7 +243,7 @@ bool CSoundMgr::Load(HANDLE hFile)
 	m_pDlgSound->Clear();
 
 	DWORD dwRWC;
-	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
 	if(!m_pDlgSound->LoadSoundGroup(hFile)) return false;
 
 	//m_pSound클리어...
@@ -257,7 +257,7 @@ bool CSoundMgr::Load(HANDLE hFile)
 	CLyTerrain* pRefTerrain = m_pRefMapMng->GetTerrain();
 
 	int cnt = 0;
-	ReadFile(hFile, &cnt, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
 	for(int i=0;i<cnt;i++)
 	{
 		CSoundCell* pSoundCell = new CSoundCell(pRefTerrain);
@@ -274,11 +274,11 @@ bool CSoundMgr::Load(HANDLE hFile)
 bool CSoundMgr::Save(HANDLE hFile)
 {
 	DWORD dwRWC;
-	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
 	if(!m_pDlgSound->SaveSoundGroup(hFile)) return false;
 
 	int cnt = m_pSound.size(); 
-	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
 
 	std::list<CSoundCell*>::iterator it;
 	for(it = m_pSound.begin(); it != m_pSound.end(); it++)
@@ -317,7 +317,7 @@ void CSoundMgr::SaveGameData(HANDLE hFile)
 	std::list<int>::iterator it_int = tmpList.begin();
 	int cnt = tmpList.size();
 	DWORD dwRWC;
-	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
 	for(int i=0;i<cnt;i++)
 	{
 		int dwID = (*it_int);
@@ -338,15 +338,15 @@ void CSoundMgr::SaveGameData(HANDLE hFile)
 			
 			str = pSI->szBGM[j];
 			str_size = str.size();
-			WriteFile(hFile, &str_size, sizeof(int), &dwRWC, NULL);
-			WriteFile(hFile, str.c_str(), str_size, &dwRWC, NULL);
-			WriteFile(hFile, &(pSI->fBGMRegenTime[j]), sizeof(float), &dwRWC, NULL);
+			WriteFile(hFile, &str_size, sizeof(int), &dwRWC, nullptr);
+			WriteFile(hFile, str.c_str(), str_size, &dwRWC, nullptr);
+			WriteFile(hFile, &(pSI->fBGMRegenTime[j]), sizeof(float), &dwRWC, nullptr);
 
 			str = pSI->szBGE[j];
 			str_size = str.size();
-			WriteFile(hFile, &str_size, sizeof(int), &dwRWC, NULL);
-			WriteFile(hFile, str.c_str(), str_size, &dwRWC, NULL);
-			WriteFile(hFile, &(pSI->fBGERegenTime[j]), sizeof(float), &dwRWC, NULL);
+			WriteFile(hFile, &str_size, sizeof(int), &dwRWC, nullptr);
+			WriteFile(hFile, str.c_str(), str_size, &dwRWC, nullptr);
+			WriteFile(hFile, &(pSI->fBGERegenTime[j]), sizeof(float), &dwRWC, nullptr);
 		}
 	}
 	
@@ -363,10 +363,10 @@ void CSoundMgr::SaveGameData(HANDLE hFile)
 			}
 		}
 	}
-	WriteFile(hFile, pSound, sizeof(char)*m_MapSize*m_MapSize, &dwRWC, NULL);
+	WriteFile(hFile, pSound, sizeof(char)*m_MapSize*m_MapSize, &dwRWC, nullptr);
 	
 	GlobalFree(pSound);
-	pSound = NULL;
+	pSound = nullptr;
 }
 
 //

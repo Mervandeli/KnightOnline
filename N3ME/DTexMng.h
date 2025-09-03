@@ -36,7 +36,7 @@ public:
 	int		GetNumDTex() { return m_pDTex.size(); }
 	bool	AddDTex(CString FileName);
 	void	DelDTexByID(int id);
-	void	Init(CMainFrame* pFrm = NULL);
+	void	Init(CMainFrame* pFrm = nullptr);
 	void	Release();
 
 	void	SaveToFile(CString RealFileName);

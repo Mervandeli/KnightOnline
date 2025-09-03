@@ -200,7 +200,7 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 	CMainFrame*			pFrm = (CMainFrame*)AfxGetMainWnd();
 	CHierarchyView*		pHView = pFrm->GetHierarchyView();
 	CN3UIBase* pUI = GetDocument()->GetSelectedUI();
-	if(pUI == NULL) return TRUE;
+	if(pUI == nullptr) return TRUE;
 	CPropertyItem* pItem = (CPropertyItem*)lParam;
 
 	// base
@@ -209,7 +209,7 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		if(pItem->m_propName == "ID string")
 		{
 			HTREEITEM hItem = pHView->GetTreeCtrl().GetSelectedItem();
-			if(NULL != hItem)
+			if(nullptr != hItem)
 			{
 				CString str = pHView->GetTreeCtrl().GetItemText(hItem);
 				int iTmp = str.Find(" - ");
@@ -253,7 +253,7 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		{
 			pUI->SetSndOpen("");
 			pUI->SetSndClose("");
-			CPropertyItem* pTmp = NULL;
+			CPropertyItem* pTmp = nullptr;
 			pTmp = m_UIBase.GetPropItem("Open sound");
 			if (pTmp) pTmp->m_curValue = "";
 			pTmp = m_UIBase.GetPropItem("Close sound");
@@ -263,7 +263,7 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		else if(pItem->m_propName == "Visible")
 		{
 			pUI->SetVisible(!pUI->IsVisible());	// 보였다 안보였다하게 하기
-			GetDocument()->UpdateAllViews(NULL);
+			GetDocument()->UpdateAllViews(nullptr);
 		}
 	}
 	// image
@@ -312,7 +312,7 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 			CN3UIBase* pParentUI = pImage->GetParent();
 			while(1)
 			{
-				if (NULL == pParentUI || (UI_TYPE_IMAGE == pParentUI->UIType()))
+				if (nullptr == pParentUI || (UI_TYPE_IMAGE == pParentUI->UIType()))
 				{	// 반드시 부모는 image가 아니어야 한다.
 					pFrm->MessageBox("Animate image의 자식 image는 animate image로 만들 수 없습니다.");
 					break;	
@@ -342,7 +342,7 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 					__FLOAT_RECT frcUV;
 					dlgTex.GetImageRect(i, &frcUV);
 					pChildImage = pImage->GetChildImage(i);
-					if (NULL == pChildImage) continue;
+					if (nullptr == pChildImage) continue;
 					pChildImage->SetTex(szTexFName);	// texture설정
 					pChildImage->SetUVRect(frcUV.left, frcUV.top, frcUV.right, frcUV.bottom);		// uv 설정
 				}
@@ -352,7 +352,7 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 				rcRegion.OffsetRect(-rcRegion.TopLeft());
 				pImage->SetRegion(rcRegion);
 				pFrm->GetRightPane()->SelectRectType(CUIEView::RT_REGION);
-				GetDocument()->UpdateAllViews(NULL);
+				GetDocument()->UpdateAllViews(nullptr);
 				break;
 			}
 		}
@@ -473,7 +473,7 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		{
 			pBtn->SetSndOn("");
 			pBtn->SetSndClick("");
-			CPropertyItem* pTmp = NULL;
+			CPropertyItem* pTmp = nullptr;
 			pTmp = m_UIButton.GetPropItem("On sound");
 			if (pTmp) pTmp->m_curValue = "";
 			pTmp = m_UIButton.GetPropItem("Click sound");
@@ -493,12 +493,12 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		else if (pItem->m_propName == "Delete bkgnd image")
 		{
 			pStatic->DeleteImage();
-			GetDocument()->UpdateAllViews(NULL);
+			GetDocument()->UpdateAllViews(nullptr);
 		}
 		else if(pItem->m_propName == "Delete sound")
 		{
 			pStatic->SetSndClick("");
-			CPropertyItem* pTmp = NULL;
+			CPropertyItem* pTmp = nullptr;
 			pTmp = m_UIStatic.GetPropItem("Click sound");
 			if (pTmp) pTmp->m_curValue = "";
 			Invalidate();
@@ -526,12 +526,12 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		else if (pItem->m_propName == "Delete bkgnd image")
 		{
 			pEdit->DeleteImage();
-			GetDocument()->UpdateAllViews(NULL);
+			GetDocument()->UpdateAllViews(nullptr);
 		}
 		else if(pItem->m_propName == "Delete sound")
 		{
 			pEdit->SetSndTyping("");
-			CPropertyItem* pTmp = NULL;
+			CPropertyItem* pTmp = nullptr;
 			pTmp = m_UIEdit.GetPropItem("Typing sound");
 			if (pTmp) pTmp->m_curValue = "";
 			Invalidate();
@@ -594,7 +594,7 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		else if (pItem->m_propName == "Delete BkGnd")
 		{
 			pProg->DeleteBkGndImage();
-			GetDocument()->UpdateAllViews(NULL);
+			GetDocument()->UpdateAllViews(nullptr);
 		}
 	}
 	// trackbar
@@ -617,7 +617,7 @@ BOOL CPropertyView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		else if (pItem->m_propName == "Delete bkgnd image")
 		{
 			pTB->DeleteBkImage();
-			GetDocument()->UpdateAllViews(NULL);
+			GetDocument()->UpdateAllViews(nullptr);
 		}
 	}
 	//scrollbar
@@ -666,7 +666,7 @@ void CPropertyView::OnSize(UINT nType, int cx, int cy)
 // CPropertyView Operations
 void CPropertyView::UpdateInfo()
 {
-	if(m_UIBase.GetSafeHwnd() == NULL) return;
+	if(m_UIBase.GetSafeHwnd() == nullptr) return;
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3UIBase* pUIBase = GetDocument()->GetSelectedUI();
@@ -684,7 +684,7 @@ void CPropertyView::UpdateInfo()
 	m_UIArea.ShowWindow(SW_HIDE);
 	m_UIIconSlot.ShowWindow(SW_HIDE);
 	m_UIList.ShowWindow(SW_HIDE);
-	if (NULL == pUIBase)	return;	// 선택된 UI가 없으므로 그냥 리턴
+	if (nullptr == pUIBase)	return;	// 선택된 UI가 없으므로 그냥 리턴
 
 	CPoint ptWndPos = -GetScrollPosition();
 	// base의 값 보이기(base는 일단 모두 가지고 있는 값이므로 표시해준다.)
@@ -736,12 +736,12 @@ void CPropertyView::Resize()
 
 void CPropertyView::SetPropertyListPos(CPropertyList* pList, CPoint& ptWndPos)
 {
-	if (NULL == pList) return;
+	if (nullptr == pList) return;
 	// 위치 조정 및 보이게 하기
 	CRect rc;
 	GetClientRect(&rc);
 	int iHeight = pList->GetItemHeight(0) * pList->GetCount() + 4;
-	pList->SetWindowPos(NULL, ptWndPos.x, ptWndPos.y, rc.Width(), iHeight, SWP_NOZORDER|SWP_SHOWWINDOW);
+	pList->SetWindowPos(nullptr, ptWndPos.x, ptWndPos.y, rc.Width(), iHeight, SWP_NOZORDER|SWP_SHOWWINDOW);
 	ptWndPos.y += iHeight + 3;
 }
 
@@ -749,10 +749,10 @@ void CPropertyView::SetPropertyListPos(CPropertyList* pList, CPoint& ptWndPos)
 void CPropertyView::UpdateUIBaseInfo()
 {
 	CN3UIBase* pUIBase = GetDocument()->GetSelectedUI();
-	if (NULL == pUIBase) return;
+	if (nullptr == pUIBase) return;
 	m_UIBase.ShowWindow(SW_SHOW);
 
-	CPropertyItem* pItem = NULL;
+	CPropertyItem* pItem = nullptr;
 	pItem = m_UIBase.GetPropItem("ID string");							// id
 	if (pItem) pItem->m_curValue = pUIBase->m_szID.c_str();
 
@@ -797,13 +797,13 @@ void CPropertyView::UpdateUIBaseInfo()
 void CPropertyView::UpdateUIImageInfo()
 {
 	CN3UIBase* pUIBase = GetDocument()->GetSelectedUI();
-	if (NULL == pUIBase) return;
-	CN3UIImage* pUI = NULL;
+	if (nullptr == pUIBase) return;
+	CN3UIImage* pUI = nullptr;
 	if (UI_TYPE_IMAGE == pUIBase->UIType()) pUI = (CN3UIImage*)pUIBase;
 	else return;
 	m_UIImage.ShowWindow(SW_SHOW);
 	
-	CPropertyItem* pItem = NULL;
+	CPropertyItem* pItem = nullptr;
 	pItem = m_UIImage.GetPropItem("Texture");							// texture 이름
 	if (pItem)
 	{
@@ -841,13 +841,13 @@ void CPropertyView::UpdateUIImageInfo()
 void CPropertyView::UpdateUIStringInfo()
 {
 	CN3UIBase* pUIBase = GetDocument()->GetSelectedUI();
-	if (NULL == pUIBase) return;
-	CN3UIString* pUI = NULL;
+	if (nullptr == pUIBase) return;
+	CN3UIString* pUI = nullptr;
 	if (UI_TYPE_STRING == pUIBase->UIType()) pUI = (CN3UIString*)pUIBase;
 	else return;
 	m_UIString.ShowWindow(SW_SHOW);
 
-	CPropertyItem* pItem = NULL;
+	CPropertyItem* pItem = nullptr;
 
 	pItem = m_UIString.GetPropItem("Line");							// Line
 	if (pItem)
@@ -907,13 +907,13 @@ void CPropertyView::UpdateUIStringInfo()
 void CPropertyView::UpdateUIListInfo()
 {
 	CN3UIBase* pUIBase = GetDocument()->GetSelectedUI();
-	if (NULL == pUIBase) return;
-	CN3UIList* pUI = NULL;
+	if (nullptr == pUIBase) return;
+	CN3UIList* pUI = nullptr;
 	if (UI_TYPE_LIST == pUIBase->UIType()) pUI = (CN3UIList*)pUIBase;
 	else return;
 	m_UIList.ShowWindow(SW_SHOW);
 
-	CPropertyItem* pItem = NULL;
+	CPropertyItem* pItem = nullptr;
 
 	pItem = m_UIList.GetPropItem("Font");							// font
 	if (pItem)
@@ -945,13 +945,13 @@ void CPropertyView::UpdateUIListInfo()
 void CPropertyView::UpdateUIButtonInfo()
 {
 	CN3UIBase* pUIBase = GetDocument()->GetSelectedUI();
-	if (NULL == pUIBase) return;
-	CN3UIButton* pUI = NULL;
+	if (nullptr == pUIBase) return;
+	CN3UIButton* pUI = nullptr;
 	if (UI_TYPE_BUTTON == pUIBase->UIType()) pUI = (CN3UIButton*)pUIBase;
 	else return;
 	m_UIButton.ShowWindow(SW_SHOW);
 
-	CPropertyItem* pItem = NULL;
+	CPropertyItem* pItem = nullptr;
 	pItem = m_UIButton.GetPropItem("Style");							// style
 	if (pItem)
 	{
@@ -979,11 +979,11 @@ void CPropertyView::UpdateUIButtonInfo()
 void CPropertyView::UpdateUIIconSlotInfo()
 {
 	CN3UIBase* pUIBase = GetDocument()->GetSelectedUI();
-	if (NULL == pUIBase) return;
+	if (nullptr == pUIBase) return;
 	if (UI_TYPE_ICONSLOT != pUIBase->UIType()) return;
 	m_UIIconSlot.ShowWindow(SW_SHOW);
 
-	CPropertyItem* pItem = NULL;
+	CPropertyItem* pItem = nullptr;
 	pItem = m_UIIconSlot.GetPropItem("Slot ID");							// style
 	if (pItem) pItem->m_curValue.Format("%d", pUIBase->GetReserved());
 	m_UIIconSlot.Invalidate();
@@ -993,13 +993,13 @@ void CPropertyView::UpdateUIIconSlotInfo()
 void CPropertyView::UpdateUIAreaInfo()			// Area정보 갱신
 {
 	CN3UIBase* pUIBase = GetDocument()->GetSelectedUI();
-	if (NULL == pUIBase) return;
-	CN3UIArea* pUI = NULL;
+	if (nullptr == pUIBase) return;
+	CN3UIArea* pUI = nullptr;
 	if (UI_TYPE_AREA == pUIBase->UIType()) pUI = (CN3UIArea*)pUIBase;
 	else return;
 	m_UIArea.ShowWindow(SW_SHOW);
 
-	CPropertyItem* pItem = NULL;
+	CPropertyItem* pItem = nullptr;
 	pItem = m_UIArea.GetPropItem("Type");							// style
 	if (pItem)
 	{
@@ -1065,14 +1065,14 @@ void CPropertyView::UpdateUIAreaInfo()			// Area정보 갱신
 void CPropertyView::UpdateUIStaticInfo()
 {
 	CN3UIBase* pUIBase = GetDocument()->GetSelectedUI();
-	if (NULL == pUIBase) return;
-	CN3UIStatic* pUI = NULL;
+	if (nullptr == pUIBase) return;
+	CN3UIStatic* pUI = nullptr;
 	if (UI_TYPE_STATIC == pUIBase->UIType() ||
 		UI_TYPE_EDIT == pUIBase->UIType() ) pUI = (CN3UIStatic*)pUIBase;	// edit도 static에서 상속 받은 것이다.
 	else return;
 	m_UIStatic.ShowWindow(SW_SHOW);
 
-	CPropertyItem* pItem = NULL;
+	CPropertyItem* pItem = nullptr;
 	pItem = m_UIStatic.GetPropItem("Click sound");					// click sound
 	if (pItem) pItem->m_curValue = pUI->GetSndFName_Click().c_str();
 
@@ -1083,13 +1083,13 @@ void CPropertyView::UpdateUIStaticInfo()
 void CPropertyView::UpdateUIEditInfo()
 {
 	CN3UIBase* pUIBase = GetDocument()->GetSelectedUI();
-	if (NULL == pUIBase) return;
-	CN3UIEdit* pUI = NULL;
+	if (nullptr == pUIBase) return;
+	CN3UIEdit* pUI = nullptr;
 	if (UI_TYPE_EDIT == pUIBase->UIType()) pUI = (CN3UIEdit*)pUIBase;
 	else return;
 	m_UIEdit.ShowWindow(SW_SHOW);
 
-	CPropertyItem* pItem = NULL;
+	CPropertyItem* pItem = nullptr;
 	pItem = m_UIEdit.GetPropItem("Style");							// style
 	if (pItem)
 	{
@@ -1107,13 +1107,13 @@ void CPropertyView::UpdateUIEditInfo()
 void CPropertyView::UpdateUIProgressInfo()
 {
 	CN3UIBase* pUIBase = GetDocument()->GetSelectedUI();
-	if (NULL == pUIBase) return;
-	CN3UIProgress* pUI = NULL;
+	if (nullptr == pUIBase) return;
+	CN3UIProgress* pUI = nullptr;
 	if (UI_TYPE_PROGRESS == pUIBase->UIType()) pUI = (CN3UIProgress*)pUIBase;
 	else return;
 	m_UIProgress.ShowWindow(SW_SHOW);
 
-	CPropertyItem* pItem = NULL;
+	CPropertyItem* pItem = nullptr;
 	pItem = m_UIProgress.GetPropItem("Style");		// style
 	if (pItem)
 	{
@@ -1136,13 +1136,13 @@ void CPropertyView::UpdateUIProgressInfo()
 void CPropertyView::UpdateUITrackBarInfo()
 {
 	CN3UIBase* pUIBase = GetDocument()->GetSelectedUI();
-	if (NULL == pUIBase) return;
-	CN3UITrackBar* pUI = NULL;
+	if (nullptr == pUIBase) return;
+	CN3UITrackBar* pUI = nullptr;
 	if (UI_TYPE_TRACKBAR == pUIBase->UIType()) pUI = (CN3UITrackBar*)pUIBase;
 	else return;
 	m_UITrackBar.ShowWindow(SW_SHOW);
 
-	CPropertyItem* pItem = NULL;
+	CPropertyItem* pItem = nullptr;
 	pItem = m_UITrackBar.GetPropItem("Style");		// style
 	if (pItem)
 	{
@@ -1165,13 +1165,13 @@ void CPropertyView::UpdateUITrackBarInfo()
 void CPropertyView::UpdateUIScrollBarInfo()
 {
 	CN3UIBase* pUIBase = GetDocument()->GetSelectedUI();
-	if (NULL == pUIBase) return;
-	CN3UIScrollBar* pUI = NULL;
+	if (nullptr == pUIBase) return;
+	CN3UIScrollBar* pUI = nullptr;
 	if (UI_TYPE_SCROLLBAR == pUIBase->UIType()) pUI = (CN3UIScrollBar*)pUIBase;
 	else return;
 	m_UIScrollBar.ShowWindow(SW_SHOW);
 
-	CPropertyItem* pItem = NULL;
+	CPropertyItem* pItem = nullptr;
 	pItem = m_UIScrollBar.GetPropItem("Style");		// style
 	if (pItem)
 	{

@@ -15,15 +15,15 @@ static char THIS_FILE[]=__FILE__;
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-LPDIRECTSOUND				CN3SndObj::s_lpDS = NULL;
-LPDIRECTSOUND3DLISTENER		CN3SndObj::s_lpDSListener = NULL;		// 3D listener object
+LPDIRECTSOUND				CN3SndObj::s_lpDS = nullptr;
+LPDIRECTSOUND3DLISTENER		CN3SndObj::s_lpDSListener = nullptr;		// 3D listener object
 DS3DLISTENER				CN3SndObj::s_dsListenerParams;			// Listener properties
 bool						CN3SndObj::s_bNeedDeferredTick = false;	// 3D Listener CommitDeferredSetting
 
 CN3SndObj::CN3SndObj()
 {
-	m_lpDSBuff = NULL;
-	m_lpDS3DBuff = NULL;
+	m_lpDSBuff = nullptr;
+	m_lpDS3DBuff = nullptr;
 	m_bIsLoop = false;
 	m_iVol = -1;
 	m_szFileName = "";
@@ -72,30 +72,30 @@ void CN3SndObj::Release()
 	if(m_lpDS3DBuff)
 	{
 		m_lpDS3DBuff->Release();
-		m_lpDS3DBuff = NULL;
+		m_lpDS3DBuff = nullptr;
 	}	
 
 	if(m_lpDSBuff)
 	{
 		m_lpDSBuff->Stop();
 		m_lpDSBuff->Release();
-		m_lpDSBuff = NULL;
+		m_lpDSBuff = nullptr;
 	}
 }
 
 bool CN3SndObj::StaticInit( HWND  hWnd, DWORD dwCoopLevel, DWORD dwPrimaryChannels, DWORD dwPrimaryFreq, DWORD dwPrimaryBitRate )
 {
     HRESULT hr;
-    LPDIRECTSOUNDBUFFER lpDSBPrimary = NULL;
+    LPDIRECTSOUNDBUFFER lpDSBPrimary = nullptr;
 
 	if(s_lpDS)
 	{
 		s_lpDS->Release();
-		s_lpDS = NULL;
+		s_lpDS = nullptr;
 	}
 
     // Create IDirectSound using the primary sound device
-    if( FAILED( hr = DirectSoundCreate( NULL, &s_lpDS, NULL ) ) )
+    if( FAILED( hr = DirectSoundCreate( nullptr, &s_lpDS, nullptr ) ) )
         return false;
 
     // Set DirectSound coop level 
@@ -109,8 +109,8 @@ bool CN3SndObj::StaticInit( HWND  hWnd, DWORD dwCoopLevel, DWORD dwPrimaryChanne
     dsbd.dwSize        = sizeof(DSBUFFERDESC);
     dsbd.dwFlags       = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRL3D | DSBCAPS_MUTE3DATMAXDISTANCE;
     dsbd.dwBufferBytes = 0;
-    dsbd.lpwfxFormat   = NULL;
-    if( FAILED( hr = s_lpDS->CreateSoundBuffer( &dsbd, &lpDSBPrimary, NULL ) ) ) return false;
+    dsbd.lpwfxFormat   = nullptr;
+    if( FAILED( hr = s_lpDS->CreateSoundBuffer( &dsbd, &lpDSBPrimary, nullptr ) ) ) return false;
 
     WAVEFORMATEX wfx;
     ZeroMemory( &wfx, sizeof(WAVEFORMATEX) ); 
@@ -125,7 +125,7 @@ bool CN3SndObj::StaticInit( HWND  hWnd, DWORD dwCoopLevel, DWORD dwPrimaryChanne
 	if(lpDSBPrimary)
 	{
 		lpDSBPrimary->Release();
-		lpDSBPrimary = NULL;
+		lpDSBPrimary = nullptr;
 	}
 
 
@@ -134,7 +134,7 @@ bool CN3SndObj::StaticInit( HWND  hWnd, DWORD dwCoopLevel, DWORD dwPrimaryChanne
     ZeroMemory( &dsbd, sizeof(dsbd) );
     dsbd.dwSize = sizeof(DSBUFFERDESC);
     dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_MUTE3DATMAXDISTANCE | DSBCAPS_CTRL3D;
-    if( FAILED( hr = s_lpDS->CreateSoundBuffer( &dsbd, &lpDSBPrimary, NULL ) ) )
+    if( FAILED( hr = s_lpDS->CreateSoundBuffer( &dsbd, &lpDSBPrimary, nullptr ) ) )
         return false;
 
     if( FAILED( hr = lpDSBPrimary->QueryInterface( IID_IDirectSound3DListener, (VOID**)(&s_lpDSListener) ) ) )
@@ -142,7 +142,7 @@ bool CN3SndObj::StaticInit( HWND  hWnd, DWORD dwCoopLevel, DWORD dwPrimaryChanne
        if(lpDSBPrimary)
 	   {
 		   lpDSBPrimary->Release();
-		   lpDSBPrimary = NULL;
+		   lpDSBPrimary = nullptr;
 	   }		   
 	   return false;
     }
@@ -150,7 +150,7 @@ bool CN3SndObj::StaticInit( HWND  hWnd, DWORD dwCoopLevel, DWORD dwPrimaryChanne
     if(lpDSBPrimary)
 	{
 		lpDSBPrimary->Release();
-		lpDSBPrimary = NULL;
+		lpDSBPrimary = nullptr;
 	}
 
 	// Set listener 
@@ -168,12 +168,12 @@ void CN3SndObj::StaticRelease()
 	if(s_lpDSListener)
 	{
 		s_lpDSListener->Release();
-		s_lpDSListener = NULL;
+		s_lpDSListener = nullptr;
 	}
 	if(s_lpDS)
 	{
 		s_lpDS->Release();
-		s_lpDS = NULL;
+		s_lpDS = nullptr;
 	}
 
 	s_bNeedDeferredTick = false;	// 3D Listener CommitDeferredSetting
@@ -190,12 +190,12 @@ void CN3SndObj::StaticTick()
 
 bool CN3SndObj::Create(const std::string& szFN, e_SndType eType)
 {
-	if(NULL == s_lpDS) return false;
+	if(nullptr == s_lpDS) return false;
 	if(SNDTYPE_2D != eType && SNDTYPE_3D != eType) return false;
 	if(m_lpDSBuff) this->Init();
 
 	CWaveFile	WaveFile;
-	HRESULT hr = WaveFile.Open(szFN.c_str(), NULL, 1);	//#define WAVEFILE_READ   1
+	HRESULT hr = WaveFile.Open(szFN.c_str(), nullptr, 1);	//#define WAVEFILE_READ   1
 	if(FAILED(hr))
 	{
 #ifdef _N3GAME
@@ -221,7 +221,7 @@ bool CN3SndObj::Create(const std::string& szFN, e_SndType eType)
 		dsbd.guid3DAlgorithm = DS3DALG_HRTF_LIGHT;
 	}
 
-	hr = s_lpDS->CreateSoundBuffer( &dsbd, &m_lpDSBuff, NULL );
+	hr = s_lpDS->CreateSoundBuffer( &dsbd, &m_lpDSBuff, nullptr );
 	if(FAILED(hr))
 	{
 #ifdef _N3GAME
@@ -251,7 +251,7 @@ bool CN3SndObj::Create(const std::string& szFN, e_SndType eType)
 
 bool CN3SndObj::Duplicate(CN3SndObj* pSrc, e_SndType eType, D3DVECTOR* pPos)
 {
-	if(NULL == s_lpDS || NULL == pSrc || NULL == pSrc->m_lpDSBuff)
+	if(nullptr == s_lpDS || nullptr == pSrc || nullptr == pSrc->m_lpDSBuff)
 		return false;
 	if(m_lpDSBuff) this->Init();
 
@@ -290,11 +290,11 @@ bool CN3SndObj::Duplicate(CN3SndObj* pSrc, e_SndType eType, D3DVECTOR* pPos)
 
 bool CN3SndObj::FillBufferWithSound(CWaveFile* pWaveFile)
 {
-    if( NULL == m_lpDSBuff || NULL == pWaveFile )
+    if( nullptr == m_lpDSBuff || nullptr == pWaveFile )
 		return false; // 포인터들 점검..
 	
     HRESULT hr; 
-    VOID*   pDSLockedBuffer      = NULL; // Pointer to locked buffer memory
+    VOID*   pDSLockedBuffer      = nullptr; // Pointer to locked buffer memory
     DWORD   dwDSLockedBufferSize = 0;    // Size of the locked DirectSound buffer
     DWORD   dwWavDataRead        = 0;    // Amount of data read from the wav file 
 
@@ -307,7 +307,7 @@ bool CN3SndObj::FillBufferWithSound(CWaveFile* pWaveFile)
 		return false;
 
     // Lock the buffer down
-	if( FAILED( hr = m_lpDSBuff->Lock( 0, dsbc.dwBufferBytes, &pDSLockedBuffer, &dwDSLockedBufferSize, NULL, NULL, 0L ) ) )
+	if( FAILED( hr = m_lpDSBuff->Lock( 0, dsbc.dwBufferBytes, &pDSLockedBuffer, &dwDSLockedBufferSize, nullptr, nullptr, 0L ) ) )
         return false;
 
 	pWaveFile->ResetFile();
@@ -329,14 +329,14 @@ bool CN3SndObj::FillBufferWithSound(CWaveFile* pWaveFile)
     }
 
     // Unlock the buffer, we don't need it anymore.
-    m_lpDSBuff->Unlock( pDSLockedBuffer, dwDSLockedBufferSize, NULL, 0 );
+    m_lpDSBuff->Unlock( pDSLockedBuffer, dwDSLockedBufferSize, nullptr, 0 );
 
     return true;
 }
 
 bool CN3SndObj::RestoreBuffer()
 {
-    if( NULL == m_lpDSBuff ) return false;
+    if( nullptr == m_lpDSBuff ) return false;
 
     HRESULT hr;
     DWORD dwStatus;
@@ -368,7 +368,7 @@ bool CN3SndObj::RestoreBuffer()
 //
 void CN3SndObj::SetVolume(int Vol)
 {
-	if(NULL == m_lpDSBuff) return;
+	if(nullptr == m_lpDSBuff) return;
 	if(m_lpDS3DBuff) return; // 3D Sound 일때는 소리 조절이 안된다..!!!
 
 	m_iVol = Vol;
@@ -389,7 +389,7 @@ void CN3SndObj::SetVolume(int Vol)
 //
 bool CN3SndObj::IsPlaying()
 {
-	if(NULL == m_lpDSBuff) return false;
+	if(nullptr == m_lpDSBuff) return false;
 	
 	DWORD dwStatus = 0;
 	m_lpDSBuff->GetStatus( &dwStatus );
@@ -405,7 +405,7 @@ bool CN3SndObj::IsPlaying()
 //
 void CN3SndObj::Tick()
 {
-	if(NULL == m_lpDSBuff || m_ePlayState == SNDSTATE_STOP) return;
+	if(nullptr == m_lpDSBuff || m_ePlayState == SNDSTATE_STOP) return;
 
 	m_fTmpSecPerFrm += CN3Base::s_fSecPerFrm;
 	
@@ -487,7 +487,7 @@ void CN3SndObj::Play(const D3DVECTOR* pvPos, float delay, float fFadeInTime, boo
 //
 void CN3SndObj::RealPlay()
 {
-    if(NULL == m_lpDSBuff) return;
+    if(nullptr == m_lpDSBuff) return;
 
 	DWORD dwStatus = 0;
 	m_lpDSBuff->GetStatus( &dwStatus );
@@ -508,7 +508,7 @@ void CN3SndObj::RealPlay()
 //
 void CN3SndObj::Stop(float fFadeOutTime)
 {
-	if( NULL == m_lpDSBuff ) return;
+	if( nullptr == m_lpDSBuff ) return;
 	if( m_ePlayState == SNDSTATE_FADEOUT || m_ePlayState == SNDSTATE_STOP) return; 
 
 	if(fFadeOutTime==0.0f)
@@ -577,14 +577,14 @@ void CN3SndObj::SetConeOrientation(D3DVECTOR* pDir)
 
 void CN3SndObj::SetDopplerFactor(D3DVALUE factor)
 {
-	if(NULL == s_lpDSListener) return;
+	if(nullptr == s_lpDSListener) return;
 	s_lpDSListener->SetDopplerFactor(factor, DS3D_DEFERRED);
 	s_bNeedDeferredTick = true;	// 3D Listener CommitDeferredSetting
 }
 
 void CN3SndObj::SetListenerPos(const D3DVECTOR* pVPos, bool IsDeferred)
 {
-	if(NULL == s_lpDSListener || NULL == pVPos) return;
+	if(nullptr == s_lpDSListener || nullptr == pVPos) return;
 	DWORD dwParam = (IsDeferred) ? DS3D_DEFERRED : DS3D_IMMEDIATE;
 	s_lpDSListener->SetPosition(pVPos->x, pVPos->y, pVPos->z, dwParam);
 	s_bNeedDeferredTick = true;	// 3D Listener CommitDeferredSetting
@@ -596,7 +596,7 @@ void CN3SndObj::SetListenerPos(const D3DVECTOR* pVPos, bool IsDeferred)
 //
 void CN3SndObj::SetListenerOrientation(const D3DVECTOR* pVAt, const D3DVECTOR* pVUp, bool IsDeferred)
 {
-	if(NULL == s_lpDSListener || NULL == pVAt || NULL == pVUp) return;
+	if(nullptr == s_lpDSListener || nullptr == pVAt || nullptr == pVUp) return;
 	DWORD dwParam = (IsDeferred) ? DS3D_DEFERRED : DS3D_IMMEDIATE;
 	s_lpDSListener->SetOrientation(pVAt->x, pVAt->y, pVAt->z, pVUp->x, pVUp->y, pVUp->z, dwParam);
 	s_bNeedDeferredTick = true;	// 3D Listener CommitDeferredSetting

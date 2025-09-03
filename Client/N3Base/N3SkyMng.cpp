@@ -33,17 +33,17 @@ typedef std::vector<__SKY_DAYCHANGE>::iterator it_SDC;
 
 CN3SkyMng::CN3SkyMng()
 {
-	m_pMoon = NULL;
-	m_pSky = NULL;
-	m_pSun = NULL;
-	m_pCloud = NULL;
-	m_pStar = NULL;
+	m_pMoon = nullptr;
+	m_pSky = nullptr;
+	m_pSun = nullptr;
+	m_pCloud = nullptr;
+	m_pStar = nullptr;
 
 	memset(m_pLightColorDiffuses, 0, sizeof(m_pLightColorDiffuses));
 	memset(m_pLightColorAmbients, 0, sizeof(m_pLightColorAmbients));
 
-	m_pGERain = NULL;
-	m_pGESnow = NULL;
+	m_pGERain = nullptr;
+	m_pGESnow = nullptr;
 
 	m_iDayChangeCurPos = 0;
 	m_iWeatherChangeCurPos = 0;
@@ -57,28 +57,28 @@ CN3SkyMng::CN3SkyMng()
 	m_iHourFix = 0;
 
 #ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다...
-	m_pSnd_Weather_Snow = NULL;
-	m_pSnd_Weather_Rain = NULL;
+	m_pSnd_Weather_Snow = nullptr;
+	m_pSnd_Weather_Rain = nullptr;
 #endif // #ifdef _N3GAME
 }
 
 CN3SkyMng::~CN3SkyMng()
 {
-	if (m_pSky) {delete m_pSky;	m_pSky = NULL;}
-	if (m_pMoon) {delete m_pMoon; m_pMoon = NULL;}
-	if (m_pSun)	{delete m_pSun;	m_pSun = NULL;}
-	if (m_pCloud) {delete m_pCloud; m_pCloud = NULL;}
-	if (m_pStar) {delete m_pStar; m_pStar = NULL;}
+	if (m_pSky) {delete m_pSky;	m_pSky = nullptr;}
+	if (m_pMoon) {delete m_pMoon; m_pMoon = nullptr;}
+	if (m_pSun)	{delete m_pSun;	m_pSun = nullptr;}
+	if (m_pCloud) {delete m_pCloud; m_pCloud = nullptr;}
+	if (m_pStar) {delete m_pStar; m_pStar = nullptr;}
 	for(int i = 0; i < MAX_GAME_LIGHT; i++)
 	{
-		delete m_pLightColorDiffuses[i]; m_pLightColorDiffuses[i] = NULL;
-		delete m_pLightColorAmbients[i]; m_pLightColorAmbients[i] = NULL;
+		delete m_pLightColorDiffuses[i]; m_pLightColorDiffuses[i] = nullptr;
+		delete m_pLightColorAmbients[i]; m_pLightColorAmbients[i] = nullptr;
 	}
 
 	m_fCellSize = 0.0f;
 	m_CurCellPos.x = m_CurCellPos.y = -1;
-	if (m_pGERain) {delete m_pGERain; m_pGERain = NULL;}
-	if (m_pGESnow) {delete m_pGESnow; m_pGESnow = NULL;}
+	if (m_pGERain) {delete m_pGERain; m_pGERain = nullptr;}
+	if (m_pGESnow) {delete m_pGESnow; m_pGESnow = nullptr;}
 
 #ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다...
 	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Weather_Snow);
@@ -98,15 +98,15 @@ void CN3SkyMng::Release()
 {
 	CN3Base::Release();
 	
-	if (m_pSky) {delete m_pSky;	m_pSky = NULL;}
-	if (m_pMoon) {delete m_pMoon; m_pMoon = NULL;}
-	if (m_pSun)	{delete m_pSun;	m_pSun = NULL;}
-	if (m_pCloud) {delete m_pCloud; m_pCloud = NULL;}
-	if (m_pStar) {delete m_pStar; m_pStar = NULL;}
+	if (m_pSky) {delete m_pSky;	m_pSky = nullptr;}
+	if (m_pMoon) {delete m_pMoon; m_pMoon = nullptr;}
+	if (m_pSun)	{delete m_pSun;	m_pSun = nullptr;}
+	if (m_pCloud) {delete m_pCloud; m_pCloud = nullptr;}
+	if (m_pStar) {delete m_pStar; m_pStar = nullptr;}
 	for(int i = 0; i < MAX_GAME_LIGHT; i++)
 	{
-		delete m_pLightColorDiffuses[i]; m_pLightColorDiffuses[i] = NULL;
-		delete m_pLightColorAmbients[i]; m_pLightColorAmbients[i] = NULL;
+		delete m_pLightColorDiffuses[i]; m_pLightColorDiffuses[i] = nullptr;
+		delete m_pLightColorAmbients[i]; m_pLightColorAmbients[i] = nullptr;
 	}
 
 	m_DayChanges.clear();
@@ -116,8 +116,8 @@ void CN3SkyMng::Release()
 	m_iWeatherChangeCurPos = 0;
 	m_eWeather = SW_CLEAR;
 
-	if (m_pGERain) {delete m_pGERain; m_pGERain = NULL;}
-	if (m_pGESnow) {delete m_pGESnow; m_pGESnow = NULL;}
+	if (m_pGERain) {delete m_pGERain; m_pGERain = nullptr;}
+	if (m_pGESnow) {delete m_pGESnow; m_pGESnow = nullptr;}
 
 #ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다...
 	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Weather_Snow);
@@ -308,12 +308,12 @@ void CN3SkyMng::Tick()
 		if (m_pGERain)
 		{
 			m_pGERain->Tick();
-			if(m_pGERain->NeedDelete()) { delete m_pGERain; m_pGERain = NULL; }
+			if(m_pGERain->NeedDelete()) { delete m_pGERain; m_pGERain = nullptr; }
 		}
 		if (m_pGESnow)
 		{
 			m_pGESnow->Tick();
-			if(m_pGESnow->NeedDelete()) { delete m_pGESnow; m_pGESnow = NULL; }
+			if(m_pGESnow->NeedDelete()) { delete m_pGESnow; m_pGESnow = nullptr; }
 		}
 	}
 }
@@ -321,11 +321,11 @@ void CN3SkyMng::Tick()
 #ifdef _N3TOOL
 bool CN3SkyMng::DayChangeParse(FILE* fp, __SKY_DAYCHANGE* pDayChange)
 {
-	if(NULL == fp || NULL == pDayChange) return false;
+	if(nullptr == fp || nullptr == pDayChange) return false;
 	char szLine0[512] = "", szLine1[512] = "";
 	char* pResult0 = fgets(szLine0, 256, fp);
 	char* pResult1 = fgets(szLine1, 256, fp);
-	if(NULL == pResult0 || NULL == pResult1) return false;
+	if(nullptr == pResult0 || nullptr == pResult1) return false;
 
 	pDayChange->Init(); // 초기화 해주고..
 	
@@ -342,7 +342,7 @@ bool CN3SkyMng::DayChangeParse(FILE* fp, __SKY_DAYCHANGE* pDayChange)
 #ifdef _N3TOOL
 bool CN3SkyMng::DayChangeWrite(FILE* fp, __SKY_DAYCHANGE* pDayChange)
 {
-	if(NULL == fp || NULL == pDayChange) return false;
+	if(nullptr == fp || nullptr == pDayChange) return false;
 	
 	char szLine[512] = "";
 	fprintf(fp, "%s\r\n", pDayChange->szName.c_str());
@@ -356,7 +356,7 @@ bool CN3SkyMng::DayChangeWrite(FILE* fp, __SKY_DAYCHANGE* pDayChange)
 #ifdef _N3TOOL
 bool CN3SkyMng::LoadFromTextFile(const char* szIniFN)
 {
-	if(NULL == szIniFN || strlen(szIniFN) <= 0) return false;
+	if(nullptr == szIniFN || strlen(szIniFN) <= 0) return false;
 
 	FILE* fp = fopen(szIniFN, "r");
 	if(!fp) return false;
@@ -418,25 +418,25 @@ bool CN3SkyMng::LoadFromTextFile(const char* szIniFN)
 
 	fclose(fp); // 파일 닫기..
 
-	if(NULL == m_pSky) m_pSky = new CN3Sky();
+	if(nullptr == m_pSky) m_pSky = new CN3Sky();
 	m_pSky->Init();
 
-	if(NULL == m_pStar) m_pStar = new CN3Star();
+	if(nullptr == m_pStar) m_pStar = new CN3Star();
 	m_pStar->Init();
 
-	if(NULL == m_pSun) m_pSun = new CN3Sun();
+	if(nullptr == m_pSun) m_pSun = new CN3Sun();
 	m_pSun->Init(szSuns);
 
-	if(NULL == m_pCloud) m_pCloud = new CN3Cloud();
+	if(nullptr == m_pCloud) m_pCloud = new CN3Cloud();
 	m_pCloud->Init(szClouds);
 
-	if(NULL == m_pMoon) m_pMoon = new CN3Moon();
+	if(nullptr == m_pMoon) m_pMoon = new CN3Moon();
 	m_pMoon->Init(szMoon);
 
 	for(i = 0; i < MAX_GAME_LIGHT; i++)
 	{
-		if(NULL == m_pLightColorDiffuses[i]) m_pLightColorDiffuses[i] = new CN3ColorChange();
-		if(NULL == m_pLightColorAmbients[i]) m_pLightColorAmbients[i] = new CN3ColorChange();
+		if(nullptr == m_pLightColorDiffuses[i]) m_pLightColorDiffuses[i] = new CN3ColorChange();
+		if(nullptr == m_pLightColorAmbients[i]) m_pLightColorAmbients[i] = new CN3ColorChange();
 	}
 
 	std::vector<__SKY_DAYCHANGE>(m_DayChanges).swap(m_DayChanges); // 용량을 딱 맞추기..
@@ -451,7 +451,7 @@ bool CN3SkyMng::LoadFromTextFile(const char* szIniFN)
 #ifdef _N3TOOL
 bool CN3SkyMng::SaveToTextFile(const char* szIniFN)
 {
-	if(NULL == szIniFN || strlen(szIniFN) <= 0) return false;
+	if(nullptr == szIniFN || strlen(szIniFN) <= 0) return false;
 
 	FILE* fp = fopen(szIniFN, "w");
 	if(!fp) return false;
@@ -777,7 +777,7 @@ int CN3SkyMng::GetLatestChange(eSKY_DAYCHANGE eSDC, int iPos)
 // Changing the status of the sky
 void CN3SkyMng::ChangeSky(__SKY_DAYCHANGE* pSDC, float fTakeTime)
 {
-	if (NULL == pSDC) return;
+	if (nullptr == pSDC) return;
 	float fPercentage = 1.0f - fTakeTime/pSDC->fHowLong;
 
 	// Execute command changes
@@ -1075,7 +1075,7 @@ void CN3SkyMng::SetWeather(eSKY_WEATHER eWeather, int iPercentage)
 		if(SW_RAINY == m_eWeather)
 		{
 			if (m_pGESnow) m_pGESnow->FadeSet(3.0f, false);
-			if (m_pGERain == NULL) m_pGERain = new CN3GERain;
+			if (m_pGERain == nullptr) m_pGERain = new CN3GERain;
 
 			__Vector3 vVelocity(3.0f * ((50-rand()%100) / 50.0f), -(10.0f + 8.0f * fPercent), 0);
 			float fRainLength = 0.4f + 0.6f * fPercent;
@@ -1093,14 +1093,14 @@ void CN3SkyMng::SetWeather(eSKY_WEATHER eWeather, int iPercentage)
 				int iMaxVol = (int)(70 * fPercent);
 				m_pSnd_Weather_Rain->SetMaxVolume(iMaxVol);
 				m_pSnd_Weather_Rain->Looping(true);
-				m_pSnd_Weather_Rain->Play(NULL, 0.0f, 2.0f);
+				m_pSnd_Weather_Rain->Play(nullptr, 0.0f, 2.0f);
 			}
 #endif // #ifdef _N3GAME
 		}
 		else if(SW_SNOW == m_eWeather)
 		{
 			if (m_pGERain) m_pGERain->FadeSet(3.0f, false);
-			if (m_pGESnow == NULL) m_pGESnow = new CN3GESnow;
+			if (m_pGESnow == nullptr) m_pGESnow = new CN3GESnow;
 
 			float fHorz = (3.0f * fPercent) + (3.0f * ((50-rand()%100) / 50.0f));
 			__Vector3 vVelocity(fHorz, -(2.0f + 2.0f * fPercent), 0);
@@ -1119,7 +1119,7 @@ void CN3SkyMng::SetWeather(eSKY_WEATHER eWeather, int iPercentage)
 				int iMaxVol = (int)(70 * fPercent);
 				m_pSnd_Weather_Snow->SetMaxVolume(iMaxVol);
 				m_pSnd_Weather_Snow->Looping(true);
-				m_pSnd_Weather_Snow->Play(NULL, 0.0f, 2.0f);
+				m_pSnd_Weather_Snow->Play(nullptr, 0.0f, 2.0f);
 			}
 #endif // #ifdef _N3GAME
 		}
@@ -1246,7 +1246,7 @@ D3DCOLOR CN3SkyMng::GetCloud2Color()
 D3DCOLOR CN3SkyMng::GetLightDiffuseColor(int iIndex)
 {
 	if(iIndex < 0 || iIndex >= MAX_GAME_LIGHT) return 0;
-	if(NULL == m_pLightColorDiffuses[iIndex]) return 0;
+	if(nullptr == m_pLightColorDiffuses[iIndex]) return 0;
 	
 	return m_pLightColorDiffuses[iIndex]->GetCurColor();
 }
@@ -1254,7 +1254,7 @@ D3DCOLOR CN3SkyMng::GetLightDiffuseColor(int iIndex)
 D3DCOLOR CN3SkyMng::GetLightAmbientColor(int iIndex)
 {
 	if(iIndex < 0 || iIndex >= MAX_GAME_LIGHT) return 0;
-	if(NULL == m_pLightColorAmbients[iIndex]) return 0;
+	if(nullptr == m_pLightColorAmbients[iIndex]) return 0;
 	
 	return m_pLightColorAmbients[iIndex]->GetCurColor();
 }
@@ -1270,58 +1270,58 @@ bool CN3SkyMng::Load(HANDLE hFile)
 	for(i = 0; i < NUM_SUNPART; i++) 
 	{
 		int iL = 0;
-		ReadFile(hFile, &iL, 4, &dwRWC, NULL);
+		ReadFile(hFile, &iL, 4, &dwRWC, nullptr);
 		if(iL > 0)
 		{
 			szSuns[i].assign(iL, ' ');
-			ReadFile(hFile, &(szSuns[i][0]), iL, &dwRWC, NULL);
+			ReadFile(hFile, &(szSuns[i][0]), iL, &dwRWC, nullptr);
 		}
 	}
 
 	for(i = 0; i < NUM_CLOUD; i++) 
 	{
 		int iL = 0;
-		ReadFile(hFile, &iL, 4, &dwRWC, NULL);
+		ReadFile(hFile, &iL, 4, &dwRWC, nullptr);
 		if(iL > 0)
 		{
 			szClouds[i].assign(iL, ' ');
-			ReadFile(hFile, &(szClouds[i][0]), iL, &dwRWC, NULL);
+			ReadFile(hFile, &(szClouds[i][0]), iL, &dwRWC, nullptr);
 		}
 	}
 	
 	int iL = 0;
-	ReadFile(hFile, &iL, 4, &dwRWC, NULL);
+	ReadFile(hFile, &iL, 4, &dwRWC, nullptr);
 	if(iL > 0)
 	{
 		szMoon.assign(iL, ' ');
-		ReadFile(hFile, &(szMoon[0]), iL, &dwRWC, NULL);
+		ReadFile(hFile, &(szMoon[0]), iL, &dwRWC, nullptr);
 	}
 
-	if(NULL == m_pSky) m_pSky = new CN3Sky();
+	if(nullptr == m_pSky) m_pSky = new CN3Sky();
 	m_pSky->Init();
 
-	if(NULL == m_pStar) m_pStar = new CN3Star();
+	if(nullptr == m_pStar) m_pStar = new CN3Star();
 	m_pStar->Init();
 
-	if(NULL == m_pSun) m_pSun = new CN3Sun();
+	if(nullptr == m_pSun) m_pSun = new CN3Sun();
 	m_pSun->Init(szSuns);
 
-	if(NULL == m_pCloud) m_pCloud = new CN3Cloud();
+	if(nullptr == m_pCloud) m_pCloud = new CN3Cloud();
 	m_pCloud->Init(szClouds);
 
-	if(NULL == m_pMoon) m_pMoon = new CN3Moon();
+	if(nullptr == m_pMoon) m_pMoon = new CN3Moon();
 	m_pMoon->Init(szMoon);
 
 	for(i = 0; i < MAX_GAME_LIGHT; i++)
 	{
-		if(NULL == m_pLightColorDiffuses[i]) m_pLightColorDiffuses[i] = new CN3ColorChange();
-		if(NULL == m_pLightColorAmbients[i]) m_pLightColorAmbients[i] = new CN3ColorChange();
+		if(nullptr == m_pLightColorDiffuses[i]) m_pLightColorDiffuses[i] = new CN3ColorChange();
+		if(nullptr == m_pLightColorAmbients[i]) m_pLightColorAmbients[i] = new CN3ColorChange();
 	}
 
 	// Day Change .....
 	m_DayChanges.clear();
 	int iSDCC = 0;
-	ReadFile(hFile, &iSDCC, 4, &dwRWC, NULL);
+	ReadFile(hFile, &iSDCC, 4, &dwRWC, nullptr);
 	if(iSDCC > 0)
 	{
 		m_DayChanges.assign(iSDCC, __SKY_DAYCHANGE());
@@ -1354,24 +1354,24 @@ bool CN3SkyMng::Save(HANDLE hFile)
 	for(i = 0; i < NUM_SUNPART; i++) 
 	{
 		int iL = szSuns[i].size();
-		WriteFile(hFile, &iL, 4, &dwRWC, NULL);
-		if(iL > 0) WriteFile(hFile, szSuns[i].c_str(), iL, &dwRWC, NULL);
+		WriteFile(hFile, &iL, 4, &dwRWC, nullptr);
+		if(iL > 0) WriteFile(hFile, szSuns[i].c_str(), iL, &dwRWC, nullptr);
 	}
 
 	for(i = 0; i < NUM_CLOUD; i++)
 	{
 		int iL = szClouds[i].size();
-		WriteFile(hFile, &iL, 4, &dwRWC, NULL);
-		if(iL > 0) WriteFile(hFile, szClouds[i].c_str(), iL, &dwRWC, NULL);
+		WriteFile(hFile, &iL, 4, &dwRWC, nullptr);
+		if(iL > 0) WriteFile(hFile, szClouds[i].c_str(), iL, &dwRWC, nullptr);
 	}
 	
 	int iL = szMoon.size();
-	WriteFile(hFile, &iL, 4, &dwRWC, NULL);
-	if(iL > 0) WriteFile(hFile, szMoon.c_str(), iL, &dwRWC, NULL);
+	WriteFile(hFile, &iL, 4, &dwRWC, nullptr);
+	if(iL > 0) WriteFile(hFile, szMoon.c_str(), iL, &dwRWC, nullptr);
 
 	// Day Change .....
 	int iSDCC = m_DayChanges.size();
-	WriteFile(hFile, &iSDCC, 4, &dwRWC, NULL);
+	WriteFile(hFile, &iSDCC, 4, &dwRWC, nullptr);
 	for(i = 0; i < iSDCC; i++)
 	{
 		m_DayChanges[i].Save(hFile);
@@ -1429,7 +1429,7 @@ bool CN3SkyMng::DayChangeDelete(int iIndex)
 
 CN3Texture* CN3SkyMng::SunTextureSet(int iIndex, const char* szPath)
 {
-	if(NULL == szPath || NULL == m_pSun || iIndex < 0 || iIndex >= NUM_SUNPART) return NULL;
+	if(nullptr == szPath || nullptr == m_pSun || iIndex < 0 || iIndex >= NUM_SUNPART) return nullptr;
 
 	s_MngTex.Delete(&(m_pSun->m_Parts[iIndex].pTex));
 	m_pSun->m_Parts[iIndex].pTex = s_MngTex.Get(szPath);
@@ -1439,7 +1439,7 @@ CN3Texture* CN3SkyMng::SunTextureSet(int iIndex, const char* szPath)
 
 CN3Texture* CN3SkyMng::MoonTextureSet(const char* szPath)
 {
-	if(NULL == szPath || NULL == m_pMoon) return NULL;
+	if(nullptr == szPath || nullptr == m_pMoon) return nullptr;
 
 	s_MngTex.Delete(&(m_pMoon->m_pTexture));
 	m_pMoon->m_pTexture = s_MngTex.Get(szPath);
@@ -1449,7 +1449,7 @@ CN3Texture* CN3SkyMng::MoonTextureSet(const char* szPath)
 
 CN3Texture* CN3SkyMng::CloudTextureSet(int iIndex, const char* szPath)
 {
-	if(NULL == szPath || NULL == m_pCloud || iIndex < 0 || iIndex >= NUM_CLOUD) return NULL;
+	if(nullptr == szPath || nullptr == m_pCloud || iIndex < 0 || iIndex >= NUM_CLOUD) return nullptr;
 
 	s_MngTex.Delete(&(m_pCloud->m_pTextures[iIndex]));
 	m_pCloud->m_pTextures[iIndex] = s_MngTex.Get(szPath);
@@ -1462,25 +1462,25 @@ CN3Texture* CN3SkyMng::CloudTextureSet(int iIndex, const char* szPath)
 
 CN3Texture* CN3SkyMng::SunTextureGet(int iIndex)
 {
-	if(NULL == m_pSun || iIndex < 0 || iIndex >= NUM_CLOUD) return NULL;
+	if(nullptr == m_pSun || iIndex < 0 || iIndex >= NUM_CLOUD) return nullptr;
 	return m_pSun->m_Parts[iIndex].pTex;
 }
 
 CN3Texture* CN3SkyMng::MoonTextureGet()
 {
-	if(NULL == m_pMoon) return NULL;
+	if(nullptr == m_pMoon) return nullptr;
 	return m_pMoon->m_pTexture;
 }
 
 CN3Texture* CN3SkyMng::CloudTextureGet(int iIndex)
 {
-	if(NULL == m_pCloud || iIndex < 0 || iIndex >= NUM_CLOUD) return NULL;
+	if(nullptr == m_pCloud || iIndex < 0 || iIndex >= NUM_CLOUD) return nullptr;
 	return m_pCloud->m_pTextures[iIndex];
 }
 
 const char* CN3SkyMng::CloudTextureFileName(int iIndex)
 {
-	if(NULL == m_pCloud || iIndex < 0 || iIndex >= NUM_CLOUD) return NULL;
+	if(nullptr == m_pCloud || iIndex < 0 || iIndex >= NUM_CLOUD) return nullptr;
 	return m_pCloud->m_szTextures[iIndex].c_str();
 }
 #endif

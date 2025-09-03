@@ -24,20 +24,20 @@ static char THIS_FILE[]=__FILE__;
 
 CGameProcNationSelect::CGameProcNationSelect()
 {
-	m_pUINationSelectDlg = NULL;
+	m_pUINationSelectDlg = nullptr;
 	s_pPlayer->m_InfoBase.eNation = NATION_NOTSELECTED; // 아직 국가를 선택하지 않았다..
 }
 
 CGameProcNationSelect::~CGameProcNationSelect()
 {
-	delete m_pUINationSelectDlg; m_pUINationSelectDlg = NULL;
+	delete m_pUINationSelectDlg; m_pUINationSelectDlg = nullptr;
 }
 
 void CGameProcNationSelect::Release()
 {
 	CGameProcedure::Release();
 
-	delete m_pUINationSelectDlg; m_pUINationSelectDlg = NULL;
+	delete m_pUINationSelectDlg; m_pUINationSelectDlg = nullptr;
 }
 
 void CGameProcNationSelect::Init()

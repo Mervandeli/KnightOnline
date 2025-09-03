@@ -37,7 +37,7 @@ CRiverMng::CRiverMng(CMainFrame* pMainFrm)
 CRiverMng::~CRiverMng()
 {
 	Release();
-	if (m_pDlgProperty) {	m_pDlgProperty->DestroyWindow(); delete m_pDlgProperty; m_pDlgProperty = NULL;}
+	if (m_pDlgProperty) {	m_pDlgProperty->DestroyWindow(); delete m_pDlgProperty; m_pDlgProperty = nullptr;}
 }
 
 void CRiverMng::Release()
@@ -52,7 +52,7 @@ void CRiverMng::Release()
 	m_RiverMeshes.clear();
 
 	m_SelVtxArray.RemoveAll();
-	m_pSelRiver = NULL;
+	m_pSelRiver = nullptr;
 	m_bEditMode = FALSE;
 	m_RCursorMode = RCM_NONE;
 	m_VtxPosDummy.Release();
@@ -64,7 +64,7 @@ bool CRiverMng::Load(HANDLE hFile)
 
 	DWORD dwNum;
 	int i, iRiverMeshCount;
-	ReadFile(hFile, &iRiverMeshCount, sizeof(iRiverMeshCount), &dwNum, NULL);
+	ReadFile(hFile, &iRiverMeshCount, sizeof(iRiverMeshCount), &dwNum, nullptr);
 	for (i=0; i<iRiverMeshCount; ++i)
 	{
 		CRiverMesh* pRvrMesh = new CRiverMesh;
@@ -78,7 +78,7 @@ bool CRiverMng::Save(HANDLE hFile)
 {
 	DWORD dwNum;
 	int iSize = m_RiverMeshes.size();
-	WriteFile(hFile, &iSize, 4, &dwNum, NULL);
+	WriteFile(hFile, &iSize, 4, &dwNum, nullptr);
 	
 	it_RiverMesh it = m_RiverMeshes.begin();
 	for(int i = 0; i < iSize; i++, it++)
@@ -125,7 +125,7 @@ void CRiverMng::Render()
 			s_lpD3DDev->SetTransform(D3DTS_WORLD, &matWorld);
 
 			// set texture
-			hr = s_lpD3DDev->SetTexture(0, NULL);
+			hr = s_lpD3DDev->SetTexture(0, nullptr);
 			hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 			hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 
@@ -163,7 +163,7 @@ void CRiverMng::Render()
 				s_lpD3DDev->SetTransform(D3DTS_WORLD, &matWorld);
 
 				// set texture
-				hr = s_lpD3DDev->SetTexture(0, NULL);
+				hr = s_lpD3DDev->SetTexture(0, nullptr);
 				hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 				hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 
@@ -196,7 +196,7 @@ void CRiverMng::Render()
 			for (int i=0; i<iSize; ++i)
 			{
 				__VertexXyzT2* pVtx = m_SelVtxArray.GetAt(i);
-				if (pVtx == NULL) continue;
+				if (pVtx == nullptr) continue;
 				D3DXVECTOR4 v;
 				D3DXVec3Transform(&v, pVtx, &matVP);
 
@@ -243,8 +243,8 @@ CRiverMesh*	CRiverMng::CreateNewRiverMesh(__Vector3& vPos1, __Vector3& vPos2, __
 	if (dlg.DoModal() == IDCANCEL)
 	{
 		delete pRM;
-		pRM = NULL;
-		m_pSelRiver = NULL;
+		pRM = nullptr;
+		m_pSelRiver = nullptr;
 	}
 	if (pRM) m_RiverMeshes.push_back(pRM);
 	return pRM;
@@ -262,8 +262,8 @@ void CRiverMng::RemoveRiverMesh(int iRiverID)
 			delete pRM;
 			it = m_RiverMeshes.erase(it);
 			m_SelVtxArray.RemoveAll();
-			m_VtxPosDummy.SetSelVtx(NULL);
-			m_pSelRiver = NULL;
+			m_VtxPosDummy.SetSelVtx(nullptr);
+			m_pSelRiver = nullptr;
 			m_pMainFrm->Invalidate();
 			return;
 		}
@@ -426,21 +426,21 @@ CRiverMesh* CRiverMng::GetRiverMesh(int iRiverID)
 		CRiverMesh* pRM = *it;
 		if (pRM->GetRiverID() == iRiverID) return pRM;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void CRiverMng::SetSelRiver(CRiverMesh* pRiverMesh)
 {
-	m_VtxPosDummy.SetSelVtx(NULL);	
+	m_VtxPosDummy.SetSelVtx(nullptr);	
 	m_pSelRiver = pRiverMesh;
 	if (m_pDlgProperty) m_pDlgProperty->UpdateInfo();
 }
 
 BOOL CRiverMng::SetRiverID(CRiverMesh* pRiverMesh, int iRiverID)
 {
-	if (pRiverMesh == NULL) return FALSE;
+	if (pRiverMesh == nullptr) return FALSE;
 	if (pRiverMesh->GetRiverID() == iRiverID) return TRUE;
-	if (GetRiverMesh(iRiverID) == NULL)
+	if (GetRiverMesh(iRiverID) == nullptr)
 	{
 		pRiverMesh->SetRiverID(iRiverID);
 		return TRUE;
@@ -457,7 +457,7 @@ void CRiverMng::SetEditMode(BOOL bEditMode)
 	}
 	else
 	{
-		SetSelRiver(NULL);
+		SetSelRiver(nullptr);
 		if (m_pDlgProperty) m_pDlgProperty->ShowWindow(FALSE);
 		m_RCursorMode = RCM_NONE;
 	}
@@ -465,11 +465,11 @@ void CRiverMng::SetEditMode(BOOL bEditMode)
 
 void CRiverMng::SelectVtxByDragRect(RECT* pRect, BOOL bAdd)
 {
-	if (pRect == NULL) return;
+	if (pRect == nullptr) return;
 	if (bAdd == FALSE)
 	{
 		m_SelVtxArray.RemoveAll();
-		SetSelRiver(NULL);	// 선택한강 해제..
+		SetSelRiver(nullptr);	// 선택한강 해제..
 	}
 
 	CN3EngTool* pEng = m_pMainFrm->m_pEng;
@@ -489,7 +489,7 @@ void CRiverMng::SelectVtxByDragRect(RECT* pRect, BOOL bAdd)
 		for (i=0; i<iVC;++i)
 		{
 			__VertexXyzT2* pVtx = m_pSelRiver->GetVertex(i);	// 점 하나 구하기
-			if (pVtx == NULL) continue;
+			if (pVtx == nullptr) continue;
 
 			D3DXVECTOR4 v;
 			D3DXVec3Transform(&v, pVtx, &matVP);
@@ -513,19 +513,19 @@ void CRiverMng::SelectVtxByDragRect(RECT* pRect, BOOL bAdd)
 	{
 		ASSERT(m_SelVtxArray.GetSize() == 0);
 
-		CRiverMesh* pSelRiver = NULL;	// 선택된 강
+		CRiverMesh* pSelRiver = nullptr;	// 선택된 강
 		it_RiverMesh it = m_RiverMeshes.begin();
 		int iSize = m_RiverMeshes.size();
 		for(int i = 0; i < iSize; i++, it++)
 		{
 			CRiverMesh* pRM = *it;
-			if (pRM == NULL) continue;
+			if (pRM == nullptr) continue;
 
 			int j, iVC = pRM->VertexCount();				// 이강의 점 갯수
 			for (j=0; j<iVC; ++j)
 			{
 				__VertexXyzT2* pVtx = pRM->GetVertex(j);	// 점 하나 구하기
-				if (pVtx == NULL) continue;
+				if (pVtx == nullptr) continue;
 
 				D3DXVECTOR4 v;
 				D3DXVec3Transform(&v, pVtx, &matVP);
@@ -548,8 +548,8 @@ void CRiverMng::SelectVtxByDragRect(RECT* pRect, BOOL bAdd)
 	int iSize = m_SelVtxArray.GetSize();
 	if ( iSize == 0)
 	{
-		SetSelRiver(NULL);
-		m_VtxPosDummy.SetSelVtx(NULL);
+		SetSelRiver(nullptr);
+		m_VtxPosDummy.SetSelVtx(nullptr);
 	}
 	else
 	{
@@ -564,7 +564,7 @@ void CRiverMng::SelectVtxByDragRect(RECT* pRect, BOOL bAdd)
 
 void CRiverMng::ExtrudeRiverEdge()
 {
-	if (m_pSelRiver == NULL) return;
+	if (m_pSelRiver == nullptr) return;
 	int iVC = m_pSelRiver->AddVertex();
 
 	m_SelVtxArray.RemoveAll();	// 기존에 선택한 점 해제
@@ -589,7 +589,7 @@ void CRiverMng::ExtrudeRiverEdge()
 
 void CRiverMng::DeleteSelectedVertex()									// 선택된 점들 지우기
 {
-	if (m_pSelRiver == NULL) return;
+	if (m_pSelRiver == nullptr) return;
 
 	int iVC = m_pSelRiver->VertexCount();
 	if (iVC <=4)
@@ -609,13 +609,13 @@ void CRiverMng::DeleteSelectedVertex()									// 선택된 점들 지우기
 	}
 
 	m_SelVtxArray.RemoveAll();	// 기존에 선택한 점 해제
-	m_VtxPosDummy.SetSelVtx(NULL);
+	m_VtxPosDummy.SetSelVtx(nullptr);
 	m_pMainFrm->Invalidate(FALSE);
 }
 
 void CRiverMng::ReCalcUV()
 {
-	if (m_pSelRiver == NULL) return;
+	if (m_pSelRiver == nullptr) return;
 	m_pSelRiver->ReCalcUV();
 	m_pMainFrm->Invalidate(FALSE);
 }
@@ -626,16 +626,16 @@ void CRiverMng::MakeGameFiles(HANDLE hFile, float fSize)
 	DWORD dwNum;
 
 	it_RiverMesh it = m_RiverMeshes.begin();
-	WriteFile(hFile, &iRiverCount, sizeof(int), &dwNum, NULL);
+	WriteFile(hFile, &iRiverCount, sizeof(int), &dwNum, nullptr);
 	for (int i=0;i<iRiverCount;i++, it++)
 	{
 		CRiverMesh *pRM =  *it;
 		ASSERT(pRM);
 
 		int iVC = pRM->VertexCount();
-		__VertexXyzT2* pVtx0 = pRM->GetVertex(0), *pSrcVtx=NULL;
+		__VertexXyzT2* pVtx0 = pRM->GetVertex(0), *pSrcVtx=nullptr;
 		ASSERT(pVtx0);
-		WriteFile(hFile, &iVC, sizeof(iVC), &dwNum, NULL);				// 점 갯수
+		WriteFile(hFile, &iVC, sizeof(iVC), &dwNum, nullptr);				// 점 갯수
 
 		// XyxT2 -> XyzColorT2 Converting.
 		__VertexRiver	*pTemp = new __VertexRiver[iVC];
@@ -648,10 +648,10 @@ void CRiverMng::MakeGameFiles(HANDLE hFile, float fSize)
 				pTemp[k].Set(pSrcVtx->x, pSrcVtx->y, pSrcVtx->z, 0.0f, 1.0f, 0.0f, 0xffffffff, pSrcVtx->tu, pSrcVtx->tv, pSrcVtx->tu2, pSrcVtx->tv2);
 		}
 		
-		if (iVC>0) WriteFile(hFile, pTemp, iVC*sizeof(__VertexRiver), &dwNum, NULL);	// vertex buffer
+		if (iVC>0) WriteFile(hFile, pTemp, iVC*sizeof(__VertexRiver), &dwNum, nullptr);	// vertex buffer
 		int iIC = pRM->IndexCount();
-		WriteFile(hFile, &iIC, sizeof(iIC), &dwNum, NULL);				// IndexBuffer Count.
-		delete[] pTemp; pTemp = NULL;
+		WriteFile(hFile, &iIC, sizeof(iIC), &dwNum, nullptr);				// IndexBuffer Count.
+		delete[] pTemp; pTemp = nullptr;
 
 		CN3Texture* pRiverTex = pRM->TexGet();
 		int iLen = 0;
@@ -670,15 +670,15 @@ void CRiverMng::MakeGameFiles(HANDLE hFile, float fSize)
 					i = 0;
 				}
 			}
-			WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, NULL);				// texture file name length
+			WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, nullptr);				// texture file name length
 			if (iLen>0)
 			{
-				WriteFile(hFile, szFindName, iLen, &dwNum, NULL);			// texture file name
+				WriteFile(hFile, szFindName, iLen, &dwNum, nullptr);			// texture file name
 			}
 		}
 		else
 		{
-			WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, NULL);				// texture file name length
+			WriteFile(hFile, &iLen, sizeof(iLen), &dwNum, nullptr);				// texture file name length
 		}
 
 
@@ -738,7 +738,7 @@ void CRiverMng::MakeGameFiles(HANDLE hFile, float fSize)
 			int iX = int(pVtx->x/fSize);	int iZ = int(pVtx->z/fSize);
 			int iPatchPos = iZ*size.cx + iX;
 			__TempRiver* pTempRiver = TempPatches[iPatchPos].GetRiver(pRM->GetRiverID());
-			if (pTempRiver == NULL)
+			if (pTempRiver == nullptr)
 			{
 				pTempRiver = new __TempRiver;
 				pTempRiver->iRiverID = pRM->GetRiverID();
@@ -845,7 +845,7 @@ void CRiverMng::MakeGameFiles(LPCTSTR lpszFName, float fSize)
 			int iX = int(pVtx->x/fSize);	int iZ = int(pVtx->z/fSize);
 			int iPatchPos = iZ*size.cx + iX;
 			__TempRiver* pTempRiver = TempPatches[iPatchPos].GetRiver(pRM->GetRiverID());
-			if (pTempRiver == NULL)
+			if (pTempRiver == nullptr)
 			{
 				pTempRiver = new __TempRiver;
 				pTempRiver->iRiverID = pRM->GetRiverID();
@@ -945,7 +945,7 @@ it_RiverMesh CRiverMng::GetDrawRiver()
 void CRiverMng::GoRiver(int iRiverID)
 {
 	CRiverMesh* pRiver = GetRiverMesh(iRiverID);
-	if(pRiver == NULL) return;
+	if(pRiver == nullptr) return;
 
 	__Vector3 vRiverPos = pRiver->GetCenter();
 	CN3Camera* pCamera = m_pMainFrm->GetMapMng()->CameraGet();

@@ -35,7 +35,7 @@ bool CN3Light::Load(HANDLE hFile)
 	CN3Transform::Load(hFile);
 
 	DWORD dwRWC;
-	ReadFile(hFile, &m_Data, sizeof(m_Data), &dwRWC, NULL); // 라이트 세팅.
+	ReadFile(hFile, &m_Data, sizeof(m_Data), &dwRWC, nullptr); // 라이트 세팅.
 
 	__ASSERT(m_Data.nNumber >= 0 && m_Data.nNumber < 8, "Light Loading Warning - Light 번호가 범위를 벗어났습니다.");
 	
@@ -48,7 +48,7 @@ bool CN3Light::Save(HANDLE hFile)
 	CN3Transform::Save(hFile);
 
 	DWORD dwRWC;
-	WriteFile(hFile, &m_Data, sizeof(m_Data), &dwRWC, NULL); // 라이트 세팅.
+	WriteFile(hFile, &m_Data, sizeof(m_Data), &dwRWC, nullptr); // 라이트 세팅.
 
 	return true;
 }

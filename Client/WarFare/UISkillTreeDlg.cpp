@@ -43,15 +43,15 @@ CUISkillTreeDlg::CUISkillTreeDlg()
 	m_iCurSkillPage		= 0;
 
 	for( i = 0; i < MAX_SKILL_FROM_SERVER; i++ )
-		m_iSkillInfo[i] = NULL;
+		m_iSkillInfo[i] = 0;
 
 	for( i = 0; i < MAX_SKILL_KIND_OF; i++ )
 		for( j = 0; j < MAX_SKILL_PAGE_NUM; j++ )
 			for( k = 0; k < MAX_SKILL_IN_PAGE; k++ )
-				m_pMySkillTree[i][j][k] = NULL;	
+				m_pMySkillTree[i][j][k] = nullptr;	
 			
-	CN3UIWndBase::m_sSkillSelectInfo.UIWnd = UIWND_HOTKEY;
-	CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+	CN3UIWndBase::s_sSkillSelectInfo.UIWnd = UIWND_HOTKEY;
+	CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = nullptr;
 }
 
 CUISkillTreeDlg::~CUISkillTreeDlg()
@@ -62,16 +62,16 @@ CUISkillTreeDlg::~CUISkillTreeDlg()
 	for( i = 0; i < MAX_SKILL_KIND_OF; i++ )
 		for( j = 0; j < MAX_SKILL_PAGE_NUM; j++ )
 			for( k = 0; k < MAX_SKILL_IN_PAGE; k++ )
-				if ( m_pMySkillTree[i][j][k] != NULL )
+				if ( m_pMySkillTree[i][j][k] != nullptr )
 				{
 					delete m_pMySkillTree[i][j][k];
-					m_pMySkillTree[i][j][k] = NULL;
+					m_pMySkillTree[i][j][k] = nullptr;
 				}
 
-	if ( (CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo != NULL) && (CN3UIWndBase::m_sSkillSelectInfo.UIWnd == UIWND_SKILL_TREE) )
+	if ( (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo != nullptr) && (CN3UIWndBase::s_sSkillSelectInfo.UIWnd == UIWND_SKILL_TREE) )
 	{
-		delete CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
-		CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+		delete CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
+		CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = nullptr;
 	}*/
 }
 
@@ -91,19 +91,19 @@ void CUISkillTreeDlg::Release()
 		{
 			for( k = 0; k < MAX_SKILL_IN_PAGE; k++ )
 			{
-				if ( m_pMySkillTree[i][j][k] != NULL )
+				if ( m_pMySkillTree[i][j][k] != nullptr )
 				{
 					delete m_pMySkillTree[i][j][k];
-					m_pMySkillTree[i][j][k] = NULL;
+					m_pMySkillTree[i][j][k] = nullptr;
 				}
 			}
 		}
 	}
 
-	if ( (CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo != NULL) && (CN3UIWndBase::m_sSkillSelectInfo.UIWnd == UIWND_SKILL_TREE) )
+	if ( (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo != nullptr) && (CN3UIWndBase::s_sSkillSelectInfo.UIWnd == UIWND_SKILL_TREE) )
 	{
-		delete CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
-		CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+		delete CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
+		CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = nullptr;
 	}
 }
 
@@ -114,7 +114,7 @@ bool CUISkillTreeDlg::HasIDSkill(int iID)
 	for( i = 0; i < MAX_SKILL_KIND_OF; i++ )
 		for( j = 0; j < MAX_SKILL_PAGE_NUM; j++ )
 			for( k = 0; k < MAX_SKILL_IN_PAGE; k++ )
-				if ( m_pMySkillTree[i][j][k] != NULL )
+				if ( m_pMySkillTree[i][j][k] != nullptr )
 				{
 					if ( m_pMySkillTree[i][j][k]->pSkill->dwID == iID )
 						return true;
@@ -131,7 +131,7 @@ void CUISkillTreeDlg::UpdateDisableCheck()
 	for( i = 0; i < MAX_SKILL_KIND_OF; i++ )
 		for( j = 0; j < MAX_SKILL_PAGE_NUM; j++ )
 			for( k = 0; k < MAX_SKILL_IN_PAGE; k++ )
-				if ( m_pMySkillTree[i][j][k] != NULL )
+				if ( m_pMySkillTree[i][j][k] != nullptr )
 				{
 					bitMask = UISTYLE_ICON_SKILL;
 					if (!CGameProcedure::s_pProcMain->m_pMagicSkillMng->CheckValidSkillMagic(m_pMySkillTree[i][j][k]->pSkill))
@@ -200,10 +200,10 @@ uint32_t CUISkillTreeDlg::MouseProc(uint32_t dwFlags, const POINT& ptCur, const 
 	// 드래그 되는 아이콘 갱신..
 	if ( GetState() == UI_STATE_ICON_MOVING ) 
 	{
-		if(CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo)
+		if(CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo)
 		{
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
 		}
 	}
 
@@ -229,7 +229,7 @@ int CUISkillTreeDlg::GetIndexInArea(POINT pt)
 
 bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 
 	if (dwMsg == UIMSG_BUTTON_CLICK)					
 	{
@@ -328,12 +328,12 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 							spSkillCopy->pUIIcon->SetStyle(bitMask);
 
 							// Save Select Info..
-							CN3UIWndBase::m_sSkillSelectInfo.UIWnd = UIWND_SKILL_TREE;
-							CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = spSkillCopy;
+							CN3UIWndBase::s_sSkillSelectInfo.UIWnd = UIWND_SKILL_TREE;
+							CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = spSkillCopy;
 
 							pDlg->SetReceiveSelectedSkill(iIndex);
 
-							CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+							CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = nullptr;
 							pDlg->CloseIconRegistry();
 						}
 					}
@@ -366,17 +366,17 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			spSkillCopy->pUIIcon->SetMoveRect(GetSampleRect());
 
 			// Save Select Info..
-			CN3UIWndBase::m_sSkillSelectInfo.UIWnd = UIWND_SKILL_TREE;
-			CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = spSkillCopy;
+			CN3UIWndBase::s_sSkillSelectInfo.UIWnd = UIWND_SKILL_TREE;
+			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = spSkillCopy;
 			break;
 
 		case UIMSG_ICON_DOWN:
 			if ( GetState()  == UI_STATE_ICON_MOVING )
 			{
-				if(CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo)
+				if(CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo)
 				{
-					CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
-					CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
+					CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
+					CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
 				}
 			}
 			break;
@@ -390,7 +390,7 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					if (!pDlg->IsSelectedSkillInRealIconArea())
 					{
 						// 리소스 Free..
-						spSkill = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
+						spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 						if (spSkill)
 						{
 							// 매니저에서 제거..
@@ -399,16 +399,16 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 							// 리소스 제거..
 							spSkill->pUIIcon->Release();
 							delete spSkill->pUIIcon;
-							spSkill->pUIIcon = NULL;
+							spSkill->pUIIcon = nullptr;
 							delete spSkill;
-							spSkill = NULL;
+							spSkill = nullptr;
 						}
 					}
 				}
 				else
 				{
 					// 리소스 Free..
-					spSkill = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
+					spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 					if (spSkill)
 					{
 						// 매니저에서 제거..
@@ -417,13 +417,13 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 						// 리소스 제거..
 						spSkill->pUIIcon->Release();
 						delete spSkill->pUIIcon;
-						spSkill->pUIIcon = NULL;
+						spSkill->pUIIcon = nullptr;
 						delete spSkill;
-						spSkill = NULL;
+						spSkill = nullptr;
 					}
 				}
 
-				CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+				CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = nullptr;
 				SetState(UI_STATE_COMMON_NONE);
 				pDlg->CloseIconRegistry();
 			}
@@ -463,7 +463,7 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 	int iSkillPoint;
 	std::string str;
 	CN3UIString* pStrName, *pStrName2;
-	pStrName = (CN3UIString* )GetChildByID("string_skillpoint"); __ASSERT(pStrName, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(pStrName, GetChildByID<CN3UIString>("string_skillpoint"));
 	str = pStrName->GetString();
 	iSkillExtra = atoi(str.c_str());
 
@@ -631,35 +631,35 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 	switch(iValue)	
 	{
 		case 1:			
-			pStrName2 = (CN3UIString* )GetChildByID("string_0"); __ASSERT(pStrName2, "NULL UI Component!!");
+			N3_VERIFY_UI_COMPONENT(pStrName2, GetChildByID<CN3UIString>("string_0"));
 			break;
 
 		case 2:
-			pStrName2 = (CN3UIString* )GetChildByID("string_1"); __ASSERT(pStrName2, "NULL UI Component!!");
+			N3_VERIFY_UI_COMPONENT(pStrName2, GetChildByID<CN3UIString>("string_1"));
 			break;
 
 		case 3:
-			pStrName2 = (CN3UIString* )GetChildByID("string_2"); __ASSERT(pStrName2, "NULL UI Component!!");
+			N3_VERIFY_UI_COMPONENT(pStrName2, GetChildByID<CN3UIString>("string_2"));
 			break;
 
 		case 4:
-			pStrName2 = (CN3UIString* )GetChildByID("string_3"); __ASSERT(pStrName2, "NULL UI Component!!");
+			N3_VERIFY_UI_COMPONENT(pStrName2, GetChildByID<CN3UIString>("string_3"));
 			break;
 
 		case 5:
-			pStrName2 = (CN3UIString* )GetChildByID("string_4"); __ASSERT(pStrName2, "NULL UI Component!!");
+			N3_VERIFY_UI_COMPONENT(pStrName2, GetChildByID<CN3UIString>("string_4"));
 			break;
 
 		case 6:
-			pStrName2 = (CN3UIString* )GetChildByID("string_5"); __ASSERT(pStrName2, "NULL UI Component!!");
+			N3_VERIFY_UI_COMPONENT(pStrName2, GetChildByID<CN3UIString>("string_5"));
 			break;
 
 		case 7:
-			pStrName2 = (CN3UIString* )GetChildByID("string_6"); __ASSERT(pStrName2, "NULL UI Component!!");
+			N3_VERIFY_UI_COMPONENT(pStrName2, GetChildByID<CN3UIString>("string_6"));
 			break;
 
 		case 8:
-			pStrName2 = (CN3UIString* )GetChildByID("string_7"); __ASSERT(pStrName2, "NULL UI Component!!");
+			N3_VERIFY_UI_COMPONENT(pStrName2, GetChildByID<CN3UIString>("string_7"));
 			break;
 
 	}
@@ -746,15 +746,15 @@ bool CUISkillTreeDlg::OnMouseWheelEvent(
 void CUISkillTreeDlg::Render()
 {
 	if (!m_bVisible) return;	// 보이지 않으면 자식들을 render하지 않는다.
-	__IconItemSkill* spSkill = NULL;
+	__IconItemSkill* spSkill = nullptr;
 
 	TooltipRenderDisable();
 
 	for(UIListReverseItor itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
-		if ( (GetState() == UI_STATE_ICON_MOVING) && (pChild->UIType() == UI_TYPE_ICON) && (CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo) &&
-			((CN3UIIcon *)pChild == CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon) )	
+		if ( (GetState() == UI_STATE_ICON_MOVING) && (pChild->UIType() == UI_TYPE_ICON) && (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo) &&
+			((CN3UIIcon *)pChild == CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon) )	
 			continue;
 		pChild->Render();
 		if ( (pChild->UIType() == UI_TYPE_ICON) && (pChild->GetStyle() & UISTYLE_ICON_HIGHLIGHT) && 
@@ -767,8 +767,8 @@ void CUISkillTreeDlg::Render()
 
 	CheckButtonTooltipRenderEnable();
 
-	if ( (GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo) ) 
-		CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->Render();		
+	if ( (GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo) ) 
+		CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->Render();		
 }
 
 void CUISkillTreeDlg::CheckButtonTooltipRenderEnable()
@@ -778,21 +778,21 @@ void CUISkillTreeDlg::CheckButtonTooltipRenderEnable()
 	RECT rect[MAX_SKILL_KIND_OF]; 
 	memset(rect, 0, sizeof(RECT)*MAX_SKILL_KIND_OF);
 
-	rect[SKILL_DEF_BASIC]		= ((CN3UIButton* )GetChildByID("btn_public"))->GetClickRect();
+	rect[SKILL_DEF_BASIC]		= GetChildByID<CN3UIButton>("btn_public")->GetClickRect();
 
 	switch ( CGameBase::s_pPlayer->m_InfoBase.eNation )
 	{
 		case NATION_ELMORAD:
-			rect[SKILL_DEF_SPECIAL0]	= ((CN3UIButton* )GetChildByID("btn_blade0"))->GetClickRect();
-			rect[SKILL_DEF_SPECIAL1]	= ((CN3UIButton* )GetChildByID("btn_blade1"))->GetClickRect();
-			rect[SKILL_DEF_SPECIAL2]	= ((CN3UIButton* )GetChildByID("btn_blade2"))->GetClickRect();
-			rect[SKILL_DEF_SPECIAL3]	= ((CN3UIButton* )GetChildByID("btn_master"))->GetClickRect();
+			rect[SKILL_DEF_SPECIAL0]	= GetChildByID<CN3UIButton>("btn_blade0")->GetClickRect();
+			rect[SKILL_DEF_SPECIAL1]	= GetChildByID<CN3UIButton>("btn_blade1")->GetClickRect();
+			rect[SKILL_DEF_SPECIAL2]	= GetChildByID<CN3UIButton>("btn_blade2")->GetClickRect();
+			rect[SKILL_DEF_SPECIAL3]	= GetChildByID<CN3UIButton>("btn_master")->GetClickRect();
 			break;
 		case NATION_KARUS:
-			rect[SKILL_DEF_SPECIAL0]	= ((CN3UIButton* )GetChildByID("btn_berserker0"))->GetClickRect();
-			rect[SKILL_DEF_SPECIAL1]	= ((CN3UIButton* )GetChildByID("btn_berserker1"))->GetClickRect();
-			rect[SKILL_DEF_SPECIAL2]	= ((CN3UIButton* )GetChildByID("btn_berserker2"))->GetClickRect();
-			rect[SKILL_DEF_SPECIAL3]	= ((CN3UIButton* )GetChildByID("btn_master"))->GetClickRect();
+			rect[SKILL_DEF_SPECIAL0]	= GetChildByID<CN3UIButton>("btn_berserker0")->GetClickRect();
+			rect[SKILL_DEF_SPECIAL1]	= GetChildByID<CN3UIButton>("btn_berserker1")->GetClickRect();
+			rect[SKILL_DEF_SPECIAL2]	= GetChildByID<CN3UIButton>("btn_berserker2")->GetClickRect();
+			rect[SKILL_DEF_SPECIAL3]	= GetChildByID<CN3UIButton>("btn_master")->GetClickRect();
 			break;
 	}
 
@@ -960,7 +960,6 @@ void CUISkillTreeDlg::TooltipRenderEnable(__IconItemSkill* spSkill)
 		return;
 
 	std::string szStr;
-	bool bFound = false;
 
 	// Tooltip - skill description
 	if (!m_pStr_info->IsVisible())
@@ -998,46 +997,26 @@ void CUISkillTreeDlg::TooltipRenderEnable(__IconItemSkill* spSkill)
 	if (!m_pStr_skill_item0->IsVisible())
 		m_pStr_skill_item0->SetVisible(true);
 
-	// Two-handed weapons
-	switch (spSkill->pSkill->iNeedSkill)
+	switch (spSkill->pSkill->dwNeedItem)
 	{
-		case SKILL_REQUIRES_DUAL_WEAPON_WARRIOR:
-		case SKILL_REQUIRES_DUAL_WEAPON_ROGUE:
-			szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_DUAL);
-			bFound = true;
-			break;
-
-		case SKILL_REQUIRES_DOUBLE_WEAPON_WARRIOR:
-		case SKILL_REQUIRES_DOUBLE_WEAPON_ROGUE:
-			szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_DOUBLE);
-			bFound = true;
-			break;
-	}
-
-	// All other weapons
-	if (!bFound)
-	{
-		switch (spSkill->pSkill->dwNeedItem)
-		{
-			case 0:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID1); break;
-			case 1:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID2); break;
-			case 2:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID3); break;
-			case 3:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID4); break;
-			case 4:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID5); break;
-			case 5:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID6); break;
-			case 6:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID7); break;
-			case 7:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID8); break;
-			case 8:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID9); break;
-			case 10:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID10); break;
-			case 11:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID11); break;
-			case 12:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID12); break;
-			case 13:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID13); break;
-			case 21:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID14); break;
-			case 22:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID15); break;
-			case 23:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID16); break;
-			case 24:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID17); break;
-			default:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_NO); break;
-		}
+		case 0:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID1); break;
+		case 1:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID2); break;
+		case 2:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID3); break;
+		case 3:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID4); break;
+		case 4:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID5); break;
+		case 5:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID6); break;
+		case 6:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID7); break;
+		case 7:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID8); break;
+		case 8:		szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID9); break;
+		case 10:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID10); break;
+		case 11:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID11); break;
+		case 12:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID12); break;
+		case 13:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID13); break;
+		case 21:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID14); break;
+		case 22:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID15); break;
+		case 23:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID16); break;
+		case 24:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_ID17); break;
+		default:	szStr = fmt::format_text_resource(IDS_SKILL_TOOLTIP_NEED_ITEM_NO); break;
 	}
 
 	m_pStr_skill_item0->SetString(szStr);
@@ -1126,24 +1105,24 @@ void CUISkillTreeDlg::InitIconWnd(e_UIWND eWnd)
 {
 	CN3UIWndBase::InitIconWnd(eWnd);
 
-	N3_VERIFY_UI_COMPONENT(m_pStr_info,			(CN3UIString*) GetChildByID("string_info"));
-	N3_VERIFY_UI_COMPONENT(m_pStr_skill_mp,		(CN3UIString*) GetChildByID("string_skill_mp"));
-	N3_VERIFY_UI_COMPONENT(m_pStr_skill_point,	(CN3UIString*) GetChildByID("string_skill_point"));
-	N3_VERIFY_UI_COMPONENT(m_pStr_skill_item0,	(CN3UIString*) GetChildByID("string_skill_item0"));
-	N3_VERIFY_UI_COMPONENT(m_pStr_skill_item1,	(CN3UIString*) GetChildByID("string_skill_item1"));
-	N3_VERIFY_UI_COMPONENT(m_pStr_skill_item2,	(CN3UIString*) GetChildByID("string_skill_item2"));
+	N3_VERIFY_UI_COMPONENT(m_pStr_info,			GetChildByID<CN3UIString>("string_info"));
+	N3_VERIFY_UI_COMPONENT(m_pStr_skill_mp,		GetChildByID<CN3UIString>("string_skill_mp"));
+	N3_VERIFY_UI_COMPONENT(m_pStr_skill_point,	GetChildByID<CN3UIString>("string_skill_point"));
+	N3_VERIFY_UI_COMPONENT(m_pStr_skill_item0,	GetChildByID<CN3UIString>("string_skill_item0"));
+	N3_VERIFY_UI_COMPONENT(m_pStr_skill_item1,	GetChildByID<CN3UIString>("string_skill_item1"));
+	N3_VERIFY_UI_COMPONENT(m_pStr_skill_item2,	GetChildByID<CN3UIString>("string_skill_item2"));
 }
 
 void CUISkillTreeDlg::InitIconUpdate()
 {
 	int j, k, iDivide;
-	__TABLE_UPC_SKILL* pUSkill = NULL;
+	__TABLE_UPC_SKILL* pUSkill = nullptr;
 
 	// 기존 아이콘 모두 클리어..
 	for(int i = 0; i < MAX_SKILL_KIND_OF; i++ )
 		for( j = 0; j < MAX_SKILL_PAGE_NUM; j++ )
 			for( k = 0; k < MAX_SKILL_IN_PAGE; k++ )
-				if ( m_pMySkillTree[i][j][k] != NULL )
+				if ( m_pMySkillTree[i][j][k] != nullptr )
 				{
 					__IconItemSkill* spSkill = m_pMySkillTree[i][j][k];
 
@@ -1153,10 +1132,10 @@ void CUISkillTreeDlg::InitIconUpdate()
 					// 리소스 제거..
 					spSkill->pUIIcon->Release();
 					delete spSkill->pUIIcon;
-					spSkill->pUIIcon = NULL;
+					spSkill->pUIIcon = nullptr;
 					delete spSkill;
-					spSkill = NULL;
-					m_pMySkillTree[i][j][k] = NULL;
+					spSkill = nullptr;
+					m_pMySkillTree[i][j][k] = nullptr;
 				}
 
 
@@ -1188,7 +1167,7 @@ void CUISkillTreeDlg::InitIconUpdate()
 	for (int i = iSkillIndexFirst; i < iSkillIndexLast; i++)
 	{
 		__TABLE_UPC_SKILL* pUSkill = CGameBase::s_pTbl_Skill.GetIndexedData(i);
-		if ( pUSkill == NULL ) continue;
+		if ( pUSkill == nullptr ) continue;
 		if ( pUSkill->dwID >= UIITEM_TYPE_USABLE_ID_MIN) continue;
 
 		// 조건이 충족 되는지 확인한다..
@@ -1241,24 +1220,42 @@ void CUISkillTreeDlg::PageButtonInitialize()
 	SetPageInCharRegion();		
 	
 	// 서버에게 받은 값으로 세팅.. m_iSkillInfo[MAX_SKILL_FROM_SERVER];										// 서버로 받는 슬롯 정보..	
-	CN3UIString* pStrName = (CN3UIString* )GetChildByID("string_skillpoint"); __ASSERT(pStrName, "NULL UI Component!!");
-	pStrName->SetStringAsInt(m_iSkillInfo[0]);
-	pStrName = (CN3UIString* )GetChildByID("string_0"); __ASSERT(pStrName, "NULL UI Component!!");
-	if(pStrName) pStrName->SetStringAsInt(m_iSkillInfo[1]);
-	pStrName = (CN3UIString* )GetChildByID("string_1"); __ASSERT(pStrName, "NULL UI Component!!");
-	if(pStrName) pStrName->SetStringAsInt(m_iSkillInfo[2]);
-	pStrName = (CN3UIString* )GetChildByID("string_2"); __ASSERT(pStrName, "NULL UI Component!!");
-	if(pStrName) pStrName->SetStringAsInt(m_iSkillInfo[3]);
-	pStrName = (CN3UIString* )GetChildByID("string_3"); __ASSERT(pStrName, "NULL UI Component!!");
-	if(pStrName) pStrName->SetStringAsInt(m_iSkillInfo[4]);
-	pStrName = (CN3UIString* )GetChildByID("string_4"); __ASSERT(pStrName, "NULL UI Component!!");
-	if(pStrName) pStrName->SetStringAsInt(m_iSkillInfo[5]);
-	pStrName = (CN3UIString* )GetChildByID("string_5"); __ASSERT(pStrName, "NULL UI Component!!");
-	if(pStrName) pStrName->SetStringAsInt(m_iSkillInfo[6]);
-	pStrName = (CN3UIString* )GetChildByID("string_6"); __ASSERT(pStrName, "NULL UI Component!!");
-	if(pStrName) pStrName->SetStringAsInt(m_iSkillInfo[7]);
-//	pStrName = (CN3UIString* )GetChildByID("string_7"); __ASSERT(pStrName, "NULL UI Component!!");
-//	if(pStrName) pStrName->SetStringAsInt(m_iSkillInfo[8]);
+	CN3UIString* pStrName = nullptr;
+	N3_VERIFY_UI_COMPONENT(pStrName, GetChildByID<CN3UIString>("string_skillpoint"));
+	if (pStrName != nullptr)
+		pStrName->SetStringAsInt(m_iSkillInfo[0]);
+
+	N3_VERIFY_UI_COMPONENT(pStrName, GetChildByID<CN3UIString>("string_0"));
+	if (pStrName != nullptr)
+		pStrName->SetStringAsInt(m_iSkillInfo[1]);
+
+	N3_VERIFY_UI_COMPONENT(pStrName, GetChildByID<CN3UIString>("string_1"));
+	if (pStrName != nullptr)
+		pStrName->SetStringAsInt(m_iSkillInfo[2]);
+
+	N3_VERIFY_UI_COMPONENT(pStrName, GetChildByID<CN3UIString>("string_2"));
+	if (pStrName != nullptr)
+		pStrName->SetStringAsInt(m_iSkillInfo[3]);
+
+	N3_VERIFY_UI_COMPONENT(pStrName, GetChildByID<CN3UIString>("string_3"));
+	if (pStrName != nullptr)
+		pStrName->SetStringAsInt(m_iSkillInfo[4]);
+
+	N3_VERIFY_UI_COMPONENT(pStrName, GetChildByID<CN3UIString>("string_4"));
+	if (pStrName != nullptr)
+		pStrName->SetStringAsInt(m_iSkillInfo[5]);
+
+	N3_VERIFY_UI_COMPONENT(pStrName, GetChildByID<CN3UIString>("string_5"));
+	if (pStrName != nullptr)
+		pStrName->SetStringAsInt(m_iSkillInfo[6]);
+
+	N3_VERIFY_UI_COMPONENT(pStrName, GetChildByID<CN3UIString>("string_6"));
+	if (pStrName != nullptr)
+		pStrName->SetStringAsInt(m_iSkillInfo[7]);
+
+	// N3_VERIFY_UI_COMPONENT(pStrName, GetChildByID<CN3UIString>("string_7"));
+	// if (pStrName != nullptr)
+	//	pStrName->SetStringAsInt(m_iSkillInfo[8]);
     
 	ButtonVisibleStateSet();
 }
@@ -1267,181 +1264,181 @@ void CUISkillTreeDlg::ButtonVisibleStateSet()
 {
 // temp macro..
 #define ASSET_0 {	\
-	__ASSERT(pButton, "NULL UI Component!!"); if (!pButton) return;	pButton->SetVisible(false);	pButton->SetState(UI_STATE_BUTTON_NORMAL); \
+	if (!pButton) return;	pButton->SetVisible(false);	pButton->SetState(UI_STATE_BUTTON_NORMAL); \
 }
 #define ASSET_1 {	\
-	__ASSERT(pButton, "NULL UI Component!!"); if (!pButton) return;	pButton->SetVisible(true);	if ( m_iCurKindOf == 1 )	pButton->SetState(UI_STATE_BUTTON_DOWN);	\
+	if (!pButton) return;	pButton->SetVisible(true);	if ( m_iCurKindOf == 1 )	pButton->SetState(UI_STATE_BUTTON_DOWN);	\
 }
 #define ASSET_2 {	\
-	__ASSERT(pButton, "NULL UI Component!!"); if (!pButton) return;	pButton->SetVisible(true);	if ( m_iCurKindOf == 2 )	pButton->SetState(UI_STATE_BUTTON_DOWN);	\
+	if (!pButton) return;	pButton->SetVisible(true);	if ( m_iCurKindOf == 2 )	pButton->SetState(UI_STATE_BUTTON_DOWN);	\
 }
 #define ASSET_3 {	\
-	__ASSERT(pButton, "NULL UI Component!!"); if (!pButton) return;	pButton->SetVisible(true);	if ( m_iCurKindOf == 3 )	pButton->SetState(UI_STATE_BUTTON_DOWN);	\
+	if (!pButton) return;	pButton->SetVisible(true);	if ( m_iCurKindOf == 3 )	pButton->SetState(UI_STATE_BUTTON_DOWN);	\
 }
 #define ASSET_4 {	\
-	__ASSERT(pButton, "NULL UI Component!!"); if (!pButton) return;	pButton->SetVisible(true);	if ( m_iCurKindOf == 4 )	pButton->SetState(UI_STATE_BUTTON_DOWN);	\
+	if (!pButton) return;	pButton->SetVisible(true);	if ( m_iCurKindOf == 4 )	pButton->SetState(UI_STATE_BUTTON_DOWN);	\
 }
 
 	CN3UIButton* pButton = nullptr;
 
-	N3_VERIFY_UI_COMPONENT(pButton, (CN3UIButton*) GetChildByID("btn_public"));
+	N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_public"));
 	if (pButton != nullptr)
 		pButton->SetState(UI_STATE_BUTTON_NORMAL);
 
 	// Hide all existing buttons by default.
-	N3_VERIFY_UI_COMPONENT(pButton, (CN3UIButton*) GetChildByID("btn_master"));
+	N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_master"));
 	if (pButton != nullptr)
 		pButton->SetVisible(false);
 
 	switch (CGameBase::s_pPlayer->m_InfoBase.eNation)
 	{
 		case NATION_ELMORAD:
-			pButton = (CN3UIButton*) GetChildByID("btn_ranger0");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_ranger1");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_ranger2");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_blade0");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_blade1");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_blade2");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_mage0");			ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_mage1");			ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_mage2");			ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_cleric0");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_cleric1");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_cleric2");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_ranger0"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_ranger1"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_ranger2"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_blade0"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_blade1"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_blade2"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_mage0"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_mage1"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_mage2"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_cleric0"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_cleric1"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_cleric2"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_master"));		ASSET_0;
 			break;
 
 		case NATION_KARUS:
-			pButton = (CN3UIButton*) GetChildByID("btn_hunter0");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_hunter1");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_hunter2");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_hunter3");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_berserker0");	ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_berserker1");	ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_berserker2");	ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_berserker3");	ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer0");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer1");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer2");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer3");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_shaman0");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_shaman1");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_shaman2");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_shaman3");		ASSET_0;
-			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_hunter0"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_hunter1"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_hunter2"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_hunter3"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_berserker0"));	ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_berserker1"));	ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_berserker2"));	ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_berserker3"));	ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_sorcerer0"));	ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_sorcerer1"));	ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_sorcerer2"));	ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_sorcerer3"));	ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_shaman0"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_shaman1"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_shaman2"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_shaman3"));		ASSET_0;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_master"));		ASSET_0;
 			break;
 	}
 
 	if (m_iCurKindOf == 0)
 	{
-		pButton = (CN3UIButton*) GetChildByID("btn_public");
+		N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_public"));
 		pButton->SetState(UI_STATE_BUTTON_DOWN);
 	}
 
 	switch (CGameBase::s_pPlayer->m_InfoBase.eClass)
 	{
 		case CLASS_KA_BERSERKER:
-			pButton = (CN3UIButton*) GetChildByID("btn_berserker0");	ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_berserker1");	ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_berserker2");	ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_berserker0"));	ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_berserker1"));	ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_berserker2"));	ASSET_3;
 			break;
 
 		case CLASS_KA_GUARDIAN:
-			pButton = (CN3UIButton*) GetChildByID("btn_berserker0");	ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_berserker1");	ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_berserker2");	ASSET_3;
-			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_berserker0"));	ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_berserker1"));	ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_berserker2"));	ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_master"));		ASSET_4;
 			break;
 
 		case CLASS_KA_HUNTER:
-			pButton = (CN3UIButton*) GetChildByID("btn_hunter0");		ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_hunter1");		ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_hunter2");		ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_hunter0"));		ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_hunter1"));		ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_hunter2"));		ASSET_3;
 			break;
 
 		case CLASS_KA_PENETRATOR:
-			pButton = (CN3UIButton*) GetChildByID("btn_hunter0");		ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_hunter1");		ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_hunter2");		ASSET_3;
-			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_hunter0"));		ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_hunter1"));		ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_hunter2"));		ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_master"));		ASSET_4;
 			break;
 
 		case CLASS_KA_SHAMAN:
-			pButton = (CN3UIButton*) GetChildByID("btn_shaman0");		ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_shaman1");		ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_shaman2");		ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_shaman0"));		ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_shaman1"));		ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_shaman2"));		ASSET_3;
 			break;
 
 		case CLASS_KA_DARKPRIEST:
-			pButton = (CN3UIButton*) GetChildByID("btn_shaman0");		ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_shaman1");		ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_shaman2");		ASSET_3;
-			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_shaman0"));		ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_shaman1"));		ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_shaman2"));		ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_master"));		ASSET_4;
 			break;
 
 		case CLASS_KA_SORCERER:
-			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer0");		ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer1");		ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer2");		ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_sorcerer0"));	ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_sorcerer1"));	ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_sorcerer2"));	ASSET_3;
 			break;
 
 		case CLASS_KA_NECROMANCER:
-			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer0");		ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer1");		ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_sorcerer2");		ASSET_3;
-			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_sorcerer0"));	ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_sorcerer1"));	ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_sorcerer2"));	ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_master"));		ASSET_4;
 			break;
 
 		case CLASS_EL_BLADE:
-			pButton = (CN3UIButton*) GetChildByID("btn_blade0");		ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_blade1");		ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_blade2");		ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_blade0"));		ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_blade1"));		ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_blade2"));		ASSET_3;
 			break;
 
 		case CLASS_EL_PROTECTOR:
-			pButton = (CN3UIButton*) GetChildByID("btn_blade0");		ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_blade1");		ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_blade2");		ASSET_3;
-			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_blade0"));		ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_blade1"));		ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_blade2"));		ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_master"));		ASSET_4;
 			break;
 
 		case CLASS_EL_RANGER:
-			pButton = (CN3UIButton*) GetChildByID("btn_ranger0");		ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_ranger1");		ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_ranger2");		ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_ranger0"));		ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_ranger1"));		ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_ranger2"));		ASSET_3;
 			break;
 
 		case CLASS_EL_ASSASIN:
-			pButton = (CN3UIButton*) GetChildByID("btn_ranger0");		ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_ranger1");		ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_ranger2");		ASSET_3;
-			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_ranger0"));		ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_ranger1"));		ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_ranger2"));		ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_master"));		ASSET_4;
 			break;
 
 		case CLASS_EL_MAGE:
-			pButton = (CN3UIButton*) GetChildByID("btn_mage0");			ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_mage1");			ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_mage2");			ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_mage0"));		ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_mage1"));		ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_mage2"));		ASSET_3;
 			break;
 
 		case CLASS_EL_ENCHANTER:
-			pButton = (CN3UIButton*) GetChildByID("btn_mage0");			ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_mage1");			ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_mage2");			ASSET_3;
-			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_mage0"));		ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_mage1"));		ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_mage2"));		ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_master"));		ASSET_4;
 			break;
 
 		case CLASS_EL_CLERIC:
-			pButton = (CN3UIButton*) GetChildByID("btn_cleric0");		ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_cleric1");		ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_cleric2");		ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_cleric0"));		ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_cleric1"));		ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_cleric2"));		ASSET_3;
 			break;
 
 		case CLASS_EL_DRUID:
-			pButton = (CN3UIButton*) GetChildByID("btn_cleric0");		ASSET_1;
-			pButton = (CN3UIButton*) GetChildByID("btn_cleric1");		ASSET_2;
-			pButton = (CN3UIButton*) GetChildByID("btn_cleric2");		ASSET_3;
-			pButton = (CN3UIButton*) GetChildByID("btn_master");		ASSET_4;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_cleric0"));		ASSET_1;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_cleric1"));		ASSET_2;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_cleric2"));		ASSET_3;
+			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_master"));		ASSET_4;
 			break;
 	}
 }
@@ -1455,7 +1452,7 @@ void CUISkillTreeDlg::AddSkillToPage(__TABLE_UPC_SKILL* pUSkill, int iOffset, bo
 	for( i = 0; i < MAX_SKILL_PAGE_NUM; i++ )
 		for ( j = 0; j < MAX_SKILL_IN_PAGE; j++ )
 		{
-			if ( m_pMySkillTree[iOffset][i][j] != NULL )
+			if ( m_pMySkillTree[iOffset][i][j] != nullptr )
 			{
 				if ( m_pMySkillTree[iOffset][i][j]->pSkill->dwID == pUSkill->dwID )
 					goto stop;
@@ -1466,7 +1463,7 @@ void CUISkillTreeDlg::AddSkillToPage(__TABLE_UPC_SKILL* pUSkill, int iOffset, bo
 	for( i = 0; i < MAX_SKILL_PAGE_NUM; i++ )
 		for ( j = 0; j < MAX_SKILL_IN_PAGE; j++ )
 		{
-			if ( m_pMySkillTree[iOffset][i][j] == NULL )
+			if ( m_pMySkillTree[iOffset][i][j] == nullptr )
 			{
 				bFound = true;
 				goto stop;
@@ -1493,7 +1490,7 @@ stop:
 	spSkill->pUIIcon->SetUIType(UI_TYPE_ICON);
 	spSkill->pUIIcon->SetStyle(UISTYLE_ICON_SKILL);
 
-	CN3UIArea* pArea = NULL;
+	CN3UIArea* pArea = nullptr;
 	pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_TREE, j);
 	if ( pArea )
 	{
@@ -1544,8 +1541,8 @@ void CUISkillTreeDlg::Open()
 void CUISkillTreeDlg::Close()
 {
 	// 리소스 Free..
-	__IconItemSkill* spSkill = NULL;
-	spSkill = CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo;
+	__IconItemSkill* spSkill = nullptr;
+	spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 	if (spSkill)
 	{
 		// 매니저에서 제거..
@@ -1554,11 +1551,11 @@ void CUISkillTreeDlg::Close()
 		// 리소스 제거..
 		spSkill->pUIIcon->Release();
 		delete spSkill->pUIIcon;
-		spSkill->pUIIcon = NULL;
+		spSkill->pUIIcon = nullptr;
 		delete spSkill;
-		spSkill = NULL;
+		spSkill = nullptr;
 	}
-	CN3UIWndBase::m_sSkillSelectInfo.pSkillDoneInfo = NULL;
+	CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = nullptr;
 	SetState(UI_STATE_COMMON_NONE);
 	CN3UIWndBase::AllHighLightIconFree();
 
@@ -1579,12 +1576,12 @@ __IconItemSkill* CUISkillTreeDlg::GetHighlightIconItem(CN3UIIcon* pUIIcon)
 {
 	for( int k = 0; k < MAX_SKILL_IN_PAGE; k++ )
 	{
-		if ( (m_pMySkillTree[m_iCurKindOf][m_iCurSkillPage][k] != NULL) && 
+		if ( (m_pMySkillTree[m_iCurKindOf][m_iCurSkillPage][k] != nullptr) && 
 			(m_pMySkillTree[m_iCurKindOf][m_iCurSkillPage][k]->pUIIcon == pUIIcon) )
 			return m_pMySkillTree[m_iCurKindOf][m_iCurSkillPage][k];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 int CUISkillTreeDlg::GetSkilliOrder(__IconItemSkill* spSkill)
@@ -1630,7 +1627,7 @@ void CUISkillTreeDlg::SetPageInIconRegion(int iKindOf, int iPageNum)		// 아이�
 			for( j = 0; j < MAX_SKILL_PAGE_NUM; j++ )
 				for( k = 0; k < MAX_SKILL_IN_PAGE; k++ )
 				{
-					if ( m_pMySkillTree[i][j][k] != NULL )
+					if ( m_pMySkillTree[i][j][k] != nullptr )
 						m_pMySkillTree[i][j][k]->pUIIcon->SetVisible(false);
 				}
 		}
@@ -1642,7 +1639,7 @@ void CUISkillTreeDlg::SetPageInIconRegion(int iKindOf, int iPageNum)		// 아이�
 				{
 					for( k = 0; k < MAX_SKILL_IN_PAGE; k++ )
 					{
-						if ( m_pMySkillTree[i][j][k] != NULL )
+						if ( m_pMySkillTree[i][j][k] != nullptr )
 							m_pMySkillTree[i][j][k]->pUIIcon->SetVisible(false);
 					}
 				}
@@ -1650,7 +1647,7 @@ void CUISkillTreeDlg::SetPageInIconRegion(int iKindOf, int iPageNum)		// 아이�
 				{
 					for( k = 0; k < MAX_SKILL_IN_PAGE; k++ )
 					{
-						if ( m_pMySkillTree[i][j][k] != NULL )
+						if ( m_pMySkillTree[i][j][k] != nullptr )
 							m_pMySkillTree[i][j][k]->pUIIcon->SetVisible(true);
 					}
 				}
@@ -1664,24 +1661,25 @@ void CUISkillTreeDlg::SetPageInIconRegion(int iKindOf, int iPageNum)		// 아이�
 
 	for( k = 0; k < MAX_SKILL_IN_PAGE; k++ )
 	{
-		if ( m_pMySkillTree[m_iCurKindOf][m_iCurSkillPage][k] != NULL )
+		if ( m_pMySkillTree[m_iCurKindOf][m_iCurSkillPage][k] != nullptr )
 		{
 			str = "string_list_" + std::to_string(k);
-			pStrName = (CN3UIString* )GetChildByID(str);	 __ASSERT(pStrName, "NULL UI Component!!");
+			N3_VERIFY_UI_COMPONENT(pStrName, GetChildByID<CN3UIString>(str));
 			pStrName->SetString(m_pMySkillTree[m_iCurKindOf][m_iCurSkillPage][k]->pSkill->szName);
 			pStrName->SetVisible(true);
 		}
 		else
 		{
 			str = "string_list_" + std::to_string(k);
-			pStrName = (CN3UIString* )GetChildByID(str);	 __ASSERT(pStrName, "NULL UI Component!!");
+			N3_VERIFY_UI_COMPONENT(pStrName, GetChildByID<CN3UIString>(str));
 			pStrName->SetVisible(false);
 		}
 	}
 
 	ButtonVisibleStateSet();
 
-	CN3UIString* pStr = (CN3UIString*) GetChildByID("string_page");	__ASSERT(pStr, "NULL UI Component!!");
+	CN3UIString* pStr = nullptr;
+	N3_VERIFY_UI_COMPONENT(pStr, GetChildByID<CN3UIString>("string_page"));
 	if (pStr != nullptr)
 		pStr->SetStringAsInt(iPageNum + 1);
 }

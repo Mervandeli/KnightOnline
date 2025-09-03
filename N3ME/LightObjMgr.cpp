@@ -24,7 +24,7 @@ static char THIS_FILE[]=__FILE__;
 
 CLightObjMgr::CLightObjMgr()
 {
-	m_pRefMapMng = NULL;				// 지형 참조 포인터..
+	m_pRefMapMng = nullptr;				// 지형 참조 포인터..
 	m_bActive = false;
 
 	m_iVersion = 1;
@@ -45,7 +45,7 @@ CLightObjMgr::CLightObjMgr()
 	m_BaseCube[6].Set(0, 0, 1); // 뒤쪽 LB
 	m_BaseCube[7].Set(1, 0, 1);	// 뒤쪽 RB
 
-	m_pCurrLO = NULL;
+	m_pCurrLO = nullptr;
 	m_VtxPosDummy.Release();
 }
 
@@ -57,13 +57,13 @@ CLightObjMgr::~CLightObjMgr()
 	{
 		m_pDlg->DestroyWindow();
 		delete m_pDlg;
-		m_pDlg = NULL;
+		m_pDlg = nullptr;
 	}
 
 	if(m_pCurrLO)
 	{
 		delete m_pCurrLO;
-		m_pCurrLO = NULL;
+		m_pCurrLO = nullptr;
 	}
 }
 
@@ -97,12 +97,12 @@ bool CLightObjMgr::Load(HANDLE hFile)
 	}
 	
 	DWORD dwRWC;
-	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
 
 	if(m_iVersion<=1)
 	{
 		int cnt = 0;
-		ReadFile(hFile, &cnt, sizeof(int), &dwRWC, NULL);
+		ReadFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
 
 		for(int i=0;i<cnt;i++)
 		{
@@ -112,7 +112,7 @@ bool CLightObjMgr::Load(HANDLE hFile)
 			pLO->pRefLight = pLight;
 			pOutPutScene->LightAdd(pLight);
 			
-			ReadFile(hFile, &(pLO->szName[0]), 80, &dwRWC, NULL);
+			ReadFile(hFile, &(pLO->szName[0]), 80, &dwRWC, nullptr);
 			pLight->Load(hFile);
 			pLight->m_Data.bOn = false;
 			pLight->m_Data.nNumber = IDX_STANDBY_LIGHT;
@@ -129,10 +129,10 @@ bool CLightObjMgr::Save(HANDLE hFile)
 {
 	DWORD dwRWC;
 
-	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
 
 	int cnt = m_ListObj.size();
-	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
 
 	std::list<LIGHTOBJ*>::iterator it, ite;
 
@@ -140,7 +140,7 @@ bool CLightObjMgr::Save(HANDLE hFile)
 	for(it=m_ListObj.begin(); it!=ite; it++)
 	{
 		LIGHTOBJ* pLO = (*it);
-		WriteFile(hFile, &(pLO->szName[0]), 80, &dwRWC, NULL);
+		WriteFile(hFile, &(pLO->szName[0]), 80, &dwRWC, nullptr);
 		pLO->pRefLight->Save(hFile);
 	}
 	return true;
@@ -173,7 +173,7 @@ void CLightObjMgr::SetActive(bool active)
 		{
 			pOutPutScene->LightDelete(m_pCurrLO->pRefLight);
 			delete m_pCurrLO;
-			m_pCurrLO = NULL;
+			m_pCurrLO = nullptr;
 		}
 		m_pCurrLO = pLO;
 	}
@@ -184,7 +184,7 @@ void CLightObjMgr::SetActive(bool active)
 		{
 			pOutPutScene->LightDelete(m_pCurrLO->pRefLight);
 			delete m_pCurrLO;
-			m_pCurrLO = NULL;
+			m_pCurrLO = nullptr;
 		}
 	}
 }
@@ -202,7 +202,7 @@ BOOL CLightObjMgr::MouseMsgFilter(LPMSG pMsg)
 			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 			vec.y += 1.0f;
 			
 			m_vCurrLOPos.Set(vec, 0.0f, 0.0f);
@@ -235,7 +235,7 @@ void CLightObjMgr::Render()
 	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx); // 월드 행렬 적용..
 	
 	// set texture
-	hr = s_lpD3DDev->SetTexture(0, NULL);
+	hr = s_lpD3DDev->SetTexture(0, nullptr);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 
@@ -474,11 +474,11 @@ bool CLightObjMgr::MakeGameFile(char* szFN)
 	int cnt = m_ListObj.size();
 	if(cnt<=0) return true;
 
-	HANDLE hFile = CreateFile(szFN, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(szFN, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	DWORD dwRWC;
-	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, NULL);
-	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
+	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
 
 	std::list<LIGHTOBJ*>::iterator it, ite;
 

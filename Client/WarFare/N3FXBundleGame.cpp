@@ -387,7 +387,7 @@ void CN3FXBundleGame::Duplicate(CN3FXBundleGame* pDestBundle)
 				CN3FXPartParticles* pPart = (CN3FXPartParticles*)pDestBundle->m_pPart[i]->pPart;
 
 				pPart->m_pRefBundle = pDestBundle;
-				pPart->m_pRefPrevPart = NULL;
+				pPart->m_pRefPrevPart = nullptr;
 				pPart->m_iType = FX_PART_TYPE_PARTICLE;
 
 				pPart->Duplicate((CN3FXPartParticles*)m_pPart[i]->pPart);
@@ -402,7 +402,7 @@ void CN3FXBundleGame::Duplicate(CN3FXBundleGame* pDestBundle)
 				CN3FXPartBillBoardGame* pPart = (CN3FXPartBillBoardGame*)pDestBundle->m_pPart[i]->pPart;
 
 				pPart->m_pRefBundle = pDestBundle;
-				pPart->m_pRefPrevPart = NULL;
+				pPart->m_pRefPrevPart = nullptr;
 				pPart->m_iType = FX_PART_TYPE_BOARD;
 
 				pPart->Duplicate((CN3FXPartBillBoardGame*)m_pPart[i]->pPart);
@@ -417,7 +417,7 @@ void CN3FXBundleGame::Duplicate(CN3FXBundleGame* pDestBundle)
 				CN3FXPartMesh* pPart = (CN3FXPartMesh*)pDestBundle->m_pPart[i]->pPart;
 				
 				pPart->m_pRefBundle = pDestBundle;
-				pPart->m_pRefPrevPart = NULL;
+				pPart->m_pRefPrevPart = nullptr;
 				pPart->m_iType = FX_PART_TYPE_MESH;
 
 				pPart->Duplicate((CN3FXPartMesh*)m_pPart[i]->pPart);
@@ -433,7 +433,7 @@ void CN3FXBundleGame::Duplicate(CN3FXBundleGame* pDestBundle)
 				CN3FXPartBottomBoardGame* pPart = (CN3FXPartBottomBoardGame*)pDestBundle->m_pPart[i]->pPart;
 				
 				pPart->m_pRefBundle = pDestBundle;
-				pPart->m_pRefPrevPart = NULL;
+				pPart->m_pRefPrevPart = nullptr;
 				pPart->m_iType = FX_PART_TYPE_BOTTOMBOARD;
 
 				pPart->Duplicate((CN3FXPartBottomBoardGame*)m_pPart[i]->pPart);

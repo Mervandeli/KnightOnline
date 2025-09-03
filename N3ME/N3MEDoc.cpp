@@ -138,7 +138,7 @@ BOOL CN3MEDoc::OnSaveDocument(LPCTSTR lpszPathName)
 void CN3MEDoc::OnFileImportPostDataFromScene() 
 {
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "n3scene", NULL, dwFlags, "N3 Scene file(*.N3Scene)|*.N3Scene||", NULL);
+	CFileDialog dlg(TRUE, "n3scene", nullptr, dwFlags, "N3 Scene file(*.N3Scene)|*.N3Scene||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
@@ -152,21 +152,21 @@ void CN3MEDoc::OnFileImportPostDataFromScene()
 
 void CN3MEDoc::OnFileImportShapes() 
 {
-	CMapMng* pMapMng = NULL;
+	CMapMng* pMapMng = nullptr;
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	if(pFrm) pMapMng = pFrm->GetMapMng();
-	if(NULL == pMapMng) return;
+	if(nullptr == pMapMng) return;
 
 	char szBuff[256000] = "";
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "n3shape", NULL, dwFlags, "Shape files(*.N3Shape)|*.N3Shape||", NULL);
+	CFileDialog dlg(TRUE, "n3shape", nullptr, dwFlags, "Shape files(*.N3Shape)|*.N3Shape||", nullptr);
 	dlg.m_ofn.nMaxFile = 25600;
 	dlg.m_ofn.lpstrFile = szBuff;
 	if(dlg.DoModal() == IDCANCEL) return;
 	
 	POSITION pos = dlg.GetStartPosition();
 	CString szPath;
-	while(pos != NULL)
+	while(pos != nullptr)
 	{
 		szPath = dlg.GetNextPathName(pos);
 		pMapMng->ImportShape(szPath);

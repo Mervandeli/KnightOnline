@@ -125,7 +125,7 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 			}
 			else return FALSE;		// 문자는 안되~!
 
-			WriteFile(hFile, &cWrite, sizeof(cWrite), &dwNum, NULL);
+			WriteFile(hFile, &cWrite, sizeof(cWrite), &dwNum, nullptr);
 		}
 		break;
 	case DT_BYTE:
@@ -139,7 +139,7 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 			}
 			else return FALSE;		// 문자는 안되~!
 
-			WriteFile(hFile, &byteWrite, sizeof(byteWrite), &dwNum, NULL);
+			WriteFile(hFile, &byteWrite, sizeof(byteWrite), &dwNum, nullptr);
 		}
 		break;
 	case DT_SHORT:
@@ -153,7 +153,7 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 			}
 			else return FALSE;		// 문자는 안되~!
 
-			WriteFile(hFile, &iWrite, sizeof(iWrite), &dwNum, NULL);
+			WriteFile(hFile, &iWrite, sizeof(iWrite), &dwNum, nullptr);
 		}
 		break;
 	case DT_WORD:
@@ -167,7 +167,7 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 			}
 			else return FALSE;		// 문자는 안되~!
 
-			WriteFile(hFile, &iWrite, sizeof(iWrite), &dwNum, NULL);
+			WriteFile(hFile, &iWrite, sizeof(iWrite), &dwNum, nullptr);
 		}
 		break;
 	case DT_INT:
@@ -176,24 +176,24 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 			if (isdigit(lpszData[0]) || '-' == lpszData[0] )	iWrite = atoi(lpszData);
 			else return FALSE;		// 문자는 안되~!
 
-			WriteFile(hFile, &iWrite, sizeof(iWrite), &dwNum, NULL);
+			WriteFile(hFile, &iWrite, sizeof(iWrite), &dwNum, nullptr);
 		}
 		break;
 	case DT_DWORD:
 		{
 			uint32_t iWrite;
-			if (isdigit(lpszData[0]) )	iWrite = strtoul(lpszData, NULL, 10);
+			if (isdigit(lpszData[0]) )	iWrite = strtoul(lpszData, nullptr, 10);
 			else return FALSE;		// 문자는 안되~!
 
-			WriteFile(hFile, &iWrite, sizeof(iWrite), &dwNum, NULL);
+			WriteFile(hFile, &iWrite, sizeof(iWrite), &dwNum, nullptr);
 		}
 		break;
 	case DT_STRING:
 		{
 			std::string& szString = *((std::string*)lpszData);
 			int iStrLen = szString.size();
-			WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, NULL);
-			if (iStrLen>0) WriteFile(hFile, &(szString[0]), iStrLen, &dwNum, NULL);
+			WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);
+			if (iStrLen>0) WriteFile(hFile, &(szString[0]), iStrLen, &dwNum, nullptr);
 		}
 		break;
 	case DT_FLOAT:
@@ -202,7 +202,7 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 			if (isdigit(lpszData[0]) || '-' == lpszData[0] ||
 				'.' == lpszData[0] )	fWrite = (float)atof(lpszData);
 			else return FALSE;	// 문자는 안되~!
-			WriteFile(hFile, &fWrite, sizeof(fWrite), &dwNum, NULL);
+			WriteFile(hFile, &fWrite, sizeof(fWrite), &dwNum, nullptr);
 		}
 		break;
 	case DT_DOUBLE:
@@ -210,7 +210,7 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 			double dWrite;
 			if (isdigit(lpszData[0]) || '-' == lpszData[0] ||
 				'.' == lpszData[0] )	dWrite = atof(lpszData);
-			WriteFile(hFile, &dWrite, sizeof(dWrite), &dwNum, NULL);
+			WriteFile(hFile, &dWrite, sizeof(dWrite), &dwNum, nullptr);
 		}
 		break;
 
@@ -229,32 +229,32 @@ BOOL CN3TableBase<Type>::ReadData(HANDLE hFile, DATA_TYPE DataType, void* pData)
 	{
 	case DT_CHAR:
 		{
-			ReadFile(hFile, pData, sizeof(char), &dwNum, NULL);
+			ReadFile(hFile, pData, sizeof(char), &dwNum, nullptr);
 		}
 		break;
 	case DT_BYTE:
 		{
-			ReadFile(hFile, pData, sizeof(uint8_t), &dwNum, NULL);
+			ReadFile(hFile, pData, sizeof(uint8_t), &dwNum, nullptr);
 		}
 		break;
 	case DT_SHORT:
 		{
-			ReadFile(hFile, pData, sizeof(int16_t), &dwNum, NULL);
+			ReadFile(hFile, pData, sizeof(int16_t), &dwNum, nullptr);
 		}
 		break;
 	case DT_WORD:
 		{
-			ReadFile(hFile, pData, sizeof(uint16_t), &dwNum, NULL);
+			ReadFile(hFile, pData, sizeof(uint16_t), &dwNum, nullptr);
 		}
 		break;
 	case DT_INT:
 		{
-			ReadFile(hFile, pData, sizeof(int), &dwNum, NULL);
+			ReadFile(hFile, pData, sizeof(int), &dwNum, nullptr);
 		}
 		break;
 	case DT_DWORD:
 		{
-			ReadFile(hFile, pData, sizeof(uint32_t), &dwNum, NULL);
+			ReadFile(hFile, pData, sizeof(uint32_t), &dwNum, nullptr);
 		}
 		break;
 	case DT_STRING:
@@ -262,24 +262,24 @@ BOOL CN3TableBase<Type>::ReadData(HANDLE hFile, DATA_TYPE DataType, void* pData)
 			std::string& szString = *((std::string*)pData);
 			
 			int iStrLen = 0;
-			ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, NULL);
+			ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);
 
 			szString = "";
 			if (iStrLen>0)
 			{
 				szString.assign(iStrLen, ' ');
-				ReadFile(hFile, &(szString[0]), iStrLen, &dwNum, NULL);
+				ReadFile(hFile, &(szString[0]), iStrLen, &dwNum, nullptr);
 			}
 		}
 		break;
 	case DT_FLOAT:
 		{
-			ReadFile(hFile, pData, sizeof(float), &dwNum, NULL);
+			ReadFile(hFile, pData, sizeof(float), &dwNum, nullptr);
 		}
 		break;
 	case DT_DOUBLE:
 		{
-			ReadFile(hFile, pData, sizeof(double), &dwNum, NULL);
+			ReadFile(hFile, pData, sizeof(double), &dwNum, nullptr);
 		}
 		break;
 
@@ -296,7 +296,7 @@ BOOL CN3TableBase<Type>::LoadFromFile(const std::string& szFN)
 	if(szFN.empty()) return FALSE;
 
 	std::wstring wStr = s2ws(szFN);
-	HANDLE hFile = ::CreateFile(wStr.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = ::CreateFile(wStr.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	if(INVALID_HANDLE_VALUE == hFile)
 	{
@@ -329,7 +329,7 @@ BOOL CN3TableBase<Type>::LoadFromFile(const std::string& szFN)
 	// 원래 파일을 읽고..
 	uint8_t* pDatas = new uint8_t[dwSizeLow];
 	DWORD dwRWC = 0;
-	::ReadFile(hFile, pDatas, dwSizeLow, &dwRWC, NULL); // 암호화된 데이터 읽고..
+	::ReadFile(hFile, pDatas, dwSizeLow, &dwRWC, nullptr); // 암호화된 데이터 읽고..
 	CloseHandle(hFile); // 원래 파일 닫고
 
 // 테이블 만드는 툴에서 쓰는 키와 같은 키..
@@ -363,12 +363,12 @@ BOOL CN3TableBase<Type>::LoadFromFile(const std::string& szFN)
 
 	// 임시 파일에 쓴다음.. 다시 연다..
 	std::wstring wStr2 = s2ws(szFNTmp);
-	hFile = ::CreateFile(wStr2.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	::WriteFile(hFile, pDatas, dwSizeLow, &dwRWC, NULL); // 임시파일에 암호화 풀린 데이터 쓰기
+	hFile = ::CreateFile(wStr2.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	::WriteFile(hFile, pDatas, dwSizeLow, &dwRWC, nullptr); // 임시파일에 암호화 풀린 데이터 쓰기
 	CloseHandle(hFile); // 임시 파일 닫기
-	delete [] pDatas; pDatas = NULL;
+	delete [] pDatas; pDatas = nullptr;
 
-	hFile = ::CreateFile(wStr2.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL); // 임시 파일 읽기 모드로 열기.
+	hFile = ::CreateFile(wStr2.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr); // 임시 파일 읽기 모드로 열기.
 
 	
 
@@ -405,13 +405,13 @@ BOOL CN3TableBase<Type>::Load(HANDLE hFile)
 	// data(column) 의 구조가 어떻게 되어 있는지 읽기
 	DWORD dwNum;
 	int i, j, iDataTypeCount = 0;
-	ReadFile(hFile, &iDataTypeCount, 4, &dwNum, NULL);			// (엑셀에서 column 수)
+	ReadFile(hFile, &iDataTypeCount, 4, &dwNum, nullptr);			// (엑셀에서 column 수)
 
 	std::vector<int> offsets;
 	if (iDataTypeCount>0)
 	{
 		m_DataTypes.insert(m_DataTypes.begin(), iDataTypeCount, DT_NONE);
-		ReadFile(hFile, &(m_DataTypes[0]), sizeof(DATA_TYPE)*iDataTypeCount, &dwNum, NULL);	// 각각의 column에 해당하는 data type
+		ReadFile(hFile, &(m_DataTypes[0]), sizeof(DATA_TYPE)*iDataTypeCount, &dwNum, nullptr);	// 각각의 column에 해당하는 data type
 
 		if(FALSE == MakeOffsetTable(offsets))
 		{
@@ -429,7 +429,7 @@ BOOL CN3TableBase<Type>::Load(HANDLE hFile)
 
 	// row 가 몇줄인지 읽기
 	int iRC;
-	ReadFile(hFile, &iRC, sizeof(iRC), &dwNum, NULL);
+	ReadFile(hFile, &iRC, sizeof(iRC), &dwNum, nullptr);
 	Type Data;
 	for (i=0; i<iRC; ++i)
 	{

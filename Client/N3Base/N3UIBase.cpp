@@ -33,8 +33,8 @@ static char THIS_FILE[]=__FILE__;
 bool CN3UIBase::s_bWaitFromServer = false;
 #endif
 
-CN3UIEdit* CN3UIBase::s_pFocusedEdit = NULL;
-CN3UITooltip* CN3UIBase::s_pTooltipCtrl = NULL;
+CN3UIEdit* CN3UIBase::s_pFocusedEdit = nullptr;
+CN3UITooltip* CN3UIBase::s_pTooltipCtrl = nullptr;
 std::string CN3UIBase::s_szStringTmp; // 임시변수..
 
 CN3UIBase::CN3UIBase()
@@ -111,7 +111,7 @@ void CN3UIBase::Init(CN3UIBase* pParent)
 
 void CN3UIBase::RemoveChild(CN3UIBase* pChild)
 {
-	if(NULL == pChild) return;
+	if(nullptr == pChild) return;
 
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor;)
 	{
@@ -356,7 +356,7 @@ void CN3UIBase::Render()
 		pChild->Render();
 
 		//this_ui
-		CN3UIBase* pCUI = NULL;
+		CN3UIBase* pCUI = nullptr;
 		pCUI = pChild->m_pChildUI;
 		while(pCUI)
 		{
@@ -439,18 +439,18 @@ uint32_t CN3UIBase::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 bool CN3UIBase::EnableTooltip(const std::string& szFN)
 {
 	delete s_pTooltipCtrl;
-	s_pTooltipCtrl = NULL;
+	s_pTooltipCtrl = nullptr;
 	if (szFN.empty()) return false;
 	
 	s_pTooltipCtrl = new CN3UITooltip();
-	s_pTooltipCtrl->Init(NULL);
+	s_pTooltipCtrl->Init(nullptr);
 	s_pTooltipCtrl->LoadFromFile(szFN);
 	return true;
 }
 
 void CN3UIBase::DestroyTooltip()
 {
-	if (s_pTooltipCtrl) {delete s_pTooltipCtrl; s_pTooltipCtrl = NULL;}
+	if (s_pTooltipCtrl) {delete s_pTooltipCtrl; s_pTooltipCtrl = nullptr;}
 }
 
 void CN3UIBase::PrintChildIDs(void) {
@@ -462,19 +462,89 @@ void CN3UIBase::PrintChildIDs(void) {
 	}
 }
 
-CN3UIBase* CN3UIBase::GetChildByID(const std::string& szID)
+CN3UIBase* CN3UIBase::GetChildByID(const std::string_view szID) const
 {
 	if (szID.empty())
 		return nullptr;
 
 	for (CN3UIBase* pChild : m_Children)
 	{
-		if (lstrcmpiA(szID.c_str(), pChild->m_szID.c_str()) == 0)
+		const std::string& childID = pChild->GetID();
+		if (szID.length() == childID.length()
+			&& _strnicmp(szID.data(), childID.data(), szID.length()) == 0)
 			return pChild;
 	}
 
 	return nullptr;
 }
+
+CN3UIBase* CN3UIBase::GetChildByID(const std::string_view szID, eUI_TYPE eUIType) const
+{
+	if (szID.empty())
+		return nullptr;
+
+	for (CN3UIBase* pChild : m_Children)
+	{
+		if (eUIType != pChild->UIType())
+			continue;
+
+		const std::string& childID = pChild->GetID();
+		if (szID.length() == childID.length()
+			&& _strnicmp(szID.data(), childID.data(), szID.length()) == 0)
+			return pChild;
+	}
+
+	return nullptr;
+}
+
+template <eUI_TYPE... UITypes>
+static CN3UIBase* GetChildByIDImpl(const CN3UIBase* parent, const std::string_view szID)
+{
+	if (szID.empty())
+		return nullptr;
+
+	for (CN3UIBase* pChild : parent->GetChildren())
+	{
+		// Use a fold expression here to include all of the supported types.
+		if (((pChild->UIType() != UITypes) && ...))
+			continue;
+
+		const std::string& childID = pChild->GetID();
+		if (szID.length() == childID.length()
+			&& _strnicmp(szID.data(), childID.data(), szID.length()) == 0)
+			return pChild;
+	}
+
+	return nullptr;
+}
+
+#define IMPL_GETCHILDBYID(Class, MainUIType, ...)							\
+template <>																	\
+Class* CN3UIBase::GetChildByID<Class>(const std::string_view szID) const	\
+{																			\
+    return static_cast<Class*>(												\
+		GetChildByIDImpl<MainUIType, ##__VA_ARGS__>(this, szID));			\
+}
+
+// Preferred behaviour for this specialization would be to just use the base class, and not require UI_TYPE_BASE.
+// This is achievable with the method it already resolves to.
+// If we truly require verifying it is in fact UI_TYPE_BASE (which is pointless), the caller can pass it to the
+// base call themselves.
+// IMPL_GETCHILDBYID(CN3UIBase,		UI_TYPE_BASE);
+
+IMPL_GETCHILDBYID(CN3UIArea,		UI_TYPE_AREA);
+IMPL_GETCHILDBYID(CN3UIButton,		UI_TYPE_BUTTON);
+IMPL_GETCHILDBYID(CN3UIEdit,		UI_TYPE_EDIT);
+IMPL_GETCHILDBYID(CN3UIImage,		UI_TYPE_IMAGE);
+IMPL_GETCHILDBYID(CN3UIList,		UI_TYPE_LIST);
+IMPL_GETCHILDBYID(CN3UIProgress,	UI_TYPE_PROGRESS);
+IMPL_GETCHILDBYID(CN3UIScrollBar,	UI_TYPE_SCROLLBAR);
+IMPL_GETCHILDBYID(CN3UIStatic,		UI_TYPE_STATIC, UI_TYPE_EDIT);	// CN3UIEdit inherits from CN3UIStatic
+IMPL_GETCHILDBYID(CN3UIString,		UI_TYPE_STRING);
+IMPL_GETCHILDBYID(CN3UITooltip,		UI_TYPE_TOOLTIP);
+IMPL_GETCHILDBYID(CN3UITrackBar,	UI_TYPE_TRACKBAR);
+
+#undef IMPL_GETCHILDBYID
 
 void CN3UIBase::SetVisible(bool bVisible)
 {
@@ -524,13 +594,13 @@ void CN3UIBase::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFocus)
 		{
 			m_pChildUI->SetVisible(false);
 		}
-		m_pChildUI	= NULL;
+		m_pChildUI	= nullptr;
 		if(m_pParentUI)
 		{
 			if(m_pParentUI->m_pChildUI == this)
-				m_pParentUI->m_pChildUI = NULL;
+				m_pParentUI->m_pChildUI = nullptr;
 		}
-		m_pParentUI = NULL;
+		m_pParentUI = nullptr;
 		m_iChildID	= -1;
 	}
 }
@@ -538,19 +608,19 @@ void CN3UIBase::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFocus)
 #ifndef _N3TOOL
 void CN3UIBase::operator = (const CN3UIBase& other)
 {
-	Init(NULL);	// 일단 부모는 없게 초기화
+	Init(nullptr);	// 일단 부모는 없게 초기화
 
 	UIListItorConst it = other.m_Children.begin();
 	UIListItorConst itEnd = other.m_Children.end();
-	CN3UIBase* pOtherChild = NULL;
-	CN3UIBase* pChild = NULL;
+	CN3UIBase* pOtherChild = nullptr;
+	CN3UIBase* pChild = nullptr;
 	for(; it != itEnd; it++)
 	{
 		pOtherChild = *it;
 
-		if(NULL == pOtherChild) continue;
+		if(nullptr == pOtherChild) continue;
 
-		pChild = NULL;
+		pChild = nullptr;
 		switch(pOtherChild->UIType())
 		{
 		case UI_TYPE_BASE:
@@ -680,7 +750,7 @@ void CN3UIBase::operator = (const CN3UIBase& other)
 bool CN3UIBase::Save(HANDLE hFile)
 {
 	CN3BaseFileAccess::Save(hFile);
-	DWORD dwRWC = NULL;
+	DWORD dwRWC = 0;
 
 	// child 정보
 	int iCC = m_Children.size();
@@ -691,16 +761,16 @@ bool CN3UIBase::Save(HANDLE hFile)
 		int16_t sCC = static_cast<int16_t>(iCC);
 		int16_t sIdk0 = 1; // unknown
 
-		WriteFile(hFile, &sCC, sizeof(int16_t), &dwRWC, NULL); // children count
-		WriteFile(hFile, &sIdk0, sizeof(int16_t), &dwRWC, NULL); //unknown
+		WriteFile(hFile, &sCC, sizeof(int16_t), &dwRWC, nullptr); // children count
+		WriteFile(hFile, &sIdk0, sizeof(int16_t), &dwRWC, nullptr); //unknown
 
 	}
 	else
 	{
-		WriteFile(hFile, &iCC, sizeof(iCC), &dwRWC, NULL);
+		WriteFile(hFile, &iCC, sizeof(iCC), &dwRWC, nullptr);
 	}
 
-	//WriteFile(hFile, &iCC, sizeof(iCC), &dwRWC, NULL); // Child 갯수 ㅆ고..고..
+	//WriteFile(hFile, &iCC, sizeof(iCC), &dwRWC, nullptr); // Child 갯수 ㅆ고..고..
 
 	for(UIListReverseItor itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
 	// childadd할때 push_front이므로 저장할 때 거꾸로 저장해야 한다.
@@ -708,33 +778,33 @@ bool CN3UIBase::Save(HANDLE hFile)
 		CN3UIBase* pChild = (*itor);
 		eUI_TYPE eUIType = pChild->UIType();
 
-		WriteFile(hFile, &eUIType, sizeof(eUIType), &dwRWC, NULL); // UI Type 쓰고..
+		WriteFile(hFile, &eUIType, sizeof(eUIType), &dwRWC, nullptr); // UI Type 쓰고..
 		pChild->Save(hFile);
 	}
 
 	// base 정보
 	int iIDLen = 0;
 	iIDLen = m_szID.size();
-	WriteFile(hFile, &iIDLen, sizeof(iIDLen), &dwRWC, NULL);				// id length
-	if (iIDLen>0) WriteFile(hFile, m_szID.c_str(), iIDLen, &dwRWC, NULL);			// ui id
-	WriteFile(hFile, &m_rcRegion, sizeof(m_rcRegion), &dwRWC, NULL);		// m_rcRegion
-	WriteFile(hFile, &m_rcMovable, sizeof(m_rcMovable), &dwRWC, NULL);		// m_rcMovable
-	WriteFile(hFile, &m_dwStyle, sizeof(m_dwStyle), &dwRWC, NULL);			// style
-	WriteFile(hFile, &m_dwReserved, sizeof(m_dwReserved), &dwRWC, NULL);	//	m_dwReserved
+	WriteFile(hFile, &iIDLen, sizeof(iIDLen), &dwRWC, nullptr);				// id length
+	if (iIDLen>0) WriteFile(hFile, m_szID.c_str(), iIDLen, &dwRWC, nullptr);			// ui id
+	WriteFile(hFile, &m_rcRegion, sizeof(m_rcRegion), &dwRWC, nullptr);		// m_rcRegion
+	WriteFile(hFile, &m_rcMovable, sizeof(m_rcMovable), &dwRWC, nullptr);		// m_rcMovable
+	WriteFile(hFile, &m_dwStyle, sizeof(m_dwStyle), &dwRWC, nullptr);			// style
+	WriteFile(hFile, &m_dwReserved, sizeof(m_dwReserved), &dwRWC, nullptr);	//	m_dwReserved
 
 	int iTooltipLen = m_szToolTip.size();
-	WriteFile(hFile, &iTooltipLen, sizeof(iTooltipLen), &dwRWC, NULL);		//	tooltip문자열 길이
-	if (iTooltipLen>0) WriteFile(hFile, m_szToolTip.c_str(), iTooltipLen, &dwRWC, NULL);
+	WriteFile(hFile, &iTooltipLen, sizeof(iTooltipLen), &dwRWC, nullptr);		//	tooltip문자열 길이
+	if (iTooltipLen>0) WriteFile(hFile, m_szToolTip.c_str(), iTooltipLen, &dwRWC, nullptr);
 
 	int iSndFNLen = 0;
 	if (m_pSnd_OpenUI) iSndFNLen = m_pSnd_OpenUI->m_szFileName.size();
-	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwRWC, NULL);		//	사운드 파일 문자열 길이
-	if (iSndFNLen>0) WriteFile(hFile, m_pSnd_OpenUI->m_szFileName.c_str(), iSndFNLen, &dwRWC, NULL);
+	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwRWC, nullptr);		//	사운드 파일 문자열 길이
+	if (iSndFNLen>0) WriteFile(hFile, m_pSnd_OpenUI->m_szFileName.c_str(), iSndFNLen, &dwRWC, nullptr);
 
 	iSndFNLen = 0;
 	if (m_pSnd_CloseUI) iSndFNLen = m_pSnd_CloseUI->m_szFileName.size();
-	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwRWC, NULL);		//	사운드 파일 문자열 길이
-	if (iSndFNLen>0) WriteFile(hFile, m_pSnd_CloseUI->m_szFileName.c_str(), iSndFNLen, &dwRWC, NULL);
+	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwRWC, nullptr);		//	사운드 파일 문자열 길이
+	if (iSndFNLen>0) WriteFile(hFile, m_pSnd_CloseUI->m_szFileName.c_str(), iSndFNLen, &dwRWC, nullptr);
 	
 	return true;
 }
@@ -929,19 +999,19 @@ void CN3UIBase::ArrangeZOrder()
 
 void CN3UIBase::operator = (const CN3UIBase& other)
 {
-	Init(NULL);	// 일단 부모는 없게 초기화
+	Init(nullptr);	// 일단 부모는 없게 초기화
 
 	UIListItorConst it = other.m_Children.begin();
 	UIListItorConst itEnd = other.m_Children.end();
-	CN3UIBase* pOtherChild = NULL;
-	CN3UIBase* pChild = NULL;
+	CN3UIBase* pOtherChild = nullptr;
+	CN3UIBase* pChild = nullptr;
 	for(; it != itEnd; it++)
 	{
 		pOtherChild = *it;
 
-		if(NULL == pOtherChild) continue;
+		if(nullptr == pOtherChild) continue;
 
-		pChild = NULL;
+		pChild = nullptr;
 		switch(pOtherChild->UIType())
 		{
 		case UI_TYPE_BASE:

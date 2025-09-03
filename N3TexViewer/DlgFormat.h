@@ -19,7 +19,7 @@ public:
 	int			m_nHeight;
 	BOOL		m_bMipMap;
 
-	CDlgFormat(CWnd* pParent = NULL);   // standard constructor
+	CDlgFormat(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgFormat)

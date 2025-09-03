@@ -28,7 +28,7 @@ public:
 	DataPack()
 	{
 		m_Size = 0;
-		m_pData = NULL;
+		m_pData = nullptr;
 	}
 	DataPack(int size, BYTE *pData)
 	{

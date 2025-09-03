@@ -18,7 +18,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgEditFxg dialog
 
 
-CDlgEditFxg::CDlgEditFxg(CWnd* pParent /*=NULL*/)
+CDlgEditFxg::CDlgEditFxg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgEditFxg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgEditFxg)
@@ -235,7 +235,7 @@ void CDlgEditFxg::OnBtnSave()
 void CDlgEditFxg::OnBtnLoadFxb0() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "fxb", NULL, dwFlags, "fxb File(*.fxb)|*.fxb||", NULL);
+	CFileDialog dlg(TRUE, "fxb", nullptr, dwFlags, "fxb File(*.fxb)|*.fxb||", nullptr);
 	
 	if(dlg.DoModal() == IDCANCEL) return;
 
@@ -247,7 +247,7 @@ void CDlgEditFxg::OnBtnLoadFxb0()
 void CDlgEditFxg::OnBtnLoadFxb1() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "fxb", NULL, dwFlags, "fxb File(*.fxb)|*.fxb||", NULL);
+	CFileDialog dlg(TRUE, "fxb", nullptr, dwFlags, "fxb File(*.fxb)|*.fxb||", nullptr);
 	
 	if(dlg.DoModal() == IDCANCEL) return;
 
@@ -259,7 +259,7 @@ void CDlgEditFxg::OnBtnLoadFxb1()
 void CDlgEditFxg::OnBtnLoadFxb2() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "fxb", NULL, dwFlags, "fxb File(*.fxb)|*.fxb||", NULL);
+	CFileDialog dlg(TRUE, "fxb", nullptr, dwFlags, "fxb File(*.fxb)|*.fxb||", nullptr);
 	
 	if(dlg.DoModal() == IDCANCEL) return;
 
@@ -271,7 +271,7 @@ void CDlgEditFxg::OnBtnLoadFxb2()
 void CDlgEditFxg::OnBtnLoadFxb3() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
-	CFileDialog dlg(TRUE, "fxb", NULL, dwFlags, "fxb File(*.fxb)|*.fxb||", NULL);
+	CFileDialog dlg(TRUE, "fxb", nullptr, dwFlags, "fxb File(*.fxb)|*.fxb||", nullptr);
 	
 	if(dlg.DoModal() == IDCANCEL) return;
 

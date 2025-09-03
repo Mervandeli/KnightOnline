@@ -6,6 +6,7 @@
 #include "PlayerNPC.h"
 #include "GameProcMain.h"
 #include "N3WorldManager.h"
+#include "PlayerMySelf.h"
 
 #include <N3Base/N3Shape.h>
 #include <N3Base/N3ShapeMgr.h>
@@ -123,5 +124,18 @@ void CPlayerNPC::MoveTo(float fPosX, float fPosY, float fPosZ, float fSpeed, int
 	else
 	{
 //		__ASSERT(0, "Invalid Move Mode");
+	}
+}
+
+void CPlayerNPC::SetSoundAndInitFont(uint32_t dwFontFlag)
+{
+	CPlayerBase::SetSoundAndInitFont(dwFontFlag);
+
+	if (s_pPlayer->m_InfoBase.iAuthority == AUTHORITY_MANAGER)
+	{
+		// NOTE: Type is the AI state (not the NPC's type as you'd expect), but it's not sent at all here,
+		// and is rarely ever even sent officially, so we'll just placeholder it to 0 for now.
+		std::string szInfo = fmt::format("ID({}) : TYPE({})", m_InfoBase.iID, 0);
+		InfoStringSet(szInfo, D3DCOLOR_XRGB(0, 255, 0));
 	}
 }

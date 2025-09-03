@@ -17,7 +17,7 @@ static char THIS_FILE[]=__FILE__;
 
 CBirdMng::CBirdMng()
 {
-	m_pBird = NULL;
+	m_pBird = nullptr;
 	Release();
 }
 
@@ -31,7 +31,7 @@ void CBirdMng::Release()
 	if(m_pBird)
 	{
 		delete[] m_pBird;
-		m_pBird = NULL;
+		m_pBird = nullptr;
 	}
 	m_iBirdCount = 0;
 }
@@ -42,15 +42,8 @@ void CBirdMng::LoadFromFile(const std::string& szFN)
 
 	if(szFN.empty()) return;
 	FILE* stream = fopen(szFN.c_str(), "r"); //text파일로 만든다 
-
-	if(NULL == stream)
-	{
-#if _DEBUG
-		std::string szErr = fmt::format("failed to open file - {}", szFN);
-		__ASSERT(stream, szErr.c_str());
-#endif
+	if (stream == nullptr)
 		return;
-	}
 
 	int i;
 	char szRrcName[_MAX_PATH];

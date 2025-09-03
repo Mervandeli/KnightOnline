@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgAnimate dialog
 
 
-CDlgAnimate::CDlgAnimate(CWnd* pParent /*=NULL*/)
+CDlgAnimate::CDlgAnimate(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgAnimate::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgAnimate)

@@ -47,25 +47,25 @@ BOOL CScaleDummy::MouseMsgFilter(LPMSG pMsg)
 				case DUMMY_CENTER:
 					{
 						__Vector3 vDiffScale;	vDiffScale.Set(fFactor, fFactor, fFactor);
-						TransDiff(NULL, NULL, &vDiffScale);
+						TransDiff(nullptr, nullptr, &vDiffScale);
 					}
 					break;
 				case DUMMY_X:
 					{
 						__Vector3 vDiffScale;	vDiffScale.Set(fFactor, 1, 1);
-						TransDiff(NULL, NULL, &vDiffScale);
+						TransDiff(nullptr, nullptr, &vDiffScale);
 					}
 					break;
 				case DUMMY_Y:
 					{
 						__Vector3 vDiffScale;	vDiffScale.Set(1, fFactor, 1);
-						TransDiff(NULL, NULL, &vDiffScale);
+						TransDiff(nullptr, nullptr, &vDiffScale);
 					}
 					break;
 				case DUMMY_Z:
 					{
 						__Vector3 vDiffScale;	vDiffScale.Set(1, 1, fFactor);
-						TransDiff(NULL, NULL, &vDiffScale);
+						TransDiff(nullptr, nullptr, &vDiffScale);
 					}
 					break;
 				}

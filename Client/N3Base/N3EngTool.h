@@ -65,7 +65,7 @@ public:
 public:
 //	bool CreateExtraDevice(int nWidth, int nHeight);
 	void GridCreate(int nWidth, int nHeight);
-	void RenderTexturePreview(CN3Texture* pTex, HWND hDlgWndDiffuse, RECT* pRCSrc = NULL);
+	void RenderTexturePreview(CN3Texture* pTex, HWND hDlgWndDiffuse, RECT* pRCSrc = nullptr);
 	void RenderGrid(const __Matrix44& mtxWorld);
 	void RenderAxis(bool bShowDir = false);
 

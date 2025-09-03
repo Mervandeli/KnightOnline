@@ -37,9 +37,7 @@
 #include "UIHotKeyDlg.h"
 #include "UIClassChange.h"
 #include "UINpcEvent.h"
-#include "UIItemExchange.h"
 #include "UIRepairTooltipDlg.h"
-#include "UINpcTalk.h"
 #include "UIKnightsOperation.h"
 #include "UIPartyBBS.h"
 #include "UIWareHouseDlg.h"
@@ -74,8 +72,9 @@
 #include <N3Base/N3SndObjStream.h>
 #include <N3Base/N3SndMgr.h>
 
-#include <io.h>
+#include <N3Base/N3UIButton.h>
 
+#include <io.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -122,8 +121,8 @@ CGameProcMain::CGameProcMain()				// r기본 생성자.. 각 변수의 역활은
 	m_fRequestGameSave = 300.0f;
 
 	//sound obj...
-	m_pSnd_Town = NULL;
-	m_pSnd_Battle = NULL;
+	m_pSnd_Town = nullptr;
+	m_pSnd_Battle = nullptr;
 
 	m_iJoinReqClan = 0;
 	m_iJoinReqClanRequierID = 0;
@@ -146,7 +145,6 @@ CGameProcMain::CGameProcMain()				// r기본 생성자.. 각 변수의 역활은
 	m_pUINotice = new CUINotice();
 	m_pUIClassChange = new CUIClassChange();
 	m_pUINpcEvent = new CUINPCEvent();
-	m_pUIItemREDlg = new CUIItemExchange();
 	m_pUIRepairTooltip = new CUIRepairTooltipDlg();
 	m_pUIDroppedItemDlg = new CUIDroppedItemDlg();
 	m_pUITransactionDlg = new CUITransactionDlg();
@@ -156,7 +154,6 @@ CGameProcMain::CGameProcMain()				// r기본 생성자.. 각 변수의 역활은
 	m_pUICmdListDlg = new CUICmdList();
 	m_pUICmdEditDlg = new CUICmdEdit();
 	m_pUIHotKeyDlg = new CUIHotKeyDlg();
-	m_pUINpcTalk = new CUINpcTalk();
 	m_pUIKnightsOp = new CUIKnightsOperation();			// 기사단 리스트 보기, 가입, 등...
 	m_pUIPartyBBS = new CUIPartyBBS(); // 파티 지원 시스템 게시판??..
 	m_pUIWareHouseDlg = new CUIWareHouseDlg();
@@ -200,8 +197,6 @@ CGameProcMain::~CGameProcMain()
 	delete m_pUINotice;
 	delete m_pUIClassChange;
 	delete m_pUINpcEvent;
-	delete m_pUIItemREDlg;
-	delete m_pUIRepairTooltip;
 	delete m_pUIDroppedItemDlg;
 	delete m_pUITransactionDlg;
 	delete m_pUIInventory;
@@ -210,7 +205,6 @@ CGameProcMain::~CGameProcMain()
 	delete m_pUICmdListDlg;
 	delete m_pUICmdEditDlg;
 	delete m_pUIHotKeyDlg;
-	delete m_pUINpcTalk;
 	delete m_pUIKnightsOp;
 	delete m_pUIPartyBBS;
 	delete m_pUIWareHouseDlg;
@@ -265,15 +259,12 @@ void CGameProcMain::ReleaseUIs()
 	m_pUINotice->Release();
 	m_pUIClassChange->Release();
 	m_pUINpcEvent->Release();
-	m_pUIItemREDlg->Release();
 	m_pUIRepairTooltip->Release();
 	m_pUIPartyOrForce->Release();
 	m_pUISkillTreeDlg->Release();
 	m_pUICmdListDlg->Release();
 	m_pUICmdEditDlg->Release();
 	m_pUIHotKeyDlg->Release();
-	m_pUINpcTalk->Release();
-//	m_pUITradeList->Release();
 	m_pUIKnightsOp->Release();			// 기사단 리스트 보기, 가입, 등...
 	m_pUIPartyBBS->Release();
 	m_pUIWareHouseDlg->Release();
@@ -320,7 +311,7 @@ void CGameProcMain::Init()
 	this->InitZone(s_pPlayer->m_InfoExt.iZoneCur, s_pPlayer->Position()); // 존 로딩..
 
 	//sound obj...
-	if(m_pSnd_Battle==NULL)
+	if(m_pSnd_Battle==nullptr)
 	{
 		int iIDSndBattle = ((NATION_KARUS == s_pPlayer->m_InfoBase.eNation) ? ID_SOUND_BGM_KA_BATTLE : ID_SOUND_BGM_EL_BATTLE);
 		m_pSnd_Battle = s_pEng->s_SndMgr.CreateStreamObj(iIDSndBattle);	// 전투음악 ID
@@ -330,13 +321,13 @@ void CGameProcMain::Init()
 			m_pSnd_Battle->Stop();
 		}
 	}
-	if(m_pSnd_Town==NULL)
+	if(m_pSnd_Town==nullptr)
 	{
 		m_pSnd_Town = s_pEng->s_SndMgr.CreateStreamObj(ID_SOUND_BGM_TOWN);	// 마을음악 ID
 		if(m_pSnd_Town)
 		{
 			m_pSnd_Town->Looping(true);
-			m_pSnd_Town->Play(NULL, 3.0f);
+			m_pSnd_Town->Play(nullptr, 3.0f);
 		}
 	}
 
@@ -492,7 +483,7 @@ void CGameProcMain::InitPlayerPosition(const __Vector3& vPos) // 플레이어 �
 	this->TargetSelect(-1, false); // 타겟 해제..
 	this->UpdateCameraAndLight(); // 카메라와 라이트 다시 계산..
 
-	s_pPlayer->Action(PSA_BASIC, true, NULL, true); // 강제로 기본 자세..
+	s_pPlayer->Action(PSA_BASIC, true, nullptr, true); // 강제로 기본 자세..
 }
 
 void CGameProcMain::Tick()
@@ -732,11 +723,11 @@ void CGameProcMain::Render()
 
 void CGameProcMain::RenderTarget()
 {
-	if(NULL == m_pTargetSymbol) return;
+	if(nullptr == m_pTargetSymbol) return;
 
 	// 플레이어가 타겟으로 잡은 캐릭터의 위치위에 그리면 된다..
 	CPlayerBase* pTarget = s_pOPMgr->CharacterGetByID(s_pPlayer->m_iIDTarget, false);//시체로 판정되기 전까지의 캐릭은 포커스를 준다.
-	if(NULL == pTarget && NULL == s_pPlayer->m_pObjectTarget) return;
+	if(nullptr == pTarget && nullptr == s_pPlayer->m_pObjectTarget) return;
 
 	float fScale = 1;
 	float fYScale = 1;
@@ -1205,7 +1196,7 @@ void CGameProcMain::ProcessLocalInput(uint32_t dwMouseFlags)
 	else if( s_pLocalInput->IsKeyPress(KM_HOTKEY8) ) iHotKey = 7;
 		
 	if ((iHotKey >= 0 && iHotKey < 8) &&
-		CN3UIBase::GetFocusedEdit() == NULL && 
+		CN3UIBase::GetFocusedEdit() == nullptr && 
 		m_pSubProcPerTrade->m_ePerTradeState == PER_TRADE_STATE_NONE )
 	{
 		m_pUIHotKeyDlg->EffectTriggerByHotKey(iHotKey);
@@ -1227,7 +1218,7 @@ void CGameProcMain::ProcessLocalInput(uint32_t dwMouseFlags)
 		if(fPitch) s_pEng->CameraPitchAdd(fPitch);
 	}
 
-	if (!IsUIKeyOperated() && NULL == CN3UIBase::GetFocusedEdit() )			// 채팅모드가 아닐때 
+	if (!IsUIKeyOperated() && nullptr == CN3UIBase::GetFocusedEdit() )			// 채팅모드가 아닐때 
 	{
 		if(s_pPlayer->m_InfoBase.iAuthority == AUTHORITY_MANAGER) //게임 운영자는 이 기능을 사용할수 있다.
 		{
@@ -1284,7 +1275,7 @@ void CGameProcMain::ProcessLocalInput(uint32_t dwMouseFlags)
 				else
 					bStart = true;// 누르는 순간이면
 			}
-			this->CommandMove(MD_FOWARD, bStart); // 앞으로 이동..
+			this->CommandMove(MD_FORWARD, bStart); // 앞으로 이동..
 		}
 		else if(s_pLocalInput->IsKeyDown(KM_MOVE_BACKWARD) || s_pLocalInput->IsKeyDown(DIK_DOWN))
 		{
@@ -1548,7 +1539,7 @@ void CGameProcMain::MsgSend_Regen()
 
 bool CGameProcMain::MsgSend_RequestItemBundleOpen(CPlayerNPC* pCorpse)
 {
-	if( NULL == pCorpse || pCorpse->m_iDroppedItemID <= 0) return false;
+	if( nullptr == pCorpse || pCorpse->m_iDroppedItemID <= 0) return false;
 
 	float fDistTmp = (pCorpse->Position() - s_pPlayer->Position()).Magnitude();
 	if(	fDistTmp >= (pCorpse->Radius() * 2.0f + 6.0f)) return false;
@@ -1588,7 +1579,7 @@ bool CGameProcMain::MsgSend_PartyOrForceCreate(int iPartyOrForce, const std::str
 
 	bool bIAmLeader, bIAmMember;
 	int iMemberIndex = -1;
-	CPlayerBase* pTarget = NULL;
+	CPlayerBase* pTarget = nullptr;
 	this->PartyOrForceConditionGet(bIAmLeader, bIAmMember, iMemberIndex, pTarget);
 	if(true == bIAmMember && false == bIAmLeader) return false; // 내가 파티에 들어 있고 리더가 아니면 실패..
 
@@ -1620,8 +1611,8 @@ bool CGameProcMain::MsgSend_PartyOrForceCreate(int iPartyOrForce, const std::str
 			s_pPlayer->m_InfoBase.eClass, 
 			s_pPlayer->m_InfoBase.iHP, 
 			s_pPlayer->m_InfoBase.iHPMax,
-			s_pPlayer->m_InfoBase.iMP,
-			s_pPlayer->m_InfoBase.iMPMax);  // 내건 미리 넣어 놓는다..
+			s_pPlayer->m_InfoExt.iMSP,
+			s_pPlayer->m_InfoExt.iMSPMax);  // 내건 미리 넣어 놓는다..
 	}
 
 	//TRACE ("Party or Force 생성 신청 - Target ID(%s)\n", szID.c_str());
@@ -1633,7 +1624,7 @@ void CGameProcMain::MsgSend_PartyOrForceLeave(int iPartyOrForce)
 {
 	if(m_pUIPartyOrForce->MemberCount() <= 0) return; // 파티원이 없다..
 
-	CPlayerBase* pTarget = NULL;
+	CPlayerBase* pTarget = nullptr;
 	bool bIAmLeader, bIAmMember;
 	int iMemberIndex = -1;
 	this->PartyOrForceConditionGet(bIAmLeader, bIAmMember, iMemberIndex, pTarget);
@@ -1933,8 +1924,8 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 
 	m_pUIPartyOrForce->MemberInfoReInit(); // 파티 창.. 갱신..
 	
-	__TABLE_ITEM_BASIC* pItem = NULL;								// 아이템 테이블 구조체 포인터..	
-	__TABLE_ITEM_EXT* pItemExt = NULL;								// 아이템 테이블 구조체 포인터..	
+	__TABLE_ITEM_BASIC* pItem = nullptr;								// 아이템 테이블 구조체 포인터..	
+	__TABLE_ITEM_EXT* pItemExt = nullptr;								// 아이템 테이블 구조체 포인터..	
 
 	int iItemIDInInventorys[MAX_ITEM_INVENTORY]; memset(iItemIDInInventorys, -1, sizeof(iItemIDInInventorys));
 	int iItemCountInInventorys[MAX_ITEM_INVENTORY]; memset(iItemCountInInventorys, -1, sizeof(iItemCountInInventorys));
@@ -1972,9 +1963,9 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 		if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
 			pItemExt = s_pTbl_Items_Exts[pItem->byExtIndex].Find(iItemIDInSlots[i]%1000);	// 열 데이터 얻기..
 		else
-			pItemExt = NULL;
+			pItemExt = nullptr;
 
-		if ( NULL == pItem || NULL == pItemExt )
+		if ( nullptr == pItem || nullptr == pItemExt )
 		{
 			__ASSERT(0, "NULL Item!!!");
 			CLogWriter::Write("MyInfo - slot - Unknown Item {}, IDNumber", iItemIDInSlots[i]);
@@ -2054,10 +2045,10 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 		if(!iItemIDInInventorys[i]) continue;
 
 		pItem = s_pTbl_Items_Basic.Find(iItemIDInInventorys[i]/1000*1000);	// 열 데이터 얻기..
-		pItemExt = NULL;
+		pItemExt = nullptr;
 		if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
 			pItemExt = s_pTbl_Items_Exts[pItem->byExtIndex].Find(iItemIDInInventorys[i]%1000);	// 열 데이터 얻기..
-		if ( NULL == pItem || NULL == pItemExt )
+		if ( nullptr == pItem || nullptr == pItemExt )
 		{
 			__ASSERT(0, "NULL Item");
 			CLogWriter::Write("MyInfo - Inv - Unknown Item {}, IDNumber", iItemIDInInventorys[i]);
@@ -2088,13 +2079,13 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 	if (m_pUIHotKeyDlg) m_pUIHotKeyDlg->UpdateDisableCheck();
 
 	if(s_pPlayer->Part(PART_POS_UPPER)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다..
-		s_pPlayer->PartSet(PART_POS_UPPER, pLooks->szPartFNs[PART_POS_UPPER], NULL, NULL);	// 상체..
+		s_pPlayer->PartSet(PART_POS_UPPER, pLooks->szPartFNs[PART_POS_UPPER], nullptr, nullptr);	// 상체..
 	if(s_pPlayer->Part(PART_POS_LOWER)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다..
-		s_pPlayer->PartSet(PART_POS_LOWER, pLooks->szPartFNs[PART_POS_LOWER], NULL, NULL);	// 하체..
+		s_pPlayer->PartSet(PART_POS_LOWER, pLooks->szPartFNs[PART_POS_LOWER], nullptr, nullptr);	// 하체..
 	if(s_pPlayer->Part(PART_POS_HANDS)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다..
-		s_pPlayer->PartSet(PART_POS_HANDS,  pLooks->szPartFNs[PART_POS_HANDS], NULL, NULL);	// 팔..
+		s_pPlayer->PartSet(PART_POS_HANDS,  pLooks->szPartFNs[PART_POS_HANDS], nullptr, nullptr);	// 팔..
 	if(s_pPlayer->Part(PART_POS_FEET)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다..
-		s_pPlayer->PartSet(PART_POS_FEET,  pLooks->szPartFNs[PART_POS_FEET], NULL, NULL);	// 다리..
+		s_pPlayer->PartSet(PART_POS_FEET,  pLooks->szPartFNs[PART_POS_FEET], nullptr, nullptr);	// 다리..
 	if(s_pPlayer->Part(PART_POS_FACE)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다..
 		s_pPlayer->InitFace();
 	if(s_pPlayer->Part(PART_POS_HAIR_HELMET)->FileName().empty()) // 아무것도 세팅안되어 있으면 파일 이름이 없다..
@@ -2121,7 +2112,7 @@ bool CGameProcMain::MsgRecv_MyInfo_All(Packet& pkt)
 	this->InitPlayerPosition(__Vector3(fX, fY, fZ)); // 플레이어 위치 초기화.. 일으켜 세우고, 기본동작을 취하게 한다.
 
 	// berserk temp
-	//s_pPlayer->PlugSet(PLUG_POS_BACK, "item/babacloak.n3cplug_cloak", NULL);	// 파트를 셋팅..
+	//s_pPlayer->PlugSet(PLUG_POS_BACK, "item/babacloak.n3cplug_cloak", nullptr);	// 파트를 셋팅..
 	// end berserk temp
 
 	// berserk
@@ -2230,7 +2221,7 @@ bool CGameProcMain::MsgRecv_Chat(Packet& pkt)
 	}
 	
 	// 풍선말 넣기..
-	CPlayerBase* pBPC = NULL;
+	CPlayerBase* pBPC = nullptr;
 	if(iID == s_pPlayer->IDNumber()) pBPC = s_pPlayer;
 	else pBPC = s_pOPMgr->CharacterGetByID(iID, false);
 	if(pBPC && s_pPlayer->Distance(pBPC->Position()) < 4.0f &&
@@ -2264,7 +2255,7 @@ bool CGameProcMain::MsgRecv_UserMove(Packet& pkt)
 		else
 		{
 			CPlayerNPC* pBPC = s_pOPMgr->CharacterGetByID(iID, true);	// 다른 플레이어를 얻어서..
-			if (NULL == pBPC)
+			if (nullptr == pBPC)
 			{
 				this->MsgSend_UserInRequest(iID); // User 정보가 없을 경우 요청한다..
 				return false;
@@ -2285,7 +2276,7 @@ bool CGameProcMain::MsgRecv_UserMove(Packet& pkt)
 	}
 
 	CPlayerOther* pUPC = s_pOPMgr->UPCGetByID(iID, true);	// 다른 플레이어를 얻어서..
-	if (NULL == pUPC) return false;
+	if (nullptr == pUPC) return false;
 
 //	if(0.0f != fSpeed) TRACE("Move - %4.1f ( %d : Mode %d ) %.2f초\n", fSpeed, iID, byMoveFlag, CN3Base::TimeGet());
 //	else TRACE("Stop - %4.1f ( %d : Mode %d )  %.2f초\n", fSpeed, iID, byMoveFlag, CN3Base::TimeGet());
@@ -2303,9 +2294,9 @@ bool CGameProcMain::MsgRecv_Rotation(Packet& pkt)
 
 	if(s_pPlayer->IDNumber() == iID) return false;
 
-	CPlayerNPC* pBPC = NULL;
+	CPlayerNPC* pBPC = nullptr;
 	pBPC = s_pOPMgr->CharacterGetByID(iID, true);	// 다른 유저 얻어서..
-	if ( NULL == pBPC ) return false;
+	if ( nullptr == pBPC ) return false;
 
 	pBPC->RotateTo(fYaw, false);	// 서버로 부터 받은 x, y, z값으로 
 
@@ -2320,14 +2311,14 @@ bool CGameProcMain::MsgRecv_Dead(Packet& pkt)
 
 	if ( iID == s_pPlayer->IDNumber() )
 	{
-		s_pPlayer->Action(PSA_PRE_DYING, true, NULL, true); // 플레이어 죽이기.
+		s_pPlayer->Action(PSA_PRE_DYING, true, nullptr, true); // 플레이어 죽이기.
 	}
 	else
 	{
 		CPlayerOther* pReadyToDead = s_pOPMgr->PlayerGetByID(iID, true); // 살아 있는 넘들중에서 검색해보고..
 		if(pReadyToDead) // 있으면 죽기직전으로 만든다.
 		{
-			pReadyToDead->Acttion(PSA_PRE_DYING, true, NULL, true);
+			pReadyToDead->Acttion(PSA_PRE_DYING, true, nullptr, true);
 		}
 	}
 
@@ -2544,7 +2535,7 @@ bool CGameProcMain::MsgRecv_UserIn(Packet& pkt, bool bWithFX)
 
 		// NOTE(srmeier): probably shouldn't be requesting this player's info if it's already in the manager...
 
-		//pUPC->Action(PSA_BASIC, true, NULL, true); // 강제로 살리고..
+		//pUPC->Action(PSA_BASIC, true, nullptr, true); // 강제로 살리고..
 		//pUPC->m_fTimeAfterDeath = 0;
 		//pUPC->PositionSet(__Vector3(fXPos, fYPos, fZPos), true);
 
@@ -2581,12 +2572,12 @@ bool CGameProcMain::MsgRecv_UserIn(Packet& pkt, bool bWithFX)
 	// 앉아 있기.., 서있기 결정..
 	if(1 == iStatus) // 서있기..
 	{
-		pUPC->Action(PSA_BASIC, true, NULL, true);
+		pUPC->Action(PSA_BASIC, true, nullptr, true);
 		pUPC->ActionMove(PSM_STOP);
 	}
 	else if(2 == iStatus) // 앉아 있기..
 	{
-		pUPC->Action(PSA_SITDOWN, true, NULL, true);
+		pUPC->Action(PSA_SITDOWN, true, nullptr, true);
 		pUPC->ActionMove(PSM_STOP);
 	}
 	else if(3 == iStatus) // 죽어 있다..
@@ -2629,7 +2620,7 @@ bool CGameProcMain::MsgRecv_UserOut(Packet& pkt)
 
 	//죽은 상태의 캐릭터를 시체로 만든다.
 	CPlayerNPC* pUPC = s_pOPMgr->UPCGetByID(iID, false);
-	if( pUPC == NULL ) return false;
+	if( pUPC == nullptr ) return false;
 	if( pUPC->IsDead() )
 	{//캐릭터가 죽은 상태에서 UserOut을 하게 되면 시체로 바꿔준다.
 		s_pOPMgr->CorpseAdd(iID);
@@ -2675,7 +2666,7 @@ bool CGameProcMain::MsgRecv_UserInAndRequest(Packet& pkt)
 	}
 
 	// 새로 받은 아이디와 리스트에 있는 UPC ID 를 검색해서..
-	CPlayerOther* pUPC = NULL;
+	CPlayerOther* pUPC = nullptr;
 	it_UPC itUPC = s_pOPMgr->m_UPCs.begin(), itUPCEnd = s_pOPMgr->m_UPCs.end();
 	for(; itUPC != itUPCEnd; )
 	{
@@ -2698,7 +2689,7 @@ bool CGameProcMain::MsgRecv_UserInAndRequest(Packet& pkt)
 			}
 			else
 			{
-				delete pUPC; pUPC = NULL;
+				delete pUPC; pUPC = nullptr;
 				itUPC = s_pOPMgr->m_UPCs.erase(itUPC);
 			}
 		}
@@ -2821,7 +2812,7 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 		CLogWriter::Write("NPC In - Duplicated ID ({}, {}) Pos({:.2f},{:.2f},{:.2f})",
 			iID, szName, fXPos, fYPos, fZPos);
 		//TRACE("NPC In - Duplicated ID (%d, %s) Pos(%.2f,%.2f,%.2f)\n", iID, szName.c_str(), fXPos, fYPos, fZPos);
-		pNPC->Action(PSA_BASIC, true, NULL, true); // 강제로 살리고..
+		pNPC->Action(PSA_BASIC, true, nullptr, true); // 강제로 살리고..
 		pNPC->m_fTimeAfterDeath = 0;
 		pNPC->PositionSet(__Vector3(fXPos, fYPos, fZPos), true);
 		return false;
@@ -2839,12 +2830,12 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 	s_pOPMgr->NPCAdd(pNPC);						// 캐릭터 추가...
 
 	// 이제 패킷에 따라 캐릭터를 치장..(?) 시켜준다.. 아이템장착, 무기 장착등...
-	CN3Shape* pShape = NULL;
-	__TABLE_PLAYER_LOOKS* pLooks = NULL;
+	CN3Shape* pShape = nullptr;
+	__TABLE_PLAYER_LOOKS* pLooks = nullptr;
 	if(0 == dwType)
 	{
 		pLooks = s_pTbl_NPC_Looks.Find(iIDResrc);	// 기본 스킨..
-		if(NULL == pLooks) // 캐릭터 기본 모습 테이블이 없으면... 
+		if(nullptr == pLooks) // 캐릭터 기본 모습 테이블이 없으면... 
 		{
 			pLooks = s_pTbl_NPC_Looks.GetIndexedData(0);
 
@@ -2857,7 +2848,7 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 	else
 	{
 		pShape = ACT_WORLD->ShapeGetByIDWithShape(iIDResrc); // Object NPC 에서 찾아 본다...
-		if(NULL == pShape)
+		if(nullptr == pShape)
 		{
 			std::string szMsg = fmt::format("Object NPC In : [Name({}), ResourceID({})]",
 				szName, iIDResrc);
@@ -2877,13 +2868,13 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 		e_PartPosition eParts[6] = { PART_POS_UPPER, PART_POS_LOWER, PART_POS_FACE, PART_POS_HANDS, PART_POS_FEET, PART_POS_HAIR_HELMET };
 		for(int i = 0; i < 6; i++)
 		{
-			pNPC->PartSet(eParts[i], pLooks->szPartFNs[eParts[i]], NULL, NULL);
+			pNPC->PartSet(eParts[i], pLooks->szPartFNs[eParts[i]], nullptr, nullptr);
 		}
 
 		if(iItemID0)
 		{
 			__TABLE_ITEM_BASIC* pItem0 = s_pTbl_Items_Basic.Find(iItemID0/1000*1000);
-			__TABLE_ITEM_EXT* pItemExt0 = NULL;
+			__TABLE_ITEM_EXT* pItemExt0 = nullptr;
 			if(pItem0 && pItem0->byExtIndex >= 0 && pItem0->byExtIndex < MAX_ITEM_EXTENSION)
 				pItemExt0 = s_pTbl_Items_Exts[pItem0->byExtIndex].Find(iItemID0%1000);	// 열 데이터 얻기..
 			if(pItem0 && pItemExt0)
@@ -2903,7 +2894,7 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 		if(iItemID1)
 		{
 			__TABLE_ITEM_BASIC* pItem1 = s_pTbl_Items_Basic.Find(iItemID1/1000*1000);
-			__TABLE_ITEM_EXT* pItemExt1 = NULL;
+			__TABLE_ITEM_EXT* pItemExt1 = nullptr;
 			if(pItem1 && pItem1->byExtIndex >= 0 && pItem1->byExtIndex < MAX_ITEM_EXTENSION)
 				pItemExt1 = s_pTbl_Items_Exts[pItem1->byExtIndex].Find(iItemID1%1000);	// 열 데이터 얻기..
 			if(pItem1 && pItemExt1)
@@ -2989,7 +2980,7 @@ bool CGameProcMain::MsgRecv_NPCIn(Packet& pkt)
 	pNPC->PositionSet(__Vector3(fXPos, fYPos, fZPos), true);	// 현재 위치 셋팅..
 	pNPC->MoveTo(fXPos, fYPos, fZPos, 0, 0);					// 현재 위치..
 	pNPC->RotateTo(D3DXToRadian(rand()%360), false);
-	pNPC->Action(PSA_BASIC, true, NULL, true);
+	pNPC->Action(PSA_BASIC, true, nullptr, true);
 	pNPC->ActionMove(PSM_STOP);
 
 	return true;
@@ -3036,7 +3027,7 @@ bool CGameProcMain::MsgRecv_NPCInAndRequest(Packet& pkt)
 	}
 
 	// 새로 받은 아이디와 리스트에 있는 NPC ID 를 검색해서..
-	CPlayerNPC* pNPC = NULL;
+	CPlayerNPC* pNPC = nullptr;
 	it_NPC itNPC = s_pOPMgr->m_NPCs.begin(), itNPCEnd = s_pOPMgr->m_NPCs.end();
 	for(; itNPC != itNPCEnd; )
 	{
@@ -3059,7 +3050,7 @@ bool CGameProcMain::MsgRecv_NPCInAndRequest(Packet& pkt)
 			}
 			else
 			{
-				delete pNPC; pNPC = NULL;
+				delete pNPC; pNPC = nullptr;
 				itNPC = s_pOPMgr->m_NPCs.erase(itNPC);
 			}
 		}
@@ -3127,9 +3118,9 @@ bool CGameProcMain::MsgRecv_NPCMove(Packet& pkt)
 	float fSpeed	= (pkt.read<int16_t>())/10.0f;
 
 	// 함수가 와야 할 부분.. ^^
-	CPlayerNPC* pNPC = NULL;
+	CPlayerNPC* pNPC = nullptr;
 	pNPC = s_pOPMgr->NPCGetByID(iID, true);				// NPC을 ID로서 얻고..
-	if ( NULL == pNPC )
+	if ( nullptr == pNPC )
 	{
 		this->MsgSend_NPCInRequest(iID);
 		return false;		// 살아있는 NPC가 있으면..
@@ -3156,10 +3147,10 @@ bool CGameProcMain::MsgRecv_Attack(Packet& pkt)
 	bool bIAmTarget = (iIDTarget == s_pPlayer->IDNumber()) ? true : false;
 	bool bIAmAttacker = (iIDAttacker == s_pPlayer->IDNumber()) ? true : false;
 	
-	CPlayerBase* pAttacker = NULL;
+	CPlayerBase* pAttacker = nullptr;
 	if ( bIAmAttacker ) pAttacker = s_pPlayer;	// 공격하는 넘이 내 자신이면
 	else pAttacker = s_pOPMgr->CharacterGetByID(iIDAttacker, true);
-	if(NULL == pAttacker) // 어라 공격하는 넘이 없네??
+	if(nullptr == pAttacker) // 어라 공격하는 넘이 없네??
 	{
 		if(iIDAttacker > 10000) // NPC 는 1000 이상이다.
 			this->MsgSend_NPCInRequest(iIDAttacker); // NPC 정보가 없을 경우 요청한다..
@@ -3168,7 +3159,7 @@ bool CGameProcMain::MsgRecv_Attack(Packet& pkt)
 		return false; // 공격하는 넘이 없으면 돌아간다.
 	}
 
-	CPlayerBase* pTarget = NULL;
+	CPlayerBase* pTarget = nullptr;
 	if(bIAmTarget) // 타겟이 나라면..
 	{
 		this->CommandSitDown(false, false); // 일으켜 세운다.
@@ -3179,7 +3170,7 @@ bool CGameProcMain::MsgRecv_Attack(Packet& pkt)
 			{
 				int SuccessValue = rand()%100;
 				if(SuccessValue >= pSkill->iPercentSuccess) // 스킬 테이블에 있는 확률대로 실패한다..
-					s_pPlayer->Action(PSA_BASIC, false, NULL, true); // 캐스팅 취소, 기본동작으로 강제 세팅..
+					s_pPlayer->Action(PSA_BASIC, false, nullptr, true); // 캐스팅 취소, 기본동작으로 강제 세팅..
 			}
 		}
 		pTarget = s_pPlayer;
@@ -3187,10 +3178,10 @@ bool CGameProcMain::MsgRecv_Attack(Packet& pkt)
 	else // 타겟이 다른넘이면..
 	{
 		pTarget = s_pOPMgr->CharacterGetByID(iIDTarget, true); //  일단 살아있는 넘들중에서 가져와보고.. 
-		if(NULL == pTarget) pTarget = s_pOPMgr->CharacterGetByID(iIDTarget, false); // 없다면 죽어가는 넘도 상관없이 타겟으로 잡고
+		if(nullptr == pTarget) pTarget = s_pOPMgr->CharacterGetByID(iIDTarget, false); // 없다면 죽어가는 넘도 상관없이 타겟으로 잡고
 	}
 
-	if(NULL == pTarget) return false; // 타겟이 없다!!!!
+	if(nullptr == pTarget) return false; // 타겟이 없다!!!!
 
 //	pTarget->m_iIDTargetMe = iIDAttacker; // 어떤 놈이 공격하는 거야??
 
@@ -3266,7 +3257,7 @@ bool CGameProcMain::MsgRecv_Dead(Packet& pkt)
 	int iIDTarget	= pkt.read<int16_t>(); // 타겟이 되서 공격당한넘.
 
 	
-	CPlayerBase* pTarget = NULL;
+	CPlayerBase* pTarget = nullptr;
 	if(iIDTarget == s_pPlayer->IDNumber())
 	{
 		pTarget = s_pPlayer;
@@ -3378,14 +3369,14 @@ bool CGameProcMain::MsgRecv_UserLookChange(Packet& pkt)
 	if(iID == s_pPlayer->IDNumber()) return false;
 	
 	CPlayerOther* pUPC = s_pOPMgr->UPCGetByID(iID, false);
-	if(NULL == pUPC) return false;
+	if(nullptr == pUPC) return false;
 
 	__TABLE_ITEM_BASIC* pItem = s_pTbl_Items_Basic.Find(dwItemID/1000*1000);
 
-	__TABLE_ITEM_EXT* pItemExt = NULL;
+	__TABLE_ITEM_EXT* pItemExt = nullptr;
 	if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
 		pItemExt = s_pTbl_Items_Exts[pItem->byExtIndex].Find(dwItemID%1000);	// 열 데이터 얻기..
-	if(dwItemID && (NULL == pItem || NULL == pItemExt))
+	if(dwItemID && (nullptr == pItem || nullptr == pItemExt))
 	{
 		__ASSERT(0, "NULL Item!!!");
 		return false;
@@ -3414,7 +3405,7 @@ bool CGameProcMain::MsgRecv_UserLookChange(Packet& pkt)
 		else
 		{
 			__TABLE_PLAYER_LOOKS* pLooks = s_pTbl_UPC_Looks.Find(pUPC->m_InfoBase.eRace);	// User Player Character Skin 구조체 포인터..
-			if(NULL == pLooks)
+			if(nullptr == pLooks)
 			{
 				CLogWriter::Write("CGameProcMain::MsgRecv_UserLookChange() - failed find table : Race ({})",
 					static_cast<int>(pUPC->m_InfoBase.eRace));
@@ -3423,7 +3414,7 @@ bool CGameProcMain::MsgRecv_UserLookChange(Packet& pkt)
 			else
 			{
 				if(PART_POS_HAIR_HELMET == ePartPos) pUPC->InitHair(); // 머리인데 없는 경우는..
-				else pUPC->PartSet(ePartPos, pLooks->szPartFNs[ePartPos], NULL, NULL);
+				else pUPC->PartSet(ePartPos, pLooks->szPartFNs[ePartPos], nullptr, nullptr);
 			}
 		}
 
@@ -3440,7 +3431,7 @@ bool CGameProcMain::MsgRecv_UserLookChange(Packet& pkt)
 		}
 		else
 		{
-			pUPC->PlugSet(ePlugPos, "", NULL, NULL);
+			pUPC->PlugSet(ePlugPos, "", nullptr, nullptr);
 			pUPC->DurabilitySet(eSlot, 0);
 		}
 
@@ -3467,7 +3458,7 @@ bool CGameProcMain::MsgRecv_ItemBundleDrop(Packet& pkt)		// Item 이 필드에 �
 	int iItemID = pkt.read<uint32_t>();
 
 	CPlayerBase* pCorpse = s_pOPMgr->NPCGetByID(iID, false);
-	if(NULL == pCorpse) pCorpse = s_pOPMgr->CorpseGetByID(iID);
+	if(nullptr == pCorpse) pCorpse = s_pOPMgr->CorpseGetByID(iID);
 	
 	if(pCorpse)
 		pCorpse->m_iDroppedItemID = iItemID; // 떨어트린 아이템 아이디 뭉치
@@ -3811,7 +3802,7 @@ void CGameProcMain::InitUI()
 	e_Nation eNation = s_pPlayer->m_InfoBase.eNation; // 국가....
 
 	__TABLE_UI_RESRC* pTbl = s_pTbl_UI.Find(eNation);
-	if(NULL == pTbl) return;
+	if(nullptr == pTbl) return;
 	
 	m_pUICmd->Init(s_pUIMgr);
 	m_pUICmd->LoadFromFile(pTbl->szCmd);
@@ -3932,14 +3923,6 @@ void CGameProcMain::InitUI()
 	iY = (iH - (rc.bottom - rc.top))/2;
 	m_pUINpcEvent->SetPos(iX, iY);
 
-	m_pUINpcTalk->Init(s_pUIMgr);
-	m_pUINpcTalk->LoadFromFile(pTbl->szNpcTalk);
-	m_pUINpcTalk->SetVisibleWithNoSound(false);
-	rc = m_pUINpcTalk->GetRegion();
-	iX = (iW - (rc.right - rc.left))/2;
-	iY = (iH - (rc.bottom - rc.top))/2;
-	m_pUINpcTalk->SetPos(iX, iY);
-
 	m_pUIWarp->Init(s_pUIMgr);
 	m_pUIWarp->LoadFromFile(pTbl->szZoneChangeOrWarp);
 	m_pUIWarp->SetVisibleWithNoSound(false);
@@ -3948,25 +3931,6 @@ void CGameProcMain::InitUI()
 	iY = (iH - (rc.bottom - rc.top))/2;
 	m_pUIWarp->SetPos(iX, iY);
 	m_pUIWarp->SetStyle(UISTYLE_USER_MOVE_HIDE | UISTYLE_SHOW_ME_ALONE);
-
-//	m_pUITradeList->Init(s_pUIMgr);
-//	m_pUITradeList->LoadFromFile(pTbl->szNpcExchangeList);
-//	m_pUITradeList->SetVisibleWithNoSound(false);
-//	rc = m_pUITradeList->GetRegion();
-//	iX = (iW - (rc.right - rc.left))/2;
-//	iY = (iH - (rc.bottom - rc.top))/2;
-//	m_pUITradeList->SetPos(iX, iY);
-
-	m_pUIItemREDlg->Init(s_pUIMgr);
-	m_pUIItemREDlg->LoadFromFile(pTbl->szExchangeRepair);
-	m_pUIItemREDlg->SetVisibleWithNoSound(false);
-	rc = m_pUIItemREDlg->GetRegion();
-	iX = (iW - (rc.right - rc.left))/2;
-	iY = (iH - (rc.bottom - rc.top))/2;
-	m_pUIItemREDlg->SetPos(iX, iY);
-	m_pUIItemREDlg->InitIconWnd(UIWND_EXCHANGE_REPAIR);
-	m_pUIItemREDlg->SetUIType(UI_TYPE_ICON_MANAGER);
-	m_pUIItemREDlg->SetState(UI_STATE_COMMON_NONE);
 
 	m_pUIRepairTooltip->Init(s_pUIMgr);
 	m_pUIRepairTooltip->LoadFromFile(pTbl->szRepairTooltip);
@@ -4014,18 +3978,18 @@ void CGameProcMain::InitUI()
 	m_pUIInventory->SetStyle(m_pUIInventory->GetStyle() | UISTYLE_POS_RIGHT);
 
 	// Countable Item Edit Dlg..
-	CN3UIWndBase::m_pCountableItemEdit = new CCountableItemEditDlg;
-	CN3UIWndBase::m_pCountableItemEdit->Init(s_pUIMgr);
-	CN3UIWndBase::m_pCountableItemEdit->LoadFromFile(pTbl->szPersonalTradeEdit);
-	CN3UIWndBase::m_pCountableItemEdit->SetStyle(UISTYLE_ALWAYSTOP);
+	CN3UIWndBase::s_pCountableItemEdit = new CCountableItemEditDlg;
+	CN3UIWndBase::s_pCountableItemEdit->Init(s_pUIMgr);
+	CN3UIWndBase::s_pCountableItemEdit->LoadFromFile(pTbl->szPersonalTradeEdit);
+	CN3UIWndBase::s_pCountableItemEdit->SetStyle(UISTYLE_ALWAYSTOP);
 	// 위치 계산 ..
-	rc = CN3UIWndBase::m_pCountableItemEdit->GetRegion();
+	rc = CN3UIWndBase::s_pCountableItemEdit->GetRegion();
 	iX = (iW - (rc.right - rc.left))/2;
 	iY = (iH - (rc.bottom - rc.top))/2;
-	CN3UIWndBase::m_pCountableItemEdit->SetPos(iX, iY);	
-	CN3UIWndBase::m_pCountableItemEdit->SetVisibleWithNoSound(false);
-	CN3UIWndBase::m_pCountableItemEdit->SetUIType(UI_TYPE_BASE);
-	CN3UIWndBase::m_pCountableItemEdit->SetState(UI_STATE_COMMON_NONE);
+	CN3UIWndBase::s_pCountableItemEdit->SetPos(iX, iY);	
+	CN3UIWndBase::s_pCountableItemEdit->SetVisibleWithNoSound(false);
+	CN3UIWndBase::s_pCountableItemEdit->SetUIType(UI_TYPE_BASE);
+	CN3UIWndBase::s_pCountableItemEdit->SetState(UI_STATE_COMMON_NONE);
 
 	m_pUISkillTreeDlg->Init(s_pUIMgr);
 	m_pUISkillTreeDlg->LoadFromFile(pTbl->szSkillTree);
@@ -4409,7 +4373,7 @@ void CGameProcMain::InitZone(int iZone, const __Vector3& vPosPlayer)
 		iZonePrev = iZone; // 최근에 읽은 존 번호를 기억해둔다.
 
 		__TABLE_ZONE* pZoneData = s_pTbl_Zones.Find(s_pPlayer->m_InfoExt.iZoneCur);
-		if (NULL == pZoneData)
+		if (nullptr == pZoneData)
 		{
 			CLogWriter::Write("can't find zone data. (zone : {})", s_pPlayer->m_InfoExt.iZoneCur);
 			__ASSERT(0, "Zone Data Not Found!");
@@ -4432,12 +4396,12 @@ void CGameProcMain::InitZone(int iZone, const __Vector3& vPosPlayer)
 
 		//char szBuf[256];
 		char szFName[_MAX_PATH];
-		_splitpath(pZoneData->szTerrainFN.c_str(), NULL, NULL, szFName, NULL);
+		_splitpath(pZoneData->szTerrainFN.c_str(), nullptr, nullptr, szFName, nullptr);
 		std::string szFName2 = szFName;
 		szFName2 += "_Bird";
 
 		char szFullPathName[_MAX_PATH] = {};
-		_makepath(szFullPathName, NULL, "misc\\bird", szFName2.c_str(), "lst");
+		_makepath(szFullPathName, nullptr, "misc\\bird", szFName2.c_str(), "lst");
 
 		m_pLightMgr->LoadZoneLight(pZoneData->szLightObjFN.c_str());
 
@@ -4518,7 +4482,7 @@ bool CGameProcMain::CommandToggleMoveContinous()
 	s_pPlayer->ToggleMoveMode();				// 자동 전진 토글.. 
 	if(s_pPlayer->m_bMoveContinous)
 	{
-		this->CommandMove(MD_FOWARD, true);
+		this->CommandMove(MD_FORWARD, true);
 		if(m_pUICmd->m_pBtn_Act_Run) m_pUICmd->m_pBtn_Act_Run->SetState(UI_STATE_BUTTON_DOWN);
 		if(m_pUICmd->m_pBtn_Act_Walk) m_pUICmd->m_pBtn_Act_Walk->SetState(UI_STATE_BUTTON_DOWN);
 	}
@@ -4538,12 +4502,12 @@ void CGameProcMain::CommandMove(e_MoveDirection eMD, bool bStartOrEnd)
 
 	if(s_pPlayer->IsDead()) return; // 죽은 넘이 어딜 감히!!
 
-	if(MD_FOWARD == eMD || MD_BACKWARD == eMD)
+	if(MD_FORWARD == eMD || MD_BACKWARD == eMD)
 	{
 		s_pUIMgr->UserMoveHideUIs();
 		this->CommandSitDown(false, false, true); // 일으켜 세우고..
 		if(s_pPlayer->m_bStun) return; // 기절해 있음 움직이지 못함..
-		if(MD_FOWARD == eMD)
+		if(MD_FORWARD == eMD)
 		{
 			if(s_pPlayer->IsRunning()) s_pPlayer->ActionMove(PSM_RUN); // 뛰어가기..
 			else s_pPlayer->ActionMove(PSM_WALK); // 걸어가기..
@@ -4978,13 +4942,13 @@ void CGameProcMain::MsgRecv_UserState(Packet& pkt)
 	e_SubPacket_State eSP = (e_SubPacket_State)pkt.read<uint8_t>(); // 0x01
 	int32_t iState = pkt.read<int32_t>();
 
-	CPlayerBase* pBPC = NULL;
+	CPlayerBase* pBPC = nullptr;
 	if ( s_pPlayer->IDNumber() == iID )
 		pBPC = s_pPlayer;
 	else
 		pBPC = s_pOPMgr->UPCGetByID(iID, false); 
 	
-	if(NULL == pBPC) return;
+	if(nullptr == pBPC) return;
 
 	if(N3_SP_STATE_CHANGE_SITDOWN == eSP) // 앉기,서기,죽음...
 	{
@@ -4995,7 +4959,7 @@ void CGameProcMain::MsgRecv_UserState(Packet& pkt)
 			else if(0x02 == iState) 
 				pBPC->Action(PSA_SITDOWN, true);
 			else if(0x03 == iState) 
-				pBPC->Action(PSA_DYING, false, NULL, true);
+				pBPC->Action(PSA_DYING, false, nullptr, true);
 		}
 	}
 	else if(N3_SP_STATE_CHANGE_RECRUIT_PARTY == eSP) // 파티 구함..
@@ -5100,11 +5064,11 @@ void CGameProcMain::MsgRecv_PartyOrForce(Packet& pkt)
 
 		case N3_SP_PARTY_OR_FORCE_INSERT:			// 0x03	// Send - s1(ID) | Recv - s3(ID, HPMax, HP, MPMax, MP) b2(Level, Class) - 문자열은 ID 로 알아낸다..
 		{
-			int iID = pkt.read<int16_t>();
-			int iErrorCode = pkt.read<uint8_t>();
+			int iIDorErrorCode		= pkt.read<int16_t>();		// IDs and positive numbers, error codes are negative numbers
 
-			if (iErrorCode >= 0)
+			if (iIDorErrorCode >= 0)
 			{
+				int iPartyPosition	= pkt.read<uint8_t>();		// order of user in the party
 				int iIDLength		= pkt.read<int16_t>();
 				std::string szID;	pkt.readString(szID, iIDLength);
 				int iHPMax			= pkt.read<int16_t>();
@@ -5115,8 +5079,8 @@ void CGameProcMain::MsgRecv_PartyOrForce(Packet& pkt)
 				int iMP				= pkt.read<int16_t>();
 				e_Nation eNation	= (e_Nation) pkt.read<uint8_t>();
 
-				m_pUIPartyOrForce->MemberAdd(iID, szID, iLevel, eClass, iHP, iHPMax, iMP, iMPMax); // 다른넘 파티에추가..
-				if (iID != s_pPlayer->IDNumber()) // 자기 자신이 아닌 경우 메시지 출력.
+				m_pUIPartyOrForce->MemberAdd(iIDorErrorCode, szID, iLevel, eClass, iHP, iHPMax, iMP, iMPMax); // 다른넘 파티에추가..
+				if (iIDorErrorCode != s_pPlayer->IDNumber()) // 자기 자신이 아닌 경우 메시지 출력.
 				{
 					std::string szMsg = fmt::format_text_resource(IDS_PARTY_INSERT);
 					MsgOutput(szID + szMsg, D3DCOLOR_ARGB(255, 255, 255, 255));
@@ -5128,13 +5092,13 @@ void CGameProcMain::MsgRecv_PartyOrForce(Packet& pkt)
 				std::string szMsg;
 
 				// 상대방이 파티에 들어오기를 거절 하였다..
-				if (-1 == iErrorCode)
+				if (-1 == iIDorErrorCode)
 					szMsg = fmt::format_text_resource(IDS_PARTY_INSERT_ERR_REJECTED);
 				// 레벨 차이가 너무 난다...
-				else if (-2 == iErrorCode)
+				else if (-2 == iIDorErrorCode)
 					szMsg = fmt::format_text_resource(IDS_PARTY_INSERT_ERR_LEVEL_DIFFERENCE);
 				// 파티를 맺을 수 없는 국가이다.
-				else if (-3 == iErrorCode)
+				else if (-3 == iIDorErrorCode)
 					szMsg = fmt::format_text_resource(IDS_PARTY_INSERT_ERR_INVALID_NATION);
 				// 상대방이 파티에 들어오기를 거절 하였다..
 				else
@@ -5253,7 +5217,7 @@ void CGameProcMain::CommandSitDown(bool bLimitInterval, bool bSitDown, bool bImm
 			return;
 
 		if(s_pPlayer->m_bAttackContinous) // 계속 공격하는 중이면..
-			this->CommandEnableAttackContinous(false, NULL); // 계속 공격 취소..
+			this->CommandEnableAttackContinous(false, nullptr); // 계속 공격 취소..
 	}
 
 	bool bVBs[2] = { false, false };
@@ -5272,7 +5236,7 @@ void CGameProcMain::CommandSitDown(bool bLimitInterval, bool bSitDown, bool bImm
 	} // 일어서는 경우
 	
 	s_pPlayer->m_bSitDown = bSitDown;
-	s_pPlayer->Action(eSA, true, NULL, bImmediately);
+	s_pPlayer->Action(eSA, true, nullptr, bImmediately);
 
 	if(m_pUICmd->m_pBtn_Act_SitDown)
 	{
@@ -5467,14 +5431,14 @@ void CGameProcMain::TargetSelect(CPlayerNPC* pTarget)
 
 	int iIDTargetPrev = s_pPlayer->m_iIDTarget; // 전의 타겟 기억..
 	s_pPlayer->m_iIDTarget = -1;
-	s_pPlayer->m_pObjectTarget = NULL;
+	s_pPlayer->m_pObjectTarget = nullptr;
 
 	if(pTarget && pTarget->m_InfoBase.iAuthority != AUTHORITY_MANAGER)
 	{ //운영자는 포커스를 주지 않게 하기 위해서...
 		s_pPlayer->m_iIDTarget = pTarget->IDNumber();
 		if(iIDTargetPrev != s_pPlayer->m_iIDTarget) // 전의 타겟과 다르면
 		{
-			this->CommandEnableAttackContinous(false, NULL);	// 자동 공격 취소..
+			this->CommandEnableAttackContinous(false, nullptr);	// 자동 공격 취소..
 
 			D3DCOLOR crID = 0xffffffff;
 			if(	pTarget->PlayerType() == PLAYER_OTHER) // User..
@@ -5505,7 +5469,7 @@ void CGameProcMain::TargetSelect(CPlayerNPC* pTarget)
 		s_pPlayer->m_iIDTarget = -1; // 타겟 아이디를 잡고..
 		m_pUITargetBar->SetVisible(false); // 타겟 바 없애기..
 
-		this->CommandEnableAttackContinous(false, NULL); // 자동 공격 취소..
+		this->CommandEnableAttackContinous(false, nullptr); // 자동 공격 취소..
 	}
 
 	if(	PSA_SITDOWN != s_pPlayer->State() && 
@@ -5680,6 +5644,13 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 		if (iResult == 0)
 			szMsg = fmt::format_text_resource(IDS_WARP_WRONG_GATE);
 		MsgOutput(szMsg, 0xff00ff00);
+	}
+	else if(iType == 8)
+	{
+		/*
+		if (iResult == 0) // anvil object failed animation	
+		if (iResult == 1) // anvil object successed animation
+		*/
 	}
 	else
 	{
@@ -6001,7 +5972,7 @@ void CGameProcMain::ParseChattingCommand(const std::string& szCmd)
 void CGameProcMain::UpdateUI_PartyOrForceButtons()
 {
 	// 파티 버튼 상태 바꾸기..
-	CPlayerBase* pTarget = NULL;
+	CPlayerBase* pTarget = nullptr;
 	bool bIAmLeader = false, bIAmMemberOfParty = false;
 	int iMemberIndex = -1;
 	this->PartyOrForceConditionGet(bIAmLeader, bIAmMemberOfParty, iMemberIndex, pTarget);
@@ -6025,12 +5996,12 @@ const __InfoPartyOrForce* CGameProcMain::PartyOrForceConditionGet(bool& bIAmLead
 		return m_pUIPartyOrForce->MemberInfoGetByID(s_pPlayer->m_iIDTarget, iMemberIndex);
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void CGameProcMain::UpdateUI_MiniMap()
 {
-	if(NULL == m_pUIStateBarAndMiniMap || !m_pUIStateBarAndMiniMap->IsVisible()) return;
+	if(nullptr == m_pUIStateBarAndMiniMap || !m_pUIStateBarAndMiniMap->IsVisible()) return;
 
 
 	m_pUIStateBarAndMiniMap->PositionInfoClear();
@@ -6039,7 +6010,7 @@ void CGameProcMain::UpdateUI_MiniMap()
 	e_Nation eNation = s_pPlayer->m_InfoBase.eNation;
 
 	it_NPC it = s_pOPMgr->m_NPCs.begin(), itEnd = s_pOPMgr->m_NPCs.end();
-	CPlayerNPC* pNPC = NULL;
+	CPlayerNPC* pNPC = nullptr;
 	for(; it != itEnd; it++) // NPC
 	{
 		pNPC = it->second;
@@ -6051,7 +6022,7 @@ void CGameProcMain::UpdateUI_MiniMap()
 	}
 
 	it_UPC it2 = s_pOPMgr->m_UPCs.begin(), itEnd2 = s_pOPMgr->m_UPCs.end();
-	CPlayerOther* pUPC = NULL;
+	CPlayerOther* pUPC = nullptr;
 	__TABLE_ZONE* pZoneInfo = s_pTbl_Zones.Find(s_pPlayer->m_InfoExt.iZoneCur);
 	for(; it2 != itEnd2; it2++) // User
 	{
@@ -6096,7 +6067,7 @@ void CGameProcMain::UpdateUI_MiniMap()
 
 void CGameProcMain::UpdateUI_TargetBar()
 {
-	if(NULL == m_pUITargetBar || !m_pUITargetBar->IsVisible()) return;
+	if(nullptr == m_pUITargetBar || !m_pUITargetBar->IsVisible()) return;
 
 	//죽은 캐릭터가 선택되었을때는 target bar를 그려주지 않는다.
 	CPlayerNPC* t_pTarget = s_pOPMgr->CharacterGetByID(s_pPlayer->m_iIDTarget, false);
@@ -6125,7 +6096,7 @@ void CGameProcMain::UpdateUI_TargetBar()
 
 void CGameProcMain::UpdateBGM()
 {
-	if(	NULL == m_pSnd_Battle || !m_pSnd_Battle->IsPlaying() ) return;
+	if(	nullptr == m_pSnd_Battle || !m_pSnd_Battle->IsPlaying() ) return;
 
 //	if(s_pPlayer->pTarget && s_pPlayer->pTarget->IsAlive()) 
 	__Vector3 vPosPlayer = s_pPlayer->Position();
@@ -6387,13 +6358,11 @@ void CGameProcMain::MsgRecv_KnightsListBasic(Packet& pkt) // 기사단 기본 �
 
 void CGameProcMain::MsgRecv_ContinousPacket(Packet& pkt) // 압축된 데이터 이다... 한번 더 파싱해야 한다!!!
 {
-	uint16_t iWholeSize;
-	pkt >> iWholeSize;
+	uint16_t iWholeSize = pkt.read<uint16_t>();
 
 	while (pkt.rpos() < iWholeSize)
 	{
-		uint16_t iSizeThisPacket;
-		pkt >> iSizeThisPacket;
+		uint16_t iSizeThisPacket = pkt.read<uint16_t>();
 
 		if (iSizeThisPacket <= 0 || iSizeThisPacket >= iWholeSize)
 		{
@@ -6477,17 +6446,17 @@ void CGameProcMain::MsgRecv_WareHouseOpen(Packet& pkt)		// 보관함 오픈..
 void CGameProcMain::PlayBGM_Town()
 {
 	if(m_pSnd_Battle) m_pSnd_Battle->Stop(3.0f);
-	if(NULL == m_pSnd_Town || m_pSnd_Town->IsPlaying()) return;
+	if(nullptr == m_pSnd_Town || m_pSnd_Town->IsPlaying()) return;
 	m_pSnd_Town->SetMaxVolume(60);
-	m_pSnd_Town->Play(NULL, 3.0f); // 전투 음악 설정.. 해제는 주위에 몬스터가 없을때 한다..
+	m_pSnd_Town->Play(nullptr, 3.0f); // 전투 음악 설정.. 해제는 주위에 몬스터가 없을때 한다..
 }
 
 void CGameProcMain::PlayBGM_Battle()
 {
 	if(m_pSnd_Town) m_pSnd_Town->Stop(3.0f);
-	if(NULL == m_pSnd_Battle || m_pSnd_Battle->IsPlaying()) return;
+	if(nullptr == m_pSnd_Battle || m_pSnd_Battle->IsPlaying()) return;
 	m_pSnd_Battle->SetMaxVolume(80);
-	m_pSnd_Battle->Play(NULL, 3.0f); // 전투 음악 설정.. 해제는 주위에 몬스터가 없을때 한다..
+	m_pSnd_Battle->Play(nullptr, 3.0f); // 전투 음악 설정.. 해제는 주위에 몬스터가 없을때 한다..
 }
 
 void CGameProcMain::ReleaseSound()
@@ -6649,17 +6618,17 @@ void CGameProcMain::MsgRecv_NoahChange(Packet& pkt)		// 노아 변경..
 
 	switch (bType)
 	{
-		case N3_SP_NOAH_GET:
+		case GOLD_CHANGE_GAIN:
 			szMsg = fmt::format_text_resource(IDS_NOAH_CHANGE_GET, dwGoldOffset);
 			MsgOutput(szMsg, 0xff6565ff);
 			break;
 
-		case N3_SP_NOAH_LOST:
+		case GOLD_CHANGE_LOSE:
 			szMsg = fmt::format_text_resource(IDS_NOAH_CHANGE_LOST, dwGoldOffset);
 			MsgOutput(szMsg, 0xffff3b3b);
 			break;
 
-		case N3_SP_NOAH_SPEND:
+		case GOLD_CHANGE_SPEND:
 			szMsg = fmt::format_text_resource(IDS_NOAH_CHANGE_SPEND, dwGoldOffset);
 			MsgOutput(szMsg, 0xffff3b3b);
 			break;
@@ -7189,7 +7158,7 @@ void CGameProcMain::MsgRecv_Knights_GradeChangeAll(Packet& pkt)
 	for(; it != itEnd; it++)
 	{
 		CPlayerOther* pUPC = it->second;
-		if(NULL == pUPC) continue;
+		if(nullptr == pUPC) continue;
 
 		int iIDTmp = pUPC->m_InfoExt.iKnightsID;
 		if(iIDTmp <= 0) continue;
@@ -7366,15 +7335,15 @@ bool CGameProcMain::OnMouseMove(POINT ptCur, POINT ptPrev)
 		if(m_pMagicSkillMng->m_dwRegionMagicState==1)
 		{
 			__Vector3 vPick;
-			CPlayerNPC*	 pTarget = NULL;
+			CPlayerNPC*	 pTarget = nullptr;
 		
 			int iID = -1;
 			pTarget = s_pOPMgr->Pick(ptCur.x, ptCur.y, iID, &vPick); // 사방에 깔린넘들 픽킹..
 			this->TargetSelect(iID, false); // 타겟을 잡는다..
-			if(NULL == pTarget) // 타겟이 없으면..
+			if(nullptr == pTarget) // 타겟이 없으면..
 			{
 				s_pPlayer->m_pObjectTarget = ACT_WORLD->PickWithShape(ptCur.x, ptCur.y, true, &vPick); // 찍힌 위치를 저장한다..
-				if(NULL == s_pPlayer->m_pObjectTarget) // 타겟도 없으면..
+				if(nullptr == s_pPlayer->m_pObjectTarget) // 타겟도 없으면..
 				{
 					ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, vPick); // 지형을 찍어본다..
 				}
@@ -7441,24 +7410,23 @@ bool CGameProcMain::OnMouseLDBtnPress(POINT ptCur, POINT ptPrev)
 /// \returns true if auto-attack process started, false otherwise
 bool CGameProcMain::TryStartAttack()
 {
-	CPlayerNPC* target = s_pOPMgr->CharacterGetByID(s_pPlayer->m_iIDTarget, true);
-	if(target == nullptr || target->m_InfoBase.iAuthority == AUTHORITY_MANAGER)
+	CPlayerNPC* pTarget = s_pOPMgr->CharacterGetByID(s_pPlayer->m_iIDTarget, true);
+	if (pTarget == nullptr || pTarget->m_InfoBase.iAuthority == AUTHORITY_MANAGER)
 	{
-		s_pPlayer->m_iIDTarget = -1;
-		target = nullptr;
+		s_pPlayer->m_iIDTarget = SKILLMAGIC_TARGET_UNKNOWN;
 		return false;
 	}
 
-	if(s_pEng->ViewPoint() == VP_THIRD_PERSON)
+	if (s_pEng->ViewPoint() == VP_THIRD_PERSON)
 	{
-		if(s_pPlayer->IsAttackableTarget(target, false))
+		if (s_pPlayer->IsAttackableTarget(pTarget, false))
 		{
-			this->CommandMove(MD_STOP, true);
-			this->CommandEnableAttackContinous(true, target);
+			CommandMove(MD_STOP, true);
+			CommandEnableAttackContinous(true, pTarget);
 		}
-		else if(target && VP_THIRD_PERSON == s_pEng->ViewPoint())
+		else
 		{
-			this->CommandMove(MD_FOWARD, true);
+			CommandMove(MD_FORWARD, true);
 			s_pPlayer->SetMoveTargetID(s_pPlayer->m_iIDTarget);
 		}
 	}
@@ -7488,19 +7456,19 @@ bool CGameProcMain::OnMouseLBtnPress(POINT ptCur, POINT ptPrev)
 	vDir.Normalize();
 	float fYaw = ::_Yaw2D(vDir.x, vDir.z);
 
-	CPlayerNPC*	 pTarget			= NULL;
+	CPlayerNPC*	 pTarget			= nullptr;
 	BOOL		 bFindCorpse		= false;
 
 	int iID = -1;
 	pTarget = s_pOPMgr->PickPrecisely(ptCur.x, ptCur.y, iID, &m_vMouseLBClickedPos); // 사방에 깔린넘들 픽킹..
 	this->TargetSelect(iID, false); // 타겟을 잡는다..
-	if(NULL == pTarget) // 타겟이 없으면..
+	if(nullptr == pTarget) // 타겟이 없으면..
 	{
 		if(s_pPlayer->m_bAttackContinous) // 계속 공격하는 중이면..
-			this->CommandEnableAttackContinous(false, NULL); // 계속 공격 취소..
+			this->CommandEnableAttackContinous(false, nullptr); // 계속 공격 취소..
 
 		s_pPlayer->m_pObjectTarget = ACT_WORLD->PickWithShape(ptCur.x, ptCur.y, true, &m_vMouseLBClickedPos); // 찍힌 위치를 저장한다..
-		if(NULL == s_pPlayer->m_pObjectTarget) // 타겟도 없으면..
+		if(nullptr == s_pPlayer->m_pObjectTarget) // 타겟도 없으면..
 		{
 			// 시체 뒤저서 아이템 상자 열기..
 			CPlayerNPC* pCorpse = s_pOPMgr->PickCorpse(ptCur.x, ptCur.y, iID); // 픽킹..
@@ -7538,7 +7506,7 @@ bool CGameProcMain::OnMouseLBtnPress(POINT ptCur, POINT ptPrev)
 				}
 				else
 				{
-					this->CommandMove(MD_FOWARD, true);
+					this->CommandMove(MD_FORWARD, true);
 					s_pPlayer->SetMoveTargetID(s_pPlayer->m_iIDTarget);
 				}
 			}
@@ -7557,7 +7525,7 @@ bool CGameProcMain::OnMouseLBtnPress(POINT ptCur, POINT ptPrev)
 			float fDist = (vMovePoint - s_pPlayer->Position()).Magnitude();
 
 			if(!s_pPlayer->m_bTargetOrPosMove && fDist > 1.5f)
-				this->CommandMove(MD_FOWARD, true);
+				this->CommandMove(MD_FORWARD, true);
 
 			if(fDist > 1.5f)
 			{
@@ -7633,7 +7601,7 @@ bool CGameProcMain::OnMouseLbtnDown(POINT ptCur, POINT ptPrev)
 
 			this->CommandSitDown(false, false); // 일단 일으켜 세운다..
 			s_pPlayer->RotateTo(fYaw, true);
-			this->CommandMove(MD_FOWARD, false);
+			this->CommandMove(MD_FORWARD, false);
 
 			ACT_WORLD->PickWideWithTerrain(ptCur.x, ptCur.y, vMovePoint); // 지형을 찍어본다..
 			fDist = (vMovePoint - s_pPlayer->Position()).Magnitude();
@@ -7652,7 +7620,7 @@ bool CGameProcMain::OnMouseLbtnDown(POINT ptCur, POINT ptPrev)
 
 			if(fDist > 1.5f)
 			{
-				this->CommandMove(MD_FOWARD, true);
+				this->CommandMove(MD_FORWARD, true);
 				s_pPlayer->SetMoveTargetPos(vMovePoint);
 			}
 		}
@@ -7674,7 +7642,7 @@ bool CGameProcMain::OnMouseRBtnPress(POINT ptCur, POINT ptPrev)
 	int iID = -1;
 	CPlayerNPC* pNPC = s_pOPMgr->PickNPC(ptCur.x, ptCur.y, iID); // 픽킹..
 
-	if(NULL == pNPC)
+	if(nullptr == pNPC)
 	{
 		// NOTE: sending the packet to pick up items
 		CPlayerNPC* pCorpse = s_pOPMgr->PickCorpse(ptCur.x, ptCur.y, iID); // 픽킹..
@@ -7850,8 +7818,8 @@ void CGameProcMain::MsgSend_SpeedCheck(bool bInit)
 
 void CGameProcMain::MsgRecv_ClassPromotion(Packet& pkt)
 {
-	uint16_t sClass, socketID;
-	pkt >> sClass >> socketID;
+	uint16_t sClass = pkt.read<uint16_t>();
+	uint16_t socketID = pkt.read<uint16_t>();
 
 	// TODO: Clean this up when CPlayerMySelf is derived properly so we can share this logic in a much nicer fashion.
 	if (socketID == s_pPlayer->IDNumber())
@@ -7871,33 +7839,6 @@ void CGameProcMain::MsgRecv_ClassPromotion(Packet& pkt)
 	}
 
 	s_pFX->TriggerBundle(socketID, -1, FXID_CLASS_CHANGE, socketID, -1);
-}
-
-
-void CGameProcMain::NoahTrade(uint8_t bType, uint32_t dwGoldOffset, uint32_t dwGold)
-{
-	std::string szMsg;
-
-	switch (bType)
-	{
-	case N3_SP_NOAH_GET:
-		szMsg = fmt::format_text_resource(IDS_TRADE_COIN_RECV, dwGoldOffset);
-		MsgOutput(szMsg, 0xff6565ff);
-		break;
-
-	case N3_SP_NOAH_LOST:
-		szMsg = fmt::format_text_resource(IDS_TRADE_COIN_PAID, dwGoldOffset);
-		MsgOutput(szMsg, 0xffff3b3b);
-		break;
-	}
-
-	//s_pPlayer->m_InfoExt.iGold = dwGold;
-	if (m_pUIInventory->IsVisible())
-		m_pUIInventory->GoldUpdate();
-	if (m_pUITransactionDlg->IsVisible())
-		m_pUITransactionDlg->GoldUpdate();
-	if (m_pSubProcPerTrade && m_pSubProcPerTrade->m_pUIPerTradeDlg->IsVisible())
-		m_pSubProcPerTrade->m_pUIPerTradeDlg->GoldUpdate();
 }
 
 void CGameProcMain::MsgRecv_ItemUpgrade(

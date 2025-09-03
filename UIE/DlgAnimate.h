@@ -14,7 +14,7 @@ class CDlgAnimate : public CDialog
 {
 // Construction
 public:
-	CDlgAnimate(CWnd* pParent = NULL);   // standard constructor
+	CDlgAnimate(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgAnimate)

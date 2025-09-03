@@ -50,8 +50,8 @@ CMainFrame::CMainFrame()
 	// TODO: add member initialization code here
 	m_eMode = MODE_NORMAL;
 
-	m_wndSplitter.m_hWnd = NULL;
-	m_wndSplitterLeft.m_hWnd = NULL;
+	m_wndSplitter.m_hWnd = nullptr;
+	m_wndSplitterLeft.m_hWnd = nullptr;
 
 	m_IsPlaying = FALSE;
 }
@@ -176,13 +176,13 @@ CViewProperty* CMainFrame::GetViewProperty()
 void CMainFrame::OnEditPmesh() 
 {
 	CN3ViewerDoc* pDoc = (CN3ViewerDoc*)(this->GetActiveDocument());
-	if(NULL == pDoc) return;
+	if(nullptr == pDoc) return;
 
 	if(pDoc->m_pSelectedObj && (pDoc->m_pSelectedObj->Type() & OBJ_SHAPE) && MODE_NORMAL == m_eMode)
 	{
 		m_eMode = MODE_EDIT_PMESH;
 		m_DlgPMeshEdit.m_pShapeRef = (CN3Shape*)pDoc->m_pSelectedObj;
-		if(m_DlgPMeshEdit.GetSafeHwnd() == NULL) m_DlgPMeshEdit.Create(IDD_PMESH_EDIT, this);
+		if(m_DlgPMeshEdit.GetSafeHwnd() == nullptr) m_DlgPMeshEdit.Create(IDD_PMESH_EDIT, this);
 		m_DlgPMeshEdit.ShowWindow(SW_SHOW);
 	}
 	else
@@ -191,7 +191,7 @@ void CMainFrame::OnEditPmesh()
 		m_eMode = MODE_NORMAL;
 	}
 	
-	this->GetView()->InvalidateRect(NULL, FALSE);
+	this->GetView()->InvalidateRect(nullptr, FALSE);
 }
 
 void CMainFrame::OnUpdateEditPmesh(CCmdUI* pCmdUI) 
@@ -213,14 +213,14 @@ void CMainFrame::OnProjectSet()
 
 void CMainFrame::OnAddLod() 
 {
-	if(m_DlgPMeshEdit.GetSafeHwnd() != NULL)
+	if(m_DlgPMeshEdit.GetSafeHwnd() != nullptr)
 		m_DlgPMeshEdit.LOD_Add();
 }
 
 void CMainFrame::OnPlay() 
 {
 	m_IsPlaying = !m_IsPlaying;
-	if(m_IsPlaying) this->SetTimer(100, 10, NULL);
+	if(m_IsPlaying) this->SetTimer(100, 10, nullptr);
 	else this->KillTimer(100);
 }
 
@@ -228,7 +228,7 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 {
 	if(100 == nIDEvent)
 	{
-		this->GetView()->InvalidateRect(NULL, FALSE);
+		this->GetView()->InvalidateRect(nullptr, FALSE);
 	}
 	
 	CFrameWnd::OnTimer(nIDEvent);
@@ -242,7 +242,7 @@ void CMainFrame::OnToolFixProgressiveMesh()
 	CString FileName;
 	char* pBuff = new char[2048000]; memset(pBuff, 0, 2048000);
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, szExt, NULL, dwFlags, szFilter, NULL);
+	CFileDialog dlg(TRUE, szExt, nullptr, dwFlags, szFilter, nullptr);
 	dlg.m_ofn.nMaxFile = 2048000;
 	dlg.m_ofn.lpstrFile = pBuff;
 	if(dlg.DoModal() == IDCANCEL)
@@ -256,7 +256,7 @@ void CMainFrame::OnToolFixProgressiveMesh()
 
 	CN3PMesh PM;
 	POSITION pos = dlg.GetStartPosition();
-	for(int i = 0; pos != NULL; i++)
+	for(int i = 0; pos != nullptr; i++)
 	{
 		FileName = dlg.GetNextPathName(pos);
 		

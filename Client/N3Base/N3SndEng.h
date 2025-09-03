@@ -34,7 +34,7 @@ public:
 	LPDIRECTSOUND8*		GetDS() { return &m_pDS; }
 	void SetDopplerFactor(D3DVALUE factor);
 	
-	void DuplicateBuff(LPSOUNDSOURCE pSrc, CN3SndObj* pDest, D3DVECTOR* pPos=NULL);
+	void DuplicateBuff(LPSOUNDSOURCE pSrc, CN3SndObj* pDest, D3DVECTOR* pPos=nullptr);
 	
 	void Tick();
 	

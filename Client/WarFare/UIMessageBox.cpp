@@ -36,13 +36,13 @@ static char THIS_FILE[]=__FILE__;
 
 CUIMessageBox::CUIMessageBox()
 {
-	m_pBtn_OK = NULL;
-	m_pBtn_Yes = NULL;
-	m_pBtn_No = NULL;
-	m_pBtn_Cancel = NULL;
-	m_pText_Message = NULL;
-	m_pText_Title = NULL;
-	m_pEdit_Common = NULL;
+	m_pBtn_OK = nullptr;
+	m_pBtn_Yes = nullptr;
+	m_pBtn_No = nullptr;
+	m_pBtn_Cancel = nullptr;
+	m_pText_Message = nullptr;
+	m_pText_Title = nullptr;
+	m_pEdit_Common = nullptr;
 
 	m_eBehavior = BEHAVIOR_NOTHING;
 	m_iStyle	= MB_OK;
@@ -57,13 +57,13 @@ bool CUIMessageBox::Load(HANDLE hFile)
 {
 	if(CN3UIBase::Load(hFile)==false) return false;
 	
-	m_pBtn_OK = (CN3UIButton*)GetChildByID("Btn_OK"); __ASSERT(m_pBtn_OK, "NULL UI Component!!");
-	m_pBtn_Yes = (CN3UIButton*)GetChildByID("Btn_Yes"); __ASSERT(m_pBtn_Yes, "NULL UI Component!!");
-	m_pBtn_No = (CN3UIButton*)GetChildByID("Btn_No"); __ASSERT(m_pBtn_No, "NULL UI Component!!");
-	m_pBtn_Cancel = (CN3UIButton*)GetChildByID("Btn_Cancel"); __ASSERT(m_pBtn_Cancel, "NULL UI Component!!");
-	m_pText_Message = (CN3UIString*)GetChildByID("Text_Message"); __ASSERT(m_pText_Message, "NULL UI Component!!");
-	m_pText_Title = (CN3UIString*)GetChildByID("Text_Title"); __ASSERT(m_pText_Title, "NULL UI Component!!");
-	m_pEdit_Common = (CN3UIEdit*)GetChildByID("Edit_Common"); __ASSERT(m_pEdit_Common, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_OK, GetChildByID<CN3UIButton>("Btn_OK"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Yes, GetChildByID<CN3UIButton>("Btn_Yes"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_No, GetChildByID<CN3UIButton>("Btn_No"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel, GetChildByID<CN3UIButton>("Btn_Cancel"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Message, GetChildByID<CN3UIString>("Text_Message"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Title, GetChildByID<CN3UIString>("Text_Title"));
+	N3_VERIFY_UI_COMPONENT(m_pEdit_Common, GetChildByID<CN3UIEdit>("Edit_Common"));
 
 	return true;
 }
@@ -80,7 +80,7 @@ void CUIMessageBox::SetTitle(const std::string& szTitle)
 
 bool CUIMessageBox::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 
 	//s_CameraData.vp;  //불러 오는 과정을 살펴본다 
 	//uint32_t mm = s_CameraData.vp.Height;
@@ -120,7 +120,7 @@ bool CUIMessageBox::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 							CGameProcedure::s_bNeedReportConnectionClosed = false; // 서버접속이 끊어진걸 보고해야 하는지..
 							CGameProcedure::s_pSocket->Disconnect();
 							Sleep(2000); // 2초 딜레이.. 서버가 처리할 시간을 준다.
-							//CGameProcedure::s_pSocket->Connect(CGameProcedure::s_hWndBase, szIP.c_str(), dwPort);
+							//CGameProcedure::s_pSocket->Connect(s_hWndBase, szIP.c_str(), dwPort);
 							CGameProcedure::s_bNeedReportConnectionClosed = true; // 서버접속이 끊어진걸 보고해야 하는지..
 
 							CGameProcedure::MsgSend_GameServerLogIn();
@@ -153,7 +153,7 @@ bool CUIMessageBox::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				case BEHAVIOR_PARTY_BBS_REGISTER_CANCEL:	if(pProcMain->m_pUIPartyBBS)pProcMain->m_pUIPartyBBS->MsgSend_RegisterCancel(); break;// 파티 게시판에 등록 해제
 				case BEHAVIOR_EXECUTE_OPTION:
 					{
-						::ShellExecute(NULL, "open", "Option.exe", NULL, NULL, SW_SHOWNORMAL); // 홈페이지로 이동..
+						::ShellExecute(nullptr, "open", "Option.exe", nullptr, nullptr, SW_SHOWNORMAL); // 홈페이지로 이동..
 						PostQuitMessage(0);	// 종료...
 					}
 					break;
@@ -222,7 +222,7 @@ void CUIMessageBox::SetBoxStyle(int iStyle)
 
 void CUIMessageBox::SetVisibleEditControl(bool bVisible) // Edit Control Visible
 {
-	if(NULL == m_pEdit_Common) return;
+	if(nullptr == m_pEdit_Common) return;
 	
 	m_pEdit_Common->SetString("");
 	m_pEdit_Common->SetVisible(bVisible);

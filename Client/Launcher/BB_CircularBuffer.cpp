@@ -23,5 +23,5 @@ BB_CircularBuffer::~BB_CircularBuffer()
 {
 	ASSERT(m_pBuffer);
 	if (m_pBuffer)
-		delete[] m_pBuffer, m_pBuffer = NULL;
+		delete[] m_pBuffer, m_pBuffer = nullptr;
 }

@@ -18,7 +18,7 @@ class CDlgEditPartParticle : public CDialog
 {
 // Construction
 public:
-	CDlgEditPartParticle(CWnd* pParent = NULL);   // standard constructor
+	CDlgEditPartParticle(CWnd* pParent = nullptr);   // standard constructor
 
 	CMainFrame*			m_pRefFrm;
 	DWORD				m_Color[NUM_KEY_COLOR];

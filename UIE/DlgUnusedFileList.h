@@ -16,7 +16,7 @@ public:
 	CStringArray m_szFileNames;
 // Construction
 public:
-	CDlgUnusedFileList(CWnd* pParent = NULL);   // standard constructor
+	CDlgUnusedFileList(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgUnusedFileList)

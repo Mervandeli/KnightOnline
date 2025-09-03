@@ -73,12 +73,12 @@ public:
 	void ReGenerateSmoothNormal();
 	int LODCtrlCount() { return m_iLODCtrlValueCount; }
 	void LODCtrlSet(__LODCtrlValue* pLODCtrls, int nCount);
-	__LODCtrlValue* LODCtrlGet(int index) { if(index < 0 || index >= m_iLODCtrlValueCount) return NULL; return &m_pLODCtrlValues[index]; }
+	__LODCtrlValue* LODCtrlGet(int index) { if(index < 0 || index >= m_iLODCtrlValueCount) return nullptr; return &m_pLODCtrlValues[index]; }
 	int CollapsesCount() { return m_iNumCollapses; }
 #endif // end of _N3TOOL
 
 //	int					GetLODCtrlValueCount() const {return m_iLODCtrlValueCount;}
-//	__PMLODCtrlValue*	GetLODCtrlValue(int iIndex) const {if (iIndex>=0&&m_iLODCtrlValueCount>iIndex)return m_pLODCtrlValues+iIndex; return NULL;}
+//	__PMLODCtrlValue*	GetLODCtrlValue(int iIndex) const {if (iIndex>=0&&m_iLODCtrlValueCount>iIndex)return m_pLODCtrlValues+iIndex; return nullptr;}
 //	void				SetLODCtrlValues(__PMLODCtrlValue* pValues) {m_pLODCtrlValues = pValues;}
 
 	__Vector3 Min() { return m_vMin; } // 월드 행렬을 적용하지 않은상태의 최소값이다.

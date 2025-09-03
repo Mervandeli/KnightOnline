@@ -17,7 +17,7 @@ static char THIS_FILE[]=__FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgRiverProperty dialog
-CDlgRiverProperty::CDlgRiverProperty(CRiverMng* pRiverMng, CWnd* pParent /*=NULL*/)
+CDlgRiverProperty::CDlgRiverProperty(CRiverMng* pRiverMng, CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgRiverProperty::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgRiverProperty)
@@ -100,7 +100,7 @@ void CDlgRiverProperty::UpdateInfo()
 {
 	ASSERT(m_pRiverMng);
 	CRiverMesh* pSelRiver = m_pRiverMng->GetSelRiver();
-	if (pSelRiver == NULL)
+	if (pSelRiver == nullptr)
 	{
 		m_LPRiver.ShowWindow(FALSE);
 		if (m_IsModalDialog==FALSE)
@@ -244,7 +244,7 @@ BOOL CDlgRiverProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 					pItem->m_curValue.Format("%d", pSelRiver->GetRiverID());
 				}
 			}
-			else if (pItem->m_propName == "Alpha factor(hex)") pSelRiver->SetAlphaFactor(strtoul(pItem->m_curValue, NULL, 16));
+			else if (pItem->m_propName == "Alpha factor(hex)") pSelRiver->SetAlphaFactor(strtoul(pItem->m_curValue, nullptr, 16));
 			else if (pItem->m_propName == "Speed1") pSelRiver->SetSpeed1((float)atof(pItem->m_curValue));
 			else if (pItem->m_propName == "meter / u") pSelRiver->SetMeterPerU((float)atof(pItem->m_curValue));
 			else if (pItem->m_propName == "meter / v") pSelRiver->SetMeterPerV((float)atof(pItem->m_curValue));
@@ -273,7 +273,7 @@ BOOL CDlgRiverProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 				char szDir[_MAX_DIR];
 				char szFName[_MAX_FNAME];
 				char szExt[_MAX_EXT];
-				_splitpath(tmp.m_szName.c_str(), NULL, szDir, szFName, szExt);
+				_splitpath(tmp.m_szName.c_str(), nullptr, szDir, szFName, szExt);
 				int iCount = atoi(szFName+lstrlen(szFName)-2) + 1;	// 파일 이름의 끝에 두자리를 숫자로 변환
 				CString strFName = szDir; strFName += szFName;
 				strFName = strFName.Left(strFName.GetLength()-2);
@@ -301,7 +301,7 @@ void CDlgRiverProperty::OnOK()
 		ASSERT(pSelRiver);
 		if (pSelRiver && pSelRiver->TexGet())
 		{
-			if (m_pRiverMng->GetRiverMesh(pSelRiver->GetRiverID()) == NULL) CDialog::OnOK();
+			if (m_pRiverMng->GetRiverMesh(pSelRiver->GetRiverID()) == nullptr) CDialog::OnOK();
 			else MessageBox("중복되는 아이디 입니다.");
 		}
 		else

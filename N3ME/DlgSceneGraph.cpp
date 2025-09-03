@@ -16,7 +16,7 @@ static char THIS_FILE[]=__FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgSceneGraph dialog
-CDlgSceneGraph::CDlgSceneGraph(CWnd* pParent /*=NULL*/, DWORD dwFlag)
+CDlgSceneGraph::CDlgSceneGraph(CWnd* pParent /*=nullptr*/, DWORD dwFlag)
 	: CDialog(CDlgSceneGraph::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgSceneGraph)
@@ -60,12 +60,12 @@ void CDlgSceneGraph::UpdateTree(CN3Scene* pScene)
 
 void CDlgSceneGraph::ExpandTree(HTREEITEM hItem)
 {
-	if(hItem == NULL) return;
+	if(hItem == nullptr) return;
 
 	m_Tree.Expand(hItem, TVE_EXPAND);
 
 	HTREEITEM hChild = m_Tree.GetChildItem(hItem);
-	while(hChild != NULL)
+	while(hChild != nullptr)
 	{
 		this->ExpandTree(hChild);
 		hChild = m_Tree.GetNextItem(hChild, TVGN_NEXT);
@@ -74,7 +74,7 @@ void CDlgSceneGraph::ExpandTree(HTREEITEM hItem)
 
 void CDlgSceneGraph::UpdateTreeItem(HTREEITEM hParent, CN3Base *pBase)
 {
-	if(pBase == NULL) return;
+	if(pBase == nullptr) return;
 	
 	DWORD dwType = pBase->Type();
 	int nItem = 0;
@@ -90,7 +90,7 @@ void CDlgSceneGraph::UpdateTreeItem(HTREEITEM hParent, CN3Base *pBase)
 	else if(dwType & OBJ_SKIN) nItem = 9;
 	else if(dwType & OBJ_TRANSFORM) nItem = 10;
 
-	HTREEITEM hItem = m_Tree.InsertItem(TVIF_IMAGE |TVIF_SELECTEDIMAGE| TVIF_TEXT, pBase->m_szName.c_str(), nItem, nItem, 0, 0, NULL, hParent, NULL);
+	HTREEITEM hItem = m_Tree.InsertItem(TVIF_IMAGE |TVIF_SELECTEDIMAGE| TVIF_TEXT, pBase->m_szName.c_str(), nItem, nItem, 0, 0, 0, hParent, nullptr);
 	m_Tree.SetItemData(hItem, (DWORD)pBase);
 
 	if(dwType & OBJ_SCENE)
@@ -100,7 +100,7 @@ void CDlgSceneGraph::UpdateTreeItem(HTREEITEM hParent, CN3Base *pBase)
 		m_Tree.SetItemText(hItem, str);
 
 		int i = 0;
-		HTREEITEM hItem2 = NULL;
+		HTREEITEM hItem2 = nullptr;
 
 		if (m_dwFlag & OBJ_CAMERA)
 		{
@@ -178,12 +178,12 @@ void CDlgSceneGraph::OnSize(UINT nType, int cx, int cy)
 {
 	CDialog::OnSize(nType, cx, cy);
 	const int iPreviewCX = 200;	const int iPreviewCY = 150;
-	if(m_Tree.GetSafeHwnd() != NULL)
+	if(m_Tree.GetSafeHwnd() != nullptr)
 	{
 		int iPreviewTop = cy-iPreviewCY;
 		int iPreviewLeft = (cx-iPreviewCX)/2; if (iPreviewLeft<0) iPreviewLeft = 0;
-		m_Tree.SetWindowPos(NULL, 0, 0, cx, iPreviewTop, SWP_NOZORDER);
-		GetDlgItem(IDC_PREVIEW)->SetWindowPos(NULL, iPreviewLeft, iPreviewTop, iPreviewCX, iPreviewCY, SWP_NOZORDER);
+		m_Tree.SetWindowPos(nullptr, 0, 0, cx, iPreviewTop, SWP_NOZORDER);
+		GetDlgItem(IDC_PREVIEW)->SetWindowPos(nullptr, iPreviewLeft, iPreviewTop, iPreviewCX, iPreviewCY, SWP_NOZORDER);
 	}
 }
 
@@ -194,7 +194,7 @@ void CDlgSceneGraph::OnRclickTreeObj(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CDlgSceneGraph::SelectObject(HTREEITEM hItem, void *pItemData)
 {
-	if(hItem == NULL) return;
+	if(hItem == nullptr) return;
 
 	if(hItem != TVI_ROOT)
 	{
@@ -206,7 +206,7 @@ void CDlgSceneGraph::SelectObject(HTREEITEM hItem, void *pItemData)
 	}
 
 	HTREEITEM hChild = m_Tree.GetChildItem(hItem);
-	while(hChild != NULL)
+	while(hChild != nullptr)
 	{
 		this->SelectObject(hChild, pItemData);
 		hChild = m_Tree.GetNextItem(hChild, TVGN_NEXT);

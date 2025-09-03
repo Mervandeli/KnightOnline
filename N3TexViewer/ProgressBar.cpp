@@ -39,7 +39,7 @@ BOOL CProgressBar::Create(LPCTSTR strMessage, int nSize, int MaxValue)
 {
 	// 상태바를 얻음
 	CStatusBar * pStatusBar = GetStatusBar();
-	if (pStatusBar == NULL) return FALSE;
+	if (pStatusBar == nullptr) return FALSE;
 
 	// 상태바 위에 프로그레스 컨트롤생성
 	if(!CProgressCtrl::Create(WS_CHILD|WS_VISIBLE, CRect(0,0,0,0), pStatusBar, 1)) return FALSE;
@@ -59,10 +59,10 @@ BOOL CProgressBar::Create(LPCTSTR strMessage, int nSize, int MaxValue)
 CStatusBar* CProgressBar::GetStatusBar()
 {
 	CFrameWnd* pFrame = (CFrameWnd*)AfxGetMainWnd();
-	if (pFrame == NULL || pFrame->IsKindOf(RUNTIME_CLASS(CFrameWnd)) == FALSE) return NULL;
+	if (pFrame == nullptr || pFrame->IsKindOf(RUNTIME_CLASS(CFrameWnd)) == FALSE) return nullptr;
 
 	CStatusBar* pBar = (CStatusBar*)pFrame->GetMessageBar();
-	if(pBar == NULL || pBar->IsKindOf(RUNTIME_CLASS(CStatusBar)) == FALSE) return NULL;
+	if(pBar == nullptr || pBar->IsKindOf(RUNTIME_CLASS(CStatusBar)) == FALSE) return nullptr;
 
 	return pBar;
 }
@@ -70,7 +70,7 @@ CStatusBar* CProgressBar::GetStatusBar()
 void CProgressBar::Resize()
 {
 	CStatusBar* pStatusBar = GetStatusBar();
-	if (pStatusBar == NULL) return;
+	if (pStatusBar == nullptr) return;
 
 	// 텍스트 출력
 	if (::IsWindow(m_hWnd) && IsWindowVisible())

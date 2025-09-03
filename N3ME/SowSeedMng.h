@@ -27,7 +27,7 @@ typedef struct __GRASS
 		Tile_x = -1;
 		Tile_z = -1;
 		Pos = __Vector3(0.0f,0.0f,0.0f);
-		Sub_Grass = NULL;
+		Sub_Grass = nullptr;
 		Sub_Grass_Count = 0;
 		roll =0;
 	};

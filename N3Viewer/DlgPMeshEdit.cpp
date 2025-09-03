@@ -21,14 +21,14 @@ static char THIS_FILE[] = __FILE__;
 // CDlgPMeshEdit dialog
 
 
-CDlgPMeshEdit::CDlgPMeshEdit(CWnd* pParent /*=NULL*/)
+CDlgPMeshEdit::CDlgPMeshEdit(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgPMeshEdit::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgPMeshEdit)
 	m_iNumVertices = 0;
 	m_bPreview = FALSE;
 	//}}AFX_DATA_INIT
-	m_pShapeRef = NULL;
+	m_pShapeRef = nullptr;
 }
 
 
@@ -148,7 +148,7 @@ void CDlgPMeshEdit::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		CN3SPart* pPD = m_pShapeRef->Part(m_CBPart.GetCurSel());
 		if(pPD) SetDlgItemInt(IDC_EDIT_NUMFACES, pPD->MeshInstance()->GetNumIndices() / 3);
 
-		((CMainFrame*)AfxGetMainWnd())->GetView()->InvalidateRect(NULL, FALSE);
+		((CMainFrame*)AfxGetMainWnd())->GetView()->InvalidateRect(nullptr, FALSE);
 	}
 	
 	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
@@ -170,7 +170,7 @@ void CDlgPMeshEdit::OnButtonMakePmesh()
 	CN3SPart* pPD = m_pShapeRef->Part(nPart);
 	CN3PMesh* pPMesh = pPD->Mesh();
 	CN3PMeshInstance* pPMI = pPD->MeshInstance();
-	if(NULL == pPMI || NULL == pPMesh) return;
+	if(nullptr == pPMI || nullptr == pPMesh) return;
 	
 
 	CDlgPMeshCreateOption OptDlg; // Progressive Mesh Create Option
@@ -205,7 +205,7 @@ void CDlgPMeshEdit::OnButtonSave()
 	{
 		CN3SPart* pPD = m_pShapeRef->Part(i);
 		CN3PMesh* pPMesh = pPD->Mesh();
-		if(NULL == pPMesh) continue;
+		if(nullptr == pPMesh) continue;
 
 		pPMesh->SaveToFile();
 	}
@@ -215,11 +215,11 @@ void CDlgPMeshEdit::UpdateInfo()
 {
 	int nPart = m_CBPart.GetCurSel();
 	CN3SPart* pPD = m_pShapeRef->Part(nPart);
-	if(NULL == pPD) return;
+	if(nullptr == pPD) return;
 
 	CN3PMesh* pPMesh = pPD->Mesh();
 	CN3PMeshInstance* pPMI = pPD->MeshInstance();
-	if(NULL == pPMI || NULL == pPMesh) return;
+	if(nullptr == pPMI || nullptr == pPMesh) return;
 
 	CString szTmp;
 
@@ -272,7 +272,7 @@ void CDlgPMeshEdit::UpdateInfo()
 
 void CDlgPMeshEdit::OnClose() 
 {
-	m_pShapeRef = NULL;
+	m_pShapeRef = nullptr;
 	
 	CDialog::OnClose();
 }
@@ -280,14 +280,14 @@ void CDlgPMeshEdit::OnClose()
 void CDlgPMeshEdit::OnDestroy() 
 {
 	CDialog::OnDestroy();
-	m_pShapeRef = NULL;
+	m_pShapeRef = nullptr;
 }
 
 void CDlgPMeshEdit::OnSelchangeCbPart() 
 {
 	this->UpdateInfo();
 	CView* pView = ((CMainFrame*)AfxGetMainWnd())->GetActiveView();
-	if(pView) pView->InvalidateRect(NULL, FALSE);
+	if(pView) pView->InvalidateRect(nullptr, FALSE);
 }
 
 void CDlgPMeshEdit::OnBMakePmeshAll() 
@@ -301,7 +301,7 @@ void CDlgPMeshEdit::OnBMakePmeshAll()
 		CN3SPart* pPD = m_pShapeRef->Part(i);
 		CN3PMeshInstance* pPMI = pPD->MeshInstance();
 		CN3PMesh* pPMesh = pPD->Mesh();
-		if(NULL == pPMI || NULL == pPMesh) continue;
+		if(nullptr == pPMI || nullptr == pPMesh) continue;
 
 		CN3PMeshCreate PMC;
 
@@ -321,7 +321,7 @@ void CDlgPMeshEdit::OnBMakePmeshAll()
 
 void CDlgPMeshEdit::UpdateAllInfo()
 {
-	if(NULL == m_pShapeRef) return;
+	if(nullptr == m_pShapeRef) return;
 
 	m_ScrollBar.SetScrollRange(0,0);
 	CString szTmp;
@@ -343,7 +343,7 @@ void CDlgPMeshEdit::UpdateAllInfo()
 
 void CDlgPMeshEdit::SavePMeshes()
 {
-	if(NULL == m_pShapeRef) return;
+	if(nullptr == m_pShapeRef) return;
 
 	int nPC = m_pShapeRef->PartCount();
 	for(int i = 0; i < nPC; i++)
@@ -361,7 +361,7 @@ void CDlgPMeshEdit::LOD_Add()
 	int nPart = m_CBPart.GetCurSel();
 	CN3SPart* pPD = m_pShapeRef->Part(nPart);
 	CN3PMesh* pPMesh = pPD->Mesh();
-	if(NULL == pPMesh) return;
+	if(nullptr == pPMesh) return;
 	
 	CN3PMesh::__LODCtrlValue LODs[32]; // LOD Control Value 복사..
 	int nLODCount = pPMesh->LODCtrlCount();
@@ -386,7 +386,7 @@ void CDlgPMeshEdit::LOD_Delete()
 	int nPart = m_CBPart.GetCurSel();
 	CN3SPart* pPD = m_pShapeRef->Part(nPart);
 	CN3PMesh* pPMesh = pPD->Mesh();
-	if(NULL == pPMesh) return;
+	if(nullptr == pPMesh) return;
 	
 	CN3PMesh::__LODCtrlValue LODs[32]; // LOD Control Value 복사..
 	int nLOD = 0;

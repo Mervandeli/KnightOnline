@@ -55,9 +55,9 @@ void CN3ShapeExtra::Tick(float fFrm)
 	bool bNeedRemakeCollisionMeshes = false;
 	int iPC = m_Parts.size();
 	float fDir = 0, fRotDelta = 0;
-	__Rotation* pRot = NULL;
+	__Rotation* pRot = nullptr;
 	__Quaternion qRot;
-	CN3SPart* pPart = NULL;
+	CN3SPart* pPart = nullptr;
 	for(int i = 0; i < iPC; i++)
 	{
 		pPart = m_Parts[i];

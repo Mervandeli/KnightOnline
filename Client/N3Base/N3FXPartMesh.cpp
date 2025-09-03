@@ -21,8 +21,8 @@ CN3FXPartMesh::CN3FXPartMesh()
 {
 	m_iVersion = SUPPORTED_PART_VERSION;
 
-	m_pShape = NULL;
-	m_pRefShape = NULL;
+	m_pShape = nullptr;
+	m_pRefShape = nullptr;
 
 	m_dwCurrColor = 0xffffffff;
 
@@ -47,7 +47,7 @@ CN3FXPartMesh::~CN3FXPartMesh()
 	{
 		m_pShape->Release();
 		delete m_pShape;
-		m_pShape = NULL;
+		m_pShape = nullptr;
 	}
 }
 
@@ -663,8 +663,8 @@ int CN3FXPartMesh::NumVertices(int Part)
 //
 LPDIRECT3DVERTEXBUFFER9 CN3FXPartMesh::GetVB(int Part)
 {
-	if(!m_pShape) return NULL;
-	return NULL;
+	if(!m_pShape) return nullptr;
+	return nullptr;
 //	return m_pShape->Part(Part)->Mesh()->GetVertexBuffer();	//this_fx
 }
 
@@ -715,7 +715,7 @@ void CN3FXPartMesh::Duplicate(CN3FXPartMesh* pSrc)
 	if(m_pShape) 
 	{
 		delete m_pShape;
-		m_pShape = NULL;
+		m_pShape = nullptr;
 	}
 
 	m_pShape = new CN3FXShape;

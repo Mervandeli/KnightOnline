@@ -35,8 +35,8 @@ static char THIS_FILE[]=__FILE__;
 
 CSubProcPerTrade::CSubProcPerTrade()
 {
-	m_pUIPerTradeDlg = NULL;
-	m_pUITradeEditDlg = NULL;
+	m_pUIPerTradeDlg = nullptr;
+	m_pUITradeEditDlg = nullptr;
 	m_ePerTradeState = PER_TRADE_STATE_NONE;
 	m_iOtherID		 = -1;
 	m_iGoldOffsetBackup = 0;
@@ -57,14 +57,14 @@ void CSubProcPerTrade::Release()
 	{
 		m_pUIPerTradeDlg->Release();
 		delete m_pUIPerTradeDlg;
-		m_pUIPerTradeDlg = NULL;
+		m_pUIPerTradeDlg = nullptr;
 	}
 
 	if (m_pUITradeEditDlg)
 	{
 		m_pUITradeEditDlg->Release();
 		delete m_pUITradeEditDlg;
-		m_pUITradeEditDlg = NULL;
+		m_pUITradeEditDlg = nullptr;
 	}
 
 	m_szMsg = "";//MessageBox key
@@ -110,7 +110,7 @@ void CSubProcPerTrade::InitPerTradeDlg(CUIManager* pUIManager)
 	m_pUITradeEditDlg->SetState(UI_STATE_COMMON_NONE);
 
 	// 일단은 돈 아이콘으로 픽스.. ^^
-	m_pUITradeEditDlg->m_pArea = (CN3UIArea *)m_pUITradeEditDlg->GetChildByID("area_trade_icon");	__ASSERT(m_pUITradeEditDlg->m_pArea, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pUITradeEditDlg->m_pArea, m_pUITradeEditDlg->GetChildByID<CN3UIArea >("area_trade_icon"));
 
 	m_pUITradeEditDlg->m_pImageOfIcon = new CN3UIImage;
 	m_pUITradeEditDlg->m_pImageOfIcon->Init(m_pUITradeEditDlg);
@@ -199,15 +199,19 @@ void CSubProcPerTrade::SecureCodeBegin()
 	// 5.인풋을 막는다..	-> 해당 부분..	ok	(키입력과 메시지..)
 
 	// 6.거래창의 편집 Control의 값을 Clear..
-	CN3UIString* pStrMy = (CN3UIString* )m_pUIPerTradeDlg->GetChildByID("string_money_my");			__ASSERT(pStrMy, "NULL UI Component!!");
-	CN3UIString* pStrOther = (CN3UIString* )m_pUIPerTradeDlg->GetChildByID("string_money_other");	__ASSERT(pStrOther, "NULL UI Component!!");
+	CN3UIString* pStrMy = nullptr, *pStrOther = nullptr;
+	N3_VERIFY_UI_COMPONENT(pStrMy, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_my"));
 	pStrMy->SetString("0");
+
+	N3_VERIFY_UI_COMPONENT(pStrOther, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_other"));
 	pStrOther->SetString("0");
 
 	// 7.개인 거래 창의 처크 버튼들 원래대로..
-	CN3UIButton* pButtonMy = (CN3UIButton* )m_pUIPerTradeDlg->GetChildByID("btn_trade_my");			__ASSERT(pButtonMy, "NULL UI Component!!");
+	CN3UIButton* pButtonMy = nullptr, *pButtonOther = nullptr;
+	N3_VERIFY_UI_COMPONENT(pButtonMy, m_pUIPerTradeDlg->GetChildByID<CN3UIButton>("btn_trade_my"));
 	pButtonMy->SetState(UI_STATE_BUTTON_NORMAL);
-	CN3UIButton* pButtonOther = (CN3UIButton* )m_pUIPerTradeDlg->GetChildByID("btn_trade_other");	__ASSERT(pButtonOther, "NULL UI Component!!");
+
+	N3_VERIFY_UI_COMPONENT(pButtonOther, m_pUIPerTradeDlg->GetChildByID<CN3UIButton>("btn_trade_other"));
 	pButtonOther->SetState(UI_STATE_BUTTON_NORMAL);
 
 	// 8.상대방 거래 버튼은 Click할 수 없다. uif 자체 기능..
@@ -238,7 +242,7 @@ void CSubProcPerTrade::PerTradeCompleteSuccess()						// 개인 거래 최종 �
 	// 개인 거래 창에 있는 아이템 삭제..
 	for ( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )
 	{
-		if (m_pUIPerTradeDlg->m_pPerTradeMy[i] != NULL)	
+		if (m_pUIPerTradeDlg->m_pPerTradeMy[i] != nullptr)	
 		{
 			__IconItemSkill* spItem;
 			spItem = m_pUIPerTradeDlg->m_pPerTradeMy[i];
@@ -249,13 +253,13 @@ void CSubProcPerTrade::PerTradeCompleteSuccess()						// 개인 거래 최종 �
 			// 리소스 제거..
 			spItem->pUIIcon->Release();
 			delete spItem->pUIIcon;
-			spItem->pUIIcon = NULL;
+			spItem->pUIIcon = nullptr;
 			delete spItem;
-			spItem = NULL;
-			m_pUIPerTradeDlg->m_pPerTradeMy[i] = NULL;
+			spItem = nullptr;
+			m_pUIPerTradeDlg->m_pPerTradeMy[i] = nullptr;
 		}
 
-		if (m_pUIPerTradeDlg->m_pPerTradeOther[i] != NULL)	
+		if (m_pUIPerTradeDlg->m_pPerTradeOther[i] != nullptr)	
 		{
 			__IconItemSkill* spItem;
 			spItem = m_pUIPerTradeDlg->m_pPerTradeOther[i];
@@ -266,10 +270,10 @@ void CSubProcPerTrade::PerTradeCompleteSuccess()						// 개인 거래 최종 �
 			// 리소스 제거..
 			spItem->pUIIcon->Release();
 			delete spItem->pUIIcon;
-			spItem->pUIIcon = NULL;
+			spItem->pUIIcon = nullptr;
 			delete spItem;
-			spItem = NULL;
-			m_pUIPerTradeDlg->m_pPerTradeOther[i] = NULL;
+			spItem = nullptr;
+			m_pUIPerTradeDlg->m_pPerTradeOther[i] = nullptr;
 		}
 	}
 
@@ -286,7 +290,8 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 	{
 		// 먼저 돈을 검사 한다..
 		// 거래 창의 내 현재 돈을 얻어 온다..
-		CN3UIString* pStrMy = (CN3UIString* )m_pUIPerTradeDlg->GetChildByID("string_money_my");		__ASSERT(pStrMy, "NULL UI Component!!");
+		CN3UIString* pStrMy = nullptr;
+		N3_VERIFY_UI_COMPONENT(pStrMy, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_my"));
 		str = pStrMy->GetString();
 		iGold = atoi(str.c_str());
 
@@ -300,7 +305,7 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 		// 아이템들을 원래 대로..
 		for ( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )
 		{
-			if (m_pUIPerTradeDlg->m_pPerTradeMy[i] != NULL)	
+			if (m_pUIPerTradeDlg->m_pPerTradeMy[i] != nullptr)	
 			{
 				if( (m_pUIPerTradeDlg->m_pPerTradeMy[i]->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||  
 					(m_pUIPerTradeDlg->m_pPerTradeMy[i]->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL) )
@@ -322,10 +327,10 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 						// 리소스 제거..
 						spItem->pUIIcon->Release();
 						delete spItem->pUIIcon;
-						spItem->pUIIcon = NULL;
+						spItem->pUIIcon = nullptr;
 						delete spItem;
-						spItem = NULL;
-						m_pUIPerTradeDlg->m_pPerTradeMy[i] = NULL;
+						spItem = nullptr;
+						m_pUIPerTradeDlg->m_pPerTradeMy[i] = nullptr;
 					}
 					// 없다면 그대로 이동한다..
 					else
@@ -339,7 +344,7 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 						m_pUIPerTradeDlg->m_pPerTradeInv[m_pUIPerTradeDlg->m_iBackupiOrder[i]] = spItem;
 
 						// 내 거래 윈도우에서 클리어..
-						m_pUIPerTradeDlg->m_pPerTradeMy[i] = NULL;
+						m_pUIPerTradeDlg->m_pPerTradeMy[i] = nullptr;
 
 						CN3UIArea* pArea;
 
@@ -362,7 +367,7 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 					m_pUIPerTradeDlg->m_pPerTradeInv[m_pUIPerTradeDlg->m_iBackupiOrder[i]] = spItem;
 
 					// 내 거래 윈도우에서 클리어..
-					m_pUIPerTradeDlg->m_pPerTradeMy[i] = NULL;
+					m_pUIPerTradeDlg->m_pPerTradeMy[i] = nullptr;
 
 					CN3UIArea* pArea;
 
@@ -375,7 +380,7 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 				}
 			}
 
-			if (m_pUIPerTradeDlg->m_pPerTradeOther[i] != NULL)	
+			if (m_pUIPerTradeDlg->m_pPerTradeOther[i] != nullptr)	
 			{
 				__IconItemSkill* spItem;
 				spItem = m_pUIPerTradeDlg->m_pPerTradeOther[i];
@@ -386,10 +391,10 @@ void CSubProcPerTrade::PerTradeCompleteCancel()							// 개인 거래 취소..
 				// 리소스 제거..
 				spItem->pUIIcon->Release();
 				delete spItem->pUIIcon;
-				spItem->pUIIcon = NULL;
+				spItem->pUIIcon = nullptr;
 				delete spItem;
-				spItem = NULL;
-				m_pUIPerTradeDlg->m_pPerTradeOther[i] = NULL;
+				spItem = nullptr;
+				m_pUIPerTradeDlg->m_pPerTradeOther[i] = nullptr;
 			}
 		}
 
@@ -499,7 +504,7 @@ void CSubProcPerTrade::PerTradeCoreInvDisable()
 
 	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )
 	{
-		if ( m_pUIPerTradeDlg->m_pPerTradeInv[i] != NULL )
+		if ( m_pUIPerTradeDlg->m_pPerTradeInv[i] != nullptr )
 			m_pUIPerTradeDlg->m_pPerTradeInv[i]->pUIIcon->SetMoveRect(rect);
 	}
 }
@@ -523,7 +528,8 @@ void CSubProcPerTrade::ItemCountEditOK()
 		iMyMoney;		// 인벤토리의 값..
 
 	// 거래 창의 내 현재 돈을 얻어 온다..
-	CN3UIString* pStrMy = (CN3UIString* )m_pUIPerTradeDlg->GetChildByID("string_money_my");	 __ASSERT(pStrMy, "NULL UI Component!!");
+	CN3UIString* pStrMy = nullptr;
+	N3_VERIFY_UI_COMPONENT(pStrMy, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_my"));
 	str = pStrMy->GetString();
 	iGold = atoi(str.c_str());
 
@@ -625,7 +631,8 @@ void CSubProcPerTrade::SecureJobStuffByMyDecision()
 
 void CSubProcPerTrade::PerTradeOtherDecision()						// 다른 사람이 거래를 결정 했다..
 {
-	CN3UIButton* pButtonOther = (CN3UIButton* )m_pUIPerTradeDlg->GetChildByID("btn_trade_other");	 __ASSERT(pButtonOther, "NULL UI Component!!");
+	CN3UIButton* pButtonOther = nullptr;
+	N3_VERIFY_UI_COMPONENT(pButtonOther, m_pUIPerTradeDlg->GetChildByID<CN3UIButton>("btn_trade_other"));
 	pButtonOther->SetState(UI_STATE_BUTTON_DISABLE);
 }
 
@@ -672,7 +679,8 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 				case PER_TRADE_ITEM_MONEY:
 					{
 						// 거래 창의 내 현재 돈을 얻어 온다..
-						CN3UIString* pStrMy = (CN3UIString* )m_pUIPerTradeDlg->GetChildByID("string_money_my");	 __ASSERT(pStrMy, "NULL UI Component!!");
+						CN3UIString* pStrMy = nullptr;
+						N3_VERIFY_UI_COMPONENT(pStrMy, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_my"));
 						str = pStrMy->GetString();
 						iGold = atoi(str.c_str());
 
@@ -695,21 +703,21 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 				case PER_TRADE_ITEM_OTHER:
 					{
 						// 전에 작업한 아이템 종류가 아이템인 경우..
-						if( (m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->
+						if( (m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->
 							pItemBasic->byContable == UIITEM_TYPE_COUNTABLE) ||
-							(m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->
+							(m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->
 							pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL) )
 						{
 							// 활이나 물약등 아이템인 경우..
 							bool bFound = false;
 
 							// 인벤토리에 아이템이 없어진 경우.. 만든다..
-							if ( !m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder] )
+							if ( !m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] )
 							{
 								bFound = true;
 								// 인벤토리에 만들고 아이템의 갯수를 정해준다..
-								__IconItemSkill *spItem, *spItemNew = NULL;
-								spItem = m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
+								__IconItemSkill *spItem, *spItemNew = nullptr;
+								spItem = m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 
 								// 아이콘이 없으면 아이콘을 만드록 갯수는 0으로..
 								spItemNew				= new __IconItemSkill;
@@ -729,32 +737,32 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 								spItemNew->pUIIcon->SetStyle(UISTYLE_ICON_ITEM|UISTYLE_ICON_CERTIFICATION_NEED);
 								spItemNew->pUIIcon->SetVisible(true);
 								CN3UIArea* pArea;
-								pArea = m_pUIPerTradeDlg->GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_INV, CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder);
+								pArea = m_pUIPerTradeDlg->GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_INV, CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder);
 								if ( pArea )
 								{
 									spItemNew->pUIIcon->SetRegion(pArea->GetRegion());
 									spItemNew->pUIIcon->SetMoveRect(pArea->GetRegion());
 								}
 
-								m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItemNew;
+								m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItemNew;
 
 								// 내 거래창의 아이템이 있는 경우 .. 갯수 갱신..
 								if ( m_pUIPerTradeDlg->m_iBackupiCount != 
-									m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount )
+									m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount )
 								{
-									m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount
+									m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount
 										-= m_pUIPerTradeDlg->m_iBackupiCount;
 								}
 							}
 
 							// 아이콘이 내 거래창의 슬롯에 생긴경우.. 삭제한다..
 							if ( m_pUIPerTradeDlg->m_iBackupiCount == 
-								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount )
+								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount )
 							{
 								bFound = true;
 
 								__IconItemSkill* spItem;
-								spItem = m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
+								spItem = m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder];
 
 								// 매니저에서 제거..
 								m_pUIPerTradeDlg->RemoveChild(spItem->pUIIcon);
@@ -762,15 +770,15 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 								// 리소스 제거..
 								spItem->pUIIcon->Release();
 								delete spItem->pUIIcon;
-								spItem->pUIIcon = NULL;
+								spItem->pUIIcon = nullptr;
 								delete spItem;
-								spItem = NULL;
-								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = NULL;
+								spItem = nullptr;
+								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
 
 								// 인벤토리에 아이템이 있는 경우.. 갯수 갱신..
-								if ( m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder] )
+								if ( m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] )
 								{
-									m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount
+									m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount
 										+= m_pUIPerTradeDlg->m_iBackupiCount;
 								}
 							}
@@ -779,27 +787,27 @@ void CSubProcPerTrade::ReceiveMsgPerTradeAdd(uint8_t bResult)
 							if ( !bFound)
 							{
 								// 내 거래창과 인벤토리의 아이템의 갯수를 정해준다..
-								m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount
+								m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder]->iCount
 									+= m_pUIPerTradeDlg->m_iBackupiCount;
 
-								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount
+								m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->iCount
 									-= m_pUIPerTradeDlg->m_iBackupiCount;
 							}
 						}
 						else
 						{
 							__IconItemSkill* spItem;
-							spItem = CN3UIWndBase::m_sRecoveryJobInfo.pItemSource;
+							spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource;
 							spItem->pUIIcon->SetParent(m_pUIPerTradeDlg);
 
 							// 인벤토리 윈도우에 세팅하고..
-							m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItem;
+							m_pUIPerTradeDlg->m_pPerTradeInv[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = spItem;
 
 							// 내 거래 윈도우에서 클리어..
-							m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = NULL;
+							m_pUIPerTradeDlg->m_pPerTradeMy[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
 
 							CN3UIArea* pArea;
-							pArea = m_pUIPerTradeDlg->GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_INV, CN3UIWndBase::m_sRecoveryJobInfo.UIWndSourceStart.iOrder);
+							pArea = m_pUIPerTradeDlg->GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_INV, CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder);
 							if ( pArea )
 							{
 								spItem->pUIIcon->SetRegion(pArea->GetRegion());
@@ -821,7 +829,8 @@ void CSubProcPerTrade::ReceiveMsgPerTradeOtherAdd(int iItemID, int iCount, int i
 	if ( iItemID == dwGold )
 	{
 		// 거래 창의 다른 사람의 현재 돈을 얻어 온다..
-		CN3UIString* pStrOther = (CN3UIString* )m_pUIPerTradeDlg->GetChildByID("string_money_other");	 __ASSERT(pStrOther, "NULL UI Component!!");
+		CN3UIString* pStrOther = nullptr;
+		N3_VERIFY_UI_COMPONENT(pStrOther, m_pUIPerTradeDlg->GetChildByID<CN3UIString>("string_money_other"));
 		str = pStrOther->GetString();
 		iGold = atoi(str.c_str());
 		
@@ -837,12 +846,12 @@ void CSubProcPerTrade::ReceiveMsgPerTradeOtherAdd(int iItemID, int iCount, int i
 		bool  bFound = false;
 
 		// 아이템 만들어서 넣기..
-		__TABLE_ITEM_BASIC*	pItem = NULL;
-		__TABLE_ITEM_EXT*	pItemExt = NULL;
+		__TABLE_ITEM_BASIC*	pItem = nullptr;
+		__TABLE_ITEM_EXT*	pItemExt = nullptr;
 		pItem = s_pTbl_Items_Basic.Find(iItemID/1000*1000);	// 열 데이터 얻기..
 		if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
 			pItemExt = CGameBase::s_pTbl_Items_Exts[pItem->byExtIndex].Find(iItemID%1000);
-		if(NULL == pItem || NULL == pItemExt)
+		if(nullptr == pItem || nullptr == pItemExt)
 		{
 			__ASSERT(0, "아이템 포인터 테이블에 없음!!");
 			return;
@@ -906,7 +915,7 @@ void CSubProcPerTrade::ReceiveMsgPerTradeOtherAdd(int iItemID, int iCount, int i
 				spItem->pUIIcon->SetStyle(UISTYLE_ICON_ITEM|UISTYLE_ICON_CERTIFICATION_NEED);
 				spItem->pUIIcon->SetVisible(true);
 
-				CN3UIArea* pArea = NULL;
+				CN3UIArea* pArea = nullptr;
 				//pArea = m_pUIPerTradeDlg->GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_OTHER, i);
 				if ( pArea )
 				{
@@ -923,7 +932,7 @@ void CSubProcPerTrade::ReceiveMsgPerTradeOtherAdd(int iItemID, int iCount, int i
 		{
 			for( int i = 0; i < MAX_ITEM_PER_TRADE; i++ )
 			{
-				if (m_pUIPerTradeDlg->m_pPerTradeOther[i] == NULL)	
+				if (m_pUIPerTradeDlg->m_pPerTradeOther[i] == nullptr)	
 				{
 					bFound = true;
 					break;
@@ -954,7 +963,7 @@ void CSubProcPerTrade::ReceiveMsgPerTradeOtherAdd(int iItemID, int iCount, int i
 			spItem->pUIIcon->SetStyle(UISTYLE_ICON_ITEM|UISTYLE_ICON_CERTIFICATION_NEED);
 			spItem->pUIIcon->SetVisible(true);
 
-			CN3UIArea* pArea = NULL;
+			CN3UIArea* pArea = nullptr;
 			//pArea = m_pUIPerTradeDlg->GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_OTHER, i);
 			if ( pArea )
 			{
@@ -989,7 +998,7 @@ void CSubProcPerTrade::ReceiveMsgPerTradeDoneItemMove(uint8_t bItemPos, int iIte
 
 	// 아이템 인벤토리 INV 영역에 추가..
 	// 아이템이 들어갈 수 있는지 확인..
-	if ( m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos] != NULL )
+	if ( m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos] != nullptr )
 	{
 		if ( iItemID != (m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos]->pItemBasic->dwID/1000*1000)+
 			(m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos]->pItemExt->dwID%1000) )
@@ -1003,10 +1012,10 @@ void CSubProcPerTrade::ReceiveMsgPerTradeDoneItemMove(uint8_t bItemPos, int iIte
 			// 리소스 제거..
 			spItem->pUIIcon->Release();
 			delete spItem->pUIIcon;
-			spItem->pUIIcon = NULL;
+			spItem->pUIIcon = nullptr;
 			delete spItem;
-			spItem = NULL;
-			m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos] = NULL;
+			spItem = nullptr;
+			m_pUIPerTradeDlg->m_pPerTradeInv[bItemPos] = nullptr;
 
 			// 서버가 준 아이디로 아이콘을 만든다..
 			goto Make_Icon;	
@@ -1033,12 +1042,12 @@ void CSubProcPerTrade::ReceiveMsgPerTradeDoneItemMove(uint8_t bItemPos, int iIte
 Make_Icon:
 
 	// 아이템 만들어서 넣기..
-	__TABLE_ITEM_BASIC*	pItem = NULL;
-	__TABLE_ITEM_EXT*	pItemExt = NULL;
+	__TABLE_ITEM_BASIC*	pItem = nullptr;
+	__TABLE_ITEM_EXT*	pItemExt = nullptr;
 	pItem = s_pTbl_Items_Basic.Find(iItemID/1000*1000);	// 열 데이터 얻기..
 	if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
 		pItemExt = CGameBase::s_pTbl_Items_Exts[pItem->byExtIndex].Find(iItemID%1000);
-	if(NULL == pItem || NULL == pItemExt)
+	if(nullptr == pItem || nullptr == pItemExt)
 	{
 		__ASSERT(0, "아이템 포인터 테이블에 없음!!");
 		return;
@@ -1065,7 +1074,7 @@ Make_Icon:
 	spItem->pUIIcon->SetStyle(UISTYLE_ICON_ITEM|UISTYLE_ICON_CERTIFICATION_NEED);
 	spItem->pUIIcon->SetVisible(true);
 
-	CN3UIArea* pArea = NULL;
+	CN3UIArea* pArea = nullptr;
 	pArea = m_pUIPerTradeDlg->GetChildAreaByiOrder(UI_AREA_TYPE_PER_TRADE_INV, bItemPos);
 	if ( pArea )
 	{

@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgFormat dialog
 
 
-CDlgFormat::CDlgFormat(CWnd* pParent /*=NULL*/)
+CDlgFormat::CDlgFormat(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgFormat::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgFormat)

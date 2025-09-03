@@ -18,10 +18,10 @@ static char THIS_FILE[]=__FILE__;
 CN3FXPMesh::CN3FXPMesh()
 {
 	m_fRadius = 0.0f;
-	m_pColorVertices = NULL;
-	m_pVertices = NULL;
-	m_pVertices2 = NULL;
-	m_pIndices = NULL;
+	m_pColorVertices = nullptr;
+	m_pVertices = nullptr;
+	m_pVertices2 = nullptr;
+	m_pIndices = nullptr;
 }
 
 CN3FXPMesh::~CN3FXPMesh()
@@ -34,9 +34,9 @@ HRESULT CN3FXPMesh::Create(int iNumVertices, int iNumIndices)
 	m_iMaxNumVertices = iNumVertices;
 	m_iMaxNumIndices = iNumIndices;
 
-	if (m_pVertices) {delete m_pVertices; m_pVertices = NULL;}
-	if (m_pIndices) {delete m_pIndices; m_pIndices = NULL;}
-	if (m_pColorVertices) {delete m_pColorVertices; m_pColorVertices = NULL;}
+	if (m_pVertices) {delete m_pVertices; m_pVertices = nullptr;}
+	if (m_pIndices) {delete m_pIndices; m_pIndices = nullptr;}
+	if (m_pColorVertices) {delete m_pColorVertices; m_pColorVertices = nullptr;}
 
 	if (m_iMaxNumVertices>0)
 	{
@@ -99,20 +99,20 @@ bool CN3FXPMesh::Load(HANDLE hFile)
 	CN3BaseFileAccess::Load(hFile);
 
 	DWORD dwNum;
-	ReadFile(hFile, &m_iNumCollapses, sizeof(m_iNumCollapses), &dwNum, NULL);
-	ReadFile(hFile, &m_iTotalIndexChanges, sizeof(m_iTotalIndexChanges), &dwNum, NULL);
+	ReadFile(hFile, &m_iNumCollapses, sizeof(m_iNumCollapses), &dwNum, nullptr);
+	ReadFile(hFile, &m_iTotalIndexChanges, sizeof(m_iTotalIndexChanges), &dwNum, nullptr);
 
-	ReadFile(hFile, &m_iMaxNumVertices, sizeof(int), &dwNum, NULL);
-	ReadFile(hFile, &m_iMaxNumIndices , sizeof(int), &dwNum, NULL);
-	ReadFile(hFile, &m_iMinNumVertices, sizeof(int), &dwNum, NULL);
-	ReadFile(hFile, &m_iMinNumIndices , sizeof(int), &dwNum, NULL);
+	ReadFile(hFile, &m_iMaxNumVertices, sizeof(int), &dwNum, nullptr);
+	ReadFile(hFile, &m_iMaxNumIndices , sizeof(int), &dwNum, nullptr);
+	ReadFile(hFile, &m_iMinNumVertices, sizeof(int), &dwNum, nullptr);
+	ReadFile(hFile, &m_iMinNumIndices , sizeof(int), &dwNum, nullptr);
 
 	HRESULT hr = Create(m_iMaxNumVertices, m_iMaxNumIndices);
 	__ASSERT(SUCCEEDED(hr), "Failed to create progressive mesh");
 
 	if (m_iMaxNumVertices>0)
 	{
-		ReadFile(hFile, m_pVertices, m_iMaxNumVertices*sizeof(__VertexT1), &dwNum, NULL);
+		ReadFile(hFile, m_pVertices, m_iMaxNumVertices*sizeof(__VertexT1), &dwNum, nullptr);
 		for(int i=0;i<m_iMaxNumVertices;i++)
 		{
 			m_pColorVertices[i].x = m_pVertices[i].x;
@@ -124,16 +124,16 @@ bool CN3FXPMesh::Load(HANDLE hFile)
 		}
 
 		delete[] m_pVertices;
-		m_pVertices = NULL;
+		m_pVertices = nullptr;
 	}
 
 	if (m_iMaxNumIndices>0)
-		ReadFile(hFile, m_pIndices, m_iMaxNumIndices*sizeof(uint16_t), &dwNum, NULL);
+		ReadFile(hFile, m_pIndices, m_iMaxNumIndices*sizeof(uint16_t), &dwNum, nullptr);
 
 	if (m_iNumCollapses>0)
 	{
 		m_pCollapses = new __EdgeCollapse[m_iNumCollapses+1];	// +1을 한 이유 : PMeshInstance::SplitOne() 함수에서 부득이하게 포인터가 경계선을 가르키게 해야 하는 경우가 있어서.
-		ReadFile(hFile, m_pCollapses, m_iNumCollapses*sizeof(__EdgeCollapse), &dwNum, NULL);
+		ReadFile(hFile, m_pCollapses, m_iNumCollapses*sizeof(__EdgeCollapse), &dwNum, nullptr);
 		ZeroMemory(m_pCollapses + m_iNumCollapses, sizeof(__EdgeCollapse));	// 위의 +1을 한이유와 같음. 만약을 대비해 마지막 데이타를 초기화 해둠
 
 		bool bFixed = false;
@@ -153,15 +153,15 @@ bool CN3FXPMesh::Load(HANDLE hFile)
 	if (m_iTotalIndexChanges>0)
 	{
 		m_pAllIndexChanges = new int[m_iTotalIndexChanges];
-		ReadFile(hFile, m_pAllIndexChanges, m_iTotalIndexChanges*sizeof(int), &dwNum, NULL);
+		ReadFile(hFile, m_pAllIndexChanges, m_iTotalIndexChanges*sizeof(int), &dwNum, nullptr);
 	}
 
-	__ASSERT(m_pLODCtrlValues == NULL && m_iLODCtrlValueCount == 0, "Invalid Level of detail control value");
-	ReadFile(hFile, &m_iLODCtrlValueCount, sizeof(m_iLODCtrlValueCount), &dwNum, NULL);
+	__ASSERT(m_pLODCtrlValues == nullptr && m_iLODCtrlValueCount == 0, "Invalid Level of detail control value");
+	ReadFile(hFile, &m_iLODCtrlValueCount, sizeof(m_iLODCtrlValueCount), &dwNum, nullptr);
 	if (m_iLODCtrlValueCount>0)
 	{
 		m_pLODCtrlValues = new __LODCtrlValue[m_iLODCtrlValueCount];
-		ReadFile(hFile, m_pLODCtrlValues, m_iLODCtrlValueCount*sizeof(__LODCtrlValue), &dwNum, NULL);
+		ReadFile(hFile, m_pLODCtrlValues, m_iLODCtrlValueCount*sizeof(__LODCtrlValue), &dwNum, nullptr);
 	}
 
 	FindMinMax();
@@ -173,9 +173,9 @@ void CN3FXPMesh::Release()
 {
 	CN3PMesh::Release();
 
-	if (m_pVertices) {delete m_pVertices; m_pVertices = NULL;}
-	if (m_pIndices) {delete m_pIndices; m_pIndices = NULL;}
-	if (m_pColorVertices) {delete m_pColorVertices; m_pColorVertices = NULL;}
+	if (m_pVertices) {delete m_pVertices; m_pVertices = nullptr;}
+	if (m_pIndices) {delete m_pIndices; m_pIndices = nullptr;}
+	if (m_pColorVertices) {delete m_pColorVertices; m_pColorVertices = nullptr;}
 }
 
 
@@ -231,7 +231,7 @@ void CN3FXPMesh::FindMinMax()
 
 void CN3FXPMesh::SetColor(uint32_t dwColor)
 {
-	if (m_pColorVertices == NULL)	return;
+	if (m_pColorVertices == nullptr)	return;
 	if (m_iMaxNumVertices <= 0)		return;
 
 	for(int i=0;i<m_iMaxNumVertices;i++)

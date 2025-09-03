@@ -19,7 +19,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgMakeNPCPath dialog
 
 
-CDlgMakeNPCPath::CDlgMakeNPCPath(CWnd* pParent /*=NULL*/)
+CDlgMakeNPCPath::CDlgMakeNPCPath(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgMakeNPCPath::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgMakeNPCPath)
@@ -31,7 +31,7 @@ CDlgMakeNPCPath::CDlgMakeNPCPath(CWnd* pParent /*=NULL*/)
 	m_ViewNonMove = -1;
 	m_fTransX = 0.0f;
 	m_fTransZ = 0.0f;
-	m_pSelPath = NULL;
+	m_pSelPath = nullptr;
 	//}}AFX_DATA_INIT
 }
 
@@ -211,7 +211,7 @@ BOOL CDlgMakeNPCPath::OnInitDialog()
 	m_iRegenTime = 1;
 	m_PathSetFileName.Empty();
 
-	m_pSelPath = NULL;
+	m_pSelPath = nullptr;
 	m_strNPCPathName.Format("noname0000");
 
 	SetNumPoint(0);
@@ -281,7 +281,7 @@ void CDlgMakeNPCPath::OnBtnLoadPathset()
 {
 	CDlgLoadNPCPath dlg;
 
-	m_pSelPath = NULL;
+	m_pSelPath = nullptr;
 	
 	if(dlg.DoModal()==IDOK)
 	{
@@ -341,7 +341,7 @@ void CDlgMakeNPCPath::OnBtnPathDelete()
 	{
 		m_pRefNPCPathMgr->DelPath(pPath);
 	}
-	m_pSelPath = NULL;
+	m_pSelPath = nullptr;
 }
 
 void CDlgMakeNPCPath::OnBtnPathModify() 
@@ -447,7 +447,7 @@ void CDlgMakeNPCPath::OnBtnPathModify()
 void CDlgMakeNPCPath::OnSelchangeListNpcpath() 
 {
 	int idx = m_ListPathGroup.GetCurSel();
-	if(idx<0) m_pSelPath = NULL;
+	if(idx<0) m_pSelPath = nullptr;
 	else m_pSelPath = (CNPCPath*)m_ListPathGroup.GetItemDataPtr(idx);
 }
 
@@ -500,7 +500,7 @@ void CDlgMakeNPCPath::OnBtnLoadNpclist()
 	m_NPCList.ResetContent();
 
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
-	CFileDialog dlg(TRUE, "txt", NULL, dwFlags, "NPCList file(*.txt)|*.txt||", NULL);
+	CFileDialog dlg(TRUE, "txt", nullptr, dwFlags, "NPCList file(*.txt)|*.txt||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	CString szNpcFileName = dlg.GetPathName();
@@ -549,7 +549,7 @@ void CDlgMakeNPCPath::OnBtnTrans()
 void CDlgMakeNPCPath::OnBtnLoadCreate() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
-	CFileDialog dlg(TRUE, "txt", NULL, dwFlags, "Create Attr List file(*.txt)|*.txt||", NULL);
+	CFileDialog dlg(TRUE, "txt", nullptr, dwFlags, "Create Attr List file(*.txt)|*.txt||", nullptr);
 
 	if(dlg.DoModal() == IDCANCEL) return;
 
@@ -592,7 +592,7 @@ void CDlgMakeNPCPath::OnBtnLoadCreate()
 void CDlgMakeNPCPath::OnBtnLoadGroup() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
-	CFileDialog dlg(TRUE, "txt", NULL, dwFlags, "Group Attr List file(*.txt)|*.txt||", NULL);
+	CFileDialog dlg(TRUE, "txt", nullptr, dwFlags, "Group Attr List file(*.txt)|*.txt||", nullptr);
 
 	if(dlg.DoModal() == IDCANCEL) return;
 
@@ -635,7 +635,7 @@ void CDlgMakeNPCPath::OnBtnLoadGroup()
 void CDlgMakeNPCPath::OnBtnLoadRegen() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
-	CFileDialog dlg(TRUE, "txt", NULL, dwFlags, "Regen Attr List file(*.txt)|*.txt||", NULL);
+	CFileDialog dlg(TRUE, "txt", nullptr, dwFlags, "Regen Attr List file(*.txt)|*.txt||", nullptr);
 
 	if(dlg.DoModal() == IDCANCEL) return;
 	
@@ -678,7 +678,7 @@ void CDlgMakeNPCPath::OnBtnLoadRegen()
 void CDlgMakeNPCPath::OnBtnLoadOption() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
-	CFileDialog dlg(TRUE, "txt", NULL, dwFlags, "Option Attr List file(*.txt)|*.txt||", NULL);
+	CFileDialog dlg(TRUE, "txt", nullptr, dwFlags, "Option Attr List file(*.txt)|*.txt||", nullptr);
 
 	if(dlg.DoModal() == IDCANCEL) return;
 

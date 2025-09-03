@@ -14,7 +14,7 @@ class CDlgPercent : public CDialog
 {
 // Construction
 public:
-	CDlgPercent(CWnd* pParent = NULL);   // standard constructor
+	CDlgPercent(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgPercent)

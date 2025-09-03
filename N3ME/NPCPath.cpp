@@ -23,7 +23,7 @@ CNPCPath::CNPCPath()
 	m_iNumNPC = 0;
 	ZeroMemory(m_strNPCName, 80);
 	ZeroMemory(m_strPathName, 255);
-	m_pRefTerrain = NULL;
+	m_pRefTerrain = nullptr;
 	m_dwColor = 0xff0000ff;
 	m_iVersion = 4;
 
@@ -75,22 +75,22 @@ bool CNPCPath::GetPath(int idx, __Vector3* pPos)
 void CNPCPath::Load(HANDLE hFile)
 {
 	DWORD dwRWC;
-	ReadFile(hFile, &m_strPathName, 256, &dwRWC, NULL);
-	ReadFile(hFile, &m_iActType, sizeof(int), &dwRWC, NULL);
-	ReadFile(hFile, &m_iNPCID, sizeof(int), &dwRWC, NULL);
-	ReadFile(hFile, &m_iNumNPC, sizeof(int), &dwRWC, NULL);
-	ReadFile(hFile, &m_iRegenTime, sizeof(int), &dwRWC, NULL);
-	ReadFile(hFile, &m_iZoneID, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &m_strPathName, 256, &dwRWC, nullptr);
+	ReadFile(hFile, &m_iActType, sizeof(int), &dwRWC, nullptr);
+	ReadFile(hFile, &m_iNPCID, sizeof(int), &dwRWC, nullptr);
+	ReadFile(hFile, &m_iNumNPC, sizeof(int), &dwRWC, nullptr);
+	ReadFile(hFile, &m_iRegenTime, sizeof(int), &dwRWC, nullptr);
+	ReadFile(hFile, &m_iZoneID, sizeof(int), &dwRWC, nullptr);
 
-	ReadFile(hFile, &m_LTStartVertex, sizeof(__Vector3), &dwRWC, NULL);
-	ReadFile(hFile, &m_RBStartVertex, sizeof(__Vector3), &dwRWC, NULL);
-	ReadFile(hFile, m_strNPCName, 80, &dwRWC, NULL);
+	ReadFile(hFile, &m_LTStartVertex, sizeof(__Vector3), &dwRWC, nullptr);
+	ReadFile(hFile, &m_RBStartVertex, sizeof(__Vector3), &dwRWC, nullptr);
+	ReadFile(hFile, m_strNPCName, 80, &dwRWC, nullptr);
 
 	m_LTStartVertex.y = m_pRefTerrain->GetHeight(m_LTStartVertex.x, m_LTStartVertex.z);
 	m_RBStartVertex.y = m_pRefTerrain->GetHeight(m_RBStartVertex.x, m_RBStartVertex.z);
 
 	int size;
-	ReadFile(hFile, &size, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &size, sizeof(int), &dwRWC, nullptr);
 
 	m_iVersion = size / 1000;
 	size = size % 1000;
@@ -99,53 +99,53 @@ void CNPCPath::Load(HANDLE hFile)
 	m_Path.clear();
 	for(int i=0;i<size;i++)
 	{
-		ReadFile(hFile, &Vertex, sizeof(__Vector3), &dwRWC, NULL);
+		ReadFile(hFile, &Vertex, sizeof(__Vector3), &dwRWC, nullptr);
 		Vertex.y = m_pRefTerrain->GetHeight(Vertex.x, Vertex.z);
 		m_Path.push_back(Vertex);
 	}
 	if(m_iVersion>=1)
 	{
-		ReadFile(hFile, &m_dwColor, sizeof(DWORD), &dwRWC, NULL);
+		ReadFile(hFile, &m_dwColor, sizeof(DWORD), &dwRWC, nullptr);
 	}
 	if(m_iVersion==2)
 	{
 		int tmp;
-		ReadFile(hFile, &tmp, sizeof(int), &dwRWC, NULL);
-		ReadFile(hFile, &m_LTActVertex, sizeof(__Vector3), &dwRWC, NULL);
-		ReadFile(hFile, &m_RBActVertex, sizeof(__Vector3), &dwRWC, NULL);
+		ReadFile(hFile, &tmp, sizeof(int), &dwRWC, nullptr);
+		ReadFile(hFile, &m_LTActVertex, sizeof(__Vector3), &dwRWC, nullptr);
+		ReadFile(hFile, &m_RBActVertex, sizeof(__Vector3), &dwRWC, nullptr);
 	}
 	if(m_iVersion>=3)
 	{
-		ReadFile(hFile, &m_LTActVertex, sizeof(__Vector3), &dwRWC, NULL);
-		ReadFile(hFile, &m_RBActVertex, sizeof(__Vector3), &dwRWC, NULL);
+		ReadFile(hFile, &m_LTActVertex, sizeof(__Vector3), &dwRWC, nullptr);
+		ReadFile(hFile, &m_RBActVertex, sizeof(__Vector3), &dwRWC, nullptr);
 
-		ReadFile(hFile, &m_cAttr_Create, sizeof(unsigned char), &dwRWC, NULL);
-		ReadFile(hFile, &m_cAttr_Regen, sizeof(unsigned char), &dwRWC, NULL);
-		ReadFile(hFile, &m_cAttr_Group, sizeof(unsigned char), &dwRWC, NULL);
+		ReadFile(hFile, &m_cAttr_Create, sizeof(unsigned char), &dwRWC, nullptr);
+		ReadFile(hFile, &m_cAttr_Regen, sizeof(unsigned char), &dwRWC, nullptr);
+		ReadFile(hFile, &m_cAttr_Group, sizeof(unsigned char), &dwRWC, nullptr);
 	}
 	if(m_iVersion>=4)
 	{
-		ReadFile(hFile, &m_cAttr_Option, sizeof(unsigned char), &dwRWC, NULL);
+		ReadFile(hFile, &m_cAttr_Option, sizeof(unsigned char), &dwRWC, nullptr);
 	}
 }
 
 void CNPCPath::Save(HANDLE hFile)
 {
 	DWORD dwRWC;
-	WriteFile(hFile, &m_strPathName, 256, &dwRWC, NULL);
-	WriteFile(hFile, &m_iActType, sizeof(int), &dwRWC, NULL);
-	WriteFile(hFile, &m_iNPCID, sizeof(int), &dwRWC, NULL);
-	WriteFile(hFile, &m_iNumNPC, sizeof(int), &dwRWC, NULL);
-	WriteFile(hFile, &m_iRegenTime, sizeof(int), &dwRWC, NULL);
-	WriteFile(hFile, &m_iZoneID, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &m_strPathName, 256, &dwRWC, nullptr);
+	WriteFile(hFile, &m_iActType, sizeof(int), &dwRWC, nullptr);
+	WriteFile(hFile, &m_iNPCID, sizeof(int), &dwRWC, nullptr);
+	WriteFile(hFile, &m_iNumNPC, sizeof(int), &dwRWC, nullptr);
+	WriteFile(hFile, &m_iRegenTime, sizeof(int), &dwRWC, nullptr);
+	WriteFile(hFile, &m_iZoneID, sizeof(int), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_LTStartVertex, sizeof(__Vector3), &dwRWC, NULL);
-	WriteFile(hFile, &m_RBStartVertex, sizeof(__Vector3), &dwRWC, NULL);
-	WriteFile(hFile, m_strNPCName, 80, &dwRWC, NULL);
+	WriteFile(hFile, &m_LTStartVertex, sizeof(__Vector3), &dwRWC, nullptr);
+	WriteFile(hFile, &m_RBStartVertex, sizeof(__Vector3), &dwRWC, nullptr);
+	WriteFile(hFile, m_strNPCName, 80, &dwRWC, nullptr);
 
 	m_iVersion = 4;
 	int size = (m_iVersion*1000) + m_Path.size();
-	WriteFile(hFile, &size, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &size, sizeof(int), &dwRWC, nullptr);
 
 	std::list<__Vector3>::iterator itVertex;
 
@@ -153,21 +153,21 @@ void CNPCPath::Save(HANDLE hFile)
 	for(itVertex = m_Path.begin(); itVertex != m_Path.end(); itVertex++)
 	{
 		Vertex = (*itVertex);
-		WriteFile(hFile, &Vertex, sizeof(__Vector3), &dwRWC, NULL);
+		WriteFile(hFile, &Vertex, sizeof(__Vector3), &dwRWC, nullptr);
 	}
 
 	if(m_iVersion>=1)
 	{
-		WriteFile(hFile, &m_dwColor, sizeof(DWORD), &dwRWC, NULL);
+		WriteFile(hFile, &m_dwColor, sizeof(DWORD), &dwRWC, nullptr);
 	}
 
-	WriteFile(hFile, &m_LTActVertex, sizeof(__Vector3), &dwRWC, NULL);
-	WriteFile(hFile, &m_RBActVertex, sizeof(__Vector3), &dwRWC, NULL);
+	WriteFile(hFile, &m_LTActVertex, sizeof(__Vector3), &dwRWC, nullptr);
+	WriteFile(hFile, &m_RBActVertex, sizeof(__Vector3), &dwRWC, nullptr);
 
-	WriteFile(hFile, &m_cAttr_Create, sizeof(unsigned char), &dwRWC, NULL);
-	WriteFile(hFile, &m_cAttr_Regen, sizeof(unsigned char), &dwRWC, NULL);
-	WriteFile(hFile, &m_cAttr_Group, sizeof(unsigned char), &dwRWC, NULL);
-	WriteFile(hFile, &m_cAttr_Option, sizeof(unsigned char), &dwRWC, NULL);	
+	WriteFile(hFile, &m_cAttr_Create, sizeof(unsigned char), &dwRWC, nullptr);
+	WriteFile(hFile, &m_cAttr_Regen, sizeof(unsigned char), &dwRWC, nullptr);
+	WriteFile(hFile, &m_cAttr_Group, sizeof(unsigned char), &dwRWC, nullptr);
+	WriteFile(hFile, &m_cAttr_Option, sizeof(unsigned char), &dwRWC, nullptr);	
 }
 
 void CNPCPath::TransPos(float x, float z)

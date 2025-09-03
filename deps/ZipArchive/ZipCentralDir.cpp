@@ -16,30 +16,30 @@ struct CZipAutoHandle
 	LPVOID m_pFileMap;
 	CZipAutoHandle()
 	{
-		m_hFileMap = NULL;
-		m_pFileMap = NULL;
+		m_hFileMap = nullptr;
+		m_pFileMap = nullptr;
 	}
 	bool CreateMapping(HANDLE hFile)
 	{
-		m_hFileMap = CreateFileMapping(hFile, NULL, PAGE_READWRITE,
+		m_hFileMap = CreateFileMapping(hFile, nullptr, PAGE_READWRITE,
 			0, 0, _T("ZipArchive Mapping File"));
 		if (!m_hFileMap)
 			return false;
 		// Get pointer to memory representing file
 		m_pFileMap = MapViewOfFile(m_hFileMap, FILE_MAP_WRITE, 0, 0, 0);
-		return (m_pFileMap != NULL);
+		return (m_pFileMap != nullptr);
 	}
 	void RemoveMapping()
 	{
 		if (m_pFileMap)
 		{
 			UnmapViewOfFile(m_pFileMap);
-			m_pFileMap = NULL;
+			m_pFileMap = nullptr;
 		}
 		if (m_hFileMap)
 		{
 			CloseHandle(m_hFileMap);
-			m_hFileMap = NULL;
+			m_hFileMap = nullptr;
 		}
 		
 	}
@@ -58,8 +58,8 @@ CZipCentralDir::CZipCentralDir()
 {
 	m_bConvertAfterOpen  = true;
 	m_bFindFastEnabled = false;
-	m_pStorage = NULL;
-	m_pOpenedFile = NULL;
+	m_pStorage = nullptr;
+	m_pOpenedFile = nullptr;
 	m_iBufferSize = 32768;
 	
 }
@@ -68,7 +68,7 @@ void CZipCentralDir::Init()
 {
 	m_bOnDisk = false;
 	m_uBytesBeforeZip = m_uCentrDirPos = 0;
-	m_pOpenedFile = NULL;
+	m_pOpenedFile = nullptr;
 	m_pszComment.Release();
 }
 
@@ -198,7 +198,7 @@ void CZipCentralDir::ReadHeaders()
 // remove all headers from the central dir
 void CZipCentralDir::Clear(bool bEverything)
 {
-	m_pOpenedFile = NULL;
+	m_pOpenedFile = nullptr;
 	m_pLocalExtraField.Release();
 
 	if (bEverything)
@@ -266,7 +266,7 @@ void CZipCentralDir::CloseFile()
 		if (!m_pOpenedFile->CheckCrcAndSizes(buf))
 			ThrowError(ZIP_BADZIPFILE);
 	}
-	m_pOpenedFile = NULL;
+	m_pOpenedFile = nullptr;
 }
 
 // add new header using the argument as a template
@@ -335,7 +335,7 @@ void CZipCentralDir::CloseNewFile()
 	if (!bIsSpan)
 		m_pStorage->Flush();
 
-	m_pOpenedFile = NULL;
+	m_pOpenedFile = nullptr;
 
 }
 
@@ -506,7 +506,7 @@ DWORD CZipCentralDir::GetSize(bool bWhole)
 bool CZipCentralDir::RemoveDataDescr(bool bFromBuffer)
 {
 	CZipAutoHandle ah;
-	char* pFile = NULL;
+	char* pFile = nullptr;
 	DWORD uSize;
 	if (bFromBuffer)
 	{

@@ -43,8 +43,8 @@ static UINT indicators[] =
 CMainFrame::CMainFrame()
 {
 	// TODO: add member initialization code here
-	m_pSndObj0 = NULL;
-	m_pSndObj1 = NULL;
+	m_pSndObj0 = nullptr;
+	m_pSndObj1 = nullptr;
 }
 
 CMainFrame::~CMainFrame()
@@ -147,7 +147,7 @@ void CMainFrame::Dump(CDumpContext& dc) const
 
 CFormViewProperty* CMainFrame::GetPaneProperty()
 {
-	if(m_wndSplitter.GetSafeHwnd() == NULL) return NULL;
+	if(m_wndSplitter.GetSafeHwnd() == nullptr) return nullptr;
 
 	CWnd* pWnd = m_wndSplitter.GetPane(0, 0);
 	CFormViewProperty* pView = DYNAMIC_DOWNCAST(CFormViewProperty, pWnd);
@@ -156,7 +156,7 @@ CFormViewProperty* CMainFrame::GetPaneProperty()
 
 CN3CEView* CMainFrame::GetPaneRender()
 {
-	if(m_wndSplitter.GetSafeHwnd() == NULL) return NULL;
+	if(m_wndSplitter.GetSafeHwnd() == nullptr) return nullptr;
 
 	CWnd* pWnd = m_wndSplitter.GetPane(0, 1);
 	CN3CEView* pView = DYNAMIC_DOWNCAST(CN3CEView, pWnd);
@@ -165,7 +165,7 @@ CN3CEView* CMainFrame::GetPaneRender()
 
 CFormViewTool* CMainFrame::GetPaneTool()
 {
-	if(m_wndSplitter.GetSafeHwnd() == NULL) return NULL;
+	if(m_wndSplitter.GetSafeHwnd() == nullptr) return nullptr;
 
 	CWnd* pWnd = m_wndSplitter.GetPane(1, 0);
 	CFormViewTool* pView = DYNAMIC_DOWNCAST(CFormViewTool, pWnd);
@@ -174,7 +174,7 @@ CFormViewTool* CMainFrame::GetPaneTool()
 
 CFormViewAnimation* CMainFrame::GetPaneAnimation()
 {
-	if(m_wndSplitter.GetSafeHwnd() == NULL) return NULL;
+	if(m_wndSplitter.GetSafeHwnd() == nullptr) return nullptr;
 
 	CWnd* pWnd = m_wndSplitter.GetPane(1, 1);
 	CFormViewAnimation* pView = DYNAMIC_DOWNCAST(CFormViewAnimation, pWnd);
@@ -184,7 +184,7 @@ CFormViewAnimation* CMainFrame::GetPaneAnimation()
 
 void CMainFrame::OnEditChrProperty() 
 {
-//	if(m_DlgProperty.GetSafeHwnd() == NULL) m_DlgProperty.Create(IDD_CHR_PROPERTY, this);
+//	if(m_DlgProperty.GetSafeHwnd() == nullptr) m_DlgProperty.Create(IDD_CHR_PROPERTY, this);
 //	
 //	m_DlgProperty.UpdateInfo();
 //	m_DlgProperty.ShowWindow(SW_SHOW);

@@ -198,8 +198,8 @@ void CFormViewProperty::UpdateWindowPos()
 	int y = rc.bottom - 5;
 	int cx = rc.Width() - 6;
 
-	__Material* pMtl = NULL;
-	CN3Texture* pTex = NULL;
+	__Material* pMtl = nullptr;
+	CN3Texture* pTex = nullptr;
 	if(pBase && pBase->Type() & OBJ_CHARACTER_PART)
 	{
 		CN3CPart* pCPart = (CN3CPart*)pBase;
@@ -214,7 +214,7 @@ void CFormViewProperty::UpdateWindowPos()
 
 		int h = m_LPPlug.GetCount() * m_LPPlug.GetItemHeight(0);
 		y -= h;
-		m_LPPlug.SetWindowPos(NULL, x, y, cx, h, SWP_NOZORDER);
+		m_LPPlug.SetWindowPos(nullptr, x, y, cx, h, SWP_NOZORDER);
 		m_LPPlug.ShowWindow(SW_SHOW);
 		y -= 5;
 	}
@@ -223,7 +223,7 @@ void CFormViewProperty::UpdateWindowPos()
 	{
 		int h = m_LPMtl.GetCount() * m_LPMtl.GetItemHeight(0);
 		y -= h;
-		m_LPMtl.SetWindowPos(NULL, x, y, cx, h, SWP_NOZORDER);
+		m_LPMtl.SetWindowPos(nullptr, x, y, cx, h, SWP_NOZORDER);
 		m_LPMtl.ShowWindow(SW_SHOW);
 		y -= 5;
 	}
@@ -235,14 +235,14 @@ void CFormViewProperty::UpdateWindowPos()
 	{
 		int h = m_LPFXPlugPart.GetCount() * m_LPFXPlugPart.GetItemHeight(0);
 		y -= h;
-		m_LPFXPlugPart.SetWindowPos(NULL, x, y, cx, h, SWP_NOZORDER);
+		m_LPFXPlugPart.SetWindowPos(nullptr, x, y, cx, h, SWP_NOZORDER);
 		m_LPFXPlugPart.ShowWindow(SW_SHOW);
 		y -= 5;
 	}
 //	End Of Code (By Dino On 2002-10-11 오전 10:24:21 )
 //////////////////////////////////////////////////
 
-	m_TreeChr.SetWindowPos(NULL, x, 5, cx, y, SWP_NOZORDER);
+	m_TreeChr.SetWindowPos(nullptr, x, 5, cx, y, SWP_NOZORDER);
 
 	this->UpdateInfo();
 }
@@ -250,12 +250,12 @@ void CFormViewProperty::UpdateWindowPos()
 void CFormViewProperty::UpdateInfo()
 {
 	CN3Base* pBase = this->GetSelectedObject();
-	if(NULL == pBase) return;
+	if(nullptr == pBase) return;
 
-	CPropertyItem* pItem = NULL;
+	CPropertyItem* pItem = nullptr;
 
-	__Material* pMtl = NULL;
-	CN3Texture* pTex = NULL;
+	__Material* pMtl = nullptr;
+	CN3Texture* pTex = nullptr;
 	if(pBase->Type() & OBJ_CHARACTER_PART)
 	{
 		CN3CPart* pCPart = (CN3CPart*)pBase;
@@ -366,11 +366,11 @@ BOOL CFormViewProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 	if((void*)wParam == &m_LPMtl)
 	{
 		CN3Base* pBase = this->GetSelectedObject();
-		if(NULL == pBase) return FALSE;
+		if(nullptr == pBase) return FALSE;
 
 		CPropertyItem* pItem = (CPropertyItem*)lParam;
 
-		__Material* pMtl = NULL;
+		__Material* pMtl = nullptr;
 		if(pBase->Type() & OBJ_CHARACTER_PART) pMtl = &(((CN3CPart*)pBase)->m_Mtl);
 		else if(pBase->Type() & OBJ_CHARACTER_PLUG) pMtl = &(((CN3CPlug*)pBase)->m_Mtl);
 
@@ -388,7 +388,7 @@ BOOL CFormViewProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 			if(pItem->m_propName == "Emissive Color") pMtl->Emissive = pItem->D3DColorValueGet();
 
 			CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-			pFrm->GetPaneRender()->InvalidateRect(NULL, FALSE);
+			pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE);
 		}
 		if(pItem->m_propName == "Texture")
 		{
@@ -400,7 +400,7 @@ BOOL CFormViewProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 	else if((void*)wParam == &m_LPPlug)
 	{
 		CN3Base* pBase = this->GetSelectedObject();
-		if(NULL == pBase || !(pBase->Type() & OBJ_CHARACTER_PLUG)) return FALSE;
+		if(nullptr == pBase || !(pBase->Type() & OBJ_CHARACTER_PLUG)) return FALSE;
 
 		CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 		CPropertyItem* pItem = (CPropertyItem*)lParam;
@@ -439,7 +439,7 @@ BOOL CFormViewProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		}
 		*/
 
-		pFrm->GetPaneRender()->InvalidateRect(NULL, FALSE);
+		pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE);
 	}
 //////////////////////////////////////////////////
 //	Coded (By Dino On 2002-10-11 오전 10:37:54 )
@@ -447,7 +447,7 @@ BOOL CFormViewProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 	else if ((void*)wParam == &m_LPFXPlugPart)
 	{
 		CN3Base* pBase = this->GetSelectedObject();
-		if(NULL == pBase || !(pBase->Type() & OBJ_FX_PLUG_PART)) return FALSE;
+		if(nullptr == pBase || !(pBase->Type() & OBJ_FX_PLUG_PART)) return FALSE;
 		CPropertyItem* pItem = (CPropertyItem*)lParam;
 
 		CN3FXPlugPart* pFXPPart = (CN3FXPlugPart*)pBase;
@@ -487,14 +487,14 @@ BOOL CFormViewProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 void CFormViewProperty::OnSize(UINT nType, int cx, int cy) 
 {
 	CFormView::OnSize(nType, cx, cy);
-	if(m_TreeChr.GetSafeHwnd() == NULL) return;
+	if(m_TreeChr.GetSafeHwnd() == nullptr) return;
 
 	this->UpdateWindowPos();
 }
 
 void CFormViewProperty::UpdateAllInfo()
 {
-	if(m_TreeChr.GetSafeHwnd() == NULL) return;
+	if(m_TreeChr.GetSafeHwnd() == nullptr) return;
 
 	int nNodeCur = this->GetSelectedNode(); // 현재 선택되어 있는 노드 번호..
 
@@ -510,8 +510,8 @@ void CFormViewProperty::UpdateAllInfo()
 	m_hTI_FXPlug = m_TreeChr.InsertItem("FXPlug", 16, 16);
 	m_TreeChr.Expand(TVI_ROOT, TVE_EXPAND);
 
-	if(NULL == pChr) return;
-	HTREEITEM hInsert = NULL;
+	if(nullptr == pChr) return;
+	HTREEITEM hInsert = nullptr;
 //////////////////////////////////////////////////
 //	Coded (By Dino On 2002-10-10 오후 4:44:49 )
 //	FXPlug
@@ -546,7 +546,7 @@ void CFormViewProperty::UpdateAllInfo()
 	int nPC = pChr->PartCount();
 	for(int i = 0; i < nPC; i++)
 	{
-		if(NULL == pChr->Part(i)) 
+		if(nullptr == pChr->Part(i)) 
 		{
 			hInsert = m_TreeChr.InsertItem("Null Pointer!!!", 10, 10, m_hTI_Parts);
 			continue;
@@ -560,7 +560,7 @@ void CFormViewProperty::UpdateAllInfo()
 	nPC = pChr->PlugCount();
 	for(int i = 0; i < nPC; i++)
 	{
-		if(NULL == pChr->Plug(i)) 
+		if(nullptr == pChr->Plug(i)) 
 		{
 			hInsert = m_TreeChr.InsertItem("Null Pointer!!!", 11, 11, m_hTI_Plugs);
 			continue;
@@ -572,7 +572,7 @@ void CFormViewProperty::UpdateAllInfo()
 		m_TreeChr.SetItemData(hInsert, (DWORD)pPlug);
 
 		CString szTmp;
-		HTREEITEM hI2 = NULL;
+		HTREEITEM hI2 = nullptr;
 	}
 	m_TreeChr.Expand(m_hTI_Plugs, TVE_EXPAND);
 
@@ -587,7 +587,7 @@ void CFormViewProperty::OnTreeChrEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 
 	HTREEITEM hI = pTDI->item.hItem;
-	if(NULL == hI) return;
+	if(nullptr == hI) return;
 
 	if(hI == m_hTI_Joint) 
 	{
@@ -614,7 +614,7 @@ void CFormViewProperty::OnTreeChrEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
 
 	HTREEITEM hPI = m_TreeChr.GetParentItem(hI);
-	if(NULL == hPI) return;
+	if(nullptr == hPI) return;
 
 	CN3Base* pBase = (CN3Base*)m_TreeChr.GetItemData(hI);
 	if(pBase)
@@ -637,11 +637,11 @@ void CFormViewProperty::OnTreeChrRclick(NMHDR* pNMHDR, LRESULT* pResult)
 	CPoint pt2 = pt;
 	m_TreeChr.ScreenToClient(&pt2);
 	HTREEITEM hI = m_TreeChr.HitTest(pt2); // 현재 위치에서 찍힌
-	if(NULL == hI) return;
+	if(nullptr == hI) return;
 
 	m_TreeChr.SelectItem(hI);
 	HTREEITEM hPI = m_TreeChr.GetParentItem(hI);
-//	if(NULL == hPI) return;
+//	if(nullptr == hPI) return;
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CMenu* pMenu = pFrm->GetMenu();
@@ -700,19 +700,19 @@ void CFormViewProperty::OnEditChrJointSet()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3CEDoc* pDoc = (CN3CEDoc*)pFrm->GetActiveDocument();
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 
-	pFrm->GetPaneRender()->m_pJointSelected = NULL;
+	pFrm->GetPaneRender()->m_pJointSelected = nullptr;
 
 	CString FileName;
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "N3Joint", NULL, dwFlags, "Joint File(*.N3Joint)|*.N3Joint||", NULL);
+	CFileDialog dlg(TRUE, "N3Joint", nullptr, dwFlags, "Joint File(*.N3Joint)|*.N3Joint||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	
 	FileName = dlg.GetPathName();
 	pChr->JointSet(std::string(FileName));
 
-	pDoc->UpdateAllViews(NULL);;
+	pDoc->UpdateAllViews(nullptr);;
 }
 
 void CFormViewProperty::OnEditChrPartAdd() 
@@ -720,10 +720,10 @@ void CFormViewProperty::OnEditChrPartAdd()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3CEDoc* pDoc = (CN3CEDoc*)pFrm->GetActiveDocument();
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 
 	pChr->PartAdd();
-	pDoc->UpdateAllViews(NULL);;
+	pDoc->UpdateAllViews(nullptr);;
 }
 
 void CFormViewProperty::OnEditChrPartDelete() 
@@ -731,12 +731,12 @@ void CFormViewProperty::OnEditChrPartDelete()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3CEDoc* pDoc = (CN3CEDoc*)pFrm->GetActiveDocument();
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 
 	HTREEITEM hI = m_TreeChr.GetSelectedItem();
-	if(NULL == hI) return;
+	if(nullptr == hI) return;
 	CN3Base* pBase = (CN3Base*) m_TreeChr.GetItemData(hI);
-	if(NULL == pBase || !(pBase->Type() & OBJ_CHARACTER_PART)) return;
+	if(nullptr == pBase || !(pBase->Type() & OBJ_CHARACTER_PART)) return;
 
 	CN3CPart* pPart = (CN3CPart*)pBase;
 	int nPC = pChr->PartCount();
@@ -749,19 +749,19 @@ void CFormViewProperty::OnEditChrPartDelete()
 		}
 	}
 
-	pDoc->UpdateAllViews(NULL);;
+	pDoc->UpdateAllViews(nullptr);;
 }
 
 void CFormViewProperty::OnEditChrPartSet() 
 {
 	CN3Base* pBase = this->GetSelectedObject();
-	if(NULL == pBase || !(pBase->Type() & OBJ_CHARACTER_PART)) return;
+	if(nullptr == pBase || !(pBase->Type() & OBJ_CHARACTER_PART)) return;
 
 	CN3CPart* pPart = (CN3CPart*)pBase;
 
 	CString FileName;
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "N3CPart", NULL, dwFlags, "Character Part File(*.N3CPart)|*.N3CPart||", NULL);
+	CFileDialog dlg(TRUE, "N3CPart", nullptr, dwFlags, "Character Part File(*.N3CPart)|*.N3CPart||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	FileName = dlg.GetPathName();
@@ -769,7 +769,7 @@ void CFormViewProperty::OnEditChrPartSet()
 	pPart->LoadFromFile(std::string(FileName)); // 파일에서 읽기.
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	GetDocument()->UpdateAllViews(NULL);;
+	GetDocument()->UpdateAllViews(nullptr);;
 }
 
 void CFormViewProperty::OnEditChrPlugAdd() 
@@ -777,7 +777,7 @@ void CFormViewProperty::OnEditChrPlugAdd()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3CEDoc* pDoc = (CN3CEDoc*)pFrm->GetActiveDocument();
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 
 	CN3CPlugBase* pPlug = pChr->PlugAdd();
 	if(pPlug)
@@ -785,7 +785,7 @@ void CFormViewProperty::OnEditChrPlugAdd()
 		pPlug->m_szName = "Untitled";
 		pPlug->FileNameSet("Item\\Untitled.N3CPlug");
 	}
-	pDoc->UpdateAllViews(NULL);
+	pDoc->UpdateAllViews(nullptr);
 }
 
 void CFormViewProperty::OnEditChrPlugAddcloak() 
@@ -793,7 +793,7 @@ void CFormViewProperty::OnEditChrPlugAddcloak()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3CEDoc* pDoc = (CN3CEDoc*)pFrm->GetActiveDocument();
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 
 	CN3CPlugBase* pPlug = pChr->PlugAdd(PLUGTYPE_CLOAK);
 	if(pPlug)
@@ -801,7 +801,7 @@ void CFormViewProperty::OnEditChrPlugAddcloak()
 		pPlug->m_szName = "Untitled";
 		pPlug->FileNameSet("Item\\Untitled.N3CPlug_Cloak");
 	}
-	pDoc->UpdateAllViews(NULL);
+	pDoc->UpdateAllViews(nullptr);
 }
 
 void CFormViewProperty::OnEditChrPlugDelete() 
@@ -809,12 +809,12 @@ void CFormViewProperty::OnEditChrPlugDelete()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3CEDoc* pDoc = (CN3CEDoc*)pFrm->GetActiveDocument();
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 
 	HTREEITEM hI = m_TreeChr.GetSelectedItem();
-	if(NULL == hI) return;
+	if(nullptr == hI) return;
 	CN3Base* pBase = (CN3Base*) m_TreeChr.GetItemData(hI);
-	if(NULL == pBase || !(pBase->Type() & OBJ_CHARACTER_PLUG)) return;
+	if(nullptr == pBase || !(pBase->Type() & OBJ_CHARACTER_PLUG)) return;
 
 	CN3CPlug* pPlug = (CN3CPlug*)pBase;
 	int nPC = pChr->PlugCount();
@@ -827,19 +827,19 @@ void CFormViewProperty::OnEditChrPlugDelete()
 		}
 	}
 
-	pDoc->UpdateAllViews(NULL);;
+	pDoc->UpdateAllViews(nullptr);;
 }
 
 void CFormViewProperty::OnEditChrPlugSet() 
 {
 	CN3Base* pBase = this->GetSelectedObject();
-	if(NULL == pBase || !(pBase->Type() & OBJ_CHARACTER_PLUG)) return;
+	if(nullptr == pBase || !(pBase->Type() & OBJ_CHARACTER_PLUG)) return;
 
 	CN3CPlug* pPlug = (CN3CPlug*)pBase;
 
 	CString FileName;
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "N3CPlug", NULL, dwFlags, "Character Plug File(*.N3CPlug)|*.N3CPlug||", NULL);
+	CFileDialog dlg(TRUE, "N3CPlug", nullptr, dwFlags, "Character Plug File(*.N3CPlug)|*.N3CPlug||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	FileName = dlg.GetPathName();
@@ -849,18 +849,18 @@ void CFormViewProperty::OnEditChrPlugSet()
 	CN3Chr* pChr = GetDocument()->m_Scene.ChrGet(0);
 	if(pChr) pChr->RemakePlugTracePolygons();
 
-	GetDocument()->UpdateAllViews(NULL);;
+	GetDocument()->UpdateAllViews(nullptr);;
 }
 
 CN3Base* CFormViewProperty::GetSelectedObject()
 {
 	HTREEITEM hItem = m_TreeChr.GetSelectedItem();
-	if(NULL == hItem) return NULL;
+	if(nullptr == hItem) return nullptr;
 
-	if(m_TreeChr.GetItemData(hItem) == NULL)
+	if(m_TreeChr.GetItemData(hItem) == 0)
 	{
 		hItem = m_TreeChr.GetParentItem(hItem);
-		if(NULL == hItem) return NULL;
+		if(nullptr == hItem) return nullptr;
 	}
 
 	return (CN3Base*)m_TreeChr.GetItemData(hItem);
@@ -876,10 +876,10 @@ void CFormViewProperty::OnSelchangedTreeChr(NMHDR* pNMHDR, LRESULT* pResult)
 	if(pBase && (pBase->Type() & OBJ_JOINT))
 	{
 		pFrm->GetPaneRender()->m_pJointSelected = (CN3Joint*)pBase;
-		pFrm->GetPaneRender()->InvalidateRect(NULL, FALSE);
+		pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE);
 	}
 	
-	pFrm->GetPaneRender()->InvalidateRect(NULL, FALSE);
+	pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE);
 	this->UpdateWindowPos();
 
 	*pResult = 0;
@@ -894,7 +894,7 @@ void CFormViewProperty::SelectNode(int nNodeIndex)
 {
 	int nNode = 0;
 	for(HTREEITEM hNext = m_TreeChr.GetChildItem(TVI_ROOT);
-		NULL != hNext;
+		nullptr != hNext;
 		hNext = m_TreeChr.GetNextItem(hNext, TVGN_NEXTVISIBLE), nNode++)
 	{
 		if(nNode == nNodeIndex) 
@@ -910,7 +910,7 @@ int CFormViewProperty::GetSelectedNode()
 	int nNode = 0;
 	HTREEITEM hItem = m_TreeChr.GetSelectedItem();
 	for(HTREEITEM hNext = m_TreeChr.GetChildItem(TVI_ROOT);
-		NULL != hNext;
+		nullptr != hNext;
 		hNext = m_TreeChr.GetNextItem(hNext, TVGN_NEXTVISIBLE), nNode++)
 	{
 		if(hItem == hNext)
@@ -966,7 +966,7 @@ void CFormViewProperty::OnEditChrPlugRotationReset()
 		pPlug->RotationSet(mtxRot); // 회전값 초기화..
 
 		CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-		pFrm->GetPaneRender()->InvalidateRect(NULL, FALSE);
+		pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE);
 	}
 }
 
@@ -974,10 +974,10 @@ void CFormViewProperty::OnEditChrPlugRotationReset()
 
 void CFormViewProperty::SelectJointNode(HTREEITEM hItemParent, CN3Joint *pJoint)
 {
-	if(NULL == hItemParent || NULL == pJoint) return;
+	if(nullptr == hItemParent || nullptr == pJoint) return;
 
 	for(HTREEITEM hNext = m_TreeChr.GetChildItem(hItemParent);
-	NULL != hNext;
+	nullptr != hNext;
 	hNext = m_TreeChr.GetNextItem(hNext, TVGN_NEXTVISIBLE))
 	{
 		void* pPtr  = (void*)(m_TreeChr.GetItemData(hNext));
@@ -995,7 +995,7 @@ void CFormViewProperty::SelectJointNode(HTREEITEM hItemParent, CN3Joint *pJoint)
 void CFormViewProperty::OnEditSetVisible() 
 {
 	CN3Base* pBase = this->GetSelectedObject();
-	if(NULL == pBase) return;
+	if(nullptr == pBase) return;
 
 	if(pBase->Type() & OBJ_CHARACTER_PART)
 	{
@@ -1009,13 +1009,13 @@ void CFormViewProperty::OnEditSetVisible()
 	}
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetPaneRender()->InvalidateRect(NULL, FALSE);
+	pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE);
 }
 
 void CFormViewProperty::OnUpdateEditSetVisible(CCmdUI* pCmdUI) 
 {
 	CN3Base* pBase = this->GetSelectedObject();
-	if(NULL == pBase) return;
+	if(nullptr == pBase) return;
 
 	bool bVisible = false;
 	if(pBase->Type() & OBJ_CHARACTER_PART) bVisible = ((CN3CPart*)pBase)->m_bVisible;
@@ -1029,11 +1029,11 @@ void CFormViewProperty::OnUpdateEditSetVisible(CCmdUI* pCmdUI)
 void CFormViewProperty::OnEditChrPlugImportPMesh() 
 {
 	CN3Base* pBase = this->GetSelectedObject();
-	if(NULL == pBase || !(pBase->Type() & OBJ_CHARACTER_PLUG)) return;
+	if(nullptr == pBase || !(pBase->Type() & OBJ_CHARACTER_PLUG)) return;
 
 	CString FileName;
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "N3PMesh", NULL, dwFlags, "N3 Progressive Mesh(*.N3PMesh)|*.N3PMesh||", NULL);
+	CFileDialog dlg(TRUE, "N3PMesh", nullptr, dwFlags, "N3 Progressive Mesh(*.N3PMesh)|*.N3PMesh||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	
 	FileName = dlg.GetPathName();
@@ -1042,7 +1042,7 @@ void CFormViewProperty::OnEditChrPlugImportPMesh()
 	pPlug->ImportPMesh((const char*)FileName);
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetPaneRender()->InvalidateRect(NULL, FALSE);
+	pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE);
 }
 
 void CFormViewProperty::OnEditFxplugSet() 
@@ -1050,17 +1050,17 @@ void CFormViewProperty::OnEditFxplugSet()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3CEDoc* pDoc = (CN3CEDoc*)pFrm->GetActiveDocument();
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 
 	CString FileName;
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "N3FXPlug", NULL, dwFlags, "FXPlug File(*.N3FXPlug)|*.N3FXPlug||", NULL);
+	CFileDialog dlg(TRUE, "N3FXPlug", nullptr, dwFlags, "FXPlug File(*.N3FXPlug)|*.N3FXPlug||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 	
 	FileName = dlg.GetPathName();
 	pChr->FXPlugSet(std::string(FileName));
 
-	pDoc->UpdateAllViews(NULL);
+	pDoc->UpdateAllViews(nullptr);
 }
 
 void CFormViewProperty::OnEditFxplugDelete() 
@@ -1068,10 +1068,10 @@ void CFormViewProperty::OnEditFxplugDelete()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3CEDoc* pDoc = (CN3CEDoc*)pFrm->GetActiveDocument();
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 
 	pChr->FXPlugDelete();
-	pDoc->UpdateAllViews(NULL);
+	pDoc->UpdateAllViews(nullptr);
 	
 }
 
@@ -1080,12 +1080,12 @@ void CFormViewProperty::OnEditFxplugPartAdd()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3CEDoc* pDoc = (CN3CEDoc*)pFrm->GetActiveDocument();
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3FXPlug* pFXPlug = pChr->FXPlugGet();
-	if (NULL == pFXPlug) pFXPlug = pChr->FXPlugCreate();
+	if (nullptr == pFXPlug) pFXPlug = pChr->FXPlugCreate();
 	pFXPlug->FXPPartAdd();
 
-	pDoc->UpdateAllViews(NULL);
+	pDoc->UpdateAllViews(nullptr);
 }
 
 void CFormViewProperty::OnEditFxplugPartDelete() 
@@ -1093,14 +1093,14 @@ void CFormViewProperty::OnEditFxplugPartDelete()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3CEDoc* pDoc = (CN3CEDoc*)pFrm->GetActiveDocument();
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3FXPlug* pFXPlug = pChr->FXPlugGet();
-	if(NULL == pFXPlug) return;
+	if(nullptr == pFXPlug) return;
 
 	HTREEITEM hI = m_TreeChr.GetSelectedItem();
-	if(NULL == hI) return;
+	if(nullptr == hI) return;
 	CN3Base* pBase = (CN3Base*) m_TreeChr.GetItemData(hI);
-	if(NULL == pBase || !(pBase->Type() & OBJ_FX_PLUG_PART)) return;
+	if(nullptr == pBase || !(pBase->Type() & OBJ_FX_PLUG_PART)) return;
 
 	CN3FXPlugPart* pPart = (CN3FXPlugPart*)pBase;
 	int nPC = pFXPlug->m_FXPParts.size();
@@ -1113,7 +1113,7 @@ void CFormViewProperty::OnEditFxplugPartDelete()
 		}
 	}
 
-	pDoc->UpdateAllViews(NULL);
+	pDoc->UpdateAllViews(nullptr);
 }
 
 void CFormViewProperty::OnEditFxplugStart() 
@@ -1121,13 +1121,13 @@ void CFormViewProperty::OnEditFxplugStart()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3CEDoc* pDoc = (CN3CEDoc*)pFrm->GetActiveDocument();
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3FXPlug* pFXPlug = pChr->FXPlugGet();
-	if (NULL == pFXPlug) return;
+	if (nullptr == pFXPlug) return;
 
 	pFXPlug->TriggerAll();
 
-	pDoc->UpdateAllViews(NULL);	
+	pDoc->UpdateAllViews(nullptr);	
 }
 
 void CFormViewProperty::OnEditFxplugStop() 
@@ -1135,11 +1135,11 @@ void CFormViewProperty::OnEditFxplugStop()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3CEDoc* pDoc = (CN3CEDoc*)pFrm->GetActiveDocument();
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3FXPlug* pFXPlug = pChr->FXPlugGet();
-	if (NULL == pFXPlug) return;
+	if (nullptr == pFXPlug) return;
 
 	pFXPlug->StopAll();
 
-	pDoc->UpdateAllViews(NULL);		
+	pDoc->UpdateAllViews(nullptr);		
 }

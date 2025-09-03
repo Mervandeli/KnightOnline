@@ -32,7 +32,7 @@ CEventCell::CEventCell()
 	}
 	sprintf(m_Name,"none");
 
-	m_pRefTerrain = NULL;
+	m_pRefTerrain = nullptr;
 }
 
 CEventCell::CEventCell(CLyTerrain* pRefTerrain)
@@ -159,33 +159,33 @@ void CEventCell::Render(DWORD color)
 void CEventCell::Load(HANDLE hFile)
 {
 	DWORD dwRWC;
-	ReadFile(hFile, &m_ZoneID, sizeof(short), &dwRWC, NULL);
-	ReadFile(hFile, m_Name, 80, &dwRWC, NULL);
-	ReadFile(hFile, &m_EventID, sizeof(short), &dwRWC, NULL);
-	ReadFile(hFile, &m_EventType, sizeof(short), &dwRWC, NULL);
+	ReadFile(hFile, &m_ZoneID, sizeof(short), &dwRWC, nullptr);
+	ReadFile(hFile, m_Name, 80, &dwRWC, nullptr);
+	ReadFile(hFile, &m_EventID, sizeof(short), &dwRWC, nullptr);
+	ReadFile(hFile, &m_EventType, sizeof(short), &dwRWC, nullptr);
 
 	for(int i=0;i<MAX_CON;i++)
 	{
-		ReadFile(hFile, m_Con[i], 256, &dwRWC, NULL);
-		ReadFile(hFile, m_Exe[i], 256, &dwRWC, NULL);
+		ReadFile(hFile, m_Con[i], 256, &dwRWC, nullptr);
+		ReadFile(hFile, m_Exe[i], 256, &dwRWC, nullptr);
 	}
 
-	ReadFile(hFile, &m_Rect, sizeof(RECT), &dwRWC, NULL);
+	ReadFile(hFile, &m_Rect, sizeof(RECT), &dwRWC, nullptr);
 }
 
 void CEventCell::Save(HANDLE hFile)
 {
 	DWORD dwRWC;
-	WriteFile(hFile, &m_ZoneID, sizeof(short), &dwRWC, NULL);
-	WriteFile(hFile, m_Name, 80, &dwRWC, NULL);
-	WriteFile(hFile, &m_EventID, sizeof(short), &dwRWC, NULL);
-	WriteFile(hFile, &m_EventType, sizeof(short), &dwRWC, NULL);
+	WriteFile(hFile, &m_ZoneID, sizeof(short), &dwRWC, nullptr);
+	WriteFile(hFile, m_Name, 80, &dwRWC, nullptr);
+	WriteFile(hFile, &m_EventID, sizeof(short), &dwRWC, nullptr);
+	WriteFile(hFile, &m_EventType, sizeof(short), &dwRWC, nullptr);
 
 	for(int i=0;i<MAX_CON;i++)
 	{
-		WriteFile(hFile, m_Con[i], 256, &dwRWC, NULL);
-		WriteFile(hFile, m_Exe[i], 256, &dwRWC, NULL);
+		WriteFile(hFile, m_Con[i], 256, &dwRWC, nullptr);
+		WriteFile(hFile, m_Exe[i], 256, &dwRWC, nullptr);
 	}
 
-	WriteFile(hFile, &m_Rect, sizeof(RECT), &dwRWC, NULL);
+	WriteFile(hFile, &m_Rect, sizeof(RECT), &dwRWC, nullptr);
 }

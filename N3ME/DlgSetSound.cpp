@@ -19,7 +19,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgSetSound dialog
 
 
-CDlgSetSound::CDlgSetSound(CWnd* pParent /*=NULL*/)
+CDlgSetSound::CDlgSetSound(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgSetSound::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgSetSound)
@@ -63,7 +63,7 @@ LPSOUNDINFO CDlgSetSound::GetSoundGroup(DWORD dwID)
 		LPSOUNDINFO pSoundInfo = (LPSOUNDINFO)m_ListSoundGroup.GetItemDataPtr(i);
 		if(pSoundInfo && pSoundInfo->dwID == dwID) return pSoundInfo;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void CDlgSetSound::OnBtnAddSoundgroup() 
@@ -109,7 +109,7 @@ int CDlgSetSound::MakeIdx()
 	if(m_iIdx_Min>0) return 0;
 	if(m_iIdx_Min > m_iIdx_Max) return 0;
 
-	LPSOUNDINFO pSoundInfo = NULL;
+	LPSOUNDINFO pSoundInfo = nullptr;
 
 	for(int i=m_iIdx_Min; i<=m_iIdx_Max;i++)
 	{
@@ -254,8 +254,8 @@ BOOL CDlgSetSound::OnInitDialog()
 	SetDlgItemText(IDC_BGE_REGENTIME3, "0");
 	SetDlgItemText(IDC_BGE_REGENTIME4, "0");
 
-	m_pRefSoundMgr = NULL;
-	m_pSelSound = NULL;
+	m_pRefSoundMgr = nullptr;
+	m_pSelSound = nullptr;
 	
 	m_ListSoundGroup.ResetContent();
 	m_ListSoundInfo.ResetContent();
@@ -343,7 +343,7 @@ void CDlgSetSound::OnSelchangeListSoundinfo()
 	int idx = m_ListSoundInfo.GetCurSel();
 	if(idx<0)
 	{
-		m_pSelSound = NULL;
+		m_pSelSound = nullptr;
 		m_pRefSoundMgr->m_pRefMapMng->Invalidate();
 		return;
 	}
@@ -359,7 +359,7 @@ void CDlgSetSound::OnBtnInputInfoDel()
 	{
 		m_pSelSound = (CSoundCell*)m_ListSoundInfo.GetItemDataPtr(idx);
 		m_pRefSoundMgr->DelSound(m_pSelSound);
-		m_pSelSound = NULL;
+		m_pSelSound = nullptr;
 		m_ListSoundInfo.DeleteString(idx);		
 	}
 	
@@ -373,7 +373,7 @@ void CDlgSetSound::OnBtnInputInfoEdit()
 	{
 		m_pSelSound = (CSoundCell*)m_ListSoundInfo.GetItemDataPtr(idx);
 		m_pRefSoundMgr->SetCurrSound(m_pSelSound);
-		m_pSelSound = NULL;
+		m_pSelSound = nullptr;
 		m_ListSoundInfo.DeleteString(idx);
 	}
 	
@@ -384,12 +384,12 @@ bool CDlgSetSound::LoadSoundGroup(HANDLE hFile)
 {
 	DWORD dwRWC;
 	int cnt = 0;
-	ReadFile(hFile, &cnt, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
 		
 	for(int i=0;i<cnt;i++)
 	{
 		LPSOUNDINFO pSndInfo = new SOUNDINFO;
-		ReadFile(hFile, pSndInfo, sizeof(SOUNDINFO), &dwRWC, NULL);
+		ReadFile(hFile, pSndInfo, sizeof(SOUNDINFO), &dwRWC, nullptr);
 		AddSoundGroup(pSndInfo->szName, pSndInfo);
 	}
 	return true;
@@ -399,13 +399,13 @@ bool CDlgSetSound::SaveSoundGroup(HANDLE hFile)
 {
 	DWORD dwRWC;
 	int cnt = m_ListSoundGroup.GetCount();
-	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
 
 	LPSOUNDINFO pSndInfo;
 	for(int i=0;i<cnt;i++)
 	{
 		pSndInfo = (LPSOUNDINFO)m_ListSoundGroup.GetItemDataPtr(i);
-		WriteFile(hFile, pSndInfo, sizeof(SOUNDINFO), &dwRWC, NULL);
+		WriteFile(hFile, pSndInfo, sizeof(SOUNDINFO), &dwRWC, nullptr);
 	}
 	return true;
 }

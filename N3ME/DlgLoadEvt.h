@@ -14,7 +14,7 @@ class CDlgLoadEvt : public CDialog
 {
 // Construction
 public:
-	CDlgLoadEvt(CWnd* pParent = NULL);   // standard constructor
+	CDlgLoadEvt(CWnd* pParent = nullptr);   // standard constructor
 
 	CString	m_SelFileName;
 // Dialog Data

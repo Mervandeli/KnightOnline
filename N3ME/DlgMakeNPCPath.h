@@ -29,7 +29,7 @@ public:
 	unsigned char	m_cSelAttrCreate;
 	unsigned char	m_cSelOption;
 
-	CDlgMakeNPCPath(CWnd* pParent = NULL);   // standard constructor
+	CDlgMakeNPCPath(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgMakeNPCPath)

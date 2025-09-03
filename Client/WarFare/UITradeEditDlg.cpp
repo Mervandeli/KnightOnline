@@ -29,9 +29,9 @@ static char THIS_FILE[]=__FILE__;
 
 CUITradeEditDlg::CUITradeEditDlg()
 {
-	m_pSubProcPerTrade = NULL;
-	m_pArea = NULL;
-	m_pImageOfIcon = NULL;
+	m_pSubProcPerTrade = nullptr;
+	m_pArea = nullptr;
+	m_pImageOfIcon = nullptr;
 }
 
 CUITradeEditDlg::~CUITradeEditDlg()
@@ -48,16 +48,16 @@ void CUITradeEditDlg::Release()
 
 int	CUITradeEditDlg::GetQuantity() // "edit_trade" Edit Control 에서 정수값을 얻오온다..
 {
-	CN3UIEdit* pEdit = (CN3UIEdit*)this->GetChildByID("edit_trade");
-	__ASSERT(pEdit, "NULL UI Component!!");
+	CN3UIEdit* pEdit = nullptr;
+	N3_VERIFY_UI_COMPONENT(pEdit, GetChildByID<CN3UIEdit>("edit_trade"));
 
 	return atoi(pEdit->GetString().c_str());
 }
 
 void CUITradeEditDlg::SetQuantity(int iQuantity) // "edit_trade" Edit Control 에서 정수값을 문자열로 세팅한다..
 {
-	CN3UIEdit* pEdit = (CN3UIEdit*) GetChildByID("edit_trade");
-	__ASSERT(pEdit, "NULL UI Component!!");
+	CN3UIEdit* pEdit = nullptr;
+	N3_VERIFY_UI_COMPONENT(pEdit, GetChildByID<CN3UIEdit>("edit_trade"));
 
 	std::string buff = std::to_string(iQuantity);
 	pEdit->SetString(buff);
@@ -65,7 +65,7 @@ void CUITradeEditDlg::SetQuantity(int iQuantity) // "edit_trade" Edit Control �
 
 bool CUITradeEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(NULL == pSender) return false;
+	if(nullptr == pSender) return false;
 
 	if (dwMsg == UIMSG_BUTTON_CLICK)					
 	{
@@ -87,19 +87,17 @@ void CUITradeEditDlg::Open(bool bCountGold)
 	else
 		szMsg = fmt::format_text_resource(IDS_EDIT_BOX_COUNT);
 
-	CN3UIString* pString = NULL;
-	pString = (CN3UIString*)this->GetChildByID("String_PersonTradeEdit_Msg");
+	CN3UIString* pString = nullptr;
+	N3_VERIFY_UI_COMPONENT(pString, GetChildByID<CN3UIString>("String_PersonTradeEdit_Msg"));
 	__ASSERT(pString, "NULL UI Component!!");
 	if (pString)
 		pString->SetString(szMsg);
 
 	SetVisible(true);
 
-	//this_ui_add_start
-	CN3UIEdit* pEdit = (CN3UIEdit*)this->GetChildByID("edit_trade");
-	__ASSERT(pEdit, "NULL UI Component!!");
+	CN3UIEdit* pEdit = nullptr;
+	N3_VERIFY_UI_COMPONENT(pEdit, GetChildByID<CN3UIEdit>("edit_trade"));
 	if(pEdit) pEdit->SetFocus();
-	//this_ui_add_end
 
 	RECT rc, rcThis;
 	int iCX, iCY;

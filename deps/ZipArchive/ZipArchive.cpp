@@ -373,7 +373,7 @@ void CZipArchive::Close(bool bAfterException)
 	if (!bAfterException)
 	{
 		if (m_iFileOpened == extract)
-			CloseFile(NULL);
+			CloseFile(nullptr);
 		
 		if (m_iFileOpened == compress)
 			CloseNewFile();
@@ -583,21 +583,21 @@ CString CZipArchive::GetFilePath(LPCTSTR lpszFilePath)
 {
 	TCHAR szDir[_MAX_DIR];
 	TCHAR szDrive[_MAX_DRIVE];
-	_tsplitpath(lpszFilePath, szDrive, szDir, NULL, NULL);
+	_tsplitpath(lpszFilePath, szDrive, szDir, nullptr, nullptr);
 	return  CString(szDrive) + CString(szDir);
 }
 
 CString CZipArchive::GetFileExt(LPCTSTR lpszFilePath)
 {
    TCHAR szExt[_MAX_EXT];
-   _tsplitpath(lpszFilePath, NULL, NULL, NULL, szExt);
+   _tsplitpath(lpszFilePath, nullptr, nullptr, nullptr, szExt);
    return CString(szExt);
 }
 
 CString CZipArchive::GetFileTitle(LPCTSTR lpszFilePath)
 {
 	TCHAR szFname[_MAX_FNAME];
-	_tsplitpath(lpszFilePath, NULL, NULL, szFname, NULL);
+	_tsplitpath(lpszFilePath, nullptr, nullptr, szFname, nullptr);
 	return  CString(szFname);
 }
 
@@ -606,7 +606,7 @@ CString CZipArchive::GetFileDirAndName(LPCTSTR lpszFilePath)
 	TCHAR szDir[_MAX_DIR];
 	TCHAR szFname[_MAX_FNAME];
 	TCHAR szExt[_MAX_EXT];
-	_tsplitpath(lpszFilePath, NULL , szDir, szFname, szExt);
+	_tsplitpath(lpszFilePath, nullptr , szDir, szFname, szExt);
 	CString Dir = szDir;
 	Dir.TrimLeft(_T("\\"));
 	return  Dir + szFname + szExt;
@@ -617,7 +617,7 @@ CString CZipArchive::GetFileName(LPCTSTR lpszFilePath)
 {
 	TCHAR szExt[_MAX_EXT];
 	TCHAR szName[_MAX_FNAME];
-	_tsplitpath(lpszFilePath, NULL, NULL, szName, szExt);
+	_tsplitpath(lpszFilePath, nullptr, nullptr, szName, szExt);
 	return CString(szName) + CString(szExt);
 }
 
@@ -631,7 +631,7 @@ bool CZipArchive::ForceDirectory(LPCTSTR lpDirectory)
 		return true;
 	if (!ForceDirectory(GetFilePath(szDirectory)))
 		return false;
-	if (!CreateDirectory(szDirectory, NULL))
+	if (!CreateDirectory(szDirectory, nullptr))
 		return false;
 	return true;
 }
@@ -974,7 +974,7 @@ bool CZipArchive::IsDriveRemovable(LPCTSTR lpszFilePath)
 CString CZipArchive::GetDrive(LPCTSTR lpszFilePath)
 {
 	TCHAR szDrive[_MAX_DRIVE];
-	_tsplitpath(lpszFilePath, szDrive, NULL, NULL, NULL);
+	_tsplitpath(lpszFilePath, szDrive, nullptr, nullptr, nullptr);
 	return szDrive;
 }
 
@@ -1238,7 +1238,7 @@ DWORD CZipArchive::CryptCRC32(DWORD l, char c)
 void CZipArchive::CryptCryptHeader(long iCrc, CZipAutoBuffer &buf)
 {
 	CryptInitKeys();
-	srand(UINT(GetTickCount()*time(NULL)));
+	srand(UINT(GetTickCount()*time(nullptr)));
 	// genereate pseudo-random sequence
 	char c;
 	for (int i = 0; i < ENCR_HEADER_LEN - 2; i++)
@@ -1344,12 +1344,12 @@ int CZipArchive::WideToSingle(LPCTSTR lpWide, CZipAutoBuffer &szSingle)
 #ifdef _UNICODE	
 	// iLen does not include terminating character
 	int iLen = WideCharToMultiByte(CP_ACP,0, lpWide, wideLen, szSingle, 
-		0, NULL, NULL);
+		0, nullptr, nullptr);
 	if (iLen > 0)
 	{
 		szSingle.Allocate(iLen, true);
 		iLen = WideCharToMultiByte(CP_ACP,0, lpWide , wideLen, szSingle, 
-			iLen, NULL, NULL);
+			iLen, nullptr, nullptr);
 		ASSERT(iLen != 0);
 	}
 	else // here it means error
@@ -1360,7 +1360,7 @@ int CZipArchive::WideToSingle(LPCTSTR lpWide, CZipAutoBuffer &szSingle)
 	return iLen;
 		
 #else // if not UNICODE just copy
-	// 	iLen does not include the NULL character
+	// 	iLen does not include the nullptr character
 	szSingle.Allocate(wideLen);
 	memcpy(szSingle, lpWide, wideLen);
 	return wideLen;
@@ -1373,7 +1373,7 @@ int CZipArchive::SingleToWide(CZipAutoBuffer &szSingle, CString& szWide)
 	int singleLen = szSingle.GetSize();
 #ifdef _UNICODE	
 	// iLen doesn't include terminating character
-	int iLen = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, szSingle, singleLen, NULL, 0);
+	int iLen = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, szSingle, singleLen, nullptr, 0);
 	if (iLen > 0)
 	{
 		iLen = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, szSingle, singleLen, 
@@ -1389,7 +1389,7 @@ int CZipArchive::SingleToWide(CZipAutoBuffer &szSingle, CString& szWide)
 	return iLen;
 
 #else // if not UNICODE just copy
-	// 	iLen does not include the NULL character
+	// 	iLen does not include the nullptr character
 	memcpy(szWide.GetBuffer(singleLen), szSingle, singleLen);
 	szWide.ReleaseBuffer(singleLen);
 	return singleLen;

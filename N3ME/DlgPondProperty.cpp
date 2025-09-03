@@ -20,7 +20,7 @@ static char THIS_FILE[]=__FILE__;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CDlgPondProperty::CDlgPondProperty(CPondMng* pPondMng, CWnd* pParent /*=NULL*/)
+CDlgPondProperty::CDlgPondProperty(CPondMng* pPondMng, CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgPondProperty::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgPondProperty)
@@ -120,7 +120,7 @@ void CDlgPondProperty::UpdateInfo()
 {
 	ASSERT(m_pPondMng);
 	CPondMesh* pSelPond = m_pPondMng->GetSelPond();
-	if (pSelPond == NULL)
+	if (pSelPond == nullptr)
 	{
 		m_LPPond.ShowWindow(FALSE);
 		if (m_IsModalDialog==FALSE)
@@ -273,7 +273,7 @@ void CDlgPondProperty::OnCobGOPond()
 
 void CDlgPondProperty::UpdateWaterLength(CPondMesh* pSelPond)
 {
-	if(pSelPond==NULL) return;
+	if(pSelPond==nullptr) return;
 
 	m_fWidthLength = pSelPond->GetWaterWidthLength();
 	m_fHeightLength = pSelPond->GetWaterHeightLength();
@@ -299,7 +299,7 @@ BOOL CDlgPondProperty::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 				}
 			}
 			else if (pItem->m_propName == "WaterHeight(float)")		{pSelPond->SetWaterHeight((float)atof(pItem->m_curValue)); }
-			else if (pItem->m_propName == "Alpha factor(hex)")		{pSelPond->SetAlphaFactor(strtoul(pItem->m_curValue, NULL, 16)); }
+			else if (pItem->m_propName == "Alpha factor(hex)")		{pSelPond->SetAlphaFactor(strtoul(pItem->m_curValue, nullptr, 16)); }
 			else if (pItem->m_propName == "Water tu(float)")		{pSelPond->SetTU((float)atof(pItem->m_curValue)); }
 			else if (pItem->m_propName == "Water tv(float)")		{pSelPond->SetTV((float)atof(pItem->m_curValue)); }
 			else if (pItem->m_propName == "left(float)")			{pSelPond->SetLeft((float)atof(pItem->m_curValue));		UpdateWaterLength(pSelPond);}
@@ -365,7 +365,7 @@ void CDlgPondProperty::OnOK()
 		ASSERT(pSelPond);
 		if (pSelPond && pSelPond->TexGet())
 		{
-			if (m_pPondMng->GetPondMesh(pSelPond->GetPondID()) == NULL) CDialog::OnOK();
+			if (m_pPondMng->GetPondMesh(pSelPond->GetPondID()) == nullptr) CDialog::OnOK();
 			else MessageBox("중복되는 아이디 입니다.");
 		}
 		else
@@ -400,10 +400,10 @@ void CDlgPondProperty::OnButtonEditPond()
 void CDlgPondProperty::OnButtonRecalUV() 
 {
 	if (m_IsModalDialog) return;
-	if (m_pPondMng == NULL) return;
+	if (m_pPondMng == nullptr) return;
 
 	CPondMesh* pSelPond = m_pPondMng->GetSelPond();
-	if(pSelPond==NULL) return;
+	if(pSelPond==nullptr) return;
 
 	pSelPond->SetChangUVState();
 	if(pSelPond->GetChangUVState()==TRUE)

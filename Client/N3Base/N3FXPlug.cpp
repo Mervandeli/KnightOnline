@@ -19,7 +19,7 @@ CN3FXPlugPart::CN3FXPlugPart() :
 m_vOffsetPos(0,0,0), m_vOffsetDir(0,0,1)
 {
 	m_dwType |= OBJ_FX_PLUG_PART;
-	m_pFXB = NULL;
+	m_pFXB = nullptr;
 	m_nRefIndex = -1;
 }
 
@@ -32,7 +32,7 @@ void CN3FXPlugPart::Release()
 {
 	CN3BaseFileAccess::Release();
 
-	delete m_pFXB; m_pFXB = NULL;
+	delete m_pFXB; m_pFXB = nullptr;
 	m_nRefIndex = -1;
 	m_vOffsetPos.Set(0,0,0); m_vOffsetDir.Set(0,0,1);
 }
@@ -40,24 +40,24 @@ void CN3FXPlugPart::Release()
 bool CN3FXPlugPart::Load(HANDLE hFile)
 {
 	if (false == CN3BaseFileAccess::Load(hFile)) return false;
-	__ASSERT(NULL == m_pFXB, "must null");
+	__ASSERT(nullptr == m_pFXB, "must null");
 	DWORD dwNum;
 	int nStrLen;
-	ReadFile(hFile, &nStrLen, sizeof(nStrLen), &dwNum, NULL);
+	ReadFile(hFile, &nStrLen, sizeof(nStrLen), &dwNum, nullptr);
 	if (nStrLen>0)
 	{
 		char szFN[_MAX_PATH];
-		ReadFile(hFile, szFN, nStrLen, &dwNum, NULL);
-		szFN[nStrLen] = NULL;
+		ReadFile(hFile, szFN, nStrLen, &dwNum, nullptr);
+		szFN[nStrLen] = '\0';
 
 		m_pFXB = new CN3FXBundle();
-		if (false == m_pFXB->LoadFromFile(szFN)) {delete m_pFXB; m_pFXB = NULL;}
+		if (false == m_pFXB->LoadFromFile(szFN)) {delete m_pFXB; m_pFXB = nullptr;}
 		else {m_pFXB->Init(); m_pFXB->Trigger();}
 	}
 
-	ReadFile(hFile, &m_nRefIndex, sizeof(m_nRefIndex), &dwNum, NULL);
-	ReadFile(hFile, &m_vOffsetPos, sizeof(m_vOffsetPos), &dwNum, NULL);
-	ReadFile(hFile, &m_vOffsetDir, sizeof(m_vOffsetDir), &dwNum, NULL);
+	ReadFile(hFile, &m_nRefIndex, sizeof(m_nRefIndex), &dwNum, nullptr);
+	ReadFile(hFile, &m_vOffsetPos, sizeof(m_vOffsetPos), &dwNum, nullptr);
+	ReadFile(hFile, &m_vOffsetDir, sizeof(m_vOffsetDir), &dwNum, nullptr);
 
 	return true;
 }
@@ -70,11 +70,11 @@ bool CN3FXPlugPart::Save(HANDLE hFile)
 
 	DWORD dwNum;
 	int nStrLen = m_pFXB->FileName().size();
-	WriteFile(hFile, &nStrLen, sizeof(nStrLen), &dwNum, NULL);
-	WriteFile(hFile, m_pFXB->FileName().c_str(), nStrLen, &dwNum, NULL);
-	WriteFile(hFile, &m_nRefIndex, sizeof(m_nRefIndex), &dwNum, NULL);
-	WriteFile(hFile, &m_vOffsetPos, sizeof(m_vOffsetPos), &dwNum, NULL);
-	WriteFile(hFile, &m_vOffsetDir, sizeof(m_vOffsetDir), &dwNum, NULL);
+	WriteFile(hFile, &nStrLen, sizeof(nStrLen), &dwNum, nullptr);
+	WriteFile(hFile, m_pFXB->FileName().c_str(), nStrLen, &dwNum, nullptr);
+	WriteFile(hFile, &m_nRefIndex, sizeof(m_nRefIndex), &dwNum, nullptr);
+	WriteFile(hFile, &m_vOffsetPos, sizeof(m_vOffsetPos), &dwNum, nullptr);
+	WriteFile(hFile, &m_vOffsetDir, sizeof(m_vOffsetDir), &dwNum, nullptr);
 
 	return true;
 }
@@ -103,7 +103,7 @@ void CN3FXPlugPart::Tick(const CN3Chr* pChr)
 	{
 		// 위치
 		const __Matrix44* pMtxJoint = pChr->MatrixGet(m_nRefIndex);
-		if (NULL == pMtxJoint) return;
+		if (nullptr == pMtxJoint) return;
 
 		static __Matrix44 mtx;
 		mtx = *(pMtxJoint);
@@ -125,7 +125,7 @@ void CN3FXPlugPart::Render()
 
 void CN3FXPlugPart::SetFXB(const std::string& strFN)
 {
-	if (NULL == m_pFXB) m_pFXB = new CN3FXBundle();
+	if (nullptr == m_pFXB) m_pFXB = new CN3FXBundle();
 	else m_pFXB->Release();
 	m_pFXB->LoadFromFile(strFN);
 
@@ -175,9 +175,9 @@ bool CN3FXPlug::Load(HANDLE hFile)
 	__ASSERT(0 == m_FXPParts.size(), "must 0");
 	DWORD dwNum;
 	int i, nCount;
-	ReadFile(hFile, &nCount, sizeof(nCount), &dwNum, NULL);		// Part의 갯수
+	ReadFile(hFile, &nCount, sizeof(nCount), &dwNum, nullptr);		// Part의 갯수
 
-	if (nCount > 0) m_FXPParts.assign(nCount, NULL);
+	if (nCount > 0) m_FXPParts.assign(nCount, nullptr);
 	for(i=0; i<nCount; ++i)
 	{
 		m_FXPParts[i] = new CN3FXPlugPart();
@@ -188,7 +188,7 @@ bool CN3FXPlug::Load(HANDLE hFile)
 
 void CN3FXPlug::Tick(const CN3Chr* pChr)
 {
-	if (NULL == pChr) return;
+	if (nullptr == pChr) return;
 	int i, nCount = m_FXPParts.size();
 	for(i=0; i<nCount; ++i) m_FXPParts[i]->Tick(pChr);
 }
@@ -226,7 +226,7 @@ bool CN3FXPlug::Save(HANDLE hFile)
 
 	DWORD dwNum;
 	int i, nCount = m_FXPParts.size();
-	WriteFile(hFile, &nCount, sizeof(nCount), &dwNum, NULL);		// Part의 갯수
+	WriteFile(hFile, &nCount, sizeof(nCount), &dwNum, nullptr);		// Part의 갯수
 	for(i=0; i<nCount; ++i)	m_FXPParts[i]->Save(hFile);
 
 	return true;
@@ -237,18 +237,18 @@ void CN3FXPlug::RemoveFXPParts_HaveNoBundle()	// 번들 없는 Part들 제거하
 	int i, nCount = m_FXPParts.size();
 	for(i=0; i<nCount; ++i)
 	{
-		if (m_FXPParts[i] && NULL == m_FXPParts[i]->GetFXB())
+		if (m_FXPParts[i] && nullptr == m_FXPParts[i]->GetFXB())
 		{
 			delete m_FXPParts[i];								// FXB가 없으면 이 파트는 지운다.
-			m_FXPParts[i] = NULL;
+			m_FXPParts[i] = nullptr;
 		}
 	}
 
-	// NULL인 포인터들을 없앤다.
+	// nullptr인 포인터들을 없앤다.
 	std::vector<CN3FXPlugPart*>::iterator itor;
 	for (itor = m_FXPParts.begin(); itor != m_FXPParts.end();)
 	{
-		if (NULL == (*itor)) itor = m_FXPParts.erase(itor);
+		if (nullptr == (*itor)) itor = m_FXPParts.erase(itor);
 		else ++itor;
 	}
 }

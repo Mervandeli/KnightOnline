@@ -23,8 +23,8 @@ static char THIS_FILE[]=__FILE__;
 
 CDTexGroupMng::CDTexGroupMng()
 {
-	m_pGroupView = NULL;
-	m_pMainFrm = NULL;
+	m_pGroupView = nullptr;
+	m_pMainFrm = nullptr;
 
 	memset(&m_SelectedDTex, 0, sizeof(m_SelectedDTex));
 	memset(&m_SelectedDTexTile, 0, sizeof(m_SelectedDTexTile));
@@ -63,7 +63,7 @@ void CDTexGroupMng::Release()
 	{
 		m_pGroupView->DestroyWindow();
 		delete m_pGroupView;
-		m_pGroupView = NULL;
+		m_pGroupView = nullptr;
 	}
 
 	it_DTexGroup it = m_Groups.begin();
@@ -303,7 +303,7 @@ __DTexTileAttr CDTexGroupMng::GetTileAttr(int groupID, int attr)
 		return DTileAttr;
 	}
 
-	CDTexGroup* pGroup = NULL;
+	CDTexGroup* pGroup = nullptr;
 	it_DTexGroup it = m_Groups.begin();
 	int iSize = m_Groups.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -336,7 +336,7 @@ __DTexTileAttr CDTexGroupMng::GetTileAttrManuel(int groupID, int attr, int AttrI
 	__DTexTileAttr DTileAttr;
 	DTileAttr.TexID = -1;
 
-	CDTexGroup* pGroup = NULL;
+	CDTexGroup* pGroup = nullptr;
 	it_DTexGroup it = m_Groups.begin();
 	int iSize = m_Groups.size();
 	for(int i = 0; i < iSize; i++, it++)
@@ -371,7 +371,7 @@ char* CDTexGroupMng::GetGroupName(int id)
 			return pDTG->m_Name;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //
@@ -424,7 +424,7 @@ bool CDTexGroupMng::SaveToFile(CString RealFileName)
 {
 	SetCurrentDirectory(CN3Base::s_szPath.c_str());
 
-	CreateDirectory("dtex", NULL);
+	CreateDirectory("dtex", nullptr);
 
 	char szDTexInfoFileName[_MAX_PATH];
 	sprintf(szDTexInfoFileName,"dtex\\%s.tgx", (LPCTSTR)RealFileName);

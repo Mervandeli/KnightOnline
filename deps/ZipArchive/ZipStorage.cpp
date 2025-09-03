@@ -20,10 +20,10 @@
 char CZipStorage::m_gszExtHeaderSignat[] = {0x50, 0x4b, 0x07, 0x08};
 CZipStorage::CZipStorage()
 {
-	m_pCallbackData = m_pZIPCALLBACKFUN = NULL;
+	m_pCallbackData = m_pZIPCALLBACKFUN = nullptr;
 	m_iWriteBufferSize = 65535;
 	m_iCurrentDisk = -1;
-	m_pFile = NULL;
+	m_pFile = nullptr;
 }
 
 CZipStorage::~CZipStorage()
@@ -219,7 +219,7 @@ void CZipStorage::Close(bool bAfterException)
 	m_pWriteBuffer.Release();
 	m_iCurrentDisk = -1;
 	m_iSpanMode = noSpan;
-	m_pFile = NULL;
+	m_pFile = nullptr;
 }
 
 CString CZipStorage::GetTdVolumeName(bool bLast, LPCTSTR lpszZipName)

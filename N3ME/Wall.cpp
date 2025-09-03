@@ -57,16 +57,16 @@ bool CWall::GetVertex(int idx, __Vector3* pPos)
 void CWall::Load(HANDLE hFile)
 {
 	DWORD dwRWC;
-	ReadFile(hFile, m_Name, 80, &dwRWC, NULL);
+	ReadFile(hFile, m_Name, 80, &dwRWC, nullptr);
 
 	int size;
-	ReadFile(hFile, &size, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &size, sizeof(int), &dwRWC, nullptr);
 
 	__Vector3 Vertex;
 	m_Wall.clear();
 	for(int i=0;i<size;i++)
 	{
-		ReadFile(hFile, &Vertex, sizeof(__Vector3), &dwRWC, NULL);
+		ReadFile(hFile, &Vertex, sizeof(__Vector3), &dwRWC, nullptr);
 		m_Wall.push_back(Vertex);
 	}
 }
@@ -74,10 +74,10 @@ void CWall::Load(HANDLE hFile)
 void CWall::Save(HANDLE hFile)
 {
 	DWORD dwRWC;
-	WriteFile(hFile, m_Name, 80, &dwRWC, NULL);
+	WriteFile(hFile, m_Name, 80, &dwRWC, nullptr);
 
 	int size = m_Wall.size();
-	WriteFile(hFile, &size, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &size, sizeof(int), &dwRWC, nullptr);
 
 	std::list<__Vector3>::iterator itVertex;
 
@@ -85,6 +85,6 @@ void CWall::Save(HANDLE hFile)
 	for(itVertex = m_Wall.begin(); itVertex != m_Wall.end(); itVertex++)
 	{
 		Vertex = (*itVertex);
-		WriteFile(hFile, &Vertex, sizeof(__Vector3), &dwRWC, NULL);
+		WriteFile(hFile, &Vertex, sizeof(__Vector3), &dwRWC, nullptr);
 	}
 }

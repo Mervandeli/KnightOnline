@@ -1,4 +1,4 @@
-// KscViewerDoc.cpp : implementation of the CKscViewerDoc class
+﻿// KscViewerDoc.cpp : implementation of the CKscViewerDoc class
 //
 
 #include "stdafx.h"
@@ -29,13 +29,13 @@ END_MESSAGE_MAP()
 
 CKscViewerDoc::CKscViewerDoc()
 {
-	m_pJpegFile = NULL;
+	m_pJpegFile = nullptr;
 	m_pJpegFile = new CN3JpegFile;
 }
 
 CKscViewerDoc::~CKscViewerDoc()
 {
-	if(m_pJpegFile) delete m_pJpegFile; m_pJpegFile = NULL;
+	if(m_pJpegFile) delete m_pJpegFile; m_pJpegFile = nullptr;
 }
 
 BOOL CKscViewerDoc::OnNewDocument()
@@ -90,10 +90,10 @@ BOOL CKscViewerDoc::OnOpenDocument(LPCTSTR lpszPathName)
 {
 //	if (!CDocument::OnOpenDocument(lpszPathName))
 //		return FALSE;
-	if(m_pJpegFile == NULL)
+	if(m_pJpegFile == nullptr)
 		return FALSE;
 
-	char* szExt = NULL;
+	char* szExt = nullptr;
 	int nLen = strlen(lpszPathName);
 
 	szExt = (char*)lpszPathName + nLen - 3;
@@ -113,7 +113,7 @@ BOOL CKscViewerDoc::OnOpenDocument(LPCTSTR lpszPathName)
 		}
 	}
 
-	UpdateAllViews(NULL);
+	UpdateAllViews(nullptr);
 	return TRUE;
 }
 
@@ -124,7 +124,7 @@ CN3JpegFile* CKscViewerDoc::GetJpegFile()
 
 BOOL CKscViewerDoc::OnSaveDocument(LPCTSTR lpszPathName) 
 {
-	if(m_pJpegFile == NULL) return FALSE;
+	if(m_pJpegFile == nullptr) return FALSE;
 	if(m_szKscPath.IsEmpty()) return FALSE;
 
 	CString szTemp = m_szKscPath.Right(3);

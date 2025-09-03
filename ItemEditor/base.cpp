@@ -61,7 +61,7 @@ void N3LoadTexture(const char* szFN) {
 	printf("Texture: %s (%s)\n", pTexName, szFN);
 
 	FILE* fpTexture = fopen(szFN, "rb");
-	if(fpTexture == NULL) {
+	if(fpTexture == nullptr) {
 		fprintf(stderr, "ERROR: Missing texture %s\n", szFN);
 		return;
 	}
@@ -124,7 +124,7 @@ void N3LoadTexture(const char* szFN) {
 	if(iPixelSize == 0) {
 		if(compTexData) {
 			delete compTexData;
-			compTexData = NULL;
+			compTexData = nullptr;
 		}
 
 		compTexData = new uint8_t[compTexSize];
@@ -133,7 +133,7 @@ void N3LoadTexture(const char* szFN) {
 	} else {
 		if(compTexData) {
 			delete compTexData;
-			compTexData = NULL;
+			compTexData = nullptr;
 		}
 
 		compTexSize = (HeaderOrg.nWidth*HeaderOrg.nHeight*iPixelSize);
@@ -147,7 +147,7 @@ void N3LoadTexture(const char* szFN) {
 //-----------------------------------------------------------------------------
 void N3LoadMesh(const char* szFN) {
 	FILE* fpMesh = fopen(szFN, "rb");
-	if(fpMesh == NULL) {
+	if(fpMesh == nullptr) {
 		fprintf(stderr, "\nERROR: Missing mesh %s\n", szFN);
 		return;
 	}
@@ -176,7 +176,7 @@ void N3LoadMesh(const char* szFN) {
 
 	if(m_pVertices0) {
 		delete[] m_pVertices0;
-		m_pVertices0 = NULL;
+		m_pVertices0 = nullptr;
 	}
 
 	if(m_iMaxNumVertices0 > 0) {
@@ -187,7 +187,7 @@ void N3LoadMesh(const char* szFN) {
 
 	if(m_pIndices0) {
 		delete m_pIndices0;
-		m_pIndices0 = NULL;
+		m_pIndices0 = nullptr;
 	}
 
 	if(m_iMaxNumIndices0 > 0) {
@@ -304,7 +304,7 @@ bool CN3BaseFileAccess_Load(FILE* hFile) {
 	int nL = 0;
 	fread(&nL, sizeof(int), 1, hFile);
 	if(nL > 0)  {
-		std::vector<char> buffer(nL+1, NULL);
+		std::vector<char> buffer(nL+1, '\0');
 		fread(&buffer[0], sizeof(char), nL, hFile);
 		m_szName = &buffer[0];
 	}
@@ -448,7 +448,7 @@ bool CN3CPart_Load(FILE* hFile) {
 		fread(szFN, sizeof(char), nL, hFile); szFN[nL] = '\0';
 
 		FILE* fpSkin = fopen(szFN, "rb");
-		if(fpSkin == NULL) {
+		if(fpSkin == nullptr) {
 			fprintf(stderr, "\nERROR: Missing skin %s\n", szFN);
 			return false;
 		}
@@ -472,7 +472,7 @@ e_ItemType MakeResrcFileNameForUPC(
 	if(pszResrcFN) *pszResrcFN = "";
 	if(pszIconFN) *pszIconFN = "";
 
-	if(NULL == pItem) return ITEM_TYPE_UNKNOWN;
+	if(nullptr == pItem) return ITEM_TYPE_UNKNOWN;
 
 	e_ItemType eType = ITEM_TYPE_UNKNOWN;
 	e_ItemPosition ePos = (e_ItemPosition)pItem->byAttachPoint;
@@ -512,7 +512,7 @@ e_ItemType MakeResrcFileNameForUPC(
 		szExt = ".dxt";
 	} else printf("Invalid Item Position\n");
 
-	std::vector<char> buffer(256, NULL);
+	std::vector<char> buffer(256, '\0');
 	if(pszResrcFN) {
 		if(pItem->dwIDResrc) {
 			if(eRace!=RACE_UNKNOWN && ePos>=/*ITEM_POS_DUAL*/ITEM_POS_UPPER && ePos<=ITEM_POS_SHOES) {
@@ -557,8 +557,8 @@ e_ItemType MakeResrcFileNameForUPC(
 //-----------------------------------------------------------------------------
 void GenerateScene(void) {
 
-	float* vertices = NULL;
-	uint32_t* elements = NULL;
+	float* vertices = nullptr;
+	uint32_t* elements = nullptr;
 
 	int iVC = 0;
 	int iFC = 0;
@@ -642,7 +642,7 @@ void GenerateScene(void) {
 	m_Scene.mRootNode = new aiNode();
 
 	m_Scene.mMaterials = new aiMaterial*[1];
-	m_Scene.mMaterials[0] = NULL;
+	m_Scene.mMaterials[0] = nullptr;
 	m_Scene.mNumMaterials = 1;
 
 	m_Scene.mMaterials[0] = new aiMaterial();
@@ -652,10 +652,10 @@ void GenerateScene(void) {
 		&strTex, AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0)
 	);
 
-	if(vertices!=NULL && elements!=NULL) {
+	if(vertices!=nullptr && elements!=nullptr) {
 
 		m_Scene.mMeshes = new aiMesh*[1];
-		m_Scene.mMeshes[0] = NULL;
+		m_Scene.mMeshes[0] = nullptr;
 		m_Scene.mNumMeshes = 1;
 
 		m_Scene.mMeshes[0] = new aiMesh();
@@ -727,7 +727,7 @@ bool N3MeshConverter::Convert(char* filename) {
 		char tmp[0xFF] = "";
 		sprintf(tmp, "./item/%s", filename);
 		FILE* pFile = fopen(tmp, "rb");
-		if(pFile == NULL) {
+		if(pFile == nullptr) {
 			fprintf(stderr, "ERROR: Missing N3Plug %s\n", tmp);
 			delete pExporter;
 			return false;
@@ -742,7 +742,7 @@ bool N3MeshConverter::Convert(char* filename) {
 		char tmp[0xFF] = "";
 		sprintf(tmp, "./item/%s", filename);
 		FILE* pFile = fopen(tmp, "rb");
-		if(pFile == NULL) {
+		if(pFile == nullptr) {
 			fprintf(stderr, "ERROR: Missing N3Part %s\n", tmp);
 			delete pExporter;
 			return false;

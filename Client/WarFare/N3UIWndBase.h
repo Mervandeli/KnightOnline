@@ -29,7 +29,6 @@ enum e_UIWND				{
 								UIWND_SKILL_TREE,			// Skill Icon Info Wnd..
 								UIWND_HOTKEY,				// Hot Key Wnd..
 								UIWND_PER_TRADE_EDIT,		// Per Trade Edit Wnd..
-								UIWND_EXCHANGE_REPAIR,		// Exchange Repair Wnd..
 								UIWND_WARE_HOUSE,			// 보관함..
 								UIWND_UPGRADE,				// Item Upgrade Wnd..
 								UIWND_UNKNOWN,				// Wnd Unknown..
@@ -45,8 +44,6 @@ enum e_UIWND_DISTRICT		{
 								UIWND_DISTRICT_DROPITEM,			// Dropitem district of Drop item wnd..
 								UIWND_DISTRICT_SKILL_TREE,			// Skillicon district of Skill icon wnd..
 								UIWND_DISTRICT_SKILL_HOTKEY,		// Skillicon district of Hotkey icon wnd..
-								UIWND_DISTRICT_EX_RE_NPC,			// Exchange Repair Wnd Npc District..			
-								UIWND_DISTRICT_EX_RE_INV,			// Exchange Repair Wnd Inv District..
 								UIWND_DISTRICT_TRADE_MY,			// Npc 와의 거래에서 내 영역..
 								UIWND_DISTRICT_PER_TRADE_INV,		// Inv District of Per Trade Wnd ..
 								UIWND_DISTRICT_UPGRADE_SLOT,		// Slot district of Item Upgrade Wnd..
@@ -122,11 +119,11 @@ class CN3UIWndBase  : public CN3UIBase		// 가상 함수로 자식의 Area 갯�
 	void				PlayItemArmorSound();
 
 public:
-	static __InfoSelectedIcon		m_sSelectedIconInfo;
-	static __RecoveryJobInfo		m_sRecoveryJobInfo;
-	static __SkillSelectInfo		m_sSkillSelectInfo;
-	static CN3UIImage*				m_pSelectionImage;
-	static CCountableItemEditDlg*	m_pCountableItemEdit;
+	static __InfoSelectedIcon		s_sSelectedIconInfo;
+	static __RecoveryJobInfo		s_sRecoveryJobInfo;
+	static __SkillSelectInfo		s_sSkillSelectInfo;
+	static CN3UIImage*				s_pSelectionImage;
+	static CCountableItemEditDlg*	s_pCountableItemEdit;
 
 protected:
 	e_UIWND						m_eUIWnd;

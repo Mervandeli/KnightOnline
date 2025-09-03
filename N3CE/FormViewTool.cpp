@@ -86,25 +86,25 @@ void CFormViewTool::UpdateAllInfo()
 void CFormViewTool::OnBMakeSmooth() 
 {
 	CN3Chr* pChr = ((CN3CEDoc*)GetDocument())->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 
 	int nPC = pChr->PartCount();
 	for(int i = 0; i < nPC; i++)
 	{
 		CN3CPart* pPart = pChr->Part(i);
-		if(NULL == pPart) continue;
+		if(nullptr == pPart) continue;
 
 		for(int j = 0; j < MAX_CHR_LOD; j++)
 		{
 			CN3Skin* pSkin = pPart->Skin(j);
-			if(NULL == pSkin) continue;
+			if(nullptr == pSkin) continue;
 
 			pSkin->ReGenerateSmoothNormal(); // 법선 벡터를 만들고.. // 부드럽게 게산..
 		}
 	}
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetPaneRender()->InvalidateRect(NULL, FALSE); // 렌더링..
+	pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE); // 렌더링..
 }
 
 void CFormViewTool::OnInitialUpdate() 
@@ -137,14 +137,14 @@ void CFormViewTool::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 void CFormViewTool::OnSelchangeCbLod() 
 {
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	pFrm->GetPaneRender()->InvalidateRect(NULL, FALSE); // 렌더링..
+	pFrm->GetPaneRender()->InvalidateRect(nullptr, FALSE); // 렌더링..
 }
 
 void CFormViewTool::OnBAddTestSound0() 
 {
 	char szBuff[10240] = "";
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "wav", NULL, dwFlags, "Wave files(*.wav)|*.wav||", NULL);
+	CFileDialog dlg(TRUE, "wav", nullptr, dwFlags, "Wave files(*.wav)|*.wav||", nullptr);
 	char szCurPath[256]; GetCurrentDirectory(256, szCurPath);
 	dlg.m_ofn.lpstrInitialDir = szCurPath;
 	dlg.m_ofn.nMaxFile = 10240;
@@ -155,7 +155,7 @@ void CFormViewTool::OnBAddTestSound0()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	POSITION pos = dlg.GetStartPosition();
 	CString FileName;
-	while(pos != NULL)
+	while(pos != nullptr)
 	{
 		FileName = dlg.GetNextPathName(pos);
 		m_ListSound0.AddString(FileName);
@@ -198,7 +198,7 @@ void CFormViewTool::OnBAddTestSound1()
 {
 	char szBuff[10240] = "";
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "wav", NULL, dwFlags, "Wave files(*.wav)|*.wav||", NULL);
+	CFileDialog dlg(TRUE, "wav", nullptr, dwFlags, "Wave files(*.wav)|*.wav||", nullptr);
 	char szCurPath[256]; GetCurrentDirectory(256, szCurPath);
 	dlg.m_ofn.lpstrInitialDir = szCurPath;
 	dlg.m_ofn.nMaxFile = 10240;
@@ -209,7 +209,7 @@ void CFormViewTool::OnBAddTestSound1()
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	POSITION pos = dlg.GetStartPosition();
 	CString FileName;
-	while(pos != NULL)
+	while(pos != nullptr)
 	{
 		FileName = dlg.GetNextPathName(pos);
 		m_ListSound1.AddString(FileName);
@@ -252,7 +252,7 @@ void CFormViewTool::OnSize(UINT nType, int cx, int cy)
 {
 	CFormView::OnSize(nType, cx, cy);
 	
-	if(m_ListSound0.GetSafeHwnd() != NULL)
+	if(m_ListSound0.GetSafeHwnd() != nullptr)
 	{
 		CRect rcOrg, rcClient;
 		m_ListSound0.GetWindowRect(rcOrg); // 그래프 컨트롤의 원래 화면 좌표를 
@@ -262,10 +262,10 @@ void CFormViewTool::OnSize(UINT nType, int cx, int cy)
 		int cx2 = rcClient.right - rcOrg.left - 5;
 		int cy2 = rcOrg.Height();
 
-		m_ListSound0.SetWindowPos(NULL, 0, 0, cx2, cy2, SWP_NOMOVE | SWP_NOZORDER);
+		m_ListSound0.SetWindowPos(nullptr, 0, 0, cx2, cy2, SWP_NOMOVE | SWP_NOZORDER);
 	}
 
-	if(m_ListSound1.GetSafeHwnd() != NULL)
+	if(m_ListSound1.GetSafeHwnd() != nullptr)
 	{
 		CRect rcOrg, rcClient;
 		m_ListSound1.GetWindowRect(rcOrg); // 그래프 컨트롤의 원래 화면 좌표를 
@@ -275,7 +275,7 @@ void CFormViewTool::OnSize(UINT nType, int cx, int cy)
 		int cx2 = rcClient.right - rcOrg.left - 5;
 		int cy2 = rcOrg.Height();
 
-		m_ListSound1.SetWindowPos(NULL, 0, 0, cx2, cy2, SWP_NOMOVE | SWP_NOZORDER);
+		m_ListSound1.SetWindowPos(nullptr, 0, 0, cx2, cy2, SWP_NOMOVE | SWP_NOZORDER);
 	}
 }
 
@@ -288,9 +288,9 @@ void CFormViewTool::OnBApplyOffsetFrame()
 
 	CN3CEDoc* pDoc = (CN3CEDoc*)(GetDocument());
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr) return;
+	if(nullptr == pChr) return;
 	CN3AnimControl* pAniCtrl = pChr->AniCtrl();
-	if(NULL == pAniCtrl || pAniCtrl->Count() <= 0) return;
+	if(nullptr == pAniCtrl || pAniCtrl->Count() <= 0) return;
 
 	int iCount = pAniCtrl->Count();
 	for(int i = 0; i < iCount; i++)

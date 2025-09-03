@@ -14,7 +14,7 @@ class CDlgLoadNPCPath : public CDialog
 {
 // Construction
 public:
-	CDlgLoadNPCPath(CWnd* pParent = NULL);   // standard constructor
+	CDlgLoadNPCPath(CWnd* pParent = nullptr);   // standard constructor
 
 	CString	m_SelFileName;
 

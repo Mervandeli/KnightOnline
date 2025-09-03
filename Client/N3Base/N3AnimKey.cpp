@@ -19,19 +19,19 @@ CN3AnimKey::CN3AnimKey()
 
 	m_nCount = 0; // 키 카운트
 	m_fSamplingRate = 30.0;
-	m_pDatas = NULL;
+	m_pDatas = nullptr;
 }
 
 CN3AnimKey::~CN3AnimKey()
 {
-	delete [] m_pDatas; m_pDatas = NULL;
+	delete [] m_pDatas; m_pDatas = nullptr;
 }
 
 void CN3AnimKey::Release()
 {
 	m_nCount = 0; // 키 카운트
 	m_fSamplingRate = 30.0;
-	delete [] m_pDatas; m_pDatas = NULL;
+	delete [] m_pDatas; m_pDatas = nullptr;
 
 	CN3Base::Release();
 }
@@ -46,9 +46,9 @@ void CN3AnimKey::Alloc(int nCount, float fSamplingRate, ANIMATION_KEY_TYPE eType
 		return;
 	}
 
-	if(m_pDatas != NULL)
+	if(m_pDatas != nullptr)
 	{
-		delete [] m_pDatas; m_pDatas = NULL;
+		delete [] m_pDatas; m_pDatas = nullptr;
 		m_nCount = 0;
 	}
 
@@ -73,24 +73,24 @@ bool CN3AnimKey::Load(HANDLE hFile)
 	if(m_nCount > 0) this->Release();
 
 	DWORD dwRWC = 0;
-	ReadFile(hFile, &m_nCount, 4, &dwRWC, NULL); // 키가 몇개 있는지
+	ReadFile(hFile, &m_nCount, 4, &dwRWC, nullptr); // 키가 몇개 있는지
 
 	// 키값을 파일에서 읽기..
 	if(m_nCount > 0)
 	{
-		ReadFile(hFile, &m_eType, 4, &dwRWC, NULL); // Key Type
-		ReadFile(hFile, &m_fSamplingRate, 4, &dwRWC, NULL); // Sampling Rate
+		ReadFile(hFile, &m_eType, 4, &dwRWC, nullptr); // Key Type
+		ReadFile(hFile, &m_fSamplingRate, 4, &dwRWC, nullptr); // Sampling Rate
 
 		this->Alloc(m_nCount, m_fSamplingRate, m_eType);
 		if(KEY_VECTOR3 == m_eType)
 		{
-			ReadFile(hFile, m_pDatas, sizeof(__Vector3)*m_nCount, &dwRWC, NULL);
+			ReadFile(hFile, m_pDatas, sizeof(__Vector3)*m_nCount, &dwRWC, nullptr);
 			__Vector3* pKeys = (__Vector3*)m_pDatas; // 끝에 하나더 복사해준다.
 			pKeys[m_nCount] = pKeys[m_nCount-1];
 		}
 		else if(KEY_QUATERNION == m_eType)
 		{
-			ReadFile(hFile, m_pDatas, sizeof(__Quaternion)*m_nCount, &dwRWC, NULL);
+			ReadFile(hFile, m_pDatas, sizeof(__Quaternion)*m_nCount, &dwRWC, nullptr);
 			__Quaternion* pKeys = (__Quaternion*)m_pDatas; // 끝에 하나더 복사해준다.
 			pKeys[m_nCount] = pKeys[m_nCount-1];
 		}
@@ -103,15 +103,15 @@ bool CN3AnimKey::Load(HANDLE hFile)
 bool CN3AnimKey::Save(HANDLE hFile)
 {
 	DWORD dwRWC = 0;
-	WriteFile(hFile, &m_nCount, 4, &dwRWC, NULL); // 키가 몇개 있는지
+	WriteFile(hFile, &m_nCount, 4, &dwRWC, nullptr); // 키가 몇개 있는지
 
 	if(m_nCount > 0)
 	{
-		WriteFile(hFile, &m_eType, 4, &dwRWC, NULL); // Key Type
-		WriteFile(hFile, &m_fSamplingRate, 4, &dwRWC, NULL); // Sampling Rate
+		WriteFile(hFile, &m_eType, 4, &dwRWC, nullptr); // Key Type
+		WriteFile(hFile, &m_fSamplingRate, 4, &dwRWC, nullptr); // Sampling Rate
 
-		if(KEY_VECTOR3 == m_eType) WriteFile(hFile, m_pDatas, sizeof(__Vector3)*m_nCount, &dwRWC, NULL);
-		else if(KEY_QUATERNION == m_eType) WriteFile(hFile, m_pDatas, sizeof(__Quaternion)*m_nCount, &dwRWC, NULL);
+		if(KEY_VECTOR3 == m_eType) WriteFile(hFile, m_pDatas, sizeof(__Vector3)*m_nCount, &dwRWC, nullptr);
+		else if(KEY_QUATERNION == m_eType) WriteFile(hFile, m_pDatas, sizeof(__Quaternion)*m_nCount, &dwRWC, nullptr);
 	}
 
 	return true;
@@ -142,7 +142,7 @@ void CN3AnimKey::Add(CN3AnimKey &AKSrc, int nIndexS, int nIndexE)
 	int nAddCount = nIndexE - nIndexS + 1; // 추가할 갯수
 
 	int nPrevCount = m_nCount;
-	void* pVBackup = NULL;
+	void* pVBackup = nullptr;
 	if(nPrevCount > 0) // backup
 	{
 		if(KEY_VECTOR3 == m_eType)
@@ -195,7 +195,7 @@ void CN3AnimKey::Add(CN3AnimKey &AKSrc, int nIndexS, int nIndexE)
 		}
 	}
 
-	delete [] pVBackup; pVBackup = NULL;
+	delete [] pVBackup; pVBackup = nullptr;
 }
 #endif // end of _N3TOOL
 

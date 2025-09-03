@@ -44,7 +44,7 @@ public:
 	LRESULT			IMEMessageProc(UINT nMsg, WPARAM wParam, LPARAM lParam);
 protected:
 	inline BOOL Enter() {
-		if(m_hWnd != NULL) return (BOOL)(m_hIMC = ImmGetContext(m_hWnd));
+		if(m_hWnd != nullptr) return (BOOL)(m_hIMC = ImmGetContext(m_hWnd));
 		else return FALSE;
 	};
 	inline void Leave() {

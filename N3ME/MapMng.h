@@ -61,7 +61,7 @@ public:
 	CN3Transform*	GetSelOutputObj(int iIndex) const 
 	{
 		if (iIndex < 0 || iIndex >= m_SelOutputObjArray.GetSize() )
-			return NULL;
+			return nullptr;
 		return m_SelOutputObjArray.GetAt(iIndex);
 	}
 	int				GetSelOutputObjCount() const {return m_SelOutputObjArray.GetSize();};

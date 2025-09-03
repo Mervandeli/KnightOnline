@@ -20,10 +20,10 @@ static char THIS_FILE[]=__FILE__;
 
 const float CARET_FLICKERING_TIME = 0.4f;
 
-//HWND CN3UIEdit::s_hWndParent = NULL;
-HWND CN3UIEdit::s_hWndEdit = NULL;
-HWND CN3UIEdit::s_hWndParent = NULL;
-WNDPROC	CN3UIEdit::s_lpfnEditProc = NULL;
+//HWND CN3UIEdit::s_hWndParent = nullptr;
+HWND CN3UIEdit::s_hWndEdit = nullptr;
+HWND CN3UIEdit::s_hWndParent = nullptr;
+WNDPROC	CN3UIEdit::s_lpfnEditProc = nullptr;
 char CN3UIEdit::s_szBuffTmp[512] = "";
 
 //////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ void CN3UIEdit::CN3Caret::Render(LPDIRECT3DDEVICE9	lpD3DDev)
 	if(!m_bFlickerStatus) return;
 
 	__ASSERT(lpD3DDev, "DIRECT3DDEVICE8 is null");
-	lpD3DDev->SetTexture(0, NULL);
+	lpD3DDev->SetTexture(0, nullptr);
 //	lpD3DDev->SetTextureStageState( 0, D3DTSS_COLOROP,    D3DTOP_SELECTARG1 );
 //	lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG1,  D3DTA_DIFFUSE );
 	lpD3DDev->SetFVF(FVF_TRANSFORMEDCOLOR);
@@ -95,11 +95,11 @@ void CN3UIEdit::CN3Caret::InitFlckering()
 
 BOOL CN3UIEdit::CreateEditWindow(HWND hParent, RECT rect)
 {
-	if(NULL == hParent) return FALSE;
+	if(nullptr == hParent) return FALSE;
 	if(s_hWndEdit) return FALSE;
 
 	s_hWndParent = hParent;
-	s_hWndEdit = CreateWindow("EDIT", "EditWindow", WS_CHILD|WS_TABSTOP|ES_LEFT|ES_WANTRETURN, rect.left, rect.top, rect.right-rect.left, rect.bottom-rect.top, hParent, NULL, NULL, NULL);
+	s_hWndEdit = CreateWindow("EDIT", "EditWindow", WS_CHILD|WS_TABSTOP|ES_LEFT|ES_WANTRETURN, rect.left, rect.top, rect.right-rect.left, rect.bottom-rect.top, hParent, nullptr, nullptr, nullptr);
 	s_lpfnEditProc = (WNDPROC)SetWindowLong(s_hWndEdit, GWL_WNDPROC, (uint32_t)(CN3UIEdit::EditWndProc));
 
 	// Set the edit control's text size to the maximum.
@@ -422,7 +422,7 @@ CN3UIEdit::CN3UIEdit()
 	m_iCompLength = 0;
 	m_iMaxStrLen = 0x7fffffff;
 	KillFocus();
-	m_pSnd_Typing = NULL;
+	m_pSnd_Typing = nullptr;
 }
 
 CN3UIEdit::~CN3UIEdit()
@@ -467,7 +467,7 @@ void CN3UIEdit::KillFocus()
 {
 	if (HaveFocus())
 	{
-		s_pFocusedEdit = NULL;
+		s_pFocusedEdit = nullptr;
 		s_Caret.m_bVisible = FALSE;
 
 		if(s_hWndEdit)
@@ -481,7 +481,7 @@ void CN3UIEdit::KillFocus()
 bool CN3UIEdit::SetFocus()
 {
 //	if (HaveFocus()) return true;		// 이미 내가 포커스를 가지고 있으면 return true;
-	if (NULL != s_pFocusedEdit) s_pFocusedEdit->KillFocus();	// 다른 edit 가 가지고 있으면 killfocus호출
+	if (nullptr != s_pFocusedEdit) s_pFocusedEdit->KillFocus();	// 다른 edit 가 가지고 있으면 killfocus호출
 	s_pFocusedEdit = this;				// 포커스를 가지고 있는 edit를 나로 설정
 
 	SIZE size;
@@ -608,34 +608,34 @@ const std::string& CN3UIEdit::GetString()
 
 void CN3UIEdit::SetString(const std::string& szString)
 {
-	if (NULL == m_pBuffOutRef) return;
+	if (nullptr == m_pBuffOutRef) return;
 	if (szString.size() > m_iMaxStrLen)
 	{
 		std::string szNewBuff(m_iMaxStrLen, '?');
 
 		if (IsHangulMiddleByte(szString.c_str(), m_iMaxStrLen))
 		{
-			szNewBuff = szString.substr(0, m_iMaxStrLen-1);	// -1은 한글이므로 하나 덜 카피하기 위해 +1은 맨 마지막에 NULL 넣기 위해
+			szNewBuff = szString.substr(0, m_iMaxStrLen-1);	// -1은 한글이므로 하나 덜 카피하기 위해 +1은 맨 마지막에 nullptr 넣기 위해
 			if (UISTYLE_EDIT_PASSWORD & m_dwStyle)
 			{
 				int iNewBuffLen = szNewBuff.size();
 				m_szPassword = szNewBuff;
 
 				szNewBuff.assign(m_iMaxStrLen-1, '*');
-				__ASSERT(NULL == szNewBuff[m_iMaxStrLen-1],"글자수가 다르다.");
+				__ASSERT('\0' == szNewBuff[m_iMaxStrLen - 1], "글자수가 다르다.");
 			}
 			m_pBuffOutRef->SetString(szNewBuff);
 		}
 		else
 		{
-			szNewBuff = szString.substr(0, m_iMaxStrLen);	// +1은 맨 마지막에 NULL 넣기 위해
+			szNewBuff = szString.substr(0, m_iMaxStrLen);	// +1은 맨 마지막에 nullptr 넣기 위해
 			if (UISTYLE_EDIT_PASSWORD & m_dwStyle)
 			{
 				int iNewBuffLen = szNewBuff.size();
 				m_szPassword = szNewBuff;
 
 				szNewBuff.assign(m_iMaxStrLen, '*');
-				__ASSERT(NULL == szNewBuff[m_iMaxStrLen],"글자수가 다르다.");
+				__ASSERT('\0' == szNewBuff[m_iMaxStrLen], "글자수가 다르다.");
 			}
 			m_pBuffOutRef->SetString(szNewBuff);
 		}
@@ -688,13 +688,13 @@ bool CN3UIEdit::Load(HANDLE hFile)
 	int iSndFNLen = 0;
 	DWORD dwNum;
 
-	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, NULL);		//	사운드 파일 문자열 길이
+	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
 	if (iSndFNLen>0)
 	{
-		std::vector<char> buffer(iSndFNLen+1, NULL);
-		ReadFile(hFile, &buffer[0], iSndFNLen, &dwNum, NULL);
+		std::vector<char> buffer(iSndFNLen+1, '\0');
+		ReadFile(hFile, &buffer[0], iSndFNLen, &dwNum, nullptr);
 
-		__ASSERT(NULL == m_pSnd_Typing, "memory leak");
+		__ASSERT(nullptr == m_pSnd_Typing, "memory leak");
 		m_pSnd_Typing = s_SndMgr.CreateObj(&buffer[0], SNDTYPE_2D);
 	}
 
@@ -716,8 +716,8 @@ bool CN3UIEdit::Save(HANDLE hFile)
 
 	int iSndFNLen = 0;
 	if (m_pSnd_Typing) iSndFNLen = m_pSnd_Typing->m_szFileName.size();
-	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, NULL);		//	사운드 파일 문자열 길이
-	if (iSndFNLen>0) WriteFile(hFile, m_pSnd_Typing->m_szFileName.c_str(), iSndFNLen, &dwNum, NULL);
+	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
+	if (iSndFNLen>0) WriteFile(hFile, m_pSnd_Typing->m_szFileName.c_str(), iSndFNLen, &dwNum, nullptr);
 
 	return true;
 }
@@ -743,7 +743,7 @@ std::string CN3UIEdit::GetSndFName_Typing() const
 
 void CN3UIEdit::UpdateTextFromEditCtrl()
 {
-	if(NULL == s_pFocusedEdit || NULL == s_hWndEdit) return;
+	if(nullptr == s_pFocusedEdit || nullptr == s_hWndEdit) return;
 
 	::GetWindowText(s_hWndEdit, s_szBuffTmp, 512);
 	s_pFocusedEdit->SetString(s_szBuffTmp);
@@ -751,7 +751,7 @@ void CN3UIEdit::UpdateTextFromEditCtrl()
 
 void CN3UIEdit::UpdateCaretPosFromEditCtrl()
 {
-	if(NULL == s_pFocusedEdit || NULL == s_hWndEdit) return;
+	if(nullptr == s_pFocusedEdit || nullptr == s_hWndEdit) return;
 
 /*	int iCaret = 0;
 	int iLen = GetWindowTextLength(s_hWndEdit);
@@ -806,7 +806,7 @@ static std::map<HWND, CN3UIEdit*> s_Edits;
 
 bool CN3UIEdit::AddEdit(CN3UIEdit* pEdit)
 {
-	if(pEdit == NULL)
+	if(pEdit == nullptr)
 	{
 		__ASSERT(0, "NULL POINTER");
 		return false;
@@ -827,7 +827,7 @@ bool CN3UIEdit::AddEdit(CN3UIEdit* pEdit)
 
 bool CN3UIEdit::DeleteEdit(CN3UIEdit* pEdit)
 {
-	if(pEdit == NULL)
+	if(pEdit == nullptr)
 	{
 		__ASSERT(0, "NULL POINTER");
 		return false;
@@ -843,7 +843,7 @@ bool CN3UIEdit::DeleteEdit(CN3UIEdit* pEdit)
 CN3UIEdit* CN3UIEdit::GetEdit(HWND hWnd)
 {
 	it_Edit it = s_Edits.find(hWnd);
-	if(it == s_Edits.end()) return NULL;
+	if(it == s_Edits.end()) return nullptr;
 
 	return it->second;
 }

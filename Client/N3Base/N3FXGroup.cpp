@@ -38,15 +38,15 @@ CN3FXGroup::~CN3FXGroup()
 bool CN3FXGroup::Load(HANDLE hFile)
 {
 	DWORD			dwRWC = 0;
-	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
 
 	int count;
-	ReadFile(hFile, &count, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &count, sizeof(int), &dwRWC, nullptr);
 
 	for(int i=0;i<count;i++)
 	{
 		__FXBInfo* pFXB = new __FXBInfo;
-		ReadFile(hFile, pFXB, sizeof(__FXBInfo), &dwRWC, NULL);
+		ReadFile(hFile, pFXB, sizeof(__FXBInfo), &dwRWC, nullptr);
 		FXBList.push_back(pFXB);
 	}
 	return true;
@@ -55,10 +55,10 @@ bool CN3FXGroup::Load(HANDLE hFile)
 bool CN3FXGroup::Save(HANDLE hFile)
 {
 	DWORD			dwRWC = 0;
-	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
 
 	int count = GetCount();
-	WriteFile(hFile, &count, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &count, sizeof(int), &dwRWC, nullptr);
 
 	std::list<__FXBInfo*>::iterator it, ite;
 	ite = FXBList.end();
@@ -67,7 +67,7 @@ bool CN3FXGroup::Save(HANDLE hFile)
 	while(it!=ite)
 	{
 		__FXBInfo* pFXB = (*it);
-		WriteFile(hFile, pFXB, sizeof(__FXBInfo), &dwRWC, NULL);
+		WriteFile(hFile, pFXB, sizeof(__FXBInfo), &dwRWC, nullptr);
 		it++;
 	}
 	return true;
@@ -103,7 +103,7 @@ bool CN3FXGroup::DecodeScriptFile(const char* lpPathName)
 	while(!feof(stream))
 	{
 		char* pResult = fgets(szLine, 512, stream);
-		if(pResult == NULL) continue;
+		if(pResult == nullptr) continue;
 
 		ZeroMemory(szCommand,80);
 		ZeroMemory(szBuf[0],80);

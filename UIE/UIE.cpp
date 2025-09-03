@@ -162,11 +162,11 @@ void CUIEApp::OnAppAbout()
 // global function
 BOOL SelectTexture(char* pszBuff)
 {
-	if (NULL == pszBuff) return FALSE;
-	pszBuff[0] = NULL;
+	if (nullptr == pszBuff) return FALSE;
+	pszBuff[0] = '\0';
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "dxt", NULL, dwFlags, "Generic Image Files(*.bmp, *.tga, *.dxt)|*.bmp;*.tga;*.dxt||", NULL);
+	CFileDialog dlg(TRUE, "dxt", nullptr, dwFlags, "Generic Image Files(*.bmp, *.tga, *.dxt)|*.bmp;*.tga;*.dxt||", nullptr);
 	dlg.m_ofn.lpstrInitialDir = pFrm->m_Eng.PathGet().c_str();
 	dlg.m_ofn.lpstrTitle = "Select texture file";
 	if (IDCANCEL == dlg.DoModal()) return FALSE;

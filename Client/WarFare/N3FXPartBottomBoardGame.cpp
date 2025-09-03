@@ -25,13 +25,13 @@ CN3FXPartBottomBoardGame::~CN3FXPartBottomBoardGame()
 	if(m_pVB)
 	{
 		delete[] m_pVB;
-		m_pVB = NULL;
+		m_pVB = nullptr;
 	}
 
 	if(m_vUnit)
 	{
 		delete[] m_vUnit;
-		m_vUnit = NULL;
+		m_vUnit = nullptr;
 	}
 }
 

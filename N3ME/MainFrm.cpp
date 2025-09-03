@@ -144,12 +144,12 @@ static UINT indicators[] =
 
 CMainFrame::CMainFrame()
 {
-	m_pEng = NULL;
-	m_pMapMng = NULL;
-	m_pDTexMng = NULL;
-	m_pDTexGroupMng = NULL;
+	m_pEng = nullptr;
+	m_pMapMng = nullptr;
+	m_pDTexMng = nullptr;
+	m_pDTexGroupMng = nullptr;
 	m_DTexInfoFileName.Empty();
-	m_pDlgSowSeed = NULL;
+	m_pDlgSowSeed = nullptr;
 	ZeroMemory(m_SeedFileName, MAX_PATH);
 }
 
@@ -159,7 +159,7 @@ CMainFrame::~CMainFrame()
 	{
 		m_pDlgSowSeed->Release();
 		delete m_pDlgSowSeed;
-		m_pDlgSowSeed = NULL;
+		m_pDlgSowSeed = nullptr;
 	}
 	std::list<LPSEEDGROUP>::iterator sgit;
 	for(sgit = m_SeedGroupList.begin(); sgit != m_SeedGroupList.end(); sgit++)
@@ -290,18 +290,18 @@ void CMainFrame::OnDestroy()
 {
 	CFrameWnd::OnDestroy();
 
-	if (m_pDTexGroupMng){ m_pDTexGroupMng->Release(); delete m_pDTexGroupMng; m_pDTexGroupMng = NULL;}
-	if (m_pDTexMng){ m_pDTexMng->Release(); delete m_pDTexMng; m_pDTexMng = NULL;}
-	if (m_pMapMng) { m_pMapMng->Release(); delete m_pMapMng; m_pMapMng = NULL;}
-	if (m_pEng){ m_pEng->Release(); delete m_pEng; m_pEng = NULL;}	
-	if (m_pDlgSowSeed){ delete m_pDlgSowSeed; m_pDlgSowSeed = NULL;}
+	if (m_pDTexGroupMng){ m_pDTexGroupMng->Release(); delete m_pDTexGroupMng; m_pDTexGroupMng = nullptr;}
+	if (m_pDTexMng){ m_pDTexMng->Release(); delete m_pDTexMng; m_pDTexMng = nullptr;}
+	if (m_pMapMng) { m_pMapMng->Release(); delete m_pMapMng; m_pMapMng = nullptr;}
+	if (m_pEng){ m_pEng->Release(); delete m_pEng; m_pEng = nullptr;}	
+	if (m_pDlgSowSeed){ delete m_pDlgSowSeed; m_pDlgSowSeed = nullptr;}
 }
 
 
 void CMainFrame::OnFileExport() 
 {
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(FALSE, "gmd", NULL, dwFlags, "Game Map Data file(*.gmd)|*.gmd||", NULL);
+	CFileDialog dlg(FALSE, "gmd", nullptr, dwFlags, "Game Map Data file(*.gmd)|*.gmd||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	strcpy(m_SeedFileName,dlg.GetFileTitle());
@@ -311,7 +311,7 @@ void CMainFrame::OnFileExport()
 void CMainFrame::OnFileServerData() 
 {
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(FALSE, "smd", NULL, dwFlags, "Server Map Data file(*.smd)|*.smd||", NULL);
+	CFileDialog dlg(FALSE, "smd", nullptr, dwFlags, "Server Map Data file(*.smd)|*.smd||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	m_pMapMng->MakeServerDataFiles(dlg.GetPathName());	
@@ -536,7 +536,7 @@ void CMainFrame::OnUpdateTipTilingAll(CCmdUI* pCmdUI)
 void CMainFrame::OnFileImport() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
-	CFileDialog dlg(TRUE, "N3VMesh", NULL, dwFlags, "N3 Progressive Mesh file(*.N3VMesh)|*.N3VMesh||", NULL);
+	CFileDialog dlg(TRUE, "N3VMesh", nullptr, dwFlags, "N3 Progressive Mesh file(*.N3VMesh)|*.N3VMesh||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	m_pMapMng->ImportTerrain(dlg.GetPathName());
@@ -545,7 +545,7 @@ void CMainFrame::OnFileImport()
 void CMainFrame::OnFileImportHeight() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
-	CFileDialog dlg(TRUE, "N3VMesh", NULL, dwFlags, "N3 Progressive Mesh file(*.N3VMesh)|*.N3VMesh||", NULL);
+	CFileDialog dlg(TRUE, "N3VMesh", nullptr, dwFlags, "N3 Progressive Mesh file(*.N3VMesh)|*.N3VMesh||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	m_pMapMng->ImportTerrainHeight(dlg.GetPathName());	
@@ -591,7 +591,7 @@ void CMainFrame::OnResourcePathSet()
 void CMainFrame::OnFileColormapLoad() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
-	CFileDialog dlg(TRUE, "BMP", NULL, dwFlags, "24Bit Bitmap File(*.BMP)|*.BMP||", NULL);
+	CFileDialog dlg(TRUE, "BMP", nullptr, dwFlags, "24Bit Bitmap File(*.BMP)|*.BMP||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	ASSERT(m_pMapMng);
@@ -602,7 +602,7 @@ void CMainFrame::OnFileColormapLoad()
 void CMainFrame::OnFileColormapSave() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
-	CFileDialog dlg(FALSE, "BMP", NULL, dwFlags, "24Bit Bitmap File(*.BMP)|*.BMP||", NULL);
+	CFileDialog dlg(FALSE, "BMP", nullptr, dwFlags, "24Bit Bitmap File(*.BMP)|*.BMP||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	ASSERT(m_pMapMng);
@@ -699,7 +699,7 @@ void CMainFrame::OnTipSowSeed()
 	if( m_pMapMng)
 	{
 		m_pMapMng->SetCursorMode(CM_EDIT_SEED);
-		if( m_pMapMng->GetTerrain() != NULL)
+		if( m_pMapMng->GetTerrain() != nullptr)
 			m_pMapMng->GetTerrain()->SetEditMode(TEM_BRUSH_SHOW);
 
 		m_pMapMng->m_SowSeedMng.SetActive(TRUE);
@@ -747,7 +747,7 @@ void CMainFrame::OnViewOrth()
 			pCamera->EyePosSet(0, 2048, 0);
 			pCamera->AtPosSet(0, 0, 0);
 			pCamera->UpVectorSet(0, 0, 1);
-			if(this->GetActiveView()) this->GetActiveView()->InvalidateRect(NULL, FALSE);
+			if(this->GetActiveView()) this->GetActiveView()->InvalidateRect(nullptr, FALSE);
 		}
 	}
 }
@@ -760,7 +760,7 @@ void CMainFrame::OnViewToggleFog()
 		if(pCamera)
 		{
 			pCamera->m_bFogUse = !pCamera->m_bFogUse;
-			if(this->GetActiveView()) this->GetActiveView()->InvalidateRect(NULL, FALSE);
+			if(this->GetActiveView()) this->GetActiveView()->InvalidateRect(nullptr, FALSE);
 		}
 	}
 }
@@ -796,7 +796,7 @@ void CMainFrame::OnFileImportHeightBmp()
 	if(!(m_pMapMng->GetTerrain())) return;
 
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
-	CFileDialog dlg(TRUE, "bmp", NULL, dwFlags, "Height file(*.bmp)|*.bmp||", NULL);
+	CFileDialog dlg(TRUE, "bmp", nullptr, dwFlags, "Height file(*.bmp)|*.bmp||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	m_pMapMng->GetTerrain()->ImportHeightBMP((LPCTSTR)dlg.GetPathName());
@@ -808,7 +808,7 @@ void CMainFrame::OnFileExportHeightBmp()
 	if(!(m_pMapMng->GetTerrain())) return;
 
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;	
-	CFileDialog dlg(FALSE, "bmp", NULL, dwFlags, "Height BMP file(*.bmp)|*.bmp||", NULL);
+	CFileDialog dlg(FALSE, "bmp", nullptr, dwFlags, "Height BMP file(*.bmp)|*.bmp||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	m_pMapMng->GetTerrain()->ExportHeightBMP((LPCTSTR)dlg.GetPathName());

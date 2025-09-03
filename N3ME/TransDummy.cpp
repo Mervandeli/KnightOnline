@@ -21,7 +21,7 @@ static char THIS_FILE[]=__FILE__;
 
 CTransDummy::CTransDummy()
 {
-	m_pTerrainRef = NULL;
+	m_pTerrainRef = nullptr;
 
 	ZeroMemory(m_pSortedCubes, sizeof(m_pSortedCubes));
 
@@ -34,7 +34,7 @@ CTransDummy::CTransDummy()
 	m_LineVertices[0].Set(0,0,0, LineColor);	m_LineVertices[1].Set(fCubeOffset,0,0, LineColor);
 	m_LineVertices[2].Set(0,0,0, LineColor);	m_LineVertices[3].Set(0,fCubeOffset,0, LineColor);
 	m_LineVertices[4].Set(0,0,0, LineColor);	m_LineVertices[5].Set(0,0,fCubeOffset, LineColor);
-	m_vPrevScaleArray = NULL;
+	m_vPrevScaleArray = nullptr;
 
 	Release();
 }
@@ -46,14 +46,14 @@ CTransDummy::~CTransDummy()
 
 void CTransDummy::Release()
 {
-	m_pTerrainRef = NULL;
+	m_pTerrainRef = nullptr;
 
 	m_SelObjArray.RemoveAll();
-	m_pSelectedCube = NULL;
+	m_pSelectedCube = nullptr;
 	m_vPrevPos.Set(0,0,0);
 	m_qPrevRot.x = m_qPrevRot.y = m_qPrevRot.z = m_qPrevRot.w = 0;
 
-	if (m_vPrevScaleArray) {delete [] m_vPrevScaleArray; m_vPrevScaleArray = NULL;}
+	if (m_vPrevScaleArray) {delete [] m_vPrevScaleArray; m_vPrevScaleArray = nullptr;}
 }
 
 void CTransDummy::InitDummyCube(int iType, __DUMMYCUBE* pDummyCube, const __Vector3& vOffset, D3DCOLOR color)
@@ -133,7 +133,7 @@ void CTransDummy::Render()
 	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &m_Matrix); // 월드 행렬 적용..
 
 	// set texture
-	hr = s_lpD3DDev->SetTexture(0, NULL);
+	hr = s_lpD3DDev->SetTexture(0, nullptr);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 
@@ -209,7 +209,7 @@ __DUMMYCUBE* CTransDummy::Pick(int x, int y)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 BOOL CTransDummy::MouseMsgFilter(LPMSG pMsg)
@@ -229,7 +229,7 @@ BOOL CTransDummy::MouseMsgFilter(LPMSG pMsg)
 				_ASSERT(pSelObj0);
 				m_vPrevPos = pSelObj0->Pos();
 				m_qPrevRot = pSelObj0->Rot();
-				if (m_vPrevScaleArray) {delete [] m_vPrevScaleArray; m_vPrevScaleArray = NULL;}
+				if (m_vPrevScaleArray) {delete [] m_vPrevScaleArray; m_vPrevScaleArray = nullptr;}
 				m_vPrevScaleArray = new __Vector3[iSize];
 				for (int i=0; i<iSize; ++i)	// 모든 선택된 객체의 스케일 저장
 				{
@@ -248,7 +248,7 @@ BOOL CTransDummy::MouseMsgFilter(LPMSG pMsg)
 			if (m_pSelectedCube)
 			{
 				ReleaseCapture();
-				m_pSelectedCube = NULL;
+				m_pSelectedCube = nullptr;
 				return TRUE;
 			}
 		}
@@ -261,7 +261,7 @@ BOOL CTransDummy::MouseMsgFilter(LPMSG pMsg)
 //				__Quaternion qDiffRot = m_qPrevRot - m_qRot;
 				__Vector3 vDiffScale; vDiffScale.Set(1.0f, 1.0f, 1.0f);
 //				TransDiff(&vDiffPos, &vDiffRot, &vDiffScale);
-				TransDiff(&vDiffPos, NULL, &vDiffScale);
+				TransDiff(&vDiffPos, nullptr, &vDiffScale);
 
 				m_vPos = m_vPrevPos;
 				m_qRot = m_qPrevRot;
@@ -270,7 +270,7 @@ BOOL CTransDummy::MouseMsgFilter(LPMSG pMsg)
 
 
 				ReleaseCapture();
-				m_pSelectedCube = NULL;
+				m_pSelectedCube = nullptr;
 				return TRUE;
 			}
 		}
@@ -297,7 +297,7 @@ void CTransDummy::GetPickRay(POINT point, __Vector3& vDir, __Vector3& vOrig)
     // Get the inverse view matrix
     D3DXMATRIX matView, m;
     lpD3DDev->GetTransform( D3DTS_VIEW, &matView );
-    D3DXMatrixInverse( &m, NULL, &matView );
+    D3DXMatrixInverse( &m, nullptr, &matView );
 
     // Transform the screen space pick ray into 3D space
     vDir.x  = v.x*m._11 + v.y*m._21 + v.z*m._31;

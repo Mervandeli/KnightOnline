@@ -155,12 +155,12 @@ public:
 //		is 0
 // Argument         : WORD uIndex
 //		index of the file to test
-// 	Argument         : ZIPCALLBACKFUN pCallback = NULL
+// 	Argument         : ZIPCALLBACKFUN pCallback = nullptr
 //		See the description at AddNewFile
-// 	Argument         : void* pUserData = NULL
+// 	Argument         : void* pUserData = nullptr
 // Argument         : DWORD uBufSize = 65535
 //		the size of the buffer used during extraction
-	bool TestFile(WORD uIndex, ZIPCALLBACKFUN pCallback = NULL, void* pUserData = NULL, DWORD uBufSize = 65535);
+	bool TestFile(WORD uIndex, ZIPCALLBACKFUN pCallback = nullptr, void* pUserData = nullptr, DWORD uBufSize = 65535);
 
 // Function name	: CloseFileAfterTestFailed
 // Description	    : Perform the necessary cleanup after the exception 
@@ -176,9 +176,9 @@ public:
 //						return false if the password contains ASCII characters
 //						with values 128 or higher or the file inside archive is
 //						opened		
-// Argument         : LPCTSTR lpszPassword = NULL
-//						set it to NULL to clear password
-	bool SetPassword(LPCTSTR lpszPassword = NULL);
+// Argument         : LPCTSTR lpszPassword = nullptr
+//						set it to nullptr to clear password
+	bool SetPassword(LPCTSTR lpszPassword = nullptr);
 
 // Function name	: SetAdvanced
 // Description	    :  set advanced options
@@ -205,7 +205,7 @@ public:
 //		for the description of callback function see CZipStorage.h
 // Argument         : void* pData
 //		user data to be passed to the callback function as the last parameter
-	void SetSpanCallback(ZIPCALLBACKFUN pFunc, void* pData = NULL);
+	void SetSpanCallback(ZIPCALLBACKFUN pFunc, void* pData = nullptr);
 
 //	archive open modes	
 	enum {open, openReadOnly, create, createSpan};
@@ -265,8 +265,8 @@ public:
 //		the compression level (see OpenNewFile() for detailed desciption)
 // Argument			: bool bFullPath
 //		if true, include full path of the file inside the archive	
-// 	Argument         : ZIPCALLBACKFUN pCallback = NULL
-// callback function (may be NULL)
+// 	Argument         : ZIPCALLBACKFUN pCallback = nullptr
+// callback function (may be nullptr)
 // 	To set the callback function for this operation pass its pointer as the 
 // 	argument (do not use SetSpanCallback for it - its for different purposes).
 // 	The callback function, if set, is called after reading and writing one portion of data.
@@ -276,7 +276,7 @@ public:
 // 			total number bytes already read
 // 	- the third argument (void*): 
 // 		pUserData argument passed to #AddNewFile
-// 	Argument         : void* pUserData = NULL
+// 	Argument         : void* pUserData = nullptr
 // 		user - defined data passed on to the callback function
 // 		(doesn't matter if there is no callback function defined)
 // Argument         : DWORD nBufSize = 65535
@@ -284,13 +284,13 @@ public:
 
 /*
 */
-	bool AddNewFile(LPCTSTR lpszFilePath, int iLevel = -1, bool bFullPath = true, ZIPCALLBACKFUN pCallback = NULL, void* pUserData = NULL, unsigned long nBufSize = 65535);
+	bool AddNewFile(LPCTSTR lpszFilePath, int iLevel = -1, bool bFullPath = true, ZIPCALLBACKFUN pCallback = nullptr, void* pUserData = nullptr, unsigned long nBufSize = 65535);
 
 // Function name	: OpenNewFile
 // Description	    : add a new file to the zip archive
 // Return type		: bool 
 //		return false in the following cases:
-//		- the lpszFilePath is not NULL and the file	attributes and data was not correctly retreived
+//		- the lpszFilePath is not nullptr and the file	attributes and data was not correctly retreived
 //		- a file is already opened for extraction or compression
 //		- archive is an existing disk span archive
 //		- maximum file count inside archive reached (65535)
@@ -299,9 +299,9 @@ public:
 //			- m_uMethod - file compression method; can be 0 (storing) or Z_DEFLATE (deflating)
 //				otherwise Z_DEFLATE is assumed
 //			- m_uModDate, m_uModTime - use SetTime method of CFileHeadeer to set them
-//				if lpszFilePath is not NULL this fields are updated automaticaly
+//				if lpszFilePath is not nullptr this fields are updated automaticaly
 //			- m_uExternalAttr - attributes of the file
-//				if lpszFilePath is not NULL this field is updated automaticaly
+//				if lpszFilePath is not nullptr this field is updated automaticaly
 //			- m_szFileName - file name (may be with path) to be stored inside archive
 //				to represent this file
 //			- m_szComment - file comment
@@ -315,9 +315,9 @@ public:
 //		Z_NO_COMPRESSION		: 0
 //		Z_BEST_SPEED			: 1
 //		Z_BEST_COMPRESSION		: 9
-// Argument         : LPCTSTR lpszFilePath = NULL
+// Argument         : LPCTSTR lpszFilePath = nullptr
 //		the path to the file to retreive date and attributes from
-	bool OpenNewFile(CZipFileHeader & header, int iLevel = Z_DEFAULT_COMPRESSION, LPCTSTR lpszFilePath = NULL);
+	bool OpenNewFile(CZipFileHeader & header, int iLevel = Z_DEFAULT_COMPRESSION, LPCTSTR lpszFilePath = nullptr);
 
 // Function name	: WriteNewFile
 // Description	    : compress the contents of the buffer and write it to a new file
@@ -358,14 +358,14 @@ public:
 //		extract the file with full path (if there is a path stored with the filename)
 //		or just with the filename alone
 //		(it means that the resulting file path is lpszPath + one of the above)	
-// Argument			: LPCTSTR lpszNewName = NULL
-//			if NULL the default file name is taken (from the archive)
-// 	Argument         : ZIPCALLBACKFUN pCallback = NULL
+// Argument			: LPCTSTR lpszNewName = nullptr
+//			if nullptr the default file name is taken (from the archive)
+// 	Argument         : ZIPCALLBACKFUN pCallback = nullptr
 //		See the description at AddNewFile
-// 	Argument         : void* pUserData = NULL
+// 	Argument         : void* pUserData = nullptr
 // Argument         : DWORD nBufSize = 65535
 //		the size of the buffer used during extraction
-	bool ExtractFile(WORD uIndex, LPCTSTR lpszPath, bool bFullPath = true, LPCTSTR lpszNewName = NULL, ZIPCALLBACKFUN pCallback = NULL, void* pUserData = NULL, DWORD nBufSize = 65535);
+	bool ExtractFile(WORD uIndex, LPCTSTR lpszPath, bool bFullPath = true, LPCTSTR lpszNewName = nullptr, ZIPCALLBACKFUN pCallback = nullptr, void* pUserData = nullptr, DWORD nBufSize = 65535);
 
 // Function name	: OpenFile
 // Description	    : open the file with the given index in the archive for extracting
@@ -387,7 +387,7 @@ public:
 // Description	    : get the local extra filed of the currently opened 
 //					  for extraction file in the archive
 // Return type		: int 
-//		if pBuf == NULL return the size of the local extra field
+//		if pBuf == nullptr return the size of the local extra field
 // Argument         : char* pBuf
 //		the buffer to receive the data
 // Argument         : int iSize
@@ -420,7 +420,7 @@ public:
 	-  "-2" = setting extracted file date and attributes was not successful	
 	\note Throws exceptions.
 */	
-	int CloseFile(LPCTSTR lpszFilePath = NULL, bool bAfterException = false);
+	int CloseFile(LPCTSTR lpszFilePath = nullptr, bool bAfterException = false);
 
 // Function name	: DeleteFile
 // Description	    : delete the file with the given index

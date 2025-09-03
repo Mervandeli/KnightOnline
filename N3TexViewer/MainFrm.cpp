@@ -142,13 +142,13 @@ void CMainFrame::AdjustWindowSize()
 
 	if(nW < 256) nW = 256;
 
-	SetWindowPos(NULL, 0, 0, nW, nH, SWP_NOMOVE | SWP_NOZORDER);
+	SetWindowPos(nullptr, 0, 0, nW, nH, SWP_NOMOVE | SWP_NOZORDER);
 }
 
 void CMainFrame::OnFileConvert() 
 {
 	CN3TexViewerDoc* pDoc = (CN3TexViewerDoc*)GetActiveDocument();
-	if(NULL == pDoc->m_pTex || NULL == pDoc->m_pTex->Get()) return;
+	if(nullptr == pDoc->m_pTex || nullptr == pDoc->m_pTex->Get()) return;
 
 	CDlgFormat dlg;
 	dlg.m_Fmt = pDoc->m_pTex->PixelFormat();
@@ -167,7 +167,7 @@ void CMainFrame::OnToolConvertFilesAutomaticaly()
 {
 	char szBuff[102400] = "";
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "dxt", NULL, dwFlags, "Generic Image Files(*.bmp, *.tga, *.jpg)|*.bmp;*.tga;*.jpg||", NULL);
+	CFileDialog dlg(TRUE, "dxt", nullptr, dwFlags, "Generic Image Files(*.bmp, *.tga, *.jpg)|*.bmp;*.tga;*.jpg||", nullptr);
 	char szCurPath[256]; GetCurrentDirectory(256, szCurPath);
 	dlg.m_ofn.lpstrInitialDir = szCurPath;
 	dlg.m_ofn.nMaxFile = 102400;
@@ -178,7 +178,7 @@ void CMainFrame::OnToolConvertFilesAutomaticaly()
 	CN3Texture Tex;
 	POSITION pos = dlg.GetStartPosition();
 	CString FileName;
-	while(pos != NULL)
+	while(pos != nullptr)
 	{
 		FileName = dlg.GetNextPathName(pos);
 		
@@ -217,7 +217,7 @@ void CMainFrame::OnToolConvertFilesManually()
 {
 	char szBuff[102400] = "";
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "dxt", NULL, dwFlags, "Generic Image Files(*.dxt, *.bmp, *.tga, *.jpg)|*.dxt;*.bmp;*.tga;*.jpg|BitmapFile File(*.bmp)|*.bmp|Targa File(*.tga)|*.bmp|DXT File(*.dxt)|*.dxt||", NULL);
+	CFileDialog dlg(TRUE, "dxt", nullptr, dwFlags, "Generic Image Files(*.dxt, *.bmp, *.tga, *.jpg)|*.dxt;*.bmp;*.tga;*.jpg|BitmapFile File(*.bmp)|*.bmp|Targa File(*.tga)|*.bmp|DXT File(*.dxt)|*.dxt||", nullptr);
 	char szCurPath[256]; GetCurrentDirectory(256, szCurPath);
 	dlg.m_ofn.lpstrInitialDir = szCurPath;
 	dlg.m_ofn.nMaxFile = 102400;
@@ -238,7 +238,7 @@ void CMainFrame::OnToolConvertFilesManually()
 
 	POSITION pos = dlg.GetStartPosition();
 	CString FileName;
-	while(pos != NULL)
+	while(pos != nullptr)
 	{
 		FileName = dlg.GetNextPathName(pos);
 		
@@ -262,7 +262,7 @@ void CMainFrame::OnToolConvertFilesManually()
 void CMainFrame::OnToolCutBmp() 
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
-	CFileDialog dlg(TRUE, "bmp", NULL, dwFlags, "Bitmap file(*.bmp)|*.bmp||", NULL);
+	CFileDialog dlg(TRUE, "bmp", nullptr, dwFlags, "Bitmap file(*.bmp)|*.bmp||", nullptr);
 	if(dlg.DoModal() == IDCANCEL) return;
 
 	CDlgFormat dlgFmt; // 크기 및 저장 형식 지정.
@@ -291,8 +291,8 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 	char szDrive[_MAX_DRIVE];
 	char szDir[_MAX_DIR];
 	char szFName[_MAX_FNAME];
-	_splitpath(lpszFileName, szDrive, szDir, szFName, NULL);
-	CreateDirectory(szFName, NULL);	// 하위 폴더 만들기
+	_splitpath(lpszFileName, szDrive, szDir, szFName, nullptr);
+	CreateDirectory(szFName, nullptr);	// 하위 폴더 만들기
 
 	int xx = BMF.Width() / iWidth;
 	int yy = BMF.Height() / iHeight;
@@ -401,7 +401,7 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 	int iRealWidthDest = ((int)((iWidth*3 + 3)/4))*4;	
 	int iDestDIBSize = sizeof(BITMAPINFOHEADER) + iRealWidthDest * iHeight;
 	LPVOID pDestDIB;
-	if ((pDestDIB = ::GlobalAlloc(GMEM_FIXED | GMEM_ZEROINIT, iDestDIBSize )) == NULL )
+	if ((pDestDIB = ::GlobalAlloc(GMEM_FIXED | GMEM_ZEROINIT, iDestDIBSize )) == nullptr )
 	{
 		MessageBox("메모리를 할당하지 못했습니다.", "error");
 		return FALSE;
@@ -430,17 +430,17 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 	char szDir[_MAX_DIR];
 	char szFName[_MAX_FNAME];
 	char szFNameDest[_MAX_FNAME];
-	_splitpath(lpszFileName, szDrive, szDir, szFName, NULL);
-	CreateDirectory(szFName, NULL);	// 하위 폴더 만들기
+	_splitpath(lpszFileName, szDrive, szDir, szFName, nullptr);
+	CreateDirectory(szFName, nullptr);	// 하위 폴더 만들기
 
 	// 쪼갠 정보를 tcd파일에 넣어서 저장
 	DWORD dwNum;
 	wsprintf(szFNameDest, "%s\\%s.tcd", szFName, szFName);
-	HANDLE hFile = CreateFile(szFNameDest, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(szFNameDest, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if(INVALID_HANDLE_VALUE != hFile)
 	{
-		WriteFile(hFile, &iCX, sizeof(iCX), &dwNum, NULL);
-		WriteFile(hFile, &iCY, sizeof(iCX), &dwNum, NULL);
+		WriteFile(hFile, &iCX, sizeof(iCX), &dwNum, nullptr);
+		WriteFile(hFile, &iCY, sizeof(iCX), &dwNum, nullptr);
 		CloseHandle(hFile);
 	}
 
@@ -488,11 +488,11 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 				wsprintf(szFNameDest, "%s%s%s\\%s_%02d%02d.bmp", szDrive, szDir, szFName, szFName, i, iCY-1-j);
 			}
 
-			hFile = CreateFile(szFNameDest, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			hFile = CreateFile(szFNameDest, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 			if(INVALID_HANDLE_VALUE != hFile)
 			{
-				WriteFile(hFile, &bmfHeaderDest, sizeof(bmfHeaderDest), &dwNum, NULL);
-				WriteFile(hFile, pDestDIB, iDestDIBSize, &dwNum, NULL);
+				WriteFile(hFile, &bmfHeaderDest, sizeof(bmfHeaderDest), &dwNum, nullptr);
+				WriteFile(hFile, pDestDIB, iDestDIBSize, &dwNum, nullptr);
 				CloseHandle(hFile);
 			}
 			ProgressBar.StepIt();
@@ -555,7 +555,7 @@ void CMainFrame::OnToolSaveRepeat()
 {
 	char szBuff[102400] = "";
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "dxt", NULL, dwFlags, "Noah Texture Files(*.dxt)|*.dxt||", NULL);
+	CFileDialog dlg(TRUE, "dxt", nullptr, dwFlags, "Noah Texture Files(*.dxt)|*.dxt||", nullptr);
 	char szCurPath[256]; GetCurrentDirectory(256, szCurPath);
 	dlg.m_ofn.lpstrInitialDir = szCurPath;
 	dlg.m_ofn.nMaxFile = 102400;
@@ -566,7 +566,7 @@ void CMainFrame::OnToolSaveRepeat()
 	CN3Texture Tex;
 	POSITION pos = dlg.GetStartPosition();
 	CStringArray FileNames;
-	while(pos != NULL)
+	while(pos != nullptr)
 	{
 		FileNames.Add(dlg.GetNextPathName(pos));
 	}

@@ -28,16 +28,16 @@ CUIKnightsOperation::CUIKnightsOperation()
 {
 	m_iPageCur = 0;
 
-	m_pBtn_Up	= NULL;
-	m_pBtn_Down	= NULL;
-	m_pBtn_Close	= NULL;
+	m_pBtn_Up	= nullptr;
+	m_pBtn_Down	= nullptr;
+	m_pBtn_Close	= nullptr;
 
-	m_pList_Knights = NULL;
-	m_pBtn_Join = NULL;
-	m_pBtn_Create = NULL;
-	m_pBtn_Destroy = NULL;
-	m_pBtn_Withdraw = NULL;
-	m_pEdit_KnightsName = NULL;
+	m_pList_Knights = nullptr;
+	m_pBtn_Join = nullptr;
+	m_pBtn_Create = nullptr;
+	m_pBtn_Destroy = nullptr;
+	m_pBtn_Withdraw = nullptr;
+	m_pEdit_KnightsName = nullptr;
 }
 
 CUIKnightsOperation::~CUIKnightsOperation()
@@ -52,32 +52,32 @@ void CUIKnightsOperation::Release()
 	m_iPageCur = 0;
 	m_KnightsListExt.clear();
 
-	m_pBtn_Up	= NULL;
-	m_pBtn_Down	= NULL;
-	m_pBtn_Close	= NULL;
+	m_pBtn_Up	= nullptr;
+	m_pBtn_Down	= nullptr;
+	m_pBtn_Close	= nullptr;
 
-	m_pList_Knights = NULL;
-	m_pBtn_Join = NULL;
-	m_pBtn_Create = NULL;
-	m_pBtn_Destroy = NULL;
-	m_pBtn_Withdraw = NULL;
-	m_pEdit_KnightsName = NULL;
+	m_pList_Knights = nullptr;
+	m_pBtn_Join = nullptr;
+	m_pBtn_Create = nullptr;
+	m_pBtn_Destroy = nullptr;
+	m_pBtn_Withdraw = nullptr;
+	m_pEdit_KnightsName = nullptr;
 }
 
 bool CUIKnightsOperation::Load(HANDLE hFile)
 {
 	if(false == CN3UIBase::Load(hFile)) return false;
 
-	m_pBtn_Up = (CN3UIButton*)(this->GetChildByID("btn_up"));		__ASSERT(m_pBtn_Up, "NULL UI Component!!");
-	m_pBtn_Down = (CN3UIButton*)(this->GetChildByID("btn_down"));	__ASSERT(m_pBtn_Down, "NULL UI Component!!");
-	m_pBtn_Close = (CN3UIButton*)(this->GetChildByID("btn_close"));	__ASSERT(m_pBtn_Close, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Up, GetChildByID<CN3UIButton>("btn_up"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Down, GetChildByID<CN3UIButton>("btn_down"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Close, GetChildByID<CN3UIButton>("btn_close"));
 
-	m_pList_Knights =		(CN3UIList*)(this->GetChildByID("List_Knights"));		__ASSERT(m_pList_Knights, "NULL UI Component!!");
-	m_pBtn_Join =			(CN3UIButton*)(this->GetChildByID("Btn_Join"));			__ASSERT(m_pBtn_Join, "NULL UI Component!!");
-	m_pBtn_Create =			(CN3UIButton*)(this->GetChildByID("Btn_Create"));		__ASSERT(m_pBtn_Create, "NULL UI Component!!");
-	m_pBtn_Destroy =		(CN3UIButton*)(this->GetChildByID("Btn_Destroy"));		__ASSERT(m_pBtn_Destroy, "NULL UI Component!!");
-	m_pBtn_Withdraw =		(CN3UIButton*)(this->GetChildByID("Btn_Withdraw"));		__ASSERT(m_pBtn_Withdraw, "NULL UI Component!!");
-	m_pEdit_KnightsName =	(CN3UIEdit*)(this->GetChildByID("Edit_KnightsName"));	__ASSERT(m_pEdit_KnightsName, "NULL UI Component!!");
+	N3_VERIFY_UI_COMPONENT(m_pList_Knights, GetChildByID<CN3UIList>("List_Knights"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Join, GetChildByID<CN3UIButton>("Btn_Join"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Create, GetChildByID<CN3UIButton>("Btn_Create"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Destroy, GetChildByID<CN3UIButton>("Btn_Destroy"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Withdraw, GetChildByID<CN3UIButton>("Btn_Withdraw"));
+	N3_VERIFY_UI_COMPONENT(m_pEdit_KnightsName, GetChildByID<CN3UIEdit>("Edit_KnightsName"));
 
 	return true;
 }
@@ -165,7 +165,7 @@ __KnightsInfoBase* CUIKnightsOperation::KnightsInfoFind(int iID)
 {
 	it_KIB it = m_KnightsMapBase.find(iID);
 	if(it != m_KnightsMapBase.end()) return &(it->second);
-	return NULL;
+	return nullptr;
 }
 
 void CUIKnightsOperation::KnightsListAdd(	int iID,
@@ -186,7 +186,7 @@ void CUIKnightsOperation::KnightsListAdd(	int iID,
 
 void CUIKnightsOperation::KnightsListUpdate()
 {
-	if(NULL == m_pList_Knights) return;
+	if(nullptr == m_pList_Knights) return;
 
 	m_pList_Knights->ResetContent();
 
@@ -264,7 +264,7 @@ bool CUIKnightsOperation::MsgRecv_KnightsList(Packet& pkt)
 
 void CUIKnightsOperation::MsgSend_KnightsCreate()
 {
-	if(NULL == m_pEdit_KnightsName) return;
+	if(nullptr == m_pEdit_KnightsName) return;
 
 	std::string szKnightsName = m_pEdit_KnightsName->GetString();
 	if(szKnightsName.empty()) // 이름이 없으면 에러..
@@ -298,7 +298,7 @@ void CUIKnightsOperation::MsgSend_KnightsDestroy()
 
 void CUIKnightsOperation::MsgSend_KnightsJoin()
 {
-	if(NULL == m_pList_Knights) return;
+	if(nullptr == m_pList_Knights) return;
 	int iCurSel = m_pList_Knights->GetCurSel();
 	if (iCurSel < 0
 		|| iCurSel >= static_cast<int>(m_KnightsListExt.size()))

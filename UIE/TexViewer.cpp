@@ -20,19 +20,19 @@ static char THIS_FILE[] = __FILE__;
 CTexViewer::CTexViewer()
 :m_WhiteDashPen(PS_DOT, 1, RGB(255,255,255))
 {
-	m_pTex = NULL;
+	m_pTex = nullptr;
 	Release();
 
-	m_hCursorSelect = LoadCursor(NULL, IDC_CROSS);
+	m_hCursorSelect = LoadCursor(nullptr, IDC_CROSS);
 	m_hCursorZoomIn = (HCURSOR)LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDC_CURSOR_ZOOMIN), IMAGE_CURSOR, 0, 0,LR_DEFAULTSIZE);
 	m_hCursorZoomOut = (HCURSOR)LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDC_CURSOR_ZOOMOUT), IMAGE_CURSOR, 0, 0,LR_DEFAULTSIZE);
 	m_hCursorHand = (HCURSOR)LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDC_CURSOR_HAND), IMAGE_CURSOR, 0, 0,LR_DEFAULTSIZE);
 
-	m_hCursorSizeAll = LoadCursor(NULL, IDC_SIZEALL);
-	m_hCursorSizeWE = LoadCursor(NULL, IDC_SIZEWE);
-	m_hCursorSizeNS = LoadCursor(NULL, IDC_SIZENS);
-	m_hCursorSizeNWSE = LoadCursor(NULL, IDC_SIZENWSE);
-	m_hCursorSizeNESW = LoadCursor(NULL, IDC_SIZENESW);
+	m_hCursorSizeAll = LoadCursor(nullptr, IDC_SIZEALL);
+	m_hCursorSizeWE = LoadCursor(nullptr, IDC_SIZEWE);
+	m_hCursorSizeNS = LoadCursor(nullptr, IDC_SIZENS);
+	m_hCursorSizeNWSE = LoadCursor(nullptr, IDC_SIZENWSE);
+	m_hCursorSizeNESW = LoadCursor(nullptr, IDC_SIZENESW);
 }
 
 CTexViewer::~CTexViewer()
@@ -389,7 +389,7 @@ void CTexViewer::Release()
 
 void CTexViewer::Render()
 {
-	if (NULL == m_pTex) return;
+	if (nullptr == m_pTex) return;
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CN3EngTool* pEng = &(pFrm->m_Eng);
 	LPDIRECT3DDEVICE9 lpD3DDev = pEng->s_lpD3DDev;
@@ -414,7 +414,7 @@ void CTexViewer::Render()
 	if (D3DTEXF_POINT != dwMinFilter) lpD3DDev->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT); //lpD3DDev->SetTextureStageState(0, D3DTSS_MINFILTER,   D3DTEXF_POINT);
 	if (D3DTEXF_NONE != dwMipFilter) lpD3DDev->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE); //lpD3DDev->SetTextureStageState(0, D3DTSS_MIPFILTER,   D3DTEXF_NONE);
 	lpD3DDev->SetTexture(0, m_pTex->Get());
-	lpD3DDev->SetTexture(1, NULL);
+	lpD3DDev->SetTexture(1, nullptr);
 	lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP,  D3DTOP_SELECTARG1);
 	lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1,  D3DTA_TEXTURE);
 	lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP,  D3DTOP_DISABLE);
@@ -473,7 +473,7 @@ BOOL CTexViewer::Zoom(float fScale)
 
 BOOL CTexViewer::ScreenToImage(POINT	*pPoint)
 {
-	if (pPoint == NULL || 0.0f == m_fScale || m_ptLeftTopInImage == CPoint(-1,-1)) return FALSE;
+	if (pPoint == nullptr || 0.0f == m_fScale || m_ptLeftTopInImage == CPoint(-1,-1)) return FALSE;
 	pPoint->x = (int)(m_ptLeftTopInImage.x + pPoint->x/m_fScale);
 	pPoint->y = (int)(m_ptLeftTopInImage.y + pPoint->y/m_fScale);
 	return TRUE;
@@ -481,7 +481,7 @@ BOOL CTexViewer::ScreenToImage(POINT	*pPoint)
 
 BOOL CTexViewer::ScreenToImage(RECT* pRect)
 {
-	if (pRect == NULL || 0.0f == m_fScale || m_ptLeftTopInImage == CPoint(-1,-1)) return FALSE;
+	if (pRect == nullptr || 0.0f == m_fScale || m_ptLeftTopInImage == CPoint(-1,-1)) return FALSE;
 	pRect->left = (int)(m_ptLeftTopInImage.x + pRect->left/m_fScale);
 	pRect->right = (int)(m_ptLeftTopInImage.x + pRect->right/m_fScale);
 	pRect->top = (int)(m_ptLeftTopInImage.y + pRect->top/m_fScale);
@@ -491,7 +491,7 @@ BOOL CTexViewer::ScreenToImage(RECT* pRect)
 
 BOOL CTexViewer::ImageToScreen(POINT	*pPoint)
 {
-	if (pPoint == NULL || 0.0f == m_fScale || m_ptLeftTopInImage == CPoint(-1,-1)) return FALSE;
+	if (pPoint == nullptr || 0.0f == m_fScale || m_ptLeftTopInImage == CPoint(-1,-1)) return FALSE;
 	pPoint->x = (int)((pPoint->x - m_ptLeftTopInImage.x)*m_fScale);
 	pPoint->y = (int)((pPoint->y - m_ptLeftTopInImage.y)*m_fScale);
 	return TRUE;
@@ -499,7 +499,7 @@ BOOL CTexViewer::ImageToScreen(POINT	*pPoint)
 
 BOOL CTexViewer::ImageToScreen(RECT* pRect)
 {
-	if (pRect == NULL || 0.0f == m_fScale || m_ptLeftTopInImage == CPoint(-1,-1)) return FALSE;
+	if (pRect == nullptr || 0.0f == m_fScale || m_ptLeftTopInImage == CPoint(-1,-1)) return FALSE;
 	pRect->left = (int)((pRect->left - m_ptLeftTopInImage.x)*m_fScale);
 	pRect->right = (int)((pRect->right - m_ptLeftTopInImage.x)*m_fScale);
 	pRect->top = (int)((pRect->top - m_ptLeftTopInImage.y)*m_fScale);
@@ -537,7 +537,7 @@ void CTexViewer::SetLeftTopInImage(CPoint ptLeftTop)
 
 BOOL CTexViewer::GetSelectedUVRect(__FLOAT_RECT* pFRect) const
 {
-	if (NULL == pFRect) return FALSE;
+	if (nullptr == pFRect) return FALSE;
 	if (-1 == m_rcSelectedRect.left) return FALSE;
 	ASSERT(m_TexSize.cx > 2 && m_TexSize.cy > 2);
 
@@ -559,7 +559,7 @@ BOOL CTexViewer::GetSelectedUVRect(__FLOAT_RECT* pFRect) const
 }
 void CTexViewer::SetSelectedUVRect(const __FLOAT_RECT* pFRect)
 {
-	if (NULL == pFRect) return;
+	if (nullptr == pFRect) return;
 	ASSERT(m_TexSize.cx > 2 && m_TexSize.cy > 2);
 
 	m_rcSelectedRect.left = int(pFRect->left*m_TexSize.cx + 0.5f);		// 0.5f를 더하는 이유는 반올림..

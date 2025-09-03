@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 // CDlgLoadTileSet dialog
 
 
-CDlgLoadTileSet::CDlgLoadTileSet(CWnd* pParent /*=NULL*/)
+CDlgLoadTileSet::CDlgLoadTileSet(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgLoadTileSet::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgLoadTileSet)
@@ -53,11 +53,11 @@ BOOL CDlgLoadTileSet::OnInitDialog()
 
 	char szDrive[_MAX_DRIVE], szDir[_MAX_DIR];
 	char szModuleFilePath[_MAX_PATH];
-	GetModuleFileName(NULL, szModuleFilePath, _MAX_PATH);
+	GetModuleFileName(nullptr, szModuleFilePath, _MAX_PATH);
 
 	char szNewPath[_MAX_PATH];
-	_splitpath(szModuleFilePath, szDrive, szDir, NULL, NULL);
-	_makepath(szNewPath, szDrive, szDir, NULL, NULL);
+	_splitpath(szModuleFilePath, szDrive, szDir, nullptr, nullptr);
+	_makepath(szNewPath, szDrive, szDir, nullptr, nullptr);
 	SetCurrentDirectory(szNewPath);
 	m_ListTileSet.Dir(DDL_READONLY, "dtex\\*.dtx");
 
@@ -69,7 +69,7 @@ BOOL CDlgLoadTileSet::OnInitDialog()
 		m_ListTileSet.GetText(0, str);
 
 		char szFileName[MAX_PATH];
-		_splitpath((LPCTSTR)str, NULL, NULL, szFileName, NULL);
+		_splitpath((LPCTSTR)str, nullptr, nullptr, szFileName, nullptr);
 
 		str.Format(szFileName);
 		m_ListTileSet.InsertString(count, str);
@@ -88,7 +88,7 @@ void CDlgLoadTileSet::OnSelchangeListLoadTileset()
 	m_ListTileSet.GetText(CurrSel, m_SelFileName);// TODO: Add your control notification handler code here
 
 	char szFileName[MAX_PATH];
-	_splitpath((LPCTSTR)m_SelFileName, NULL, NULL, szFileName, NULL);
+	_splitpath((LPCTSTR)m_SelFileName, nullptr, nullptr, szFileName, nullptr);
 
 	m_SelFileName.Format(szFileName);
 }

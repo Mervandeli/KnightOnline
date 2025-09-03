@@ -133,6 +133,7 @@ protected:
 	CN3UIButton*	m_pBtn_Appoint;
 	CN3UIButton*	m_pBtn_Remove;
 	CN3UIButton*	m_pBtn_Refresh;
+	CN3UIButton*	m_pBtn_ClanParty;
 
 public:	
 	float			m_fTimeLimit_Refresh;
@@ -161,12 +162,13 @@ public:
 
 	void ClearLists();
 
-	void UpdatePageNumber(int nNewPageNr = -1);
-	void UpdateMemberCount(int nMemberCount);
+	void UpdatePageNumber(int iNewPageNo = -1);
+	void UpdateMemberCount(int iMemberCountOnline, int iMemberCountTotal);
 
 	void PreviousPageButtonHandler();
 	void NextPageButtonHandler();
 	void RefreshButtonHandler(bool blBypassTime = false);
+	void ClanPartyButtonHandler();
 	void WhisperButtonHandler();
 	void AdmitButtonHandler();
 	void RemoveButtonHandler();

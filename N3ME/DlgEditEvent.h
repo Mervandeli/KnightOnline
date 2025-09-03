@@ -19,7 +19,7 @@ class CDlgEditEvent : public CDialog
 public:
 	void ResetAll();
 	void SetCurrName(char* pName);
-	CDlgEditEvent(CWnd* pParent = NULL);   // standard constructor
+	CDlgEditEvent(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgEditEvent)

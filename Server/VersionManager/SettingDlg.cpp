@@ -29,7 +29,7 @@ using PathType = std::string;
 
 /// \brief standard constructor called by VersionManagerDlg::OnVersionSetting().
 /// Constructs using _main->LastVersion
-CSettingDlg::CSettingDlg(int lastVersion, CWnd* parent /*=NULL*/)
+CSettingDlg::CSettingDlg(int lastVersion, CWnd* parent /*=nullptr*/)
 	: CDialog(IDD, parent)
 {
 	//{{AFX_DATA_INIT(CSettingDlg)

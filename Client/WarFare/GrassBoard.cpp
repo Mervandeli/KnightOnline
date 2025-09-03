@@ -109,7 +109,7 @@ void CGrassBoard::Render(CN3Texture** ppTex)
 	for(int i=0;i<m_ucTexNum;++i)
 	{
 		pGrass = &m_sGrassInfo[i];
-		if(ppTex[pGrass->iTexIndex]==NULL) continue;
+		if(ppTex[pGrass->iTexIndex]==nullptr) continue;
 
 		s_lpD3DDev->SetTransform(D3DTS_WORLD, &pGrass->mtxWorld);
 

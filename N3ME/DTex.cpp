@@ -21,7 +21,7 @@ static char THIS_FILE[]=__FILE__;
 
 CDTex::CDTex()
 {
-	m_pTex = NULL;
+	m_pTex = nullptr;
 	m_ID = -1;
 	
 	ZeroMemory(m_Attr, NUM_DTEXTILE*NUM_DTEXTILE*sizeof(DTEXATTR));
@@ -42,7 +42,7 @@ void CDTex::Release()
 	{
 		m_pTex->Release();
 		delete m_pTex;
-		m_pTex = NULL;
+		m_pTex = nullptr;
 	}
 }
 

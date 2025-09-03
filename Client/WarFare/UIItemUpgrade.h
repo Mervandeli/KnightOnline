@@ -32,6 +32,7 @@ private:
 	__IconItemSkill* m_pUpgradeResultSlot;
 	int8_t m_iUpgradeScrollSlotInvPos[MAX_ITEM_UPGRADE_SLOT];
 	int8_t m_iUpgradeItemSlotInvPos;
+	int8_t m_iUpgradeResultSlotInvPos;
 	CN3UIString* m_pStrMyGold;
 	
 	// Animation state management

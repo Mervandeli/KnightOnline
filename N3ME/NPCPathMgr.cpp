@@ -26,15 +26,15 @@ CNPCPathMgr::CNPCPathMgr()
 {
 	m_pPaths.clear();
 	m_bActive = false;
-	m_pRefMapMng = NULL;
+	m_pRefMapMng = nullptr;
 
 	m_pDlgMakePath = new CDlgMakeNPCPath;
 	m_pDlgMakePath->Create(IDD_MAKE_NPCPATH);
 	m_pDlgMakePath->ShowWindow(FALSE);
 	m_pDlgMakePath->m_pRefNPCPathMgr = this;
 
-	m_pCurrPath = NULL;
-	m_pppRefEvent = NULL;
+	m_pCurrPath = nullptr;
+	m_pppRefEvent = nullptr;
 	m_bRenderMovableRegion = false;
 
 	m_BaseCube[0].Set(0, 1, 0);	// 앞쪽 LT
@@ -65,8 +65,8 @@ CNPCPathMgr::CNPCPathMgr(CMapMng* pMapMng)
 	m_pDlgMakePath->ShowWindow(FALSE);
 	m_pDlgMakePath->m_pRefNPCPathMgr = this;
 
-	m_pCurrPath = NULL;
-	m_pppRefEvent = NULL;
+	m_pCurrPath = nullptr;
+	m_pppRefEvent = nullptr;
 	m_bRenderMovableRegion = false;
 
 	m_BaseCube[0].Set(0, 1, 0);	// 앞쪽 LT
@@ -92,24 +92,24 @@ CNPCPathMgr::~CNPCPathMgr()
 	for(it = m_pPaths.begin(); it != m_pPaths.end(); it++)
 	{
 		delete (*it);
-		(*it) = NULL;
+		(*it) = nullptr;
 	}
 	m_pPaths.clear();
 
 	if(m_pCurrPath)
 	{
 		delete m_pCurrPath;
-		m_pCurrPath = NULL;
+		m_pCurrPath = nullptr;
 	}
 
 	if(m_pDlgMakePath) 
 	{
 		m_pDlgMakePath->DestroyWindow();
 		delete m_pDlgMakePath;
-		m_pDlgMakePath = NULL;
+		m_pDlgMakePath = nullptr;
 	}
 
-	m_pppRefEvent = NULL;
+	m_pppRefEvent = nullptr;
 	m_bRenderMovableRegion = false;
 }
 
@@ -122,7 +122,7 @@ void CNPCPathMgr::LoadFromFile(const char* FileName)
 	if(m_pCurrPath)
 	{
 		delete m_pCurrPath;
-		m_pCurrPath = NULL;
+		m_pCurrPath = nullptr;
 	}
 	m_pCurrPath = new CNPCPath;
 
@@ -136,10 +136,10 @@ void CNPCPathMgr::LoadFromFile(const char* FileName)
 	wsprintf(szNPCPathFileName, "%snpcpath\\%s.npi", s_szPath.c_str(), FileName);
 	
 	DWORD dwRWC;
-	HANDLE hFile = CreateFile(szNPCPathFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(szNPCPathFileName, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	int NumPath;
-	ReadFile(hFile, &NumPath, sizeof(int), &dwRWC, NULL);
+	ReadFile(hFile, &NumPath, sizeof(int), &dwRWC, nullptr);
 
 	m_pPaths.clear();
 	for(int i=0;i<NumPath;i++)
@@ -158,15 +158,15 @@ void CNPCPathMgr::SaveToFile(const char* FileName)
 	GetCurrentDirectory(_MAX_PATH, szOldPath);	
 	SetCurrentDirectory(s_szPath.c_str());
 
-	CreateDirectory("npcpath", NULL); // 경로 만들고..
+	CreateDirectory("npcpath", nullptr); // 경로 만들고..
 	char szNPCPathFileName[_MAX_PATH];
 	wsprintf(szNPCPathFileName, "%snpcpath\\%s.npi", s_szPath.c_str(), FileName);
 
 	DWORD dwRWC;
-	HANDLE hFile = CreateFile(szNPCPathFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(szNPCPathFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 	
 	int NumPath = m_pPaths.size();
-	WriteFile(hFile, &NumPath, sizeof(int), &dwRWC, NULL);
+	WriteFile(hFile, &NumPath, sizeof(int), &dwRWC, nullptr);
 
 	std::list<CNPCPath*>::iterator itPath;
 	CNPCPath* pPath;
@@ -275,7 +275,7 @@ void CNPCPathMgr::SetActive(bool active)
 		if(m_pCurrPath)
 		{
 			delete m_pCurrPath;
-			m_pCurrPath = NULL;
+			m_pCurrPath = nullptr;
 		}
 		m_pCurrPath = pPath;
 	}
@@ -286,7 +286,7 @@ void CNPCPathMgr::SetActive(bool active)
 		if(m_pCurrPath)
 		{
 			delete m_pCurrPath;
-			m_pCurrPath = NULL;
+			m_pCurrPath = nullptr;
 		}
 	}
 }
@@ -304,7 +304,7 @@ BOOL CNPCPathMgr::MouseMsgFilter(LPMSG pMsg)
 			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 
 			if(m_pDlgMakePath->m_State==0)	// 시작 RECT 그림.
 			{
@@ -357,7 +357,7 @@ BOOL CNPCPathMgr::MouseMsgFilter(LPMSG pMsg)
 			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 
 			if(m_pDlgMakePath->m_State==0)
 			{
@@ -378,7 +378,7 @@ BOOL CNPCPathMgr::MouseMsgFilter(LPMSG pMsg)
 			__Vector3 vec;
 //			if(nFlags & MK_SHIFT)
 //			{
-//				if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+//				if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 //				
 //				CStatusBar* pBar = m_pRefMapMng->GetStatusBar();
 //				CString str; str.Format("X:%f Y:%f Z:%f", vec.x, vec.y, vec.z);
@@ -390,7 +390,7 @@ BOOL CNPCPathMgr::MouseMsgFilter(LPMSG pMsg)
 			{
 				if(nFlags & MK_LBUTTON)
 				{
-					if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+					if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 
 					m_RBStartVertex = vec;
 
@@ -405,7 +405,7 @@ BOOL CNPCPathMgr::MouseMsgFilter(LPMSG pMsg)
 			{
 				if(nFlags & MK_LBUTTON)
 				{
-					if(!pRefTerrain->Pick(point.x, point.y, &vec, NULL)) break;
+					if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
 
 					m_RBActVertex = vec;
 
@@ -482,7 +482,7 @@ void CNPCPathMgr::Render()
 	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx); // 월드 행렬 적용..
 	
 	// set texture
-	hr = s_lpD3DDev->SetTexture(0, NULL);
+	hr = s_lpD3DDev->SetTexture(0, nullptr);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 
@@ -766,7 +766,7 @@ void CNPCPathMgr::SetCurrPath(CNPCPath* pPath)
 	if(m_pCurrPath)
 	{
 		delete m_pCurrPath;
-		m_pCurrPath = NULL;
+		m_pCurrPath = nullptr;
 	}
 
 	std::list<CNPCPath*>::iterator itPath;

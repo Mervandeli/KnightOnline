@@ -19,8 +19,8 @@ CN3UITrackBar::CN3UITrackBar()
 {
 	m_eType = UI_TYPE_TRACKBAR;
 
-	m_pBkGndImageRef = NULL;
-	m_pThumbImageRef = NULL;
+	m_pBkGndImageRef = nullptr;
+	m_pThumbImageRef = nullptr;
 	m_iMaxPos = 10;
 	m_iMinPos = 0;
 	m_iCurPos = 0;
@@ -34,8 +34,8 @@ CN3UITrackBar::~CN3UITrackBar()
 void CN3UITrackBar::Release()
 {
 	CN3UIBase::Release();
-	m_pBkGndImageRef = NULL;
-	m_pThumbImageRef = NULL;
+	m_pBkGndImageRef = nullptr;
+	m_pThumbImageRef = nullptr;
 	m_iMaxPos = 10;
 	m_iMinPos = 0;
 	m_iCurPos = 0;
@@ -183,7 +183,7 @@ void CN3UITrackBar::SetCurrentPos(int iPos)
 // Pos수치로 Thumb의 위치를 조정
 void CN3UITrackBar::UpdateThumbPos()
 {
-	if (NULL == m_pThumbImageRef) return;
+	if (nullptr == m_pThumbImageRef) return;
 	float fDiff = (float)m_iMaxPos - (float)m_iMinPos;
 	if (0.0f == fDiff) return;
 	float fPercentage = (float)m_iCurPos/fDiff;
@@ -204,7 +204,7 @@ void CN3UITrackBar::UpdateThumbPos()
 // thumb을 pixel단위로 위치 조정하고 thumb의 위치를 바탕으로 pos 수치를 계산하여 넣음
 void CN3UITrackBar::UpDownThumbPos(int iDiff)
 {
-	if (NULL == m_pThumbImageRef) return;
+	if (nullptr == m_pThumbImageRef) return;
 	RECT rcThumb = m_pThumbImageRef->GetRegion();
 
 	if (UISTYLE_TRACKBAR_VERTICAL == m_dwStyle)		// 아래 움직일 대
@@ -288,7 +288,7 @@ void CN3UITrackBar::operator = (const CN3UITrackBar& other)
 
 void CN3UITrackBar::CreateImages()
 {
-	__ASSERT(NULL == m_pBkGndImageRef && NULL == m_pThumbImageRef, "이미지가 이미 할당되어 있어여");
+	__ASSERT(nullptr == m_pBkGndImageRef && nullptr == m_pThumbImageRef, "이미지가 이미 할당되어 있어여");
 	m_pBkGndImageRef = new CN3UIImage();
 	m_pBkGndImageRef->Init(this);
 	m_pBkGndImageRef->SetReserved(IMAGETYPE_BKGND);
@@ -303,7 +303,7 @@ void CN3UITrackBar::CreateImages()
 void CN3UITrackBar::DeleteBkImage()
 {
 	delete m_pBkGndImageRef;
-	m_pBkGndImageRef = NULL;
+	m_pBkGndImageRef = nullptr;
 }
 
 #endif

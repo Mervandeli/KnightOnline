@@ -14,7 +14,7 @@ class CDlgSaveEvt : public CDialog
 {
 // Construction
 public:
-	CDlgSaveEvt(CWnd* pParent = NULL);   // standard constructor
+	CDlgSaveEvt(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgSaveEvt)

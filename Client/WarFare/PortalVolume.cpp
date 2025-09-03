@@ -59,7 +59,7 @@ CPortalVolume::CPortalVolume()	: m_fOffs(0.001f), m_fHeightOffs(0.01f), m_fVolOf
 	*pIdx++ = 6;  *pIdx++ = 5;  *pIdx++ = 7;
 
 	m_iID = -1;
-	m_pManager = NULL;
+	m_pManager = nullptr;
 	m_iPriority = 100;
 
 	m_eRenderType = TYPE_UNKNOWN;
@@ -143,7 +143,7 @@ void CPortalVolume::Render()
 	mtxWorld.Identity();
 
 	CN3Base::s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtxWorld);
-	CN3Base::s_lpD3DDev->SetTexture(0, NULL);
+	CN3Base::s_lpD3DDev->SetTexture(0, nullptr);
 
 	// Shape..
 	RenderShape();	
@@ -186,7 +186,7 @@ void CPortalVolume::RenderShape()
 		CN3Base::s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtxBackup);
 	}
 
-	ShapePart* pSP = NULL;
+	ShapePart* pSP = nullptr;
 	spiter spit = m_lpShapePartList.begin();
 	while( spit != m_lpShapePartList.end())
 	{
@@ -220,8 +220,8 @@ void CPortalVolume::RenderShape()
 
 void CPortalVolume::RenderCollision()
 {
-	__ColIndex * pCI = NULL;
-	ShapeInfo* pSI = NULL;
+	__ColIndex * pCI = nullptr;
+	ShapeInfo* pSI = nullptr;
 
 	ciiter ciit = m_lpShapeColPartList.begin();
 	while(ciit != m_lpShapeColPartList.end())
@@ -268,31 +268,31 @@ bool CPortalVolume::Load(HANDLE hFile)
 
 	// 링크된 갯수를 로드..	일단 읽구 버린다..
 	int iLinkedCount = 0, iTID, iEWT;
-	ReadFile(hFile, &iLinkedCount, sizeof(int), &dwNum, NULL);
+	ReadFile(hFile, &iLinkedCount, sizeof(int), &dwNum, nullptr);
 	for( int i = 0; i < iLinkedCount; i++ )
 	{
-		ReadFile(hFile, &iTID, sizeof(int), &dwNum, NULL);
-		ReadFile(hFile, &iEWT, sizeof(int), &dwNum, NULL);
+		ReadFile(hFile, &iTID, sizeof(int), &dwNum, nullptr);
+		ReadFile(hFile, &iEWT, sizeof(int), &dwNum, nullptr);
 	}
 
 	// 링크된 Shape 갯수 로드..
 	int iCount = 0;
-	ReadFile(hFile, &iCount, sizeof(int), &dwNum, NULL);
+	ReadFile(hFile, &iCount, sizeof(int), &dwNum, nullptr);
 	for (int i = 0; i < iCount; i++)
 	{
 		ShapeInfo*	pSI = new ShapeInfo;
-		ReadFile(hFile, &pSI->m_iID, sizeof(int), &dwNum, NULL);
+		ReadFile(hFile, &pSI->m_iID, sizeof(int), &dwNum, nullptr);
 
 		// 문자열 길이..
 		strSrc = CPvsMgr::ReadDecryptString(hFile);
 		_splitpath(strSrc.c_str(), szDrive, szDir, szFName, szExt);
 		strDest = szFName;	strDest +=  szExt;
 		pSI->m_strShapeFile = m_pManager->GetIndoorFolderPath() + strDest;
-		ReadFile(hFile, &pSI->m_iBelong, sizeof(int), &dwNum, NULL);	
-		ReadFile(hFile, &pSI->m_iEventID, sizeof(int), &dwNum, NULL);	
-		ReadFile(hFile, &pSI->m_iEventType, sizeof(int), &dwNum, NULL);	
-		ReadFile(hFile, &pSI->m_iNPC_ID, sizeof(int), &dwNum, NULL);	
-		ReadFile(hFile, &pSI->m_iNPC_Status, sizeof(int), &dwNum, NULL);	
+		ReadFile(hFile, &pSI->m_iBelong, sizeof(int), &dwNum, nullptr);	
+		ReadFile(hFile, &pSI->m_iEventID, sizeof(int), &dwNum, nullptr);	
+		ReadFile(hFile, &pSI->m_iEventType, sizeof(int), &dwNum, nullptr);	
+		ReadFile(hFile, &pSI->m_iNPC_ID, sizeof(int), &dwNum, nullptr);	
+		ReadFile(hFile, &pSI->m_iNPC_Status, sizeof(int), &dwNum, nullptr);	
 		if (pSI->m_iEventID || pSI->m_iEventType || pSI->m_iNPC_ID || pSI->m_iNPC_Status ) // 이벤트가 있으면
 			pSI->m_pShape = CPvsMgr::s_MngShapeExt.Get(m_pManager->GetIndoorFolderPath() + strDest);
 		else
@@ -304,35 +304,35 @@ bool CPortalVolume::Load(HANDLE hFile)
 
 	// Visible..
 	IDAndPriority IDAP;
-	ReadFile(hFile, &iCount, sizeof(int), &dwNum, NULL);
+	ReadFile(hFile, &iCount, sizeof(int), &dwNum, nullptr);
 
 	for(int i = 0; i < iCount; i++ )
 	{
-		ReadFile(hFile, &IDAP.m_iID, sizeof(int), &dwNum, NULL);
-		ReadFile(hFile, &IDAP.m_iPriority, sizeof(int), &dwNum, NULL);
+		ReadFile(hFile, &IDAP.m_iID, sizeof(int), &dwNum, nullptr);
+		ReadFile(hFile, &IDAP.m_iPriority, sizeof(int), &dwNum, nullptr);
 		__ASSERT(IDAP.m_iPriority != -1, "잘못된 파일");
 		m_piVisibleIDList.push_back(IDAP);
 	}
 
-	ReadFile(hFile, &iCount, sizeof(int), &dwNum, NULL);
+	ReadFile(hFile, &iCount, sizeof(int), &dwNum, nullptr);
 
 	int iSize_2 = 0, iSize_3 = 0;
 	for(int i = 0; i < iCount; i++ )
 	{
 		ShapePart* pSP = new ShapePart;
-		ReadFile(hFile, &pSP->m_iID, sizeof(int), &dwNum, NULL);
+		ReadFile(hFile, &pSP->m_iID, sizeof(int), &dwNum, nullptr);
 		
-		ReadFile(hFile, &iSize_2, sizeof(int), &dwNum, NULL);
+		ReadFile(hFile, &iSize_2, sizeof(int), &dwNum, nullptr);
 		for( int j = 0; j <iSize_2; j++ )
 		{
 			__VPI vpi;
-			ReadFile(hFile, &vpi.m_iPartIndex, sizeof(int), &dwNum, NULL);
+			ReadFile(hFile, &vpi.m_iPartIndex, sizeof(int), &dwNum, nullptr);
 
-			ReadFile(hFile, &iSize_3, sizeof(int), &dwNum, NULL);
+			ReadFile(hFile, &iSize_3, sizeof(int), &dwNum, nullptr);
 			for( int k = 0; k < iSize_3; k++ )
 			{
 				int iV = 0;
-				ReadFile(hFile, &iV, sizeof(int), &dwNum, NULL);
+				ReadFile(hFile, &iV, sizeof(int), &dwNum, nullptr);
 				vpi.m_ivVector.push_back(iV);
 			}
 
@@ -342,18 +342,18 @@ bool CPortalVolume::Load(HANDLE hFile)
 		m_lpShapePartList.push_back(pSP);
 	}
 
-	ReadFile(hFile, &iCount, sizeof(int), &dwNum, NULL);
+	ReadFile(hFile, &iCount, sizeof(int), &dwNum, nullptr);
 
 	for(int i = 0; i < iCount; i++ )
 	{
 		__ColIndex* pCI = new __ColIndex;
-		ReadFile(hFile, &pCI->m_iID, sizeof(int), &dwNum, NULL);		
+		ReadFile(hFile, &pCI->m_iID, sizeof(int), &dwNum, nullptr);		
 
-		ReadFile(hFile, &iSize_2, sizeof(int), &dwNum, NULL);
+		ReadFile(hFile, &iSize_2, sizeof(int), &dwNum, nullptr);
 		for( int j = 0; j <iSize_2; j++ )
 		{
 			int iV = 0;			
-			ReadFile(hFile, &iV, sizeof(int), &dwNum, NULL);
+			ReadFile(hFile, &iV, sizeof(int), &dwNum, nullptr);
 			pCI->m_ivVector.push_back(iV);
 		}
 
@@ -373,7 +373,7 @@ bool CPortalVolume::CheckCollisionCameraWithTerrain(__Vector3& vEyeResult, const
 	bool bCollision = false;
 	bool bColl = false;
 	__Vector3 vDir = vEyeResult- vAt;	vDir.Normalize();
-	__ColIndex * pCI = NULL;
+	__ColIndex * pCI = nullptr;
 
 	int iCount = m_lpShapeColPartList.size();
 	ciiter ciit = m_lpShapeColPartList.begin();
@@ -423,7 +423,7 @@ bool CPortalVolume::CheckCollisionCameraWithShape(__Vector3& vEyeResult, const _
 	bool bCollision = false;
 	bool bColl = false;
 	__Vector3 vDir = vEyeResult- vAt;	vDir.Normalize();
-	ShapeInfo* pSI = NULL;
+	ShapeInfo* pSI = nullptr;
 
 	siiter siit = m_plShapeInfoList.begin();
 	while(siit != m_plShapeInfoList.end())
@@ -462,7 +462,7 @@ bool CPortalVolume::CheckCollisionCameraWithShape(__Vector3& vEyeResult, const _
 
 bool CPortalVolume::GetHeightWithTerrain(float fx, float fz, float& fy)
 {
-	CPortalVolume* pVol = NULL;
+	CPortalVolume* pVol = nullptr;
 
 	VisPortalPriority vPP;
 	vppiter vppit = m_pVisiblePvsList.begin();
@@ -474,7 +474,7 @@ bool CPortalVolume::GetHeightWithTerrain(float fx, float fz, float& fy)
 
 		pVol = vPP.m_pVol;
 
-		__ColIndex * pCI = NULL;
+		__ColIndex * pCI = nullptr;
 		int iCount = pVol->m_lpShapeColPartList.size();
 		ciiter ciit = pVol->m_lpShapeColPartList.begin();
 		while(ciit != pVol->m_lpShapeColPartList.end())
@@ -526,7 +526,7 @@ bool CPortalVolume::GetHeightWithTerrain(float fx, float fz, float& fy)
 float CPortalVolume::GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal)
 {
 	float fHeight = FLT_MIN;
-	ShapeInfo* pSI = NULL;
+	ShapeInfo* pSI = nullptr;
 
 	int iCount = m_plShapeInfoList.size();
 	siiter siit = m_plShapeInfoList.begin();
@@ -614,7 +614,7 @@ BOOL CPortalVolume::PickWideWithTerrain(int x, int y, __Vector3& vPick)
 
 	__Vector3 A, B, C;
 	float t, u, v;
-	__ColIndex * pCI = NULL;
+	__ColIndex * pCI = nullptr;
 
 	int iCount = m_lpShapeColPartList.size();
 	ciiter ciit = m_lpShapeColPartList.begin();
@@ -663,8 +663,8 @@ CN3Shape* CPortalVolume::PickWithShape(int iXScreen, int iYScreen, bool bMustHav
 
 	// 거리순으로 정렬..
 	std::vector<ShapeInfo*> Shapes;
-	ShapeInfo* pSI = NULL;
-	CPortalVolume* pVol = NULL;
+	ShapeInfo* pSI = nullptr;
+	CPortalVolume* pVol = nullptr;
 	VisPortalPriority vPP;
 	vppiter vppit = m_pVisiblePvsList.begin();
 	while( vppit != m_pVisiblePvsList.end())
@@ -699,13 +699,13 @@ CN3Shape* CPortalVolume::PickWithShape(int iXScreen, int iYScreen, bool bMustHav
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 CN3Shape* CPortalVolume::ShapeGetByIDWithShape(int iID)
 {
-	ShapeInfo* pSI = NULL;
-	CPortalVolume* pVol = NULL;
+	ShapeInfo* pSI = nullptr;
+	CPortalVolume* pVol = nullptr;
 	VisPortalPriority vPP;
 	vppiter vppit = m_pVisiblePvsList.begin();
 	while( vppit != m_pVisiblePvsList.end())
@@ -728,7 +728,7 @@ CN3Shape* CPortalVolume::ShapeGetByIDWithShape(int iID)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool CPortalVolume::CheckCollisionWithShape(	const __Vector3& vPos,				 // 충돌 위치
@@ -743,8 +743,8 @@ bool CPortalVolume::CheckCollisionWithShape(	const __Vector3& vPos,				 // 충�
 
 	bool bCollision = false;
 	bool bColl = false;
-	CPortalVolume* pVol = NULL;
-	ShapeInfo* pSI = NULL;
+	CPortalVolume* pVol = nullptr;
+	ShapeInfo* pSI = nullptr;
 
 	VisPortalPriority vPP;
 	vppiter vppit = m_pVisiblePvsList.begin();

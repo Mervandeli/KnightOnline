@@ -14,7 +14,7 @@ class CDlgNewFileName : public CDialog
 {
 // Construction
 public:
-	CDlgNewFileName(CWnd* pParent = NULL);   // standard constructor
+	CDlgNewFileName(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgNewFileName)

@@ -15,7 +15,7 @@ class CDlgTexture : public CDialog
 {
 // Construction
 public:
-	CDlgTexture(CWnd* pParent = NULL);   // standard constructor
+	CDlgTexture(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CDlgTexture();
 
 // Dialog Data
@@ -39,7 +39,7 @@ public:
 	void	SetSelectedUVRect(const struct __FLOAT_RECT* pFRect);	// 현재 선택된 UV좌표 넣기
 	CRect	GetSelectedRect() const;
 	void	SetImageTypes(int iCount, char** pszNames);
-	CRect	GetImageRect(int iIndex, __FLOAT_RECT* pUVRect = NULL);
+	CRect	GetImageRect(int iIndex, __FLOAT_RECT* pUVRect = nullptr);
 protected:
 	void Resize();
 public:

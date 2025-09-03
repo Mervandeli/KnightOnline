@@ -17,7 +17,7 @@ public:
 	int		m_SelectedGroupID;
 	POINT	m_Point;
 	
-	CDlgInputAttr(CWnd* pParent = NULL);   // standard constructor
+	CDlgInputAttr(CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CDlgInputAttr)

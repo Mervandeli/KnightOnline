@@ -110,7 +110,7 @@ void CN3Sun::Render(__Matrix44& matView, __Matrix44& matProj)
 		pSP->pVertices[3].x = (float)rcSun[i].left;		pSP->pVertices[3].y = (float)rcSun[i].bottom;
 
 		if(pSP->pTex) s_lpD3DDev->SetTexture(0, pSP->pTex->Get());
-		else s_lpD3DDev->SetTexture(0, NULL);
+		else s_lpD3DDev->SetTexture(0, nullptr);
 		s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN , 2, pSP->pVertices, sizeof(__VertexTransformed) );
 	}
 

@@ -21,15 +21,15 @@ static char THIS_FILE[] = __FILE__;
 // CDlgEditEvent dialog
 
 
-CDlgEditEvent::CDlgEditEvent(CWnd* pParent /*=NULL*/)
+CDlgEditEvent::CDlgEditEvent(CWnd* pParent /*=nullptr*/)
 	: CDialog(CDlgEditEvent::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgEditEvent)
 	m_CurrFileName = _T("");
 	//}}AFX_DATA_INIT
 
-	m_pRefEventMgr = NULL;
-	m_pSelEvent = NULL;
+	m_pRefEventMgr = nullptr;
+	m_pSelEvent = nullptr;
 }
 
 
@@ -65,7 +65,7 @@ void CDlgEditEvent::OnBtnEventDel()
 	m_EventList.DeleteString(idx);
 
 	if(pEvent) m_pRefEventMgr->DelEvent(pEvent);
-	m_pSelEvent = NULL;
+	m_pSelEvent = nullptr;
 	m_pRefEventMgr->m_pRefMapMng->Invalidate();
 }
 

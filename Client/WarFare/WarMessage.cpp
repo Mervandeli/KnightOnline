@@ -16,7 +16,7 @@
 
 CWarMessage::CWarMessage()
 {
-	m_pMessageFont = NULL;
+	m_pMessageFont = nullptr;
 	m_fTime = 0.0f;
 }
 
@@ -51,7 +51,7 @@ void CWarMessage::InitFont()
 
 void CWarMessage::Release()
 {
-	if (m_pMessageFont) delete m_pMessageFont; m_pMessageFont = NULL;
+	if (m_pMessageFont) delete m_pMessageFont; m_pMessageFont = nullptr;
 }
 
 void CWarMessage::SetMessage(const std::string& szText, uint32_t dwFlags, uint32_t dwColor)

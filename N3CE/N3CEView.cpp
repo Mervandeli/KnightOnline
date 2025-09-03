@@ -57,7 +57,7 @@ CN3CEView::CN3CEView()
 
 	m_ptPrev.x = m_ptPrev.y = 0;
 
-	m_pJointSelected = NULL;
+	m_pJointSelected = nullptr;
 	m_fTickPrev = CN3Base::TimeGet();
 
 	m_eCursorMode = eCM_Nothing; // 커서 모드 보통..
@@ -104,7 +104,7 @@ void CN3CEView::OnDraw(CDC* pDC)
 	pFrm->m_Eng.RenderAxis();
 	
 	CN3Chr* pChr = pDoc->m_Scene.ChrGet(0);
-	if(NULL == pChr || NULL == pChr->Joint())
+	if(nullptr == pChr || nullptr == pChr->Joint())
 	{
 		CN3Base::s_AlphaMgr.Render(); // Draw Alpha primitive...
 		pFrm->m_Eng.s_lpD3DDev->EndScene();
@@ -236,7 +236,7 @@ void CN3CEView::OnDraw(CDC* pDC)
 	for(int i = 0; i < nPC; i++)
 	{
 		CN3CPart* pPart = pChr->Part(i);
-		if(NULL == pPart) continue;
+		if(nullptr == pPart) continue;
 		
 		pPart->Render(0);
 	}
@@ -289,7 +289,7 @@ void CN3CEView::OnDraw(CDC* pDC)
 	{
 		CN3AnimControl* pAC = pChr->AniCtrl();
 		int iAI = m_DequeAnimation[i];
-		if(NULL == pAC || NULL == pAC->DataGet(iAI)) continue;
+		if(nullptr == pAC || nullptr == pAC->DataGet(iAI)) continue;
 
 		CString szAniName = pAC->DataGet(iAI)->szName.c_str();
 		pDC->TextOut(20, 20 + i * 18, szAniName);
@@ -305,14 +305,14 @@ void CN3CEView::OnInitialUpdate()
 
 	DragAcceptFiles(); // Drag File 을 받는다..
 
-	m_pJointSelected = NULL;
+	m_pJointSelected = nullptr;
 
 	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 	CRect rc; GetClientRect(rc);
 	pFrm->m_Eng.Reset(TRUE, rc.Width(), rc.Height(), 0);
 
 	this->SetCameraToDefault(); // 카메라를 기본값으로 하고..
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -368,7 +368,7 @@ void CN3CEView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 void CN3CEView::SetCameraToDefault()
 {
 	CN3Camera* pCamera = GetDocument()->m_Scene.CameraGetActive();
-	if(NULL == pCamera) return;
+	if(nullptr == pCamera) return;
 
 	pCamera->m_Data.fNP = 0.1f;
 	pCamera->m_Data.fFP = 256.0f;
@@ -377,7 +377,7 @@ void CN3CEView::SetCameraToDefault()
 	pCamera->AtPosSet(0.0f, 0.8f, 0.0f);
 	pCamera->UpVectorSet(0.0f, 1.0f, 0.0f);
 
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 BOOL CN3CEView::OnEraseBkgnd(CDC* pDC) 
@@ -392,7 +392,7 @@ void CN3CEView::OnLButtonDown(UINT nFlags, CPoint point)
 		!(nFlags & MK_SHIFT) &&
 		!::_IsKeyDown(VK_MENU))
 	{
-		m_pJointSelected = NULL;
+		m_pJointSelected = nullptr;
 		
 		CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
 		CN3Scene* pScene = &(GetDocument()->m_Scene);
@@ -463,7 +463,7 @@ void CN3CEView::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 	}
 	
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 	
 	m_ptPrev = point;
 
@@ -473,7 +473,7 @@ void CN3CEView::OnLButtonDown(UINT nFlags, CPoint point)
 void CN3CEView::OnViewXray() 
 {
 	m_bRenderOptionXRay = !m_bRenderOptionXRay;
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CN3CEView::OnUpdateViewXray(CCmdUI* pCmdUI) 
@@ -483,7 +483,7 @@ void CN3CEView::OnUpdateViewXray(CCmdUI* pCmdUI)
 void CN3CEView::OnViewJoint() 
 {
 	m_bRenderOptionJoint = !m_bRenderOptionJoint;
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CN3CEView::OnUpdateViewJoint(CCmdUI* pCmdUI) 
@@ -493,8 +493,8 @@ void CN3CEView::OnUpdateViewJoint(CCmdUI* pCmdUI)
 void CN3CEView::UpdateAllInfo()
 {
 	SetCameraToDefault(); // 카메라를 기본값으로 만들고...
-	m_pJointSelected = NULL;
-	this->InvalidateRect(NULL, FALSE);
+	m_pJointSelected = nullptr;
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 DROPEFFECT CN3CEView::OnDragEnter(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point) 
@@ -542,7 +542,7 @@ void CN3CEView::OnDropFiles(HDROP hDropInfo)
 
 void CN3CEView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint) 
 {
-	this->InvalidateRect(NULL, FALSE);
+	this->InvalidateRect(nullptr, FALSE);
 }
 
 void CN3CEView::OnSize(UINT nType, int cx, int cy) 
@@ -553,7 +553,7 @@ void CN3CEView::OnSize(UINT nType, int cx, int cy)
 	if(pFrm)
 	{
 		pFrm->m_Eng.Reset(TRUE, cx, cy, 0);
-		this->InvalidateRect(NULL, FALSE);
+		this->InvalidateRect(nullptr, FALSE);
 	}
 }
 
@@ -660,7 +660,7 @@ void CN3CEView::OnMouseMove(UINT nFlags, CPoint point)
 					__Vector3 vDelta(ptDelta.x * 0.003f, -ptDelta.y * 0.003f, 0);
 					vDelta *= mtx;
 
-					::D3DXMatrixInverse(&mtx, NULL, pMtxTmp);
+					::D3DXMatrixInverse(&mtx, nullptr, pMtxTmp);
 					mtx.PosSet(0,0,0);
 					vDelta *= mtx;
 
@@ -685,7 +685,7 @@ void CN3CEView::OnMouseMove(UINT nFlags, CPoint point)
 					__Matrix44 mtx;
 					mtx.Identity();
 
-					::D3DXMatrixInverse(&mtx, NULL, pMtxTmp);
+					::D3DXMatrixInverse(&mtx, nullptr, pMtxTmp);
 					mtx.PosSet(0,0,0);
 
 					vAxis = CN3Base::s_CameraData.vAt - CN3Base::s_CameraData.vEye;
@@ -726,7 +726,7 @@ void CN3CEView::OnMouseMove(UINT nFlags, CPoint point)
 			pPlug->ReCalcMatrix();
 			pFrm->GetPaneProperty()->UpdateInfo();
 
-			this->InvalidateRect(NULL, FALSE);
+			this->InvalidateRect(nullptr, FALSE);
 		}
 //////////////////////////////////////////////////
 //	Coded (By Dino On 2002-10-11 오후 2:04:29 )
@@ -752,7 +752,7 @@ void CN3CEView::OnMouseMove(UINT nFlags, CPoint point)
 					__Vector3 vDelta(ptDelta.x * 0.003f, -ptDelta.y * 0.003f, 0);
 					vDelta *= mtx;
 
-					::D3DXMatrixInverse(&mtx, NULL, pMtxTmp);
+					::D3DXMatrixInverse(&mtx, nullptr, pMtxTmp);
 					mtx.PosSet(0,0,0);
 					vDelta *= mtx;
 
@@ -767,7 +767,7 @@ void CN3CEView::OnMouseMove(UINT nFlags, CPoint point)
 					__Matrix44 mtx;
 					mtx.Identity();
 
-					::D3DXMatrixInverse(&mtx, NULL, pMtxTmp);
+					::D3DXMatrixInverse(&mtx, nullptr, pMtxTmp);
 					mtx.PosSet(0,0,0);
 
 					vAxis = CN3Base::s_CameraData.vAt - CN3Base::s_CameraData.vEye;
@@ -786,7 +786,7 @@ void CN3CEView::OnMouseMove(UINT nFlags, CPoint point)
 			}
 
 			pFrm->GetPaneProperty()->UpdateInfo();
-			this->InvalidateRect(NULL, FALSE);
+			this->InvalidateRect(nullptr, FALSE);
 		}
 //	End Of Code (By Dino On 2002-10-11 오후 2:04:29 )
 //////////////////////////////////////////////////

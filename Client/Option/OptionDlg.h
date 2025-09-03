@@ -55,7 +55,7 @@ public:
 	void SettingUpdate();
 	void SettingLoad(CString szIniFile);
 	void SettingSave(CString szIniFile);
-	COptionDlg(CWnd* pParent = NULL);	// standard constructor
+	COptionDlg(CWnd* pParent = nullptr);	// standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(COptionDlg)
