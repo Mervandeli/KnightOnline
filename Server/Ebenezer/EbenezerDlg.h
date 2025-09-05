@@ -127,7 +127,8 @@ public:
 	void KillUser(const char* strbuff);
 	void Send_PartyMember(int party, char* pBuf, int len);
 	void Send_KnightsMember(int index, char* pBuf, int len, int zone = 100);
-	BOOL AISocketConnect(int zone, int flag = 0);
+	BOOL AISocketConnect(int zone, bool flag, std::string* errorReason = nullptr);
+	int GetAIServerPort() const;
 	int GetRegionNpcIn(C3DMap* pMap, int region_x, int region_z, char* buff, int& t_count);
 	BOOL LoadNoticeData();
 	int GetZoneIndex(int zonenumber);

@@ -80,11 +80,7 @@ protected:
 public:
 	void ReportTableLoadError(const recordset_loader::Error& err, const char* source);
 
-	/// \brief clears the OutputList text area and regenerates default output
-	/// \see _outputList
-	void ResetOutputList();
-
-	// \brief updates the last/latest version and resets the output list
+	// \brief updates the last/latest version
 	void SetLastVersion(int lastVersion);
 
 protected:

@@ -89,19 +89,17 @@ BOOL CVersionManagerDlg::OnInitDialog()
 	for (int i = 0; i < MAX_USER; i++)
 		IocPort.m_SockArrayInActive[i] = new CUser(this);
 
-	if (!IocPort.Listen(_LISTEN_PORT))
-	{
-		AfxMessageBox(_T("FAIL TO CREATE LISTEN STATE"));
-		AfxPostQuitMessage(0);
-		return FALSE;
-	}
-
 	if (!GetInfoFromIni())
 	{
 		AfxMessageBox(_T("Ini File Info Error!!"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
+
+	// print the ODBC connection string
+	// TODO: modelUtil::DbType::ACCOUNT;  Currently all models are assigned to GAME
+	AddOutputMessage(
+		db::ConnectionManager::GetOdbcConnectionString(modelUtil::DbType::GAME));
 
 	if (!DbProcess.InitDatabase())
 	{
@@ -117,9 +115,17 @@ BOOL CVersionManagerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	ResetOutputList();
+	if (!IocPort.Listen(_LISTEN_PORT))
+	{
+		AfxMessageBox(_T("FAIL TO CREATE LISTEN STATE"));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
 
 	::ResumeThread(IocPort.m_hAcceptThread);
+
+	AddOutputMessage(fmt::format("Listening on 0.0.0.0:{}",
+		_LISTEN_PORT));
 
 	SetTimer(DB_POOL_CHECK, 60000, nullptr);
 
@@ -245,13 +251,15 @@ BOOL CVersionManagerDlg::LoadVersionList()
 	if (!DbProcess.LoadVersionList(&versionList))
 		return FALSE;
 
-	_lastVersion = 0;
+	int lastVersion = 0;
 
 	for (const auto& [_, pInfo] : versionList)
 	{
-		if (_lastVersion < pInfo->Number)
-			_lastVersion = pInfo->Number;
+		if (lastVersion < pInfo->Number)
+			lastVersion = pInfo->Number;
 	}
+
+	SetLastVersion(lastVersion);
 
 	VersionList.Swap(versionList);
 	return TRUE;
@@ -352,27 +360,16 @@ void CVersionManagerDlg::ReportTableLoadError(const recordset_loader::Error& err
 	spdlog::error(error);
 }
 
-/// \brief clears the _outputList text area and regenerates default output
-/// \see _outputList
-void CVersionManagerDlg::ResetOutputList()
-{
-	_outputList.ResetContent();
-
-	// print the ODBC connection string
-	// TODO: modelUtil::DbType::ACCOUNT;  Currently all models are assigned to GAME
-	std::string odbcString = db::ConnectionManager::GetOdbcConnectionString(modelUtil::DbType::GAME);
-	AddOutputMessage(odbcString);
-
-	// print the current version
-	std::wstring version = std::format(L"Latest Version: {}", _lastVersion);
-	AddOutputMessage(version);
-}
-
 // \brief updates the last/latest version and resets the output list
 void CVersionManagerDlg::SetLastVersion(int lastVersion)
 {
+	if (lastVersion != _lastVersion)
+	{
+		AddOutputMessage(std::format(L"Latest Version: {}",
+			lastVersion));
+	}
+
 	_lastVersion = lastVersion;
-	ResetOutputList();
 }
 
 /// \brief adds a message to the application's output box and updates scrollbar position

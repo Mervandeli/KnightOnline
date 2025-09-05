@@ -210,11 +210,17 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 		return false;
 	}
 	
+	std::string newCharId = charId;
+#if defined(DB_COMPAT_PADDED_NAMES)
+	rtrim(newCharId);
+#endif
+
 	// data successfully loaded from the database, copy to UserData record
-	if (strcpy_s(user->m_id, charId))
+	if (newCharId.length() > MAX_ID_SIZE
+		|| strcpy_s(user->m_id, newCharId.c_str()))
 	{
-		spdlog::error("DBAgent::LoadUserData(): failed to write charId(len: {}, val: {}) to user->m_id",
-			std::strlen(charId), charId);
+		spdlog::error("DBAgent::LoadUserData(): failed to write newCharId(len: {}, val: {}) to user->m_id",
+			newCharId.length(), newCharId);
 		return false;
 	}
 
@@ -254,7 +260,6 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 
 	spdlog::debug("DBAgent::LoadUserData: name={}, nation={}, zone={}, level={}, exp={}, money={}",
 		charId, Nation, Zone, Level, Exp, Gold);
-	
 
 	for (int i = 0; i < 9; i++)
 		user->m_bstrSkill[i] = skills.read<uint8_t>();
@@ -599,7 +604,9 @@ bool CDBAgent::LoadCharInfo(char* charId_, char* buff, int& buffIndex)
 {
 	// trim charId
 	std::string charId = charId_;
+#if defined(DB_COMPAT_PADDED_NAMES)
 	rtrim(charId);
+#endif
 
 	uint8_t Race = 0, HairColor = 0, Level = 0, Face = 0, Zone = 0;
 	int16_t Class = 0;
@@ -724,21 +731,30 @@ bool CDBAgent::GetAllCharID(const char* accountId, char* charId1_, char* charId2
 		return false;
 	}
 
-	if (strcpy_s(charId1_, MAX_ID_SIZE + 1, charId1.c_str()))
+#if defined(DB_COMPAT_PADDED_NAMES)
+	rtrim(charId1);
+	rtrim(charId2);
+	rtrim(charId3);
+#endif
+
+	if (charId1.length() > MAX_ID_SIZE
+		|| strcpy_s(charId1_, MAX_ID_SIZE + 1, charId1.c_str()))
 	{
 		spdlog::error("DBAgent::GetAllCharID: failed to write charId1(len: {}, val: {}) to charId1_",
 			charId1.length(), charId1);
 		return false;
 	}
 
-	if (strcpy_s(charId2_, MAX_ID_SIZE + 1, charId2.c_str()))
+	if (charId2.length() > MAX_ID_SIZE
+		|| strcpy_s(charId2_, MAX_ID_SIZE + 1, charId2.c_str()))
 	{
 		spdlog::error("DBAgent::GetAllCharID: failed to write charId2(len: {}, val: {}) to charId2_",
 			charId2.length(), charId2);
 		return false;
 	}
 
-	if (strcpy_s(charId3_, MAX_ID_SIZE + 1, charId3.c_str()))
+	if (charId3.length() > MAX_ID_SIZE
+		|| strcpy_s(charId3_, MAX_ID_SIZE + 1, charId3.c_str()))
 	{
 		spdlog::error("DBAgent::GetAllCharID: failed to write charId3(len: {}, val: {}) to charId3_",
 			charId3.length(), charId3);
@@ -847,7 +863,10 @@ int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int
 				uint8_t Level = result->get<uint8_t>(2);
 				int16_t Class = result->get<int16_t>(3);
 
+#if defined(DB_COMPAT_PADDED_NAMES)
 				rtrim(charId);
+#endif
+
 				SetString2(buffOut, charId.c_str(), static_cast<short>(charId.length()), tempIndex);
 				SetByte(buffOut, Fame, tempIndex);
 				SetByte(buffOut, Level, tempIndex);
@@ -1115,6 +1134,11 @@ bool CDBAgent::LoadKnightsInfo(int knightsId, char* buffOut, int& buffIndex)
 		}
 
 		model::Knights knights = recordSet.get();
+
+#if defined(DB_COMPAT_PADDED_NAMES)
+		rtrim(knights.Name);
+#endif
+
 		if (knights.Name.length() > MAX_ID_SIZE)
 		{
 			spdlog::error("DBAgent::LoadKnightsInfo: knights.Name(len: {}, val: {}) exceeds length",

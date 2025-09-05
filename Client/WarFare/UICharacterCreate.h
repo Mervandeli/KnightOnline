@@ -30,7 +30,7 @@ public:
 	CN3UIButton*	m_pBtn_Races[MAX_RACE_SELECT];
 	CN3UIButton*	m_pBtn_Classes[MAX_CLASS_SELECT];
 	CN3UIImage*		m_pImg_Disable_Classes[MAX_CLASS_SELECT];
-	CN3UIImage*		m_pImg_Stats[MAX_STATS];
+	CN3UIString*	m_pStr_Stat_Labels[MAX_STATS];
 	CN3UIString*	m_pStr_Stats[MAX_STATS];
 	CN3UIArea*		m_pArea_Stats[MAX_STATS];
 

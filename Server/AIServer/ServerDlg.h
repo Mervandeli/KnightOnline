@@ -198,6 +198,11 @@ protected:
 	/// \see m_byZone
 	/// \returns true when successful, otherwise false
 	bool ListenByZone();
+
+	/// \brief fetches the listen port associated with m_byZone
+	/// \see m_byZone
+	/// \returns the associated listen port or -1 if invalid
+	int GetListenPortByZone() const;
 	
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();

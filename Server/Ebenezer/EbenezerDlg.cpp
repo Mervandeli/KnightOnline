@@ -345,7 +345,14 @@ BOOL CEbenezerDlg::OnInitDialog()
 	}
 
 	if (!m_Iocport.Listen(pInfo->sPort))
-		AfxMessageBox(_T("FAIL TO CREATE LISTEN STATE"), MB_OK);
+	{
+		AfxMessageBox(_T("FAIL TO CREATE LISTEN STATE"));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
+
+	AddOutputMessage(fmt::format("Listening on 0.0.0.0:{} - not accepting user connections yet",
+		pInfo->sPort));
 
 	if (!InitializeMMF())
 	{
@@ -780,9 +787,9 @@ void CEbenezerDlg::OnTimer(UINT nIDEvent)
 					CAISocket* pAISock = m_AISocketMap.GetData(i);
 					if (pAISock != nullptr
 						&& pAISock->GetState() == STATE_DISCONNECTED)
-						AISocketConnect(i, 1);
+						AISocketConnect(i, true);
 					else if (pAISock == nullptr)
-						AISocketConnect(i, 1);
+						AISocketConnect(i, true);
 					else
 						count++;
 				}
@@ -822,13 +829,13 @@ void CEbenezerDlg::OnTimer(UINT nIDEvent)
 // sungyong 2002.05.22
 BOOL CEbenezerDlg::AIServerConnect()
 {
+	std::string errorReason;
 	for (int i = 0; i < MAX_AI_SOCKET; i++)
 	{
-		if (!AISocketConnect(i))
+		if (!AISocketConnect(i, false, &errorReason))
 		{
-			std::wstring msg = std::format(L"Failed to connect to AIServer zone {}", i);
+			std::wstring msg = Utf8ToWide(errorReason);
 			AfxMessageBox(msg.c_str());
-			spdlog::error("EbenezerDlg::AIServerConnect: failed to connect to AIServer zone {}", i);
 			return FALSE;
 		}
 	}
@@ -836,11 +843,12 @@ BOOL CEbenezerDlg::AIServerConnect()
 	return TRUE;
 }
 
-BOOL CEbenezerDlg::AISocketConnect(int zone, int flag)
+BOOL CEbenezerDlg::AISocketConnect(int zone, bool flag, std::string* errorReason_ /*= nullptr*/)
 {
 	CAISocket* pAISock = nullptr;
 	int send_index = 0;
 	char pBuf[128] = {};
+	std::string errorReason;
 
 	//if( m_nServerNo == 3 ) return FALSE;
 
@@ -858,39 +866,49 @@ BOOL CEbenezerDlg::AISocketConnect(int zone, int flag)
 	if (!pAISock->Create())
 	{
 		delete pAISock;
+
+		errorReason = fmt::format("Failed to create new AI socket for zone {}", zone);
+		spdlog::error("EbenezerDlg::AISocketConnect: {}", errorReason);
+
+		if (errorReason_ != nullptr)
+			*errorReason_ = errorReason;
+
 		return FALSE;
 	}
 
-	if (m_nServerNo == KARUS)
+	int port = GetAIServerPort();
+	if (port < 0)
 	{
-		if (!pAISock->Connect(&m_Iocport, m_AIServerIP, AI_KARUS_SOCKET_PORT))
-		{
-			delete pAISock;
-			return FALSE;
-		}
+		delete pAISock;
+
+		errorReason = fmt::format("Invalid port, unsupported m_nServerNo {} (zone {})", m_nServerNo, zone);
+		spdlog::error("EbenezerDlg::AISocketConnect: {}", errorReason);
+
+		if (errorReason_ != nullptr)
+			*errorReason_ = errorReason;
+
+		return FALSE;
 	}
-	else if (m_nServerNo == ELMORAD)
+
+	if (!pAISock->Connect(&m_Iocport, m_AIServerIP, port))
 	{
-		if (!pAISock->Connect(&m_Iocport, m_AIServerIP, AI_ELMO_SOCKET_PORT))
-		{
-			delete pAISock;
-			return FALSE;
-		}
-	}
-	else if (m_nServerNo == BATTLE)
-	{
-		if (!pAISock->Connect(&m_Iocport, m_AIServerIP, AI_BATTLE_SOCKET_PORT))
-		{
-			delete pAISock;
-			return FALSE;
-		}
+		delete pAISock;
+
+		errorReason = fmt::format("Failed to connect to AI server (zone {}) ({}:{})",
+			zone, m_AIServerIP, port);
+		spdlog::error("EbenezerDlg::AISocketConnect: {}", errorReason);
+
+		if (errorReason_ != nullptr)
+			*errorReason_ = errorReason;
+
+		return FALSE;
 	}
 
 	SetByte(pBuf, AI_SERVER_CONNECT, send_index);
 	SetByte(pBuf, zone, send_index);
 
 	// 재접속
-	if (flag == 1)
+	if (flag)
 		SetByte(pBuf, 1, send_index);
 	// 처음 접속..
 	else
@@ -907,6 +925,24 @@ BOOL CEbenezerDlg::AISocketConnect(int zone, int flag)
 	return TRUE;
 }
 // ~sungyong 2002.05.22
+
+int CEbenezerDlg::GetAIServerPort() const
+{
+	switch (m_nServerNo)
+	{
+		case KARUS:
+			return AI_KARUS_SOCKET_PORT;
+
+		case ELMORAD:
+			return AI_ELMO_SOCKET_PORT;
+
+		case BATTLE:
+			return AI_BATTLE_SOCKET_PORT;
+
+		default:
+			return -1;
+	}
+}
 
 void CEbenezerDlg::Send_All(char* pBuf, int len, CUser* pExceptUser, int nation)
 {
@@ -3099,8 +3135,11 @@ BOOL CEbenezerDlg::LoadServerResourceTable()
 		return FALSE;
 	}
 
+	// NOTE: Not a name, but still falls under the same umbrella - this won't be an issue with DBs not padding these.
+#if defined(DB_COMPAT_PADDED_NAMES)
 	for (auto& [_, serverResource] : tableMap)
 		rtrim(serverResource->Resource);
+#endif
 
 	m_ServerResourceTableMap.Swap(tableMap);
 	return TRUE;
@@ -3137,27 +3176,37 @@ BOOL CEbenezerDlg::LoadAllKnights()
 			pKnights->m_byFlag = row.Flag;
 			pKnights->m_byNation = row.Nation;
 
+#if defined(DB_COMPAT_PADDED_NAMES)
 			rtrim(row.Name);
+#endif
 			strcpy(pKnights->m_strName, row.Name.c_str());
 
+#if defined(DB_COMPAT_PADDED_NAMES)
 			rtrim(row.Chief);
+#endif
 			strcpy(pKnights->m_strChief, row.Chief.c_str());
 
 			if (row.ViceChief1.has_value())
 			{
+#if defined(DB_COMPAT_PADDED_NAMES)
 				rtrim(*row.ViceChief1);
+#endif
 				strcpy(pKnights->m_strViceChief_1, row.ViceChief1->c_str());
 			}
 
 			if (row.ViceChief2.has_value())
 			{
+#if defined(DB_COMPAT_PADDED_NAMES)
 				rtrim(*row.ViceChief2);
+#endif
 				strcpy(pKnights->m_strViceChief_2, row.ViceChief2->c_str());
 			}
 
 			if (row.ViceChief3.has_value())
 			{
+#if defined(DB_COMPAT_PADDED_NAMES)
 				rtrim(*row.ViceChief3);
+#endif
 				strcpy(pKnights->m_strViceChief_3, row.ViceChief3->c_str());
 			}
 
@@ -3208,7 +3257,9 @@ BOOL CEbenezerDlg::LoadAllKnightsUserData()
 			ModelType row = {};
 			recordset.get_ref(row);
 
+#if defined(DB_COMPAT_PADDED_NAMES)
 			rtrim(row.UserId);
+#endif
 			m_KnightsManager.AddKnightsUser(row.KnightsId, row.UserId.c_str());
 		}
 		while (recordset.next());
@@ -3593,11 +3644,12 @@ BOOL CEbenezerDlg::LoadKnightsRankTable()
 			recordset.get_ref(row);
 		
 			CKnights* pKnights = m_KnightsMap.GetData(row.Index);
-
-			rtrim(row.Name);
-
 			if (pKnights == nullptr)
 				continue;
+
+#if defined(DB_COMPAT_PADDED_NAMES)
+			rtrim(row.Name);
+#endif
 
 			if (pKnights->m_byNation == KARUS)
 			{

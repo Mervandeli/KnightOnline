@@ -12,12 +12,14 @@
 #include <shared/lzf.h>
 #include <shared/globals.h>
 #include <shared/Ini.h>
+#include <shared/StringConversion.h>
+#include <shared/StringUtils.h>
 
-#include <db-library/ConnectionManager.h>
 #include <spdlog/spdlog.h>
 
+#include <db-library/ConnectionManager.h>
+
 #include <math.h>
-#include <shared/StringConversion.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -389,27 +391,43 @@ BOOL CServerDlg::OnInitDialog()
 /// \returns true when successful, otherwise false
 bool CServerDlg::ListenByZone()
 {
-	int port = 0;
-	if (m_byZone == KARUS_ZONE
-		|| m_byZone == UNIFY_ZONE)
+	int port = GetListenPortByZone();
+	if (port < 0)
 	{
-		port = AI_KARUS_SOCKET_PORT;
-	}
-	else if (m_byZone == ELMORAD_ZONE)
-	{
-		port = AI_ELMO_SOCKET_PORT;
-	}
-	else if (m_byZone == BATTLE_ZONE)
-	{
-		port = AI_BATTLE_SOCKET_PORT;
+		spdlog::error("ServerDlg::ListenByZone: failed to associate listen port for zone {}", m_byZone);
+		return false;
 	}
 
-	if (!m_Iocport.Listen(port)) {
+	if (!m_Iocport.Listen(port))
+	{
 		spdlog::error("ServerDlg::ListenByZone: failed to listen on port {}", port);
 		return false;
 	}
-	
+
+	AddOutputMessage(fmt::format("Listening on 0.0.0.0:{}", port));
 	return true;
+}
+
+/// \brief fetches the listen port associated with m_byZone
+/// \see m_byZone
+/// \returns the associated listen port or -1 if invalid
+int CServerDlg::GetListenPortByZone() const
+{
+	switch (m_byZone)
+	{
+		case KARUS_ZONE:
+		case UNIFY_ZONE:
+			return AI_KARUS_SOCKET_PORT;
+
+		case ELMORAD_ZONE:
+			return AI_ELMO_SOCKET_PORT;
+
+		case BATTLE_ZONE:
+			return AI_BATTLE_SOCKET_PORT;
+
+		default:
+			return -1;
+	}
 }
 
 void CServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -617,14 +635,25 @@ BOOL CServerDlg::GetNpcItemTable()
 //	Monster Table Data 를 읽는다.
 BOOL CServerDlg::GetMonsterTableData()
 {
+	NpcTableMap tableMap;
 	recordset_loader::STLMap<
 		NpcTableMap,
-		model::Monster> loader(m_MonTableMap);
+		model::Monster> loader(tableMap);
 	if (!loader.Load_ForbidEmpty())
 	{
 		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
 	}
+
+#if defined(DB_COMPAT_PADDED_NAMES)
+	for (const auto& [_, row] : tableMap)
+	{
+		if (row->Name.has_value())
+			rtrim(*row->Name);
+	}
+#endif
+
+	m_MonTableMap.Swap(tableMap);
 
 	spdlog::info("ServerDlg::GetMonsterTableData: K_MONSTER loaded");
 	return TRUE;
@@ -633,12 +662,23 @@ BOOL CServerDlg::GetMonsterTableData()
 //	NPC Table Data 를 읽는다. (경비병 & NPC)
 BOOL CServerDlg::GetNpcTableData()
 {
-	recordset_loader::STLMap loader(m_NpcTableMap);
+	NpcTableMap tableMap;
+	recordset_loader::STLMap loader(tableMap);
 	if (!loader.Load_ForbidEmpty())
 	{
 		ReportTableLoadError(loader.GetError(), __func__);
 		return FALSE;
 	}
+
+#if defined(DB_COMPAT_PADDED_NAMES)
+	for (const auto& [_, row] : tableMap)
+	{
+		if (row->Name.has_value())
+			rtrim(*row->Name);
+	}
+#endif
+
+	m_NpcTableMap.Swap(tableMap);
 
 	spdlog::info("ServerDlg::GetNpcTableData: K_NPC loaded");
 	return TRUE;
