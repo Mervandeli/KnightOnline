@@ -4143,8 +4143,6 @@ void CGameProcMain::InitUI()
 	m_pUIItemUpgrade->SetVisibleWithNoSound(false);
 	rc = m_pUIItemUpgrade->GetRegion();
 	m_pUIItemUpgrade->SetPos(iW - (rc.right - rc.left), 10);
-	m_pUIItemUpgrade->InitIconWnd(UIWND_UPGRADE);
-	m_pUIItemUpgrade->SetUIType(UI_TYPE_ICON_MANAGER);
 	m_pUIItemUpgrade->SetState(UI_STATE_COMMON_NONE);
 	m_pUIItemUpgrade->SetStyle(UISTYLE_USER_MOVE_HIDE | UISTYLE_SHOW_ME_ALONE);
 

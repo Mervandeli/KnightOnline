@@ -9,22 +9,35 @@
 #include <N3Base/N3UIString.h>
 #include <N3Base/N3UIImage.h>
 #include <N3Base/N3UIButton.h>
-#include "GameProcedure.h"
+#include <N3Base/N3UIBase.h>
+#include "N3UIIcon.h"
 
-#include "GameDef.h"
-#include "N3UIWndBase.h"
+#include "IconItemSkill.h"
+#include "UIImageTooltipDlg.h"
+
+//#include "UIImageTooltipDlg.h"
 
 const int MAX_ITEM_UPGRADE_SLOT = 9;	// Max items in the item upgrade UI.
 const int MAX_UPGRADE_MATERIAL = 10;	// Max items in the item upgrade UI.
 const int FLIPFLOP_MAX_FRAMES = 20;
 
+struct __SelectedSkillInfo {
+	__IconItemSkill* pSelectedItem;
+};
+
+enum e_UI_DISTRICT {
+	UIWND_DISTRICT_UPGRADE_SLOT,		// Slot district of Result Item.
+	UIWND_DISTRICT_UPGRADE_INV,			// Inv district of Item Upgrade Wnd.
+	UIWND_DISTRICT_UPGRADE_CANNOT_MOVE,	// Upgrade Slot district of Can not move.
+};
+
 //////////////////////////////////////////////////////////////////////
 
-class CUIItemUpgrade : public CN3UIWndBase
+class CUIItemUpgrade : public CN3UIBase
 {
 
 private:
-
+	__SelectedSkillInfo	m_sSelectedIconInfo;
 	__IconItemSkill* m_pUpgradeScrollSlots[MAX_ITEM_UPGRADE_SLOT]; // Upgrade and Trina Scroll Slot
 	__IconItemSkill* m_pMyUpgradeInv[MAX_ITEM_INVENTORY];
 	__IconItemSkill* m_pBackupUpgradeInv[MAX_ITEM_INVENTORY];
@@ -79,14 +92,14 @@ public:
 	void				Close();
 	void				Open();
 	void				SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false) override;
-	void				InitIconWnd(e_UIWND eWnd) override;
+	void				InitIconWnd();
 	void				MsgRecv_ItemUpgrade(Packet& pkt);
 	void				SetNpcID(int iNpcID);
 private:
 
-	int					GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWndDist) const;
+	int					GetItemiOrder(__IconItemSkill* spItem, e_UI_DISTRICT eWndDist) const;
 	RECT				GetSampleRect();
-	e_UIWND_DISTRICT	GetWndDistrict(__IconItemSkill* spItem);
+	e_UI_DISTRICT	GetWndDistrict(__IconItemSkill* spItem) const;
 	void				HandleInventoryIconRightClick(POINT ptCur);
 	void				ShowItemCount(__IconItemSkill* spItem, int iorder);
 	bool				OnKeyPress(int iKey) override;
@@ -96,9 +109,9 @@ private:
 	bool				ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
 	void				Render() override;
 
-	__IconItemSkill*	GetHighlightIconItem(CN3UIIcon* pUIIcon) override;
-	void				IconRestore();
-	bool				ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur) override;
+	__IconItemSkill*	GetHighlightIconItem(CN3UIIcon* pUIIcon);
+	void				CancelIconDrop(__IconItemSkill* spItem);
+	bool				ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur);
 	void				ItemMoveFromInvToThis();
 	void				ItemMoveFromThisToInv();
 	void                UpdateInventory();
