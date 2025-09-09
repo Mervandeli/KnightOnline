@@ -23,6 +23,7 @@ const int FLIPFLOP_MAX_FRAMES = 20;
 
 struct __SelectedSkillInfo {
 	__IconItemSkill* pSelectedItem;
+	int iSourceOrder;
 };
 
 enum e_UI_DISTRICT {
@@ -40,7 +41,6 @@ private:
 	__SelectedSkillInfo	m_sSelectedIconInfo;
 	__IconItemSkill* m_pUpgradeScrollSlots[MAX_ITEM_UPGRADE_SLOT]; // Upgrade and Trina Scroll Slot
 	__IconItemSkill* m_pMyUpgradeInv[MAX_ITEM_INVENTORY];
-	__IconItemSkill* m_pBackupUpgradeInv[MAX_ITEM_INVENTORY];
 	__IconItemSkill* m_pUpgradeItemSlot;	// Which item to upgrade
 	__IconItemSkill* m_pUpgradeResultSlot;
 	int8_t m_iUpgradeScrollSlotInvPos[MAX_ITEM_UPGRADE_SLOT];
@@ -99,8 +99,8 @@ private:
 
 	int					GetItemiOrder(__IconItemSkill* spItem, e_UI_DISTRICT eWndDist) const;
 	RECT				GetSampleRect();
-	e_UI_DISTRICT	GetWndDistrict(__IconItemSkill* spItem) const;
-	void				HandleInventoryIconRightClick(POINT ptCur);
+	e_UI_DISTRICT		GetWndDistrict(__IconItemSkill* spItem) const;
+	bool				HandleInventoryIconRightClick(__IconItemSkill* spItem,POINT ptCur);
 	void				ShowItemCount(__IconItemSkill* spItem, int iorder);
 	bool				OnKeyPress(int iKey) override;
 	bool				Load(HANDLE hFile) override;
@@ -131,8 +131,8 @@ private:
 	void				CreateUIIconForItem(__IconItemSkill* spItem);
 	void				SetupIconArea(__IconItemSkill* spItem, CN3UIArea* pArea);
 	bool				HandleUpgradeAreaDrop(__IconItemSkill* spItem);
-	bool				HandleSlotDrop(__IconItemSkill* spItem, int iDestiOrder);
-	bool				IsSlotCompatible(__IconItemSkill* pSrc) const;
+	bool				HandleMaterialSlotDrop(__IconItemSkill* spItem);
+	bool				IsMaterialSlotCompatible(__IconItemSkill* pSrc) const;
 	void				Tick() override;
 };
 
