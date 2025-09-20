@@ -29,7 +29,8 @@ struct __SelectedSkillInfo {
 enum e_UI_DISTRICT {
 	UIWND_DISTRICT_UPGRADE_SLOT,		// Slot district of Result Item.
 	UIWND_DISTRICT_UPGRADE_INV,			// Inv district of Item Upgrade Wnd.
-	UIWND_DISTRICT_UPGRADE_CANNOT_MOVE,	// Upgrade Slot district of Can not move.
+	UIWND_DISTRICT_UPGRADE_RESULT_SLOT,	// Upgrade  Result Slot district.
+	UIWND_DISTRICT_UPGRADE_UNKNOWN
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -39,9 +40,8 @@ class CUIItemUpgrade : public CN3UIBase
 
 private:
 	__SelectedSkillInfo	m_sSelectedIconInfo;
-	__IconItemSkill* m_pUpgradeScrollSlots[MAX_ITEM_UPGRADE_SLOT]; // Upgrade and Trina Scroll Slot
 	__IconItemSkill* m_pMyUpgradeInv[MAX_ITEM_INVENTORY];
-	__IconItemSkill* m_pUpgradeItemSlot;	// Which item to upgrade
+	__IconItemSkill* m_pUpgradeMaterialSlots[MAX_ITEM_UPGRADE_SLOT];
 	__IconItemSkill* m_pUpgradeResultSlot;
 	int8_t m_iUpgradeScrollSlotInvPos[MAX_ITEM_UPGRADE_SLOT];
 	int8_t m_iUpgradeItemSlotInvPos;
@@ -109,12 +109,12 @@ private:
 	bool				ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
 	void				Render() override;
 
-	__IconItemSkill*	GetHighlightIconItem(CN3UIIcon* pUIIcon);
+	void				SetSelectedIconInfo(CN3UIIcon* pUIIcon);
 	void				CancelIconDrop(__IconItemSkill* spItem);
 	bool				ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur);
 	void				ItemMoveFromInvToThis();
 	void				ItemMoveFromThisToInv();
-	void                UpdateInventory();
+	void                ResetUpgradeInventory();
 	void				GoldUpdate();
 	void				InitIconUpdate(){};
 	bool				IsTrina(uint32_t dwID) const;
@@ -130,8 +130,8 @@ private:
 	void				HideAllAnimationFrames();
 	void				CreateUIIconForItem(__IconItemSkill* spItem);
 	void				SetupIconArea(__IconItemSkill* spItem, CN3UIArea* pArea);
-	bool				HandleUpgradeAreaDrop(__IconItemSkill* spItem);
-	bool				HandleMaterialSlotDrop(__IconItemSkill* spItem);
+	bool				UpgradeAreaDrop(__IconItemSkill* spItem);
+	bool				MaterialSlotDrop(__IconItemSkill* spItem,int iOrder);
 	bool				IsMaterialSlotCompatible(__IconItemSkill* pSrc) const;
 	void				Tick() override;
 };

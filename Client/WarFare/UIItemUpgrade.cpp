@@ -29,7 +29,7 @@ CUIItemUpgrade::CUIItemUpgrade()
 {
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		m_pUpgradeScrollSlots[i] = nullptr;
+		m_pUpgradeMaterialSlots[i] = nullptr;
 		m_iUpgradeScrollSlotInvPos[i] = -1;
 	}
 
@@ -41,7 +41,6 @@ CUIItemUpgrade::CUIItemUpgrade()
 	m_iUpgradeResultSlotInvPos = -1;
 
 	m_pUpgradeResultSlot = nullptr;
-	m_pUpgradeItemSlot = nullptr;
 	m_pUITooltipDlg = nullptr;
 	m_pStrMyGold = nullptr;
 
@@ -52,21 +51,22 @@ CUIItemUpgrade::CUIItemUpgrade()
 	m_bUpgradeInProgress = false;
 	m_iNpcID = 0;
 	m_sSelectedIconInfo.pSelectedItem = nullptr;
+	m_sSelectedIconInfo.iSourceOrder = -1;
 }
 
 CUIItemUpgrade::~CUIItemUpgrade()
 {
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		if (m_pUpgradeScrollSlots[i] != nullptr)
+		if (m_pUpgradeMaterialSlots[i] != nullptr)
 		{
-			if (m_pUpgradeScrollSlots[i]->pUIIcon != nullptr)
+			if (m_pUpgradeMaterialSlots[i]->pUIIcon != nullptr)
 			{
-				delete m_pUpgradeScrollSlots[i]->pUIIcon;
-				m_pUpgradeScrollSlots[i]->pUIIcon = nullptr;
+				delete m_pUpgradeMaterialSlots[i]->pUIIcon;
+				m_pUpgradeMaterialSlots[i]->pUIIcon = nullptr;
 			}
-			delete m_pUpgradeScrollSlots[i];
-			m_pUpgradeScrollSlots[i] = nullptr;
+			delete m_pUpgradeMaterialSlots[i];
+			m_pUpgradeMaterialSlots[i] = nullptr;
 		}
 		m_iUpgradeScrollSlotInvPos[i] = -1;
 	}
@@ -80,6 +80,20 @@ CUIItemUpgrade::~CUIItemUpgrade()
 		}
 		delete m_pUpgradeResultSlot;
 		m_pUpgradeResultSlot = nullptr;
+	}
+
+	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
+	{
+		if (m_pMyUpgradeInv[i] != nullptr)
+		{
+			if (m_pMyUpgradeInv[i]->pUIIcon != nullptr)
+			{
+				delete m_pMyUpgradeInv[i]->pUIIcon;
+				m_pMyUpgradeInv[i]->pUIIcon = nullptr;
+			}
+			delete m_pMyUpgradeInv[i];
+			m_pMyUpgradeInv[i] = nullptr;
+		}
 	}
 
 
@@ -147,12 +161,12 @@ void CUIItemUpgrade::Render()
 			pChild->UIType() == UI_TYPE_ICON && pChild->GetStyle() & UISTYLE_ICON_HIGHLIGHT)
 		{
 			bTooltipRender = true;
-			spItem = GetHighlightIconItem((CN3UIIcon*) pChild);
+			SetSelectedIconInfo((CN3UIIcon*) pChild);
 			uint32_t dwFlags = CGameProcedure::s_pLocalInput->MouseGetFlag();
 
 			if (dwFlags == MOUSE_RBCLICKED && !m_bUpgradeInProgress)
 			{
-				HandleInventoryIconRightClick(spItem,ptCur);
+				HandleInventoryIconRightClick(m_sSelectedIconInfo.pSelectedItem,ptCur);
 			}
 		}
 	}
@@ -160,9 +174,9 @@ void CUIItemUpgrade::Render()
 	if (GetState() == UI_STATE_ICON_MOVING && m_sSelectedIconInfo.pSelectedItem != nullptr && m_sSelectedIconInfo.pSelectedItem->pUIIcon != nullptr)
 		m_sSelectedIconInfo.pSelectedItem->pUIIcon->Render();
 
-	if (bTooltipRender && spItem != nullptr)
+	if (bTooltipRender && m_sSelectedIconInfo.pSelectedItem != nullptr)
 	{
-		m_pUITooltipDlg->DisplayTooltipsEnable(ptCur.x, ptCur.y, spItem, false, false);
+		m_pUITooltipDlg->DisplayTooltipsEnable(ptCur.x, ptCur.y, m_sSelectedIconInfo.pSelectedItem, false, false);
 	}
 }
 
@@ -177,27 +191,32 @@ void CUIItemUpgrade::InitIconWnd()
 	m_pUITooltipDlg->SetVisible(false);
 }
 
-__IconItemSkill* CUIItemUpgrade::GetHighlightIconItem(CN3UIIcon* pUIIcon)
+void CUIItemUpgrade::SetSelectedIconInfo(CN3UIIcon* pUIIcon)
 {
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		if (m_pUpgradeScrollSlots[i] != nullptr && m_pUpgradeScrollSlots[i]->pUIIcon == pUIIcon)
-			return m_pUpgradeScrollSlots[i];
+		if (m_pUpgradeMaterialSlots[i] != nullptr && m_pUpgradeMaterialSlots[i]->pUIIcon == pUIIcon)
+		{
+			m_sSelectedIconInfo.iSourceOrder = -1; // Can not selectable
+			m_sSelectedIconInfo.pSelectedItem = m_pUpgradeMaterialSlots[i];
+		}
+
 	}
 
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
 		if (m_pMyUpgradeInv[i] != nullptr && m_pMyUpgradeInv[i]->pUIIcon == pUIIcon)
-			return m_pMyUpgradeInv[i];
+		{
+			m_sSelectedIconInfo.iSourceOrder = i;
+			m_sSelectedIconInfo.pSelectedItem = m_pMyUpgradeInv[i];
+		}		
 	}
 
-	if (m_pUpgradeItemSlot != nullptr && m_pUpgradeItemSlot->pUIIcon == pUIIcon)
-		return m_pUpgradeItemSlot;
-
 	if (m_pUpgradeResultSlot != nullptr && m_pUpgradeResultSlot->pUIIcon == pUIIcon)
-		return m_pUpgradeResultSlot;
-
-	return nullptr;
+	{
+		m_sSelectedIconInfo.iSourceOrder = m_iUpgradeResultSlotInvPos;
+		m_sSelectedIconInfo.pSelectedItem = m_pUpgradeResultSlot;
+	}
 }
 
 void CUIItemUpgrade::Open()
@@ -225,22 +244,24 @@ void CUIItemUpgrade::ItemMoveFromInvToThis()
 	if (pInven == nullptr)
 		return;
 
+	m_iUpgradeItemSlotInvPos = -1;
+	m_iUpgradeResultSlotInvPos = -1;
+	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
+	{
+		m_iUpgradeScrollSlotInvPos[i] = -1;
+	}
+	
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
-		if (pInven->m_pMyInvWnd[i] != nullptr)
-		{
-			__IconItemSkill* spItem = pInven->m_pMyInvWnd[i];
-			spItem->pUIIcon->SetParent(this);
-			pInven->m_pMyInvWnd[i] = nullptr;
+		__IconItemSkill* spItem = pInven->m_pMyInvWnd[i];
 
+		if (spItem != nullptr)
+		{
+			spItem = new __IconItemSkill(*pInven->m_pMyInvWnd[i]);
+			CreateUIIconForItem(spItem);
 			SetupIconArea(spItem, m_pInvArea[i]);
 			ShowItemCount(spItem,i);
-
 			m_pMyUpgradeInv[i] = spItem;
-		}
-		else
-		{
-			m_pMyUpgradeInv[i] = nullptr;
 		}
 	}
 }
@@ -259,13 +280,17 @@ void CUIItemUpgrade::ItemMoveFromThisToInv()
 
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
-		__IconItemSkill* spItem = m_pMyUpgradeInv[i];
-		if (spItem != nullptr)
+		if (m_pMyUpgradeInv[i] == nullptr)
+			pInven->m_pMyInvWnd[i] = nullptr;
+
+		if (m_pMyUpgradeInv[i] != nullptr)
 		{
-			spItem->pUIIcon->SetParent(pInven);
-			CN3UIArea* pArea = pInven->GetChildAreaByiOrder(UI_AREA_TYPE_INV, i);
-			SetupIconArea(spItem, pArea);
-			pInven->m_pMyInvWnd[i] = spItem;
+			if (m_pMyUpgradeInv[i]->pUIIcon != nullptr)
+			{
+				delete m_pMyUpgradeInv[i]->pUIIcon;
+				m_pMyUpgradeInv[i]->pUIIcon = nullptr;
+			}
+			delete m_pMyUpgradeInv[i];
 			m_pMyUpgradeInv[i] = nullptr;
 		}
 	}
@@ -273,20 +298,36 @@ void CUIItemUpgrade::ItemMoveFromThisToInv()
 
 bool CUIItemUpgrade::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 {
-	if (m_pAreaUpgrade != nullptr && m_pAreaUpgrade->IsIn(ptCur.x, ptCur.y))
+	if (spItem == nullptr)
+		return false;
+
+	if (IsAllowedUpgradeItem(spItem))
 	{
-		if (IsAllowedUpgradeItem(spItem))
+		if (m_iUpgradeItemSlotInvPos == -1 && m_pAreaUpgrade->IsIn(ptCur.x, ptCur.y))
 		{
-			if (HandleUpgradeAreaDrop(spItem))
-				return true;
+			if (m_pUpgradeResultSlot != nullptr)
+			{
+				SetupIconArea(m_pUpgradeResultSlot, m_pInvArea[m_iUpgradeResultSlotInvPos]);
+				m_iUpgradeResultSlotInvPos = -1;
+				m_pUpgradeResultSlot = nullptr;
+			}
+			SetupIconArea(spItem, m_pAreaUpgrade);
+			m_iUpgradeItemSlotInvPos = m_sSelectedIconInfo.iSourceOrder;
+			return true;
 		}
 	}
 	else if (IsMaterialSlotCompatible(spItem))
 	{
-		if (HandleMaterialSlotDrop(spItem));
-		return true;
+		for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
+		{
+			CN3UIArea* pArea = m_pSlotArea[i];
+			if (pArea != nullptr && pArea->IsIn(ptCur.x, ptCur.y))
+			{
+				if (MaterialSlotDrop(spItem, i));
+					return true;
+			}
+		}
 	}
-
 	return false;
 }
 
@@ -295,14 +336,15 @@ void CUIItemUpgrade::CancelIconDrop(__IconItemSkill* spItem)
 {
 	if (spItem != nullptr)
 	{
-		e_UI_DISTRICT eUIWnd = GetWndDistrict(spItem);
-		int iOrder = GetItemiOrder(spItem, eUIWnd);
-		if (iOrder != -1 && eUIWnd != UIWND_DISTRICT_UPGRADE_CANNOT_MOVE)
+		int iOrder = m_sSelectedIconInfo.iSourceOrder;
+		if (iOrder != -1)
 		{
 			CN3UIArea* pArea = m_pInvArea[iOrder];
 			SetupIconArea(spItem, pArea);
 			ShowItemCount(spItem, iOrder);
 			SetState(UI_STATE_COMMON_NONE);
+			m_sSelectedIconInfo.pSelectedItem = nullptr;
+			m_sSelectedIconInfo.iSourceOrder = -1;
 		}
 	}	
 }
@@ -369,14 +411,32 @@ RECT CUIItemUpgrade::GetSampleRect()
 // Determines which window district (slot or inventory) the given item belongs to.
 e_UI_DISTRICT CUIItemUpgrade::GetWndDistrict(__IconItemSkill* spItem) const
 {
-	if(m_pUpgradeResultSlot == spItem)
-		return UIWND_DISTRICT_UPGRADE_SLOT;
-	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
+	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
+	if (m_pAreaUpgrade->IsIn(ptCur.x, ptCur.y))
 	{
-		if (m_pMyUpgradeInv[i] != nullptr && m_pMyUpgradeInv[i] == spItem)
-			return UIWND_DISTRICT_UPGRADE_INV;
+		return UIWND_DISTRICT_UPGRADE_SLOT;
 	}
-	return UIWND_DISTRICT_UPGRADE_CANNOT_MOVE; // Other icons can not move
+	if (m_pAreaResult->IsIn(ptCur.x, ptCur.y))
+	{
+		return UIWND_DISTRICT_UPGRADE_RESULT_SLOT;
+	}
+	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
+	{
+		CN3UIArea* pArea = m_pSlotArea[i];
+		if (pArea != nullptr && pArea->IsIn(ptCur.x, ptCur.y))
+		{
+			return UIWND_DISTRICT_UPGRADE_SLOT;
+		}
+	}
+	for (int i = 0; i < MAX_ITEM_INVENTORY; ++i)
+	{
+		CN3UIArea* pArea = m_pInvArea[i];
+		if (pArea != nullptr && pArea->IsIn(ptCur.x, ptCur.y))
+		{
+			return UIWND_DISTRICT_UPGRADE_INV;
+		}
+	}
+	return UIWND_DISTRICT_UPGRADE_UNKNOWN; // Other icons can not move
 }
 
 // Handles UI messages such as button clicks and icon events.
@@ -390,7 +450,7 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		if (pSender == m_pBtnClose)
 			Close();
 		else if (pSender == m_pBtnCancel && !m_bUpgradeInProgress)
-			UpdateInventory();
+			ResetUpgradeInventory();
 		else if (pSender == m_pBtnOk && !m_bUpgradeInProgress)
 		{
 			SendToServerUpgradeMsg();
@@ -398,7 +458,7 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		return true;
 	}
 	__IconItemSkill* spItem = nullptr;
-	e_UI_DISTRICT  eUIWnd = UIWND_DISTRICT_UPGRADE_CANNOT_MOVE;
+	e_UI_DISTRICT  eUIWnd = UIWND_DISTRICT_UPGRADE_UNKNOWN;
 
 	int iOrder = -1;
 	RECT region = GetSampleRect();
@@ -407,21 +467,18 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 	switch (dwMsg & dwBitMask)
 	{
 		case UIMSG_ICON_DOWN_FIRST:
-			spItem = GetHighlightIconItem((CN3UIIcon*) pSender);
+			SetSelectedIconInfo((CN3UIIcon*) pSender);
+			spItem = m_sSelectedIconInfo.pSelectedItem;
+			iOrder = m_sSelectedIconInfo.iSourceOrder;
 			eUIWnd = GetWndDistrict(spItem);
-			if (eUIWnd == UIWND_DISTRICT_UPGRADE_CANNOT_MOVE)
+
+			if (iOrder == -1 || (eUIWnd != UIWND_DISTRICT_UPGRADE_INV 
+				&& UIWND_DISTRICT_UPGRADE_RESULT_SLOT))
 			{
 				SetState(UI_STATE_COMMON_NONE);
 				return false;
 			}
-			m_sSelectedIconInfo.pSelectedItem = spItem;
-			iOrder = GetItemiOrder(spItem, eUIWnd);
-			m_sSelectedIconInfo.iSourceOrder = iOrder;
-			if (iOrder == -1)	
-			{
-				SetState(UI_STATE_COMMON_NONE);
-				return false;
-			}
+
 			// Set icon region for moving.
 			pSender->SetRegion(region);
 			pSender->SetMoveRect(region);
@@ -430,7 +487,7 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			if (spItem != nullptr && (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
 				|| spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
 			{
-				if (spItem->iCount > 0)
+				if (spItem->iCount > 1)
 				{
 					ShowItemCount(spItem, iOrder);
 				}
@@ -444,9 +501,9 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				break;
 			if (!ReceiveIconDrop(spItem, ptCur))
 			{
-				CancelIconDrop(spItem);// Restore the icon position to its original place if drop failed.
+				// Restore the icon position to its original place if drop failed.
+				CancelIconDrop(spItem);
 			}
-				
 			break;
 
 		case UIMSG_ICON_DOWN:
@@ -477,7 +534,7 @@ void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFo
 			CancelIconDrop(m_sSelectedIconInfo.pSelectedItem);
 
 		// Move the items inventory area.
-		UpdateInventory();
+		ResetUpgradeInventory();
 		ItemMoveFromThisToInv();
 		AnimClose();
 	}
@@ -553,8 +610,8 @@ bool CUIItemUpgrade::OnKeyPress(int iKey)
 	return CN3UIBase::OnKeyPress(iKey);
 }
 
-// Restores the inventory and slots from the backup, recreating icons as needed.
-void CUIItemUpgrade::UpdateInventory()
+// Restores the inventory and slots.
+void CUIItemUpgrade::ResetUpgradeInventory()
 {
 	if (m_pUpgradeResultSlot != nullptr && m_iUpgradeResultSlotInvPos != -1)
 	{
@@ -563,39 +620,35 @@ void CUIItemUpgrade::UpdateInventory()
 		m_pUpgradeResultSlot = nullptr;
 		m_iUpgradeResultSlotInvPos = -1;
 	}
-	if (m_pUpgradeItemSlot != nullptr && m_iUpgradeItemSlotInvPos != -1)
+	if (m_iUpgradeItemSlotInvPos != -1)
 	{
-		SetupIconArea(m_pUpgradeItemSlot, m_pInvArea[m_iUpgradeItemSlotInvPos]);
-		m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos] = m_pUpgradeItemSlot;
-		m_pUpgradeItemSlot = nullptr;
+		SetupIconArea(m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos], m_pInvArea[m_iUpgradeItemSlotInvPos]);
 		m_iUpgradeItemSlotInvPos = -1;
 	}
 
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		if (m_pUpgradeScrollSlots[i] != nullptr)
+		if (m_pUpgradeMaterialSlots[i] != nullptr)
 		{
-			__IconItemSkill* spItem = m_pUpgradeScrollSlots[i];
-			int iOrder = m_iUpgradeScrollSlotInvPos[i];
-			if (m_pMyUpgradeInv[iOrder] != nullptr && (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
-				|| spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
+			if (m_pUpgradeMaterialSlots[i]->pUIIcon != nullptr)
 			{
-				if (spItem->pUIIcon != nullptr)
-				{
-					delete spItem->pUIIcon;
-					spItem->pUIIcon = nullptr;
-				}
-				++m_pMyUpgradeInv[iOrder]->iCount;
-				ShowItemCount(m_pMyUpgradeInv[iOrder], iOrder);
+				delete m_pUpgradeMaterialSlots[i]->pUIIcon;
+				m_pUpgradeMaterialSlots[i]->pUIIcon = nullptr;
+				m_pUpgradeMaterialSlots[i] = nullptr;
 			}
-			else if(spItem != nullptr)
+		}
+
+		int iOrder = m_iUpgradeScrollSlotInvPos[i];
+		if (iOrder != -1)
+		{
+			__IconItemSkill* spItem = m_pMyUpgradeInv[iOrder];
+			if (spItem != nullptr)
 			{
 				SetupIconArea(spItem, m_pInvArea[iOrder]);
-				m_pMyUpgradeInv[iOrder] = m_pUpgradeScrollSlots[i];
+				ShowItemCount(spItem, iOrder);
 			}
-			m_pUpgradeScrollSlots[i] = nullptr;
-			m_iUpgradeScrollSlotInvPos[i] = -1;
 		}
+		m_iUpgradeScrollSlotInvPos[i] = -1;
 	}
 }
 
@@ -611,7 +664,7 @@ bool CUIItemUpgrade::IsTrina(uint32_t dwID) const
 // Checks if the given item is allowed to be upgraded (unique or upgrade type).
 bool CUIItemUpgrade::IsAllowedUpgradeItem(__IconItemSkill* spItem) const
 {
-	if (m_pUpgradeItemSlot != nullptr)
+	if (m_iUpgradeItemSlotInvPos != -1)
 		return false;
 	if (spItem != nullptr  && spItem->pItemBasic != nullptr)
 	{
@@ -631,14 +684,15 @@ bool CUIItemUpgrade::IsAllowedUpgradeItem(__IconItemSkill* spItem) const
 			default:
 				return false;
 		}
+		e_ItemAttrib eTA = (e_ItemAttrib) (spItem->pItemExt->byMagicOrRare);
+		return (eTA == ITEM_ATTRIB_UNIQUE || eTA == ITEM_ATTRIB_UPGRADE || eTA == ITEM_ATTRIB_UNIQUE_REVERSE);
 	}
-	e_ItemAttrib eTA = (e_ItemAttrib) (spItem->pItemExt->byMagicOrRare);
-	return (eTA == ITEM_ATTRIB_UNIQUE || eTA == ITEM_ATTRIB_UPGRADE || eTA == ITEM_ATTRIB_UNIQUE_REVERSE);
+	return false;
 }
 
 void CUIItemUpgrade::SendToServerUpgradeMsg()
 {
-	if (m_pUpgradeItemSlot == nullptr || m_pUpgradeScrollSlots == nullptr)
+	if (m_iUpgradeItemSlotInvPos == -1)
 		return;
 	m_bUpgradeInProgress = true;
 	uint8_t byBuff[512];
@@ -653,9 +707,9 @@ void CUIItemUpgrade::SendToServerUpgradeMsg()
 	int8_t bPos = -1;
 
 	// Add Upgrade Item
-	if (m_pUpgradeItemSlot != nullptr)
+	if (m_iUpgradeItemSlotInvPos != -1)
 	{
-		nItemID = m_pUpgradeItemSlot->pItemBasic->dwID + m_pUpgradeItemSlot->pItemExt->dwID;
+		nItemID = m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos]->pItemBasic->dwID + m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos]->pItemExt->dwID;
 		bPos = m_iUpgradeItemSlotInvPos;
 
 		CAPISocket::MP_AddDword(byBuff, iOffset, nItemID);
@@ -666,11 +720,12 @@ void CUIItemUpgrade::SendToServerUpgradeMsg()
 	// Add Upgrade Slots
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
 	{
-		if (m_pUpgradeScrollSlots[i] != nullptr)
+		int iOrder = m_iUpgradeScrollSlotInvPos[i];
+		if (iOrder != -1)
 		{
-			nItemID= m_pUpgradeScrollSlots[i]->pItemBasic->dwID +
-				m_pUpgradeScrollSlots[i]->pItemExt->dwID;
-			bPos = m_iUpgradeScrollSlotInvPos[i];
+			nItemID= m_pMyUpgradeInv[iOrder]->pItemBasic->dwID +
+				m_pMyUpgradeInv[iOrder]->pItemExt->dwID;
+			bPos = iOrder;
 			CAPISocket::MP_AddDword(byBuff, iOffset, nItemID);
 			CAPISocket::MP_AddByte(byBuff, iOffset, bPos);
 			++itotalSent;
@@ -691,6 +746,9 @@ void CUIItemUpgrade::SendToServerUpgradeMsg()
 
 void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 {
+	CUIInventory* pInven = CGameProcedure::s_pProcMain->m_pUIInventory;
+	if (pInven == nullptr)
+		return;
 	enum UpgradeErrorCodes
 	{
 		UpgradeFailed = 0,
@@ -702,7 +760,7 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 
 	int8_t result = pkt.read<uint8_t>();
 	uint32_t nItemID[10] = {0};
-	uint8_t bPos[10] = {-1};
+	int8_t bPos[10] = {-1};
 	for (int i = 0; i < MAX_UPGRADE_MATERIAL; i++)
 	{
 		nItemID[i] = pkt.read<uint32_t>();
@@ -710,6 +768,8 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 		if (bPos[i] < 0 || bPos[i] > MAX_ITEM_INVENTORY)
 			bPos[i] = -1;
 	}
+	if (bPos[0] != -1)
+		m_iUpgradeResultSlotInvPos = bPos[0];
 
 	__TABLE_ITEM_EXT* itemExt = nullptr;
 	__TABLE_ITEM_BASIC* itemBasic = nullptr;
@@ -721,32 +781,67 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 
 	if (result == UpgradeFailed)
 	{
-		// Clean  item upgrade slot
-		if (m_pUpgradeItemSlot != nullptr)
+		for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 		{
-			if (m_pUpgradeItemSlot->pUIIcon != nullptr)
+			int iOrder = m_iUpgradeScrollSlotInvPos[i];
+			if (iOrder != -1)
 			{
-				delete m_pUpgradeItemSlot->pUIIcon;
-				m_pUpgradeItemSlot->pUIIcon = nullptr;
+				__IconItemSkill* spItem = m_pMyUpgradeInv[iOrder];
+				if (spItem != nullptr)
+				{
+					if (spItem->iCount > 1)
+					{
+						--spItem->iCount;
+						--pInven->m_pMyInvWnd[iOrder]->iCount;
+					}
+					else
+					{
+						if (pInven->m_pMyInvWnd[iOrder]->pUIIcon != nullptr)
+							pInven->m_pMyInvWnd[iOrder]->pUIIcon = nullptr;
+						pInven->m_pMyInvWnd[iOrder] = nullptr;
+
+						if (spItem->pUIIcon != nullptr)
+						{
+							delete spItem->pUIIcon;
+							spItem->pUIIcon = nullptr;
+						}
+						spItem = nullptr;
+					}
+				}
+
+				// Clean UpgradeInv items
+				if (m_pUpgradeMaterialSlots[i] != nullptr)
+				{
+					if (m_pUpgradeMaterialSlots[i]->pUIIcon != nullptr)
+						delete m_pUpgradeMaterialSlots[i]->pUIIcon;
+					m_pUpgradeMaterialSlots[i]->pUIIcon = nullptr;
+				}
 			}
-			delete m_pUpgradeItemSlot;
-			m_pUpgradeItemSlot = nullptr;
+			m_iUpgradeScrollSlotInvPos[i] = -1;
 		}
 
-		// Clean upgrade scroll slots
-		for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
+		if (pInven->m_pMyInvWnd[m_iUpgradeItemSlotInvPos] != nullptr)
 		{
-			if (m_pUpgradeScrollSlots[i] != nullptr)
+			if (pInven->m_pMyInvWnd[m_iUpgradeItemSlotInvPos]->pUIIcon != nullptr)
 			{
-				if (m_pUpgradeScrollSlots[i]->pUIIcon != nullptr)
-				{
-					delete m_pUpgradeScrollSlots[i]->pUIIcon;
-					m_pUpgradeScrollSlots[i]->pUIIcon = nullptr;
-				}
-				delete m_pUpgradeScrollSlots[i];
-				m_pUpgradeScrollSlots[i] = nullptr;
+				delete pInven->m_pMyInvWnd[m_iUpgradeItemSlotInvPos]->pUIIcon;
+				pInven->m_pMyInvWnd[m_iUpgradeItemSlotInvPos]->pUIIcon = nullptr;
 			}
+			delete pInven->m_pMyInvWnd[m_iUpgradeItemSlotInvPos];
+			pInven->m_pMyInvWnd[m_iUpgradeItemSlotInvPos] = nullptr;
 		}
+
+		if (m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos] != nullptr)
+		{
+			if (m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos]->pUIIcon != nullptr)
+			{
+				delete m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos]->pUIIcon;
+				m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos]->pUIIcon = nullptr;
+			}
+			delete m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos];
+			m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos] = nullptr;
+		}
+		m_iUpgradeItemSlotInvPos = -1;
 
 		m_bUpgradeSucceeded = false;
 		m_eAnimationState = ANIM_START;
@@ -755,34 +850,57 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 	}
 	else if (result == UpgradeSucceeded)
 	{
-		// Clean  item upgrade slot
-		if (m_pUpgradeItemSlot != nullptr)
+		
+		for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 		{
-			if (m_pUpgradeItemSlot->pUIIcon != nullptr)
+			int iOrder = m_iUpgradeScrollSlotInvPos[i];
+			if (iOrder != -1)
 			{
-				delete m_pUpgradeItemSlot->pUIIcon;
-				m_pUpgradeItemSlot->pUIIcon = nullptr;
+				__IconItemSkill* spItem = m_pMyUpgradeInv[iOrder];
+				if (spItem != nullptr)
+				{
+					if (spItem->iCount > 1)
+					{
+						--spItem->iCount;
+						--pInven->m_pMyInvWnd[iOrder]->iCount;
+					}
+					else
+					{
+						if (pInven->m_pMyInvWnd[iOrder]->pUIIcon != nullptr)
+							pInven->m_pMyInvWnd[iOrder]->pUIIcon = nullptr;
+						pInven->m_pMyInvWnd[iOrder] = nullptr;
+
+						if (spItem->pUIIcon != nullptr)
+						{
+							delete spItem->pUIIcon;
+							spItem->pUIIcon = nullptr;
+						}
+						spItem = nullptr;
+					}
+				}
+
+				// Clean copy items
+				if (m_pUpgradeMaterialSlots[i] != nullptr)
+				{
+					if (m_pUpgradeMaterialSlots[i]->pUIIcon != nullptr)
+						delete m_pUpgradeMaterialSlots[i]->pUIIcon;
+					m_pUpgradeMaterialSlots[i]->pUIIcon = nullptr;
+				}
 			}
-			delete m_pUpgradeItemSlot;
-			m_pUpgradeItemSlot = nullptr;
-			m_iUpgradeItemSlotInvPos = -1;
+			m_iUpgradeScrollSlotInvPos[i] = -1;
 		}
 
-		// Clean upgrade scroll slots
-		for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
+		if (m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos] != nullptr)
 		{
-			if (m_pUpgradeScrollSlots[i] != nullptr)
+			if (m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos]->pUIIcon != nullptr)
 			{
-				if (m_pUpgradeScrollSlots[i]->pUIIcon != nullptr)
-				{
-					delete m_pUpgradeScrollSlots[i]->pUIIcon;
-					m_pUpgradeScrollSlots[i]->pUIIcon = nullptr;
-				}
-				delete m_pUpgradeScrollSlots[i];
-				m_pUpgradeScrollSlots[i] = nullptr;
-				m_iUpgradeScrollSlotInvPos[i] = -1;
+				delete m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos]->pUIIcon;
+				m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos]->pUIIcon = nullptr;
 			}
+			delete m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos];
+			m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos] = nullptr;
 		}
+		m_iUpgradeItemSlotInvPos = -1;
 
 		m_bUpgradeSucceeded = true;
 		if(m_bUpgradeInProgress)
@@ -806,32 +924,35 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 		spItemNew->iCount = 1;
 		CreateUIIconForItem(spItemNew);
 
-		if (bPos[0] != -1)
-			m_iUpgradeResultSlotInvPos = bPos[0];
-
-		if (m_pAreaResult != nullptr && m_eAnimationState != ANIM_NONE)
+		if (m_eAnimationState != ANIM_NONE)
 		{
 			m_pUpgradeResultSlot = spItemNew;
 		}
+
+		//Upgrade Item in Inventory
+		pInven->m_pMyInvWnd[m_iUpgradeResultSlotInvPos]->pItemBasic = m_pUpgradeResultSlot->pItemBasic;
+		pInven->m_pMyInvWnd[m_iUpgradeResultSlotInvPos]->pItemExt = m_pUpgradeResultSlot->pItemExt;
+		pInven->m_pMyInvWnd[m_iUpgradeResultSlotInvPos]->iDurability = m_pUpgradeResultSlot->iDurability;
+
 	}
 	else if (result == UpgradeTrading)
 	{
 		m_bUpgradeInProgress = false;
-		UpdateInventory();
+		ResetUpgradeInventory();
 		szMsg = fmt::format_text_resource(IDS_ITEM_UPGRADE_CANNOT_PERFORM);
 		CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_XRGB(255, 0, 255));
 	}
 	else if (result == UpgradeNeedCoins)
 	{
 		m_bUpgradeInProgress = false;
-		UpdateInventory();
+		ResetUpgradeInventory();
 		szMsg = fmt::format_text_resource(IDS_ITEM_UPGRADE_NEED_COIN);
 		CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_XRGB(255, 0, 255));
 	}
 	else if (result == UpgradeNoMatch)
 	{
 		m_bUpgradeInProgress = false;
-		UpdateInventory();
+		ResetUpgradeInventory();
 		szMsg = fmt::format_text_resource(IDS_ITEM_UPGRADE_NON_MATCH);
 		CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_XRGB(255, 0, 255));
 	}
@@ -955,30 +1076,20 @@ void CUIItemUpgrade::SetupIconArea(__IconItemSkill* spItem, CN3UIArea* pArea)
 	spItem->pUIIcon->SetMoveRect(pArea->GetRegion());
 }
 
-bool CUIItemUpgrade::HandleUpgradeAreaDrop(__IconItemSkill* spItem)
+bool CUIItemUpgrade::UpgradeAreaDrop(__IconItemSkill* spItem)
 {
-	// Only Upgrade and Unique items can be dropped here
 	if (m_bUpgradeInProgress)
 		return false;
-	if (m_pUpgradeResultSlot != nullptr)
-	{
-		SetupIconArea(m_pUpgradeResultSlot, m_pInvArea[m_iUpgradeResultSlotInvPos]);
-		m_iUpgradeResultSlotInvPos = -1;
-		m_pUpgradeResultSlot = nullptr;
-	}
-	m_pUpgradeItemSlot = spItem;
 
-	// Remove the item from inventory
 	for (int i = 0; i < MAX_ITEM_INVENTORY; ++i)
 	{
 		if (m_pMyUpgradeInv[i] == spItem)
 		{
-			m_pMyUpgradeInv[i] = nullptr;
 			m_iUpgradeItemSlotInvPos = i;
 			break;
 		}
 	}
-	// Update the item's UI position
+
 	SetupIconArea(spItem, m_pAreaUpgrade);
 	return true;
 }
@@ -993,9 +1104,10 @@ bool CUIItemUpgrade::IsMaterialSlotCompatible(__IconItemSkill* pSrc) const
 
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
 	{
-		if (m_pUpgradeScrollSlots[i] != nullptr)
+		int iOrder = m_iUpgradeScrollSlotInvPos[i];
+		if (iOrder != -1)
 		{
-			if (IsTrina(m_pUpgradeScrollSlots[i]->pItemBasic->dwID))
+			if (IsTrina(m_pMyUpgradeInv[iOrder]->pItemBasic->dwID))
 			{
 				bhasTrina = true;
 			}
@@ -1011,7 +1123,6 @@ bool CUIItemUpgrade::IsMaterialSlotCompatible(__IconItemSkill* pSrc) const
 		return false;
 	return true;
 }
-
 
 void CUIItemUpgrade::FlipFlopAnim()
 {
@@ -1087,9 +1198,8 @@ bool CUIItemUpgrade::HandleInventoryIconRightClick(__IconItemSkill* spItem,POINT
     // Check for right mouse button click using MOUSE_RBCLICKED
 	if (m_pUpgradeResultSlot != nullptr && m_iUpgradeResultSlotInvPos != -1)
 	{
-		UpdateInventory();
+		ResetUpgradeInventory();
 	}		
-    // Find the icon under the mouse
 
     if (spItem == nullptr || spItem->pUIIcon == nullptr)
 		return false;
@@ -1098,15 +1208,20 @@ bool CUIItemUpgrade::HandleInventoryIconRightClick(__IconItemSkill* spItem,POINT
     {
 		if (IsAllowedUpgradeItem(spItem))
 		{
-			if (HandleUpgradeAreaDrop(spItem));
+			if (UpgradeAreaDrop(spItem));
 				return true;
 		}
 		else if(IsMaterialSlotCompatible(spItem))
 		{
-			if(HandleMaterialSlotDrop(spItem));
-			return true;
-		}				
-        return false; // Only handle one icon per click
+			for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
+			{
+				if (m_iUpgradeScrollSlotInvPos[i] == -1)
+				{
+					if (MaterialSlotDrop(spItem, i));
+						return true;
+				}
+			}	
+		}
     }
 	return false;
 }
@@ -1126,7 +1241,7 @@ void CUIItemUpgrade::ShowItemCount(__IconItemSkill* spItem,int iorder)
 			{
 				pStr->SetStringAsInt(spItem->iCount);
 				if (GetState() == UI_STATE_ICON_MOVING && m_sSelectedIconInfo.pSelectedItem != nullptr)
-					pStr->SetStringAsInt(spItem->iCount - 1);
+					pStr->SetStringAsInt(spItem->iCount - 1); 
 				pStr->SetVisible(true);
 				pStr->Render();
 				pStr->SetParent(this);
@@ -1145,51 +1260,30 @@ void CUIItemUpgrade::ShowItemCount(__IconItemSkill* spItem,int iorder)
 	}
 }
 
-bool CUIItemUpgrade::HandleMaterialSlotDrop(__IconItemSkill* spItem)
+bool CUIItemUpgrade::MaterialSlotDrop(__IconItemSkill* spItem,int iOrder)
 {
-	e_UI_DISTRICT eUIWnd = GetWndDistrict(spItem);
-	int iSourceOrder = GetItemiOrder(spItem, eUIWnd);
-
-	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
+	// Handle countable items
+	CN3UIArea* pArea = m_pSlotArea[iOrder];
+	int iSourceOrder = m_sSelectedIconInfo.iSourceOrder;
+	if (spItem->iCount > 1 && (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
+		|| spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
 	{
-		int iDestiOrder = i;
-
-		// Handle countable items
-		CN3UIArea* pSlotArea = m_pSlotArea[iDestiOrder];
-		if (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
-			|| spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
-		{
-			if (spItem->iCount > 1)
-			{
-				// Create a new icon, put it in 1 slot,
-				__IconItemSkill* pNew = new __IconItemSkill(*spItem);
-				pNew->iCount = 1;
-				CreateUIIconForItem(pNew);
-				SetupIconArea(pNew, pSlotArea);
-				m_pUpgradeScrollSlots[iDestiOrder] = pNew;
-
-				// Reduce the number in the inventory
-				--spItem->iCount;
-				CancelIconDrop(spItem);
-				ShowItemCount(spItem, iSourceOrder);
-			}
-			else
-			{
-				// If the last one, move directly
-				m_pUpgradeScrollSlots[iDestiOrder] = spItem;
-				m_pMyUpgradeInv[iSourceOrder] = nullptr;
-				SetupIconArea(spItem, pSlotArea);
-			}
-		}
-		else
-		{
-			// If is not countable item, just move it
-			m_pUpgradeScrollSlots[iDestiOrder] = spItem;
-			m_pMyUpgradeInv[iSourceOrder] = nullptr;
-			SetupIconArea(spItem, pSlotArea);
-		}
-		m_iUpgradeScrollSlotInvPos[iDestiOrder] = iSourceOrder;
+		__IconItemSkill* pNew = new __IconItemSkill(*spItem);
+		CreateUIIconForItem(pNew);
+		SetupIconArea(pNew, pArea);
+		SetupIconArea(spItem, m_pInvArea[iSourceOrder]);
+		m_pUpgradeMaterialSlots[iOrder] = pNew;
+		m_iUpgradeScrollSlotInvPos[iOrder] = iSourceOrder;
 
 		return true;
 	}
+	else
+	{
+		SetupIconArea(spItem, pArea);
+		m_iUpgradeScrollSlotInvPos[iOrder] = iSourceOrder;
+
+		return true;
+	}
+	
+	return false;
 }
