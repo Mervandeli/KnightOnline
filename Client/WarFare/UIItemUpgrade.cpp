@@ -200,7 +200,6 @@ void CUIItemUpgrade::SetSelectedIconInfo(CN3UIIcon* pUIIcon)
 			m_sSelectedIconInfo.iSourceOrder = -1; // Can not selectable
 			m_sSelectedIconInfo.pSelectedItem = m_pUpgradeMaterialSlots[i];
 		}
-
 	}
 
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
@@ -238,7 +237,7 @@ void CUIItemUpgrade::GoldUpdate()
 	}
 }
 
-void CUIItemUpgrade::ItemMoveFromInvToThis()
+void CUIItemUpgrade::GetItemFromInv()
 {
 	CUIInventory* pInven = CGameProcedure::s_pProcMain->m_pUIInventory;
 	if (pInven == nullptr)
@@ -253,8 +252,18 @@ void CUIItemUpgrade::ItemMoveFromInvToThis()
 	
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
-		__IconItemSkill* spItem = pInven->m_pMyInvWnd[i];
+		if (m_pMyUpgradeInv[i] != nullptr)
+		{
+			if (m_pMyUpgradeInv[i]->pUIIcon != nullptr)
+			{
+				delete m_pMyUpgradeInv[i]->pUIIcon;
+				m_pMyUpgradeInv[i]->pUIIcon = nullptr;
+			}
+			delete m_pMyUpgradeInv[i];
+			m_pMyUpgradeInv[i] = nullptr;
+		}
 
+		__IconItemSkill* spItem = pInven->m_pMyInvWnd[i];
 		if (spItem != nullptr)
 		{
 			spItem = new __IconItemSkill(*pInven->m_pMyInvWnd[i]);
@@ -270,30 +279,6 @@ void CUIItemUpgrade::Close()
 {
 	bool bwork = IsVisible();
 	SetVisibleWithNoSound(false, bwork,false);
-}
-
-void CUIItemUpgrade::ItemMoveFromThisToInv()
-{
-	CUIInventory* pInven = CGameProcedure::s_pProcMain->m_pUIInventory;
-	if (pInven == nullptr)
-		return;
-
-	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
-	{
-		if (m_pMyUpgradeInv[i] == nullptr)
-			pInven->m_pMyInvWnd[i] = nullptr;
-
-		if (m_pMyUpgradeInv[i] != nullptr)
-		{
-			if (m_pMyUpgradeInv[i]->pUIIcon != nullptr)
-			{
-				delete m_pMyUpgradeInv[i]->pUIIcon;
-				m_pMyUpgradeInv[i]->pUIIcon = nullptr;
-			}
-			delete m_pMyUpgradeInv[i];
-			m_pMyUpgradeInv[i] = nullptr;
-		}
-	}
 }
 
 bool CUIItemUpgrade::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
@@ -369,27 +354,6 @@ uint32_t CUIItemUpgrade::MouseProc(uint32_t dwFlags, const POINT& ptCur, const P
 	}
 
 	return CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);
-}
-
-// Returns the index of the given item in the specified window district.
-int CUIItemUpgrade::GetItemiOrder(__IconItemSkill* spItem, e_UI_DISTRICT eWndDist) const
-{
-	switch (eWndDist)
-	{
-		case UIWND_DISTRICT_UPGRADE_SLOT:
-			if (m_pUpgradeResultSlot != nullptr && m_pUpgradeResultSlot == spItem)
-				return m_iUpgradeResultSlotInvPos;
-			break;
-
-		case UIWND_DISTRICT_UPGRADE_INV:
-			for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
-			{
-				if (m_pMyUpgradeInv[i] != nullptr && m_pMyUpgradeInv[i] == spItem)
-					return i;
-			}
-			break;
-	}
-	return -1;
 }
 
 // Returns a rectangle centered at the mouse position, used for moving icons.
@@ -524,7 +488,7 @@ void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFo
 
 	if (bVisible)
 	{
-		ItemMoveFromInvToThis();
+		GetItemFromInv();
 	}
 
 	if (bWork && !bVisible)
@@ -535,7 +499,6 @@ void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFo
 
 		// Move the items inventory area.
 		ResetUpgradeInventory();
-		ItemMoveFromThisToInv();
 		AnimClose();
 	}
 }
@@ -1076,24 +1039,6 @@ void CUIItemUpgrade::SetupIconArea(__IconItemSkill* spItem, CN3UIArea* pArea)
 	spItem->pUIIcon->SetMoveRect(pArea->GetRegion());
 }
 
-bool CUIItemUpgrade::UpgradeAreaDrop(__IconItemSkill* spItem)
-{
-	if (m_bUpgradeInProgress)
-		return false;
-
-	for (int i = 0; i < MAX_ITEM_INVENTORY; ++i)
-	{
-		if (m_pMyUpgradeInv[i] == spItem)
-		{
-			m_iUpgradeItemSlotInvPos = i;
-			break;
-		}
-	}
-
-	SetupIconArea(spItem, m_pAreaUpgrade);
-	return true;
-}
-
 bool CUIItemUpgrade::IsMaterialSlotCompatible(__IconItemSkill* pSrc) const
 {
 	if (pSrc->pItemBasic->dwEffectID2 != UpgradeMaterial && !m_bUpgradeInProgress)
@@ -1208,8 +1153,10 @@ bool CUIItemUpgrade::HandleInventoryIconRightClick(__IconItemSkill* spItem,POINT
     {
 		if (IsAllowedUpgradeItem(spItem))
 		{
-			if (UpgradeAreaDrop(spItem));
-				return true;
+			SetupIconArea(spItem, m_pAreaUpgrade);
+			m_iUpgradeItemSlotInvPos = m_sSelectedIconInfo.iSourceOrder;
+
+			return true;
 		}
 		else if(IsMaterialSlotCompatible(spItem))
 		{

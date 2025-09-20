@@ -97,7 +97,6 @@ public:
 	void				SetNpcID(int iNpcID);
 private:
 
-	int					GetItemiOrder(__IconItemSkill* spItem, e_UI_DISTRICT eWndDist) const;
 	RECT				GetSampleRect();
 	e_UI_DISTRICT		GetWndDistrict(__IconItemSkill* spItem) const;
 	bool				HandleInventoryIconRightClick(__IconItemSkill* spItem,POINT ptCur);
@@ -112,8 +111,7 @@ private:
 	void				SetSelectedIconInfo(CN3UIIcon* pUIIcon);
 	void				CancelIconDrop(__IconItemSkill* spItem);
 	bool				ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur);
-	void				ItemMoveFromInvToThis();
-	void				ItemMoveFromThisToInv();
+	void				GetItemFromInv();
 	void                ResetUpgradeInventory();
 	void				GoldUpdate();
 	void				InitIconUpdate(){};
@@ -130,7 +128,6 @@ private:
 	void				HideAllAnimationFrames();
 	void				CreateUIIconForItem(__IconItemSkill* spItem);
 	void				SetupIconArea(__IconItemSkill* spItem, CN3UIArea* pArea);
-	bool				UpgradeAreaDrop(__IconItemSkill* spItem);
 	bool				MaterialSlotDrop(__IconItemSkill* spItem,int iOrder);
 	bool				IsMaterialSlotCompatible(__IconItemSkill* pSrc) const;
 	void				Tick() override;
