@@ -608,6 +608,11 @@ void CUIItemUpgrade::ResetUpgradeInventory()
 			if (spItem != nullptr)
 			{
 				SetupIconArea(spItem, m_pInvArea[iOrder]);
+				if (spItem->iCount > 1 && (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
+					|| spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
+				{
+					++spItem->iCount;
+				}
 				ShowItemCount(spItem, iOrder);
 			}
 		}
@@ -1166,7 +1171,7 @@ bool CUIItemUpgrade::HandleInventoryIconRightClick(__IconItemSkill* spItem,POINT
 				{
 					if (MaterialSlotDrop(spItem, i));
 						return true;
-				}
+					}
 			}	
 		}
     }
@@ -1219,6 +1224,8 @@ bool CUIItemUpgrade::MaterialSlotDrop(__IconItemSkill* spItem,int iOrder)
 		CreateUIIconForItem(pNew);
 		SetupIconArea(pNew, pArea);
 		SetupIconArea(spItem, m_pInvArea[iSourceOrder]);
+		--spItem->iCount;
+		ShowItemCount(spItem, iSourceOrder);
 		m_pUpgradeMaterialSlots[iOrder] = pNew;
 		m_iUpgradeScrollSlotInvPos[iOrder] = iSourceOrder;
 
