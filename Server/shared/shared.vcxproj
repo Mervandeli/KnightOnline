@@ -73,6 +73,13 @@
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;VC_EXTRALEAN;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
+    <PreBuildEvent>
+      <Command>
+        if exist "$(ProjectDir)server_config.h.default" if not exist "$(ProjectDir)server_config.h" (
+          copy /Y "$(ProjectDir)server_config.h.default" "$(ProjectDir)server_config.h"
+        )
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -159,6 +166,7 @@
     <ClInclude Include="lzf.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="packets.h" />
+    <ClInclude Include="server_config.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="STLMap.h" />
     <ClInclude Include="StringConversion.h" />

@@ -8,6 +8,10 @@
 	1. #define AI_SOCKET_PORT	10020 -> 11020으로 수정됨..
 */
 
+constexpr int USER_DAMAGE_OVERRIDE_GM			= 30'000;
+constexpr int USER_DAMAGE_OVERRIDE_LIMITED_GM	= 0;
+constexpr int USER_DAMAGE_OVERRIDE_TEST_MODE	= 10'000;
+
 //
 //	MAX VALUE DEFINE
 //
@@ -117,8 +121,8 @@ struct _NpcPosition
 
 struct _NpcMovePosition
 {
-	BOOL bX;				// x (true +, flase -)
-	BOOL bZ;				// z (true +, flase -)
+	bool bX;				// x (true +, flase -)
+	bool bZ;				// z (true +, flase -)
 	float fMovePos;
 	float fAddPos;
 	float fAdd_ZPos;

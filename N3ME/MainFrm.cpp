@@ -290,13 +290,21 @@ void CMainFrame::OnDestroy()
 {
 	CFrameWnd::OnDestroy();
 
-	if (m_pDTexGroupMng){ m_pDTexGroupMng->Release(); delete m_pDTexGroupMng; m_pDTexGroupMng = nullptr;}
-	if (m_pDTexMng){ m_pDTexMng->Release(); delete m_pDTexMng; m_pDTexMng = nullptr;}
-	if (m_pMapMng) { m_pMapMng->Release(); delete m_pMapMng; m_pMapMng = nullptr;}
-	if (m_pEng){ m_pEng->Release(); delete m_pEng; m_pEng = nullptr;}	
-	if (m_pDlgSowSeed){ delete m_pDlgSowSeed; m_pDlgSowSeed = nullptr;}
-}
+	delete m_pDTexGroupMng;
+	m_pDTexGroupMng = nullptr;
 
+	delete m_pDTexMng;
+	m_pDTexMng = nullptr;
+
+	delete m_pMapMng;
+	m_pMapMng = nullptr;
+
+	delete m_pDlgSowSeed;
+	m_pDlgSowSeed = nullptr;
+
+	delete m_pEng;
+	m_pEng = nullptr;
+}
 
 void CMainFrame::OnFileExport() 
 {

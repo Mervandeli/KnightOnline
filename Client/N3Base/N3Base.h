@@ -133,8 +133,11 @@ struct __Options
 	int iViewDist;
 	int iEffectSndDist;			// 이펙트 사운드 거리
 
-	bool bSndEnable;		// 0 - High, 1 - Low
+	bool bSndEnable;
+	bool bSndBgmEnable;
+	bool bSndEffectEnable;
 	bool bSndDuplicated;	// 중복된 음원 사용
+
 	bool bWindowCursor;		// 0 - 게임에서 그려주는 커서 1 - 윈도우 커서 사용
 	bool bWindowMode;
 
@@ -152,6 +155,8 @@ struct __Options
 		iViewDist = 512;
 		iEffectSndDist = 48;
 		bSndEnable = false;
+		bSndBgmEnable = false;
+		bSndEffectEnable = false;
 		bSndDuplicated = false;
 		bWindowCursor = true;
 		bWindowMode = false;

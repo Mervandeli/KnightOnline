@@ -123,7 +123,6 @@ CMapMng::CMapMng(CMainFrame* pMainFrm)
 // 파괴자
 CMapMng::~CMapMng()
 {
-	Release();
 	if (m_pSceneSource) {delete m_pSceneSource; m_pSceneSource = nullptr;}
 	if (m_pDlgSourceList) {m_pDlgSourceList->DestroyWindow(); delete m_pDlgSourceList; m_pDlgSourceList = nullptr;}
 	if (m_pDlgOutputList) {m_pDlgOutputList->DestroyWindow(); delete m_pDlgOutputList; m_pDlgOutputList = nullptr;}	

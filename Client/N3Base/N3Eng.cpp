@@ -111,10 +111,10 @@ void CN3Eng::SetViewPort(RECT& rc)
 	memcpy(&s_CameraData.vp, &vp, sizeof(D3DVIEWPORT9));
 }
 
-//-----------------------------------------------------------------------------
 void CN3Eng::SetDefaultEnvironment()
 {
-	__Matrix44 matWorld; matWorld.Identity();
+	__Matrix44 matWorld;
+	matWorld.Identity();
 
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &matWorld);
 	s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
@@ -131,12 +131,22 @@ void CN3Eng::SetDefaultEnvironment()
 
 	float fMipMapLODBias = -1.0f;
 
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < 8; ++i)
+	{
 		s_lpD3DDev->SetTexture(i, nullptr);
 		s_lpD3DDev->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 		s_lpD3DDev->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 		s_lpD3DDev->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-		s_lpD3DDev->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((LPDWORD)(&fMipMapLODBias)));
+		s_lpD3DDev->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((LPDWORD) (&fMipMapLODBias)));
+	}
+
+	// 기본 라이트 정보 지정..
+	for (int i = 0; i < 8; i++)
+	{
+		CN3Light::__Light Lgt;
+		_D3DCOLORVALUE LgtColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		Lgt.InitPoint(i, __Vector3(0, 0, 0), LgtColor);
+		s_lpD3DDev->SetLight(i, &Lgt);
 	}
 
 	D3DCLIPSTATUS9 cs;
@@ -145,7 +155,6 @@ void CN3Eng::SetDefaultEnvironment()
 	s_lpD3DDev->SetClipStatus(&cs);
 }
 
-//-----------------------------------------------------------------------------
 /*!
 Used to set the view matrix for DirectX
 */
@@ -411,15 +420,6 @@ bool CN3Eng::Init(
 	if(s_DevCaps.TextureCaps & D3DPTEXTURECAPS_SQUAREONLY) s_dwTextureCaps |= TEX_CAPS_SQUAREONLY;
 	if(s_DevCaps.TextureCaps & D3DPTEXTURECAPS_MIPMAP) s_dwTextureCaps |= TEX_CAPS_MIPMAP;
 	if(s_DevCaps.TextureCaps & D3DPTEXTURECAPS_POW2) s_dwTextureCaps |= TEX_CAPS_POW2;
-
-	// 기본 라이트 정보 지정..
-	for(int i = 0; i < 8; i++)
-	{
-		CN3Light::__Light Lgt;
-		_D3DCOLORVALUE LgtColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		Lgt.InitPoint(i, __Vector3(0,0,0), LgtColor);
-		s_lpD3DDev->SetLight(i, &Lgt);
-	}
 
 	// 기본 뷰와 프로젝션 설정.
 	this->LookAt(__Vector3(5,5,-10), __Vector3(0,0,0), __Vector3(0,1,0));

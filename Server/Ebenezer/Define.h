@@ -40,35 +40,123 @@ constexpr int MAX_CURRENT_EVENT		= 20;
 // logic관련 define
 enum e_LogicCheck
 {
-	LOGIC_CHECK_UNDER_WEIGHT		= 0x01,
-	LOGIC_CHECK_OVER_WEIGHT			= 0x02,
-	LOGIC_CHECK_SKILL_POINT			= 0x03,
-	LOGIC_EXIST_ITEM				= 0x04,
-	LOGIC_CHECK_CLASS				= 0x05,
-	LOGIC_CHECK_WEIGHT				= 0x06,
-	LOGIC_CHECK_EDITBOX				= 0x07,
-	LOGIC_RAND						= 0x08,
-	LOGIC_HOWMUCH_ITEM				= 0x09,
-	LOGIC_CHECK_LEVEL				= 0x0A,
-	LOGIC_NOEXIST_COM_EVENT			= 0x0B,
-	LOGIC_EXIST_COM_EVENT			= 0x0C,
-	LOGIC_CHECK_NOAH				= 0x0D
+	LOGIC_CHECK_NONE						= 0x00,
+	LOGIC_CHECK_UNDER_WEIGHT				= 0x01,
+	LOGIC_CHECK_OVER_WEIGHT					= 0x02,
+	LOGIC_CHECK_SKILL_POINT					= 0x03,
+	LOGIC_CHECK_EXIST_ITEM					= 0x04,
+	LOGIC_CHECK_CLASS						= 0x05,
+	LOGIC_CHECK_WEIGHT						= 0x06,
+	LOGIC_CHECK_EDITBOX						= 0x07,
+	LOGIC_RAND								= 0x08,
+	LOGIC_HOWMUCH_ITEM						= 0x09,
+	LOGIC_CHECK_LV 							= 0x0A,
+	LOGIC_NOEXIST_COM_EVENT					= 0x0B,
+	LOGIC_EXIST_COM_EVENT					= 0x0C,
+	LOGIC_CHECK_NOAH						= 0x0D,
+	LOGIC_CHECK_NATION						= 0x0E,
+	LOGIC_CHECK_PPCARD_SERIAL				= 0x0F,
+	LOGIC_CHECK_PPCARD_TYPE					= 0x10,
+	LOGIC_CHECK_EXIST_ITEM_AND				= 0x11,
+	LOGIC_CHECK_EXIST_ITEM_OR				= 0x12,
+	LOGIC_CHECK_NOEXIST_ITEM_AND			= 0x13,
+	LOGIC_CHECK_NOEXIST_ITEM_OR				= 0x14,
+	LOGIC_CHECK_EXIST_EVENT					= 0x15,
+	LOGIC_CHECK_NOEXIST_EVENT				= 0x16,
+	LOGIC_CHECK_PROMOTION_ELIGIBLE			= 0x17,
+	LOGIC_CHECK_EXCHANGE					= 0x18,
+	LOGIC_CHECK_NOEXIST_ITEM				= 0x19,
+	LOGIC_CHECK_ITEMCHANGE_NUM				= 0x1A,
+	LOGIC_CHECK_NOCLASS						= 0x1B,
+	LOGIC_CHECK_LOYALTY						= 0x1C,
+	LOGIC_CHECK_CHIEF						= 0x1D,
+	LOGIC_CHECK_NO_CHIEF					= 0x1E,
+	LOGIC_CHECK_CLAN_GRADE					= 0x1F,
+	LOGIC_CHECK_KNIGHT						= 0x20,
+	LOGIC_CHECK_DICE						= 0x21,
+	LOGIC_CHECK_CLAN						= 0x22,
+	LOGIC_CHECK_NO_CLAN						= 0x23,
+	LOGIC_CHECK_MANNER						= 0x24,
+	LOGIC_CHECK_MONSTER_CHALLENGE_TIME		= 0x25,
+	LOGIC_CHECK_MONSTER_CHALLENGE_USERCOUNT	= 0x26,
+	LOGIC_CHECK_CASTLE						= 0x27,
+	LOGIC_CHECK_NO_CASTLE					= 0x28,
+	LOGIC_CHECK_SKILL_TOTAL					= 0x29,
+	LOGIC_CHECK_STAT_TOTAL					= 0x2A,
+	LOGIC_CHECK_EMPTY_SLOT					= 0x2B,
+	LOGIC_CHECK_LOYALTY_RANK_MONTHLY		= 0x2C,
+	LOGIC_CHECK_LOYALTY_RANK				= 0x2D,
+	LOGIC_CHECK_CLAN_RANKING				= 0x2E,
+	LOGIC_CHECK_MIDDLE_STATUE_CAPTURE		= 0x2F,
+	LOGIC_CHECK_MIDDLE_STATUE_NOCAPTURE		= 0x30,
+	LOGIC_CHECK_INPUT_COUNT					= 0x31,
+	LOGIC_CHECK_EXIST_ITEM_INPUT_COUNT		= 0x32,
+	LOGIC_CHECK_WEIGHT_INPUT_COUNT			= 0x33,
+	LOGIC_CHECK_EXAM_COUNT					= 0x34,
+	LOGIC_CHECK_BEEF_ROAST_KARUS_VICTORY	= 0x35,
+	LOGIC_CHECK_BEEF_ROAST_ELMORAD_VICTORY	= 0x36,
+	LOGIC_CHECK_BEEF_ROAST_NO_VICTORY		= 0x37
 };
 
 // 실행관련 define
 enum e_Exec
 {
-	EXEC_SAY						= 0x01,
-	EXEC_SELECT_MSG					= 0x02,
-	EXEC_RUN_EVENT					= 0x03,
-	EXEC_GIVE_ITEM					= 0x04,
-	EXEC_ROB_ITEM					= 0x05,
-	EXEC_RETURN						= 0x06,
-	EXEC_OPEN_EDITBOX				= 0x07,
-	EXEC_GIVE_NOAH					= 0x08,
-	EXEC_LOG_COUPON_ITEM			= 0x09,
-	EXEC_SAVE_COM_EVENT				= 0x0A,
-	EXEC_ROB_NOAH					= 0x0B
+	EXEC_NONE								= 0x00,
+	EXEC_SAY								= 0x01,
+	EXEC_SELECT_MSG							= 0x02,
+	EXEC_RUN_EVENT							= 0x03,
+	EXEC_GIVE_ITEM							= 0x04,
+	EXEC_ROB_ITEM 							= 0x05,
+	EXEC_RETURN								= 0x06,
+	EXEC_OPEN_EDITBOX						= 0x07,
+	EXEC_GIVE_NOAH							= 0x08,
+	EXEC_LOG_COUPON_ITEM					= 0x09,
+	EXEC_SAVE_COM_EVENT						= 0x0A,
+	EXEC_ROB_NOAH							= 0x0B,
+	EXEC_REQUEST_REWARD						= 0x0C,
+	EXEC_GIVE_PPCARD_ITEM					= 0x0D,
+	EXEC_SAVE_EVENT							= 0x0E,
+	EXEC_PROMOTE_USER						= 0x0F,
+	EXEC_GIVE_PROMOTION_QUEST				= 0x10,
+	EXEC_RUN_EXCHANGE						= 0x11,
+	EXEC_KISS_USER							= 0x12,
+	EXEC_ZONE_CHANGE						= 0x13,
+	EXEC_PROMOTE_USER_NOVICE				= 0x14,
+	EXEC_SKILL_POINT_DISTRIBUTE				= 0x15,
+	EXEC_STAT_POINT_DISTRIBUTE				= 0x16,
+	EXEC_LEVEL_UP							= 0x17,
+	EXEC_EXP_CHANGE							= 0x18,
+	EXEC_DESTROY_ITEM						= 0x19,
+	EXEC_PROMOTE_KNIGHT						= 0x1A,
+	EXEC_CHANGE_POSITION					= 0x1B,
+	EXEC_ROLL_DICE							= 0x1C,
+	EXEC_ZONE_CHANGE_CLAN					= 0x1D,
+	EXEC_CHANGE_LOYALTY						= 0x1E,
+	EXEC_SKILL_POINT_FREE					= 0x1F,
+	EXEC_STAT_POINT_FREE					= 0x20,
+	EXEC_CHANGE_NAME						= 0x21,
+	EXEC_SEND_WEBPAGE_ADDRESS				= 0x22,
+	EXEC_ROB_ALLITEM_PARTY					= 0x23,
+	EXEC_ZONE_CHANGE_PARTY					= 0x24,
+	EXEC_STATE_CHANGE						= 0x25,
+	EXEC_EMIGRATION_ACCEPT					= 0x26,
+	EXEC_CHANGE_MANNER						= 0x27,
+	EXEC_SHOW_PCBANG_ITEM					= 0x28,
+	EXEC_CHECK_PCBANG_ITEM					= 0x29,
+	EXEC_GIVE_PCBANG_ITEM					= 0x3A,
+	EXEC_CHECK_PCBANG_OWNER					= 0x3B,
+	EXEC_REQUEST_PERSONAL_RANK_REWARD		= 0x3C,
+	EXEC_CHECK_KJWAR_ACCOUNT				= 0x3D,
+	EXEC_GIVE_KJWAR_ITEM					= 0x3E,
+	EXEC_CHECK_LOGTIME_ACCOUNT				= 0x3F,
+	EXEC_GIVE_LOGTIME_ITEM					= 0x40,
+	EXEC_MOVE_MIDDLE_STATUE					= 0x41,
+	EXEC_CHECK_OLYMPIC_ACCOUNT				= 0x42,
+	EXEC_LOG_OLYMPIC_ACCOUNT				= 0x43,
+	EXEC_OPEN_INPUT_COUNT					= 0x44,
+	EXEC_ROB_ITEM_INPUT_COUNT				= 0x45,
+	EXEC_GIVE_ITEM_INPUT_COUNT				= 0x46,
+	EXEC_ROB_EXAM							= 0x47
 };
 
 // EVENT 시작 번호들 :)
@@ -168,10 +256,11 @@ constexpr int BBS_CHECK_TIME		= 36000;
 // DEFINE Shared Memory Queue
 //////////////////////////////////////////////////////////////////
 
-#define E	0x00
-#define R	0x01
-#define W	0x02
-#define WR	0x03
+// TODO: Throw these away. They're too vague and contaminate things.
+constexpr uint8_t E		= 0x00;
+constexpr uint8_t R		= 0x01;
+constexpr uint8_t W		= 0x02;
+constexpr uint8_t WR	= 0x03;
 
 // DEFINE Shared Memory Queue Return VALUE
 
@@ -394,10 +483,10 @@ inline void SetVarString(char* tBuf, const char* sBuf, int len, int& index)
 }
 
 // ~sungyong 2001.11.06
-inline int ParseSpace(char* tBuf, char* sBuf)
+inline int ParseSpace(char* tBuf, const char* sBuf)
 {
 	int i = 0, index = 0;
-	BOOL flag = FALSE;
+	bool flag = false;
 
 	while (sBuf[index] == ' '
 		|| sBuf[index] == '\t')
@@ -408,7 +497,7 @@ inline int ParseSpace(char* tBuf, char* sBuf)
 		&& sBuf[index] != (BYTE) 0)
 	{
 		tBuf[i++] = sBuf[index++];
-		flag = TRUE;
+		flag = true;
 	}
 
 	tBuf[i] = 0;
@@ -462,7 +551,7 @@ inline int myrand(int min, int max)
 inline float TimeGet()
 {
 	static bool bInit = false;
-	static bool bUseHWTimer = FALSE;
+	static bool bUseHWTimer = false;
 	static LARGE_INTEGER nTime, nFrequency;
 
 	if (!bInit)
@@ -470,11 +559,11 @@ inline float TimeGet()
 		if (::QueryPerformanceCounter(&nTime))
 		{
 			::QueryPerformanceFrequency(&nFrequency);
-			bUseHWTimer = TRUE;
+			bUseHWTimer = true;
 		}
 		else
 		{
-			bUseHWTimer = FALSE;
+			bUseHWTimer = false;
 		}
 
 		bInit = true;

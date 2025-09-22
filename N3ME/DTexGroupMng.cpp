@@ -32,7 +32,15 @@ CDTexGroupMng::CDTexGroupMng()
 
 CDTexGroupMng::~CDTexGroupMng()
 {
-	Release();
+	if (m_pGroupView != nullptr)
+	{
+		m_pGroupView->DestroyWindow();
+		delete m_pGroupView;
+		m_pGroupView = nullptr;
+	}
+
+	for (CDTexGroup* pDTG : m_Groups)
+		delete pDTG;
 }
 
 

@@ -32,7 +32,7 @@ EVENT::~EVENT()
 	DeleteAll();
 }
 
-BOOL EVENT::LoadEvent(int zone)
+bool EVENT::LoadEvent(int zone)
 {
 	DWORD		length, count;
 	CString		filename;
@@ -53,8 +53,9 @@ BOOL EVENT::LoadEvent(int zone)
 	evtPath /= QUESTS_DIR;
 	evtPath /= std::to_wstring(zone) + L".evt";
 
+	// Doesn't exist but this isn't a problem; we don't expect it to exist.
 	if (!std::filesystem::exists(evtPath))
-		return TRUE;
+		return true;
 
 	// Resolve it to strip the relative references to be nice.
 	// NOTE: Requires the file to exist.
@@ -65,26 +66,33 @@ BOOL EVENT::LoadEvent(int zone)
 	m_Zone = zone;
 
 	if (!pFile.Open(filename, CFile::modeRead))
-		return FALSE;
+		return false;
+
+	std::wstring filenameWide = evtPath.wstring();
 
 	length = static_cast<DWORD>(pFile.GetLength());
 
 	CArchive in(&pFile, CArchive::load);
-
+	int lineNumber = 0;
 	count = 0;
 
 	while (count < length)
 	{
-		in >> byte;	count ++;
+		in >> byte;
+		++count;
 
 		if ((char) byte != '\r'
 			&& (char) byte != '\n')
 			buf[index++] = byte;
 
-		if (((char) byte == '\n'
+		if ((char) byte == '\n'
 			|| count == length)
-			&& index > 1)
 		{
+			++lineNumber;
+
+			if (index <= 1)
+				continue;
+
 			buf[index] = (BYTE) 0;
 
 			t_index = 0;
@@ -99,8 +107,8 @@ BOOL EVENT::LoadEvent(int zone)
 
 			t_index += ParseSpace(first, buf + t_index);
 
-//			if (!strcmp( first, "QUEST"))
-			if (!strcmp(first, "EVENT"))
+//			if (0 == strcmp(first, "QUEST"))
+			if (0 == strcmp(first, "EVENT"))
 			{
 				t_index += ParseSpace(temp, buf + t_index);
 				event_num = atoi(temp);
@@ -126,32 +134,37 @@ BOOL EVENT::LoadEvent(int zone)
 				}
 				newData = m_arEvent.GetData(event_num);
 			}
-			else if (!strcmp(first, "E"))
+			else if (0 == strcmp(first, "E"))
 			{
 				if (newData == nullptr)
 					goto cancel_event_load;
 
 				EXEC* newExec = new EXEC;
-				newExec->Parse(buf + t_index);
+				newExec->Parse(buf + t_index, filenameWide, lineNumber);
 				newData->m_arExec.push_back(newExec);
 			}
-			else if (!strcmp(first, "A"))
+			else if (0 == strcmp(first, "A"))
 			{
 				if (newData == nullptr)
 					goto cancel_event_load;
 
 				LOGIC_ELSE* newLogicElse = new LOGIC_ELSE;
-				newLogicElse->Parse_and(buf + t_index);
+				newLogicElse->Parse_and(buf + t_index, filenameWide, lineNumber);
 				newData->m_arLogicElse.push_back(newLogicElse);
 			}
-			else if (!strcmp(first, "END"))
+			else if (0 == strcmp(first, "END"))
 			{
 				if (newData == nullptr)
 					goto cancel_event_load;
 
 				newData = nullptr;
 			}
-
+			else if (isalnum(first[0]))
+			{
+				spdlog::warn(
+					"EVENT::LoadEvent({}): unhandled opcode '{}' ({}:{})",
+					zone, first, WideToUtf8(filenameWide), lineNumber);
+			}
 			index = 0;
 		}
 	}
@@ -159,7 +172,7 @@ BOOL EVENT::LoadEvent(int zone)
 	in.Close();
 	pFile.Close();
 
-	return TRUE;
+	return true;
 
 cancel_event_load:
 	CString str;
@@ -168,7 +181,7 @@ cancel_event_load:
 	in.Close();
 	pFile.Close();
 	DeleteAll();
-	return FALSE;
+	return false;
 }
 
 void EVENT::Init()

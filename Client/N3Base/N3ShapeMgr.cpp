@@ -12,6 +12,8 @@
 #include "N3ShapeExtra.h"
 #endif // end of #ifndef _3DSERVER
 
+#include <shared/globals.h>
+
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -152,21 +154,20 @@ bool CN3ShapeMgr::Load(HANDLE hFile)
 			if (pShape->m_iEventID != 0)
 			{
 				m_ShapesHaveID.push_back(pShape);
-				pShape->MakeCollisionMeshByParts(); // 현재 모습 그대로... 충돌 메시를 만든다...
+				pShape->MakeCollisionMeshByPartsDetail(); // 현재 모습 그대로... 충돌 메시를 만든다...
 
 				//TRACE(_T("  Load OBject Event : ID(%d) Type(%d) CtrlID(%d) Status(%d)\n"),
 					//pShape->m_iEventID, pShape->m_iEventType, pShape->m_iNPC_ID, pShape->m_iNPC_Status);
 
 				switch (pShape->m_iEventType)
 				{
-					case 1: // 좌우열림성문,
-					case 2: // 상하열림성문
-					case 3: // 상하 레버
-						pShape->m_bVisible = false;
+					case OBJECT_TYPE_BIND: // 좌우열림성문,
+					case OBJECT_TYPE_WARP_GATE:
+						pShape->m_bVisible = true;
 						break;
 
 					default:
-						pShape->m_bVisible = true;
+						pShape->m_bVisible = false;
 				}
 			}
 
@@ -222,7 +223,7 @@ bool CN3ShapeMgr::LoadCollisionData(HANDLE hFile)
 #endif
 
 	// Cell Data 쓰기.
-	BOOL bExist = FALSE;
+	int iExist = 0;
 	int z = 0;
 	for (float fZ = 0.0f; fZ < m_fMapLength; fZ += CELL_MAIN_SIZE, z++)
 	{
@@ -231,9 +232,9 @@ bool CN3ShapeMgr::LoadCollisionData(HANDLE hFile)
 		{
 			delete m_pCells[x][z]; m_pCells[x][z] = nullptr;
 
-			ReadFile(hFile, &bExist, 4, &dwRWC, nullptr); // 데이터가 있는 셀인지 쓰고..
+			ReadFile(hFile, &iExist, 4, &dwRWC, nullptr); // 데이터가 있는 셀인지 쓰고..
 
-			if (!bExist)
+			if (iExist == 0)
 				continue;
 
 			m_pCells[x][z] = new __CellMain;
@@ -294,12 +295,12 @@ bool CN3ShapeMgr::SaveCollisionData(HANDLE hFile)
 		int x = 0;
 		for (float fX = 0.0f; fX < m_fMapWidth; fX += CELL_MAIN_SIZE, x++)
 		{
-			BOOL bExist = FALSE;
+			int iExist = 0;
 			if (m_pCells[x][z] != nullptr)
-				bExist = TRUE;
+				iExist = 1;
 
 			// 데이터가 있는 셀인지 쓰고..
-			WriteFile(hFile, &bExist, 4, &dwRWC, nullptr);
+			WriteFile(hFile, &iExist, 4, &dwRWC, nullptr);
 
 			if (m_pCells[x][z] != nullptr)
 				m_pCells[x][z]->Save(hFile);

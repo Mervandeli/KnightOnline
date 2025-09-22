@@ -110,9 +110,9 @@ bool CUICharacterCreate::Load(HANDLE hFile)
 	uint32_t dwResrcIDs[MAX_STATS] = { IDS_NEWCHR_POW, IDS_NEWCHR_STA, IDS_NEWCHR_DEX, IDS_NEWCHR_INT, IDS_NEWCHR_MAP };
 	for(int i = 0; i < MAX_STATS; i++)
 	{
-		N3_VERIFY_UI_COMPONENT(m_pStr_Stats[i],		GetChildByID<CN3UIString>(szTexts[i]));
-		N3_VERIFY_UI_COMPONENT(m_pArea_Stats[i],	GetChildByID<CN3UIArea>(szAreas[i]));
-		N3_VERIFY_UI_COMPONENT(m_pImg_Stats[i],		GetChildByID<CN3UIImage>(szImgs[i]));
+		N3_VERIFY_UI_COMPONENT(m_pStr_Stats[i],			GetChildByID<CN3UIString>(szTexts[i]));
+		N3_VERIFY_UI_COMPONENT(m_pArea_Stats[i],		GetChildByID<CN3UIArea>(szAreas[i]));
+		N3_VERIFY_UI_COMPONENT(m_pStr_Stat_Labels[i],	GetChildByID<CN3UIString>(szImgs[i]));
 
 		if (m_pArea_Stats[i] != nullptr)
 			m_pArea_Stats[i]->SetTooltipText(fmt::format_text_resource(dwResrcIDs[i]));
@@ -471,11 +471,15 @@ void CUICharacterCreate::UpdateStats()
 
 	for (int i = 0; i < MAX_STATS; i++)
 	{
-		if (m_pImg_Stats[i]) m_pImg_Stats[i]->SetVisible(false);
-		if (m_pStr_Stats[i]) m_pStr_Stats[i]->SetStringAsInt(iStats[i]);
+		if (m_pStr_Stat_Labels[i] != nullptr)
+			m_pStr_Stat_Labels[i]->SetVisible(false);
+
+		if (m_pStr_Stats[i] != nullptr)
+			m_pStr_Stats[i]->SetStringAsInt(iStats[i]);
 	}
 
-	if (m_pStr_Bonus) m_pStr_Bonus->SetStringAsInt(m_iBonusPoint);
+	if (m_pStr_Bonus != nullptr)
+		m_pStr_Bonus->SetStringAsInt(m_iBonusPoint);
 }
 
 uint32_t CUICharacterCreate::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld)
@@ -625,11 +629,16 @@ void CUICharacterCreate::UpdateClassButtons(e_Class eClass)
 		bVisibles[3] = true; // 지능
 		break;
 	}
-	
-	for(int i = 0; i < MAX_CLASS_SELECT; i++)
-		if(m_pBtn_Classes[i]) m_pBtn_Classes[i]->SetState(eUIStates[i]);
 
-	for(int i = 0; i < MAX_STATS; i++) 
-		if(m_pImg_Stats[i]) m_pImg_Stats[i]->SetVisible(bVisibles[i]);
+	for (int i = 0; i < MAX_CLASS_SELECT; i++)
+	{
+		if (m_pBtn_Classes[i] != nullptr)
+			m_pBtn_Classes[i]->SetState(eUIStates[i]);
+	}
+
+	for (int i = 0; i < MAX_STATS; i++)
+	{
+		if (m_pStr_Stat_Labels[i] != nullptr)
+			m_pStr_Stat_Labels[i]->SetVisible(bVisibles[i]);
+	}
 }
- 

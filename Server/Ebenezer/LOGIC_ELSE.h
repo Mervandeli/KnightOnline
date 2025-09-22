@@ -12,11 +12,10 @@
 class LOGIC_ELSE
 {
 public:
-	void Parse_and(char* pBuf);
-	void Parse_or(char* pBuf);
+	void Parse_and(const char* line, const std::wstring& filename, int lineNumber);
 	void Init();
 	BYTE m_LogicElse;
-	BOOL m_bAnd;
+	bool m_bAnd;
 	int m_LogicElseInt[MAX_LOGIC_ELSE_INT];
 
 	LOGIC_ELSE();

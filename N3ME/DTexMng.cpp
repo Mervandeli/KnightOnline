@@ -32,7 +32,9 @@ CDTexMng::CDTexMng()
 
 CDTexMng::~CDTexMng()
 {
-	Release();
+	for (CDTex* pDTex : m_pDTex)
+		delete pDTex;
+	m_pDTex.clear();
 }
 
 
@@ -41,17 +43,8 @@ CDTexMng::~CDTexMng()
 //
 void CDTexMng::Release()
 {
-	it_DTex it = m_pDTex.begin();
-	while(it!=m_pDTex.end())
-	{
-		CDTex* pTmpDTex = (*it);
-		if(pTmpDTex)
-		{
-			pTmpDTex->Release();
-			delete pTmpDTex;
-		}
-		it = m_pDTex.erase(it);
-	}
+	for (CDTex* pDTex : m_pDTex)
+		delete pDTex;
 	m_pDTex.clear();
 }
 

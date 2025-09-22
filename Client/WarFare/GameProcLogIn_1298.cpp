@@ -112,12 +112,25 @@ void CGameProcLogIn_1298::Init()
 	if (iServer >= 0
 		&& lstrlen(szIPs[iServer]) > 0)
 	{
+		const char* ip = szIPs[iServer];
+		int port = SOCKET_PORT_LOGIN;
+
 		s_bNeedReportConnectionClosed = false; // Should I report that the server connection was lost?
-		int iErr = s_pSocket->Connect(s_hWndBase, szIPs[iServer], SOCKET_PORT_LOGIN);
-		s_bNeedReportConnectionClosed = true; // Should I report that the server connection was lost?
+		int iErr = s_pSocket->Connect(s_hWndBase, ip, port);
+		s_bNeedReportConnectionClosed = true;
 
 		if (iErr != 0)
+		{
+#if defined(_DEBUG)
+			std::string errorMessage = fmt::format(
+				"{}:{} (errorCode: {})\n"
+				"From config: Server.ini (client)",
+				ip, port, iErr);
+			MessageBoxPost(errorMessage, "Failed to connect to login server", MB_OK, BEHAVIOR_EXIT);
+#else
 			ReportServerConnectionFailed("LogIn Server", iErr, true);
+#endif
+		}
 		else
 		{
 			m_pUILogIn->FocusToID(); // Focus on the ID input box..
@@ -249,14 +262,6 @@ void CGameProcLogIn_1298::MsgRecv_News(Packet& pkt)
 	// read content
 	std::string strContent;
 	pkt.readString(strContent, wSize);
-
-	/* //to trace bytes
-	for (size_t i = 0; i < strContent.size(); i++)
-	{
-		TRACE("[%03d] %02X (%c)\n", (int) i, (unsigned char) strContent[i],
-			isprint(strContent[i]) ? strContent[i] : '.');
-	}
-	*/
 
 	m_pUILogIn->AddNews(strContent);
 }
@@ -462,13 +467,25 @@ void CGameProcLogIn_1298::ConnectToGameServer() // 고른 게임 서버에 접�
 	if (!m_pUILogIn->ServerInfoGetCur(GSI))
 		return; // 서버를 고른다음..
 
+	const char* ip = GSI.szIP.c_str();
+	int port = SOCKET_PORT_GAME;
+
 	s_bNeedReportConnectionClosed = false; // 서버접속이 끊어진걸 보고해야 하는지..
-	int iErr = s_pSocket->Connect(s_hWndBase, GSI.szIP.c_str(), SOCKET_PORT_GAME); // 게임서버 소켓 연결
+	int iErr = s_pSocket->Connect(s_hWndBase, ip, port); // 게임서버 소켓 연결
 	s_bNeedReportConnectionClosed = true; // 서버접속이 끊어진걸 보고해야 하는지..
 
 	if (iErr != 0)
 	{
+#if defined(_DEBUG)
+		std::string errorMessage = fmt::format(
+			"{}:{} (errorCode: {})\n"
+			"From config: Version.ini (server)",
+			ip, port, iErr);
+		MessageBoxPost(errorMessage, "Failed to connect to game server", MB_OK);
+#else
 		ReportServerConnectionFailed(GSI.szName, iErr, false);
+#endif
+
 		m_pUILogIn->ConnectButtonSetEnable(true);
 	}
 	else

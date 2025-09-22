@@ -48,8 +48,8 @@ public:
 
 	CVersionManagerDlg(CWnd* parent = nullptr);	// standard constructor
 	~CVersionManagerDlg();
-	BOOL GetInfoFromIni();
-	BOOL LoadVersionList();
+	bool GetInfoFromIni();
+	bool LoadVersionList();
 
 	/// \brief adds a message to the application's output box and updates scrollbar position
 	/// \see _outputList
@@ -80,11 +80,7 @@ protected:
 public:
 	void ReportTableLoadError(const recordset_loader::Error& err, const char* source);
 
-	/// \brief clears the OutputList text area and regenerates default output
-	/// \see _outputList
-	void ResetOutputList();
-
-	// \brief updates the last/latest version and resets the output list
+	// \brief updates the last/latest version
 	void SetLastVersion(int lastVersion);
 
 protected:

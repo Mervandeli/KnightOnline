@@ -35,6 +35,8 @@
 #include "define.h"			// define
 //#include "extern.h"			// 전역 객체
 
+#include <shared/server_config.h>
+
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 

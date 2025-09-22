@@ -121,9 +121,7 @@ void CGameProcedure::Init()
 	s_pUIMgr->SetFocusedUI(nullptr);
 }
 
-void CGameProcedure::StaticMemberInit(
-	HINSTANCE hInstance,
-	HWND hWndMain)
+void CGameProcedure::StaticMemberInit(HINSTANCE hInstance, HWND hWndMain)
 {
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// 게임 기본 3D 엔진 만들기..

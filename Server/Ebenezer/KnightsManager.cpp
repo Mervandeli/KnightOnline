@@ -190,15 +190,15 @@ fail_return:
 	pUser->Send(send_buff, send_index);
 }
 
-BOOL CKnightsManager::IsAvailableName(const char* strname)
+bool CKnightsManager::IsAvailableName(const char* strname) const
 {
 	for (const auto& [_, pKnights] : m_pMain->m_KnightsMap)
 	{
 		if (_strnicmp(pKnights->m_strName, strname, MAX_ID_SIZE) == 0)
-			return FALSE;
+			return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 int CKnightsManager::GetKnightsIndex(int nation)
@@ -700,7 +700,7 @@ void CKnightsManager::AllKnightsList(CUser* pUser, char* pBuf)
 
 void CKnightsManager::AllKnightsMember(CUser* pUser, char* pBuf)
 {
-	int index = 0, send_index = 0, page = 0, ret_value = 0, temp_index = 0, count = 0, pktsize = 0;
+	int index = 0, send_index = 0, page = 0, ret_value = 0, temp_index = 0, count = 0, onlineCount = 0, pktsize = 0;
 	char send_buff[4096] = {};
 	char temp_buff[4096] = {};
 	CKnights* pKnights = nullptr;
@@ -734,24 +734,24 @@ void CKnightsManager::AllKnightsMember(CUser* pUser, char* pBuf)
 		return;
 	}*/
 
+	onlineCount = m_pMain->GetKnightsAllMembers(pUser->m_pUserData->m_bKnights, temp_buff, temp_index, 0);
+
 	// 직접.. 게임서버에서 유저정보를 참조해서 불러오는 방식 (단장이 아닌 모든 사람)
 	if (pUser->m_pUserData->m_bFame == CHIEF)
-	{
 		count = m_pMain->GetKnightsAllMembers(pUser->m_pUserData->m_bKnights, temp_buff, temp_index, 1);
-	}
 	else
-	{
-		count = m_pMain->GetKnightsAllMembers(pUser->m_pUserData->m_bKnights, temp_buff, temp_index, 0);
-	}
+		count = onlineCount;
 
 	pktsize = temp_index + 4;
-	if (count > 24)
+	if (count > MAX_CLAN)
 		return;
 
 	SetByte(send_buff, WIZ_KNIGHTS_PROCESS, send_index);
 	SetByte(send_buff, KNIGHTS_MEMBER_REQ, send_index);
 	SetByte(send_buff, 0x01, send_index);
 	SetShort(send_buff, pktsize, send_index);
+	SetShort(send_buff, onlineCount, send_index);
+	SetShort(send_buff, pKnights->m_sMembers, send_index);
 	SetShort(send_buff, count, send_index);
 	SetString(send_buff, temp_buff, temp_index, send_index);
 	pUser->Send(send_buff, send_index);
@@ -1405,14 +1405,14 @@ void CKnightsManager::RecvKnightsList(char* pBuf)
 	}
 }
 
-BOOL CKnightsManager::AddKnightsUser(int knightsId, const char* charId)
+bool CKnightsManager::AddKnightsUser(int knightsId, const char* charId)
 {
 	CKnights* pKnights = m_pMain->m_KnightsMap.GetData(knightsId);
 	if (pKnights == nullptr)
 	{
 		spdlog::error("KnightsManager::AddKnightsUser: knightsId={} not found",
 			knightsId);
-		return FALSE;
+		return false;
 	}
 
 	for (int i = 0; i < MAX_CLAN; i++)
@@ -1423,21 +1423,21 @@ BOOL CKnightsManager::AddKnightsUser(int knightsId, const char* charId)
 		pKnights->m_arKnightsUser[i].byUsed = 1;
 		strcpy(pKnights->m_arKnightsUser[i].strUserName, charId);
 		//TRACE(_T("+++ AddKnightsUser knightsindex : username=%hs, knightsindex=%d, i=%d \n"), UserName, index, i);
-		return TRUE;
+		return true;
 	}
 
 	//TRACE(_T("#### AddKnightsUser user full : username=%hs, knightsindex=%d ####\n"), UserName, index);
-	return FALSE;
+	return false;
 }
 
-BOOL CKnightsManager::ModifyKnightsUser(int knightsId, const char* charId)
+bool CKnightsManager::ModifyKnightsUser(int knightsId, const char* charId)
 {
 	CKnights* pKnights = m_pMain->m_KnightsMap.GetData(knightsId);
 	if (pKnights == nullptr)
 	{
 		spdlog::error("KnightsManager::ModifyKnightsUser: knightsId={} not found",
 			knightsId);
-		return FALSE;
+		return false;
 	}
 
 	for (int i = 0; i < MAX_CLAN; i++)
@@ -1449,22 +1449,22 @@ BOOL CKnightsManager::ModifyKnightsUser(int knightsId, const char* charId)
 		{
 			pKnights->m_arKnightsUser[i].byUsed = 1;
 			strcpy(pKnights->m_arKnightsUser[i].strUserName, charId);
-			return TRUE;
+			return true;
 		}
 	}
 
 	//TRACE(_T("#### ModifyKnightsUser user full : username=%hs, knightsindex=%d ####\n"), UserName, index);
-	return FALSE;
+	return false;
 }
 
-BOOL CKnightsManager::RemoveKnightsUser(int knightsId, const char* charId)
+bool CKnightsManager::RemoveKnightsUser(int knightsId, const char* charId)
 {
 	CKnights* pKnights = m_pMain->m_KnightsMap.GetData(knightsId);
 	if (pKnights == nullptr)
 	{
 		spdlog::error("KnightsManager::RemoveKnightsUser: knightsId={} not found",
 			knightsId);
-		return FALSE;
+		return false;
 	}
 
 	for (int i = 0; i < MAX_CLAN; i++)
@@ -1477,12 +1477,12 @@ BOOL CKnightsManager::RemoveKnightsUser(int knightsId, const char* charId)
 			pKnights->m_arKnightsUser[i].byUsed = 0;
 			strcpy(pKnights->m_arKnightsUser[i].strUserName, "");
 			//TRACE(_T("---> RemoveKnightsUser knightsindex : username=%hs, knightsindex=%d, i=%d \n"), UserName, index, i);
-			return TRUE;
+			return true;
 		}
 	}
 
 	//TRACE(_T("#### RemoveKnightsUser user full : username=%hs, knightsindex=%d ####\n"), UserName, index);
-	return FALSE;
+	return false;
 }
 
 void CKnightsManager::SetKnightsUser(int knightsId, const char* charId)

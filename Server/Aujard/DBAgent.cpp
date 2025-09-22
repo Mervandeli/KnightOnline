@@ -210,11 +210,17 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 		return false;
 	}
 	
+	std::string newCharId = charId;
+#if defined(DB_COMPAT_PADDED_NAMES)
+	rtrim(newCharId);
+#endif
+
 	// data successfully loaded from the database, copy to UserData record
-	if (strcpy_s(user->m_id, charId))
+	if (newCharId.length() > MAX_ID_SIZE
+		|| strcpy_s(user->m_id, newCharId.c_str()))
 	{
-		spdlog::error("DBAgent::LoadUserData(): failed to write charId(len: {}, val: {}) to user->m_id",
-			std::strlen(charId), charId);
+		spdlog::error("DBAgent::LoadUserData(): failed to write newCharId(len: {}, val: {}) to user->m_id",
+			newCharId.length(), newCharId);
 		return false;
 	}
 
@@ -254,7 +260,6 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 
 	spdlog::debug("DBAgent::LoadUserData: name={}, nation={}, zone={}, level={}, exp={}, money={}",
 		charId, Nation, Zone, Level, Exp, Gold);
-	
 
 	for (int i = 0; i < 9; i++)
 		user->m_bstrSkill[i] = skills.read<uint8_t>();
@@ -599,7 +604,9 @@ bool CDBAgent::LoadCharInfo(char* charId_, char* buff, int& buffIndex)
 {
 	// trim charId
 	std::string charId = charId_;
+#if defined(DB_COMPAT_PADDED_NAMES)
 	rtrim(charId);
+#endif
 
 	uint8_t Race = 0, HairColor = 0, Level = 0, Face = 0, Zone = 0;
 	int16_t Class = 0;
@@ -724,21 +731,30 @@ bool CDBAgent::GetAllCharID(const char* accountId, char* charId1_, char* charId2
 		return false;
 	}
 
-	if (strcpy_s(charId1_, MAX_ID_SIZE + 1, charId1.c_str()))
+#if defined(DB_COMPAT_PADDED_NAMES)
+	rtrim(charId1);
+	rtrim(charId2);
+	rtrim(charId3);
+#endif
+
+	if (charId1.length() > MAX_ID_SIZE
+		|| strcpy_s(charId1_, MAX_ID_SIZE + 1, charId1.c_str()))
 	{
 		spdlog::error("DBAgent::GetAllCharID: failed to write charId1(len: {}, val: {}) to charId1_",
 			charId1.length(), charId1);
 		return false;
 	}
 
-	if (strcpy_s(charId2_, MAX_ID_SIZE + 1, charId2.c_str()))
+	if (charId2.length() > MAX_ID_SIZE
+		|| strcpy_s(charId2_, MAX_ID_SIZE + 1, charId2.c_str()))
 	{
 		spdlog::error("DBAgent::GetAllCharID: failed to write charId2(len: {}, val: {}) to charId2_",
 			charId2.length(), charId2);
 		return false;
 	}
 
-	if (strcpy_s(charId3_, MAX_ID_SIZE + 1, charId3.c_str()))
+	if (charId3.length() > MAX_ID_SIZE
+		|| strcpy_s(charId3_, MAX_ID_SIZE + 1, charId3.c_str()))
 	{
 		spdlog::error("DBAgent::GetAllCharID: failed to write charId3(len: {}, val: {}) to charId3_",
 			charId3.length(), charId3);
@@ -847,7 +863,10 @@ int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int
 				uint8_t Level = result->get<uint8_t>(2);
 				int16_t Class = result->get<int16_t>(3);
 
+#if defined(DB_COMPAT_PADDED_NAMES)
 				rtrim(charId);
+#endif
+
 				SetString2(buffOut, charId.c_str(), static_cast<short>(charId.length()), tempIndex);
 				SetByte(buffOut, Fame, tempIndex);
 				SetByte(buffOut, Level, tempIndex);
@@ -878,6 +897,8 @@ int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int
 	{
 		spdlog::error("DBAgent::LoadKnightsAllMembers: No rows selected for knightsId={}", knightsId);
 	}
+
+	buffIndex = tempIndex;
 
 	// clamp result so that start doesn't send rowCount negative
 	return std::max(rowCount - start, 0);
@@ -1115,6 +1136,11 @@ bool CDBAgent::LoadKnightsInfo(int knightsId, char* buffOut, int& buffIndex)
 		}
 
 		model::Knights knights = recordSet.get();
+
+#if defined(DB_COMPAT_PADDED_NAMES)
+		rtrim(knights.Name);
+#endif
+
 		if (knights.Name.length() > MAX_ID_SIZE)
 		{
 			spdlog::error("DBAgent::LoadKnightsInfo: knights.Name(len: {}, val: {}) exceeds length",
@@ -1438,11 +1464,11 @@ bool CDBAgent::UpdateBattleEvent(const char* charId, int nation)
 }
 
 /* TODO: Proc does not exist
-BOOL CDBAgent::CheckCouponEvent(const char* accountId)
+bool CDBAgent::CheckCouponEvent(const char* accountId)
 {
 	SQLHSTMT		hstmt = nullptr;
 	SQLRETURN		retcode;
-	BOOL			bData = TRUE, retval = FALSE;
+	bool			retval = false;
 	TCHAR			szSQL[1024] = {};
 	SQLINTEGER		Indexind = SQL_NTS;
 	SQLSMALLINT		sRet = 0;
@@ -1453,13 +1479,13 @@ BOOL CDBAgent::CheckCouponEvent(const char* accountId)
 
 	retcode = SQLAllocHandle(SQL_HANDLE_STMT, accountConn1.m_hdbc, &hstmt);
 	if (retcode != SQL_SUCCESS)
-		return FALSE;
+		return false;
 
 	retcode = SQLBindParameter(hstmt, 1, SQL_PARAM_OUTPUT, SQL_C_SSHORT, SQL_SMALLINT, 0, 0, &sRet, 0, &Indexind);
 	if (retcode != SQL_SUCCESS)
 	{
 		SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-		return FALSE;
+		return false;
 	}
 
 	retcode = SQLExecDirect(hstmt, (SQLTCHAR*) szSQL, SQL_NTS);
@@ -1467,9 +1493,9 @@ BOOL CDBAgent::CheckCouponEvent(const char* accountId)
 		|| retcode == SQL_SUCCESS_WITH_INFO)
 	{
 		if (sRet == 0)
-			retval = TRUE;
+			retval = true;
 		else
-			retval = FALSE;
+			retval = false;
 	}
 	else
 	{
@@ -1479,11 +1505,11 @@ BOOL CDBAgent::CheckCouponEvent(const char* accountId)
 			if (!accountConn1.IsOpen())
 			{
 				ReconnectIfDisconnected(&accountConn1, _main->m_strAccountDSN, _main->m_strAccountUID, _main->m_strAccountPWD);
-				return FALSE;
+				return false;
 			}
 		}
 
-		retval = FALSE;
+		retval = false;
 	}
 
 	SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
@@ -1492,11 +1518,11 @@ BOOL CDBAgent::CheckCouponEvent(const char* accountId)
 }*/
 
 /*  TODO:  Proc does not exist
-BOOL CDBAgent::UpdateCouponEvent(const char* accountId, char* charId, char* cpid, int itemId, int count)
+bool CDBAgent::UpdateCouponEvent(const char* accountId, char* charId, char* cpid, int itemId, int count)
 {
 	SQLHSTMT		hstmt = nullptr;
 	SQLRETURN		retcode;
-	BOOL			bData = TRUE, retval = FALSE;
+	bool			retval = false;
 	TCHAR			szSQL[1024] = {};
 	SQLINTEGER		Indexind = SQL_NTS;
 	SQLSMALLINT		sRet = 0;
@@ -1507,15 +1533,15 @@ BOOL CDBAgent::UpdateCouponEvent(const char* accountId, char* charId, char* cpid
 
 	retcode = SQLAllocHandle(SQL_HANDLE_STMT, accountConn1.m_hdbc, &hstmt);
 	if (retcode != SQL_SUCCESS)
-		return FALSE;
+		return false;
 
 	retcode = SQLExecDirect(hstmt, (SQLTCHAR*) szSQL, SQL_NTS);
 	if (retcode == SQL_SUCCESS
 		|| retcode == SQL_SUCCESS_WITH_INFO)
 	{
-		retval = TRUE;
-		//if( sRet == 1 )	retval = TRUE;
-		//else retval = FALSE;
+		retval = true;
+		//if( sRet == 1 )	retval = true;
+		//else retval = false;
 	}
 	else
 	{
@@ -1525,11 +1551,11 @@ BOOL CDBAgent::UpdateCouponEvent(const char* accountId, char* charId, char* cpid
 			if (!accountConn1.IsOpen())
 			{
 				ReconnectIfDisconnected(&accountConn1, _main->m_strAccountDSN, _main->m_strAccountUID, _main->m_strAccountPWD);
-				return FALSE;
+				return false;
 			}
 		}
 
-		retval = FALSE;
+		retval = false;
 	}
 
 	SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
@@ -1538,7 +1564,7 @@ BOOL CDBAgent::UpdateCouponEvent(const char* accountId, char* charId, char* cpid
 */
 
 /* TODO: Proc doesn't exist
-BOOL CDBAgent::DeleteChar(int index, char* id, char* charId, char* socno)
+bool CDBAgent::DeleteChar(int index, char* id, char* charId, char* socno)
 {
 	SQLHSTMT		hstmt = nullptr;
 	SQLRETURN		retcode;
@@ -1566,12 +1592,12 @@ BOOL CDBAgent::DeleteChar(int index, char* id, char* charId, char* socno)
 					if (!gameConn1.IsOpen())
 					{
 						ReconnectIfDisconnected(&gameConn1, _main->m_strGameDSN, _main->m_strGameUID, _main->m_strGamePWD);
-						return FALSE;
+						return false;
 					}
 				}
 
 				SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-				return FALSE;
+				return false;
 			}
 
 			SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
@@ -1579,5 +1605,5 @@ BOOL CDBAgent::DeleteChar(int index, char* id, char* charId, char* socno)
 		}
 	}
 
-	return FALSE;
+	return false;
 }*/

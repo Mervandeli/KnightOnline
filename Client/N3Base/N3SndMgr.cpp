@@ -50,7 +50,19 @@ CN3SndObj* CN3SndMgr::CreateObj(int iID, e_SndType eType)
 
 CN3SndObj* CN3SndMgr::CreateObj(std::string szFN, e_SndType eType)
 {
-	if(!m_bSndEnable) return nullptr;
+	if (!m_bSndEnable)
+		return nullptr;
+
+	if (eType == SNDTYPE_STREAM)
+	{
+		if (!CN3Base::s_Options.bSndBgmEnable)
+			return nullptr;
+	}
+	else
+	{
+		if (!CN3Base::s_Options.bSndEffectEnable)
+			return nullptr;
+	}
 
 	if (!PreprocessFilename(szFN))
 		return nullptr;
@@ -86,6 +98,9 @@ CN3SndObj* CN3SndMgr::CreateObj(std::string szFN, e_SndType eType)
 
 CN3SndObjStream* CN3SndMgr::CreateStreamObj(std::string szFN)
 {
+	if (!CN3Base::s_Options.bSndBgmEnable)
+		return nullptr;
+
 	if (!PreprocessFilename(szFN))
 		return nullptr;
 
@@ -103,10 +118,11 @@ CN3SndObjStream* CN3SndMgr::CreateStreamObj(std::string szFN)
 
 CN3SndObjStream* CN3SndMgr::CreateStreamObj(int iID)
 {
-	TABLE_SOUND* pTbl = m_Tbl_Source.Find(iID);
-	if(pTbl==nullptr) return nullptr;
+	__TABLE_SOUND* pTbl = m_Tbl_Source.Find(iID);
+	if (pTbl == nullptr)
+		return nullptr;
 
-	return this->CreateStreamObj(pTbl->szFN);
+	return CreateStreamObj(pTbl->szFN);
 }
 
 void CN3SndMgr::ReleaseStreamObj(CN3SndObjStream** ppObj)
@@ -314,7 +330,11 @@ void CN3SndMgr::Release()
 // 대신 위치는 처음 한번밖에 지정할 수 없다.
 bool CN3SndMgr::PlayOnceAndRelease(int iSndID, const _D3DVECTOR* pPos)
 {
-	if(!m_bSndEnable) return false;
+	if (!m_bSndEnable)
+		return false;
+
+	if (!CN3Base::s_Options.bSndEffectEnable)
+		return false;
 
 	TABLE_SOUND* pTbl = m_Tbl_Source.Find(iSndID);
 	if(pTbl==nullptr || pTbl->szFN.empty()) return false;

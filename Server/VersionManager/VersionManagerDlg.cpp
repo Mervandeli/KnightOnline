@@ -89,19 +89,17 @@ BOOL CVersionManagerDlg::OnInitDialog()
 	for (int i = 0; i < MAX_USER; i++)
 		IocPort.m_SockArrayInActive[i] = new CUser(this);
 
-	if (!IocPort.Listen(_LISTEN_PORT))
-	{
-		AfxMessageBox(_T("FAIL TO CREATE LISTEN STATE"));
-		AfxPostQuitMessage(0);
-		return FALSE;
-	}
-
 	if (!GetInfoFromIni())
 	{
 		AfxMessageBox(_T("Ini File Info Error!!"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
+
+	// print the ODBC connection string
+	// TODO: modelUtil::DbType::ACCOUNT;  Currently all models are assigned to GAME
+	AddOutputMessage(
+		db::ConnectionManager::GetOdbcConnectionString(modelUtil::DbType::GAME));
 
 	if (!DbProcess.InitDatabase())
 	{
@@ -117,16 +115,24 @@ BOOL CVersionManagerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	ResetOutputList();
+	if (!IocPort.Listen(_LISTEN_PORT))
+	{
+		AfxMessageBox(_T("FAIL TO CREATE LISTEN STATE"));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
 
 	::ResumeThread(IocPort.m_hAcceptThread);
+
+	AddOutputMessage(fmt::format("Listening on 0.0.0.0:{}",
+		_LISTEN_PORT));
 
 	SetTimer(DB_POOL_CHECK, 60000, nullptr);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 }
 
-BOOL CVersionManagerDlg::GetInfoFromIni()
+bool CVersionManagerDlg::GetInfoFromIni()
 {
 	CString exePath = GetProgPath();
 	std::string exePathUtf8(CT2A(exePath, CP_UTF8));
@@ -162,16 +168,16 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 
 	if (strlen(_ftpUrl) == 0
 		|| strlen(_ftpPath) == 0)
-		return FALSE;
+		return false;
 
 	if (datasourceName.length() == 0
 		// TODO: Should we not validate UID/Pass length?  Would that allow Windows Auth?
 		|| datasourceUser.length() == 0
 		|| datasourcePass.length() == 0)
-		return FALSE;
+		return false;
 
 	if (serverCount <= 0)
-		return FALSE;
+		return false;
 
 	char key[20] = {};
 	ServerList.reserve(serverCount);
@@ -224,7 +230,7 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 		if (newsContent.size() > sizeof(News.Content))
 		{
 			AfxMessageBox(_T("News too long"));
-			return FALSE;
+			return false;
 		}
 
 		memcpy(&News.Content, newsContent.c_str(), newsContent.size());
@@ -236,25 +242,27 @@ BOOL CVersionManagerDlg::GetInfoFromIni()
 
 	spdlog::info("Version Manager initialized");
 
-	return TRUE;
+	return true;
 }
 
-BOOL CVersionManagerDlg::LoadVersionList()
+bool CVersionManagerDlg::LoadVersionList()
 {
 	VersionInfoList versionList;
 	if (!DbProcess.LoadVersionList(&versionList))
-		return FALSE;
+		return false;
 
-	_lastVersion = 0;
+	int lastVersion = 0;
 
 	for (const auto& [_, pInfo] : versionList)
 	{
-		if (_lastVersion < pInfo->Number)
-			_lastVersion = pInfo->Number;
+		if (lastVersion < pInfo->Number)
+			lastVersion = pInfo->Number;
 	}
 
+	SetLastVersion(lastVersion);
+
 	VersionList.Swap(versionList);
-	return TRUE;
+	return true;
 }
 
 void CVersionManagerDlg::OnTimer(UINT EventId)
@@ -352,27 +360,16 @@ void CVersionManagerDlg::ReportTableLoadError(const recordset_loader::Error& err
 	spdlog::error(error);
 }
 
-/// \brief clears the _outputList text area and regenerates default output
-/// \see _outputList
-void CVersionManagerDlg::ResetOutputList()
-{
-	_outputList.ResetContent();
-
-	// print the ODBC connection string
-	// TODO: modelUtil::DbType::ACCOUNT;  Currently all models are assigned to GAME
-	std::string odbcString = db::ConnectionManager::GetOdbcConnectionString(modelUtil::DbType::GAME);
-	AddOutputMessage(odbcString);
-
-	// print the current version
-	std::wstring version = std::format(L"Latest Version: {}", _lastVersion);
-	AddOutputMessage(version);
-}
-
 // \brief updates the last/latest version and resets the output list
 void CVersionManagerDlg::SetLastVersion(int lastVersion)
 {
+	if (lastVersion != _lastVersion)
+	{
+		AddOutputMessage(std::format(L"Latest Version: {}",
+			lastVersion));
+	}
+
 	_lastVersion = lastVersion;
-	ResetOutputList();
 }
 
 /// \brief adds a message to the application's output box and updates scrollbar position

@@ -16,7 +16,7 @@ public:
 	BYTE m_Exec;
 	int m_ExecInt[MAX_EXEC_INT];
 
-	void Parse(char* pBuf);
+	void Parse(const char* line, const std::wstring& filename, int lineNumber);
 	EXEC();
 	virtual ~EXEC();
 

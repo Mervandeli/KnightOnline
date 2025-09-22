@@ -29,7 +29,8 @@ CDTex::CDTex()
 
 CDTex::~CDTex()
 {
-	Release();
+	delete m_pTex;
+	m_pTex = nullptr;
 }
 
 

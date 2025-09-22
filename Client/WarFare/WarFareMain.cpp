@@ -96,7 +96,9 @@ int APIENTRY WinMain(
 	if(CN3Base::s_Options.iEffectSndDist > 48) CN3Base::s_Options.iEffectSndDist = 48;
 
 	// NOTE: is sound enabled?
-	CN3Base::s_Options.bSndEnable = ini.GetBool("Sound", "Enable", true);
+	CN3Base::s_Options.bSndBgmEnable = ini.GetBool("Sound", "Bgm", true);
+	CN3Base::s_Options.bSndEffectEnable = ini.GetBool("Sound", "Effect", true);
+	CN3Base::s_Options.bSndEnable = (CN3Base::s_Options.bSndBgmEnable || CN3Base::s_Options.bSndEffectEnable);
 
 	// NOTE: is sound duplicated?
 	CN3Base::s_Options.bSndDuplicated = ini.GetBool("Sound", "Duplicate", false);
