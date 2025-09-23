@@ -11,11 +11,8 @@
 #include <N3Base/N3UIButton.h>
 #include <N3Base/N3UIBase.h>
 #include "N3UIIcon.h"
-
 #include "IconItemSkill.h"
 #include "UIImageTooltipDlg.h"
-
-//#include "UIImageTooltipDlg.h"
 
 const int MAX_ITEM_UPGRADE_SLOT = 9;	// Max items in the item upgrade UI.
 const int MAX_UPGRADE_MATERIAL = 10;	// Max items in the item upgrade UI.
@@ -98,7 +95,7 @@ private:
 	RECT				GetSampleRect();
 	e_UI_DISTRICT		GetWndDistrict(__IconItemSkill* spItem) const;
 	bool				HandleInventoryIconRightClick(__IconItemSkill* spItem,POINT ptCur);
-	void				ShowItemCount(__IconItemSkill* spItem, int iorder);
+	void				ShowItemCount(__IconItemSkill* spItem, int iOrder);
 	bool				OnKeyPress(int iKey) override;
 	bool				Load(HANDLE hFile) override;
 	
