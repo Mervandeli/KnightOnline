@@ -42,10 +42,8 @@ private:
 	__SelectedSkillInfo	m_sSelectedIconInfo;
 	__IconItemSkill* m_pMyUpgradeInv[MAX_ITEM_INVENTORY];
 	__IconItemSkill* m_pUpgradeMaterialSlots[MAX_ITEM_UPGRADE_SLOT];
-	__IconItemSkill* m_pUpgradeResultSlot;
 	int8_t m_iUpgradeScrollSlotInvPos[MAX_ITEM_UPGRADE_SLOT];
 	int8_t m_iUpgradeItemSlotInvPos;
-	int8_t m_iUpgradeResultSlotInvPos;
 	CN3UIString* m_pStrMyGold;
 	
 	// Animation state management
@@ -121,7 +119,6 @@ private:
 
 	void				FlipFlopAnim();
 	void				AnimClose();
-	void				ShowResultUpgrade();
 	void				StartUpgradeAnim();
 	void				UpdateCoverAnimation();
 	void				UpdateFlipFlopAnimation();
