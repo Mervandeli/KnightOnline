@@ -153,18 +153,11 @@ void CUIItemUpgrade::Render()
 		{
 			bTooltipRender = true;
 			SetSelectedIconInfo((CN3UIIcon*) pChild);
-			uint32_t dwFlags = CGameProcedure::s_pLocalInput->MouseGetFlag();
-
-			if (dwFlags == MOUSE_RBCLICKED && !m_bUpgradeInProgress)
-			{
-				HandleInventoryIconRightClick(m_sSelectedIconInfo.pSelectedItem, ptCur);
-			}
 		}
 	}
 
 	if (GetState() == UI_STATE_ICON_MOVING && m_sSelectedIconInfo.pSelectedItem != nullptr && m_sSelectedIconInfo.pSelectedItem->pUIIcon != nullptr)
 		m_sSelectedIconInfo.pSelectedItem->pUIIcon->Render();
-		
 
 	if (bTooltipRender && m_sSelectedIconInfo.pSelectedItem != nullptr)
 	{
@@ -229,6 +222,8 @@ void CUIItemUpgrade::GetItemFromInv()
 	if (pInven == nullptr)
 		return;
 
+	m_sSelectedIconInfo.pSelectedItem = nullptr;
+	m_sSelectedIconInfo.iSourceOrder = -1;
 	m_iUpgradeItemSlotInvPos = -1;
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
@@ -356,6 +351,10 @@ RECT CUIItemUpgrade::GetSampleRect()
 // Determines which window district (slot or inventory) the given item belongs to.
 e_UI_DISTRICT CUIItemUpgrade::GetWndDistrict(__IconItemSkill* spItem) const
 {
+	if (spItem == nullptr)
+	{
+		return UIWND_DISTRICT_UPGRADE_UNKNOWN;
+	}
 	int x = spItem->pUIIcon->GetRegion().left / 2 + spItem->pUIIcon->GetRegion().right / 2;
 	int y = spItem->pUIIcon->GetRegion().top / 2 + spItem->pUIIcon->GetRegion().bottom / 2;
 
@@ -411,15 +410,22 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 	int iOrder = -1;
 	RECT region = GetSampleRect();
-	uint32_t dwBitMask = 0x000f0000;
 
-	switch (dwMsg & dwBitMask)
+	switch (dwMsg)
 	{
 		case UIMSG_ICON_DOWN_FIRST:
 			SetSelectedIconInfo((CN3UIIcon*) pSender);
 			spItem = m_sSelectedIconInfo.pSelectedItem;
 			iOrder = m_sSelectedIconInfo.iSourceOrder;
 			eUIWnd = GetWndDistrict(spItem);
+
+			if (eUIWnd == UIWND_DISTRICT_UPGRADE_RESULT_SLOT)
+				ResetUpgradeInventory();
+			if (iOrder == -1 || (eUIWnd != UIWND_DISTRICT_UPGRADE_INV))
+			{
+				SetState(UI_STATE_COMMON_NONE);
+				return false;
+			}
 
 			// Divide countable items
 			if (spItem->iCount > 1 && (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
@@ -431,18 +437,9 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				m_sSelectedIconInfo.pSelectedItem = pNew;
 			}
 
-			if (eUIWnd == UIWND_DISTRICT_UPGRADE_RESULT_SLOT)
-				ResetUpgradeInventory();
-			if (iOrder == -1 || (eUIWnd != UIWND_DISTRICT_UPGRADE_INV))
-			{
-				SetState(UI_STATE_COMMON_NONE);
-				return false;
-			}
-
 			// Set icon region for moving.
 			m_sSelectedIconInfo.pSelectedItem->pUIIcon->SetRegion(region);
 			m_sSelectedIconInfo.pSelectedItem->pUIIcon->SetMoveRect(region);
-
 			break;
 
 		case UIMSG_ICON_UP:
@@ -483,6 +480,13 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			{
 				spItem->pUIIcon->SetRegion(region);
 				spItem->pUIIcon->SetMoveRect(region);
+			}
+			break;
+		case UIMSG_ICON_RDOWN_FIRST:
+			SetSelectedIconInfo((CN3UIIcon*) pSender);
+			if (!m_bUpgradeInProgress)
+			{
+				HandleInventoryIconRightClick(m_sSelectedIconInfo.pSelectedItem);
 			}
 			break;
 	}
@@ -1126,7 +1130,7 @@ void CUIItemUpgrade::StartUpgradeAnim()
 	m_eAnimationState = ANIM_FLIPFLOP;
 }
 
-bool CUIItemUpgrade::HandleInventoryIconRightClick(__IconItemSkill* spItem, POINT ptCur)
+bool CUIItemUpgrade::HandleInventoryIconRightClick(__IconItemSkill* spItem)
 {
 	// Move upgrade result to inv
 	if (m_bUpgradeSucceeded)
@@ -1138,6 +1142,7 @@ bool CUIItemUpgrade::HandleInventoryIconRightClick(__IconItemSkill* spItem, POIN
 	if (spItem == nullptr || spItem->pUIIcon == nullptr)
 		return false;
 
+	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
 	if (spItem->pUIIcon->IsVisible() && spItem->pUIIcon->IsIn(ptCur.x, ptCur.y))
 	{
 		if (IsAllowedUpgradeItem(spItem))
@@ -1149,6 +1154,16 @@ bool CUIItemUpgrade::HandleInventoryIconRightClick(__IconItemSkill* spItem, POIN
 		}
 		else if (IsMaterialSlotCompatible(spItem))
 		{
+			// Divide countable items
+			if (spItem->iCount > 1 && (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
+				|| spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
+			{
+				__IconItemSkill* pNew = new __IconItemSkill(*spItem);
+				CreateUIIconForItem(pNew);
+				//ShowItemCount(spItem, m_sSelectedIconInfo.iSourceOrder);
+				spItem = pNew;
+			}
+
 			for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
 			{
 				if (m_iUpgradeScrollSlotInvPos[i] == -1)

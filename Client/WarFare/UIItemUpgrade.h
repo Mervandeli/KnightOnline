@@ -94,7 +94,7 @@ private:
 
 	RECT				GetSampleRect();
 	e_UI_DISTRICT		GetWndDistrict(__IconItemSkill* spItem) const;
-	bool				HandleInventoryIconRightClick(__IconItemSkill* spItem,POINT ptCur);
+	bool				HandleInventoryIconRightClick(__IconItemSkill* spItem);
 	void				ShowItemCount(__IconItemSkill* spItem, int iOrder);
 	bool				OnKeyPress(int iKey) override;
 	bool				Load(HANDLE hFile) override;
