@@ -38,7 +38,7 @@ class CUIItemUpgrade : public CN3UIBase
 private:
 	__SelectedSkillInfo	m_sSelectedIconInfo;
 	__IconItemSkill* m_pMyUpgradeInv[MAX_ITEM_INVENTORY];
-	__IconItemSkill* m_pUpgradeMaterialSlots[MAX_ITEM_UPGRADE_SLOT];
+	__IconItemSkill* m_pCopyMaterialSlots[MAX_ITEM_UPGRADE_SLOT];
 	int8_t m_iUpgradeScrollSlotInvPos[MAX_ITEM_UPGRADE_SLOT];
 	int8_t m_iUpgradeItemSlotInvPos;
 	CN3UIString* m_pStrMyGold;
@@ -105,7 +105,7 @@ private:
 
 	void				SetSelectedIconInfo(CN3UIIcon* pUIIcon);
 	void				CancelIconDrop(__IconItemSkill* spItem);
-	bool				ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur);
+	bool				ReceiveIconDrop(__IconItemSkill* spItem);
 	void				GetItemFromInv();
 	void                ResetUpgradeInventory();
 	void				GoldUpdate();
