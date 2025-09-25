@@ -38,7 +38,6 @@ class CUIItemUpgrade : public CN3UIBase
 private:
 	__SelectedSkillInfo	m_sSelectedIconInfo;
 	__IconItemSkill* m_pMyUpgradeInv[MAX_ITEM_INVENTORY];
-	__IconItemSkill* m_pCopyMaterialSlots[MAX_ITEM_UPGRADE_SLOT];
 	int8_t m_iUpgradeScrollSlotInvPos[MAX_ITEM_UPGRADE_SLOT];
 	int8_t m_iUpgradeItemSlotInvPos;
 	CN3UIString* m_pStrMyGold;
@@ -93,7 +92,7 @@ public:
 private:
 
 	RECT				GetSampleRect();
-	e_UI_DISTRICT		GetWndDistrict(__IconItemSkill* spItem) const;
+	e_UI_DISTRICT		GetWndDistrict() const;
 	bool				HandleInventoryIconRightClick(__IconItemSkill* spItem);
 	void				ShowItemCount(__IconItemSkill* spItem, int iOrder);
 	bool				OnKeyPress(int iKey) override;
@@ -123,6 +122,7 @@ private:
 	void				CreateUIIconForItem(__IconItemSkill* spItem);
 	void				SetupIconArea(__IconItemSkill* spItem, CN3UIArea* pArea);
 	bool				MaterialSlotDrop(__IconItemSkill* spItem,int iOrder);
+	void				CleanAreaSlot(CN3UIArea* pArea);
 	bool				IsMaterialSlotCompatible(__IconItemSkill* pSrc) const;
 	void				Tick() override;
 };
