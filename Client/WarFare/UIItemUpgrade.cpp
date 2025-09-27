@@ -59,10 +59,8 @@ CUIItemUpgrade::~CUIItemUpgrade()
 		{
 			if (m_pMyUpgradeInv[i]->pUIIcon != nullptr)
 			{
-				delete m_pMyUpgradeInv[i]->pUIIcon;
 				m_pMyUpgradeInv[i]->pUIIcon = nullptr;
 			}
-			delete m_pMyUpgradeInv[i];
 			m_pMyUpgradeInv[i] = nullptr;
 		}
 	}
@@ -435,11 +433,12 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				break;
 			if (!ReceiveIconDrop(spItem))
 			{
-				// Clean divided item
 				if (spItem->iCount > 1 && (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
 					|| spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
 				{
 					ShowItemCount(spItem, iOrder);
+
+					// Clean divided item
 					if (spItem != nullptr)
 					{
 						if (spItem->pUIIcon != nullptr)
