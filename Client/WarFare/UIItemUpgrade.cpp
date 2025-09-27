@@ -67,7 +67,6 @@ CUIItemUpgrade::~CUIItemUpgrade()
 		}
 	}
 
-
 	m_pUITooltipDlg = nullptr;
 	m_pStrMyGold = nullptr;
 
@@ -528,30 +527,27 @@ bool CUIItemUpgrade::Load(HANDLE hFile)
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; ++i)
 	{
 		std::string szID = fmt::format("a_m_{}", i);
-		m_pSlotArea[i] = (CN3UIArea*) GetChildByID(szID);
+		N3_VERIFY_UI_COMPONENT(m_pSlotArea[i], (CN3UIArea*) GetChildByID(szID));
 	}
 
 	for (int i = 0; i < MAX_ITEM_INVENTORY; ++i)
 	{
-		std::string szID = fmt::format("a_slot_{}", i);
-		m_pInvArea[i] = (CN3UIArea*) GetChildByID(szID);
-	}
-
-	for (int i = 0; i < MAX_ITEM_INVENTORY; ++i)
-	{
-		std::string szID = fmt::format("s_count_{}", i);
-		m_pInvString[i] = (CN3UIString*) GetChildByID(szID);
+		std::string szID;
+		szID = fmt::format("a_slot_{}", i);
+		N3_VERIFY_UI_COMPONENT(m_pInvArea[i], (CN3UIArea*) GetChildByID(szID));
+		szID = fmt::format("s_count_{}", i);
+		N3_VERIFY_UI_COMPONENT(m_pInvString[i], (CN3UIString*) GetChildByID(szID));
 	}
 
 	for (int i = 0; i < FLIPFLOP_MAX_FRAMES; ++i)
 	{
 		std::string szID;
 		szID = fmt::format("img_s_load_{}", i);
-		if (CN3UIImage* pImg = (CN3UIImage*) GetChildByID(szID))
-			pImg->SetVisible(false);
+		N3_VERIFY_UI_COMPONENT(m_pImgSuccess[i], (CN3UIImage*) GetChildByID(szID));
 		szID = fmt::format("img_f_load_{}", i);
-		if (CN3UIImage* pImg = (CN3UIImage*) GetChildByID(szID))
-			pImg->SetVisible(false);
+		N3_VERIFY_UI_COMPONENT(m_pImgFail[i], (CN3UIImage*) GetChildByID(szID));
+		m_pImgFail[i]->SetVisible(false);
+		m_pImgSuccess[i]->SetVisible(false);
 	}
 	InitIconWnd();
 
@@ -960,18 +956,14 @@ void CUIItemUpgrade::HideAllAnimationFrames()
 	// Hide all img_s_load_X frames
 	for (int i = 0; i < FLIPFLOP_MAX_FRAMES; ++i)
 	{
-		std::string szID = fmt::format("img_s_load_{}", i);
-		CN3UIImage* pImg = (CN3UIImage*) GetChildByID(szID);
-		if (pImg == nullptr) break;
-		pImg->SetVisible(false);
+		if (m_pImgSuccess[i] != nullptr)
+			m_pImgSuccess[i]->SetVisible(false);
 	}
 	// Hide all img_f_load_X frames
 	for (int i = 0; i < FLIPFLOP_MAX_FRAMES; ++i)
 	{
-		std::string szID = fmt::format("img_f_load_{}", i);
-		CN3UIImage* pImg = (CN3UIImage*) GetChildByID(szID);
-		if (pImg == nullptr) break;
-		pImg->SetVisible(false);
+		if (m_pImgFail[i] != nullptr)
+			m_pImgFail[i]->SetVisible(false);
 	}
 }
 
@@ -1040,17 +1032,22 @@ void CUIItemUpgrade::FlipFlopAnim()
 	// Hide before frame
 	if (m_iCurrentFrame > 0)
 	{
-		szID = fmt::format(fmt::runtime(m_bUpgradeSucceeded ? "img_s_load_{}" : "img_f_load_{}"), m_iCurrentFrame - 1);
-		if (CN3UIImage* pImg = (CN3UIImage*) GetChildByID(szID))
-			pImg->SetVisible(false);
+		if (m_bUpgradeSucceeded)
+			m_pImgSuccess[m_iCurrentFrame - 1]->SetVisible(false);
+		else
+			m_pImgFail[m_iCurrentFrame - 1]->SetVisible(false);
 	}
 
 	// Show current frame
-	szID = fmt::format(fmt::runtime(m_bUpgradeSucceeded ? "img_s_load_{}" : "img_f_load_{}"), m_iCurrentFrame);
-	if (CN3UIImage* pImg = (CN3UIImage*) GetChildByID(szID))
+	if (m_bUpgradeSucceeded)
 	{
-		pImg->SetVisible(true);
-		pImg->SetParent(this);
+		m_pImgSuccess[m_iCurrentFrame]->SetVisible(true);
+		m_pImgSuccess[m_iCurrentFrame]->SetParent(this);
+	}
+	else
+	{
+		m_pImgFail[m_iCurrentFrame]->SetVisible(true);
+		m_pImgFail[m_iCurrentFrame]->SetParent(this);
 	}
 }
 void CUIItemUpgrade::AnimClose()
@@ -1189,14 +1186,12 @@ bool CUIItemUpgrade::MaterialSlotDrop(__IconItemSkill* spItem, int iOrder)
 
 void CUIItemUpgrade::CleanAreaSlot(CN3UIArea* pArea)
 {
-
 	for (UIListReverseItor itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
 		int x = pChild->GetRegion().left / 2 + pChild->GetRegion().right / 2;
 		int y = pChild->GetRegion().top / 2 + pChild->GetRegion().bottom / 2;
-		if (pChild->UIType() == UI_TYPE_ICON &&
-			pArea->IsIn(x, y))
+		if (pChild->UIType() == UI_TYPE_ICON && pArea->IsIn(x, y))
 		{
 			delete pChild;
 		}

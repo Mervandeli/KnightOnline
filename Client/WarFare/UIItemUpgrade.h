@@ -16,7 +16,7 @@
 
 const int MAX_ITEM_UPGRADE_SLOT = 9;	// Max items in the item upgrade UI.
 const int MAX_UPGRADE_MATERIAL = 10;	// Max items in the item upgrade UI.
-const int FLIPFLOP_MAX_FRAMES = 20;
+const int FLIPFLOP_MAX_FRAMES = 19;
 
 struct __SelectedSkillInfo {
 	__IconItemSkill* pSelectedItem;
@@ -76,6 +76,8 @@ private:
 	CN3UIArea* m_pInvArea[MAX_ITEM_INVENTORY];
 	CN3UIString* m_pInvString[MAX_ITEM_INVENTORY];
 	CN3UIArea* m_pSlotArea[MAX_ITEM_UPGRADE_SLOT];
+	CN3UIImage* m_pImgFail[FLIPFLOP_MAX_FRAMES];
+	CN3UIImage* m_pImgSuccess[FLIPFLOP_MAX_FRAMES];
 	CN3UIImage* m_pImageCover1;
 	CN3UIImage* m_pImageCover2;
 
