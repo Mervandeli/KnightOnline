@@ -98,7 +98,7 @@ void CSettingDlg::OnOK()
 /// \brief triggered when the Add button is clicked.  Opens a file picker and processes the selection
 void CSettingDlg::OnAddFile()
 {
-	constexpr DWORD FilenameBufferSize = 512000;
+	constexpr uint32_t FilenameBufferSize = 512000;
 
 	CFileDialog dlg(TRUE);
 	PathType fileName, filePath, defaultPath;
@@ -230,7 +230,7 @@ void CSettingDlg::OnDeleteFile()
 void CSettingDlg::OnCompress()
 {
 	CString			pathName, fileName, errMsg, compressName, compressPath;
-	DWORD size;
+	uint32_t size;
 	CFile file;
 	std::string		fileNameA;
 
@@ -267,7 +267,7 @@ void CSettingDlg::OnCompress()
 			continue;
 		}
 
-		size = static_cast<DWORD>(file.GetLength());
+		size = static_cast<uint32_t>(file.GetLength());
 		file.Close();
 
 		if (!_zipArchive.AddNewFile(pathName, _defaultPath, -1, size))
@@ -389,7 +389,7 @@ bool CSettingDlg::Repacking(int version)
 		return false;
 	}
 
-	DWORD dwsize = static_cast<DWORD>(file.GetLength());
+	uint32_t dwsize = static_cast<uint32_t>(file.GetLength());
 	file.Close();
 
 	if (!_zipArchive.AddNewFile(filename, _defaultPath, -1, dwsize))

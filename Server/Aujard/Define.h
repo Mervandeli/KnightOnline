@@ -56,18 +56,18 @@ constexpr long DB_PROCESS_TIMEOUT = 10;
 ////////////////////////////////////////////////////////////
 
 typedef union {
-	short int	i;
-	BYTE		b[2];
+	int16_t		i;
+	uint8_t		b[2];
 } MYSHORT;
 
 typedef union {
-	int			i;
-	BYTE		b[4];
+	int32_t		i;
+	uint8_t		b[4];
 } MYINT;
 
 typedef union {
-	DWORD		w;
-	BYTE		b[4];
+	uint32_t	w;
+	uint8_t		b[4];
 } MYDWORD;
 
 // DEFINE Shared Memory Queue Flag
@@ -185,23 +185,23 @@ inline void GetString(char* tBuf, char* sBuf, int len, int& index)
 	index += len;
 }
 
-inline BYTE GetByte(char* sBuf, int& index)
+inline uint8_t GetByte(char* sBuf, int& index)
 {
 	int t_index = index;
 	index++;
-	return (BYTE) (*(sBuf + t_index));
+	return (uint8_t) (*(sBuf + t_index));
 }
 
 inline int GetShort(char* sBuf, int& index)
 {
 	index += 2;
-	return *(short*) (sBuf + index - 2);
+	return *(int16_t*) (sBuf + index - 2);
 }
 
-inline DWORD GetDWORD(char* sBuf, int& index)
+inline uint32_t GetDWORD(char* sBuf, int& index)
 {
 	index += 4;
-	return *(DWORD*) (sBuf + index - 4);
+	return *(uint32_t*) (sBuf + index - 4);
 }
 
 inline float Getfloat(char* sBuf, int& index)
@@ -222,7 +222,7 @@ inline void SetString(char* tBuf, const char* sBuf, int len, int& index)
 	index += len;
 }
 
-inline void SetByte(char* tBuf, BYTE sByte, int& index)
+inline void SetByte(char* tBuf, uint8_t sByte, int& index)
 {
 	*(tBuf + index) = (char) sByte;
 	index++;
@@ -230,13 +230,13 @@ inline void SetByte(char* tBuf, BYTE sByte, int& index)
 
 inline void SetShort(char* tBuf, int sShort, int& index)
 {
-	short temp = (short) sShort;
+	int16_t temp = (int16_t) sShort;
 
 	CopyMemory(tBuf + index, &temp, 2);
 	index += 2;
 }
 
-inline void SetDWORD(char* tBuf, DWORD sDWORD, int& index)
+inline void SetDWORD(char* tBuf, uint32_t sDWORD, int& index)
 {
 	CopyMemory(tBuf + index, &sDWORD, 4);
 	index += 4;
@@ -254,13 +254,13 @@ inline void SetInt64(char* tBuf, int64_t nInt64, int& index)
 	index += 8;
 }
 
-inline void SetString1(char* tBuf, const char* sBuf, BYTE len, int& index)
+inline void SetString1(char* tBuf, const char* sBuf, uint8_t len, int& index)
 {
 	SetByte(tBuf, len, index);
 	SetString(tBuf, sBuf, len, index);
 }
 
-inline void SetString2(char* tBuf, const char* sBuf, short len, int& index)
+inline void SetString2(char* tBuf, const char* sBuf, int16_t len, int& index)
 {
 	SetShort(tBuf, len, index);
 	SetString(tBuf, sBuf, len, index);
@@ -271,7 +271,7 @@ inline int GetVarString(char* tBuf, char* sBuf, int nSize, int& index)
 {
 	int nLen = 0;
 
-	if (nSize == sizeof(BYTE))
+	if (nSize == sizeof(uint8_t))
 		nLen = GetByte(sBuf, index);
 	else
 		nLen = GetShort(sBuf, index);
@@ -284,7 +284,7 @@ inline int GetVarString(char* tBuf, char* sBuf, int nSize, int& index)
 
 inline void SetVarString(char* tBuf, TCHAR* sBuf, int len, int& index)
 {
-	*(tBuf + index) = (BYTE) len;
+	*(tBuf + index) = (uint8_t) len;
 	index ++;
 
 	CopyMemory(tBuf + index, sBuf, len);

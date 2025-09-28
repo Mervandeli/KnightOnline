@@ -45,12 +45,12 @@ CSharedMemQueue::~CSharedMemQueue()
 		CloseHandle(m_hMMFile);
 }
 
-bool CSharedMemQueue::InitializeMMF(DWORD dwOffsetsize, int maxcount, LPCTSTR lpname, bool bCreate)
+bool CSharedMemQueue::InitializeMMF(uint32_t dwOffsetsize, int maxcount, LPCTSTR lpname, bool bCreate)
 {
 	if (maxcount < 1)
 		return false;
 
-	DWORD dwfullsize = dwOffsetsize * maxcount + sizeof(_SMQ_HEADER);
+	uint32_t dwfullsize = dwOffsetsize * maxcount + sizeof(_SMQ_HEADER);
 
 	m_nMaxCount = maxcount;
 	m_wOffset = dwOffsetsize;
@@ -96,7 +96,7 @@ bool CSharedMemQueue::InitializeMMF(DWORD dwOffsetsize, int maxcount, LPCTSTR lp
 
 int CSharedMemQueue::PutData(char* pBuf, int size)
 {
-	BYTE BlockMode;
+	uint8_t BlockMode;
 	int index = 0, temp_rear = 0;
 
 	if (size > static_cast<int>(m_wOffset))
@@ -119,7 +119,7 @@ int CSharedMemQueue::PutData(char* pBuf, int size)
 		return SMQ_WRITING;
 	}
 
-	LONG pQueue = m_lReference + (m_pHeader->Rear * m_wOffset);
+	uintptr_t pQueue = m_lReference + (m_pHeader->Rear * m_wOffset);
 	BlockMode = GetByte((char*) pQueue, index);
 	if (BlockMode == WR
 		&& m_pHeader->nCount >= m_nMaxCount - 1)
@@ -148,7 +148,7 @@ int CSharedMemQueue::PutData(char* pBuf, int size)
 int CSharedMemQueue::GetData(char* pBuf)
 {
 	int index = 0, size = 0, temp_front = 0;
-	BYTE BlockMode;
+	uint8_t BlockMode;
 
 	if (m_pHeader->FrontMode == R)
 		return SMQ_READING;
@@ -167,7 +167,7 @@ int CSharedMemQueue::GetData(char* pBuf)
 		return SMQ_READING;
 	}
 
-	LONG pQueue = m_lReference + (m_pHeader->Front * m_wOffset);
+	uintptr_t pQueue = m_lReference + (m_pHeader->Front * m_wOffset);
 
 	index = 0;
 	BlockMode = GetByte((char*) pQueue, index);

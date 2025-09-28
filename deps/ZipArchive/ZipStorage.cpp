@@ -432,7 +432,7 @@ void CZipStorage::Flush()
 
 DWORD CZipStorage::GetPosition()
 {
-	return m_pFile->GetPosition() + m_uBytesInWriteBuffer;
+	return static_cast<DWORD>(m_pFile->GetPosition()) + m_uBytesInWriteBuffer;
 }
 
 

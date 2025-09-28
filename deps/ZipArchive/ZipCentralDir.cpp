@@ -135,7 +135,7 @@ DWORD CZipCentralDir::Locate()
 
 	// maximum size of end of central dir record
 	long uMaxRecordSize = 0xffff + ZIPCENTRALDIRSIZE;
-	DWORD uFileSize = m_pStorage->m_pFile->GetLength();
+	DWORD uFileSize = static_cast<DWORD>(m_pStorage->m_pFile->GetLength());
 
 	if ((DWORD)uMaxRecordSize > uFileSize)
 		uMaxRecordSize = uFileSize;
@@ -476,12 +476,12 @@ void CZipCentralDir::RemoveFile(WORD uIndex)
 	{
 		int i = FindFileNameIndex(pHeader->GetFileName(), true);
 		ASSERT(i != -1);
-		int uIndex = m_findarray[i].m_uIndex;
+		int uSubIndex = m_findarray[i].m_uIndex;
 		m_findarray.RemoveAt(i);
 		// shift down the indexes
 		for (int j = 0; j < m_findarray.GetSize(); j++)
 		{
-			if (m_findarray[j].m_uIndex > uIndex)
+			if (m_findarray[j].m_uIndex > uSubIndex)
 				m_findarray[j].m_uIndex--;
 		}
 	}
@@ -515,8 +515,8 @@ bool CZipCentralDir::RemoveDataDescr(bool bFromBuffer)
 	}
 	else
 	{
-		uSize = m_pStorage->m_pFile->GetLength();
-		if (!ah.CreateMapping((HANDLE)m_pStorage->m_pFile->m_hFile))
+		uSize = static_cast<DWORD>(m_pStorage->m_pFile->GetLength());
+		if (!ah.CreateMapping(m_pStorage->m_pFile->m_hFile))
 			return false;
 		pFile = (char*)ah.m_pFileMap;
 	}

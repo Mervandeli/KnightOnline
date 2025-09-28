@@ -24,7 +24,7 @@ class CGameSocket : public CIOCPSocket2
 public:
 	CServerDlg* m_pMain;
 	CParty		m_Party;
-	short m_sSocketID;
+	int16_t m_sSocketID;
 public:
 	CGameSocket();
 	virtual ~CGameSocket();
@@ -55,7 +55,7 @@ public:
 	void RecvHealMagic(char* pBuf);
 	void RecvTimeAndWeather(char* pBuf);
 	void RecvUserFail(char* pBuf);
-	void Send_UserError(short uid, short tid = 10000);
+	void Send_UserError(int16_t uid, int16_t tid = 10000);
 	void RecvBattleEvent(char* pBuf);
 };
 

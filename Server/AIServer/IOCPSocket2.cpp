@@ -114,14 +114,14 @@ int CIOCPSocket2::Send(char* pBuf, long length, int dwFlag)
 	memset(pTBuf, 0x00, MAX_PACKET_SIZE);
 	int index = 0;
 
-	pTBuf[index++] = (BYTE) PACKET_START1;
-	pTBuf[index++] = (BYTE) PACKET_START2;
+	pTBuf[index++] = (uint8_t) PACKET_START1;
+	pTBuf[index++] = (uint8_t) PACKET_START2;
 	memcpy(pTBuf + index, &length, 2);
 	index += 2;
 	memcpy(pTBuf + index, pBuf, length);
 	index += length;
-	pTBuf[index++] = (BYTE) PACKET_END1;
-	pTBuf[index++] = (BYTE) PACKET_END2;
+	pTBuf[index++] = (uint8_t) PACKET_END1;
+	pTBuf[index++] = (uint8_t) PACKET_END2;
 
 	out.buf = pTBuf;
 	out.len = index;
@@ -287,18 +287,18 @@ void CIOCPSocket2::ReceivedData(int length)
 
 bool CIOCPSocket2::PullOutCore(char*& data, int& length)
 {
-	BYTE*		pTmp;
+	uint8_t*	pTmp;
 	int			len;
 	bool		foundCore;
 	MYSHORT		slen;
-	DWORD		wSerial = 0;
+	uint32_t		wSerial = 0;
 
 	len = m_pBuffer->GetValidCount();
 
 	if (len <= 0)
 		return false;
 
-	pTmp = new BYTE[len];
+	pTmp = new uint8_t[len];
 
 	m_pBuffer->GetData((char*) pTmp, len);
 

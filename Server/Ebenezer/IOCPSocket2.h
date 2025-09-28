@@ -51,11 +51,11 @@ public:
 		return (HANDLE) m_Socket;
 	}
 
-	BYTE GetState() const {
+	uint8_t GetState() const {
 		return m_State;
 	}
 
-	BYTE GetSockType() const {
+	uint8_t GetSockType() const {
 		return m_Type;
 	}
 
@@ -66,9 +66,9 @@ public:
 	CIOCPSocket2();
 	virtual ~CIOCPSocket2();
 
-	short				m_nSocketErr;
-	short				m_nPending;
-	short				m_nWouldblock;
+	int16_t				m_nSocketErr;
+	int16_t				m_nPending;
+	int16_t				m_nWouldblock;
 	_REGION_BUFFER*		m_pRegionBuffer;
 
 protected:
@@ -85,19 +85,19 @@ protected:
 	OVERLAPPED			m_RecvOverlapped;
 	OVERLAPPED			m_SendOverlapped;
 
-	BYTE				m_Type;
-	BYTE				m_State;
+	uint8_t				m_Type;
+	uint8_t				m_State;
 	int					m_Sid;
 	std::string			m_ConnectAddress;
 
 	// Cryption
 	CJvCryption			jct;
 	int					m_CryptionFlag;
-	DWORD				m_Sen_val;
-	DWORD				m_Rec_val;
+	uint32_t			m_Sen_val;
+	uint32_t			m_Rec_val;
 	///~
 
-	DWORD				m_wPacketSerial;
+	uint32_t			m_wPacketSerial;
 };
 
 #endif // !defined(AFX_IOCPSOCKET2_H__36499609_63DD_459C_B4D0_1686FEEC67C2__INCLUDED_)

@@ -61,6 +61,7 @@ typedef CSTLMap <model::MagicType3>			MagicType3TableMap;
 typedef CSTLMap	<model::MagicType4>			MagicType4TableMap;
 typedef CSTLMap	<model::MagicType7>			MagicType7TableMap;
 typedef CSTLMap <_PARTY_GROUP>				PartyMap;
+typedef CSTLMap <model::MakeItemGroup>		MakeItemGroupMap;
 typedef CSTLMap <model::MakeWeapon>			MakeWeaponTableMap;
 typedef CSTLMap <model::MakeItemGradeCode>	MakeGradeItemCodeTableMap;
 typedef CSTLMap <model::MakeItemRareCode>	MakeItemRareCodeTableMap;
@@ -70,9 +71,9 @@ typedef std::vector <MAP*>					ZoneArray;
 /*
 	 ** Repent AI Server 작업시 참고 사항 **
 	1. 3개의 함수 추가
-		int GetSpeed(BYTE bySpeed);
-		int GetAttackSpeed(BYTE bySpeed);
-		int GetCatsSpeed(BYTE bySpeed);
+		int GetSpeed(uint8_t bySpeed);
+		int GetAttackSpeed(uint8_t bySpeed);
+		int GetCatsSpeed(uint8_t bySpeed);
 */
 
 class CServerDlg : public CDialog
@@ -145,6 +146,7 @@ public:
 	MagicType3TableMap			m_MagicType3TableMap;
 	MagicType4TableMap			m_MagicType4TableMap;
 	MagicType7TableMap			m_MagicType7TableMap;
+	MakeItemGroupMap			m_MakeItemGroupTableMap;
 	MakeWeaponTableMap			m_MakeWeaponTableMap;
 	MakeWeaponTableMap			m_MakeDefensiveTableMap;
 	MakeGradeItemCodeTableMap	m_MakeGradeItemArray;
@@ -163,24 +165,24 @@ public:
 	long			m_TotalNPC;			// DB에있는 총 수
 	long			m_CurrentNPCError;	// 세팅에서 실패한 수
 	long			m_CurrentNPC;		// 현재 게임상에서 실제로 셋팅된 수
-	short			m_sTotalMap;		// Zone 수 
-	short			m_sMapEventNpc;		// Map에서 읽어들이는 event npc 수
+	int16_t			m_sTotalMap;		// Zone 수 
+	int16_t			m_sMapEventNpc;		// Map에서 읽어들이는 event npc 수
 
 	// sungyong 2002.05.23
-	bool			m_bFirstServerFlag;		// 서버가 처음시작한 후 게임서버가 붙은 경우에는 1, 붙지 않은 경우 0
-	short m_sSocketCount;		// GameServer와 처음접시 필요
-	short m_sReSocketCount;		// GameServer와 재접시 필요
-	float m_fReConnectStart;	// 처음 소켓이 도착한 시간
-	short m_sErrorSocketCount;  // 이상소켓 감시용
+	bool			m_bFirstServerFlag;	// 서버가 처음시작한 후 게임서버가 붙은 경우에는 1, 붙지 않은 경우 0
+	int16_t			m_sSocketCount;		// GameServer와 처음접시 필요
+	int16_t			m_sReSocketCount;	// GameServer와 재접시 필요
+	float			m_fReConnectStart;	// 처음 소켓이 도착한 시간
+	int16_t			m_sErrorSocketCount;  // 이상소켓 감시용
 	// ~sungyong 2002.05.23
-	BYTE  m_byBattleEvent;				   // 전쟁 이벤트 관련 플래그( 1:전쟁중이 아님, 0:전쟁중)
-	short m_sKillKarusNpc, m_sKillElmoNpc; // 전쟁동안에 죽은 npc숫자
+	uint8_t			m_byBattleEvent;	// 전쟁 이벤트 관련 플래그( 1:전쟁중이 아님, 0:전쟁중)
+	int16_t			m_sKillKarusNpc, m_sKillElmoNpc; // 전쟁동안에 죽은 npc숫자
 
-	int m_iYear, m_iMonth, m_iDate, m_iHour, m_iMin, m_iWeather, m_iAmount;
-	BYTE	m_byNight;			// 밤인지,, 낮인지를 판단... 1:낮, 2:밤
-	BYTE    m_byTestMode;
+	int				m_iYear, m_iMonth, m_iDate, m_iHour, m_iMin, m_iWeather, m_iAmount;
+	uint8_t			m_byNight;			// 밤인지,, 낮인지를 판단... 1:낮, 2:밤
+	uint8_t			m_byTestMode;
 
-	CIOCPort m_Iocport;
+	CIOCPort		m_Iocport;
 
 	static CServerDlg* s_pInstance;
 
@@ -219,7 +221,7 @@ private:
 	int					m_iCompIndex;
 	// ~패킷 압축에 필요 변수   -------------
 
-	BYTE				m_byZone;
+	uint8_t				m_byZone;
 
 	AIServerLogger		_logger;
 	
@@ -243,6 +245,7 @@ private:
 	bool GetMakeDefensiveItemTableData();
 	bool GetMakeGradeItemTableData();
 	bool GetMakeRareItemTableData();
+	bool GetMakeItemGroupTableData();
 	bool MapFileLoad();
 	void GetServerInfoIni();
 

@@ -262,7 +262,7 @@ bool CDBProcess::IsCurrentUser(const char* accountId, char* serverIp, int& serve
 /// \param accountId
 /// \param[out] premiumDaysRemaining output value of remaining premium days
 /// \return true on success, false on failure
-bool CDBProcess::LoadPremiumServiceUser(const char* accountId, short* premiumDaysRemaining)
+bool CDBProcess::LoadPremiumServiceUser(const char* accountId, int16_t* premiumDaysRemaining)
 {
 	int32_t premiumType = 0, // NOTE: we don't need this in the login server
 		daysRemaining = 0;
@@ -277,6 +277,6 @@ bool CDBProcess::LoadPremiumServiceUser(const char* accountId, short* premiumDay
 		return false;
 	}
 
-	*premiumDaysRemaining = static_cast<short>(daysRemaining);
+	*premiumDaysRemaining = static_cast<int16_t>(daysRemaining);
 	return true;
 }

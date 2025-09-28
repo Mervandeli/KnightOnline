@@ -193,10 +193,10 @@ bool CVersionManagerDlg::GetInfoFromIni()
 		ini.GetString(ini::SERVER_LIST, key, "TEST|Server 1", pInfo->strServerName, _countof(pInfo->strServerName));
 
 		snprintf(key, sizeof(key), "ID_%02d", i);
-		pInfo->sServerID = static_cast<short>(ini.GetInt(ini::SERVER_LIST, key, 1));
+		pInfo->sServerID = static_cast<int16_t>(ini.GetInt(ini::SERVER_LIST, key, 1));
 
 		snprintf(key, sizeof(key), "USER_LIMIT_%02d", i);
-		pInfo->sUserLimit = static_cast<short>(ini.GetInt(ini::SERVER_LIST, key, MAX_USER));
+		pInfo->sUserLimit = static_cast<int16_t>(ini.GetInt(ini::SERVER_LIST, key, MAX_USER));
 
 		ServerList.push_back(pInfo);
 	}
@@ -234,7 +234,7 @@ bool CVersionManagerDlg::GetInfoFromIni()
 		}
 
 		memcpy(&News.Content, newsContent.c_str(), newsContent.size());
-		News.Size = static_cast<short>(newsContent.size());
+		News.Size = static_cast<int16_t>(newsContent.size());
 	}
 
 	// Trigger a save to flush defaults to file.

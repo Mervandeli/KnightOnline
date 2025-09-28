@@ -62,100 +62,133 @@ CN3FXPartMesh::~CN3FXPartMesh()
 #ifdef _N3TOOL
 bool CN3FXPartMesh::ParseScript(char* szCommand, char* szBuff0, char* szBuff1, char* szBuff2, char* szBuff3)
 {
-	if(CN3FXPartBase::ParseScript(szCommand, szBuff0, szBuff1, szBuff2, szBuff3)) return true;
+	if (CN3FXPartBase::ParseScript(szCommand, szBuff0, szBuff1, szBuff2, szBuff3))
+		return true;
 
-	if(lstrcmpi(szCommand, "<shape_name>")==0)
+	if (lstrcmpi(szCommand, "<shape_name>") == 0)
 	{
 		char szPath[MAX_PATH] = {};
 		strcpy(szPath, szBuff0);
-		m_pShape = new CN3FXShape;
 
+		m_pShape = new CN3FXShape();
 		m_pRefShape = s_MngFXShape.Get(szPath);
 		m_pShape->Duplicate(m_pRefShape);
 
 		__Vector3 vScale;
-		if(m_pShape->m_KeyScale.DataGet(0, vScale)) m_vUnitScale = vScale;
-		else m_vUnitScale = m_pShape->Scale();
+		if (m_pShape->m_KeyScale.DataGet(0, vScale))
+			m_vUnitScale = vScale;
+		else
+			m_vUnitScale = m_pShape->Scale();
 
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<texture_move>")==0)
+
+	if (lstrcmpi(szCommand, "<texture_move>") == 0)
 	{
-		if(lstrcmpi(szBuff0,"up")==0) m_cTextureMoveDir = 1;
-		else if(lstrcmpi(szBuff0,"down")==0) m_cTextureMoveDir = 2;
-		else if(lstrcmpi(szBuff0,"left")==0) m_cTextureMoveDir = 3;
-		else if(lstrcmpi(szBuff0,"right")==0) m_cTextureMoveDir = 4;
+		if (lstrcmpi(szBuff0, "up") == 0)
+			m_cTextureMoveDir = 1;
+		else if (lstrcmpi(szBuff0, "down") == 0)
+			m_cTextureMoveDir = 2;
+		else if (lstrcmpi(szBuff0, "left") == 0)
+			m_cTextureMoveDir = 3;
+		else if (lstrcmpi(szBuff0, "right") == 0)
+			m_cTextureMoveDir = 4;
 
-		float uv = atof(szBuff1);
+		float uv = static_cast<float>(atof(szBuff1));
 
-		if(m_cTextureMoveDir==1)
+		if (m_cTextureMoveDir == 1)
 		{
 			m_fu = 0.0f;
 			m_fv = uv;
 		}
-		else if(m_cTextureMoveDir==2)
+		else if (m_cTextureMoveDir == 2)
 		{
 			m_fu = 0.0f;
 			m_fv = -uv;
 		}
-		else if(m_cTextureMoveDir==3)
+		else if (m_cTextureMoveDir == 3)
 		{
 			m_fu = uv;
 			m_fv = 0.0f;
 		}
-		else if(m_cTextureMoveDir==4)
+		else if (m_cTextureMoveDir == 4)
 		{
 			m_fu = -uv;
 			m_fv = 0.0f;
 		}
-		
+
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<scale_velocity>")==0)
+
+	if (lstrcmpi(szCommand, "<scale_velocity>") == 0)
 	{
-		m_vScaleVel.Set(atof(szBuff0),atof(szBuff1),atof(szBuff2));
+		m_vScaleVel.Set(
+			static_cast<float>(atof(szBuff0)),
+			static_cast<float>(atof(szBuff1)),
+			static_cast<float>(atof(szBuff2)));
 		m_vCurrScaleVel = m_vScaleVel;
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<scale_accelerate>")==0)
+
+	if (lstrcmpi(szCommand, "<scale_accelerate>") == 0)
 	{
-		m_vScaleAccel.Set(atof(szBuff0),atof(szBuff1),atof(szBuff2));
+		m_vScaleAccel.Set(
+			static_cast<float>(atof(szBuff0)),
+			static_cast<float>(atof(szBuff1)),
+			static_cast<float>(atof(szBuff2)));
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<scale>")==0)
+
+	if (lstrcmpi(szCommand, "<scale>") == 0)
 	{
-		m_vUnitScale.Set(atof(szBuff0),atof(szBuff1),atof(szBuff2));
+		m_vUnitScale.Set(
+			static_cast<float>(atof(szBuff0)),
+			static_cast<float>(atof(szBuff1)),
+			static_cast<float>(atof(szBuff2)));
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<tex_fps>")==0)
+
+	if (lstrcmpi(szCommand, "<tex_fps>") == 0)
 	{
-		m_fTexFPS = atof(szBuff0);
-		if(!m_pShape) return false;
-		for(int i=0;i<m_pShape->PartCount();i++)
+		m_fTexFPS = static_cast<float>(atof(szBuff0));
+		if (m_pShape == nullptr)
+			return false;
+
+		for (int i = 0; i < m_pShape->PartCount(); i++)
 		{
-			m_pShape->Part(i)->m_fTexFPS = atof(szBuff0);
+			CN3FXSPart* part = m_pShape->Part(i);
+			if (part != nullptr)
+				part->m_fTexFPS = m_fTexFPS;
 		}
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<tex_loop>")==0)
+
+	if (lstrcmpi(szCommand, "<tex_loop>") == 0)
 	{
 		m_bTexLoop = true;
-		if(lstrcmpi(szBuff0,"false")==0) m_bTexLoop = false;
+		if (lstrcmpi(szBuff0, "false") == 0)
+			m_bTexLoop = false;
 
-		if(!m_pShape) return false;
-		for(int i=0;i<m_pShape->PartCount();i++)
+		if (m_pShape == nullptr)
+			return false;
+
+		for (int i = 0; i < m_pShape->PartCount(); i++)
 		{
-			m_pShape->Part(i)->m_bTexLoop = m_bTexLoop;
+			CN3FXSPart* part = m_pShape->Part(i);
+			if (part != nullptr)
+				part->m_bTexLoop = m_bTexLoop;
 		}
-		return true;
-	}
-	if(lstrcmpi(szCommand, "<mesh_fps>")==0)
-	{
-		m_fMeshFPS = atof(szBuff0);
+
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<end>")==0)
+	if (lstrcmpi(szCommand, "<mesh_fps>") == 0)
+	{
+		m_fMeshFPS = static_cast<float>(atof(szBuff0));
+		return true;
+	}
+
+	if (lstrcmpi(szCommand, "<end>") == 0)
 	{
 		Init();
 		return true;

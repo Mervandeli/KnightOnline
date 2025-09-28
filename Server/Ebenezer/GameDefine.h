@@ -150,6 +150,25 @@ constexpr int ITEM_NO_TRADE		= 900000001;	// 거래 불가 아이템들.... 비�
 
 ////////////////////////////////////////////////////////////
 
+enum e_BeefRoastVictory : uint8_t
+{
+	BEEF_ROAST_VICTORY_START = 0,						// Stage for Bifrost to be be captured by a nation - 30 minutes.
+	BEEF_ROAST_VICTORY_KARUS,							// Karus captured the Bifrost monument and can now solely enter Bifrost - 60 minutes.
+	BEEF_ROAST_VICTORY_ELMORAD,							// El Morad captured the Bifrost monument and can now solely enter Bifrost - 60 minutes.
+	BEEF_ROAST_VICTORY_ALL,								// Both nations are allowed to enter Bifrost - 2 hours.
+	BEEF_ROAST_VICTORY_PENDING_RESTART_AFTER_VICTORY,	// Bifrost is not active - 4 hours
+	BEEF_ROAST_VICTORY_PENDING_RESTART_AFTER_DRAW,		// Bifrost is not active - 2 hours
+};
+
+enum e_InvasionMonumentType
+{
+	INVASION_MONUMENT_BASE	= 0, // Luferson/El Morad
+	INVASION_MONUMENT_ASGA	= 1, // Asga/Bellua
+	INVASION_MONUMENT_RAIBA	= 2, // Raiba/Linate
+	INVASION_MONUMENT_DODA	= 3, // Doda/Laon
+	INVASION_MONUMENT_COUNT
+};
+
 ////////////////////////////////////////////////////////////
 // USER POINT DEFINE
 enum e_StatType
@@ -253,9 +272,9 @@ namespace model = ebenezer_model;
 // Bundle unit
 struct _ZONE_ITEM
 {
-	DWORD bundle_index;
+	uint32_t bundle_index;
 	int itemid[6];
-	short count[6];
+	int16_t count[6];
 	float x;
 	float z;
 	float y;
@@ -266,20 +285,20 @@ struct _EXCHANGE_ITEM
 {
 	int itemid;
 	int count;
-	short duration;
-	BYTE pos;			//  교환후 들어갈 자리..
+	int16_t duration;
+	uint8_t pos;			//  교환후 들어갈 자리..
 	int64_t	nSerialNum;	// item serial code
 };
 
 struct	_PARTY_GROUP
 {
-	WORD wIndex;
-	short uid[8];		// 하나의 파티에 8명까지 가입가능
-	short sMaxHp[8];
-	short sHp[8];
-	BYTE bLevel[8];
-	short sClass[8];
-	BYTE bItemRouting;
+	uint16_t wIndex;
+	int16_t uid[8];		// 하나의 파티에 8명까지 가입가능
+	int16_t sMaxHp[8];
+	int16_t sHp[8];
+	uint8_t bLevel[8];
+	int16_t sClass[8];
+	uint8_t bItemRouting;
 	_PARTY_GROUP()
 	{
 		for (int i = 0; i < 8; i++)
@@ -297,12 +316,12 @@ struct	_PARTY_GROUP
 
 struct _OBJECT_EVENT
 {
-	BYTE byLife;			// 1:살아있다, 0:켁,, 죽음
+	uint8_t byLife;			// 1:살아있다, 0:켁,, 죽음
 	int sBelong;			// 소속
-	short sIndex;			// 100 번대 - 카루스 바인드 포인트 | 200 번대 엘모라드 바인드 포인트 | 1100 번대 - 카루스 성문들 1200 - 엘모라드 성문들
-	short sType;			// 0 - 바인드 포인트, 1 - 좌우로 열리는 성문, 2 - 상하로 열리는 성문, 3 - 레버, 4 - 깃발레버, 6:철창, 7-깨지는 부활비석
-	short sControlNpcID;	// 조종할 NPC ID (조종할 Object Index), Type-> 5 : Warp Group ID
-	short sStatus;			// status
+	int16_t sIndex;			// 100 번대 - 카루스 바인드 포인트 | 200 번대 엘모라드 바인드 포인트 | 1100 번대 - 카루스 성문들 1200 - 엘모라드 성문들
+	int16_t sType;			// 0 - 바인드 포인트, 1 - 좌우로 열리는 성문, 2 - 상하로 열리는 성문, 3 - 레버, 4 - 깃발레버, 6:철창, 7-깨지는 부활비석
+	int16_t sControlNpcID;	// 조종할 NPC ID (조종할 Object Index), Type-> 5 : Warp Group ID
+	int16_t sStatus;			// status
 	float fPosX;			// 위치값
 	float fPosY;
 	float fPosZ;
@@ -320,14 +339,14 @@ struct _REGENE_EVENT
 
 struct _KNIGHTS_USER
 {
-	BYTE    byUsed;								// 사용중 : 1, 비사용중 : 0
+	uint8_t    byUsed;								// 사용중 : 1, 비사용중 : 0
 	char	strUserName[MAX_ID_SIZE + 1];		// 캐릭터의 이름
 };
 
 struct _ZONE_SERVERINFO
 {
-	short		sServerNo;
-	short		sPort;
+	int16_t		sServerNo;
+	int16_t		sPort;
 	char		strServerIP[20];
 
 	_ZONE_SERVERINFO()
@@ -342,16 +361,16 @@ struct _ZONE_SERVERINFO
 #pragma pack(push, 4)
 struct _WARP_INFO
 {
-	short	sWarpID;
-	char	strWarpName[32];
-	char	strAnnounce[256];
-	DWORD	dwPay;
-	short	sZone;
-	float	fX;
-	float	fY;
-	float	fZ;
-	float	fR;
-	short	sNation;
+	int16_t		sWarpID;
+	char		strWarpName[32];
+	char		strAnnounce[256];
+	uint32_t	dwPay;
+	int16_t		sZone;
+	float		fX;
+	float		fY;
+	float		fZ;
+	float		fR;
+	int16_t		sNation;
 
 	_WARP_INFO()
 	{

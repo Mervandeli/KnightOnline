@@ -34,10 +34,10 @@ EVENT::~EVENT()
 
 bool EVENT::LoadEvent(int zone)
 {
-	DWORD		length, count;
+	uint32_t		length, count;
 	CString		filename;
 	CFile		pFile;
-	BYTE		byte;
+	uint8_t		byte;
 	char		buf[4096];
 	char		first[1024];
 	char		temp[1024];
@@ -70,7 +70,7 @@ bool EVENT::LoadEvent(int zone)
 
 	std::wstring filenameWide = evtPath.wstring();
 
-	length = static_cast<DWORD>(pFile.GetLength());
+	length = static_cast<uint32_t>(pFile.GetLength());
 
 	CArchive in(&pFile, CArchive::load);
 	int lineNumber = 0;
@@ -93,7 +93,7 @@ bool EVENT::LoadEvent(int zone)
 			if (index <= 1)
 				continue;
 
-			buf[index] = (BYTE) 0;
+			buf[index] = (uint8_t) 0;
 
 			t_index = 0;
 

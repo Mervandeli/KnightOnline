@@ -362,13 +362,13 @@ void MAP::LoadMapTile(HANDLE hFile)
 	int x1 = m_sizeMap.cx;
 	int z1 = m_sizeMap.cy;
 	DWORD dwNum;
-	short** pEvent = new short* [m_sizeMap.cx];
+	int16_t** pEvent = new int16_t* [m_sizeMap.cx];
 
 	// 잠시 막아놓고..
 	for (int x = 0; x < m_sizeMap.cx; x++)
 	{
-		pEvent[x] = new short[m_sizeMap.cx];
-		ReadFile(hFile, pEvent[x], sizeof(short) * m_sizeMap.cy, &dwNum, nullptr);
+		pEvent[x] = new int16_t[m_sizeMap.cx];
+		ReadFile(hFile, pEvent[x], sizeof(int16_t) * m_sizeMap.cy, &dwNum, nullptr);
 	}
 
 	m_pMap = new CMapInfo* [m_sizeMap.cx];
@@ -381,7 +381,7 @@ void MAP::LoadMapTile(HANDLE hFile)
 	{
 		for (int j = 0; j < m_sizeMap.cx; j++)
 		{
-			m_pMap[j][i].m_sEvent = (short) pEvent[j][i];
+			m_pMap[j][i].m_sEvent = (int16_t) pEvent[j][i];
 
 			// NOTE: The SMDs don't have the correct data.
 			// Since we can't trust their data, we must assume every tile is movable.
@@ -504,10 +504,9 @@ void MAP::LoadObjectEvent(HANDLE hFile)
 
 bool MAP::LoadRoomEvent(int zone_number)
 {
-	DWORD		length, count;
 	CString		filename;
 	CFile		pFile;
-	BYTE		byte;
+	uint8_t		byte;
 	char		buf[4096];
 	char		first[1024];
 	char		temp[1024];
@@ -536,11 +535,11 @@ bool MAP::LoadRoomEvent(int zone_number)
 
 	std::wstring filenameWide = evtPath.wstring();
 
-	length = pFile.GetLength();
+	uint64_t length = pFile.GetLength();
 
 	CArchive in(&pFile, CArchive::load);
 	int lineNumber = 0;
-	count = 0;
+	uint64_t count = 0;
 
 	while (count < length)
 	{
@@ -559,7 +558,7 @@ bool MAP::LoadRoomEvent(int zone_number)
 			if (index <= 1)
 				continue;
 
-			buf[index] = (BYTE) 0;
+			buf[index] = (uint8_t) 0;
 			t_index = 0;
 
 			// 주석에 대한 처리
@@ -933,12 +932,14 @@ void MAP::InitializeRoom()
 /// \brief Checks if a position is valid for the map
 bool MAP::IsValidPosition(float x, float z) const
 {
-	int mapMaxX = (m_sizeMap.cx-1) * m_fUnitDist;
-	int mapMaxZ = (m_sizeMap.cy-1) * m_fUnitDist;
-	if (x < 0 || x > mapMaxX
-		|| z < 0 || z > mapMaxZ)
-	{
+	int mapMaxX = static_cast<int>((m_sizeMap.cx - 1) * m_fUnitDist);
+	int mapMaxZ = static_cast<int>((m_sizeMap.cy - 1) * m_fUnitDist);
+
+	if (x < 0 || x > mapMaxX)
 		return false;
-	}
+
+	if (z < 0 || z > mapMaxZ)
+		return false;
+
 	return true;
 }

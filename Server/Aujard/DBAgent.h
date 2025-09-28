@@ -54,7 +54,7 @@ public:
 	/// \param clientIp
 	/// \param init 0x01 to insert, 0x02 to update CURRENTUSER
 	/// \returns true when CURRENTUSER successfully updated, otherwise false
-	bool SetLogInInfo(const char* accountId, const char* charId, const char* serverIp, int serverId, const char* clientIp, BYTE init);
+	bool SetLogInInfo(const char* accountId, const char* charId, const char* serverIp, int serverId, const char* clientIp, uint8_t init);
 
 	/// \brief loads knights clan metadata into the supplied buffer
 	/// \param knightsId

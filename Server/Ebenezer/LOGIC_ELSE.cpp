@@ -146,6 +146,7 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::wstring& filename, int l
 			m_LogicElse = LOGIC_CHECK_PROMOTION_ELIGIBLE;
 			argsToParse = 1; // officially it always parses 1 even though it doesn't use it
 			break;
+#endif
 
 		// A CHECK_MONSTER_CHALLENGE_TIME {Forgotten Temple type}
 		case "CHECK_MONSTER_CHALLENGE_TIME"_djb2:
@@ -153,15 +154,23 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::wstring& filename, int l
 			argsToParse = 1;
 			break;
 
+#if 0 // TODO
 		// A CHECK_PPCARD_SERIAL
 		case "CHECK_PPCARD_SERIAL"_djb2:
 			m_LogicElse = LOGIC_CHECK_PPCARD_SERIAL;
 			argsToParse = 1; // officially it always parses 1 even though it doesn't use it
 			break;
+#endif
 
 		// A CHECK_EXIST_EVENT {quest ID} {quest state}
 		case "CHECK_EXIST_EVENT"_djb2:
 			m_LogicElse = LOGIC_CHECK_EXIST_EVENT;
+			argsToParse = 2;
+			break;
+
+		// A CHECK_NOEXIST_EVENT {quest ID} {quest state}
+		case "CHECK_NOEXIST_EVENT"_djb2:
+			m_LogicElse = LOGIC_CHECK_NOEXIST_EVENT;
 			argsToParse = 2;
 			break;
 
@@ -176,7 +185,6 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::wstring& filename, int l
 			m_LogicElse = LOGIC_CHECK_NOCLASS;
 			argsToParse = 6;
 			break;
-#endif
 
 		// A CHECK_LOYALTY {minimum} {maximum}
 		case "CHECK_LOYALTY"_djb2:
@@ -202,7 +210,6 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::wstring& filename, int l
 			argsToParse = 2;
 			break;
 
-#if 0 // TODO
 		// A CHECK_KNIGHT
 		case "CHECK_KNIGHT"_djb2:
 			m_LogicElse = LOGIC_CHECK_KNIGHT;
@@ -245,6 +252,7 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::wstring& filename, int l
 			argsToParse = 1;
 			break;
 
+#if 0 // TODO
 		// A CHECK_STAT_TOTAL {minimum} {maximum}
 		case "CHECK_STAT_TOTAL"_djb2:
 			m_LogicElse = LOGIC_CHECK_STAT_TOTAL;
@@ -258,8 +266,23 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::wstring& filename, int l
 			break;
 #endif // 0
 
+		// A CHECK_BEEF_ROAST_KARUS_VICTORY
+		case "CHECK_BEEF_ROAST_KARUS_VICTORY"_djb2:
+			argsToParse = 1; // officially it always parses 1 even though it doesn't use it
+			break;
+
+		// A CHECK_BEEF_ROAST_ELMORAD_VICTORY
+		case "CHECK_BEEF_ROAST_ELMORAD_VICTORY"_djb2:
+			argsToParse = 1; // officially it always parses 1 even though it doesn't use it
+			break;
+
+		// A CHECK_BEEF_ROAST_NO_VICTORY
+		case "CHECK_BEEF_ROAST_NO_VICTORY"_djb2:
+			argsToParse = 1; // officially it always parses 1 even though it doesn't use it
+			break;
+
 		default:
-			spdlog::warn("LOGIC_ELSE::Parse_And: unhandled opcode '{}' ({}:{})", temp, WideToUtf8(filename), lineNumber);
+			spdlog::warn("LOGIC_ELSE::Parse_and: unhandled opcode '{}' ({}:{})", temp, WideToUtf8(filename), lineNumber);
 			break;
 	}
 

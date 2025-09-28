@@ -17,9 +17,9 @@ typedef CSTLMap <int>			mapNpcArray;
 
 struct _RoomEvent
 {
-	short	sNumber;			// 명령어, 조건문 번호
-	short	sOption_1;			// option 1 (몬스터의 번호를 주로 가지고 있음)
-	short	sOption_2;			// option 2 (몬스터의 마리수)
+	int16_t	sNumber;			// 명령어, 조건문 번호
+	int16_t	sOption_1;			// option 1 (몬스터의 번호를 주로 가지고 있음)
+	int16_t	sOption_2;			// option 2 (몬스터의 마리수)
 };
 
 class CNpc;
@@ -29,10 +29,10 @@ class CRoomEvent
 {
 public:
 	int     m_iZoneNumber;		// zone number
-	short	m_sRoomNumber;		// room number (0:empty room)
-	BYTE	m_byStatus;			// room status (1:init, 2:progress, 3:clear)
-	BYTE	m_byCheck;			// 조건문의 갯수
-	BYTE	m_byRoomType;		// 방의 타입(0:일반, 1:함정방, 2:,,,,)
+	int16_t	m_sRoomNumber;		// room number (0:empty room)
+	uint8_t	m_byStatus;			// room status (1:init, 2:progress, 3:clear)
+	uint8_t	m_byCheck;			// 조건문의 갯수
+	uint8_t	m_byRoomType;		// 방의 타입(0:일반, 1:함정방, 2:,,,,)
 
 	int		m_iInitMinX;		// room region x
 	int		m_iInitMinZ;
@@ -53,7 +53,7 @@ public:
 	CServerDlg* m_pMain;
 
 private:
-	BYTE    m_byLogicNumber;	// 현재의 조건문 검사 번호 (조건번호는 1부터 시작됨) (m_byCheck와 m_byLogicNumber이 같다면 클리어 상태)
+	uint8_t    m_byLogicNumber;	// 현재의 조건문 검사 번호 (조건번호는 1부터 시작됨) (m_byCheck와 m_byLogicNumber이 같다면 클리어 상태)
 
 
 public:

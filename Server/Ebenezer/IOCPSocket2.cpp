@@ -138,7 +138,7 @@ int CIOCPSocket2::Send(char* pBuf, long length, int dwFlag)
 	if (length > MAX_PACKET_SIZE)
 		return 0;
 
-	BYTE pTBuf[MAX_PACKET_SIZE] = {},
+	uint8_t pTBuf[MAX_PACKET_SIZE] = {},
 		pTIBuf[MAX_PACKET_SIZE] = {},
 		pTOutBuf[MAX_PACKET_SIZE] = {};
 
@@ -146,36 +146,36 @@ int CIOCPSocket2::Send(char* pBuf, long length, int dwFlag)
 
 	if (m_CryptionFlag)
 	{
-		uint16_t len = static_cast<uint16_t>(length + sizeof(WORD) + 2 + 1);
+		uint16_t len = static_cast<uint16_t>(length + sizeof(uint16_t) + 2 + 1);
 
 		m_Sen_val++;
 		m_Sen_val &= 0x00ffffff;
 
 		pTIBuf[0] = 0xfc; // 암호가 정확한지
 		pTIBuf[1] = 0x1e;
-		memcpy(pTIBuf + 2, &m_Sen_val, sizeof(WORD) + 1);
+		memcpy(pTIBuf + 2, &m_Sen_val, sizeof(uint16_t) + 1);
 		memcpy(pTIBuf + 5, pBuf, length);
 		jct.JvEncryptionFast(len, pTIBuf, pTOutBuf);
 
-		pTBuf[index++] = (BYTE) PACKET_START1;
-		pTBuf[index++] = (BYTE) PACKET_START2;
+		pTBuf[index++] = (uint8_t) PACKET_START1;
+		pTBuf[index++] = (uint8_t) PACKET_START2;
 		memcpy(pTBuf + index, &len, 2);
 		index += 2;
 		memcpy(pTBuf + index, pTOutBuf, len);
 		index += len;
-		pTBuf[index++] = (BYTE) PACKET_END1;
-		pTBuf[index++] = (BYTE) PACKET_END2;
+		pTBuf[index++] = (uint8_t) PACKET_END1;
+		pTBuf[index++] = (uint8_t) PACKET_END2;
 	}
 	else
 	{
-		pTBuf[index++] = (BYTE) PACKET_START1;
-		pTBuf[index++] = (BYTE) PACKET_START2;
+		pTBuf[index++] = (uint8_t) PACKET_START1;
+		pTBuf[index++] = (uint8_t) PACKET_START2;
 		memcpy(pTBuf + index, &length, 2);
 		index += 2;
 		memcpy(pTBuf + index, pBuf, length);
 		index += length;
-		pTBuf[index++] = (BYTE) PACKET_END1;
-		pTBuf[index++] = (BYTE) PACKET_END2;
+		pTBuf[index++] = (uint8_t) PACKET_END1;
+		pTBuf[index++] = (uint8_t) PACKET_END2;
 	}
 
 	out.buf = (char*) pTBuf;
@@ -224,7 +224,7 @@ int CIOCPSocket2::Send(char* pBuf, long length, int dwFlag)
 		m_nSocketErr = 0;
 	}
 
-	return sent;
+	return static_cast<int>(sent);
 
 close_routine:
 	pOvl = &m_RecvOverlapped;
@@ -418,7 +418,7 @@ bool CIOCPSocket2::PullOutCore(char*& data, int& length)
 			return false;
 		}
 
-		std::vector<BYTE> decryption_buffer(length);
+		std::vector<uint8_t> decryption_buffer(length);
 
 		int decrypted_len = jct.JvDecryptionWithCRC32(length, &tmp_buffer[sPos + 2], &decryption_buffer[0]);
 		if (decrypted_len < 0)
@@ -430,7 +430,7 @@ bool CIOCPSocket2::PullOutCore(char*& data, int& length)
 		}
 
 		int index = 0;
-		DWORD recv_packet = GetDWORD((char*) &decryption_buffer[0], index);
+		uint32_t recv_packet = GetDWORD((char*) &decryption_buffer[0], index);
 
 		// Verify the sequence number.
 		// If it wraps back around, we should simply let it reset.
@@ -611,8 +611,8 @@ void CIOCPSocket2::SendCompressingPacket(const char* pData, int len)
 	}
 
 	SetByte(send_buff, WIZ_COMPRESS_PACKET, send_index);
-	SetShort(send_buff, (short) out_len, send_index);
-	SetShort(send_buff, (short) len, send_index);
+	SetShort(send_buff, (int16_t) out_len, send_index);
+	SetShort(send_buff, (int16_t) len, send_index);
 	SetDWORD(send_buff, 0, send_index); // checksum
 	SetString(send_buff, pBuff, out_len, send_index);
 	Send(send_buff, send_index);

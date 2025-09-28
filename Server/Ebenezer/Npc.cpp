@@ -85,10 +85,10 @@ void CNpc::MoveResult(float xpos, float ypos, float zpos, float speed)
 
 	SetByte(pOutBuf, WIZ_NPC_MOVE, send_index);
 	SetShort(pOutBuf, m_sNid, send_index);
-	SetShort(pOutBuf, (WORD) m_fCurX * 10, send_index);
-	SetShort(pOutBuf, (WORD) m_fCurZ * 10, send_index);
-	SetShort(pOutBuf, (short) m_fCurY * 10, send_index);
-	SetShort(pOutBuf, (short) speed * 10, send_index);
+	SetShort(pOutBuf, (uint16_t) m_fCurX * 10, send_index);
+	SetShort(pOutBuf, (uint16_t) m_fCurZ * 10, send_index);
+	SetShort(pOutBuf, (int16_t) m_fCurY * 10, send_index);
+	SetShort(pOutBuf, (int16_t) speed * 10, send_index);
 
 	m_pMain->Send_Region(pOutBuf, send_index, m_sCurZone, m_sRegion_X, m_sRegion_Z, nullptr, false);
 	//TRACE(_T("RecvNpcMove ==> nid = %d, zone=%d, x = %f, z = %f\n"), m_sNid, m_sCurZone, m_fCurX, m_fCurZ);
@@ -304,12 +304,12 @@ void CNpc::GetNpcInfo(char* buff, int& buff_index)
 	SetShort(buff, m_sSize, buff_index);
 	SetDWORD(buff, m_iWeapon_1, buff_index);
 	SetDWORD(buff, m_iWeapon_2, buff_index);
-	SetString1(buff, m_strName, static_cast<BYTE>(strlen(m_strName)), buff_index);
+	SetString1(buff, m_strName, static_cast<uint8_t>(strlen(m_strName)), buff_index);
 	SetByte(buff, m_byGroup, buff_index);
 	SetByte(buff, m_byLevel, buff_index);
-	SetShort(buff, (WORD) m_fCurX * 10, buff_index);
-	SetShort(buff, (WORD) m_fCurZ * 10, buff_index);
-	SetShort(buff, (short) m_fCurY * 10, buff_index);
+	SetShort(buff, (uint16_t) m_fCurX * 10, buff_index);
+	SetShort(buff, (uint16_t) m_fCurZ * 10, buff_index);
+	SetShort(buff, (int16_t) m_fCurY * 10, buff_index);
 	SetDWORD(buff, (int) m_byGateOpen, buff_index);
 	SetByte(buff, m_byObjectType, buff_index);
 	SetShort(buff, 0, buff_index); // Client: sIDK0

@@ -37,7 +37,7 @@ void CParty::Initialize()
 void CParty::PartyProcess(char* pBuf)
 {
 	int index = 0;
-	BYTE subcommand;
+	uint8_t subcommand;
 
 	subcommand = GetByte(pBuf, index);
 	switch (subcommand)
@@ -63,9 +63,9 @@ void CParty::PartyProcess(char* pBuf)
 void CParty::PartyCreate(char* pBuf)
 {
 	int index = 0;
-	short sPartyIndex = 0;
-	short sUid = 0, sHP = 0, sClass = 0;
-	BYTE  byLevel = 0;
+	int16_t sPartyIndex = 0;
+	int16_t sUid = 0, sHP = 0, sClass = 0;
+	uint8_t byLevel = 0;
 	_PARTY_GROUP* pParty = nullptr;
 	CUser* pUser = nullptr;
 
@@ -99,10 +99,10 @@ void CParty::PartyCreate(char* pBuf)
 void CParty::PartyInsert(char* pBuf)
 {
 	int index = 0;
-	short sPartyIndex = 0;
-	BYTE  byIndex = -1;
-	short sUid = 0, sHP = 0, sClass = 0;
-	BYTE  byLevel = 0;
+	int16_t sPartyIndex = 0;
+	uint8_t  byIndex = -1;
+	int16_t sUid = 0, sHP = 0, sClass = 0;
+	uint8_t  byLevel = 0;
 	_PARTY_GROUP* pParty = nullptr;
 	CUser* pUser = nullptr;
 
@@ -136,8 +136,8 @@ void CParty::PartyInsert(char* pBuf)
 void CParty::PartyRemove(char* pBuf)
 {
 	int index = 0;
-	short sPartyIndex = 0;
-	short sUid = 0;
+	int16_t sPartyIndex = 0;
+	int16_t sUid = 0;
 	_PARTY_GROUP* pParty = nullptr;
 	CUser* pUser = nullptr;
 
@@ -179,7 +179,7 @@ void CParty::PartyRemove(char* pBuf)
 void CParty::PartyDelete(char* pBuf)
 {
 	int index = 0;
-	short sPartyIndex = 0;
+	int16_t sPartyIndex = 0;
 	_PARTY_GROUP* pParty = nullptr;
 	CUser* pUser = nullptr;
 

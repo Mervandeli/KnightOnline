@@ -133,174 +133,204 @@ CN3FXPartParticles::~CN3FXPartParticles()
 #ifdef _N3TOOL
 bool CN3FXPartParticles::ParseScript(char* szCommand, char* szBuff0, char* szBuff1, char* szBuff2, char* szBuff3)
 {
-	if(CN3FXPartBase::ParseScript(szCommand, szBuff0, szBuff1, szBuff2, szBuff3)) return true;
+	if (CN3FXPartBase::ParseScript(szCommand, szBuff0, szBuff1, szBuff2, szBuff3))
+		return true;
 
 	//	파티클 수.
-	if(lstrcmpi(szCommand, "<particle_count>")==0)
+	if (lstrcmpi(szCommand, "<particle_count>") == 0)
 	{
 		m_iNumParticle = atoi(szBuff0);
-		if(m_iNumParticle>0) InitVB();
+		if (m_iNumParticle > 0)
+			InitVB();
 		return true;
 	}
 
 	//	파티클 크기.
-	if(lstrcmpi(szCommand, "<particle_size>")==0)
+	if (lstrcmpi(szCommand, "<particle_size>") == 0)
 	{
-		m_pair_fParticleSize.first = m_pair_fParticleSize.second = atof(szBuff0);
+		m_pair_fParticleSize.first = m_pair_fParticleSize.second = static_cast<float>(atof(szBuff0));
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<particle_size_range>")==0)
+
+	if (lstrcmpi(szCommand, "<particle_size_range>") == 0)
 	{
-		m_pair_fParticleSize.first = atof(szBuff0);
-		m_pair_fParticleSize.second = atof(szBuff1);
+		m_pair_fParticleSize.first = static_cast<float>(atof(szBuff0));
+		m_pair_fParticleSize.second = static_cast<float>(atof(szBuff1));
 		return true;
 	}
 
 	//	파티클 생명.
-	if(lstrcmpi(szCommand, "<particle_life>")==0)
+	if (lstrcmpi(szCommand, "<particle_life>") == 0)
 	{
-		m_pair_fParticleLife.first = atof(szBuff0);
-		m_pair_fParticleLife.second = atof(szBuff1);
+		m_pair_fParticleLife.first = static_cast<float>(atof(szBuff0));
+		m_pair_fParticleLife.second = static_cast<float>(atof(szBuff1));
 		return true;
 	}
 
 	//	파티클 시작오차..min
-	if(lstrcmpi(szCommand, "<start_range_min>")==0)
+	if (lstrcmpi(szCommand, "<start_range_min>") == 0)
 	{
-		m_MinCreateRange.Set(atof(szBuff0), atof(szBuff1), atof(szBuff2));
+		m_MinCreateRange.Set(
+			static_cast<float>(atof(szBuff0)),
+			static_cast<float>(atof(szBuff1)),
+			static_cast<float>(atof(szBuff2)));
 		return true;
 	}
 
 	//	파티클 시작오차..max
-	if(lstrcmpi(szCommand, "<start_range_max>")==0)
+	if (lstrcmpi(szCommand, "<start_range_max>") == 0)
 	{
-		m_MaxCreateRange.Set(atof(szBuff0), atof(szBuff1), atof(szBuff2));
+		m_MaxCreateRange.Set(
+			static_cast<float>(atof(szBuff0)),
+			static_cast<float>(atof(szBuff1)),
+			static_cast<float>(atof(szBuff2)));
 		return true;
 	}
 
 	//	파티클 한번에 생성 갯수
-	if(lstrcmpi(szCommand, "<create_count>")==0)
+	if (lstrcmpi(szCommand, "<create_count>") == 0)
 	{
 		m_iNumCreate = atoi(szBuff0);
 		return true;
 	}
 
 	//	파티클 한번에 생성 시간 범위
-	if(lstrcmpi(szCommand, "<create_delay>")==0)
+	if (lstrcmpi(szCommand, "<create_delay>") == 0)
 	{
-		m_CurrCreateDelay = m_fCreateDelay = atof(szBuff0);
+		m_CurrCreateDelay = m_fCreateDelay = static_cast<float>(atof(szBuff0));
 		return true;
 	}
 
 	//	시작하는 방법.
-	if(lstrcmpi(szCommand, "<emit_type>")==0)
+	if (lstrcmpi(szCommand, "<emit_type>") == 0)
 	{
-		if(lstrcmpi(szBuff0, "spread")==0)
+		if (lstrcmpi(szBuff0, "spread") == 0)
 		{
 			m_dwEmitType = FX_PART_PARTICLE_EMIT_TYPE_SPREAD;
-			m_uEmitCon.fEmitAngle = atof(szBuff1);
+			m_uEmitCon.fEmitAngle = static_cast<float>(atof(szBuff1));
 		}
-		else if(lstrcmpi(szBuff0, "gather")==0)
+		else if (lstrcmpi(szBuff0, "gather") == 0)
 		{
 			m_dwEmitType = FX_PART_PARTICLE_EMIT_TYPE_GATHER;
-			m_uEmitCon.vGatherPoint.x = atof(szBuff1);
-			m_uEmitCon.vGatherPoint.y = atof(szBuff2);
-			m_uEmitCon.vGatherPoint.z = atof(szBuff3);
+			m_uEmitCon.vGatherPoint.x = static_cast<float>(atof(szBuff1));
+			m_uEmitCon.vGatherPoint.y = static_cast<float>(atof(szBuff2));
+			m_uEmitCon.vGatherPoint.z = static_cast<float>(atof(szBuff3));
 		}
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<particle_direction>")==0)
+	if (lstrcmpi(szCommand, "<particle_direction>") == 0)
 	{
-		m_vPtEmitDir.Set(atof(szBuff0), atof(szBuff1), atof(szBuff2));
+		m_vPtEmitDir.Set(
+			static_cast<float>(atof(szBuff0)),
+			static_cast<float>(atof(szBuff1)),
+			static_cast<float>(atof(szBuff2)));
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<particle_velocity>")==0)
+	if (lstrcmpi(szCommand, "<particle_velocity>") == 0)
 	{
-		m_fPtVelocity = atof(szBuff0);
+		m_fPtVelocity = static_cast<float>(atof(szBuff0));
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<particle_acceleration>")==0)
+	if (lstrcmpi(szCommand, "<particle_acceleration>") == 0)
 	{
-		m_fPtAccel = atof(szBuff0);
+		m_fPtAccel = static_cast<float>(atof(szBuff0));
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<particle_rotation_velocity>")==0)
+	if (lstrcmpi(szCommand, "<particle_rotation_velocity>") == 0)
 	{
-		float Degree = atof(szBuff0);			
+		float Degree = static_cast<float>(atof(szBuff0));
 		m_fPtRotVelocity = D3DXToRadian(Degree);
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<particle_gravity>")==0)
+	if (lstrcmpi(szCommand, "<particle_gravity>") == 0)
 	{
-		m_fPtGravity = atof(szBuff0);
+		m_fPtGravity = static_cast<float>(atof(szBuff0));
 		return true;
 	}
-	
-	if(lstrcmpi(szCommand, "<particle_color>")==0)
+
+	if (lstrcmpi(szCommand, "<particle_color>") == 0)
 	{
 		int seq = atoi(szBuff0);
 		uint32_t color = atoi(szBuff1);
-		if(seq>=0 && seq<NUM_KEY_COLOR) m_dwChangeColor[seq] = color;
+		if (seq >= 0 && seq < NUM_KEY_COLOR)
+			m_dwChangeColor[seq] = color;
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<change_color>")==0)
+	if (lstrcmpi(szCommand, "<change_color>") == 0)
 	{
-		if(lstrcmpi(szBuff0, "true")==0) m_bChangeColor = true;
-		if(lstrcmpi(szBuff0, "false")==0) m_bChangeColor = false;
+		if (lstrcmpi(szBuff0, "true") == 0)
+			m_bChangeColor = true;
+		else if (lstrcmpi(szBuff0, "false") == 0)
+			m_bChangeColor = false;
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<color_key>")==0)
+	if (lstrcmpi(szCommand, "<color_key>") == 0)
 	{
 		int seq = atoi(szBuff0);
-		if(seq>=0 && seq<NUM_KEY_COLOR) m_bChangeColorKey[seq] = true;
+		if (seq >= 0 && seq < NUM_KEY_COLOR)
+			m_bChangeColorKey[seq] = true;
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<alpha_key>")==0)
+
+	if (lstrcmpi(szCommand, "<alpha_key>") == 0)
 	{
 		int seq = atoi(szBuff0);
-		if(seq>=0 && seq<NUM_KEY_COLOR) m_bChangeAlphaKey[seq] = true;
+		if (seq >= 0 && seq < NUM_KEY_COLOR)
+			m_bChangeAlphaKey[seq] = true;
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<shape_name>")==0 && lstrcmpi(szBuff0, "")!=0)
+
+	if (lstrcmpi(szCommand, "<shape_name>") == 0)
 	{
+		if (lstrcmpi(szBuff0, "") == 0)
+			return false;
+
 		char szPath[MAX_PATH] = {};
 		strcpy(szPath, szBuff0);
-		m_pShape = new CN3FXShape;
 
+		m_pShape = new CN3FXShape();
 		m_pRefShape = s_MngFXShape.Get(szPath);
 		m_pShape->Duplicate(m_pRefShape);
 		m_vCurrPos = m_pShape->CenterPos();
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<shape_fps>")==0)
+
+	if (lstrcmpi(szCommand, "<shape_fps>") == 0)
 	{
-		m_fMeshFPS = atof(szBuff0);
+		m_fMeshFPS = static_cast<float>(atof(szBuff0));
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<shape_apply>")==0)
+
+	if (lstrcmpi(szCommand, "<shape_apply>") == 0)
 	{
-		if(lstrcmpi(szBuff0, "true")==0) m_bAnimKey = true;
-		if(lstrcmpi(szBuff0, "false")==0) m_bAnimKey = false;
+		if (lstrcmpi(szBuff0, "true") == 0)
+			m_bAnimKey = true;
+		else if (lstrcmpi(szBuff0, "false") == 0)
+			m_bAnimKey = false;
+
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<texture_rotation_speed>")==0)
+
+	if (lstrcmpi(szCommand, "<texture_rotation_speed>") == 0)
 	{
-		m_fTexRotateVelocity = atof(szBuff0);
+		m_fTexRotateVelocity = static_cast<float>(atof(szBuff0));
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<particle_scale_velocity>")==0)
+
+	if (lstrcmpi(szCommand, "<particle_scale_velocity>") == 0)
 	{
-		m_fScaleVelX = atof(szBuff0);
-		m_fScaleVelY = atof(szBuff1);
+		m_fScaleVelX = static_cast<float>(atof(szBuff0));
+		m_fScaleVelY = static_cast<float>(atof(szBuff1));
 		return true;
 	}
+
 	return false;
 }
 #endif // end of _N3TOOL

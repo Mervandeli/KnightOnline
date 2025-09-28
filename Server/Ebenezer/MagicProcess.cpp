@@ -79,7 +79,7 @@ void CMagicProcess::MagicPacket(char* pBuf, int len)
 	model::Magic* pTable = nullptr;
 	CNpc* pMon = nullptr;
 
-	BYTE command = GetByte(pBuf, index);	// Get the magic status.  
+	uint8_t command = GetByte(pBuf, index);	// Get the magic status.  
 	magicid = GetDWORD(pBuf, index);		// Get ID of magic.
 	sid = GetShort(pBuf, index);			// Get ID of source.
 	tid = GetShort(pBuf, index);			// Get ID of target.
@@ -360,7 +360,7 @@ void CMagicProcess::MagicPacket(char* pBuf, int len)
 				SetShort(send_buff, data4, send_index);
 				SetShort(send_buff, data5, send_index);
 				SetShort(send_buff, data6, send_index);
-				short total_cha = m_pSrcUser->m_pUserData->m_bCha + m_pSrcUser->m_sItemCham;
+				int16_t total_cha = m_pSrcUser->m_pUserData->m_bCha + m_pSrcUser->m_sItemCham;
 				SetShort(send_buff, total_cha, send_index);
 
 				// Does the magic user have a staff?
@@ -378,7 +378,7 @@ void CMagicProcess::MagicPacket(char* pBuf, int len)
 						if (pMagic->Type1 == 3)
 						{
 //
-							total_magic_damage += ((pRightHand->Damage * 0.8f) + (pRightHand->Damage * m_pSrcUser->m_pUserData->m_bLevel) / 60);
+							total_magic_damage += static_cast<int>(((pRightHand->Damage * 0.8f) + (pRightHand->Damage * m_pSrcUser->m_pUserData->m_bLevel) / 60));
 //
 
 							model::MagicType3* pType3 = m_pMain->m_MagicType3TableMap.GetData(magicid);     // Get magic skill table type 4.
@@ -388,7 +388,7 @@ void CMagicProcess::MagicPacket(char* pBuf, int len)
 							if (m_pSrcUser->m_bMagicTypeRightHand == pType3->Attribute)
 							{
 //								total_magic_damage += pRightHand->Damage;
-								total_magic_damage += ((pRightHand->Damage * 0.8f) + (pRightHand->Damage * m_pSrcUser->m_pUserData->m_bLevel) / 30);
+								total_magic_damage += static_cast<int>(((pRightHand->Damage * 0.8f) + (pRightHand->Damage * m_pSrcUser->m_pUserData->m_bLevel) / 30));
 							}
 //
 							// Remember what Sunglae told ya!
@@ -540,7 +540,7 @@ return_echo:
 	}
 }
 
-model::Magic* CMagicProcess::IsAvailable(int magicid, int tid, int sid, BYTE type, int data1, int data2, int data3)
+model::Magic* CMagicProcess::IsAvailable(int magicid, int tid, int sid, uint8_t type, int data1, int data2, int data3)
 {
 	CUser* pUser = nullptr;		// When the target is a player....
 	CUser* pParty = nullptr;	// When the target is a party....
@@ -1042,7 +1042,7 @@ fail_return:    // In case the magic failed, just send a packet.
 	return nullptr;     // Magic was a failure!
 }
 
-BYTE CMagicProcess::ExecuteType1(int magicid, int sid, int tid, int data1, int data2, int data3)   // Applied to an attack skill using a weapon.
+uint8_t CMagicProcess::ExecuteType1(int magicid, int sid, int tid, int data1, int data2, int data3)   // Applied to an attack skill using a weapon.
 {
 	int damage = 0, send_index = 0, result = 1;     // Variable initialization. result == 1 : success, 0 : fail
 	char send_buff[128] = {};
@@ -1131,13 +1131,13 @@ packet_send:
 	return result;
 }
 
-BYTE CMagicProcess::ExecuteType2(int magicid, int sid, int tid, int data1, int data2, int data3)
+uint8_t CMagicProcess::ExecuteType2(int magicid, int sid, int tid, int data1, int data2, int data3)
 {
 	int damage = 0, send_index = 0, result = 1; // Variable initialization. result == 1 : success, 0 : fail	
 	char send_buff[128] = {};	// For the packet. 
 
 	int total_range = 0;	// These variables are used for range verification!
-	int sx, sz, tx, tz;
+	float sx, sz, tx, tz;
 
 	model::Magic* pMagic = m_pMain->m_MagicTableMap.GetData(magicid);   // Get main magic table.
 	if (pMagic == nullptr)
@@ -1164,7 +1164,7 @@ BYTE CMagicProcess::ExecuteType2(int magicid, int sid, int tid, int data1, int d
 		goto packet_send;
 	}
 
-	total_range = pow(((pType->RangeMod * pTable->Range) / 100), 2);     // Range verification procedure.
+	total_range = static_cast<int>(pow(((pType->RangeMod * pTable->Range) / 100), 2));     // Range verification procedure.
 //	total_range = pow(((pType->RangeMod / 100) * pTable->Range), 2) ;     // Range verification procedure.
 
 	sx = m_pSrcUser->m_pUserData->m_curx;
@@ -1587,7 +1587,6 @@ void CMagicProcess::ExecuteType3(int magicid, int sid, int tid, int data1, int d
 //
 		}
 
-	packet_send:
 		if (pMagic->Type2 == 0
 			|| pMagic->Type2 == 3)
 		{
@@ -1787,11 +1786,11 @@ void CMagicProcess::ExecuteType4(int magicid, int sid, int tid, int data1, int d
 				break;
 
 			case 7:
-				pTUser->m_bStrAmount = pType->Strength;
-				pTUser->m_bStaAmount = pType->Stamina;
-				pTUser->m_bDexAmount = pType->Dexterity;
-				pTUser->m_bIntelAmount = pType->Intelligence;
-				pTUser->m_bChaAmount = pType->Charisma;
+				pTUser->m_sStrAmount = pType->Strength;
+				pTUser->m_sStaAmount = pType->Stamina;
+				pTUser->m_sDexAmount = pType->Dexterity;
+				pTUser->m_sIntelAmount = pType->Intelligence;
+				pTUser->m_sChaAmount = pType->Charisma;
 				pTUser->m_sDuration7 = pType->Duration;
 				pTUser->m_fStartTime7 = TimeGet();
 				break;
@@ -2080,11 +2079,11 @@ void CMagicProcess::ExecuteType5(int magicid, int sid, int tid, int data1, int d
 			{
 				pTUser->m_sDuration7 = 0;
 				pTUser->m_fStartTime7 = 0.0f;
-				pTUser->m_bStrAmount = 0;
-				pTUser->m_bStaAmount = 0;
-				pTUser->m_bDexAmount = 0;
-				pTUser->m_bIntelAmount = 0;
-				pTUser->m_bChaAmount = 0;
+				pTUser->m_sStrAmount = 0;
+				pTUser->m_sStaAmount = 0;
+				pTUser->m_sDexAmount = 0;
+				pTUser->m_sIntelAmount = 0;
+				pTUser->m_sChaAmount = 0;
 				pTUser->m_bType4Buff[6] = 0;
 
 				SendType4BuffRemove(tid, 7);
@@ -2261,28 +2260,6 @@ void CMagicProcess::ExecuteType5(int magicid, int sid, int tid, int data1, int d
 			m_pMain->Send_Region(send_buff, send_index, pTUser->m_pUserData->m_bZone, pTUser->m_RegionX, pTUser->m_RegionZ, nullptr, false);
 		}
 	}
-
-	return;
-
-fail_return:
-	if (sid >= 0
-		&& sid < MAX_USER)
-	{
-		memset(send_buff, 0, sizeof(send_buff));
-		send_index = 0;
-		SetByte(send_buff, WIZ_MAGIC_PROCESS, send_index);		// In case of failure!!!
-		SetByte(send_buff, MAGIC_FAIL, send_index);
-		SetDWORD(send_buff, magicid, send_index);
-		SetShort(send_buff, sid, send_index);
-		SetShort(send_buff, tid, send_index);
-		SetShort(send_buff, 0, send_index);
-		SetShort(send_buff, 0, send_index);
-		SetShort(send_buff, 0, send_index);
-		SetShort(send_buff, 0, send_index);
-		SetShort(send_buff, 0, send_index);
-		SetShort(send_buff, 0, send_index);
-		m_pSrcUser->Send(send_buff, send_index);
-	}
 }
 
 void CMagicProcess::ExecuteType6(int magicid)
@@ -2429,8 +2406,8 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 //					m_pUserData->m_curz = m_fWill_z = pEvent->fPosZ + z;
 //					m_pUserData->m_cury = 0;
 
-					SetShort(send_buff, (WORD) ((pEvent->fPosX * 10) + x), send_index);
-					SetShort(send_buff, (WORD) ((pEvent->fPosZ * 10) + z), send_index);
+					SetShort(send_buff, (uint16_t) ((pEvent->fPosX * 10) + x), send_index);
+					SetShort(send_buff, (uint16_t) ((pEvent->fPosZ * 10) + z), send_index);
 					pTUser->Warp(send_buff);
 
 				}
@@ -2445,8 +2422,8 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 //						m_pUserData->m_curx = m_fWill_x = (float)852.0 + x;
 //						m_pUserData->m_curz = m_fWill_z = (float)164.0 + z;
 
-						SetShort(send_buff, 852 + x, send_index);
-						SetShort(send_buff, 164 + z, send_index);
+						SetShort(send_buff, static_cast<int16_t>(852 + x), send_index);
+						SetShort(send_buff, static_cast<int16_t>(164 + z), send_index);
 						pTUser->Warp(send_buff);
 					}
 					// Land of Elmorad
@@ -2456,8 +2433,8 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 //						m_pUserData->m_curx = m_fWill_x = (float)177.0 + x;
 //						m_pUserData->m_curz = m_fWill_z = (float)923.0 + z;
 
-						SetShort(send_buff, 177 + x, send_index);
-						SetShort(send_buff, 923 + z, send_index);
+						SetShort(send_buff, static_cast<int16_t>(177 + x), send_index);
+						SetShort(send_buff, static_cast<int16_t>(923 + z), send_index);
 						pTUser->Warp(send_buff);
 					}
 				}
@@ -2466,21 +2443,21 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 				// 개척존 --;
 				else if (pTUser->m_pUserData->m_bZone == ZONE_BATTLE)
 				{
-					SetShort(send_buff, (WORD) ((pHomeInfo->BattleZoneX * 10) + x), send_index);
-					SetShort(send_buff, (WORD) ((pHomeInfo->BattleZoneZ * 10) + z), send_index);
+					SetShort(send_buff, (uint16_t) ((pHomeInfo->BattleZoneX * 10) + x), send_index);
+					SetShort(send_buff, (uint16_t) ((pHomeInfo->BattleZoneZ * 10) + z), send_index);
 					pTUser->Warp(send_buff);
 				}
 				else if (pTUser->m_pUserData->m_bZone == ZONE_FRONTIER)
 				{
-					SetShort(send_buff, (WORD) ((pHomeInfo->FreeZoneX * 10) + x), send_index);
-					SetShort(send_buff, (WORD) ((pHomeInfo->FreeZoneZ * 10) + z), send_index);
+					SetShort(send_buff, (uint16_t) ((pHomeInfo->FreeZoneX * 10) + x), send_index);
+					SetShort(send_buff, (uint16_t) ((pHomeInfo->FreeZoneZ * 10) + z), send_index);
 					pTUser->Warp(send_buff);
 				}
 				// No, I don't have any idea what this part means....
 				else
 				{
-					SetShort(send_buff, (WORD) ((pTMap->m_fInitX * 10) + x), send_index);
-					SetShort(send_buff, (WORD) ((pTMap->m_fInitZ * 10) + z), send_index);
+					SetShort(send_buff, (uint16_t) ((pTMap->m_fInitX * 10) + x), send_index);
+					SetShort(send_buff, (uint16_t) ((pTMap->m_fInitZ * 10) + z), send_index);
 					pTUser->Warp(send_buff);
 				}
 
@@ -2552,8 +2529,8 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 				send_index = 0;
 				memset(send_buff, 0, sizeof(send_buff));
 
-				SetShort(send_buff, (WORD) (m_pSrcUser->m_pUserData->m_curx * 10 /* + myrand(1,3) */), send_index);	// Send packet with new positions to the Warp() function.
-				SetShort(send_buff, (WORD) (m_pSrcUser->m_pUserData->m_curz * 10 /* + myrand(1,3) */), send_index);
+				SetShort(send_buff, (uint16_t) (m_pSrcUser->m_pUserData->m_curx * 10 /* + myrand(1,3) */), send_index);	// Send packet with new positions to the Warp() function.
+				SetShort(send_buff, (uint16_t) (m_pSrcUser->m_pUserData->m_curz * 10 /* + myrand(1,3) */), send_index);
 				pTUser->Warp(send_buff);
 
 				send_index = 0;
@@ -2606,18 +2583,22 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 				float warp_x, warp_z;		// Variable Initialization.
 				float temp_warp_x, temp_warp_z;
 
-				warp_x = pTUser->m_pUserData->m_curx;	// Get current locations.
+				// Get current locations.
+				warp_x = pTUser->m_pUserData->m_curx;
 				warp_z = pTUser->m_pUserData->m_curz;
 
-				temp_warp_x = myrand(0, 20);	// Get random positions (within 20 meters)
-				temp_warp_z = myrand(0, 20);
+				// Get random positions (within 20 meters)
+				temp_warp_x = static_cast<float>(myrand(0, 20));
+				temp_warp_z = static_cast<float>(myrand(0, 20));
 
-				if (temp_warp_x > 10)	// Get new x-position.
+				// Get new x-position.
+				if (temp_warp_x > 10)
 					warp_x = warp_x + (temp_warp_x - 10);
 				else
 					warp_x = warp_x - temp_warp_x;
 
-				if (temp_warp_z > 10)	// Get new z-position.
+				// Get new z-position.
+				if (temp_warp_z > 10)
 					warp_z = warp_z + (temp_warp_z - 10);
 				else
 					warp_z = warp_z - temp_warp_z;
@@ -2637,8 +2618,8 @@ void CMagicProcess::ExecuteType8(int magicid, int sid, int tid, int data1, int d
 				if (warp_z > 4096)
 					warp_z = 4096;
 
-				SetShort(send_buff, (WORD) warp_x, send_index);	// Send packet with new positions to the Warp() function.
-				SetShort(send_buff, (WORD) warp_z, send_index);
+				SetShort(send_buff, (uint16_t) warp_x, send_index);	// Send packet with new positions to the Warp() function.
+				SetShort(send_buff, (uint16_t) warp_z, send_index);
 				pTUser->Warp(send_buff);
 
 				send_index = 0;			// Clear index and buffer!
@@ -2680,13 +2661,13 @@ void CMagicProcess::ExecuteType10(int magicid)
 {
 }
 
-short CMagicProcess::GetMagicDamage(int sid, int tid, int total_hit, int attribute)
+int16_t CMagicProcess::GetMagicDamage(int sid, int tid, int total_hit, int attribute)
 {
 	CNpc* pMon = nullptr;
 
-	short damage = 0, temp_hit = 0, righthand_damage = 0, attribute_damage = 0;
+	int16_t damage = 0, temp_hit = 0, righthand_damage = 0, attribute_damage = 0;
 	int random = 0, total_r = 0;
-	BYTE result;
+	uint8_t result;
 
 	// Check if target id is valid.
 	if (tid < 0
@@ -2706,7 +2687,7 @@ short CMagicProcess::GetMagicDamage(int sid, int tid, int total_hit, int attribu
 			|| pMon->m_NpcState == NPC_DEAD)
 			return 0;
 
-		result = m_pSrcUser->GetHitRate(pMon->m_sHitRate / pTUser->m_sTotalEvasionrate);
+		result = m_pSrcUser->GetHitRate(pMon->m_sHitRate / pTUser->m_fTotalEvasionRate);
 	}
 	// If the source is another player.
 	else
@@ -2782,9 +2763,9 @@ short CMagicProcess::GetMagicDamage(int sid, int tid, int total_hit, int attribu
 			}
 		}
 
-		damage = (short) (total_hit - ((0.7 * total_hit * total_r) / 200));
+		damage = static_cast<int16_t>(total_hit - ((0.7 * total_hit * total_r) / 200));
 		random = myrand(0, damage);
-		damage = (short) (0.7 * (total_hit - ((0.9 * total_hit * total_r) / 200))) + 0.2 * random;
+		damage = static_cast<int16_t>((0.7 * (total_hit - ((0.9 * total_hit * total_r) / 200))) + 0.2 * random);
 //	
 		if (sid >= NPC_BAND)
 		{
@@ -2795,7 +2776,7 @@ short CMagicProcess::GetMagicDamage(int sid, int tid, int total_hit, int attribu
 			// Only if the staff has an attribute.
 			if (attribute != 4)
 			{
-				damage = damage - ((righthand_damage * 0.8f) + (righthand_damage * m_pSrcUser->m_pUserData->m_bLevel) / 60) - ((attribute_damage * 0.8f) + (attribute_damage * m_pSrcUser->m_pUserData->m_bLevel) / 30);
+				damage = static_cast<int16_t>(damage - ((righthand_damage * 0.8f) + (righthand_damage * m_pSrcUser->m_pUserData->m_bLevel) / 60) - ((attribute_damage * 0.8f) + (attribute_damage * m_pSrcUser->m_pUserData->m_bLevel) / 30));
 			}
 		}
 //
@@ -2806,7 +2787,7 @@ short CMagicProcess::GetMagicDamage(int sid, int tid, int total_hit, int attribu
 	return damage;
 }
 
-bool CMagicProcess::UserRegionCheck(int sid, int tid, int magicid, int radius, short mousex, short mousez) const
+bool CMagicProcess::UserRegionCheck(int sid, int tid, int magicid, int radius, int16_t mousex, int16_t mousez) const
 {
 	CNpc* pMon = nullptr;
 
@@ -2917,10 +2898,10 @@ final_test:
 				if (radius != 0)
 				{
 					// Y-AXIS DISABLED TEMPORARILY!!!
-					int temp_x = pTUser->m_pUserData->m_curx - mousex;
-					int temp_z = pTUser->m_pUserData->m_curz - mousez;
-					int distance = pow(temp_x, 2) + pow(temp_z, 2);
-					if (distance > pow(radius, 2))
+					float temp_x = pTUser->m_pUserData->m_curx - mousex;
+					float temp_z = pTUser->m_pUserData->m_curz - mousez;
+					float distance = pow(temp_x, 2.0f) + pow(temp_z, 2.0f);
+					if (distance > pow(radius, 2.0f))
 						return false;
 				}
 
@@ -2942,10 +2923,10 @@ final_test:
 				// Radius check! ( ...in case there is one :(  )
 				if (radius != 0)
 				{
-					int temp_x = pTUser->m_pUserData->m_curx - pMon->m_fCurX;
-					int temp_z = pTUser->m_pUserData->m_curz - pMon->m_fCurZ;
-					int distance = pow(temp_x, 2) + pow(temp_z, 2);
-					if (distance > pow(radius, 2))
+					float temp_x = pTUser->m_pUserData->m_curx - pMon->m_fCurX;
+					float temp_z = pTUser->m_pUserData->m_curz - pMon->m_fCurZ;
+					float distance = pow(temp_x, 2.0f) + pow(temp_z, 2.0f);
+					if (distance > pow(radius, 2.0f))
 						return false;
 				}
 
@@ -2958,7 +2939,7 @@ final_test:
 	return false;
 }
 
-void CMagicProcess::Type4Cancel(int magicid, short tid)
+void CMagicProcess::Type4Cancel(int magicid, int16_t tid)
 {
 	int send_index = 0;
 	char send_buff[128] = {};
@@ -2974,7 +2955,7 @@ void CMagicProcess::Type4Cancel(int magicid, short tid)
 		return;
 
 	bool buff = false;
-	BYTE buff_type = pType->BuffType;
+	uint8_t buff_type = pType->BuffType;
 
 	switch (buff_type)
 	{
@@ -3044,19 +3025,19 @@ void CMagicProcess::Type4Cancel(int magicid, short tid)
 			break;
 
 		case 7:
-			if ((pTUser->m_bStrAmount
-				+ pTUser->m_bStaAmount
-				+ pTUser->m_bDexAmount
-				+ pTUser->m_bIntelAmount
-				+ pTUser->m_bChaAmount) > 0)
+			if ((pTUser->m_sStrAmount
+				+ pTUser->m_sStaAmount
+				+ pTUser->m_sDexAmount
+				+ pTUser->m_sIntelAmount
+				+ pTUser->m_sChaAmount) > 0)
 			{
 				pTUser->m_sDuration7 = 0;
 				pTUser->m_fStartTime7 = 0.0f;
-				pTUser->m_bStrAmount = 0;
-				pTUser->m_bStaAmount = 0;
-				pTUser->m_bDexAmount = 0;
-				pTUser->m_bIntelAmount = 0;
-				pTUser->m_bChaAmount = 0;
+				pTUser->m_sStrAmount = 0;
+				pTUser->m_sStaAmount = 0;
+				pTUser->m_sDexAmount = 0;
+				pTUser->m_sIntelAmount = 0;
+				pTUser->m_sChaAmount = 0;
 				buff = true;
 			}
 			break;
@@ -3148,7 +3129,7 @@ void CMagicProcess::Type4Cancel(int magicid, short tid)
 //
 }
 
-void CMagicProcess::Type3Cancel(int magicid, short tid)
+void CMagicProcess::Type3Cancel(int magicid, int16_t tid)
 {
 	int send_index = 0;
 	char send_buff[128] = {};
@@ -3206,7 +3187,7 @@ void CMagicProcess::Type3Cancel(int magicid, short tid)
 //
 }
 
-void CMagicProcess::SendType4BuffRemove(short tid, BYTE buff)
+void CMagicProcess::SendType4BuffRemove(int16_t tid, uint8_t buff)
 {
 	int send_index = 0;
 	char send_buff[128];
@@ -3225,7 +3206,7 @@ void CMagicProcess::SendType4BuffRemove(short tid, BYTE buff)
 	pTUser->Send(send_buff, send_index);
 }
 
-short CMagicProcess::GetWeatherDamage(short damage, short attribute)
+int16_t CMagicProcess::GetWeatherDamage(int16_t damage, int16_t attribute)
 {
 	bool weather_buff = false;
 

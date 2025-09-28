@@ -31,7 +31,7 @@ import AujardBinder;
 import AujardModel;
 namespace model = aujard_model;
 
-WORD g_increase_serial = 50001;
+uint16_t g_increase_serial = 50001;
 
 CAujardDlg* CAujardDlg::_instance = nullptr;
 
@@ -39,7 +39,7 @@ DWORD WINAPI ReadQueueThread(LPVOID lp)
 {
 	CAujardDlg* main = (CAujardDlg*) lp;
 	int recvLen = 0, index = 0;
-	BYTE command;
+	uint8_t command;
 	char recvBuff[1024] = {};
 
 	while (true)
@@ -312,7 +312,7 @@ BOOL CAujardDlg::DestroyWindow()
 /// \brief initializes shared memory with other server applications
 bool CAujardDlg::InitSharedMemory()
 {
-	DWORD filesize = MAX_USER * ALLOCATED_USER_DATA_BLOCK;
+	uint32_t filesize = MAX_USER * ALLOCATED_USER_DATA_BLOCK;
 
 	_sharedMemoryHandle = OpenFileMapping(FILE_MAP_ALL_ACCESS, TRUE, _T("KNIGHT_DB"));
 	if (_sharedMemoryHandle == nullptr)
@@ -367,7 +367,7 @@ void CAujardDlg::SelectCharacter(char* buffer)
 {
 	int index = 0, userId = -1, sendIndex = 0, idLen1 = 0, idLen2 = 0, tempUserId = -1,
 		retryCount = 0, packetIndex = 0, maxRetry = 50;
-	BYTE init = 0x01;
+	uint8_t init = 0x01;
 	char sendBuff[256] = {},
 		accountId[MAX_ID_SIZE + 1] = {},
 		charId[MAX_ID_SIZE + 1] = {};
@@ -513,7 +513,7 @@ void CAujardDlg::UserLogOut(char* buffer)
 /// \param saveType one of: UPDATE_LOGOUT, UPDATE_ALL_SAVE
 /// \param forceLogout should be set to true in panic situations
 /// \see UserLogOut(), AllSaveRoutine(), HandleUserUpdate()
-bool CAujardDlg::HandleUserLogout(int userId, BYTE saveType, bool forceLogout)
+bool CAujardDlg::HandleUserLogout(int userId, uint8_t saveType, bool forceLogout)
 {
 	bool logoutResult = false;
 
@@ -559,9 +559,9 @@ bool CAujardDlg::HandleUserLogout(int userId, BYTE saveType, bool forceLogout)
 /// \param user reference to user object
 /// \param saveType one of: UPDATE_LOGOUT, UPDATE_ALL_SAVE, UPDATE_PACKET_SAVE
 /// \see UserDataSave(), HandleUserLogout()
-bool CAujardDlg::HandleUserUpdate(int userId, const _USER_DATA& user, BYTE saveType)
+bool CAujardDlg::HandleUserUpdate(int userId, const _USER_DATA& user, uint8_t saveType)
 {
-	DWORD sleepTime = 10;
+	uint32_t sleepTime = 10;
 	int updateWarehouseResult = 0, updateUserResult = 0,
 		retryCount = 0, maxRetry = 10;
 
@@ -919,7 +919,7 @@ void CAujardDlg::OnTimer(UINT EventId)
 void CAujardDlg::AllSaveRoutine()
 {
 	// TODO:  100ms seems excessive
-	DWORD sleepTime = 100;
+	uint32_t sleepTime = 100;
 	bool allUsersSaved = true;
 	
 	// log the disconnect
@@ -1072,7 +1072,7 @@ _USER_DATA* CAujardDlg::GetUserPtr(const char* charId, int& userId)
 void CAujardDlg::KnightsPacket(char* buffer)
 {
 	int index = 0, nation = 0;
-	BYTE command = GetByte(buffer, index);
+	uint8_t command = GetByte(buffer, index);
 
 	switch (command)
 	{
@@ -1186,7 +1186,7 @@ void CAujardDlg::JoinKnights(char* buffer)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1,
 		retryCount = 0, maxRetry = 50;
-	BYTE result = 0;
+	uint8_t result = 0;
 	char sendBuff[256] = {};
 
 	userId = GetShort(buffer, index);
@@ -1232,7 +1232,7 @@ void CAujardDlg::WithdrawKnights(char* buffer)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1,
 		retryCount = 0, maxRetry = 50;
-	BYTE result = 0;
+	uint8_t result = 0;
 	char sendBuff[256] = {};
 
 	userId = GetShort(buffer, index);
@@ -1274,11 +1274,11 @@ void CAujardDlg::WithdrawKnights(char* buffer)
 /// \brief attempts to modify a knights character
 /// \see KnightsPacket(), KNIGHTS_REMOVE, KNIGHTS_ADMIT, KNIGHTS_REJECT, KNIGHTS_CHIEF,
 /// KNIGHTS_VICECHIEF, KNIGHTS_OFFICER, KNIGHTS_PUNISH
-void CAujardDlg::ModifyKnightsMember(char* buffer, BYTE command)
+void CAujardDlg::ModifyKnightsMember(char* buffer, uint8_t command)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1, charIdLen = 0,
 		removeFlag = 0, retryCount = 0, maxRetry = 50;
-	BYTE result = 0;
+	uint8_t result = 0;
 	char send_buff[256] = {},
 		charId[MAX_ID_SIZE + 1] = {};
 
@@ -1361,7 +1361,7 @@ void CAujardDlg::DestroyKnights(char* buffer)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1,
 		retryCount = 0, maxRetry = 50;
-	BYTE result = 0;
+	uint8_t result = 0;
 	char sendBuff[256] = {};
 
 	userId = GetShort(buffer, index);
@@ -1401,7 +1401,7 @@ void CAujardDlg::AllKnightsMember(char* buffer)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1,
 		dbIndex = 0, count = 0, retryCount = 0, maxRetry = 50;
-	BYTE result = 0;
+	uint8_t result = 0;
 	char sendBuff[2048] = {},
 		dbBuff[2048] = {};
 
@@ -1421,7 +1421,7 @@ void CAujardDlg::AllKnightsMember(char* buffer)
 	SetByte(sendBuff, KNIGHTS_MEMBER_REQ, sendIndex);
 	SetShort(sendBuff, userId, sendIndex);
 	SetByte(sendBuff, 0x00, sendIndex);		// Success
-	SetShort(sendBuff, 4 + dbIndex, sendIndex);	// total packet size -> short(*3) + buff_index 
+	SetShort(sendBuff, 4 + dbIndex, sendIndex);	// total packet size -> int16_t(*3) + buff_index 
 	//SetShort( send_buff, page, send_index );
 	SetShort(sendBuff, count, sendIndex);
 	SetString(sendBuff, dbBuff, dbIndex, sendIndex);
@@ -1504,7 +1504,7 @@ void CAujardDlg::SetLogInInfo(char* buffer)
 	GetString(clientIp, buffer, clientIpLen, index);
 	
 	// init: 0x01 to insert, 0x02 to update CURRENTUSER
-	BYTE init = GetByte(buffer, index);
+	uint8_t init = GetByte(buffer, index);
 
 	if (!_dbAgent.SetLogInInfo(accountId, charId, serverIp, serverId, clientIp, init))
 	{
@@ -1556,7 +1556,7 @@ void CAujardDlg::WritePacketLog()
 /// \see UserDataSave(), OnTimer(), PACKET_CHECK
 void CAujardDlg::SaveUserData()
 {
-	DWORD sleepTime = 100;
+	uint32_t sleepTime = 100;
 	char sendBuff[256] = {};
 	int sendIndex = 0;
 

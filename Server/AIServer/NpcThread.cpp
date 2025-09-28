@@ -27,9 +27,9 @@ UINT NpcThreadProc(LPVOID pParam /* NPC_THREAD_INFO ptr */)
 	CPoint				pt;
 
 	int					i			= 0;
-	DWORD				dwDiffTime	= 0;
-	DWORD				dwSleep		= 250;
-	DWORD				dwTickTime	= 0;
+	uint32_t			dwDiffTime	= 0;
+	uint32_t			dwSleep		= 250;
+	uint32_t			dwTickTime	= 0;
 	srand((unsigned int) time(nullptr));
 	myrand(1, 10000);
 	myrand(1, 10000);
@@ -60,7 +60,7 @@ UINT NpcThreadProc(LPVOID pParam /* NPC_THREAD_INFO ptr */)
 				continue;
 
 			fTime3 = fTime2 - pNpc->m_fDelayTime;
-			dwTickTime = fTime3 * 1000;
+			dwTickTime = static_cast<uint32_t>(fTime3 * 1000);
 
 			//if(i==0)
 			//TRACE(_T("thread time = %.2f, %.2f, %.2f, delay=%d, state=%d, nid=%d\n"), pNpc->m_fDelayTime, fTime2, fTime3, dwTickTime, pNpc->m_NpcState, pNpc->m_sNid+NPC_BAND);
@@ -87,7 +87,7 @@ UINT NpcThreadProc(LPVOID pParam /* NPC_THREAD_INFO ptr */)
 			}
 
 			fTime3 = fTime2 - pNpc->m_fHPChangeTime;
-			dwTickTime = fTime3 * 1000;
+			dwTickTime = static_cast<uint32_t>(fTime3 * 1000);
 
 			// 10초마다 HP를 회복 시켜준다
 			if (10000 < dwTickTime)

@@ -22,7 +22,7 @@ typedef struct _NPC_THREAD_INFO
 {
 	CIOCPort*	pIOCP;
 	CNpc*		pNpc[NPC_NUM];
-	BYTE		m_byNpcUsed[NPC_NUM];
+	uint8_t		m_byNpcUsed[NPC_NUM];
 	HWND		hWndMsg;
 } NPC_THREAD_INFO;
 
@@ -39,7 +39,7 @@ public:
 
 	NPC_THREAD_INFO		m_ThreadInfo;
 	CWinThread* m_pThread;
-	short m_sThreadNumber;					// thread number ,, test
+	int16_t m_sThreadNumber;					// thread number ,, test
 
 };
 

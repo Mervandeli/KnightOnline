@@ -2201,7 +2201,7 @@ bool CN3Terrain::LoadColorMap(const std::string& szFN)
 	int temp1 = PATCH_PIXEL_SIZE;
 	int temp2 = COLORMAPTEX_SIZE;
 	m_iNumColorMap = (m_pat_MapSize * PATCH_PIXEL_SIZE) / COLORMAPTEX_SIZE;
-	m_ppColorMapTex = new CN3Texture * [m_iNumColorMap];
+	m_ppColorMapTex = new CN3Texture* [m_iNumColorMap];
 	for (int x = 0;x < m_iNumColorMap;x++)
 	{
 		m_ppColorMapTex[x] = new CN3Texture[m_iNumColorMap];

@@ -90,17 +90,17 @@ public:
 	float m_fInitX;
 	float m_fInitZ;
 	float m_fInitY;
-	BYTE	m_bType;		// Zone Type : 1 -> common zone,  2 -> battle zone, 3 -> 24 hour open battle zone
-	short	m_sMaxUser;
+	uint8_t	m_bType;		// Zone Type : 1 -> common zone,  2 -> battle zone, 3 -> 24 hour open battle zone
+	int16_t	m_sMaxUser;
 
 	CRegion** m_ppRegion;
-	short** m_ppnEvent;
+	int16_t** m_ppnEvent;
 
 	WarpArray			m_WarpArray;
 
 	CEbenezerDlg* m_pMain;
 
-	DWORD m_wBundle;	// Zone Item Max Count
+	uint32_t m_wBundle;	// Zone Item Max Count
 };
 
 #endif // !defined(AFX_3DMAP_H__986E02B6_E5A3_43CF_B1D7_A7135551933D__INCLUDED_)

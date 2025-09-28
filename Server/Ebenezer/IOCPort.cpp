@@ -407,7 +407,7 @@ CIOCPort::CIOCPort()
 	memset(&m_PostOverlapped, 0, sizeof(m_PostOverlapped));
 
 	WSADATA wsaData = {};
-	WORD wVersionRequested = MAKEWORD(2, 2);
+	uint16_t wVersionRequested = MAKEWORD(2, 2);
 	(void) WSAStartup(wVersionRequested, &wsaData);
 
 	InitializeCriticalSection(&g_critical);
@@ -682,7 +682,7 @@ void CIOCPort::CreateClientWorkerThread()
 void CIOCPort::CreateSendWorkerThread()
 {
 	SYSTEM_INFO		SystemInfo;
-	DWORD			dwNumberOfWorkers = 0;
+	uint32_t		dwNumberOfWorkers = 0;
 
 	GetSystemInfo(&SystemInfo);
 	dwNumberOfWorkers = 2 * SystemInfo.dwNumberOfProcessors;

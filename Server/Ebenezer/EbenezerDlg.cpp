@@ -43,14 +43,14 @@ CRITICAL_SECTION g_region_critical;
 CEbenezerDlg* CEbenezerDlg::s_pInstance = nullptr;
 CIOCPort CEbenezerDlg::m_Iocport;
 
-WORD g_increase_serial = 1;
+uint16_t g_increase_serial = 1;
 bool g_serverdown_flag = false;
 
 DWORD WINAPI ReadQueueThread(LPVOID lp)
 {
 	CEbenezerDlg* pMain = (CEbenezerDlg*) lp;
 	int recvlen = 0, index = 0, uid = -1, send_index = 0, buff_length = 0;
-	BYTE command, result;
+	uint8_t command, result;
 	char pBuf[1024] = {}, send_buff[1024] = {};
 	CUser* pUser = nullptr;
 	int currenttime = 0;
@@ -218,6 +218,12 @@ CEbenezerDlg::CEbenezerDlg(CWnd* pParent /*=nullptr*/)
 	m_sKarusDead = 0;
 	m_sElmoradDead = 0;
 
+	for (int i = 0; i < INVASION_MONUMENT_COUNT; i++)
+	{
+		_karusInvasionMonumentLastCapturedNation[i] = 0;
+		_elmoradInvasionMonumentLastCapturedNation[i] = 0;
+	}
+
 	m_bVictory = 0;
 	m_byOldVictory = 0;
 	m_byBattleSave = 0;
@@ -268,6 +274,12 @@ CEbenezerDlg::CEbenezerDlg(CWnd* pParent /*=nullptr*/)
 	memset(m_strElmoradCaptain, 0, sizeof(m_strElmoradCaptain));
 
 	m_bySanta = 0;		// 갓댐 산타!!! >.<
+
+	_beefRoastVictoryType = BEEF_ROAST_VICTORY_PENDING_RESTART_AFTER_VICTORY;
+
+	_monsterChallengeActiveType = 0;
+	_monsterChallengeState = 0;
+	_monsterChallengePlayerCount = 0;
 
 	ConnectionManager::Create();
 }
@@ -497,6 +509,15 @@ BOOL CEbenezerDlg::OnInitDialog()
 	{
 		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache KNIGHTS_USER table, closing");
 		AfxMessageBox(_T("LoadAllKnightsUserData Load Fail"));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
+
+	spdlog::info("EbenezerDlg::OnInitDialog: loading KNIGHTS_SIEGE_WARFARE table");
+	if (!LoadKnightsSiegeWarfareTable())
+	{
+		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache KNIGHTS_SIEGE_WARFARE table, closing");
+		AfxMessageBox(_T("LoadKnightsSiegeWarfareTable Load Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
@@ -1200,7 +1221,7 @@ bool CEbenezerDlg::InitializeMMF()
 {
 	bool bCreate = true;
 
-	DWORD filesize = MAX_USER * ALLOCATED_USER_DATA_BLOCK;
+	uint32_t filesize = MAX_USER * ALLOCATED_USER_DATA_BLOCK;
 	m_hMMFile = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, filesize, _T("KNIGHT_DB"));
 
 	if (m_hMMFile != nullptr
@@ -1630,7 +1651,7 @@ void CEbenezerDlg::UpdateGameTime()
 	SetShort(pSendBuf, m_nDate, send_index);
 	SetShort(pSendBuf, m_nHour, send_index);
 	SetShort(pSendBuf, m_nMin, send_index);
-	SetByte(pSendBuf, (BYTE) m_nWeather, send_index);		// weather info
+	SetByte(pSendBuf, (uint8_t) m_nWeather, send_index);		// weather info
 	SetShort(pSendBuf, m_nAmount, send_index);
 	Send_AIServer(1000, pSendBuf, send_index);
 
@@ -1675,7 +1696,7 @@ void CEbenezerDlg::UpdateWeather()
 	m_nWeather = weather;
 
 	SetByte(send_buff, WIZ_WEATHER, send_index);
-	SetByte(send_buff, (BYTE) m_nWeather, send_index);
+	SetByte(send_buff, (uint8_t) m_nWeather, send_index);
 	SetShort(send_buff, m_nAmount, send_index);
 	Send_All(send_buff, send_index);
 }
@@ -2519,7 +2540,7 @@ void CEbenezerDlg::SendAllUserInfo()
 			if (count == tot)
 			{
 				SetByte(send_buff, AG_USER_INFO_ALL, send_count);
-				SetByte(send_buff, (BYTE) count, send_count);
+				SetByte(send_buff, (uint8_t) count, send_count);
 				m_CompCount++;
 				memset(m_CompBuf, 0, sizeof(m_CompBuf));
 				memcpy(m_CompBuf, send_buff, send_index);
@@ -2541,7 +2562,7 @@ void CEbenezerDlg::SendAllUserInfo()
 	{
 		send_count = 0;
 		SetByte(send_buff, AG_USER_INFO_ALL, send_count);
-		SetByte(send_buff, (BYTE) count, send_count);
+		SetByte(send_buff, (uint8_t) count, send_count);
 		Send_AIServer(1000, send_buff, send_index);
 		send_tot++;
 		//TRACE(_T("AllNpcInfo - send_count=%d, count=%d\n"), send_tot, count);
@@ -2614,10 +2635,10 @@ void CEbenezerDlg::SendCompressedData()
 	crc_value = crc32(reinterpret_cast<uint8_t*>(m_CompBuf), m_iCompIndex);
 
 	SetByte(send_buff, AG_COMPRESSED_DATA, send_index);
-	SetShort(send_buff, (short) comp_data_len, send_index);
-	SetShort(send_buff, (short) m_iCompIndex, send_index);
+	SetShort(send_buff, (int16_t) comp_data_len, send_index);
+	SetShort(send_buff, (int16_t) m_iCompIndex, send_index);
 	SetDWORD(send_buff, crc_value, send_index);
-	SetShort(send_buff, (short) m_CompCount, send_index);
+	SetShort(send_buff, (int16_t) m_CompCount, send_index);
 	SetString(send_buff, reinterpret_cast<const char*>(comp_buff), comp_data_len, send_index);
 
 	Send_AIServer(1000, send_buff, send_index);
@@ -2700,6 +2721,14 @@ CNpc* CEbenezerDlg::GetNpcPtr(int sid, int cur_zone)
 	}
 
 	return nullptr;
+}
+
+CKnights* CEbenezerDlg::GetKnightsPtr(int16_t clanId)
+{
+	if (clanId <= 0)
+		return nullptr;
+
+	return m_KnightsMap.GetData(clanId);
 }
 
 void CEbenezerDlg::WithdrawUserOut()
@@ -2975,7 +3004,7 @@ void CEbenezerDlg::ResetBattleZone()
 	// REMEMBER TO MAKE ALL FLAGS AND LEVERS NEUTRAL AGAIN!!!!!!!!!!
 }
 
-void CEbenezerDlg::Announcement(BYTE type, int nation, int chat_type)
+void CEbenezerDlg::Announcement(uint8_t type, int nation, int chat_type)
 {
 	int send_index = 0;
 	char send_buff[1024] = {};
@@ -3221,6 +3250,32 @@ bool CEbenezerDlg::LoadAllKnightsUserData()
 	return true;
 }
 
+bool CEbenezerDlg::LoadKnightsSiegeWarfareTable()
+{
+	using ModelType = model::KnightsSiegeWarfare;
+
+	recordset_loader::Base<ModelType> loader;
+	loader.SetProcessFetchCallback([this](db::ModelRecordSet<ModelType>& recordset)
+	{
+		do
+		{
+			ModelType row = {};
+			recordset.get_ref(row);
+			m_KnightsSiegeWar._castleIndex		= row.CastleIndex;
+			m_KnightsSiegeWar._masterKnights	= row.MasterKnights;
+		}
+		while (recordset.next());
+	});
+
+	if (!loader.Load_AllowEmpty())
+	{
+		ReportTableLoadError(loader.GetError(), __func__);
+		return false;
+	}
+
+	return true;
+}
+
 int CEbenezerDlg::GetKnightsAllMembers(int knightsindex, char* temp_buff, int& buff_index, int type)
 {
 	if (knightsindex <= 0)
@@ -3369,7 +3424,7 @@ void CEbenezerDlg::MarketBBSTimeCheck()
 	}
 }
 
-void CEbenezerDlg::MarketBBSBuyDelete(short index)
+void CEbenezerDlg::MarketBBSBuyDelete(int16_t index)
 {
 	m_sBuyID[index] = -1;
 	memset(m_strBuyTitle[index], 0, sizeof(m_strBuyTitle[index]));
@@ -3378,7 +3433,7 @@ void CEbenezerDlg::MarketBBSBuyDelete(short index)
 	m_fBuyStartTime[index] = 0.0f;
 }
 
-void CEbenezerDlg::MarketBBSSellDelete(short index)
+void CEbenezerDlg::MarketBBSSellDelete(int16_t index)
 {
 	m_sSellID[index] = -1;
 	memset(m_strSellTitle[index], 0, sizeof(m_strSellTitle[index]));
@@ -3465,12 +3520,12 @@ int64_t CEbenezerDlg::GenerateItemSerial()
 
 	increase.w = g_increase_serial++;
 
-	serial.b[7] = (BYTE) m_nServerNo;
-	serial.b[6] = (BYTE) (t.GetYear() % 100);
-	serial.b[5] = (BYTE) t.GetMonth();
-	serial.b[4] = (BYTE) t.GetDay();
-	serial.b[3] = (BYTE) t.GetHour();
-	serial.b[2] = (BYTE) t.GetMinute();
+	serial.b[7] = (uint8_t) m_nServerNo;
+	serial.b[6] = (uint8_t) (t.GetYear() % 100);
+	serial.b[5] = (uint8_t) t.GetMonth();
+	serial.b[4] = (uint8_t) t.GetDay();
+	serial.b[3] = (uint8_t) t.GetHour();
+	serial.b[2] = (uint8_t) t.GetMinute();
 	serial.b[1] = increase.b[1];
 	serial.b[0] = increase.b[0];
 
@@ -3480,7 +3535,7 @@ int64_t CEbenezerDlg::GenerateItemSerial()
 	return serial.i;
 }
 
-void CEbenezerDlg::KickOutZoneUsers(short zone)
+void CEbenezerDlg::KickOutZoneUsers(int16_t zone)
 {
 	for (int i = 0; i < MAX_USER; i++)
 	{

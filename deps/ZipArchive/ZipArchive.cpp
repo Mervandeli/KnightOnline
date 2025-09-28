@@ -914,7 +914,7 @@ DWORD CZipArchive::RemovePackedFile(DWORD uStartOffset, DWORD uEndOffset)
 {
 	uStartOffset += m_centralDir.m_uBytesBeforeZip;
 	uEndOffset += m_centralDir.m_uBytesBeforeZip;
-	DWORD BytesToCopy = m_storage.m_pFile->GetLength() - uEndOffset;
+	DWORD BytesToCopy = static_cast<DWORD>(m_storage.m_pFile->GetLength()) - uEndOffset;
 	DWORD uTotalToWrite = BytesToCopy;
 	
 	char* buf = (char*)m_info.m_pBuffer;
@@ -1052,7 +1052,7 @@ bool CZipArchive::AddNewFile(LPCTSTR lpszFilePath,
 		if (!bRet)
 			return false;
 		
-		DWORD iRead, iFileLength = pCallback ? f.GetLength() : 0, iSoFar = 0;
+		DWORD iRead, iFileLength = pCallback ? static_cast<DWORD>(f.GetLength()) : 0, iSoFar = 0;
 		CZipAutoBuffer buf(nBufSize);
 		do
 		{

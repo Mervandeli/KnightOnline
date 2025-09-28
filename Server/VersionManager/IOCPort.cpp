@@ -313,7 +313,7 @@ CIOCPort::CIOCPort()
 	m_dwConcurrency = 1;
 
 	WSADATA wsaData;
-	WORD wVersionRequested = MAKEWORD(2, 2);
+	uint16_t wVersionRequested = MAKEWORD(2, 2);
 	(void) WSAStartup(wVersionRequested, &wsaData);
 
 	InitializeCriticalSection(&g_critical);
@@ -481,7 +481,7 @@ bool CIOCPort::Associate(CIOCPSocket2* pIocpSock, HANDLE hPort)
 		return false;
 	}
 
-	HANDLE hTemp = CreateIoCompletionPort(pIocpSock->GetSocketHandle(), hPort, (DWORD) pIocpSock->GetSocketID(), m_dwConcurrency);
+	HANDLE hTemp = CreateIoCompletionPort(pIocpSock->GetSocketHandle(), hPort, (ULONG_PTR) pIocpSock->GetSocketID(), m_dwConcurrency);
 	return (hTemp == hPort);
 }
 

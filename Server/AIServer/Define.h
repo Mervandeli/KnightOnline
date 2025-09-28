@@ -96,24 +96,24 @@ constexpr int USER_DAMAGE_OVERRIDE_TEST_MODE	= 10'000;
 ////////////////////////////////////////////////////////////
 
 typedef union {
-	short int	i;
-	BYTE		b[2];
+	int16_t		i;
+	uint8_t		b[2];
 } MYSHORT;
 
 typedef union {
-	int			i;
-	BYTE		b[4];
+	int32_t		i;
+	uint8_t		b[4];
 } MYINT;
 
 typedef union {
-	DWORD		w;
-	BYTE		b[4];
+	uint32_t	w;
+	uint8_t		b[4];
 } MYDWORD;
 
 struct _NpcPosition
 {
-	BYTE	byType;			// type
-	BYTE	bySpeed;		// speed
+	uint8_t	byType;			// type
+	uint8_t	bySpeed;		// speed
 	POINT	pPoint;			// position
 	float fXPos;
 	float fZPos;
@@ -131,10 +131,10 @@ struct _NpcMovePosition
 struct _OBJECT_EVENT
 {
 	int sBelong;			// 소속
-	short sIndex;			// 100 번대 - 카루스 바인드 포인트 | 200 번대 엘모라드 바인드 포인트 | 1100 번대 - 카루스 성문들 1200 - 엘모라드 성문들
-	short sType;			// 0 - 바인드 포인트.. 1 - 좌우로 열리는 성문 2 - 상하로 열리는 성문 3 - 레버
-	short sControlNpcID;	// 조종할 NPC ID (조종할 Object Index)
-	short sStatus;			// status
+	int16_t sIndex;			// 100 번대 - 카루스 바인드 포인트 | 200 번대 엘모라드 바인드 포인트 | 1100 번대 - 카루스 성문들 1200 - 엘모라드 성문들
+	int16_t sType;			// 0 - 바인드 포인트.. 1 - 좌우로 열리는 성문 2 - 상하로 열리는 성문 3 - 레버
+	int16_t sControlNpcID;	// 조종할 NPC ID (조종할 Object Index)
+	int16_t sStatus;			// status
 	float fPosX;			// 위치값
 	float fPosY;
 	float fPosZ;
@@ -245,8 +245,8 @@ struct _OBJECT_EVENT
 #define		DEFAULT_AT_DELAY	700
 #define		DEFAULT_SP_DEC		1
 
-const BYTE	ATTACK_MIN		=	20;
-const BYTE	ATTACK_MAX		=	80;
+const uint8_t	ATTACK_MIN		=	20;
+const uint8_t	ATTACK_MAX		=	80;
 
 #define		DAMAGE_DELAY_C_TIME	2000
 

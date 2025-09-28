@@ -16,7 +16,7 @@ DWORD WINAPI ReadQueueThread(LPVOID lp)
 {
 	CItemManagerDlg* pMain = (CItemManagerDlg*) lp;
 	int recvlen = 0, index = 0;
-	BYTE command;
+	uint8_t command;
 	char recv_buff[1024] = {};
 	CString string;
 

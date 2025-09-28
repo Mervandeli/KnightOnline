@@ -20,13 +20,13 @@ public:
 	CServerDlg*	m_pMain;
 	CNpc*		m_pSrcNpc;
 
-	BYTE		m_bMagicState;
+	uint8_t		m_bMagicState;
 
 public:
 	CNpcMagicProcess();
 	virtual ~CNpcMagicProcess();
 
-	short GetMagicDamage(int tid, int total_hit, int attribute, int dexpoint);
+	int16_t GetMagicDamage(int tid, int total_hit, int attribute, int dexpoint);
 	void ExecuteType10(int magicid);
 	void ExecuteType9(int magicid);
 	void ExecuteType8(int magicid, int tid, int sid, int data1, int data2, int data3);
@@ -38,7 +38,7 @@ public:
 	void ExecuteType2(int magicid, int tid, int data1, int data2, int data3);
 	void ExecuteType1(int magicid, int tid, int data1, int data2, int data3);	// sequence => type1 or type2
 
-	model::Magic* IsAvailable(int magicid, int tid, BYTE type);
+	model::Magic* IsAvailable(int magicid, int tid, uint8_t type);
 	void MagicPacket(char* pBuf, int len, CIOCPort* pIOCP);
 
 };

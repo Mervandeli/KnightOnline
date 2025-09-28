@@ -63,72 +63,81 @@ CN3FXPartBillBoard::~CN3FXPartBillBoard()
 #ifdef _N3TOOL
 bool CN3FXPartBillBoard::ParseScript(char* szCommand, char* szBuff0, char* szBuff1, char* szBuff2, char* szBuff3)
 {
-	if(CN3FXPartBase::ParseScript(szCommand, szBuff0, szBuff1, szBuff2, szBuff3)) return true;
+	if (CN3FXPartBase::ParseScript(szCommand, szBuff0, szBuff1, szBuff2, szBuff3))
+		return true;
 
 	//	보드 갯수.
-	if(lstrcmpi(szCommand, "<billboard_count>")==0)
+	if (lstrcmpi(szCommand, "<billboard_count>") == 0)
 	{
 		m_iNum = atoi(szBuff0);
-		if(m_iNum>0) CreateVB();
+		if (m_iNum > 0)
+			CreateVB();
 		return true;
 	}
 
 	//	보드 크기.
-	if(lstrcmpi(szCommand, "<billboard_size>")==0)
+	if (lstrcmpi(szCommand, "<billboard_size>") == 0)
 	{
-		m_fSizeX = atof(szBuff0);
-		m_fSizeY = atof(szBuff1);
+		m_fSizeX = static_cast<float>(atof(szBuff0));
+		m_fSizeY = static_cast<float>(atof(szBuff1));
 
 		m_fCurrSizeX = m_fSizeX;
 		m_fCurrSizeY = m_fSizeY;
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<tex_loop>")==0)
+
+	if (lstrcmpi(szCommand, "<tex_loop>") == 0)
 	{
-		if(lstrcmpi(szBuff0,"true")==0) m_bTexLoop = true;
-		else if(lstrcmpi(szBuff0,"false")==0) m_bTexLoop = false;
+		if (lstrcmpi(szBuff0, "true") == 0)
+			m_bTexLoop = true;
+		else if (lstrcmpi(szBuff0, "false") == 0)
+			m_bTexLoop = false;
 
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<distance>")==0)
+
+	if (lstrcmpi(szCommand, "<distance>") == 0)
 	{
-		m_fRadius = atof(szBuff0);
+		m_fRadius = static_cast<float>(atof(szBuff0));
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<Rotate_only_y>")==0)
+	if (lstrcmpi(szCommand, "<Rotate_only_y>") == 0)
 	{
-		if(lstrcmpi(szBuff0,"true")==0) m_bRoateOnlyY = true;
-		else if(lstrcmpi(szBuff0,"false")==0) m_bRoateOnlyY = false;
+		if (lstrcmpi(szBuff0, "true") == 0)
+			m_bRoateOnlyY = true;
+		else if (lstrcmpi(szBuff0, "false") == 0)
+			m_bRoateOnlyY = false;
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<billboard_scale_velocity>")==0)
+	if (lstrcmpi(szCommand, "<billboard_scale_velocity>") == 0)
 	{
-		m_fScaleVelX = atof(szBuff0);
-		m_fScaleVelY = atof(szBuff1);
+		m_fScaleVelX = static_cast<float>(atof(szBuff0));
+		m_fScaleVelY = static_cast<float>(atof(szBuff1));
 
 		m_fCurrScaleVelX = m_fScaleVelX;
 		m_fCurrScaleVelY = m_fScaleVelY;
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<billboard_scale_acceleration>")==0)
+	if (lstrcmpi(szCommand, "<billboard_scale_acceleration>") == 0)
 	{
-		m_fScaleAccelX = atof(szBuff0);
-		m_fScaleAccelY = atof(szBuff1);
+		m_fScaleAccelX = static_cast<float>(atof(szBuff0));
+		m_fScaleAccelY = static_cast<float>(atof(szBuff1));
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<billboard_Rotation>")==0)
+	if (lstrcmpi(szCommand, "<billboard_Rotation>") == 0)
 	{
-		m_fRotBillBoardX = atof(szBuff0);
-		m_fRotBillBoardY = atof(szBuff1);
-		m_fRotBillBoardZ = atof(szBuff2);
+		m_fRotBillBoardX = static_cast<float>(atof(szBuff0));
+		m_fRotBillBoardY = static_cast<float>(atof(szBuff1));
+		m_fRotBillBoardZ = static_cast<float>(atof(szBuff2));
 		m_mtxRot.Identity();
-		m_mtxRot.Rotation(D3DXToRadian(m_fRotBillBoardX),
-						  D3DXToRadian(m_fRotBillBoardY),
-						  D3DXToRadian(m_fRotBillBoardZ));
+		m_mtxRot.Rotation(
+			D3DXToRadian(m_fRotBillBoardX),
+			D3DXToRadian(m_fRotBillBoardY),
+			D3DXToRadian(m_fRotBillBoardZ));
 		//m_mtxRot.PosSet(0,0,0);
 		return true;
 	}

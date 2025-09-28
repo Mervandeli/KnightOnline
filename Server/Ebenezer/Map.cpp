@@ -144,8 +144,8 @@ void C3DMap::LoadObjectEvent(HANDLE hFile)
 	DWORD dwNum;
 	_OBJECT_EVENT* pEvent = nullptr;
 
-	BYTE regene_point_counter_karus = 0;
-	BYTE regene_point_counter_elmo = 0;
+	uint8_t regene_point_counter_karus = 0;
+	uint8_t regene_point_counter_elmo = 0;
 
 	ReadFile(hFile, &iEventObjectCount, 4, &dwNum, nullptr);
 
@@ -181,11 +181,11 @@ void C3DMap::LoadMapTile(HANDLE hFile)
 {
 	DWORD dwNum;
 
-	m_ppnEvent = new short* [m_nMapSize];
+	m_ppnEvent = new int16_t* [m_nMapSize];
 	for (int x = 0; x < m_nMapSize;x++)
 	{
-		m_ppnEvent[x] = new short[m_nMapSize];
-		ReadFile(hFile, m_ppnEvent[x], sizeof(short) * m_nMapSize, &dwNum, nullptr);
+		m_ppnEvent[x] = new int16_t[m_nMapSize];
+		ReadFile(hFile, m_ppnEvent[x], sizeof(int16_t) * m_nMapSize, &dwNum, nullptr);
 	}
 }
 
@@ -404,7 +404,7 @@ bool C3DMap::RegionItemRemove(int rx, int rz, int bundle_index, int itemid, int 
 	_ZONE_ITEM* pItem = nullptr;
 	CRegion* region = &m_ppRegion[rx][rz];
 	bool bFind = false;
-	short t_count = 0;
+	int16_t t_count = 0;
 
 	EnterCriticalSection(&g_region_critical);
 

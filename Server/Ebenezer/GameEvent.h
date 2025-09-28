@@ -17,8 +17,8 @@ public:
 	CGameEvent();
 	virtual ~CGameEvent();
 
-	short	m_sIndex;
-	BYTE	m_bType;
+	int16_t	m_sIndex;
+	uint8_t	m_bType;
 
 	int		m_iExec[5];
 };

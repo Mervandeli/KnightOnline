@@ -50,9 +50,9 @@ using namespace db;
 /*
 	 ** Repent AI Server 작업시 참고 사항 **
 	1. 3개의 함수 추가
-		int GetSpeed(BYTE bySpeed);
-		int GetAttackSpeed(BYTE bySpeed);
-		int GetCatsSpeed(BYTE bySpeed);
+		int GetSpeed(uint8_t bySpeed);
+		int GetAttackSpeed(uint8_t bySpeed);
+		int GetCatsSpeed(uint8_t bySpeed);
 	2. Repent에  맞개 아래의 함수 수정
 		CreateNpcThread();
 		GetMonsterTableData();
@@ -321,6 +321,13 @@ BOOL CServerDlg::OnInitDialog()
 		return FALSE;
 	}
 
+	if (!GetMakeItemGroupTableData())
+	{
+		spdlog::error("ServerDlg::OnInitDialog: failed to load MAKE_ITEM_GROUP, closing server");
+		EndDialog(IDCANCEL);
+		return FALSE;
+	}
+
 	//----------------------------------------------------------------------
 	//	Load NPC Chat Table
 	//----------------------------------------------------------------------
@@ -581,6 +588,19 @@ bool CServerDlg::GetMakeRareItemTableData()
 	return true;
 }
 
+bool CServerDlg::GetMakeItemGroupTableData()
+{
+	recordset_loader::STLMap loader(m_MakeItemGroupTableMap);
+	if (!loader.Load_ForbidEmpty())
+	{
+		ReportTableLoadError(loader.GetError(), __func__);
+		return false;
+	}
+
+	spdlog::info("ServerDlg::GetMakeItemGroupTableData: MAKE_ITEM_GROUP loaded");
+	return true;
+}
+
 /////////////////////////////////////////////////////////////////////////
 //	NPC Item Table 을 읽는다.
 //
@@ -776,7 +796,7 @@ bool CServerDlg::LoadNpcPosTable(std::vector<model::NpcPos*>& rows)
 				{
 					CNpc* pNpc = new CNpc();
 					pNpc->m_sNid = nSerial++;						// 서버 내에서의 고유 번호
-					pNpc->m_sSid = (short) row->NpcId;				// MONSTER(NPC) Serial ID
+					pNpc->m_sSid = (int16_t) row->NpcId;				// MONSTER(NPC) Serial ID
 
 					pNpc->m_byMoveType = row->ActType;
 					pNpc->m_byInitMoveType = row->ActType;
@@ -952,7 +972,7 @@ bool CServerDlg::LoadNpcPosTable(std::vector<model::NpcPos*>& rows)
 					{
 						if (m_ZoneArray[i]->m_nZoneNumber == pNpc->m_sCurZone)
 						{
-							pNpc->m_ZoneIndex = static_cast<short>(i);
+							pNpc->m_ZoneIndex = static_cast<int16_t>(i);
 							pMap = m_ZoneArray[i];
 							break;
 						}
@@ -1340,7 +1360,7 @@ void CServerDlg::AllNpcInfo()
 			if (count == NPC_NUM)
 			{
 				SetByte(send_buff, NPC_INFO_ALL, send_count);
-				SetByte(send_buff, (BYTE) count, send_count);
+				SetByte(send_buff, (uint8_t) count, send_count);
 				m_CompCount++;
 				//::CopyMemory(m_CompBuf+m_iCompIndex, send_buff, send_index);
 				memset(m_CompBuf, 0, sizeof(m_CompBuf));
@@ -1363,7 +1383,7 @@ void CServerDlg::AllNpcInfo()
 		{
 			send_count = 0;
 			SetByte(send_buff, NPC_INFO_ALL, send_count);
-			SetByte(send_buff, (BYTE) count, send_count);
+			SetByte(send_buff, (uint8_t) count, send_count);
 			Send(send_buff, send_index, nZone);
 			send_tot++;
 			//TRACE(_T("AllNpcInfo - send_count=%d, count=%d, zone=%d\n"), send_tot, count, nZone);
@@ -1375,7 +1395,7 @@ void CServerDlg::AllNpcInfo()
 		SetByte(send_buff, AG_SERVER_INFO, send_index);
 		SetByte(send_buff, SERVER_INFO_END, send_index);
 		SetByte(send_buff, nZone, send_index);
-		SetShort(send_buff, (short) m_TotalNPC, send_index);
+		SetShort(send_buff, (int16_t) m_TotalNPC, send_index);
 		packet_size = Send(send_buff, send_index, nZone);
 
 		spdlog::debug("ServerDlg::AllNpcInfo: end for zoneId={}", nZone);
@@ -1566,10 +1586,10 @@ void CServerDlg::SendCompressedData(int nZone)
 	crc_value = crc32(reinterpret_cast<uint8_t*>(m_CompBuf), m_iCompIndex);
 
 	SetByte(send_buff, AG_COMPRESSED_DATA, send_index);
-	SetShort(send_buff, (short) comp_data_len, send_index);
-	SetShort(send_buff, (short) m_iCompIndex, send_index);
+	SetShort(send_buff, (int16_t) comp_data_len, send_index);
+	SetShort(send_buff, (int16_t) m_iCompIndex, send_index);
 	SetDWORD(send_buff, crc_value, send_index);
-	SetShort(send_buff, (short) m_CompCount, send_index);
+	SetShort(send_buff, (int16_t) m_CompCount, send_index);
 	SetString(send_buff, reinterpret_cast<const char*>(comp_buff), comp_data_len, send_index);
 
 	Send(send_buff, send_index, nZone);
@@ -1878,7 +1898,7 @@ bool CServerDlg::SetSummonNpcData(CNpc* pNpc, int zone_id, float fx, float fz)
 	pEventNpc->m_byWhatAttackType = pNpc->m_byWhatAttackType;
 
 	//////// MONSTER POS ////////////////////////////////////////
-	pEventNpc->m_sCurZone = static_cast<short>(zone_id);
+	pEventNpc->m_sCurZone = static_cast<int16_t>(zone_id);
 	pEventNpc->m_fCurX = fx;
 	pEventNpc->m_fCurY = 0;
 	pEventNpc->m_fCurZ = fz;
@@ -1897,7 +1917,7 @@ bool CServerDlg::SetSummonNpcData(CNpc* pNpc, int zone_id, float fx, float fz)
 	{
 		if (m_ZoneArray[i]->m_nZoneNumber == zone_id)
 		{
-			pEventNpc->m_ZoneIndex = static_cast<short>(i);
+			pEventNpc->m_ZoneIndex = static_cast<int16_t>(i);
 			break;
 		}
 	}
@@ -2078,7 +2098,7 @@ bool CServerDlg::AddObjectEventNpc(_OBJECT_EVENT* pEvent, int zone_number)
 	CNpc* pNpc = new CNpc();
 
 	pNpc->m_sNid = m_sMapEventNpc++;				// 서버 내에서의 고유 번호
-	pNpc->m_sSid = (short) pEvent->sIndex;			// MONSTER(NPC) Serial ID
+	pNpc->m_sSid = (int16_t) pEvent->sIndex;			// MONSTER(NPC) Serial ID
 
 	pNpc->m_byMoveType = 100;
 	pNpc->m_byInitMoveType = 100;
@@ -2097,15 +2117,15 @@ bool CServerDlg::AddObjectEventNpc(_OBJECT_EVENT* pEvent, int zone_number)
 
 	pNpc->m_sCurZone = zone_number;
 
-	pNpc->m_byGateOpen = pEvent->sStatus;
+	pNpc->m_byGateOpen = static_cast<uint8_t>(pEvent->sStatus);
 	pNpc->m_fCurX = pEvent->fPosX;
 	pNpc->m_fCurY = pEvent->fPosY;
 	pNpc->m_fCurZ = pEvent->fPosZ;
 
-	pNpc->m_nInitMinX = pEvent->fPosX - 1;
-	pNpc->m_nInitMinY = pEvent->fPosZ - 1;
-	pNpc->m_nInitMaxX = pEvent->fPosX + 1;
-	pNpc->m_nInitMaxY = pEvent->fPosZ + 1;
+	pNpc->m_nInitMinX = static_cast<int>(pEvent->fPosX - 1);
+	pNpc->m_nInitMinY = static_cast<int>(pEvent->fPosZ - 1);
+	pNpc->m_nInitMaxX = static_cast<int>(pEvent->fPosX + 1);
+	pNpc->m_nInitMaxY = static_cast<int>(pEvent->fPosZ + 1);
 
 	pNpc->m_sRegenTime = 10000 * 1000;	// 초(DB)단위-> 밀리세컨드로
 	//pNpc->m_sRegenTime		= 30 * 1000;	// 초(DB)단위-> 밀리세컨드로

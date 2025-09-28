@@ -83,7 +83,7 @@ public:
 	/// \brief attempts to modify a knights character
 	/// \see KnightsPacket(), KNIGHTS_REMOVE, KNIGHTS_ADMIT, KNIGHTS_REJECT, KNIGHTS_CHIEF,
 	/// KNIGHTS_VICECHIEF, KNIGHTS_OFFICER, KNIGHTS_PUNISH
-	void ModifyKnightsMember(char* buffer, BYTE command);
+	void ModifyKnightsMember(char* buffer, uint8_t command);
 
 	/// \brief attempt to remove a character from a knights clan
 	/// \see KnightsPacket(), KNIGHTS_WITHDRAW
@@ -213,14 +213,14 @@ protected:
 	/// \param saveType one of: UPDATE_LOGOUT, UPDATE_ALL_SAVE
 	/// \param forceLogout should be set to true in panic situations
 	/// \see UserLogOut(), AllSaveRoutine(), HandleUserUpdate()
-	bool HandleUserLogout(int userId, BYTE saveType, bool forceLogout = false);
+	bool HandleUserLogout(int userId, uint8_t saveType, bool forceLogout = false);
 
 	/// \brief handles user update functions and retry logic
 	/// \param userId user index for UserData
 	/// \param user reference to user object
 	/// \param saveType one of: UPDATE_LOGOUT, UPDATE_ALL_SAVE, UPDATE_PACKET_SAVE
 	/// \see UserDataSave(), HandleUserLogout()
-	bool HandleUserUpdate(int userId, const _USER_DATA& user, BYTE saveType);
+	bool HandleUserUpdate(int userId, const _USER_DATA& user, uint8_t saveType);
 
 	/// \brief performs MFC data exchange
 	/// \see https://learn.microsoft.com/en-us/cpp/mfc/dialog-data-exchange?view=msvc-170

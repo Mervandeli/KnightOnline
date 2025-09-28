@@ -22,14 +22,14 @@ public:
 	bool AddKnightsUser(int knightsId, const char* charId);
 	void RecvKnightsList(char* pBuf);
 	void RecvDestroyKnights(CUser* pUser, char* pBuf);
-	void RecvModifyFame(CUser* pUser, char* pBuf, BYTE command);
-	void RecvJoinKnights(CUser* pUser, char* pBuf, BYTE command);
+	void RecvModifyFame(CUser* pUser, char* pBuf, uint8_t command);
+	void RecvJoinKnights(CUser* pUser, char* pBuf, uint8_t command);
 	void RecvCreateKnights(CUser* pUser, char* pBuf);
-	void ReceiveKnightsProcess(CUser* pUser, char* pBuf, BYTE command);
+	void ReceiveKnightsProcess(CUser* pUser, char* pBuf, uint8_t command);
 	void CurrentKnightsMember(CUser* pUser, char* pBuf);
 	void AllKnightsMember(CUser* pUser, char* pBuf);
 	void AllKnightsList(CUser* pUser, char* pBuf);
-	void ModifyKnightsMember(CUser* pUser, char* pBuf, BYTE command);
+	void ModifyKnightsMember(CUser* pUser, char* pBuf, uint8_t command);
 	void DestroyKnights(CUser* pUser);
 	void WithdrawKnights(CUser* pUser, char* pBuf);
 	void JoinKnights(CUser* pUser, char* pBuf);

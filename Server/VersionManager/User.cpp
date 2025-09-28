@@ -39,7 +39,7 @@ void CUser::Parsing(int len, char* pData)
 {
 	int index = 0, send_index = 0, client_version = 0;
 	char buff[2048] = {};
-	BYTE command = GetByte(pData, index);
+	uint8_t command = GetByte(pData, index);
 
 	switch (command)
 	{
@@ -54,12 +54,12 @@ void CUser::Parsing(int len, char* pData)
 			_main->DbProcess.LoadUserCountList();
 
 			SetByte(buff, LS_SERVERLIST, send_index);
-			SetByte(buff, static_cast<BYTE>(_main->ServerList.size()), send_index);
+			SetByte(buff, static_cast<uint8_t>(_main->ServerList.size()), send_index);
 
 			for (const _SERVER_INFO* pInfo : _main->ServerList)
 			{
-				SetString2(buff, pInfo->strServerIP, (short) strlen(pInfo->strServerIP), send_index);
-				SetString2(buff, pInfo->strServerName, (short) strlen(pInfo->strServerName), send_index);
+				SetString2(buff, pInfo->strServerIP, (int16_t) strlen(pInfo->strServerIP), send_index);
+				SetString2(buff, pInfo->strServerName, (int16_t) strlen(pInfo->strServerName), send_index);
 
 				if (pInfo->sUserCount <= pInfo->sUserLimit)
 					SetShort(buff, pInfo->sUserCount, send_index);   // 기범이가 ^^;
@@ -93,7 +93,7 @@ void CUser::LogInReq(char* pBuf)
 		serverip[MAX_IP_SIZE + 1] = {},
 		accountid[MAX_ID_SIZE + 1] = {},
 		pwd[MAX_PW_SIZE + 1] = {};
-	short sPremiumTimeDaysRemaining = -1;
+	int16_t sPremiumTimeDaysRemaining = -1;
 
 	idlen = GetShort(pBuf, index);
 	if (idlen > MAX_ID_SIZE
@@ -121,7 +121,7 @@ void CUser::LogInReq(char* pBuf)
 			result = AUTH_IN_GAME;
 
 			SetByte(send_buff, result, send_index);
-			SetString2(send_buff, serverip, (short) strlen(serverip), send_index);
+			SetString2(send_buff, serverip, (int16_t) strlen(serverip), send_index);
 			SetShort(send_buff, serverno, send_index);
 		}
 		else
@@ -162,12 +162,12 @@ void CUser::SendDownloadInfo(int version)
 
 	SetByte(buff, LS_DOWNLOADINFO_REQ, send_index);
 
-	SetString2(buff, _main->FtpUrl(), (short) strlen(_main->FtpUrl()), send_index);
-	SetString2(buff, _main->FtpPath(), (short) strlen(_main->FtpPath()), send_index);
+	SetString2(buff, _main->FtpUrl(), (int16_t) strlen(_main->FtpUrl()), send_index);
+	SetString2(buff, _main->FtpPath(), (int16_t) strlen(_main->FtpPath()), send_index);
 	SetShort(buff, static_cast<int>(downloadset.size()), send_index);
 
 	for (const std::string& filename : downloadset)
-		SetString2(buff, filename.c_str(), (short) filename.size(), send_index);
+		SetString2(buff, filename.c_str(), (int16_t) filename.size(), send_index);
 
 	Send(buff, send_index);
 }

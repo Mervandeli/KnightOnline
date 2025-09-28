@@ -48,7 +48,7 @@ void CAISocket::Parsing(int len, char* pData)
 {
 	int index = 0;
 
-	BYTE command = GetByte(pData, index);
+	uint8_t command = GetByte(pData, index);
 
 	//TRACE(_T("Parsing - command=%d, length = %d\n"), command, len);
 
@@ -154,10 +154,10 @@ void CAISocket::LoginProcess(char* pBuf)
 {
 	int index = 0;
 	float fReConnectEndTime = 0.0f;
-	BYTE zone = GetByte(pBuf, index);
+	uint8_t zone = GetByte(pBuf, index);
 	// 0: first connect
 	// 1: reconnect
-	BYTE byReConnect = GetByte(pBuf, index);
+	uint8_t byReConnect = GetByte(pBuf, index);
 	
 	// zone 틀리면 에러 
 	if (zone == 0xff)
@@ -230,8 +230,8 @@ void CAISocket::LoginProcess(char* pBuf)
 void CAISocket::RecvServerInfo(char* pBuf)
 {
 	int index = 0;
-	BYTE type = GetByte(pBuf, index);
-	BYTE byZone = GetByte(pBuf, index);
+	uint8_t type = GetByte(pBuf, index);
+	uint8_t byZone = GetByte(pBuf, index);
 	CString logstr;
 	int size = static_cast<int>(m_pMain->m_ZoneArray.size());
 
@@ -241,7 +241,7 @@ void CAISocket::RecvServerInfo(char* pBuf)
 	}
 	else if (type == SERVER_INFO_END)
 	{
-		short sTotalMonster = GetShort(pBuf, index);
+		int16_t sTotalMonster = GetShort(pBuf, index);
 		std::wstring logStr = std::format(L"NPC info received for zoneId {}", byZone);
 		m_pMain->AddOutputMessage(logStr);
 		//Sleep(100);
@@ -272,12 +272,12 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 	int index = 0;
 	uint8_t		byCount = 0;	// 마리수
 	uint8_t        byType;			// 0:처음에 등장하지 않는 몬스터, 1:등장
-	short		instanceId;			// NPC index
-	short		npcId;			// NPC index
-	short       sZone;			// Current zone number
-	short       sZoneIndex;		// Current zone index
-	short		pictureId;			// NPC Picture Number
-	short		sSize = 100;	// NPC Size
+	int16_t		instanceId;			// NPC index
+	int16_t		npcId;			// NPC index
+	int16_t       sZone;			// Current zone number
+	int16_t       sZoneIndex;		// Current zone index
+	int16_t		pictureId;			// NPC Picture Number
+	int16_t		sSize = 100;	// NPC Size
 	int			iweapon_1;
 	int			iweapon_2;
 	char		npcName[MAX_NPC_NAME_SIZE + 1];
@@ -293,7 +293,7 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 	int			nMaxHP;			// 최대 HP
 	int			nHP;			// 현재 HP
 	uint8_t		byGateOpen;		// 성문일경우 열림과 닫힘 정보
-	short		sHitRate;
+	int16_t		sHitRate;
 	uint8_t		byObjectType;	// 보통 : 0, 특수 : 1
 	uint8_t		byTrapNumber;
 
@@ -310,7 +310,7 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 		iweapon_2 = GetDWORD(pBuf, index);
 		sZone = GetShort(pBuf, index);
 		sZoneIndex = GetShort(pBuf, index);
-		int nLength = GetVarString(npcName, pBuf, sizeof(BYTE), index);
+		int nLength = GetVarString(npcName, pBuf, sizeof(uint8_t), index);
 		byGroup = GetByte(pBuf, index);
 		byLevel = GetByte(pBuf, index);
 		fPosX = Getfloat(pBuf, index);
@@ -447,9 +447,9 @@ void CAISocket::RecvNpcMoveResult(char* pBuf)
 	// sungyong tw
 	char send_buff[256];	memset(send_buff, 0x00, 256);
 	int index = 0, send_index = 0;
-	BYTE		flag;			// 01(INFO_MODIFY)	: NPC 정보 변경
+	uint8_t		flag;			// 01(INFO_MODIFY)	: NPC 정보 변경
 								// 02(INFO_DELETE)	: NPC 정보 삭제
-	short		nid;			// NPC index
+	int16_t		nid;			// NPC index
 	float		fPosX;			// X Position
 	float		fPosZ;			// Z Position
 	float		fPosY;			// Y Position
@@ -483,10 +483,10 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 {
 	int index = 0, send_index = 0;
 	int sid = -1, tid = -1;
-	BYTE type, result;
-	short damage = 0;
+	uint8_t type, result;
+	int16_t damage = 0;
 	int nHP = 0;
-	BYTE  byAttackType = 0;
+	uint8_t  byAttackType = 0;
 	CNpc* pNpc = nullptr;
 	CNpc* pMon = nullptr;
 	CUser* pUser = nullptr;
@@ -777,8 +777,8 @@ void CAISocket::RecvMagicAttackResult(char* pBuf)
 {
 	int index = 0, send_index = 1;
 	int sid = -1, tid = -1, magicid = 0;
-	BYTE byCommand;
-	short data0, data1, data2, data3, data4, data5;
+	uint8_t byCommand;
+	int16_t data0, data1, data2, data3, data4, data5;
 
 	CNpc* pNpc = nullptr;
 	CUser* pUser = nullptr;
@@ -871,14 +871,14 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 
 	uint8_t		Mode;						// 01(INFO_MODIFY)	: NPC 정보 변경
 											// 02(INFO_DELETE)	: NPC 정보 삭제
-	short		instanceId;						// NPC index
-	short		npcId;						// NPC index
-	short		pictureId;						// NPC Picture Number
-	short		sSize = 100;				// NPC Size
+	int16_t		instanceId;						// NPC index
+	int16_t		npcId;						// NPC index
+	int16_t		pictureId;						// NPC Picture Number
+	int16_t		sSize = 100;				// NPC Size
 	int			iWeapon_1;					// 오른손 무기
 	int			iWeapon_2;					// 왼손  무기
-	short       sZone;						// Current zone number
-	short       sZoneIndex;					// Current zone index
+	int16_t       sZone;						// Current zone number
+	int16_t       sZoneIndex;					// Current zone index
 	char		npcName[MAX_NPC_NAME_SIZE + 1];	// NPC Name
 	uint8_t		byGroup;					// 소속 집단
 	uint8_t		byLevel;					// level
@@ -895,7 +895,7 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 	int			nMaxHP;						// 최대 HP
 	int			nHP;						// 현재 HP
 	uint8_t		byGateOpen;
-	short		sHitRate;					// 공격 성공률
+	int16_t		sHitRate;					// 공격 성공률
 	uint8_t		byObjectType;				// 보통 : 0, 특수 : 1
 	uint8_t		byTrapNumber;
 
@@ -908,7 +908,7 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 	iWeapon_2 = GetDWORD(pBuf, index);
 	sZone = GetShort(pBuf, index);
 	sZoneIndex = GetShort(pBuf, index);
-	int nLength = GetVarString(npcName, pBuf, sizeof(BYTE), index);
+	int nLength = GetVarString(npcName, pBuf, sizeof(uint8_t), index);
 
 	// 잘못된 monster 아이디 
 	if (nLength < 0
@@ -1056,8 +1056,8 @@ void CAISocket::RecvUserExp(char* pBuf)
 {
 	int index = 0;
 	int userId = GetShort(pBuf, index);
-	short sExp = GetShort(pBuf, index);
-	short sLoyalty = GetShort(pBuf, index);
+	int16_t sExp = GetShort(pBuf, index);
+	int16_t sLoyalty = GetShort(pBuf, index);
 
 	CUser* pUser = (CUser*) m_pMain->m_Iocport.m_SockArray[userId];
 	if (pUser == nullptr)
@@ -1094,8 +1094,8 @@ void CAISocket::RecvSystemMsg(char* pBuf)
 	char send_buff[256] = {},
 		strSysMsg[256] = {};
 
-	BYTE bType;
-	short sWho, sLength;
+	uint8_t bType;
+	int16_t sWho, sLength;
 
 	bType = GetByte(pBuf, index);
 	sWho = GetShort(pBuf, index);
@@ -1132,11 +1132,11 @@ void CAISocket::RecvNpcGiveItem(char* pBuf)
 {
 	int index = 0, send_index = 0;
 	char send_buff[1024] = {};
-	short sUid, sNid, sZone, regionx, regionz;
+	int16_t sUid, sNid, sZone, regionx, regionz;
 	float fX, fZ, fY;
-	BYTE byCount;
+	uint8_t byCount;
 	int nItemNumber[NPC_HAVE_ITEM_LIST];
-	short sCount[NPC_HAVE_ITEM_LIST];
+	int16_t sCount[NPC_HAVE_ITEM_LIST];
 	_ZONE_ITEM* pItem = nullptr;
 	C3DMap* pMap = nullptr;
 	CUser* pUser = nullptr;
@@ -1214,7 +1214,7 @@ void CAISocket::RecvNpcGiveItem(char* pBuf)
 
 void CAISocket::RecvUserFail(char* pBuf)
 {
-	short instanceId = 0, npcId = 0;
+	int16_t instanceId = 0, npcId = 0;
 	int index = 0, send_index = 0;
 	char pOutBuf[1024] = {};
 
@@ -1239,8 +1239,8 @@ void CAISocket::RecvUserFail(char* pBuf)
 
 	pUser->HpChange(-10000, 1);
 
-	BYTE type = 0x01;
-	BYTE result = 0x02;
+	uint8_t type = 0x01;
+	uint8_t result = 0x02;
 
 	SetByte(pOutBuf, WIZ_ATTACK, send_index);
 	SetByte(pOutBuf, type, send_index);
@@ -1258,7 +1258,7 @@ void CAISocket::RecvUserFail(char* pBuf)
 void CAISocket::RecvCompressedData(char* pBuf)
 {
 	int index = 0;
-	short sCompLen, sOrgLen, sCompCount;
+	int16_t sCompLen, sOrgLen, sCompCount;
 	std::vector<uint8_t> decompressedBuffer;
 	uint8_t* pCompressedBuffer = nullptr;
 
@@ -1644,7 +1644,7 @@ void CAISocket::RecvNpcEventItem(char* pBuf)
 {
 	int index = 0, send_index = 0, zoneindex = -1;
 	char send_buff[1024] = {};
-	short sUid = 0, sNid = 0;
+	int16_t sUid = 0, sNid = 0;
 	int nItemNumber = 0, nCount = 0;
 	CUser* pUser = nullptr;
 

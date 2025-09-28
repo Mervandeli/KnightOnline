@@ -17,6 +17,7 @@
 #include "SharedMem.h"
 #include "Knights.h"
 #include "KnightsManager.h"
+#include "KnightsSiegeWar.h"
 #include "EVENT.h"
 #include "UdpSocket.h"
 
@@ -100,22 +101,23 @@ public:
 	void Send_CommandChat(char* pBuf, int len, int nation, CUser* pExceptUser = nullptr);
 	bool LoadBattleTable();
 	void Send_UDP_All(char* pBuf, int len, int group_type = 0);
-	void KickOutZoneUsers(short zone);
+	void KickOutZoneUsers(int16_t zone);
 	int64_t GenerateItemSerial();
 	void KickOutAllUsers();
 	void CheckAliveUser();
 	int GetKnightsGrade(int nPoints);
 	void WritePacketLog();
-	void MarketBBSSellDelete(short index);
-	void MarketBBSBuyDelete(short index);
+	void MarketBBSSellDelete(int16_t index);
+	void MarketBBSBuyDelete(int16_t index);
 	void MarketBBSTimeCheck();
 	int  GetKnightsAllMembers(int knightsindex, char* temp_buff, int& buff_index, int type = 0);
+	bool LoadKnightsSiegeWarfareTable();
 	bool LoadAllKnightsUserData();
 	bool LoadAllKnights();
 	bool LoadStartPositionTable();
 	bool LoadServerResourceTable();
 	bool LoadHomeTable();
-	void Announcement(BYTE type, int nation = 0, int chat_type = 8);
+	void Announcement(uint8_t type, int nation = 0, int chat_type = 8);
 	void ResetBattleZone();
 	void BanishLosers();
 	void BattleZoneVictoryCheck();
@@ -165,6 +167,7 @@ public:
 	void SendCompressedData();
 	void DeleteAllNpcList(int flag = 0);
 	CNpc* GetNpcPtr(int sid, int cur_zone);
+	CKnights* GetKnightsPtr(int16_t clanId);
 	// ~sungyong 2001.11.06
 	bool InitializeMMF();
 	void UserInOutForMe(CUser* pSendUser);	// 9 Regions All Users USERINOUT Packet Packaging Function
@@ -196,7 +199,7 @@ public:
 	HANDLE	m_hMMFile;
 	char*	m_lpMMFile;
 	bool	m_bMMFCreate;
-	DWORD	m_ServerOffset;
+	uint32_t	m_ServerOffset;
 
 	char	m_ppNotice[20][128];
 	char	m_AIServerIP[20];
@@ -224,18 +227,19 @@ public:
 	EventTriggerMap			m_EventTriggerMap;
 
 	CKnightsManager			m_KnightsManager;
+	CKnightsSiegeWar		m_KnightsSiegeWar;
 
-	short	m_sPartyIndex;
-	short	m_sZoneCount;							// AI Server 재접속시 사용
-	short	m_sSocketCount;							// AI Server 재접속시 사용
+	int16_t	m_sPartyIndex;
+	int16_t	m_sZoneCount;							// AI Server 재접속시 사용
+	int16_t	m_sSocketCount;							// AI Server 재접속시 사용
 	// sungyong 2002.05.23
-	short   m_sSendSocket;
+	int16_t	m_sSendSocket;
 	bool 	m_bFirstServerFlag;		// 서버가 처음시작한 후 게임서버가 붙은 경우에는 1, 붙지 않은 경우 0
 	bool 	m_bServerCheckFlag;
 	bool 	m_bPointCheckFlag;		// AI서버와 재접전에 NPC포인터 참조막기 (true:포인터 참조, false:포인터 참조 못함)
-	short   m_sReSocketCount;		// GameServer와 재접시 필요
+	int16_t	m_sReSocketCount;		// GameServer와 재접시 필요
 	float   m_fReConnectStart;	// 처음 소켓이 도착한 시간
-	short   m_sErrorSocketCount;  // 이상소켓 감시용
+	int16_t	m_sErrorSocketCount;  // 이상소켓 감시용
 	// ~sungyong 2002.05.23
 
 	int m_iPacketCount;		// packet check
@@ -246,27 +250,31 @@ public:
 	int m_nCastleCapture;
 
 	// ~Yookozuna 2002.06.12
-	BYTE    m_byBattleOpen, m_byOldBattleOpen;					// 0:전쟁중이 아님, 1:전쟁중(국가간전쟁), 2:눈싸움전쟁
-	BYTE	m_bVictory, m_byOldVictory;
-	BYTE	m_bKarusFlag, m_bElmoradFlag;
-	BYTE    m_byKarusOpenFlag, m_byElmoradOpenFlag, m_byBanishFlag, m_byBattleSave;
-	short   m_sDiscount;	// 능력치와 포인트 초기화 할인 (0:할인없음, 1:할인(50%) )
-	short	m_sKarusDead, m_sElmoradDead, m_sBanishDelay, m_sKarusCount, m_sElmoradCount;
+	uint8_t	m_byBattleOpen, m_byOldBattleOpen;					// 0:전쟁중이 아님, 1:전쟁중(국가간전쟁), 2:눈싸움전쟁
+	uint8_t	m_bVictory, m_byOldVictory;
+	uint8_t	m_bKarusFlag, m_bElmoradFlag;
+	uint8_t	m_byKarusOpenFlag, m_byElmoradOpenFlag, m_byBanishFlag, m_byBattleSave;
+	int16_t	m_sDiscount;	// 능력치와 포인트 초기화 할인 (0:할인없음, 1:할인(50%) )
+	int16_t	m_sKarusDead, m_sElmoradDead, m_sBanishDelay, m_sKarusCount, m_sElmoradCount;
+
+	uint8_t _karusInvasionMonumentLastCapturedNation[INVASION_MONUMENT_COUNT];
+	uint8_t _elmoradInvasionMonumentLastCapturedNation[INVASION_MONUMENT_COUNT];
+
 	int		m_nBattleZoneOpenWeek, m_nBattleZoneOpenHourStart, m_nBattleZoneOpenHourEnd;
 	char	m_strKarusCaptain[MAX_ID_SIZE + 1];
 	char	m_strElmoradCaptain[MAX_ID_SIZE + 1];
 
 	// ~Yookozuna 2002.07.17
-	BYTE	m_bMaxRegenePoint;
+	uint8_t	m_bMaxRegenePoint;
 
 	// ~Yookozuna 2002.09.21 - Today is Chusok :( 
-	short	m_sBuyID[MAX_BBS_POST];
+	int16_t	m_sBuyID[MAX_BBS_POST];
 	char	m_strBuyTitle[MAX_BBS_POST][MAX_BBS_TITLE];
 	char	m_strBuyMessage[MAX_BBS_POST][MAX_BBS_MESSAGE];
 	int		m_iBuyPrice[MAX_BBS_POST];
 	float	m_fBuyStartTime[MAX_BBS_POST];
 
-	short	m_sSellID[MAX_BBS_POST];
+	int16_t	m_sSellID[MAX_BBS_POST];
 	char	m_strSellTitle[MAX_BBS_POST][MAX_BBS_TITLE];
 	char	m_strSellMessage[MAX_BBS_POST][MAX_BBS_MESSAGE];
 	int		m_iSellPrice[MAX_BBS_POST];
@@ -279,6 +287,12 @@ public:
 
 	// ~Yookozuna 2002.12.11 - 갓댐 산타 클로스 --;
 	uint8_t	m_bySanta;
+
+	e_BeefRoastVictory	_beefRoastVictoryType;
+
+	uint8_t				_monsterChallengeActiveType;
+	uint8_t				_monsterChallengeState; // TODO: enum this
+	int16_t				_monsterChallengePlayerCount;
 
 	// 패킷 압축에 필요 변수   -------------only from ai server
 	int					m_CompCount;

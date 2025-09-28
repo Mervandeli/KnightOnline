@@ -16,8 +16,10 @@ int surround_z[8] = { 0, -1, -1, -1, 0, 1, 1, 1 };
 int test_id = 1056;
 bool useNpcTrace = false;
 
-constexpr int MAX_MAXWEAPON_CLASSES		= _countof(model::MakeWeapon::Class);
-constexpr int MAX_ITEM_GRADECODE_GRADES	= _countof(model::MakeItemGradeCode::Grade);
+// TODO: Cross-platform helper for these would be ideal (_countof() is MSVC-specific)
+constexpr int MAX_MAKE_WEAPON_CLASS		= sizeof(model::MakeWeapon::Class) / sizeof(model::MakeWeapon::Class[0]);
+constexpr int MAX_ITEM_GRADECODE_GRADE	= sizeof(model::MakeItemGradeCode::Grade) / sizeof(model::MakeItemGradeCode::Grade[0]);
+constexpr int MAX_MAKE_ITEM_GROUP_ITEM	= sizeof(model::MakeItemGroup::Item) / sizeof(model::MakeItemGroup::Item[0]);
 
 #define ATROCITY_ATTACK_TYPE 1				// 선공
 #define TENDER_ATTACK_TYPE	 0				// 후공	
@@ -269,7 +271,7 @@ inline void CNpc::InitTarget()
 
 void CNpc::Load(const model::Npc* pNpcTable, bool transformSpeeds)
 {
-	constexpr short MONSTER_SPEED = 1500;
+	constexpr int16_t MONSTER_SPEED = 1500;
 
 	_ASSERT(pNpcTable != nullptr);
 
@@ -615,7 +617,7 @@ void CNpc::NpcTracing(CIOCPort* pIOCP)
 		Setfloat(pBuf, m_fPrevX, index);
 		Setfloat(pBuf, m_fPrevZ, index);
 		Setfloat(pBuf, m_fPrevY, index);
-		fMoveSpeed = m_fSecForRealMoveMetor / ((double) m_sSpeed / 1000);
+		fMoveSpeed = m_fSecForRealMoveMetor / (m_sSpeed / 1000.0f);
 		Setfloat(pBuf, fMoveSpeed, index);
 		//Setfloat(pBuf, m_fSecForRealMoveMetor, index);
 		//TRACE(_T("Npc Tracing --> nid = %d, cur=[x=%.2f, z=%.2f], prev=[x=%.2f, z=%.2f, metor = %.2f], frame=%d, speed = %d \n"), m_sNid, m_fCurX, m_fCurZ, m_fPrevX, m_fPrevZ, m_fSecForRealMoveMetor, m_sStepCount, m_sSpeed);
@@ -780,10 +782,9 @@ void CNpc::NpcMoving(CIOCPort* pIOCP)
 				m_sNid + NPC_BAND, m_sSid, m_strName, m_fCurX, m_fCurZ);
 		}
 
-		int rx = m_fCurX / VIEW_DIST;
-		int rz = m_fCurZ / VIEW_DIST;
+		// TRACE(_T("** NpcMoving --> IsMovingEnd() 이동이 끝남,, rx=%d, rz=%d, stand로\n"),
+		//	static_cast<int>(m_fCurX / VIEW_DIST), static_cast<int>(m_fCurZ / VIEW_DIST));
 
-		//TRACE(_T("** NpcMoving --> IsMovingEnd() 이동이 끝남,, rx=%d, rz=%d, stand로\n"), rx, rz);
 		m_NpcState = NPC_STANDING;
 		m_Delay = m_sStandTime;
 		m_fDelayTime = TimeGet();
@@ -843,7 +844,7 @@ void CNpc::NpcMoving(CIOCPort* pIOCP)
 		Setfloat(pBuf, m_fPrevX, index);
 		Setfloat(pBuf, m_fPrevZ, index);
 		Setfloat(pBuf, m_fPrevY, index);
-		fMoveSpeed = m_fSecForRealMoveMetor / ((double) m_sSpeed / 1000);
+		fMoveSpeed = m_fSecForRealMoveMetor / (m_sSpeed / 1000.0f);
 		Setfloat(pBuf, fMoveSpeed, index);
 		//Setfloat(pBuf, m_fSecForRealMoveMetor, index);
 		//TRACE(_T("Npc Move --> nid = %d, cur=[x=%.2f, z=%.2f], prev=[x=%.2f, z=%.2f, metor = %.2f], frame=%d, speed = %d \n"), m_sNid+NPC_BAND, m_fCurX, m_fCurZ, m_fPrevX, m_fPrevZ, m_fSecForRealMoveMetor, m_sStepCount, m_sSpeed);
@@ -1060,7 +1061,7 @@ void CNpc::NpcBack(CIOCPort* pIOCP)
 	Setfloat(pBuf, m_fPrevX, index);
 	Setfloat(pBuf, m_fPrevZ, index);
 	Setfloat(pBuf, m_fPrevY, index);
-	fMoveSpeed = m_fSecForRealMoveMetor / ((double) m_sSpeed / 1000);
+	fMoveSpeed = m_fSecForRealMoveMetor / (m_sSpeed / 1000.0f);
 	Setfloat(pBuf, fMoveSpeed, index);
 	//Setfloat(pBuf, m_fSecForRealMoveMetor, index);
 
@@ -1362,8 +1363,8 @@ bool CNpc::RandomMove()
 		// 처음위치로 돌아가도록...
 		if (m_iPattenFrame == 0)
 		{
-			m_pPattenPos.x = (short) m_nInitX;
-			m_pPattenPos.z = (short) m_nInitZ;
+			m_pPattenPos.x = (int16_t) m_nInitX;
+			m_pPattenPos.z = (int16_t) m_nInitZ;
 		}
 
 		random_x = myrand(3, 7);
@@ -1515,8 +1516,8 @@ bool CNpc::RandomMove()
 	vStart.Set(m_fCurX, 0, m_fCurZ);
 	vEnd.Set(fDestX, 0, fDestZ);
 
-	int mapMaxX = (pMap->m_sizeMap.cx-1) * pMap->m_fUnitDist;
-	int mapMaxZ = (pMap->m_sizeMap.cy-1) * pMap->m_fUnitDist;
+	int mapMaxX = static_cast<int>((pMap->m_sizeMap.cx - 1) * pMap->m_fUnitDist);
+	int mapMaxZ = static_cast<int>((pMap->m_sizeMap.cy - 1) * pMap->m_fUnitDist);
 	if (!pMap->IsValidPosition(m_fCurX, m_fCurZ))
 	{
 		spdlog::error("Npc::RandomMove: coordinates invalid [serial={} npcName={} x={} z={} destX={} destZ={} mapBounds=[x:{} z:{}]]",
@@ -2595,7 +2596,7 @@ float CNpc::FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType)
 				// 선공몹...
 				else
 				{
-					iLevelComprison = pUser->m_sLevel - m_sLevel;
+					iLevelComprison = pUser->m_byLevel - m_sLevel;
 
 					// 작업할 것 : 타입에 따른 공격성향으로..
 					//if(iLevelComprison > ATTACK_LIMIT_LEVEL)	continue;
@@ -3296,7 +3297,7 @@ int CNpc::GetTargetPath(int option)
 		if (m_byAttackPos > 0
 			&& m_byAttackPos < 9)
 		{
-			fDegree = (m_byAttackPos - 1) * 45;
+			fDegree = (m_byAttackPos - 1) * 45.0f;
 			fTargetDistance = 2.0f + m_fBulk;
 			vEnd22 = ComputeDestPos(vUser, 0.0f, fDegree, fTargetDistance);
 			fSurX = vEnd22.x - vUser.x;
@@ -3307,7 +3308,7 @@ int CNpc::GetTargetPath(int option)
 		}
 		else
 		{
-			vEnd22 = CalcAdaptivePosition(vNpc, vUser, 2.0 + m_fBulk);
+			vEnd22 = CalcAdaptivePosition(vNpc, vUser, 2.0f + m_fBulk);
 			m_fEndPoint_X = vEnd22.x;
 			m_fEndPoint_Y = vEnd22.z;
 		}
@@ -3552,9 +3553,9 @@ int CNpc::Attack(CIOCPort* pIOCP)
 				SetDWORD(buff, m_iMagic2, send_index);			// Area Magic
 				SetShort(buff, m_sNid + NPC_BAND, send_index);
 				SetShort(buff, -1, send_index);					// tid는 반드시 -1
-				SetShort(buff, (short) m_fCurX, send_index);	// target point
-				SetShort(buff, (short) m_fCurY, send_index);
-				SetShort(buff, (short) m_fCurZ, send_index);
+				SetShort(buff, (int16_t) m_fCurX, send_index);	// target point
+				SetShort(buff, (int16_t) m_fCurY, send_index);
+				SetShort(buff, (int16_t) m_fCurZ, send_index);
 				SetShort(buff, 0, send_index);
 				SetShort(buff, 0, send_index);
 				SetShort(buff, 0, send_index);
@@ -4084,13 +4085,13 @@ void CNpc::MoveAttack(CIOCPort* pIOCP)
 
 int CNpc::GetNFinalDamage(CNpc* pNpc)
 {
-	short damage = 0;
+	int16_t damage = 0;
 	float Attack = 0;
 	float Avoid = 0;
-	short Hit = 0;
-	short Ac = 0;
+	int16_t Hit = 0;
+	int16_t Ac = 0;
 	int random = 0;
-	BYTE result;
+	uint8_t result;
 
 	if (pNpc == nullptr)
 		return damage;
@@ -4105,7 +4106,7 @@ int CNpc::GetNFinalDamage(CNpc* pNpc)
 	Hit = m_sDamage;
 
 	// 방어자 Ac 
-	Ac = (short) pNpc->m_sDefense;
+	Ac = (int16_t) pNpc->m_sDefense;
 
 	// 타격비 구하기
 	result = GetHitRate(Attack / Avoid);
@@ -4113,17 +4114,17 @@ int CNpc::GetNFinalDamage(CNpc* pNpc)
 	switch (result)
 	{
 //		case GREAT_SUCCESS:
-//			damage = (short)(0.6 * (2 * Hit));
+//			damage = (int16_t)(0.6 * (2 * Hit));
 //			if(damage <= 0){
 //				damage = 0;
 //				break;
 //			}
 //			damage = myrand(0, damage);
-//			damage += (short)(0.7 * (2 * Hit));
+//			damage += (int16_t)(0.7 * (2 * Hit));
 //			break;
 
 		case GREAT_SUCCESS:
-			damage = (short) (0.6 * Hit);
+			damage = (int16_t) (0.6 * Hit);
 			if (damage <= 0)
 			{
 				damage = 0;
@@ -4131,14 +4132,14 @@ int CNpc::GetNFinalDamage(CNpc* pNpc)
 			}
 
 			damage = myrand(0, damage);
-			damage += (short) (0.7 * Hit);
+			damage += (int16_t) (0.7 * Hit);
 			break;
 
 		case SUCCESS:
 		case NORMAL:
 			if (Hit - Ac > 0)
 			{
-				damage = (short) (0.6 * (Hit - Ac));
+				damage = (int16_t) (0.6 * (Hit - Ac));
 				if (damage <= 0)
 				{
 					damage = 0;
@@ -4146,7 +4147,7 @@ int CNpc::GetNFinalDamage(CNpc* pNpc)
 				}
 
 				damage = myrand(0, damage);
-				damage += (short) (0.7 * (Hit - Ac));
+				damage += (int16_t) (0.7 * (Hit - Ac));
 			}
 			else
 			{
@@ -4265,14 +4266,14 @@ bool CNpc::ResetPath()
 
 int CNpc::GetFinalDamage(CUser* pUser, int type)
 {
-	short damage = 0;
+	int16_t damage = 0;
 	float Attack = 0;
 	float Avoid = 0;
-	short Hit = 0;
-	short Ac = 0;
-	short HitB = 0;
+	int16_t Hit = 0;
+	int16_t Ac = 0;
+	int16_t HitB = 0;
 	int random = 0;
-	BYTE result;
+	uint8_t result;
 
 	if (pUser == nullptr)
 		return damage;
@@ -4280,15 +4281,15 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 	Attack = (float) m_sHitRate;								// 공격민첩
 	Avoid = (float) pUser->m_fAvoidrate;						// 방어민첩	
 	Hit = m_sDamage;											// 공격자 Hit 		
-//	Ac = (short) pUser->m_sAC;									// 방어자 Ac 
+//	Ac = (int16_t) pUser->m_sAC;									// 방어자 Ac 
 
-//	Ac = (short) pUser->m_sItemAC + (short) pUser->m_sLevel;	// 방어자 Ac 
-//	Ac = (short) pUser->m_sAC - (short) pUser->m_sLevel;		// 방어자 Ac. 잉...성래씨 미워 ㅜ.ㅜ
-	Ac = (short) pUser->m_sItemAC + (short) pUser->m_sLevel + (short) (pUser->m_sAC - pUser->m_sLevel - pUser->m_sItemAC);
+//	Ac = (int16_t) pUser->m_sItemAC + (int16_t) pUser->m_byLevel;	// 방어자 Ac 
+//	Ac = (int16_t) pUser->m_sAC - (int16_t) pUser->m_byLevel;		// 방어자 Ac. 잉...성래씨 미워 ㅜ.ㅜ
+	Ac = (int16_t) pUser->m_sItemAC + (int16_t) pUser->m_byLevel + (int16_t) (pUser->m_sAC - pUser->m_byLevel - pUser->m_sItemAC);
 
 //	ASSERT(Ac != 0);
-//	short kk = (short) pUser->m_sItemAC;
-//	short tt = (short) pUser->m_sLevel;
+//	int16_t kk = (int16_t) pUser->m_sItemAC;
+//	int16_t tt = (int16_t) pUser->m_byLevel;
 //	Ac = kk + tt;
 
 	HitB = (int) ((Hit * 200) / (Ac + 240));
@@ -4304,19 +4305,19 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 	{
 		case GREAT_SUCCESS:
 	/*
-			damage = (short)(0.6 * (2 * Hit));
+			damage = (int16_t)(0.6 * (2 * Hit));
 			if(damage <= 0){
 				damage = 0;
 				break;
 			}
 			damage = myrand(0, damage);
-			damage += (short)(0.7 * (2 * Hit));
+			damage += (int16_t)(0.7 * (2 * Hit));
 			break;
 	*/
 	//		damage = 0;
 	//		break;
 
-			damage = (short) HitB;
+			damage = (int16_t) HitB;
 			if (damage <= 0)
 			{
 				damage = 0;
@@ -4324,14 +4325,14 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 			}
 
 			damage = (int) (0.3f * myrand(0, damage));
-			damage += (short) (0.85f * (float) HitB);
+			damage += (int16_t) (0.85f * (float) HitB);
 	//		damage = damage * 2;
 			damage = (damage * 3) / 2;
 			break;
 
 		case SUCCESS:
 	/*
-			damage = (short) (0.6f * Hit);
+			damage = (int16_t) (0.6f * Hit);
 			if (damage <= 0)
 			{
 				damage = 0;
@@ -4339,11 +4340,11 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 			}
 
 			damage = myrand(0, damage);
-			damage += (short) (0.7f * Hit);
+			damage += (int16_t) (0.7f * Hit);
 			break;
 	*/
 	/*
-			damage = (short) (0.3f * (float) HitB);
+			damage = (int16_t) (0.3f * (float) HitB);
 			if (damage <= 0)
 			{
 				damage = 0;
@@ -4351,10 +4352,10 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 			}
 
 			damage = myrand(0, damage);
-			damage += (short) (0.85f * (float) HitB);
+			damage += (int16_t) (0.85f * (float) HitB);
 	*/
 	/*
-			damage = (short) HitB;
+			damage = (int16_t) HitB;
 			if (damage <= 0)
 			{
 				damage = 0;
@@ -4362,7 +4363,7 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 			}
 
 			damage = (int) (0.3f * myrand(0, damage));
-			damage += (short) (0.85f * (float)HitB);
+			damage += (int16_t) (0.85f * (float)HitB);
 			damage = damage * 2;
 
 			break;
@@ -4371,7 +4372,7 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 			/*
 			if (Hit - Ac > 0)
 			{
-				damage = (short) (0.6f * (Hit - Ac));
+				damage = (int16_t) (0.6f * (Hit - Ac));
 				if (damage <= 0)
 				{
 					damage = 0;
@@ -4379,7 +4380,7 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 				}
 
 				damage = myrand(0, damage);
-				damage += (short)(0.7f * (Hit - Ac));
+				damage += (int16_t)(0.7f * (Hit - Ac));
 			}
 			else
 			{
@@ -4387,7 +4388,7 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 			}
 			*/
 	/*
-			damage = (short) (0.3f * (float) HitB);
+			damage = (int16_t) (0.3f * (float) HitB);
 			if (damage <= 0)
 			{
 				damage = 0;
@@ -4395,9 +4396,9 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 			}
 
 			damage = myrand(0, damage);
-			damage += (short) (0.85f * (float) HitB);
+			damage += (int16_t) (0.85f * (float) HitB);
 	*/
-			damage = (short) HitB;
+			damage = (int16_t) HitB;
 			if (damage <= 0)
 			{
 				damage = 0;
@@ -4405,7 +4406,7 @@ int CNpc::GetFinalDamage(CUser* pUser, int type)
 			}
 
 			damage = (int) (0.3f * myrand(0, damage));
-			damage += (short) (0.85f * (float) HitB);
+			damage += (int16_t) (0.85f * (float) HitB);
 			break;
 
 		case FAIL:
@@ -4841,7 +4842,7 @@ go_result:
 
 	if (m_iHP <= 0)
 	{
-	//	m_ItemUserLevel = pUser->m_sLevel;
+	//	m_ItemUserLevel = pUser->m_byLevel;
 		m_iHP = 0;
 		Dead(pIOCP);
 		return false;
@@ -4859,7 +4860,7 @@ go_result:
 			&& m_NpcState != NPC_FAINTING)
 		{
 			// 확률 계산..
-			iLightningR = 10 + (40 - 40 * ((double) m_sLightningR / 80));
+			iLightningR = static_cast<int>(10 + (40 - 40 * (m_sLightningR / 80.0)));
 			if (COMPARE(iRandom, 0, iLightningR))
 			{
 				m_NpcState = NPC_FAINTING;
@@ -5056,7 +5057,7 @@ void CNpc::SendExpToUserList()
 								continue;
 
 							++nTotalMan;
-							nTotalLevel += pPartyUser->m_sLevel;
+							nTotalLevel += pPartyUser->m_byLevel;
 						}
 
 						nPartyExp = GetPartyExp(nTotalLevel, nTotalMan, nPartyExp);
@@ -5073,7 +5074,7 @@ void CNpc::SendExpToUserList()
 							if (!IsInExpRange(pPartyUser))
 								continue;
 
-							TempValue = (nPartyExp * (1 + 0.3 * (nTotalMan - 1))) * (double) pPartyUser->m_sLevel / (double) nTotalLevel;
+							TempValue = (nPartyExp * (1 + 0.3 * (nTotalMan - 1))) * (double) pPartyUser->m_byLevel / (double) nTotalLevel;
 							//TempValue = ( nPartyExp * ( 1+0.3*( nTotalMan-1 ) ) );
 							nExp = (int) TempValue;
 
@@ -5086,7 +5087,7 @@ void CNpc::SendExpToUserList()
 							}
 							else
 							{
-								TempValue = (nPartyLoyalty * (1 + 0.2 * (nTotalMan - 1))) * (double) pPartyUser->m_sLevel / (double) nTotalLevel;
+								TempValue = (nPartyLoyalty * (1 + 0.2 * (nTotalMan - 1))) * (double) pPartyUser->m_byLevel / (double) nTotalLevel;
 								nLoyalty = (int) TempValue;
 								if (TempValue > nLoyalty)
 									++nLoyalty;
@@ -5114,7 +5115,7 @@ void CNpc::SendExpToUserList()
 							continue;
 
 						++nTotalMan;
-						nTotalLevel += pPartyUser->m_sLevel;
+						nTotalLevel += pPartyUser->m_byLevel;
 					}
 
 					nPartyExp = GetPartyExp(nTotalLevel, nTotalMan, nPartyExp);
@@ -5131,7 +5132,7 @@ void CNpc::SendExpToUserList()
 						if (!IsInExpRange(pPartyUser))
 							continue;
 
-						TempValue = (nPartyExp * (1 + 0.3 * (nTotalMan - 1))) * (double) pPartyUser->m_sLevel / (double) nTotalLevel;
+						TempValue = (nPartyExp * (1 + 0.3 * (nTotalMan - 1))) * (double) pPartyUser->m_byLevel / (double) nTotalLevel;
 						//TempValue = ( nPartyExp * ( 1+0.3*( nTotalMan-1 ) ) );
 						nExp = (int) TempValue;
 
@@ -5144,7 +5145,7 @@ void CNpc::SendExpToUserList()
 						}
 						else
 						{
-							TempValue = (nPartyLoyalty * (1 + 0.2 * (nTotalMan - 1))) * (double) pPartyUser->m_sLevel / (double) nTotalLevel;
+							TempValue = (nPartyLoyalty * (1 + 0.2 * (nTotalMan - 1))) * (double) pPartyUser->m_byLevel / (double) nTotalLevel;
 							nLoyalty = (int) TempValue;
 							if (TempValue > nLoyalty)
 								++nLoyalty;
@@ -5527,12 +5528,12 @@ void CNpc::FindFriendRegion(int x, int z, MAP* pMap, _TargetHealer* pHealer, int
 					continue;
 
 				// HP상태를 체크
-				iHP = pNpc->m_iMaxHP * 0.9;
+				iHP = static_cast<int>(pNpc->m_iMaxHP * 0.9);
 
 				// HP 체크
 				if (pNpc->m_iHP <= iHP)
 				{
-					iCompValue = (pNpc->m_iMaxHP - pNpc->m_iHP) / (pNpc->m_iMaxHP * 0.01);
+					iCompValue = static_cast<int>((pNpc->m_iMaxHP - pNpc->m_iHP) / (pNpc->m_iMaxHP * 0.01));
 					if (iValue < iCompValue)
 					{
 						iValue = iCompValue;
@@ -5548,7 +5549,7 @@ void CNpc::FindFriendRegion(int x, int z, MAP* pMap, _TargetHealer* pHealer, int
 	pNpcIDList = nullptr;
 }
 
-void CNpc::NpcStrategy(BYTE type)
+void CNpc::NpcStrategy(uint8_t type)
 {
 	switch (type)
 	{
@@ -5561,7 +5562,7 @@ void CNpc::NpcStrategy(BYTE type)
 }
 
 //	NPC 정보를 버퍼에 저장한다.
-void CNpc::FillNpcInfo(char* temp_send, int& index, BYTE flag)
+void CNpc::FillNpcInfo(char* temp_send, int& index, uint8_t flag)
 {
 	SetByte(temp_send, AG_NPC_INFO, index);
 	if (m_bySpecialType == 5 && m_byChangeType == 0)
@@ -5578,7 +5579,7 @@ void CNpc::FillNpcInfo(char* temp_send, int& index, BYTE flag)
 	SetShort(temp_send, m_ZoneIndex, index);
 	SetVarString(temp_send, m_strName.c_str(), static_cast<int>(m_strName.length()), index);
 	SetByte(temp_send, m_byGroup, index);
-	SetByte(temp_send, (BYTE) m_sLevel, index);
+	SetByte(temp_send, (uint8_t) m_sLevel, index);
 	Setfloat(temp_send, m_fCurX, index);
 	Setfloat(temp_send, m_fCurZ, index);
 	Setfloat(temp_send, m_fCurY, index);
@@ -5617,7 +5618,7 @@ void CNpc::SendNpcInfoAll(char* temp_send, int& index, int count)
 	SetShort(temp_send, m_ZoneIndex, index);
 	SetVarString(temp_send, m_strName.c_str(), static_cast<int>(m_strName.length()), index);
 	SetByte(temp_send, m_byGroup, index);
-	SetByte(temp_send, (BYTE) m_sLevel, index);
+	SetByte(temp_send, (uint8_t) m_sLevel, index);
 	Setfloat(temp_send, m_fCurX, index);
 	Setfloat(temp_send, m_fCurZ, index);
 	Setfloat(temp_send, m_fCurY, index);
@@ -5830,9 +5831,9 @@ void CNpc::NpcMoveEnd(CIOCPort* pIOCP)
 	Setfloat(pBuf, m_fCurY, index);
 	Setfloat(pBuf, 0, index);
 
-	int rx = m_fCurX / VIEW_DIST;
-	int rz = m_fCurZ / VIEW_DIST;
-	//TRACE(_T("NpcMoveEnd() --> nid = %d, x=%f, y=%f, rx=%d,rz=%d, frame=%d, speed = %d \n"), m_sNid, m_fCurX, m_fCurZ, rx,rz, m_iAniFrameCount, m_sSpeed);
+	// TRACE(_T("NpcMoveEnd() --> nid = %d, x=%f, y=%f, rx=%d,rz=%d, frame=%d, speed = %d \n"),
+	// m_sNid, m_fCurX, m_fCurZ, static_cast<int>(m_fCurX / VIEW_DIST), static_cast<int>(m_fCurZ / VIEW_DIST),
+	// m_iAniFrameCount, m_sSpeed);
 	SendAll(pIOCP, pBuf, index);   // thread 에서 send
 }
 
@@ -5955,11 +5956,11 @@ bool CNpc::GetUserInViewRange(int x, int z)
 	return false;
 }
 
-void CNpc::SendAttackSuccess(CIOCPort* pIOCP, BYTE byResult, int tuid, short sDamage, int nHP, BYTE byFlag, short sAttack_type)
+void CNpc::SendAttackSuccess(CIOCPort* pIOCP, uint8_t byResult, int tuid, int16_t sDamage, int nHP, uint8_t byFlag, uint8_t byAttackType)
 {
 	int send_index = 0;
 	int sid = -1, tid = -1;
-	BYTE type, result = 0;
+	uint8_t type, result = 0;
 	char buff[256] = {};
 	float rx = 0.0f, ry = 0.0f, rz = 0.0f;
 
@@ -5976,7 +5977,7 @@ void CNpc::SendAttackSuccess(CIOCPort* pIOCP, BYTE byResult, int tuid, short sDa
 		SetShort(buff, tid, send_index);
 		SetShort(buff, sDamage, send_index);
 		SetDWORD(buff, nHP, send_index);
-		SetByte(buff, sAttack_type, send_index);
+		SetByte(buff, byAttackType, send_index);
 	}
 	else
 	{
@@ -5991,7 +5992,7 @@ void CNpc::SendAttackSuccess(CIOCPort* pIOCP, BYTE byResult, int tuid, short sDa
 		SetShort(buff, tid, send_index);
 		SetShort(buff, sDamage, send_index);
 		SetDWORD(buff, nHP, send_index);
-		SetByte(buff, sAttack_type, send_index);
+		SetByte(buff, byAttackType, send_index);
 	}
 
 	//TRACE(_T("Npc - SendAttackSuccess() : [sid=%d, tid=%d, result=%d], damage=%d, hp = %d\n"), sid, tid, byResult, sDamage, sHP);
@@ -6051,9 +6052,9 @@ void CNpc::IsUserInSight()
 	}
 }
 
-BYTE CNpc::GetHitRate(float rate)
+uint8_t CNpc::GetHitRate(float rate)
 {
-	BYTE result = FAIL;
+	uint8_t result = FAIL;
 	int random = myrand(1, 10000);
 
 	if (rate >= 5.0f)
@@ -6418,7 +6419,7 @@ void CNpc::GiveNpcHaveItem(CIOCPort* pIOCP)
 		m_GiveItemList[0].sSid = TYPE_MONEY_SID;
 		if (iMoney > 32767)
 		{
-			iMoney = 32000;						// sungyong : short형이기 때문에,,
+			iMoney = 32000;						// sungyong : int16_t형이기 때문에,,
 			m_GiveItemList[0].count = iMoney;
 		}
 		else
@@ -6442,21 +6443,37 @@ void CNpc::GiveNpcHaveItem(CIOCPort* pIOCP)
 			if (iPer == 0)
 				continue;
 
+			int iItemID = m_pMain->m_NpcItem.m_ppItem[i][j];
+
 			// 우선 기본테이블를 참조하기위해	
 			if (iRandom <= iPer)
 			{
 				// 아이템 생성..
 				if (j == 1)
 				{
-					iMakeItemCode = ItemProdution(m_pMain->m_NpcItem.m_ppItem[i][j]);
-					if (iMakeItemCode == 0)	continue;
+					if (iItemID < 100)
+						iMakeItemCode = ItemProdution(iItemID);
+					else
+						iMakeItemCode = GetItemGroupNumber(iItemID);
+
+					if (iMakeItemCode == 0)
+						continue;
+
+					m_GiveItemList[nCount].sSid = iMakeItemCode;
+					m_GiveItemList[nCount].count = 1;
+				}
+				else if (j == 3)
+				{
+					iMakeItemCode = GetItemGroupNumber(iItemID);
+					if (iMakeItemCode == 0)
+						continue;
 
 					m_GiveItemList[nCount].sSid = iMakeItemCode;
 					m_GiveItemList[nCount].count = 1;
 				}
 				else
 				{
-					m_GiveItemList[nCount].sSid = m_pMain->m_NpcItem.m_ppItem[i][j];
+					m_GiveItemList[nCount].sSid = iItemID;
 
 					// 화살이라면
 					if (COMPARE(m_GiveItemList[nCount].sSid, ARROW_MIN, ARROW_MAX))
@@ -6464,7 +6481,9 @@ void CNpc::GiveNpcHaveItem(CIOCPort* pIOCP)
 					else
 						m_GiveItemList[nCount].count = 1;
 				}
-				nCount++;
+
+				if (++nCount >= NPC_HAVE_ITEM_LIST)
+					break;
 			}
 		}
 	}
@@ -6480,8 +6499,8 @@ void CNpc::GiveNpcHaveItem(CIOCPort* pIOCP)
 	SetShort(pBuf, m_sMaxDamageUserid, index);
 	SetShort(pBuf, m_sNid + NPC_BAND, index);
 	SetShort(pBuf, m_sCurZone, index);
-	SetShort(pBuf, (short) m_iRegion_X, index);
-	SetShort(pBuf, (short) m_iRegion_Z, index);
+	SetShort(pBuf, (int16_t) m_iRegion_X, index);
+	SetShort(pBuf, (int16_t) m_iRegion_Z, index);
 	Setfloat(pBuf, m_fCurX, index);
 	Setfloat(pBuf, m_fCurZ, index);
 	Setfloat(pBuf, m_fCurY, index);
@@ -6712,7 +6731,7 @@ void CNpc::ItemWoreOut(int type, int damage)
 }
 
 // 아이템 제작
-int	CNpc::ItemProdution(int item_number)
+int	CNpc::ItemProdution(int item_number) const
 {
 	int iItemNumber = 0, iRandom = 0, i = 0, iItemGrade = 0, iItemLevel = 0;
 	int iDefault = 0, iItemCode = 0, iItemKey = 0, iRand2 = 0, iRand3 = 0, iRand4 = 0, iRand5 = 0;
@@ -6950,7 +6969,7 @@ int	CNpc::ItemProdution(int item_number)
 	return iItemNumber;
 }
 
-int CNpc::GetItemGrade(int item_grade)
+int CNpc::GetItemGrade(int item_grade) const
 {
 	model::MakeItemGradeCode* pItemData = m_pMain->m_MakeGradeItemArray.GetData(item_grade);
 	if (pItemData == nullptr)
@@ -6959,7 +6978,7 @@ int CNpc::GetItemGrade(int item_grade)
 	int iRandom = myrand(1, 1000);
 
 	int iPercent = 0;
-	for (int i = 0; i < MAX_ITEM_GRADECODE_GRADES; i++)
+	for (int i = 0; i < MAX_ITEM_GRADECODE_GRADE; i++)
 	{
 		int iGrade = pItemData->Grade[i];
 		if (iGrade == 0)
@@ -6974,7 +6993,7 @@ int CNpc::GetItemGrade(int item_grade)
 	return 0;
 }
 
-int CNpc::GetWeaponItemCodeNumber(int item_type)
+int CNpc::GetWeaponItemCodeNumber(int item_type) const
 {
 	int iPercent = 0, iItem_level = 0;
 	model::MakeWeapon* pItemData = nullptr;
@@ -6997,7 +7016,7 @@ int CNpc::GetWeaponItemCodeNumber(int item_type)
 
 	int iRandom = myrand(0, 1000);
 
-	for (int i = 0; i < MAX_MAXWEAPON_CLASSES; i++)
+	for (int i = 0; i < MAX_MAKE_WEAPON_CLASS; i++)
 	{
 		if (pItemData->Class[i] == 0)
 			continue;
@@ -7011,7 +7030,7 @@ int CNpc::GetWeaponItemCodeNumber(int item_type)
 	return 0;
 }
 
-int CNpc::GetItemCodeNumber(int level, int item_type)
+int CNpc::GetItemCodeNumber(int level, int item_type) const
 {
 	int iItemCode = 0, iItemType = 0, iPercent = 0;
 	int iItemPercent[3];
@@ -7084,6 +7103,20 @@ int CNpc::GetItemCodeNumber(int level, int item_type)
 	}
 
 	return iItemCode;
+}
+
+int CNpc::GetItemGroupNumber(int groupId) const
+{
+	model::MakeItemGroup* makeItemGroup = m_pMain->m_MakeItemGroupTableMap.GetData(groupId);
+	if (makeItemGroup == nullptr)
+		return 0;
+	
+	int randomSlot = myrand(0, 10000) % MAX_MAKE_ITEM_GROUP_ITEM;
+	if (randomSlot < 0
+		|| randomSlot >= MAX_MAKE_ITEM_GROUP_ITEM)
+		return 0;
+
+	return makeItemGroup->Item[randomSlot];
 }
 
 void CNpc::DurationMagic_4(CIOCPort* pIOCP, float currenttime)
@@ -7447,7 +7480,7 @@ void CNpc::NpcHealing(CIOCPort* pIOCP)
 		}
 
 		// 치료 체크여부 
-		iHP = pNpc->m_iMaxHP * 0.9;		// 90퍼센트의 HP
+		iHP = static_cast<int>(pNpc->m_iMaxHP * 0.9);		// 90퍼센트의 HP
 
 		// Heal 완료상태..
 		if (pNpc->m_iHP >= iHP)
@@ -7685,8 +7718,8 @@ bool CNpc::Teleport(CIOCPort* pIOCP)
 	Setfloat(buff, m_fCurY, send_index);
 	SendAll(pIOCP, buff, send_index);   // thread 에서 send
 
-	m_fCurX = nX;
-	m_fCurZ = nZ;
+	m_fCurX = static_cast<float>(nX);
+	m_fCurZ = static_cast<float>(nZ);
 
 	memset(buff, 0, sizeof(buff));
 	send_index = 0;

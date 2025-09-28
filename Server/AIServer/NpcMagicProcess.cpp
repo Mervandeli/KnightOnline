@@ -38,7 +38,7 @@ void CNpcMagicProcess::MagicPacket(char* pBuf, int len, CIOCPort* pIOCP)
 	model::Magic* pTable = nullptr;
 
 	// Get the magic status. 
-	BYTE command = GetByte(pBuf, index);
+	uint8_t command = GetByte(pBuf, index);
 
 	// Client indicates that magic failed. Just send back packet.
 	if (command == MAGIC_FAIL)
@@ -165,7 +165,7 @@ void CNpcMagicProcess::MagicPacket(char* pBuf, int len, CIOCPort* pIOCP)
 	}
 }
 
-model::Magic* CNpcMagicProcess::IsAvailable(int magicid, int tid, BYTE type)
+model::Magic* CNpcMagicProcess::IsAvailable(int magicid, int tid, uint8_t type)
 {
 	CUser* pUser = nullptr;
 	CNpc* pNpc = nullptr;
@@ -446,11 +446,11 @@ void CNpcMagicProcess::ExecuteType10(int magicid)
 {
 }
 
-short CNpcMagicProcess::GetMagicDamage(int tid, int total_hit, int attribute, int dexpoint)
+int16_t CNpcMagicProcess::GetMagicDamage(int tid, int total_hit, int attribute, int dexpoint)
 {
-	short damage = 0, temp_hit = 0;
+	int16_t damage = 0, temp_hit = 0;
 	int random = 0, total_r = 0;
-	BYTE result;
+	uint8_t result;
 	bool bSign = true;			// false이면 -, true이면 +
 
 	// Check if target id is valid.
@@ -524,9 +524,9 @@ short CNpcMagicProcess::GetMagicDamage(int tid, int total_hit, int attribute, in
 			bSign = false;
 		}
 
-		damage = (short) (total_hit - (0.7f * total_hit * total_r / 200));
+		damage = static_cast<int16_t>(total_hit - (0.7f * total_hit * total_r / 200));
 		random = myrand(0, damage);
-		damage = (short) (0.7f * (total_hit - (0.9f * total_hit * total_r / 200))) + 0.2f * random;
+		damage = static_cast<int16_t>((0.7f * (total_hit - (0.9f * total_hit * total_r / 200))) + 0.2f * random);
 	}
 	else
 	{

@@ -13,59 +13,59 @@
 
 struct _SMQ_HEADER
 {
-	LONG	Front;
-	LONG	Rear;
-	short	nCount;
+	uintptr_t	Front;
+	uintptr_t	Rear;
+	int16_t		nCount;
 
-	BYTE	FrontMode;
-	BYTE	RearMode;
+	uint8_t		FrontMode;
+	uint8_t		RearMode;
 
-	int		WritePid;
-	int		ReadPid;
+	int			WritePid;
+	int			ReadPid;
 
-	DWORD	CreatePid;
+	uint32_t	CreatePid;
 };
 
 class CSharedMemQueue
 {
 private:
-	HANDLE	m_hMMFile;
-	char* m_lpMMFile;
+	HANDLE			m_hMMFile;
+	char*			m_lpMMFile;
 
-	bool	m_bMMFCreate;
-	short	m_nMaxCount;
-	DWORD	m_wOffset;
-	LONG	m_lReference;
-	_SMQ_HEADER* m_pHeader;
+	bool			m_bMMFCreate;
+	int16_t			m_nMaxCount;
+	uint32_t		m_wOffset;
+	uintptr_t		m_lReference;
+	_SMQ_HEADER*	m_pHeader;
 
 public:
-	inline LONG GetFrontPointer() const {
+	inline uintptr_t GetFrontPointer() const {
 		return m_pHeader->Front;
 	}
 
-	inline LONG GetRearPointer() const {
+	inline uintptr_t GetRearPointer() const {
 		return m_pHeader->Rear;
 	}
 
-	inline DWORD GetProcessId() const {
+	inline uint32_t GetProcessId() const {
 		return m_pHeader->CreatePid;
 	}
 
-	inline BYTE GetFrontMode() const {
+	inline uint8_t GetFrontMode() const {
 		return m_pHeader->FrontMode;
 	}
 
-	inline BYTE GetRearMode() const {
+	inline uint8_t GetRearMode() const {
 		return m_pHeader->RearMode;
 	}
 
 	inline int GetCount() const {
 		return m_pHeader->nCount;
-	};
+	}
 
 	int GetData(char* pBuf);
 	int PutData(char* pBuf, int size);
-	bool InitializeMMF(DWORD dwOffsetsize, int maxcount, LPCTSTR lpname, bool bCreate = true);
+	bool InitializeMMF(uint32_t dwOffsetsize, int maxcount, LPCTSTR lpname, bool bCreate = true);
 	CSharedMemQueue();
 	virtual ~CSharedMemQueue();
 };

@@ -83,7 +83,8 @@ CN3FXBundle::~CN3FXBundle()
 bool CN3FXBundle::DecodeScriptFile(const char* lpPathName)
 {
 	FILE* stream = fopen(lpPathName, "r");
-	if(!stream) return false;
+	if (stream == nullptr)
+		return false;
 
 	char szGamePathName[_MAX_PATH];
 	char szDrive[_MAX_DRIVE], szDir[_MAX_DIR], szFName[_MAX_FNAME], szExt[_MAX_EXT];
@@ -92,75 +93,98 @@ bool CN3FXBundle::DecodeScriptFile(const char* lpPathName)
 
 	CN3BaseFileAccess::FileNameSet(szGamePathName);
 
-	char szLine[512] = "", szCommand[80] = "", szBuf[4][80] = { "", "", "", ""};
+	char szLine[512] = "", szCommand[80] = "", szBuf[4][80] = { "", "", "", "" };
 	char* pResult = fgets(szLine, 512, stream);
-	sscanf(szLine, "%s %s %s %s %s", szCommand, szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
-
-	if(lstrcmpi(szCommand, "<n3fxbundle>"))
+	int argsScanned = sscanf(szLine, "%s %s %s %s %s", szCommand, szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
+	if (argsScanned <= 0)
 	{
 		fclose(stream);
 		return false;
 	}
 
-	while(!feof(stream))
+	if (lstrcmpi(szCommand, "<n3fxbundle>"))
+	{
+		fclose(stream);
+		return false;
+	}
+
+	while (!feof(stream))
 	{
 		char* pResult = fgets(szLine, 512, stream);
-		if(pResult == nullptr) continue;
+		if (pResult == nullptr)
+			continue;
 
-		ZeroMemory(szCommand,80);
-		ZeroMemory(szBuf[0],80);
-		ZeroMemory(szBuf[1],80);
-		ZeroMemory(szBuf[2],80);
-		ZeroMemory(szBuf[3],80);
+		ZeroMemory(szCommand, 80);
+		ZeroMemory(szBuf[0], 80);
+		ZeroMemory(szBuf[1], 80);
+		ZeroMemory(szBuf[2], 80);
+		ZeroMemory(szBuf[3], 80);
 
-		sscanf(szLine, "%s %s %s %s %s", szCommand, szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
+		argsScanned = sscanf(szLine, "%s %s %s %s %s", szCommand, szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
+		if (argsScanned <= 0)
+			continue;
 
-		if(lstrcmpi(szCommand, "<name>")==0)
+		if (lstrcmpi(szCommand, "<name>") == 0)
 		{
 			m_strName = szBuf[0];
 			continue;
 		}
 
-		if(lstrcmpi(szCommand, "<part>")==0)
+		if (lstrcmpi(szCommand, "<part>") == 0)
 		{
 			//full path 만들기..	
 			std::string szFullPath = fmt::format("{}{}", CN3Base::PathGet(), szBuf[0]);
-			
+
 			FXPARTWITHSTARTTIME* pPart = new FXPARTWITHSTARTTIME;
-			pPart->fStartTime = atof(szBuf[1]);
+			pPart->fStartTime = static_cast<float>(atof(szBuf[1]));
 
 			pPart->pPart = SetPart(szFullPath.c_str());
 
-			if(!(pPart->pPart)) { delete pPart; continue; }
-
-			for(int i=0;i<MAX_FX_PART;i++)
+			if (pPart->pPart == nullptr)
 			{
-				if(!m_pPart[i])
+				delete pPart;
+				continue;
+			}
+
+			for (int i = 0; i < MAX_FX_PART; i++)
+			{
+				if (m_pPart[i] == nullptr)
 				{
 					m_pPart[i] = pPart;
 					break;
 				}
 			}
-			continue;			
-		}
-		if(lstrcmpi(szCommand, "<velocity>")==0)
-		{
-			m_fVelocity = atof(szBuf[0]);
+
 			continue;
 		}
-		if(lstrcmpi(szCommand, "<depend_scale>")==0)
+
+		if (lstrcmpi(szCommand, "<velocity>") == 0)
 		{
-			if(lstrcmpi(szBuf[0], "true")==0) m_bDependScale = true;
-			else m_bDependScale = false;
+			m_fVelocity = static_cast<float>(atof(szBuf[0]));
 			continue;
 		}
-		if(lstrcmpi(szCommand, "<Static_Pos>")==0)
+
+		if (lstrcmpi(szCommand, "<depend_scale>") == 0)
 		{
-			if(lstrcmpi(szBuf[0], "true")==0) m_bStatic = true;
-			else m_bStatic = false;
+			if (lstrcmpi(szBuf[0], "true") == 0)
+				m_bDependScale = true;
+			else
+				m_bDependScale = false;
+
+			continue;
+		}
+
+		if (lstrcmpi(szCommand, "<Static_Pos>") == 0)
+		{
+			if (lstrcmpi(szBuf[0], "true") == 0)
+				m_bStatic = true;
+			else
+				m_bStatic = false;
+
 			continue;
 		}
 	}
+
 	fclose(stream);
 
 	Init();

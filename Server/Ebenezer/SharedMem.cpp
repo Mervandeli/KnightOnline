@@ -44,12 +44,12 @@ CSharedMemQueue::~CSharedMemQueue()
 		CloseHandle(m_hMMFile);
 }
 
-bool CSharedMemQueue::InitializeMMF(DWORD dwOffsetsize, int maxcount, LPCTSTR lpname, bool bCreate)
+bool CSharedMemQueue::InitializeMMF(uint32_t dwOffsetsize, int maxcount, LPCTSTR lpname, bool bCreate)
 {
-	if (maxcount < 1)
+	if (maxcount < 100)
 		return false;
 
-	DWORD dwfullsize = dwOffsetsize * maxcount + sizeof(_SMQ_HEADER);
+	uint32_t dwfullsize = dwOffsetsize * maxcount + sizeof(_SMQ_HEADER);
 
 	m_nMaxCount = maxcount;
 	m_wOffset = dwOffsetsize;
@@ -77,7 +77,7 @@ bool CSharedMemQueue::InitializeMMF(DWORD dwOffsetsize, int maxcount, LPCTSTR lp
 	
 	m_bMMFCreate	= bCreate;
 	m_pHeader		= (_SMQ_HEADER*) m_lpMMFile;
-	m_lReference	= (LONG) (m_lpMMFile + sizeof(_SMQ_HEADER));		// 초기 위치 셋팅
+	m_lReference	= (uintptr_t) (m_lpMMFile + sizeof(_SMQ_HEADER));		// 초기 위치 셋팅
 
 	if (bCreate)
 	{
@@ -94,7 +94,7 @@ bool CSharedMemQueue::InitializeMMF(DWORD dwOffsetsize, int maxcount, LPCTSTR lp
 
 int CSharedMemQueue::PutData(char* pBuf, int size)
 {
-	BYTE BlockMode;
+	uint8_t BlockMode;
 	int index = 0, count = 0;
 
 	if (size > static_cast<int>(m_wOffset))
@@ -123,7 +123,7 @@ int CSharedMemQueue::PutData(char* pBuf, int size)
 			continue;
 		}
 
-		LONG pQueue = m_lReference + (m_pHeader->Rear * m_wOffset);
+		uintptr_t pQueue = m_lReference + (m_pHeader->Rear * m_wOffset);
 		BlockMode = GetByte((char*) pQueue, index);
 		if (BlockMode == WR
 			&& m_pHeader->nCount >= m_nMaxCount - 1)
@@ -158,7 +158,7 @@ int CSharedMemQueue::PutData(char* pBuf, int size)
 int CSharedMemQueue::GetData(char* pBuf)
 {
 	int index = 0, size = 0, temp_front = 0;
-	BYTE BlockMode;
+	uint8_t BlockMode;
 
 	if (m_pHeader->FrontMode == R)
 		return SMQ_READING;
@@ -174,7 +174,7 @@ int CSharedMemQueue::GetData(char* pBuf)
 		return SMQ_READING;
 	}
 
-	LONG pQueue = m_lReference + (m_pHeader->Front * m_wOffset);
+	uintptr_t pQueue = m_lReference + (m_pHeader->Front * m_wOffset);
 
 	index = 0;
 	BlockMode = GetByte((char*) pQueue, index);
@@ -182,7 +182,7 @@ int CSharedMemQueue::GetData(char* pBuf)
 	{
 		m_pHeader->FrontMode = WR;
 		if (m_pHeader->Front < m_pHeader->Rear
-			|| (m_pHeader->Front > m_pHeader->Rear && m_pHeader->Front > m_nMaxCount - 100))
+			|| (m_pHeader->Front > m_pHeader->Rear && m_pHeader->Front > static_cast<uintptr_t>(m_nMaxCount - 100)))
 		{
 			temp_front = (m_pHeader->Front + 1) % m_nMaxCount;
 			m_pHeader->Front = temp_front;

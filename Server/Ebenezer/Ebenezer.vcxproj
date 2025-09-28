@@ -57,6 +57,7 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(DependencyDir);.;..;..\..;..\..\Client;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -140,6 +141,7 @@
     <ClCompile Include="IOCPSocket2.cpp" />
     <ClCompile Include="Knights.cpp" />
     <ClCompile Include="KnightsManager.cpp" />
+    <ClCompile Include="KnightsSiegeWar.cpp" />
     <ClCompile Include="LOGIC_ELSE.cpp" />
     <ClCompile Include="MagicProcess.cpp" />
     <ClCompile Include="Map.cpp" />
@@ -174,6 +176,7 @@
     <ClInclude Include="IOCPSocket2.h" />
     <ClInclude Include="Knights.h" />
     <ClInclude Include="KnightsManager.h" />
+    <ClInclude Include="KnightsSiegeWar.h" />
     <ClInclude Include="LOGIC_ELSE.h" />
     <ClInclude Include="MagicProcess.h" />
     <ClInclude Include="Map.h" />

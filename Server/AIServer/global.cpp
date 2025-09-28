@@ -17,7 +17,7 @@ int GetVarString(char* tBuf, const char* sBuf, int nSize, int& index)
 {
 	int nLen = 0;
 
-	if (nSize == sizeof(BYTE))
+	if (nSize == sizeof(uint8_t))
 		nLen = GetByte(sBuf, index);
 	else
 		nLen = GetShort(sBuf, index);
@@ -34,17 +34,17 @@ void GetString(char* tBuf, const char* sBuf, int len, int& index)
 	index += len;
 }
 
-BYTE GetByte(const char* sBuf, int& index)
+uint8_t GetByte(const char* sBuf, int& index)
 {
 	int t_index = index;
 	index++;
-	return (BYTE) (*(sBuf + t_index));
+	return (uint8_t) (*(sBuf + t_index));
 }
 
 int GetShort(const char* sBuf, int& index)
 {
 	index += 2;
-	return *(short*) (sBuf + index - 2);
+	return *(int16_t*) (sBuf + index - 2);
 }
 
 int GetInt(const char* sBuf, int& index)
@@ -53,10 +53,10 @@ int GetInt(const char* sBuf, int& index)
 	return *(int*) (sBuf + index - 4);
 }
 
-DWORD GetDWORD(const char* sBuf, int& index)
+uint32_t GetDWORD(const char* sBuf, int& index)
 {
 	index += 4;
-	return *(DWORD*) (sBuf + index - 4);
+	return *(uint32_t*) (sBuf + index - 4);
 }
 
 float Getfloat(const char* sBuf, int& index)
@@ -73,14 +73,14 @@ void SetString(char* tBuf, const char* sBuf, int len, int& index)
 
 void SetVarString(char* tBuf, const char* sBuf, int len, int& index)
 {
-	*(tBuf + index) = (BYTE) len;
+	*(tBuf + index) = (uint8_t) len;
 	index ++;
 
 	CopyMemory(tBuf + index, sBuf, len);
 	index += len;
 }
 
-void SetByte(char* tBuf, BYTE sByte, int& index)
+void SetByte(char* tBuf, uint8_t sByte, int& index)
 {
 	*(tBuf + index) = (char) sByte;
 	index++;
@@ -88,7 +88,7 @@ void SetByte(char* tBuf, BYTE sByte, int& index)
 
 void SetShort(char* tBuf, int sShort, int& index)
 {
-	short temp = (short) sShort;
+	int16_t temp = (int16_t) sShort;
 
 	CopyMemory(tBuf + index, &temp, 2);
 	index += 2;
@@ -100,7 +100,7 @@ void SetInt(char* tBuf, int sInt, int& index)
 	index += 4;
 }
 
-void SetDWORD(char* tBuf, DWORD sDword, int& index)
+void SetDWORD(char* tBuf, uint32_t sDword, int& index)
 {
 	CopyMemory(tBuf + index, &sDword, 4);
 	index += 4;
@@ -114,14 +114,14 @@ void Setfloat(char* tBuf, float sFloat, int& index)
 
 void SetString1(char* tBuf, const std::string_view str, int& index)
 {
-	BYTE len = static_cast<BYTE>(str.length());
+	uint8_t len = static_cast<uint8_t>(str.length());
 	SetByte(tBuf, len, index);
 	SetString(tBuf, str.data(), len, index);
 }
 
 void SetString2(char* tBuf, const std::string_view str, int& index)
 {
-	short len = static_cast<short >(str.length());
+	int16_t len = static_cast<int16_t >(str.length());
 	SetShort(tBuf, len, index);
 	SetString(tBuf, str.data(), len, index);
 }
@@ -137,7 +137,7 @@ int ParseSpace(char* tBuf, const char* sBuf)
 
 	while (sBuf[index] != ' '
 		&& sBuf[index] != '\t'
-		&& sBuf[index] != (BYTE) 0)
+		&& sBuf[index] != (uint8_t) 0)
 	{
 		tBuf[i++] = sBuf[index++];
 		flag = true;
@@ -207,11 +207,11 @@ int XdY(int x, int y)
 }
 
 ///////////////////////////////////////////////////////////////////////////
-//	DWORD 의 Max 값을 채크하면서 증가시킨다.
+//	uint32_t 의 Max 값을 채크하면서 증가시킨다.
 //
-void CheckMaxValue(DWORD& dest, DWORD add)
+void CheckMaxValue(uint32_t& dest, uint32_t add)
 {
-	DWORD Diff = _MAX_DWORD - dest;
+	uint32_t Diff = _MAX_DWORD - dest;
 
 	if (add <= Diff)
 		dest += add;
@@ -233,11 +233,11 @@ void CheckMaxValue(int& dest, int add)
 }
 
 ///////////////////////////////////////////////////////////////////////////
-//	short 의 Max 값을 채크하면서 증가시킨다.
+//	int16_t 의 Max 값을 채크하면서 증가시킨다.
 //
-void CheckMaxValue(short& dest, short add)
+void CheckMaxValue(int16_t& dest, int16_t add)
 {
-	short Diff = _MAX_SHORT - dest;
+	int16_t Diff = _MAX_SHORT - dest;
 
 	if (add <= Diff)
 		dest += add;
@@ -245,9 +245,9 @@ void CheckMaxValue(short& dest, short add)
 		dest = _MAX_SHORT;
 }
 
-bool CheckMaxValueReturn(DWORD& dest, DWORD add)
+bool CheckMaxValueReturn(uint32_t& dest, uint32_t add)
 {
-	DWORD Diff = _MAX_DWORD - dest;
+	uint32_t Diff = _MAX_DWORD - dest;
 
 	if (add <= Diff)
 		return true;//dest += add;

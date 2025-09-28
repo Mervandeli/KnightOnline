@@ -11,8 +11,8 @@ namespace model = aiserver_model;
 
 struct _PARTY_GROUP
 {
-	WORD wIndex;
-	short uid[8];		// 하나의 파티에 8명까지 가입가능
+	uint16_t wIndex;
+	int16_t uid[8];		// 하나의 파티에 8명까지 가입가능
 	_PARTY_GROUP()
 	{
 		for (int i = 0; i < 8; i++)
@@ -23,8 +23,8 @@ struct _PARTY_GROUP
 struct _USERLOG
 {
 	CTime t;
-	BYTE  byFlag;	// 
-	BYTE  byLevel;
+	uint8_t  byFlag;	// 
+	uint8_t  byLevel;
 	char  strUserID[MAX_ID_SIZE + 1];		// 아이디(캐릭터 이름)
 };
 

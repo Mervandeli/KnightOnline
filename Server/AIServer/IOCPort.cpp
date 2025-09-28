@@ -427,7 +427,7 @@ CIOCPort::CIOCPort()
 	m_dwConcurrency = 1;
 
 	WSADATA wsaData;
-	WORD wVersionRequested = MAKEWORD(2, 2);
+	uint16_t wVersionRequested = MAKEWORD(2, 2);
 	(void)WSAStartup(wVersionRequested, &wsaData);
 
 	InitializeCriticalSection(&g_critical);

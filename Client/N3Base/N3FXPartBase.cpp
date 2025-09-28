@@ -94,32 +94,37 @@ CN3FXPartBase::~CN3FXPartBase()
 bool CN3FXPartBase::ParseScript(char* szCommand, char* szBuff0, char* szBuff1, char* szBuff2, char* szBuff3)
 {
 	//	이름.
-	if(lstrcmpi(szCommand, "<name>")==0)
+	if (lstrcmpi(szCommand, "<name>") == 0)
 	{
 		m_strName = szBuff0;
 		return true;
 	}
 
 	//	타입..
-	if(lstrcmpi(szCommand, "<type>")==0)
+	if (lstrcmpi(szCommand, "<type>") == 0)
 	{
-		if(lstrcmpi(szBuff0, "particle")==0) m_iType = FX_PART_TYPE_PARTICLE;
-		if(lstrcmpi(szBuff0, "board")==0) m_iType = FX_PART_TYPE_BOARD;
-		if(lstrcmpi(szBuff0, "mesh")==0) m_iType = FX_PART_TYPE_MESH;
-		if(lstrcmpi(szBuff0, "ground")==0) m_iType = FX_PART_TYPE_BOTTOMBOARD;
+		if (lstrcmpi(szBuff0, "particle") == 0)
+			m_iType = FX_PART_TYPE_PARTICLE;
+		else if (lstrcmpi(szBuff0, "board") == 0)
+			m_iType = FX_PART_TYPE_BOARD;
+		else if (lstrcmpi(szBuff0, "mesh") == 0)
+			m_iType = FX_PART_TYPE_MESH;
+		else if (lstrcmpi(szBuff0, "ground") == 0)
+			m_iType = FX_PART_TYPE_BOTTOMBOARD;
+
 		//^^v 더 넣을꺼 있으면 넣어라..
 		return true;
 	}
 
 	//	지속시간.(0이면 무한대...)
-	if(lstrcmpi(szCommand, "<life>")==0)
+	if (lstrcmpi(szCommand, "<life>") == 0)
 	{
-		m_fLife = atof(szBuff0);
+		m_fLife = static_cast<float>(atof(szBuff0));
 		return true;
 	}
 
 	//	texture 이름과 개수 읽기.
-	if(lstrcmpi(szCommand, "<texture>")==0)
+	if (lstrcmpi(szCommand, "<texture>") == 0)
 	{
 		m_iNumTex = atoi(szBuff1);
 		m_ppRefTex = new CN3Texture* [m_iNumTex];
@@ -146,154 +151,196 @@ bool CN3FXPartBase::ParseScript(char* szCommand, char* szBuff0, char* szBuff1, c
 	}
 
 	//	texture animation speed 설정..
-	if(lstrcmpi(szCommand, "<texture_animation_speed>")==0)
+	if (lstrcmpi(szCommand, "<texture_animation_speed>") == 0)
 	{
-		m_fTexFPS = atof(szBuff0);
+		m_fTexFPS = static_cast<float>(atof(szBuff0));
 		return true;
 	}
 
 	//	상대위치...
-	if(lstrcmpi(szCommand, "<position0>")==0)
+	if (lstrcmpi(szCommand, "<position0>") == 0)
 	{
-		m_vPos.x = atof(szBuff0);
-		m_vPos.y = atof(szBuff1);
-		m_vPos.z = atof(szBuff2);
+		m_vPos.x = static_cast<float>(atof(szBuff0));
+		m_vPos.y = static_cast<float>(atof(szBuff1));
+		m_vPos.z = static_cast<float>(atof(szBuff2));
 		return true;
 	}
 
 	//	속도..
-	if(lstrcmpi(szCommand, "<velocity>")==0)
+	if (lstrcmpi(szCommand, "<velocity>") == 0)
 	{
 		__Vector3 v;
-		m_vVelocity.x = atof(szBuff0);
-		m_vVelocity.y = atof(szBuff1);
-		m_vVelocity.z = atof(szBuff2);
+		m_vVelocity.x = static_cast<float>(atof(szBuff0));
+		m_vVelocity.y = static_cast<float>(atof(szBuff1));
+		m_vVelocity.z = static_cast<float>(atof(szBuff2));
 		return true;
 	}
 
 	//	가속도..
-	if(lstrcmpi(szCommand, "<acceleration>")==0)
+	if (lstrcmpi(szCommand, "<acceleration>") == 0)
 	{
 		__Vector3 v;
-		m_vAcceleration.x = atof(szBuff0);
-		m_vAcceleration.y = atof(szBuff1);
-		m_vAcceleration.z = atof(szBuff2);
+		m_vAcceleration.x = static_cast<float>(atof(szBuff0));
+		m_vAcceleration.y = static_cast<float>(atof(szBuff1));
+		m_vAcceleration.z = static_cast<float>(atof(szBuff2));
 		return true;
 	}
 
 	//	회전 각속도..
-	if(lstrcmpi(szCommand, "<rot_velocity>")==0)
+	if (lstrcmpi(szCommand, "<rot_velocity>") == 0)
 	{
 		__Vector3 v;
-		m_vRotVelocity.x = atof(szBuff0);
-		m_vRotVelocity.y = atof(szBuff1);
-		m_vRotVelocity.z = atof(szBuff2);
+		m_vRotVelocity.x = static_cast<float>(atof(szBuff0));
+		m_vRotVelocity.y = static_cast<float>(atof(szBuff1));
+		m_vRotVelocity.z = static_cast<float>(atof(szBuff2));
 		return true;
 	}
 
 	//	SRCBLEND..
-	if(lstrcmpi(szCommand, "<src_blend>")==0)
+	if (lstrcmpi(szCommand, "<src_blend>") == 0)
 	{
-		if(lstrcmpi(szBuff0, "ONE")==0) m_dwSrcBlend = D3DBLEND_ONE;
-		else if(lstrcmpi(szBuff0, "ZERO")==0) m_dwSrcBlend = D3DBLEND_ZERO;
-		else if(lstrcmpi(szBuff0, "SRCCOLOR")==0) m_dwSrcBlend = D3DBLEND_SRCCOLOR;
-		else if(lstrcmpi(szBuff0, "INVSRCCOLOR")==0) m_dwSrcBlend = D3DBLEND_INVSRCCOLOR;
-		else if(lstrcmpi(szBuff0, "SRCALPHA")==0) m_dwSrcBlend = D3DBLEND_SRCALPHA;
-		else if(lstrcmpi(szBuff0, "INVSRCALPHA")==0) m_dwSrcBlend = D3DBLEND_INVSRCALPHA;
+		if (lstrcmpi(szBuff0, "ONE") == 0)
+			m_dwSrcBlend = D3DBLEND_ONE;
+		else if (lstrcmpi(szBuff0, "ZERO") == 0)
+			m_dwSrcBlend = D3DBLEND_ZERO;
+		else if (lstrcmpi(szBuff0, "SRCCOLOR") == 0)
+			m_dwSrcBlend = D3DBLEND_SRCCOLOR;
+		else if (lstrcmpi(szBuff0, "INVSRCCOLOR") == 0)
+			m_dwSrcBlend = D3DBLEND_INVSRCCOLOR;
+		else if (lstrcmpi(szBuff0, "SRCALPHA") == 0)
+			m_dwSrcBlend = D3DBLEND_SRCALPHA;
+		else if (lstrcmpi(szBuff0, "INVSRCALPHA") == 0)
+			m_dwSrcBlend = D3DBLEND_INVSRCALPHA;
+
 		return true;
 	}
 
 	//	SRCBLEND..
-	if(lstrcmpi(szCommand, "<dest_blend>")==0)
+	if (lstrcmpi(szCommand, "<dest_blend>") == 0)
 	{
-		if(lstrcmpi(szBuff0, "ONE")==0) m_dwDestBlend = D3DBLEND_ONE;
-		else if(lstrcmpi(szBuff0, "ZERO")==0) m_dwDestBlend = D3DBLEND_ZERO;
-		else if(lstrcmpi(szBuff0, "SRCCOLOR")==0) m_dwDestBlend = D3DBLEND_SRCCOLOR;
-		else if(lstrcmpi(szBuff0, "INVSRCCOLOR")==0) m_dwDestBlend = D3DBLEND_INVSRCCOLOR;
-		else if(lstrcmpi(szBuff0, "SRCALPHA")==0) m_dwDestBlend = D3DBLEND_SRCALPHA;
-		else if(lstrcmpi(szBuff0, "INVSRCALPHA")==0) m_dwDestBlend = D3DBLEND_INVSRCALPHA;
+		if (lstrcmpi(szBuff0, "ONE") == 0)
+			m_dwDestBlend = D3DBLEND_ONE;
+		else if (lstrcmpi(szBuff0, "ZERO") == 0)
+			m_dwDestBlend = D3DBLEND_ZERO;
+		else if (lstrcmpi(szBuff0, "SRCCOLOR") == 0)
+			m_dwDestBlend = D3DBLEND_SRCCOLOR;
+		else if (lstrcmpi(szBuff0, "INVSRCCOLOR") == 0)
+			m_dwDestBlend = D3DBLEND_INVSRCCOLOR;
+		else if (lstrcmpi(szBuff0, "SRCALPHA") == 0)
+			m_dwDestBlend = D3DBLEND_SRCALPHA;
+		else if (lstrcmpi(szBuff0, "INVSRCALPHA") == 0)
+			m_dwDestBlend = D3DBLEND_INVSRCALPHA;
+
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<alpha>")==0)
+	if (lstrcmpi(szCommand, "<alpha>") == 0)
 	{
 		m_dwRenderFlag |= RF_ALPHABLENDING;
-		if(lstrcmpi(szBuff0, "TRUE")==0) m_bAlpha = TRUE;
-		else if(lstrcmpi(szBuff0, "FALSE")==0)
+
+		if (lstrcmpi(szBuff0, "TRUE") == 0)
+		{
+			m_bAlpha = TRUE;
+		}
+		else if (lstrcmpi(szBuff0, "FALSE") == 0)
 		{
 			m_bAlpha = FALSE;
 			m_dwRenderFlag ^= RF_ALPHABLENDING;
 		}
+
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<fadeout>")==0)
+	if (lstrcmpi(szCommand, "<fadeout>") == 0)
 	{
-		m_fFadeOut = atof(szBuff0);
+		m_fFadeOut = static_cast<float>(atof(szBuff0));
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<fadein>")==0)
+	if (lstrcmpi(szCommand, "<fadein>") == 0)
 	{
-		m_fFadeIn = atof(szBuff0);
+		m_fFadeIn = static_cast<float>(atof(szBuff0));
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<on_ground>")==0)
+	if (lstrcmpi(szCommand, "<on_ground>") == 0)
 	{
-		if(lstrcmpi(szBuff0, "TRUE")==0) m_bOnGround = true;
-		else if(lstrcmpi(szBuff0, "FALSE")==0) m_bOnGround = false;
+		if (lstrcmpi(szBuff0, "TRUE") == 0)
+			m_bOnGround = true;
+		else if (lstrcmpi(szBuff0, "FALSE") == 0)
+			m_bOnGround = false;
+
 		return true;
 	}
-	
-	if(lstrcmpi(szCommand, "<doubleside>")==0)
+
+	if (lstrcmpi(szCommand, "<doubleside>") == 0)
 	{
 		m_dwRenderFlag |= RF_DOUBLESIDED;
-		if(lstrcmpi(szBuff0, "true")==0) m_dwDoubleSide = D3DCULL_NONE;
-		if(lstrcmpi(szBuff0, "false")==0)
+
+		if (lstrcmpi(szBuff0, "true") == 0)
+		{
+			m_dwDoubleSide = D3DCULL_NONE;
+		}
+		else if (lstrcmpi(szBuff0, "false") == 0)
 		{
 			m_dwDoubleSide = D3DCULL_CCW;
 			m_dwRenderFlag ^= RF_DOUBLESIDED;
 		}
+
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<light>")==0)
+	if (lstrcmpi(szCommand, "<light>") == 0)
 	{
 		m_dwRenderFlag |= RF_NOTUSELIGHT;
-		if(lstrcmpi(szBuff0, "true")==0)
+
+		if (lstrcmpi(szBuff0, "true") == 0)
 		{
 			m_dwLight = TRUE;
 			m_dwRenderFlag ^= RF_NOTUSELIGHT;
 		}
-		if(lstrcmpi(szBuff0, "false")==0) m_dwLight = FALSE;
+		else if (lstrcmpi(szBuff0, "false") == 0)
+		{
+			m_dwLight = FALSE;
+		}
+
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<zbuffer>")==0)
+	if (lstrcmpi(szCommand, "<zbuffer>") == 0)
 	{
-		m_dwRenderFlag |= RF_NOTZBUFFER; 
-		if(lstrcmpi(szBuff0, "true")==0)
+		m_dwRenderFlag |= RF_NOTZBUFFER;
+
+		if (lstrcmpi(szBuff0, "true") == 0)
 		{
 			m_dwZEnable = D3DZB_TRUE;
-			m_dwRenderFlag ^= RF_NOTZBUFFER; 
+			m_dwRenderFlag ^= RF_NOTZBUFFER;
 		}
-		if(lstrcmpi(szBuff0, "false")==0) m_dwZEnable = D3DZB_FALSE;
+		else if (lstrcmpi(szBuff0, "false") == 0)
+		{
+			m_dwZEnable = D3DZB_FALSE;
+		}
+
 		return true;
 	}
 
-	if(lstrcmpi(szCommand, "<zwrite>")==0)
+	if (lstrcmpi(szCommand, "<zwrite>") == 0)
 	{
 		m_dwRenderFlag |= RF_NOTZWRITE;
-		if(lstrcmpi(szBuff0, "true")==0)
+
+		if (lstrcmpi(szBuff0, "true") == 0)
 		{
 			m_dwZWrite = TRUE;
 			m_dwRenderFlag ^= RF_NOTZWRITE;
 		}
-		if(lstrcmpi(szBuff0, "false")==0) m_dwZWrite = FALSE;
+		else if (lstrcmpi(szBuff0, "false") == 0)
+		{
+			m_dwZWrite = FALSE;
+		}
+
 		return true;
 	}
-	
+
 	return false;
 }
 #endif // end of _N3TOOL
@@ -314,31 +361,41 @@ bool CN3FXPartBase::DecodeScriptFile(const char* lpPathName)
 	CN3BaseFileAccess::FileNameSet(lpPathName);
 		
 	FILE* stream = fopen(lpPathName, "r");
-	if(!stream) return false;
+	if (stream == nullptr)
+		return false;
 
 	char szLine[512] = "", szCommand[80] = "", szBuf[4][80] = { "", "", "", ""};
 	char* pResult = fgets(szLine, 512, stream);
-	sscanf(szLine, "%s %s %s %s %s", szCommand, szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
-
-	if(lstrcmpi(szCommand, "<n3fxpart>"))
+	int argsScanned = sscanf(szLine, "%s %s %s %s %s", szCommand, szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
+	if (argsScanned <= 0)
 	{
 		fclose(stream);
 		return false;
 	}
 
-	while(!feof(stream))
+	if (lstrcmpi(szCommand, "<n3fxpart>") != 0)
+	{
+		fclose(stream);
+		return false;
+	}
+
+	while (!feof(stream))
 	{
 		char* pResult = fgets(szLine, 512, stream);
-		if(pResult == nullptr) continue;
+		if (pResult == nullptr)
+			continue;
 
-		ZeroMemory(szCommand,80);
-		ZeroMemory(szBuf[0],80);
-		ZeroMemory(szBuf[1],80);
-		ZeroMemory(szBuf[2],80);
-		ZeroMemory(szBuf[3],80);
-		sscanf(szLine, "%s %s %s %s %s", szCommand, szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
-		ParseScript(szCommand, szBuf[0], szBuf[1], szBuf[2], szBuf[3]);	
+		ZeroMemory(szCommand, 80);
+		ZeroMemory(szBuf[0], 80);
+		ZeroMemory(szBuf[1], 80);
+		ZeroMemory(szBuf[2], 80);
+		ZeroMemory(szBuf[3], 80);
+
+		argsScanned = sscanf(szLine, "%s %s %s %s %s", szCommand, szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
+		if (argsScanned > 0)
+			ParseScript(szCommand, szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
 	}
+
 	fclose(stream);
 	Init();
 

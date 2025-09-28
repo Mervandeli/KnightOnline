@@ -1969,12 +1969,20 @@ void CN3Chr::Init()
 	}
 
 	this->RemakePlugTracePolygons();
-
-	this->FindMinMax();
 	
 	// 충돌 체크를 위한 폴리곤.. 크기에 맞게 변환..
-	if(nullptr == m_pMeshCollision) m_pMeshCollision = new CN3VMesh();
-	m_pMeshCollision->CreateCube(m_vMin, m_vMax);
+	if (m_pMeshCollision == nullptr)
+		m_pMeshCollision = new CN3VMesh();
+
+	RegenerateCollisionMesh();
+}
+
+void CN3Chr::RegenerateCollisionMesh()
+{
+	FindMinMax();
+
+	if (m_pMeshCollision != nullptr)
+		m_pMeshCollision->CreateCube(m_vMin, m_vMax);
 }
 
 void CN3Chr::JointSet(const std::string& szFN)

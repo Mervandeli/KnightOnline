@@ -26,7 +26,7 @@ class CRegion
 public:
 	ZoneUserArray	m_RegionUserArray;
 	ZoneNpcArray	m_RegionNpcArray;
-	BYTE	m_byMoving;			// move : 1, not moving : 0
+	uint8_t	m_byMoving;			// move : 1, not moving : 0
 
 protected:
 	int		m_nIndex;

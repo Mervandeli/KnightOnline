@@ -14,7 +14,7 @@ class LOGIC_ELSE
 public:
 	void Parse_and(const char* line, const std::wstring& filename, int lineNumber);
 	void Init();
-	BYTE m_LogicElse;
+	uint8_t m_LogicElse;
 	bool m_bAnd;
 	int m_LogicElseInt[MAX_LOGIC_ELSE_INT];
 

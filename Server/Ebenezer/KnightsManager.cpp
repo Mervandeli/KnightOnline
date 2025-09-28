@@ -38,7 +38,7 @@ void CKnightsManager::PacketProcess(CUser* pUser, char* pBuf)
 
 	int index = 0;
 
-	BYTE command = GetByte(pBuf, index);
+	uint8_t command = GetByte(pBuf, index);
 	switch (command)
 	{
 		case KNIGHTS_CREATE:
@@ -505,7 +505,7 @@ fail_return:
 	pUser->Send(send_buff, send_index);
 }
 
-void CKnightsManager::ModifyKnightsMember(CUser* pUser, char* pBuf, BYTE command)
+void CKnightsManager::ModifyKnightsMember(CUser* pUser, char* pBuf, uint8_t command)
 {
 	int index = 0, send_index = 0, idlen = 0, ret_value = 0, vicechief = 0, remove_flag = 0;
 	char send_buff[128] = {};
@@ -838,10 +838,10 @@ fail_return:
 	pUser->Send(send_buff, send_index);
 }
 
-void CKnightsManager::ReceiveKnightsProcess(CUser* pUser, char* pBuf, BYTE command)
+void CKnightsManager::ReceiveKnightsProcess(CUser* pUser, char* pBuf, uint8_t command)
 {
 	int index = 0, send_index = 0, pktsize = 0, count = 0;
-	BYTE result;
+	uint8_t result;
 	char send_buff[2048] = {};
 	CUser* pTUser = nullptr;
 	std::string errormsg = fmt::format_db_resource(IDP_KNIGHT_DB_FAIL);
@@ -1016,7 +1016,7 @@ void CKnightsManager::RecvCreateKnights(CUser* pUser, char* pBuf)
 		m_pMain->Send_UDP_All(send_buff, send_index, 1);
 }
 
-void CKnightsManager::RecvJoinKnights(CUser* pUser, char* pBuf, BYTE command)
+void CKnightsManager::RecvJoinKnights(CUser* pUser, char* pBuf, uint8_t command)
 {
 	int send_index = 0, knightsindex = 0, index = 0, idlen = 0;
 	char send_buff[128] = {};
@@ -1106,7 +1106,7 @@ void CKnightsManager::RecvJoinKnights(CUser* pUser, char* pBuf, BYTE command)
 		m_pMain->Send_UDP_All(send_buff, send_index, 1);
 }
 
-void CKnightsManager::RecvModifyFame(CUser* pUser, char* pBuf, BYTE command)
+void CKnightsManager::RecvModifyFame(CUser* pUser, char* pBuf, uint8_t command)
 {
 	int index = 0, send_index = 0, knightsindex = 0, idlen = 0, vicechief = 0;
 	char send_buff[128] = {};

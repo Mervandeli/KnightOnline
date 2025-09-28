@@ -321,7 +321,7 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 		}
 	}
 
-	short sQuestTotal = 0;
+	int16_t sQuestTotal = 0;
 	for (int i = 0; i < MAX_QUEST; i++)
 	{
 		_USER_QUEST& quest = user->m_quests[i];
@@ -434,7 +434,7 @@ bool CDBAgent::UpdateUser(const char* charId, int userId, int updateType)
 		items(400),
 		serials(400),
 		quests(400);
-	short questTotal = 0;
+	int16_t questTotal = 0;
 
 	skills.append(user->m_bstrSkill, sizeof(user->m_bstrSkill));
 
@@ -659,7 +659,7 @@ bool CDBAgent::LoadCharInfo(char* charId_, char* buff, int& buffIndex)
 		}
 	}
 
-	SetString2(buff, charId.c_str(), static_cast<short>(charId.length()), buffIndex);
+	SetString2(buff, charId.c_str(), static_cast<int16_t>(charId.length()), buffIndex);
 	SetByte(buff, Race, buffIndex);
 	SetShort(buff, Class, buffIndex);
 	SetByte(buff, Level, buffIndex);
@@ -867,7 +867,7 @@ int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int
 				rtrim(charId);
 #endif
 
-				SetString2(buffOut, charId.c_str(), static_cast<short>(charId.length()), tempIndex);
+				SetString2(buffOut, charId.c_str(), static_cast<int16_t>(charId.length()), tempIndex);
 				SetByte(buffOut, Fame, tempIndex);
 				SetByte(buffOut, Level, tempIndex);
 				SetShort(buffOut, Class, tempIndex);
@@ -991,8 +991,8 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 	for (int i = 0; i < WAREHOUSE_MAX; i++)
 	{
 		int itemId = GetDWORD(items, index);
-		short durability = GetShort(items, index);
-		short count = GetShort(items, index);
+		int16_t durability = GetShort(items, index);
+		int16_t count = GetShort(items, index);
 
 		int64_t serialNumber = GetInt64(serials, serialIndex);
 
@@ -1150,7 +1150,7 @@ bool CDBAgent::LoadKnightsInfo(int knightsId, char* buffOut, int& buffIndex)
 
 		SetShort(buffOut, knights.ID, buffIndex);
 		SetByte(buffOut, knights.Nation, buffIndex);
-		SetString2(buffOut, knights.Name.c_str(), static_cast<short>(knights.Name.length()), buffIndex);
+		SetString2(buffOut, knights.Name.c_str(), static_cast<int16_t>(knights.Name.length()), buffIndex);
 		SetShort(buffOut, knights.Members, buffIndex);
 		SetDWORD(buffOut, knights.Points, buffIndex);
 	}
@@ -1171,7 +1171,7 @@ bool CDBAgent::LoadKnightsInfo(int knightsId, char* buffOut, int& buffIndex)
 /// \param clientIp
 /// \param init 0x01 to insert, 0x02 to update CURRENTUSER
 /// \returns true when CURRENTUSER successfully updated, otherwise false
-bool CDBAgent::SetLogInInfo(const char* accountId, const char* charId, const char* serverIp, int serverId, const char* clientIp, BYTE init)
+bool CDBAgent::SetLogInInfo(const char* accountId, const char* charId, const char* serverIp, int serverId, const char* clientIp, uint8_t init)
 {
 	using ModelType = model::CurrentUser;
 

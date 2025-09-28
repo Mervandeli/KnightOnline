@@ -24,7 +24,7 @@ public:
 	/// \param accountId
 	/// \param[out] premiumDaysRemaining output value of remaining premium days
 	/// \return true on success, false on failure
-	bool LoadPremiumServiceUser(const char* accountId, short* premiumDaysRemaining);
+	bool LoadPremiumServiceUser(const char* accountId, int16_t* premiumDaysRemaining);
 
 	/// \brief Checks to see if a user is present in CURRENTUSER for a particular server
 	/// writes to serverIp and serverId

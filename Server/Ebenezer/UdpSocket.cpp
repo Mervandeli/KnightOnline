@@ -122,20 +122,20 @@ int CUdpSocket::SendUDPPacket(char* strAddress, char* pBuf, int len)
 {
 	int s_size = 0, index = 0;
 
-	BYTE pTBuf[2048] = {};
+	uint8_t pTBuf[2048] = {};
 
 	if (len > sizeof(pTBuf)
 		|| len <= 0)
 		return 0;
 
-	pTBuf[index++] = (BYTE) PACKET_START1;
-	pTBuf[index++] = (BYTE) PACKET_START2;
+	pTBuf[index++] = (uint8_t) PACKET_START1;
+	pTBuf[index++] = (uint8_t) PACKET_START2;
 	memcpy(pTBuf + index, &len, 2);
 	index += 2;
 	memcpy(pTBuf + index, pBuf, len);
 	index += len;
-	pTBuf[index++] = (BYTE) PACKET_END1;
-	pTBuf[index++] = (BYTE) PACKET_END2;
+	pTBuf[index++] = (uint8_t) PACKET_END1;
+	pTBuf[index++] = (uint8_t) PACKET_END2;
 
 	m_SocketAddress.sin_addr.s_addr = inet_addr(strAddress);
 
@@ -146,7 +146,7 @@ int CUdpSocket::SendUDPPacket(char* strAddress, char* pBuf, int len)
 
 bool CUdpSocket::PacketProcess(int len)
 {
-	BYTE*		pTmp;
+	uint8_t*	pTmp;
 	bool		foundCore;
 	MYSHORT		slen;
 	int			length;
@@ -154,7 +154,7 @@ bool CUdpSocket::PacketProcess(int len)
 	if (len <= 0)
 		return false;
 
-	pTmp = new BYTE[len + 1];
+	pTmp = new uint8_t[len + 1];
 
 	memcpy(pTmp, m_pRecvBuf, len);
 
@@ -208,7 +208,7 @@ cancelRoutine:
 
 void CUdpSocket::Parsing(char* pBuf, int len)
 {
-	BYTE command;
+	uint8_t command;
 	int index = 0;
 
 	command = GetByte(pBuf, index);
@@ -451,7 +451,7 @@ void CUdpSocket::RecvCreateKnights(char* pBuf)
 	//TRACE(_T("UDP - RecvCreateKnights - knname=%hs, name=%hs, index=%d\n"), knightsname, chiefname, knightsindex);
 }
 
-void CUdpSocket::RecvJoinKnights(char* pBuf, BYTE command)
+void CUdpSocket::RecvJoinKnights(char* pBuf, uint8_t command)
 {
 	int send_index = 0, knightsId = 0, index = 0, idlen = 0;
 	char charId[MAX_ID_SIZE + 1] = {},
@@ -499,7 +499,7 @@ void CUdpSocket::RecvJoinKnights(char* pBuf, BYTE command)
 	m_pMain->Send_KnightsMember(knightsId, send_buff, send_index);
 }
 
-void CUdpSocket::RecvModifyFame(char* pBuf, BYTE command)
+void CUdpSocket::RecvModifyFame(char* pBuf, uint8_t command)
 {
 	int index = 0, send_index = 0, knightsindex = 0, idlen = 0, vicechief = 0;
 	char send_buff[128] = {},

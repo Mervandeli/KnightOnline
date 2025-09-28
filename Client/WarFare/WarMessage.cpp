@@ -72,12 +72,12 @@ void CWarMessage::RenderMessage()
 	{
 		D3DCOLOR crFont = m_pMessageFont->GetFontColor();
 
-		m_pMessageFont->DrawText(m_ptMessage.x - 1.0f, m_ptMessage.y, 0xff000000, 0);
-		m_pMessageFont->DrawText(m_ptMessage.x + 1.0f, m_ptMessage.y, 0xff000000, 0);
-		m_pMessageFont->DrawText(m_ptMessage.x, m_ptMessage.y + 1.0f, 0xff000000, 0);
-		m_pMessageFont->DrawText(m_ptMessage.x, m_ptMessage.y - 1.0f, 0xff000000, 0);
+		m_pMessageFont->DrawText(m_ptMessage.x - 1.0f, m_ptMessage.y + 0.0f, 0xff000000, 0);
+		m_pMessageFont->DrawText(m_ptMessage.x + 1.0f, m_ptMessage.y + 0.0f, 0xff000000, 0);
+		m_pMessageFont->DrawText(m_ptMessage.x + 0.0f, m_ptMessage.y + 1.0f, 0xff000000, 0);
+		m_pMessageFont->DrawText(m_ptMessage.x + 0.0f, m_ptMessage.y - 1.0f, 0xff000000, 0);
 
-		m_pMessageFont->DrawText(m_ptMessage.x, m_ptMessage.y, crFont, 0);
+		m_pMessageFont->DrawText(m_ptMessage.x + 0.0f, m_ptMessage.y + 0.0f, crFont, 0);
 	}
 }
 

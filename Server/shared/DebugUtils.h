@@ -18,6 +18,6 @@ void FormattedDebugString(const char* fmt, ...);
 #	endif
 
 #else
-#	define ASSERT 
-#	define TRACE 
+#	define ASSERT(...)
+#	define TRACE(...)
 #endif

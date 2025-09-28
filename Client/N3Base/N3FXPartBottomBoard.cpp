@@ -64,13 +64,14 @@ CN3FXPartBottomBoard::~CN3FXPartBottomBoard()
 #ifdef _N3TOOL
 bool CN3FXPartBottomBoard::ParseScript(char* szCommand, char* szBuff0, char* szBuff1, char* szBuff2, char* szBuff3)
 {
-	if(CN3FXPartBase::ParseScript(szCommand, szBuff0, szBuff1, szBuff2, szBuff3)) return true;
+	if (CN3FXPartBase::ParseScript(szCommand, szBuff0, szBuff1, szBuff2, szBuff3))
+		return true;
 
 	//	보드 크기.
-	if(lstrcmpi(szCommand, "<ground_size>")==0)
+	if (lstrcmpi(szCommand, "<ground_size>") == 0)
 	{
-		m_fCurrSizeX = m_fSizeX = atof(szBuff0);
-		m_fCurrSizeZ = m_fSizeZ = atof(szBuff1);
+		m_fCurrSizeX = m_fSizeX = static_cast<float>(atof(szBuff0));
+		m_fCurrSizeZ = m_fSizeZ = static_cast<float>(atof(szBuff1));
 /*
 		for(int i=0;i<NUM_VERTEX_BOTTOM;i++)
 		{
@@ -80,29 +81,34 @@ bool CN3FXPartBottomBoard::ParseScript(char* szCommand, char* szBuff0, char* szB
 */
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<tex_loop>")==0)
+
+	if (lstrcmpi(szCommand, "<tex_loop>") == 0)
 	{
-		if(lstrcmpi(szBuff0,"true")==0) m_bTexLoop = true;
-		else if(lstrcmpi(szBuff0,"false")==0) m_bTexLoop = false;
+		if (lstrcmpi(szBuff0, "true") == 0) m_bTexLoop = true;
+		else if (lstrcmpi(szBuff0, "false") == 0) m_bTexLoop = false;
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<ground_scale_velocity>")==0)
+
+	if (lstrcmpi(szCommand, "<ground_scale_velocity>") == 0)
 	{
-		m_fScaleVelX = atof(szBuff0);
-		m_fScaleVelZ = atof(szBuff1);
+		m_fScaleVelX = static_cast<float>(atof(szBuff0));
+		m_fScaleVelZ = static_cast<float>(atof(szBuff1));
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<ground_scale_acceleration>")==0)
+
+	if (lstrcmpi(szCommand, "<ground_scale_acceleration>") == 0)
 	{
-		m_fScaleAccelX = atof(szBuff0);
-		m_fScaleAccelZ = atof(szBuff1);
+		m_fScaleAccelX = static_cast<float>(atof(szBuff0));
+		m_fScaleAccelZ = static_cast<float>(atof(szBuff1));
 		return true;
 	}
-	if(lstrcmpi(szCommand, "<ground_gap>")==0)
+
+	if (lstrcmpi(szCommand, "<ground_gap>") == 0)
 	{
-		m_fGap = atof(szBuff0);
+		m_fGap = static_cast<float>(atof(szBuff0));
 		return true;
 	}
+
 	return false;
 }
 #endif // end of _N3TOOL

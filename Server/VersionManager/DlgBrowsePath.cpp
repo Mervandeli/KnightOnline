@@ -78,7 +78,7 @@ BOOL CDlgBrowsePath::OnInitDialog()
 		for (int i = 0; i < 10; i++)
 		{
 			szKey.Format(_T("Folder%.1d"), i);
-			LONG success = RegQueryValueEx(hKey, szKey, nullptr, &dwKeyType, (BYTE*) szInitDir, &dwLength);
+			LONG success = RegQueryValueEx(hKey, szKey, nullptr, &dwKeyType, (uint8_t*) szInitDir, &dwLength);
 			if (success == ERROR_SUCCESS && lstrlen(szInitDir) != 0)
 			{
 				m_CBPath.AddString(szInitDir);
@@ -203,7 +203,7 @@ void CDlgBrowsePath::OnOK()
 			int nLength = m_CBPath.GetLBTextLen(i);
 			if(nLength > 0)
 			{
-				LONG success = RegSetValueEx(hKey, szKey, 0, dwKeyType, (CONST BYTE*)szInitDir, nLength);
+				LONG success = RegSetValueEx(hKey, szKey, 0, dwKeyType, (CONST uint8_t*)szInitDir, nLength);
 			}
 		}
 	}

@@ -25,7 +25,7 @@ class CServerDlg;
 class CMapInfo					// 각 좌표의 정보
 {
 public:
-	short	m_sEvent;			// 현좌표의 이벤트 번호
+	int16_t	m_sEvent;			// 현좌표의 이벤트 번호
 
 	CMapInfo();
 	virtual ~CMapInfo();
@@ -46,15 +46,15 @@ public:
 	int					m_nMapSize;			// Grid Unit ex) 4m
 	float				m_fUnitDist;		// i Grid Distance
 	float**				m_fHeight;
-//	short				m_arDungeonBossMonster[MAX_DUNGEON_BOSS_MONSTER];
-	BYTE				m_byRoomType;		// 방의 초기화관련( 0:자동으로 초기화, 1:전쟁이벤트 관련(특정조건이 완료시 초기화)
-	BYTE				m_byRoomEvent;		// event room(0:empty, 1:use)
-	BYTE				m_byRoomStatus;		// room status(1:진행중, 2:방을 초기화중, 3:방초기화 완료)
-	BYTE				m_byInitRoomCount;	// room 초기화 시간을 제어(몬스터와 동기화를 맞추기 위해)
+//	int16_t				m_arDungeonBossMonster[MAX_DUNGEON_BOSS_MONSTER];
+	uint8_t				m_byRoomType;		// 방의 초기화관련( 0:자동으로 초기화, 1:전쟁이벤트 관련(특정조건이 완료시 초기화)
+	uint8_t				m_byRoomEvent;		// event room(0:empty, 1:use)
+	uint8_t				m_byRoomStatus;		// room status(1:진행중, 2:방을 초기화중, 3:방초기화 완료)
+	uint8_t				m_byInitRoomCount;	// room 초기화 시간을 제어(몬스터와 동기화를 맞추기 위해)
 	ObjectEventArray	m_ObjectEventArray;
 	RoomEventArray		m_arRoomEventArray;
-	short				m_sKarusRoom;		// karus의 성갯수
-	short				m_sElmoradRoom;		// elmorad의 성갯수
+	int16_t				m_sKarusRoom;		// karus의 성갯수
+	int16_t				m_sElmoradRoom;		// elmorad의 성갯수
 	
 	MAP();
 	virtual ~MAP();

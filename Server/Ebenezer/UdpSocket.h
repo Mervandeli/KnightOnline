@@ -15,8 +15,8 @@ class CUdpSocket
 public:
 	void RecvBattleZoneCurrentUsers(char* pBuf);
 	void RecvDestroyKnights(char* pBuf);
-	void RecvModifyFame(char* pBuf, BYTE command);
-	void RecvJoinKnights(char* pBuf, BYTE command);
+	void RecvModifyFame(char* pBuf, uint8_t command);
+	void RecvJoinKnights(char* pBuf, uint8_t command);
 	void RecvCreateKnights(char* pBuf);
 	void ReceiveKnightsProcess(char* pBuf);
 	void RecvBattleEvent(char* pBuf);
