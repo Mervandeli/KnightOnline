@@ -277,7 +277,7 @@ bool CUIItemUpgrade::ReceiveIconDrop(__IconItemSkill* spItem)
 			CN3UIArea* pArea = m_pSlotArea[i];
 			if (pArea != nullptr && pArea->IsIn(ptCur.x, ptCur.y))
 			{
-				if (MaterialSlotDrop(spItem, i));
+				if (MaterialSlotDrop(spItem, i))
 				return true;
 			}
 		}
