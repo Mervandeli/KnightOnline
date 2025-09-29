@@ -11597,6 +11597,11 @@ bool CUser::CheckEventLogic(const EVENT_DATA* pEventData)
 					bExact = true;
 				break;
 
+			case LOGIC_CHECK_PROMOTION_ELIGIBLE:
+				if (CheckPromotionEligible())
+					bExact = true;
+				break;
+
 			case LOGIC_CHECK_NO_CASTLE:
 				if (m_pUserData->m_bKnights != m_pMain->m_KnightsSiegeWar._masterKnights
 					|| m_pMain->m_KnightsSiegeWar._masterKnights == 0
@@ -12128,6 +12133,87 @@ bool CUser::CheckClass(int16_t class1, int16_t class2, int16_t class3, int16_t c
 	return false;
 }
 
+bool CUser::CheckPromotionEligible()
+{
+	CNpc* npc = m_pMain->m_NpcMap.GetData(m_sEventNid);
+	if (npc == nullptr)
+		return false;
+
+	if (CheckClass(CLASS_KA_GUARDIAN, CLASS_KA_PENETRATOR, CLASS_KA_NECROMANCER, CLASS_KA_DARKPRIEST)
+		|| CheckClass(CLASS_EL_PROTECTOR, CLASS_EL_ASSASIN, CLASS_EL_ENCHANTER, CLASS_EL_DRUID))
+	{
+		// Here we return that the user is already mastered
+		switch (m_pUserData->m_sClass)
+		{
+			case CLASS_EL_PROTECTOR:
+			case CLASS_KA_GUARDIAN:
+				SendSay(-1, -1, 6006);
+				break;
+
+			case CLASS_EL_ASSASIN:
+			case CLASS_KA_PENETRATOR:
+				SendSay(-1, -1, 7006);
+				break;
+
+			case CLASS_EL_ENCHANTER:
+			case CLASS_KA_NECROMANCER:
+				SendSay(-1, -1, 8006);
+				break;
+
+			case CLASS_EL_DRUID:
+			case CLASS_KA_DARKPRIEST:
+				SendSay(-1, -1, 9006);
+				break;
+		}
+
+		return false;
+	}
+
+	constexpr int MASTER_LVL = 60;
+
+	// The following SendSay() calls tell the user that they're at the wrong NPC or they've not reached level 60.
+	switch (npc->m_tNpcType)
+	{
+		case NPC_MASTER_WARRIOR:
+			if ((m_pUserData->m_sClass != CLASS_KA_BERSERKER && m_pUserData->m_sClass != CLASS_EL_BLADE)
+				|| m_pUserData->m_bLevel < MASTER_LVL)
+			{
+				SendSay(-1, -1, 6001);
+				return false;
+			}
+			return true;
+
+		case NPC_MASTER_ROGUE:
+			if ((m_pUserData->m_sClass != CLASS_KA_HUNTER && m_pUserData->m_sClass != CLASS_EL_RANGER)
+				|| m_pUserData->m_bLevel < MASTER_LVL)
+			{
+				SendSay(-1, -1, 7001);
+				return false;
+			}
+			return true;
+
+		case NPC_MASTER_MAGE:
+			if ((m_pUserData->m_sClass != CLASS_KA_SORCERER && m_pUserData->m_sClass != CLASS_EL_MAGE)
+				|| m_pUserData->m_bLevel < MASTER_LVL)
+			{
+				SendSay(-1, -1, 8001);
+				return false;
+			}
+			return true;
+
+		case NPC_MASTER_PRIEST:
+			if ((m_pUserData->m_sClass != CLASS_KA_SHAMAN && m_pUserData->m_sClass != CLASS_EL_CLERIC)
+				|| m_pUserData->m_bLevel < MASTER_LVL)
+			{
+				SendSay(-1, -1, 9001);
+				return false;
+			}
+			return true;
+	}
+
+	return false;
+}
+
 // Receive menu reply from client.
 void CUser::RecvSelectMsg(char* pBuf)
 {
@@ -12185,6 +12271,29 @@ void CUser::SendNpcSay(const EXEC* pExec)
 	Send(send_buff, send_index);
 }
 
+void CUser::SendSay(
+	int16_t eventIdUp, int16_t eventIdOk,
+	int16_t message1, int16_t message2, int16_t message3, int16_t message4,
+	int16_t message5, int16_t message6, int16_t message7, int16_t message8)
+{
+	int send_index = 0;
+	char send_buff[128] = {};
+
+	SetByte(send_buff, WIZ_NPC_SAY, send_index);
+	SetDWORD(send_buff, eventIdUp, send_index);
+	SetDWORD(send_buff, eventIdOk, send_index);
+	SetDWORD(send_buff, message1, send_index);
+	SetDWORD(send_buff, message2, send_index);
+	SetDWORD(send_buff, message3, send_index);
+	SetDWORD(send_buff, message4, send_index);
+	SetDWORD(send_buff, message5, send_index);
+	SetDWORD(send_buff, message6, send_index);
+	SetDWORD(send_buff, message7, send_index);
+	SetDWORD(send_buff, message8, send_index);
+
+	Send(send_buff, send_index);
+}
+
 void CUser::SelectMsg(const EXEC* pExec)
 {
 	int i, chat, send_index = 0;
@@ -12231,90 +12340,90 @@ bool CUser::JobGroupCheck(int16_t jobgroupid) const
 		switch (jobgroupid)
 		{
 			case JOB_GROUP_WARRIOR:
-				if (m_pUserData->m_sClass == 101
-					|| m_pUserData->m_sClass == 105
-					|| m_pUserData->m_sClass == 106
-					|| m_pUserData->m_sClass == 201
-					|| m_pUserData->m_sClass == 205
-					|| m_pUserData->m_sClass == 206)
+				if (m_pUserData->m_sClass == CLASS_KA_WARRIOR
+					|| m_pUserData->m_sClass == CLASS_KA_BERSERKER
+					|| m_pUserData->m_sClass == CLASS_KA_GUARDIAN
+					|| m_pUserData->m_sClass == CLASS_EL_WARRIOR
+					|| m_pUserData->m_sClass == CLASS_EL_BLADE
+					|| m_pUserData->m_sClass == CLASS_EL_PROTECTOR)
 					return true;
 				break;
 
 			case JOB_GROUP_ROGUE:
-				if (m_pUserData->m_sClass == 102
-					|| m_pUserData->m_sClass == 107
-					|| m_pUserData->m_sClass == 108
-					|| m_pUserData->m_sClass == 202
-					|| m_pUserData->m_sClass == 207
-					|| m_pUserData->m_sClass == 208)
+				if (m_pUserData->m_sClass == CLASS_KA_ROGUE
+					|| m_pUserData->m_sClass == CLASS_KA_HUNTER
+					|| m_pUserData->m_sClass == CLASS_KA_PENETRATOR
+					|| m_pUserData->m_sClass == CLASS_EL_ROGUE
+					|| m_pUserData->m_sClass == CLASS_EL_RANGER
+					|| m_pUserData->m_sClass == CLASS_EL_ASSASIN)
 					return true;
 				break;
 
 			case JOB_GROUP_MAGE:
-				if (m_pUserData->m_sClass == 103
-					|| m_pUserData->m_sClass == 109
-					|| m_pUserData->m_sClass == 110 
-					|| m_pUserData->m_sClass == 203
-					|| m_pUserData->m_sClass == 209
-					|| m_pUserData->m_sClass == 210)
+				if (m_pUserData->m_sClass == CLASS_KA_WIZARD
+					|| m_pUserData->m_sClass == CLASS_KA_SORCERER
+					|| m_pUserData->m_sClass == CLASS_KA_NECROMANCER
+					|| m_pUserData->m_sClass == CLASS_EL_WIZARD
+					|| m_pUserData->m_sClass == CLASS_EL_MAGE
+					|| m_pUserData->m_sClass == CLASS_EL_ENCHANTER)
 					return true;
 				break;
 
 			case JOB_GROUP_CLERIC:
-				if (m_pUserData->m_sClass == 104
-					|| m_pUserData->m_sClass == 111
-					|| m_pUserData->m_sClass == 112
-					|| m_pUserData->m_sClass == 204
-					|| m_pUserData->m_sClass == 211
-					|| m_pUserData->m_sClass == 212)
+				if (m_pUserData->m_sClass == CLASS_KA_PRIEST
+					|| m_pUserData->m_sClass == CLASS_KA_SHAMAN
+					|| m_pUserData->m_sClass == CLASS_KA_DARKPRIEST
+					|| m_pUserData->m_sClass == CLASS_EL_PRIEST
+					|| m_pUserData->m_sClass == CLASS_EL_CLERIC
+					|| m_pUserData->m_sClass == CLASS_EL_DRUID)
 					return true;
 				break;
 
 			case JOB_GROUP_ATTACK_WARRIOR:
-				if (m_pUserData->m_sClass == 105
-					|| m_pUserData->m_sClass == 205)
+				if (m_pUserData->m_sClass == CLASS_KA_BERSERKER
+					|| m_pUserData->m_sClass == CLASS_EL_BLADE)
 					return true;
 				break;
 
 			case JOB_GROUP_DEFENSE_WARRIOR:
-				if (m_pUserData->m_sClass == 106
-					|| m_pUserData->m_sClass == 206)
+				if (m_pUserData->m_sClass == CLASS_KA_GUARDIAN
+					|| m_pUserData->m_sClass == CLASS_EL_PROTECTOR)
 					return true;
 				break;
 
 			case JOB_GROUP_ARCHERER:
-				if (m_pUserData->m_sClass == 107
-					|| m_pUserData->m_sClass == 207)
+				if (m_pUserData->m_sClass == CLASS_KA_HUNTER
+					|| m_pUserData->m_sClass == CLASS_EL_RANGER)
 					return true;
 				break;
 
 			case JOB_GROUP_ASSASSIN:
-				if (m_pUserData->m_sClass == 108
-					|| m_pUserData->m_sClass == 208)
+				if (m_pUserData->m_sClass == CLASS_KA_PENETRATOR
+					|| m_pUserData->m_sClass == CLASS_EL_ASSASIN)
 					return true;
 				break;
 
 			case JOB_GROUP_ATTACK_MAGE:
-				if (m_pUserData->m_sClass == 109
-					|| m_pUserData->m_sClass == 209)
+				if (m_pUserData->m_sClass == CLASS_KA_SORCERER
+					|| m_pUserData->m_sClass == CLASS_EL_MAGE)
 					return true;
 				break;
 
 			case JOB_GROUP_PET_MAGE:
-				if (m_pUserData->m_sClass == 110
-					|| m_pUserData->m_sClass == 210)
+				if (m_pUserData->m_sClass == CLASS_KA_NECROMANCER
+					|| m_pUserData->m_sClass == CLASS_EL_ENCHANTER)
 					return true;
 				break;
 
 			case JOB_GROUP_HEAL_CLERIC:
-				if (m_pUserData->m_sClass == 111
-					|| m_pUserData->m_sClass == 211)
+				if (m_pUserData->m_sClass == CLASS_KA_SHAMAN
+					|| m_pUserData->m_sClass == CLASS_EL_CLERIC)
 					return true;
 				break;
 
 			case JOB_GROUP_CURSE_CLERIC:
-				if (m_pUserData->m_sClass == 112
-					|| m_pUserData->m_sClass == 212)
+				if (m_pUserData->m_sClass == CLASS_KA_DARKPRIEST
+					|| m_pUserData->m_sClass == CLASS_EL_DRUID)
 					return true;
 				break;
 		}
