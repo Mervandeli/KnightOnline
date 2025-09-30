@@ -835,9 +835,11 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 					else
 					{
 						if (pInven->m_pMyInvWnd[iOrder] != nullptr)
+						{
+							delete pInven->m_pMyInvWnd[iOrder]->pUIIcon;
 							pInven->m_pMyInvWnd[iOrder]->pUIIcon = nullptr;
-
-						pInven->m_pMyInvWnd[iOrder] = nullptr;
+							pInven->m_pMyInvWnd[iOrder] = nullptr;
+						}
 
 						if (spItem != nullptr)
 							spItem->pUIIcon = nullptr;
@@ -944,7 +946,7 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 		__TABLE_ITEM_BASIC* pItemBasic = CGameBase::s_pTbl_Items_Basic.Find(nItemID[0] / 1000 * 1000);
 		__TABLE_ITEM_EXT* pItemExt = nullptr;
 
-		if (pItemBasic
+		if (pItemBasic != nullptr
 			&& pItemBasic->byExtIndex >= 0
 			&& pItemBasic->byExtIndex < MAX_ITEM_EXTENSION)
 			pItemExt = CGameBase::s_pTbl_Items_Exts[pItemBasic->byExtIndex].Find(nItemID[0] % 1000);
@@ -1124,13 +1126,13 @@ bool CUIItemUpgrade::IsMaterialSlotCompatible(__IconItemSkill* pSrc) const
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
 		int iOrder = m_iUpgradeScrollSlotInvPos[i];
-		if (iOrder != -1)
-		{
-			if (IsTrina(m_pMyUpgradeInv[iOrder]->pItemBasic->dwID))
-				bHasTrina = true;
-			else
-				bHasScroll = true;
-		}
+		if (iOrder < 0)
+			continue;
+
+		if (IsTrina(m_pMyUpgradeInv[iOrder]->pItemBasic->dwID))
+			bHasTrina = true;
+		else
+			bHasScroll = true;
 	}
 
 	if (bHasTrina && IsTrina(pSrc->pItemBasic->dwID))
