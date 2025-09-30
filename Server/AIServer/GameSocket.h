@@ -1,37 +1,30 @@
-﻿// GameSocket.h: interface for the CGameSocket class.
-//
-//////////////////////////////////////////////////////////////////////
+﻿#pragma once
 
-#if !defined(AFX_GAMESOCKET_H__E8EB97C6_3A78_44E1_BE1D_E5AC1893D27E__INCLUDED_)
-#define AFX_GAMESOCKET_H__E8EB97C6_3A78_44E1_BE1D_E5AC1893D27E__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
-
-#include "IOCPSocket2.h"
 #include "Party.h"
 
-#define WM_GAMESERVER_LOGIN			(WM_USER)+100
+#include <network/TcpServerSocket.h>
 
 class CServerDlg;
 class CUser;
 class MAP;
-//class CParty;
-
-class CGameSocket : public CIOCPSocket2
+class CIOCPort;
+class CGameSocket : public TcpServerSocket
 {
 public:
 	CServerDlg* m_pMain;
 	CParty		m_Party;
-	int16_t m_sSocketID;
-public:
-	CGameSocket();
-	virtual ~CGameSocket();
+	int16_t		_zoneNo;
 
-	void Initialize();
-	void Parsing(int length, char* pData);	// recv data parsing
-	void CloseProcess();
+public:
+	CGameSocket(SocketManager* socketManager);
+	~CGameSocket() override;
+
+	void Initialize() override;
+	bool PullOutCore(char*& data, int& length) override;
+	int Send(char* pBuf, int length) override;
+	void CloseProcess() override;
+
+	void Parsing(int length, char* pData) override;	// recv data parsing
 	void RecvServerConnect(char* pBuf);
 
 	bool SetUid(float x, float z, int id, int speed);
@@ -58,5 +51,3 @@ public:
 	void Send_UserError(int16_t uid, int16_t tid = 10000);
 	void RecvBattleEvent(char* pBuf);
 };
-
-#endif // !defined(AFX_GAMESOCKET_H__E8EB97C6_3A78_44E1_BE1D_E5AC1893D27E__INCLUDED_)

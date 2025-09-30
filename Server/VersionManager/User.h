@@ -1,26 +1,15 @@
-﻿// User.h: interface for the CUser class.
-//
-//////////////////////////////////////////////////////////////////////
+﻿#pragma once
 
-#if !defined(AFX_USER_H__44B01102_A28D_4527_BCBC_1815DD57BCB0__INCLUDED_)
-#define AFX_USER_H__44B01102_A28D_4527_BCBC_1815DD57BCB0__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
-
-#include "IOCPSocket2.h"
+#include <network/TcpServerSocket.h>
 
 class CVersionManagerDlg;
-class CUser : public CIOCPSocket2
+class CUser : public TcpServerSocket
 {
 public:
-	CUser(CVersionManagerDlg* main);
-	virtual ~CUser();
-
-	void Initialize();
-	void Parsing(int len, char* pData);
-
+	CUser(CVersionManagerDlg* main, SocketManager* socketManager);
+	bool PullOutCore(char*& data, int& length) override;
+	int Send(char* pBuf, int length) override;
+	void Parsing(int len, char* pData) override;
 	void NewsReq(char* pBuf);
 	void SendDownloadInfo(int version);
 	void LogInReq(char* pBuf);
@@ -28,5 +17,3 @@ public:
 protected:
 	CVersionManagerDlg* _main;
 };
-
-#endif // !defined(AFX_USER_H__44B01102_A28D_4527_BCBC_1815DD57BCB0__INCLUDED_)
