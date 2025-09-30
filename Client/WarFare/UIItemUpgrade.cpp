@@ -491,7 +491,7 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 			// Divide countable items
 			if (spItem->iCount > 1
-				&& (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE || spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
+				&& spItem->IsStackable())
 			{
 				__IconItemSkill* pNew = new __IconItemSkill(*spItem);
 				CreateUIIconForItem(pNew);
@@ -515,7 +515,7 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			if (!ReceiveIconDrop(spItem))
 			{
 				if (spItem->iCount > 1
-					&& (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE || spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
+					&& spItem->IsStackable())
 				{
 					ShowItemCount(spItem, iOrder);
 
@@ -694,7 +694,7 @@ void CUIItemUpgrade::ResetUpgradeInventory()
 			SetupIconArea(spItem, m_pInvArea[iOrder]);
 
 			if (spItem->iCount > 1
-				&& (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE || spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
+				&& spItem->IsStackable())
 			{
 				CleanAreaSlot(m_pSlotArea[i]);
 				++spItem->iCount;
@@ -1243,9 +1243,9 @@ bool CUIItemUpgrade::HandleInventoryIconRightClick(__IconItemSkill* spItem)
 		
 		if (IsMaterialSlotCompatible(spItem))
 		{
-			// Divide countable items
+			// Split stackable items
 			if (spItem->iCount > 1
-				&& (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE || spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
+				&& spItem->IsStackable())
 			{
 				__IconItemSkill* pNew = new __IconItemSkill(*spItem);
 				CreateUIIconForItem(pNew);
@@ -1272,8 +1272,7 @@ void CUIItemUpgrade::ShowItemCount(__IconItemSkill* spItem, int iOrder)
 	if (spItem == nullptr)
 		return;
 
-	if (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
-		|| spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL)
+	if (spItem->IsStackable())
 	{
 		CN3UIString* pStr = m_pInvString[iOrder];
 		if (pStr == nullptr)
@@ -1308,7 +1307,7 @@ bool CUIItemUpgrade::MaterialSlotDrop(__IconItemSkill* spItem, int iOrder)
 
 	// If countable reduce inv item count
 	if (spItem->iCount > 1
-		&& (spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE || spItem->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL))
+		&& spItem->IsStackable())
 		--m_pMyUpgradeInv[iSourceOrder]->iCount;
 
 	SetupIconArea(spItem, pArea);

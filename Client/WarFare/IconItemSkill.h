@@ -25,4 +25,5 @@ struct	__IconItemSkill
 	uint32_t GetItemID() const;
 	int GetBuyPrice() const;
 	int GetSellPrice(bool bHasPremium = false) const;
+	bool IsStackable() const;
 };
