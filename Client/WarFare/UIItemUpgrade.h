@@ -25,11 +25,7 @@ private:
 		Done
 	};
 
-	AnimationState m_eAnimationState;
-	
-	enum ItemBasic {
-		UpgradeMaterial = 255,
-	};
+	AnimationState		m_eAnimationState;
 
 	float				m_fAnimationTimer;
 	int					m_iCurrentFrame;

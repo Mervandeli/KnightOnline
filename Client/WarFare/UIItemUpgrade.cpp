@@ -1112,7 +1112,10 @@ void CUIItemUpgrade::SetupIconArea(__IconItemSkill* spItem, CN3UIArea* pArea)
 
 bool CUIItemUpgrade::IsMaterialSlotCompatible(__IconItemSkill* pSrc) const
 {
-	if (pSrc->pItemBasic->dwEffectID2 != UpgradeMaterial && !m_bUpgradeInProgress)
+	if (m_bUpgradeInProgress)
+		return false;
+
+	if (pSrc->pItemBasic->dwEffectID2 != ITEM_EFFECT2_ITEM_UPGRADE_REQ)
 		return false;
 
 	bool bHasTrina = false;
@@ -1129,6 +1132,7 @@ bool CUIItemUpgrade::IsMaterialSlotCompatible(__IconItemSkill* pSrc) const
 				bHasScroll = true;
 		}
 	}
+
 	if (bHasTrina && IsTrina(pSrc->pItemBasic->dwID))
 		return false;
 
