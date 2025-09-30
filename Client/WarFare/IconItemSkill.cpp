@@ -2,6 +2,18 @@
 #include "IconItemSkill.h"
 #include "GameDef.h"
 
+uint32_t __IconItemSkill::GetItemID() const
+{
+	if (pItemBasic == nullptr)
+		return 0;
+
+	uint32_t nItemID = pItemBasic->dwID;
+	if (pItemExt != nullptr)
+		nItemID += pItemExt->dwID;
+
+	return nItemID;
+}
+
 int __IconItemSkill::GetBuyPrice() const
 {
 	if (pItemBasic == nullptr

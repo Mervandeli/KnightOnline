@@ -507,11 +507,11 @@ enum e_TextResourceID
 	IDS_WARP_NOT_DURING_CSW						= 6612, // You cannot enter during the Castle Siege War. 
 	IDS_WARP_NEED_LOYALTY						= 6613, // You cannot enter when you have 0 national points.
  
-	IDS_ITEM_UPGRADE_SUCCESS					= 6700,
-	IDS_ITEM_UPGRADE_FAIL						= 6701,
-	IDS_ITEM_UPGRADE_CANNOT_PERFORM				= 6702, // Cannot perform item upgrade
-	IDS_ITEM_UPGRADE_NEED_COIN					= 6703, // Upgrade Need coin
-	IDS_ITEM_UPGRADE_NON_MATCH					= 6704, // Upgrade Not Match or other
+	IDS_ITEM_UPGRADE_SUCCEEDED					= 6700, // Item upgrade succeeded. 
+	IDS_ITEM_UPGRADE_FAILED						= 6701, // Item upgrade failed. 
+	IDS_ITEM_UPGRADE_CANNOT_PERFORM				= 6702, // Cannot perform item upgrade.  
+	IDS_ITEM_UPGRADE_NEED_COINS					= 6703, // You don't have enough Coins. 
+	IDS_ITEM_UPGRADE_NON_MATCH					= 6704, // The items required for upgrade does not match. 
 
 	IDS_TELEPORT_TO_X_NEED_Y_COINS				= 7612, // To teleport to %s, you need %d coins
 

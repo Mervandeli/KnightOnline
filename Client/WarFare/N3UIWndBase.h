@@ -45,6 +45,9 @@ enum e_UIWND_DISTRICT		{
 								UIWND_DISTRICT_SKILL_HOTKEY,		// Skillicon district of Hotkey icon wnd..
 								UIWND_DISTRICT_TRADE_MY,			// Npc 와의 거래에서 내 영역..
 								UIWND_DISTRICT_PER_TRADE_INV,		// Inv District of Per Trade Wnd ..
+								UIWND_DISTRICT_UPGRADE_SLOT,		// Slot district of Result Item.
+								UIWND_DISTRICT_UPGRADE_INV,			// Inv district of Item Upgrade Wnd.
+								UIWND_DISTRICT_UPGRADE_RESULT_SLOT,	// Upgrade  Result Slot district.
 								UIWND_DISTRICT_UNKNOWN,				// District Unknown..
 							};
 
