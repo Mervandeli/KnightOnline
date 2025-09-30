@@ -5605,11 +5605,11 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 			szMsg = fmt::format_text_resource(IDS_WARP_WRONG_GATE);
 		MsgOutput(szMsg, 0xff00ff00);
 	}
-	else if(iType == 8)
+	else if (iType == OBJECT_TYPE_ANVIL)
 	{
 		/*
 		if (iResult == 0) // anvil object failed animation	
-		if (iResult == 1) // anvil object successed animation
+		if (iResult == 1) // anvil object succeeded animation
 		*/
 	}
 	else
