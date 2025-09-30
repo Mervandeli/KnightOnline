@@ -1121,7 +1121,7 @@ bool CUIItemUpgrade::HandleInventoryIconRightClick(__IconItemSkill* spItem)
 			{
 				if (m_iUpgradeScrollSlotInvPos[i] == -1)
 				{
-					if (MaterialSlotDrop(spItem, i));
+					if (MaterialSlotDrop(spItem, i))
 					return true;
 				}
 			}
