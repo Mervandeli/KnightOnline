@@ -39,7 +39,6 @@ private:
 	CN3UIButton*		m_pBtnClose;
 	CN3UIButton*		m_pBtnOk;
 	CN3UIButton*		m_pBtnCancel;
-	CN3UIButton*		m_pBtnConversation;
 	CN3UIString*		m_pStrMyGold;
 	CN3UIArea*			m_pAreaUpgrade;
 	CN3UIArea*			m_pAreaResult;
@@ -65,7 +64,6 @@ public:
 	~CUIItemUpgrade() override;
 	void Release() override;
 	void Close();
-	void Open();
 	void SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false) override;
 	void MsgRecv_ItemUpgrade(Packet& pkt);
 	void SetNpcID(int iNpcID);

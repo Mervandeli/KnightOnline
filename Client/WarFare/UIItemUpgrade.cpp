@@ -40,7 +40,6 @@ CUIItemUpgrade::CUIItemUpgrade()
 	m_pBtnClose = nullptr;
 	m_pBtnOk = nullptr;
 	m_pBtnCancel = nullptr;
-	m_pBtnConversation = nullptr;
 	m_pStrMyGold = nullptr;
 	m_pAreaUpgrade = nullptr;
 	m_pAreaResult = nullptr;
@@ -103,7 +102,6 @@ void CUIItemUpgrade::Release()
 	m_pBtnClose = nullptr;
 	m_pBtnOk = nullptr;
 	m_pBtnCancel = nullptr;
-	m_pBtnConversation = nullptr;
 	m_pStrMyGold = nullptr;
 	m_pAreaUpgrade = nullptr;
 	m_pAreaResult = nullptr;
@@ -257,11 +255,6 @@ void CUIItemUpgrade::SetSelectedIconInfo(CN3UIIcon* pUIIcon)
 			return;
 		}
 	}
-}
-
-void CUIItemUpgrade::Open()
-{
-	SetVisibleWithNoSound(true, false, false);
 }
 
 void CUIItemUpgrade::SetNpcID(int iNpcID)
@@ -567,7 +560,11 @@ void CUIItemUpgrade::SetVisible(bool bVisible)
 	CN3UIBase::SetVisible(bVisible);
 
 	if (bVisible)
+	{
+		GetItemFromInv();
+		GoldUpdate();
 		CGameProcedure::s_pUIMgr->SetVisibleFocusedUI(this);
+	}	
 	else
 		CGameProcedure::s_pUIMgr->ReFocusUI();
 }
@@ -578,8 +575,7 @@ void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFo
 
 	if (bVisible)
 	{
-		GetItemFromInv();
-		GoldUpdate();
+		SetVisible(true);
 	}
 	else
 	{
@@ -614,12 +610,13 @@ bool CUIItemUpgrade::Load(HANDLE hFile)
 	N3_VERIFY_UI_COMPONENT(m_pBtnClose,			GetChildByID<CN3UIButton>("btn_close"));
 	N3_VERIFY_UI_COMPONENT(m_pBtnOk,			GetChildByID<CN3UIButton>("btn_ok"));
 	N3_VERIFY_UI_COMPONENT(m_pBtnCancel,		GetChildByID<CN3UIButton>("btn_cancel"));
-	N3_VERIFY_UI_COMPONENT(m_pBtnConversation,	GetChildByID<CN3UIButton>("btn_conversation"));
 	N3_VERIFY_UI_COMPONENT(m_pAreaUpgrade,		GetChildByID<CN3UIArea>("a_upgrade"));
 	N3_VERIFY_UI_COMPONENT(m_pAreaResult,		GetChildByID<CN3UIArea>("a_result"));
 	N3_VERIFY_UI_COMPONENT(m_pImageCover1,		GetChildByID<CN3UIImage>("img_cover_01"));
 	N3_VERIFY_UI_COMPONENT(m_pImageCover2,		GetChildByID<CN3UIImage>("img_cover_02"));
 	N3_VERIFY_UI_COMPONENT(m_pStrMyGold,		GetChildByID<CN3UIString>("text_gold"));
+	// TODO: Implement this UI later
+	//N3_VERIFY_UI_COMPONENT(m_pBtnConversation,	GetChildByID<CN3UIButton>("btn_conversation"));
 
 	if (m_pStrMyGold != nullptr)
 		m_pStrMyGold->SetString("0");
