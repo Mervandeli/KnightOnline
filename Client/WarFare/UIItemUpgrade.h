@@ -69,6 +69,7 @@ public:
 	void SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false) override;
 	void MsgRecv_ItemUpgrade(Packet& pkt);
 	void SetNpcID(int iNpcID);
+	void SetVisible(bool bVisible);
 
 private:
 	RECT GetSampleRect();

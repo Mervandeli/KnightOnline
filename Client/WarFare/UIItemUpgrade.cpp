@@ -9,6 +9,7 @@
 #include "PlayerMySelf.h"
 #include "UIImageTooltipDlg.h"
 #include "UIInventory.h"
+#include "UIManager.h"
 
 #include "text_resources.h"
 
@@ -561,6 +562,16 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 	return true;
 }
 
+void CUIItemUpgrade::SetVisible(bool bVisible)
+{
+	CN3UIBase::SetVisible(bVisible);
+
+	if (bVisible)
+		CGameProcedure::s_pUIMgr->SetVisibleFocusedUI(this);
+	else
+		CGameProcedure::s_pUIMgr->ReFocusUI();
+}
+
 void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFocus)
 {
 	CN3UIBase::SetVisibleWithNoSound(bVisible, bWork, bReFocus);
@@ -583,6 +594,13 @@ void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFo
 			// Reset the item's inventory area.
 			ResetUpgradeInventory();
 			AnimClose();
+		}
+		if (bReFocus)
+		{
+			if (bVisible)
+				CGameProcedure::s_pUIMgr->SetVisibleFocusedUI(this);
+			else
+				CGameProcedure::s_pUIMgr->ReFocusUI();
 		}
 	}
 }
@@ -895,12 +913,10 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 					{
 						if (pInven->m_pMyInvWnd[iOrder] != nullptr)
 							pInven->m_pMyInvWnd[iOrder]->pUIIcon = nullptr;
-						delete pInven->m_pMyInvWnd[iOrder];
 						pInven->m_pMyInvWnd[iOrder] = nullptr;
 
 						if (spItem != nullptr)
 							spItem->pUIIcon = nullptr;
-						delete pInven->m_pMyInvWnd[iOrder];
 						spItem = nullptr;
 					}
 				}
