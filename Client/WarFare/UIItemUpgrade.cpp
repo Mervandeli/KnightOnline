@@ -581,27 +581,25 @@ void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFo
 		GetItemFromInv();
 		GoldUpdate();
 	}
-	else // if (!bVisible)
+	else
 	{
-		if (bWork)
-		{
-			if (m_pUITooltipDlg != nullptr)
-				m_pUITooltipDlg->DisplayTooltipsDisable();
+		if (m_pUITooltipDlg != nullptr)
+			m_pUITooltipDlg->DisplayTooltipsDisable();
 
-			if (GetState() == UI_STATE_ICON_MOVING)
-				CancelIconDrop(m_pSelectedItem);
+		if (GetState() == UI_STATE_ICON_MOVING)
+			CancelIconDrop(m_pSelectedItem);
 
-			// Reset the item's inventory area.
-			ResetUpgradeInventory();
-			AnimClose();
-		}
-		if (bReFocus)
-		{
-			if (bVisible)
-				CGameProcedure::s_pUIMgr->SetVisibleFocusedUI(this);
-			else
-				CGameProcedure::s_pUIMgr->ReFocusUI();
-		}
+		// Reset the item's inventory area.
+		ResetUpgradeInventory();
+		AnimClose();
+	}
+
+	if (bReFocus)
+	{
+		if (bVisible)
+			CGameProcedure::s_pUIMgr->SetVisibleFocusedUI(this);
+		else
+			CGameProcedure::s_pUIMgr->ReFocusUI();
 	}
 }
 
