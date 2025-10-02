@@ -88,7 +88,6 @@ private:
 	void GetItemFromInv();
 	void ResetUpgradeInventory();
 	void GoldUpdate();
-	bool IsTrina(uint32_t dwID) const;
 	bool IsAllowedUpgradeItem(const __IconItemSkill* spItem) const;
 	void SendToServerUpgradeMsg();
 

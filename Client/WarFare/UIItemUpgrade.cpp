@@ -702,20 +702,11 @@ void CUIItemUpgrade::ResetUpgradeInventory()
 
 			ShowItemCount(spItem, iOrder);
 		}
+		m_iUpgradeScrollSlotInvPos[i] = -1;
 	}
 
 	m_bUpgradeSucceeded = false;
 	m_bUpgradeInProgress = false;
-}
-
-bool CUIItemUpgrade::IsTrina(uint32_t dwID) const
-{
-	static const std::unordered_set<int> upgradeItemIDs =
-	{
-		// Trina
-		379256000, 379257000, 379258000, 700002000
-	};
-	return upgradeItemIDs.contains(dwID);
 }
 
 // Checks if the given item is allowed to be upgraded (unique or upgrade type).
@@ -904,10 +895,12 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 					{
 						if (pInven->m_pMyInvWnd[iOrder] != nullptr)
 							pInven->m_pMyInvWnd[iOrder]->pUIIcon = nullptr;
+						delete pInven->m_pMyInvWnd[iOrder];
 						pInven->m_pMyInvWnd[iOrder] = nullptr;
 
 						if (spItem != nullptr)
 							spItem->pUIIcon = nullptr;
+						delete pInven->m_pMyInvWnd[iOrder];
 						spItem = nullptr;
 					}
 				}
@@ -1120,7 +1113,7 @@ bool CUIItemUpgrade::IsMaterialSlotCompatible(__IconItemSkill* pSrc) const
 	if (pSrc->pItemBasic->dwEffectID2 != ITEM_EFFECT2_ITEM_UPGRADE_REQ)
 		return false;
 
-	bool bHasTrina = false;
+	bool bHasConsumable = false;
 	bool bHasScroll = false;
 
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
@@ -1129,19 +1122,19 @@ bool CUIItemUpgrade::IsMaterialSlotCompatible(__IconItemSkill* pSrc) const
 		if (iOrder < 0)
 			continue;
 
-		if (IsTrina(m_pMyUpgradeInv[iOrder]->pItemBasic->dwID))
-			bHasTrina = true;
+		if (m_pMyUpgradeInv[iOrder]->pItemBasic->byClass == ITEM_CLASS_CONSUMABLE)
+			bHasConsumable = true;
 		else
 			bHasScroll = true;
 	}
 
-	if (bHasTrina && IsTrina(pSrc->pItemBasic->dwID))
+	if (bHasConsumable && pSrc->pItemBasic->byClass == ITEM_CLASS_CONSUMABLE)
 		return false;
 
-	if (bHasScroll && !IsTrina(pSrc->pItemBasic->dwID))
+	if (bHasScroll && pSrc->pItemBasic->byClass != ITEM_CLASS_CONSUMABLE)
 		return false;
 
-	if (bHasTrina && bHasScroll)
+	if (bHasConsumable && bHasScroll)
 		return false;
 
 	return true;
