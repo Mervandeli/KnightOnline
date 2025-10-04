@@ -56,6 +56,7 @@ private:
 	int					m_iSelectedItemSourcePos;
 
 	__IconItemSkill*	m_pMyUpgradeInv[MAX_ITEM_INVENTORY];
+	__IconItemSkill*	m_pMaterialSlot[MAX_ITEM_UPGRADE_SLOT];
 	int8_t				m_iUpgradeScrollSlotInvPos[MAX_ITEM_UPGRADE_SLOT];
 	int8_t				m_iUpgradeItemSlotInvPos;
 
@@ -99,7 +100,6 @@ private:
 	void CreateUIIconForItem(__IconItemSkill* spItem);
 	void SetupIconArea(__IconItemSkill* spItem, CN3UIArea* pArea);
 	bool MaterialSlotDrop(__IconItemSkill* spItem, int iOrder);
-	void CleanAreaSlot(CN3UIArea* pArea);
 	bool IsMaterialSlotCompatible(__IconItemSkill* pSrc) const;
 	void Tick() override;
 };

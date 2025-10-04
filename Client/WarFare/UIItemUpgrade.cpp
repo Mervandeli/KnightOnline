@@ -216,7 +216,7 @@ void CUIItemUpgrade::Render()
 		&& m_pSelectedItem != nullptr
 		&& m_pSelectedItem->pUIIcon != nullptr)
 		m_pSelectedItem->pUIIcon->Render();
-
+	
 	if (bTooltipRender
 		&& m_pSelectedItem != nullptr)
 		m_pUITooltipDlg->DisplayTooltipsEnable(ptCur.x, ptCur.y, m_pSelectedItem, false, false);
@@ -709,11 +709,14 @@ void CUIItemUpgrade::ResetUpgradeInventory()
 			if (spItem->iCount > 1
 				&& spItem->IsStackable())
 			{
-				CleanAreaSlot(m_pSlotArea[i]);
+				if (m_pMaterialSlot[i]->pUIIcon != nullptr)
+				{
+					delete m_pMaterialSlot[i]->pUIIcon;
+					m_pMaterialSlot[i]->pUIIcon = nullptr;
+				}
 				++spItem->iCount;
 			}
-
-			ShowItemCount(spItem, iOrder);
+			m_pMaterialSlot[i] = nullptr;
 		}
 		m_iUpgradeScrollSlotInvPos[i] = -1;
 	}
@@ -828,13 +831,21 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 			int iOrder = m_iUpgradeScrollSlotInvPos[i];
 			if (iOrder != -1)
 			{
-				__IconItemSkill* spItem = m_pMyUpgradeInv[iOrder];
+				__IconItemSkill* spItem = m_pMaterialSlot[i];
 				if (spItem != nullptr)
 				{
 					if (spItem->iCount > 1)
 					{
 						--spItem->iCount;
 						--pInven->m_pMyInvWnd[iOrder]->iCount;
+
+						if (m_pMaterialSlot[i] != nullptr)
+						{
+							if (m_pMaterialSlot[i]->pUIIcon != nullptr)
+								delete m_pMaterialSlot[i]->pUIIcon;
+							delete m_pMaterialSlot[i];
+							m_pMaterialSlot[i] = nullptr;
+						}
 					}
 					else
 					{
@@ -842,18 +853,20 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 						{
 							delete pInven->m_pMyInvWnd[iOrder]->pUIIcon;
 							pInven->m_pMyInvWnd[iOrder]->pUIIcon = nullptr;
+							delete pInven->m_pMyInvWnd[iOrder];
 							pInven->m_pMyInvWnd[iOrder] = nullptr;
 						}
 
 						if (spItem != nullptr)
 							spItem->pUIIcon = nullptr;
-
+						delete spItem;
 						spItem = nullptr;
+
+						m_pMaterialSlot[i] = nullptr;
 					}
 				}
 			}
 
-			CleanAreaSlot(m_pSlotArea[i]);
 			m_iUpgradeScrollSlotInvPos[i] = -1;
 		}
 
@@ -896,28 +909,42 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 			int iOrder = m_iUpgradeScrollSlotInvPos[i];
 			if (iOrder != -1)
 			{
-				__IconItemSkill* spItem = m_pMyUpgradeInv[iOrder];
+				__IconItemSkill* spItem = m_pMaterialSlot[i];
 				if (spItem != nullptr)
 				{
 					if (spItem->iCount > 1)
 					{
 						--spItem->iCount;
 						--pInven->m_pMyInvWnd[iOrder]->iCount;
+
+						if (m_pMaterialSlot[i] != nullptr)
+						{
+							if (m_pMaterialSlot[i]->pUIIcon != nullptr)
+								delete m_pMaterialSlot[i]->pUIIcon;
+							delete m_pMaterialSlot[i];
+							m_pMaterialSlot[i] = nullptr;
+						}
 					}
 					else
 					{
 						if (pInven->m_pMyInvWnd[iOrder] != nullptr)
+						{
+							delete pInven->m_pMyInvWnd[iOrder]->pUIIcon;
 							pInven->m_pMyInvWnd[iOrder]->pUIIcon = nullptr;
-						pInven->m_pMyInvWnd[iOrder] = nullptr;
+							delete pInven->m_pMyInvWnd[iOrder];
+							pInven->m_pMyInvWnd[iOrder] = nullptr;
+						}
 
 						if (spItem != nullptr)
 							spItem->pUIIcon = nullptr;
+						delete spItem;
 						spItem = nullptr;
+
+						m_pMaterialSlot[i] = nullptr;
 					}
 				}
 			}
 
-			CleanAreaSlot(m_pSlotArea[i]);
 			m_iUpgradeScrollSlotInvPos[i] = -1;
 		}
 
@@ -1278,25 +1305,16 @@ void CUIItemUpgrade::ShowItemCount(__IconItemSkill* spItem, int iOrder)
 	if (spItem == nullptr)
 		return;
 
-	if (spItem->IsStackable())
+	if (spItem->IsStackable() && spItem->iCount > 1)
 	{
 		CN3UIString* pStr = m_pInvString[iOrder];
 		if (pStr == nullptr)
 			return;
 
-		if (spItem->iCount > 1)
-		{
-			pStr->SetStringAsInt(spItem->iCount);
-			if (GetState() == UI_STATE_ICON_MOVING && m_pSelectedItem != nullptr)
-				pStr->SetStringAsInt(spItem->iCount - 1);
-			pStr->SetVisible(true);
-			pStr->Render();
-			pStr->SetParent(this);
-		}
-		else
-		{
-			pStr->SetVisible(false);
-		}
+		pStr->SetStringAsInt(spItem->iCount);
+		pStr->SetVisible(true);
+		pStr->Render();
+		pStr->SetParent(this);
 	}
 	else
 	{
@@ -1319,19 +1337,6 @@ bool CUIItemUpgrade::MaterialSlotDrop(__IconItemSkill* spItem, int iOrder)
 	SetupIconArea(spItem, pArea);
 	ShowItemCount(m_pMyUpgradeInv[iSourceOrder], iSourceOrder); // Update inv item count
 	m_iUpgradeScrollSlotInvPos[iOrder] = iSourceOrder;
-
+	m_pMaterialSlot[iOrder] = m_pMyUpgradeInv[iSourceOrder];
 	return true;
-}
-
-void CUIItemUpgrade::CleanAreaSlot(CN3UIArea* pArea)
-{
-	for (auto itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
-	{
-		CN3UIBase* pChild = (*itor);
-		int x = pChild->GetRegion().left / 2 + pChild->GetRegion().right / 2;
-		int y = pChild->GetRegion().top / 2 + pChild->GetRegion().bottom / 2;
-		if (pChild->UIType() == UI_TYPE_ICON
-			&& pArea->IsIn(x, y))
-			delete pChild;
-	}
 }
