@@ -293,6 +293,9 @@ void CUIItemUpgrade::GetItemFromInv()
 				delete m_pMyUpgradeInv[i]->pUIIcon;
 				m_pMyUpgradeInv[i]->pUIIcon = nullptr;
 			}
+			
+			if (m_pSelectedItem == m_pMyUpgradeInv[i])
+				m_pSelectedItem = nullptr;
 
 			delete m_pMyUpgradeInv[i];
 			m_pMyUpgradeInv[i] = nullptr;
@@ -522,6 +525,9 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 							spItem->pUIIcon = nullptr;
 						}
 
+						if (m_pSelectedItem == spItem)
+							m_pSelectedItem = nullptr;
+
 						delete spItem;
 						spItem = nullptr;
 					}
@@ -716,6 +722,10 @@ void CUIItemUpgrade::ResetUpgradeInventory()
 				}
 				++spItem->iCount;
 			}
+
+			if (m_pSelectedItem == m_pMaterialSlot[i])
+				m_pSelectedItem = nullptr;
+
 			m_pMaterialSlot[i] = nullptr;
 		}
 		m_iUpgradeScrollSlotInvPos[i] = -1;
@@ -834,6 +844,9 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 				__IconItemSkill* spItem = m_pMaterialSlot[i];
 				if (spItem != nullptr)
 				{
+					if (m_pSelectedItem == spItem)
+						m_pSelectedItem = nullptr;
+
 					if (spItem->iCount > 1)
 					{
 						--spItem->iCount;
@@ -889,6 +902,9 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 				delete m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos]->pUIIcon;
 				m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos]->pUIIcon = nullptr;
 			}
+			
+			if (m_pSelectedItem == m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos])
+				m_pSelectedItem = nullptr;
 
 			delete m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos];
 			m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos] = nullptr;
@@ -912,6 +928,9 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 				__IconItemSkill* spItem = m_pMaterialSlot[i];
 				if (spItem != nullptr)
 				{
+					if (m_pSelectedItem == spItem)
+						m_pSelectedItem = nullptr;
+
 					if (spItem->iCount > 1)
 					{
 						--spItem->iCount;
@@ -955,6 +974,9 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 				delete m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos]->pUIIcon;
 				m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos]->pUIIcon = nullptr;
 			}
+
+			if (m_pSelectedItem == m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos])
+				m_pSelectedItem = nullptr;
 
 			delete m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos];
 			m_pMyUpgradeInv[m_iUpgradeItemSlotInvPos] = nullptr;
@@ -1337,6 +1359,6 @@ bool CUIItemUpgrade::MaterialSlotDrop(__IconItemSkill* spItem, int iOrder)
 	SetupIconArea(spItem, pArea);
 	ShowItemCount(m_pMyUpgradeInv[iSourceOrder], iSourceOrder); // Update inv item count
 	m_iUpgradeScrollSlotInvPos[iOrder] = iSourceOrder;
-	m_pMaterialSlot[iOrder] = m_pMyUpgradeInv[iSourceOrder];
+	m_pMaterialSlot[iOrder] = spItem;
 	return true;
 }
