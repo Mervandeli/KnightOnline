@@ -215,8 +215,45 @@ void CUIItemUpgrade::Render()
 	if (GetState() == UI_STATE_ICON_MOVING
 		&& m_pSelectedItem != nullptr
 		&& m_pSelectedItem->pUIIcon != nullptr)
-		m_pSelectedItem->pUIIcon->Render();
-	
+			m_pSelectedItem->pUIIcon->Render();
+
+	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
+	{
+		CN3UIString* pStr = m_pInvString[i];
+
+		if (m_pMyUpgradeInv[i] == nullptr)
+		{
+			if (pStr != nullptr)
+			{
+				pStr->SetVisible(false);
+			}
+			continue;
+		}
+			
+		if (m_pMyUpgradeInv[i]->IsStackable()
+			&& m_pMyUpgradeInv[i]->iCount > 1)
+		{
+			if (GetState() == UI_STATE_ICON_MOVING && i == m_iSelectedItemSourcePos)
+			{
+				pStr->SetStringAsInt(m_pMyUpgradeInv[m_iSelectedItemSourcePos]->iCount - 1);
+				pStr->Render();
+			}
+			else
+			{
+				if (m_pMyUpgradeInv[i]->pUIIcon->IsVisible())
+				{
+					pStr->SetVisible(true);
+					pStr->SetStringAsInt(m_pMyUpgradeInv[i]->iCount);
+					pStr->Render();
+				}
+				else
+				{
+					pStr->SetVisible(false);
+				}
+			}
+		}
+	}
+
 	if (bTooltipRender
 		&& m_pSelectedItem != nullptr)
 		m_pUITooltipDlg->DisplayTooltipsEnable(ptCur.x, ptCur.y, m_pSelectedItem, false, false);
@@ -306,7 +343,6 @@ void CUIItemUpgrade::GetItemFromInv()
 			__IconItemSkill* spItem = new __IconItemSkill(*pInven->m_pMyInvWnd[i]);
 			CreateUIIconForItem(spItem);
 			SetupIconArea(spItem, m_pInvArea[i]);
-			ShowItemCount(spItem, i);
 			m_pMyUpgradeInv[i] = spItem;
 		}
 	}
@@ -364,7 +400,6 @@ void CUIItemUpgrade::CancelIconDrop(__IconItemSkill* spItem)
 		return;
 
 	SetupIconArea(spItem, m_pInvArea[iOrder]);
-	ShowItemCount(spItem, iOrder);
 	m_pSelectedItem = nullptr;
 	m_iSelectedItemSourcePos = -1;
 }
@@ -492,7 +527,6 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			{
 				__IconItemSkill* pNew = new __IconItemSkill(*spItem);
 				CreateUIIconForItem(pNew);
-				ShowItemCount(spItem, iOrder);
 				m_pSelectedItem = pNew;
 			}
 
@@ -514,8 +548,6 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				if (spItem->iCount > 1
 					&& spItem->IsStackable())
 				{
-					ShowItemCount(spItem, iOrder);
-
 					// Clean divided item
 					if (spItem != nullptr)
 					{
@@ -1111,12 +1143,12 @@ void CUIItemUpgrade::UpdateFlipFlopAnimation()
 		++m_iCurrentFrame;
 
 		if (m_iCurrentFrame >= FLIPFLOP_MAX_FRAMES)
-		{
-			HideAllAnimationFrames();
+	{
+		HideAllAnimationFrames();
 
-			m_eAnimationState = AnimationState::Result;
-			m_fAnimationTimer = 0.0f;
-		}
+		m_eAnimationState = AnimationState::Result;
+		m_fAnimationTimer = 0.0f;
+	}
 		else
 		{
 			FlipFlopAnim();
@@ -1321,31 +1353,6 @@ bool CUIItemUpgrade::HandleInventoryIconRightClick(__IconItemSkill* spItem)
 	return false;
 }
 
-void CUIItemUpgrade::ShowItemCount(__IconItemSkill* spItem, int iOrder)
-{
-	// Display the count for items that should show a count.
-	if (spItem == nullptr)
-		return;
-
-	if (spItem->IsStackable() && spItem->iCount > 1)
-	{
-		CN3UIString* pStr = m_pInvString[iOrder];
-		if (pStr == nullptr)
-			return;
-
-		pStr->SetStringAsInt(spItem->iCount);
-		pStr->SetVisible(true);
-		pStr->Render();
-		pStr->SetParent(this);
-	}
-	else
-	{
-		CN3UIString* pStr = m_pInvString[iOrder];
-		if (pStr != nullptr)
-			pStr->SetVisible(false);
-	}
-}
-
 bool CUIItemUpgrade::MaterialSlotDrop(__IconItemSkill* spItem, int iOrder)
 {
 	CN3UIArea* pArea = m_pSlotArea[iOrder];
@@ -1357,7 +1364,6 @@ bool CUIItemUpgrade::MaterialSlotDrop(__IconItemSkill* spItem, int iOrder)
 		--m_pMyUpgradeInv[iSourceOrder]->iCount;
 
 	SetupIconArea(spItem, pArea);
-	ShowItemCount(m_pMyUpgradeInv[iSourceOrder], iSourceOrder); // Update inv item count
 	m_iUpgradeScrollSlotInvPos[iOrder] = iSourceOrder;
 	m_pMaterialSlot[iOrder] = spItem;
 	return true;
