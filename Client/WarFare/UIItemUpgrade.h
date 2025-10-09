@@ -8,12 +8,14 @@ enum e_UIWND_DISTRICT;
 struct __IconItemSkill;
 class CN3UIIcon;
 class CUIImageTooltipDlg;
+class CUIMsgBoxOkCancel;
 class CUIItemUpgrade : public CN3UIBase
 {
 private:
 	static constexpr int MAX_ITEM_UPGRADE_SLOT	= 9;	// Max items in the item upgrade UI.
 	static constexpr int MAX_UPGRADE_MATERIAL	= 10;	// Max items in the item upgrade UI.
 	static constexpr int FLIPFLOP_MAX_FRAMES	= 19;
+	static constexpr int CHILD_UI_MSGBOX_OKCANCEL = 1;
 
 	enum class AnimationState
 	{
@@ -51,6 +53,7 @@ private:
 	CN3UIImage*			m_pImageCover2;
 
 	CUIImageTooltipDlg* m_pUITooltipDlg;
+	CUIMsgBoxOkCancel* m_pUIMsgBoxOkCancel;
 
 	__IconItemSkill*	m_pSelectedItem;
 	int					m_iSelectedItemSourcePos;
@@ -89,6 +92,7 @@ private:
 	void GoldUpdate();
 	bool IsAllowedUpgradeItem(const __IconItemSkill* spItem) const;
 	void SendToServerUpgradeMsg();
+	void CallBackProc(int iID, uint32_t dwFlag);
 
 	void FlipFlopAnim();
 	void AnimClose();

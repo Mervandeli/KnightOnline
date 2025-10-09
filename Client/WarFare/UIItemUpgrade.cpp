@@ -10,6 +10,7 @@
 #include "UIImageTooltipDlg.h"
 #include "UIInventory.h"
 #include "UIManager.h"
+#include "UIMsgBoxOkCancel.h"
 
 #include "text_resources.h"
 
@@ -67,6 +68,7 @@ CUIItemUpgrade::CUIItemUpgrade()
 	m_pImageCover2 = nullptr;
 
 	m_pUITooltipDlg = nullptr;
+	m_pUIMsgBoxOkCancel = nullptr;
 
 	m_pSelectedItem = nullptr;
 	m_iSelectedItemSourcePos = -1;
@@ -135,6 +137,7 @@ void CUIItemUpgrade::Release()
 	m_pImageCover2 = nullptr;
 
 	m_pUITooltipDlg = nullptr;
+	m_pUIMsgBoxOkCancel = nullptr;
 
 	m_pSelectedItem = nullptr;
 	m_iSelectedItemSourcePos = -1;
@@ -491,8 +494,8 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		}
 		else if (pSender == m_pBtnOk)
 		{
-			if (!m_bUpgradeInProgress)
-				SendToServerUpgradeMsg();
+			if (!m_bUpgradeInProgress && m_pUIMsgBoxOkCancel != nullptr)
+				m_pUIMsgBoxOkCancel->ShowWindow(CHILD_UI_MSGBOX_OKCANCEL,this);
 		}
 
 		return true;
@@ -706,6 +709,19 @@ bool CUIItemUpgrade::Load(HANDLE hFile)
 		m_pUITooltipDlg->LoadFromFile(pTbl->szItemInfo);
 		m_pUITooltipDlg->InitPos();
 		m_pUITooltipDlg->SetVisible(false);
+
+		if (m_pUIMsgBoxOkCancel == nullptr)
+			m_pUIMsgBoxOkCancel = new CUIMsgBoxOkCancel();
+		m_pUIMsgBoxOkCancel->Init(this);
+		m_pUIMsgBoxOkCancel->LoadFromFile(pTbl->szMsgBoxOkCancel);
+		std::string szMsg = fmt::format_text_resource(IDS_ITEM_UPPGRADE_MSG_OK_CANCEL);
+		m_pUIMsgBoxOkCancel->SetText(szMsg);
+		int iX = (m_rcRegion.right + m_rcRegion.left) / 2;
+		int iY = (m_rcRegion.bottom + m_rcRegion.top) / 2;
+		m_pUIMsgBoxOkCancel->SetPos(
+			iX - (m_pUIMsgBoxOkCancel->GetWidth() / 2),
+			iY - (m_pUIMsgBoxOkCancel->GetHeight() / 2) - 80);
+		m_pUIMsgBoxOkCancel->SetVisible(false);
 	}
 
 	return true;
@@ -1367,4 +1383,14 @@ bool CUIItemUpgrade::MaterialSlotDrop(__IconItemSkill* spItem, int iOrder)
 	m_iUpgradeScrollSlotInvPos[iOrder] = iSourceOrder;
 	m_pMaterialSlot[iOrder] = spItem;
 	return true;
+}
+void CUIItemUpgrade::CallBackProc(int iID, uint32_t dwFlag)
+{
+	if (iID == CHILD_UI_MSGBOX_OKCANCEL)
+	{
+		if (dwFlag == CUIMsgBoxOkCancel::CALLBACK_OK)
+			SendToServerUpgradeMsg();
+		else if (dwFlag == CUIMsgBoxOkCancel::CALLBACK_CANCEL)
+			m_pUIMsgBoxOkCancel->SetVisible(false);
+	}
 }
