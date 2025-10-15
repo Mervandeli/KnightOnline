@@ -46,7 +46,7 @@ bool CUIUpgradeSelect::ReceiveMessage(
 			CUIItemUpgrade* pUIItemUpgrade = CGameProcedure::s_pProcMain->m_pUIItemUpgrade;
 			if (pUIItemUpgrade != nullptr)
 			{
-				pUIItemUpgrade->Open();
+				pUIItemUpgrade->SetVisible(true);
 				pUIItemUpgrade->SetNpcID(m_iNpcID);
 			}
 
