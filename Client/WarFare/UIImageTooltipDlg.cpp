@@ -870,6 +870,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 			m_pStr[iIndex]->SetColor(m_CWhite);
 		else
 			m_pStr[iIndex]->SetColor(m_CRed);
+		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		iIndex++;
 	}
 	ERROR_EXCEPTION
@@ -1049,6 +1050,79 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 			m_pStr[iIndex]->SetColor(m_CRed);
 
 		iIndex++;
+	}
+	ERROR_EXCEPTION
+
+	if (spItem->pItemBasic != nullptr)
+	{
+		std::string szRemark = spItem->pItemBasic->szRemark;
+	
+		int strSize = spItem->pItemBasic->szRemark.size();
+		if (strSize > 0)
+		{
+			int splitPos = 0;
+			for (int i = 0; i < strSize; i++)
+			{
+				if (szRemark[i] == '(' || (szRemark[i] == ' ' && i > strSize / 2))
+				{
+					splitPos = i;
+					break;
+				}
+			}
+			if (splitPos > 0)
+			{
+				m_pStr[iIndex]->SetColor(m_CWhite);
+				m_pstdstr[iIndex] = fmt::format("*{}", szRemark.substr(0, splitPos));
+				m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
+
+				iIndex++;
+
+				m_pStr[iIndex]->SetColor(m_CWhite);
+				m_pstdstr[iIndex] = fmt::format("{}*", szRemark.substr(splitPos));
+				m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
+
+				iIndex++;
+			}
+			else
+			{
+				m_pStr[iIndex]->SetColor(m_CWhite);
+				m_pstdstr[iIndex] = fmt::format("*{}*", szRemark);
+				m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
+
+				iIndex++;
+			}
+		}
+	}
+	ERROR_EXCEPTION
+
+	if (spItem->pItemExt != nullptr)
+	{
+		e_ItemAttrib eTA = (e_ItemAttrib) (spItem->pItemExt->byMagicOrRare);
+		switch (eTA)
+		{
+			case ITEM_ATTRIB_UNIQUE:
+				m_pStr[iIndex]->SetColor(m_CGold);
+				m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_UNIQUE);
+				m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
+				iIndex++;
+				break;
+			case ITEM_ATTRIB_UPGRADE:
+				if (spItem->pItemBasic != nullptr)
+				{
+					if (spItem->pItemBasic->byIDK3 == 1)
+						m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_LOW_CLASS);
+					else if (spItem->pItemBasic->byIDK3 == 2)
+						m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_MIDDLE_CLASS);
+					else if (spItem->pItemBasic->byIDK3 == 3)
+						m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_HIGH_CLASS);
+					else
+						break;
+					m_pStr[iIndex]->SetColor(m_CGreen);
+					m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
+					iIndex++;
+				}
+				break;
+		}
 	}
 	ERROR_EXCEPTION
 
