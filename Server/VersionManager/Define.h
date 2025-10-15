@@ -14,7 +14,6 @@
 constexpr int MAX_USER				= 3000;
 
 constexpr int _LISTEN_PORT			= 15100;
-constexpr int CLIENT_SOCKSIZE		= 10;
 constexpr int DB_PROCESS_TIMEOUT	= 100;
 
 ////////////////////////////////////////////////////////////
@@ -32,15 +31,6 @@ constexpr int DB_PROCESS_TIMEOUT	= 100;
 #define STATE_CONNECTED			0X01
 #define STATE_DISCONNECTED		0X02
 #define STATE_GAMESTART			0x03
-
-// Socket type
-#define TYPE_ACCEPT				0x01
-#define TYPE_CONNECT			0x02
-
-// Overlapped flag
-#define OVL_RECEIVE				0X01
-#define OVL_SEND				0X02
-#define OVL_CLOSE				0X03
 ////////////////////////////////////////////////////////////
 
 typedef union
@@ -135,19 +125,19 @@ inline void SetShort(char* tBuf, int sShort, int& index)
 {
 	int16_t temp = (int16_t) sShort;
 
-	CopyMemory(tBuf + index, &temp, 2);
+	memcpy(tBuf + index, &temp, 2);
 	index += 2;
 }
 
 inline void SetDWORD(char* tBuf, uint32_t sDWORD, int& index)
 {
-	CopyMemory(tBuf + index, &sDWORD, 4);
+	memcpy(tBuf + index, &sDWORD, 4);
 	index += 4;
 }
 
 inline void Setfloat(char* tBuf, float sFloat, int& index)
 {
-	CopyMemory(tBuf + index, &sFloat, 4);
+	memcpy(tBuf + index, &sFloat, 4);
 	index += 4;
 }
 
@@ -184,7 +174,7 @@ inline void SetVarString(char* tBuf, char* sBuf, int len, int& index)
 	*(tBuf + index) = (uint8_t) len;
 	index ++;
 
-	CopyMemory(tBuf + index, sBuf, len);
+	memcpy(tBuf + index, sBuf, len);
 	index += len;
 }
 

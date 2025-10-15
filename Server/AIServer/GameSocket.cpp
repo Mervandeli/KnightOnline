@@ -35,7 +35,8 @@ extern CRITICAL_SECTION g_region_critical;
 	1. RecvUserInfo(), RecvAttackReq(), RecvUserUpdate() 수정
 */
 
-CGameSocket::CGameSocket()
+CGameSocket::CGameSocket(SocketManager* socketManager)
+	: TcpServerSocket(socketManager)
 {
 	//m_pParty = nullptr;
 }
@@ -50,19 +51,119 @@ CGameSocket::~CGameSocket()
 
 void CGameSocket::Initialize()
 {
-	m_sSocketID = -1;
+	_zoneNo = -1;
 	m_pMain = (CServerDlg*) AfxGetApp()->GetMainWnd();
 	//m_pParty = new CParty;
 	//m_pParty->Initialize();
 	m_Party.Initialize();
+
+	TcpServerSocket::Initialize();
+}
+
+bool CGameSocket::PullOutCore(char*& data, int& length)
+{
+	uint8_t* pTmp;
+	int			len;
+	bool		foundCore;
+	MYSHORT		slen;
+
+	len = _recvCircularBuffer.GetValidCount();
+
+	if (len == 0
+		|| len < 0)
+		return false;
+
+	pTmp = new uint8_t[len];
+
+	_recvCircularBuffer.GetData((char*) pTmp, len);
+
+	foundCore = false;
+
+	int	sPos = 0, ePos = 0;
+
+	for (int i = 0; i < len && !foundCore; i++)
+	{
+		if (i + 2 >= len)
+			break;
+
+		if (pTmp[i] == PACKET_START1
+			&& pTmp[i + 1] == PACKET_START2)
+		{
+			sPos = i + 2;
+
+			slen.b[0] = pTmp[sPos];
+			slen.b[1] = pTmp[sPos + 1];
+
+			length = slen.i;
+
+			if (length < 0)
+				goto cancelRoutine;
+
+			if (length > len)
+				goto cancelRoutine;
+
+			ePos = sPos + length + 2;
+
+			if ((ePos + 2) > len)
+				goto cancelRoutine;
+//			ASSERT(ePos+2 <= len);
+
+			if (pTmp[ePos] == PACKET_END1
+				&& pTmp[ePos + 1] == PACKET_END2)
+			{
+				data = new char[length + 1];
+				memcpy(data, (pTmp + sPos + 2), length);
+				data[length] = 0;
+				foundCore = true;
+//				int head = _recvCircularBuffer.GetHeadPos(), tail = _recvCircularBuffer.GetTailPos();
+//				TRACE("data : %s, len : %d\n", data, length);
+//				TRACE("head : %d, tail : %d\n", head, tail );
+				break;
+			}
+			else
+			{
+				_recvCircularBuffer.HeadIncrease(3);
+				break;
+			}
+		}
+	}
+
+	if (foundCore)
+		_recvCircularBuffer.HeadIncrease(6 + length); // 6: header 2+ end 2+ length 2
+
+cancelRoutine:
+	delete[] pTmp;
+	return foundCore;
+}
+
+int CGameSocket::Send(char* pBuf, int length)
+{
+	constexpr int PacketHeaderSize = 6;
+
+	_ASSERT(length >= 0);
+	_ASSERT((length + PacketHeaderSize) <= MAX_PACKET_SIZE);
+
+	if (length < 0
+		|| (length + PacketHeaderSize) > MAX_PACKET_SIZE)
+		return -1;
+
+	char sendBuffer[MAX_PACKET_SIZE];
+	int index = 0;
+	SetByte(sendBuffer, PACKET_START1, index);
+	SetByte(sendBuffer, PACKET_START2, index);
+	SetShort(sendBuffer, length, index);
+	SetString(sendBuffer, pBuf, length, index);
+	SetByte(sendBuffer, PACKET_END1, index);
+	SetByte(sendBuffer, PACKET_END2, index);
+	return QueueAndSend(sendBuffer, index);
 }
 
 void CGameSocket::CloseProcess()
 {
-	spdlog::info("GameSocket::CloseProcess: socketId={} sSid={}", m_sSocketID, m_Sid);
-	m_pMain->DeleteAllUserList(m_sSocketID);
+	spdlog::info("GameSocket::CloseProcess: zoneNo={} socketId={}", _zoneNo, _socketId);
+	m_pMain->DeleteAllUserList(_zoneNo);
 	Initialize();
-	CIOCPSocket2::CloseProcess();
+	TcpServerSocket::CloseProcess();
 }
 
 void CGameSocket::Parsing(int length, char* pData)
@@ -184,7 +285,7 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 		Send(pData, outindex);
 	}
 
-	m_sSocketID = byZoneNumber;
+	_zoneNo = byZoneNumber;
 
 	SetByte(pData, AI_SERVER_CONNECT, outindex);
 	SetByte(pData, byZoneNumber, outindex);
@@ -236,7 +337,6 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 	}
 	else
 	{
-		//m_pMain->PostMessage( WM_GAMESERVER_LOGIN, (LONG)byZoneNumber );
 		m_pMain->m_sSocketCount++;
 		spdlog::info("GameSocket::RecvServerConnect: Ebenezer connected [zone={}, sockets={}]",
 			byZoneNumber, m_pMain->m_sSocketCount);
@@ -609,7 +709,7 @@ void CGameSocket::RecvAttackReq(char* pBuf)
 	sAmountRight = GetShort(pBuf, index);
 //
 
-	//TRACE(_T("RecvAttackReq : [sid=%d, tid=%d, zone_num=%d] \n"), sid, tid, m_sSocketID);
+	//TRACE(_T("RecvAttackReq : [sid=%d, tid=%d, zone_num=%d] \n"), sid, tid, _zoneNo);
 
 	CUser* pUser = m_pMain->GetUserPtr(sid);
 	if (pUser == nullptr)

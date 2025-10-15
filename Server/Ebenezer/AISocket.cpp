@@ -29,19 +29,116 @@ static char THIS_FILE[] = __FILE__;
 
 extern CRITICAL_SECTION g_LogFile_critical;
 
-CAISocket::CAISocket(int zonenum)
+CAISocket::CAISocket(SocketManager* socketManager, int zoneNum)
+	: TcpClientSocket(socketManager)
 {
-	m_iZoneNum = zonenum;
-}
-
-CAISocket::~CAISocket()
-{
+	_zoneNum = zoneNum;
 }
 
 void CAISocket::Initialize()
 {
-	m_pMain = (CEbenezerDlg*) AfxGetApp()->GetMainWnd();
-	m_MagicProcess.m_pMain = m_pMain;
+	_main = (CEbenezerDlg*) AfxGetApp()->GetMainWnd();
+	_magicProcess.m_pMain = _main;
+
+	TcpClientSocket::Initialize();
+}
+
+bool CAISocket::PullOutCore(char*& data, int& length)
+{
+	uint8_t*	pTmp;
+	int			len;
+	bool		foundCore;
+	MYSHORT		slen;
+
+	len = _recvCircularBuffer.GetValidCount();
+
+	if (len == 0
+		|| len < 0)
+		return false;
+
+	pTmp = new uint8_t[len];
+
+	_recvCircularBuffer.GetData((char*) pTmp, len);
+
+	foundCore = false;
+
+	int	sPos = 0, ePos = 0;
+
+	for (int i = 0; i < len && !foundCore; i++)
+	{
+		if (i + 2 >= len)
+			break;
+
+		if (pTmp[i] == PACKET_START1
+			&& pTmp[i + 1] == PACKET_START2)
+		{
+			sPos = i + 2;
+
+			slen.b[0] = pTmp[sPos];
+			slen.b[1] = pTmp[sPos + 1];
+
+			length = slen.w;
+
+			if (length < 0)
+				goto cancelRoutine;
+
+			if (length > len)
+				goto cancelRoutine;
+
+			ePos = sPos + length + 2;
+
+			if ((ePos + 2) > len)
+				goto cancelRoutine;
+//			ASSERT(ePos+2 <= len);
+
+			if (pTmp[ePos] == PACKET_END1
+				&& pTmp[ePos + 1] == PACKET_END2)
+			{
+				data = new char[length + 1];
+				memcpy(data, (pTmp + sPos + 2), length);
+				data[length] = 0;
+				foundCore = true;
+//				int head = _recvCircularBuffer.GetHeadPos(), tail = _recvCircularBuffer.GetTailPos();
+//				TRACE("data : %s, len : %d\n", data, length);
+//				TRACE("head : %d, tail : %d\n", head, tail );
+				break;
+			}
+			else
+			{
+				_recvCircularBuffer.HeadIncrease(3);
+				break;
+			}
+		}
+	}
+
+	if (foundCore)
+		_recvCircularBuffer.HeadIncrease(6 + length); // 6: header 2+ end 2+ length 2
+
+cancelRoutine:
+	delete[] pTmp;
+	return foundCore;
+}
+
+int CAISocket::Send(char* pBuf, int length)
+{
+	constexpr int PacketHeaderSize = 6;
+
+	_ASSERT(length >= 0);
+	_ASSERT((length + PacketHeaderSize) <= MAX_PACKET_SIZE);
+
+	if (length < 0
+		|| (length + PacketHeaderSize) > MAX_PACKET_SIZE)
+		return -1;
+
+	char sendBuffer[MAX_PACKET_SIZE];
+	int index = 0;
+	SetByte(sendBuffer, PACKET_START1, index);
+	SetByte(sendBuffer, PACKET_START2, index);
+	SetShort(sendBuffer, length, index);
+	SetString(sendBuffer, pBuf, length, index);
+	SetByte(sendBuffer, PACKET_END1, index);
+	SetByte(sendBuffer, PACKET_END2, index);
+	return QueueAndSend(sendBuffer, index);
 }
 
 void CAISocket::Parsing(int len, char* pData)
@@ -142,11 +239,11 @@ void CAISocket::Parsing(int len, char* pData)
 
 void CAISocket::CloseProcess()
 {
-	spdlog::debug("AISocket::CloseProcess: closing socketID={}", m_Sid);
+	spdlog::debug("AISocket::CloseProcess: closing socketID={}", _socketId);
 	
 	Initialize();
 
-	CIOCPSocket2::CloseProcess();
+	TcpClientSocket::CloseProcess();
 }
 
 // sungyong 2002.05.23
@@ -168,59 +265,59 @@ void CAISocket::LoginProcess(char* pBuf)
 	else
 	{
 		std::wstring logstr = std::format(L"AIServer zone connected: {}", zone);
-		m_pMain->AddOutputMessage(logstr);
+		_main->AddOutputMessage(logstr);
 		spdlog::info("AISocket::LoginProcess: AIServer zone={} connected", zone);
 
 		if (byReConnect == 0)
 		{
-			m_pMain->m_sSocketCount++;
-			if (m_pMain->m_sSocketCount == MAX_AI_SOCKET)
+			_main->m_sSocketCount++;
+			if (_main->m_sSocketCount == MAX_AI_SOCKET)
 			{
-				m_pMain->m_bServerCheckFlag = true;
-				m_pMain->m_sSocketCount = 0;
+				_main->m_bServerCheckFlag = true;
+				_main->m_sSocketCount = 0;
 				spdlog::debug("AISocket::LoginProcess: all AI sockets connected, sending all user info...");
-				m_pMain->SendAllUserInfo();
+				_main->SendAllUserInfo();
 			}
 		}
 		else if (byReConnect == 1)
 		{
-			if (m_pMain->m_sReSocketCount == 0)
-				m_pMain->m_fReConnectStart = TimeGet();
+			if (_main->m_sReSocketCount == 0)
+				_main->m_fReConnectStart = TimeGet();
 
-			m_pMain->m_sReSocketCount++;
+			_main->m_sReSocketCount++;
 
 			spdlog::info("AISocket::LoginProcess: reconnect zone={} socketCount={}",
-				zone, m_pMain->m_sReSocketCount);
+				zone, _main->m_sReSocketCount);
 
 			fReConnectEndTime = TimeGet();
-			if (fReConnectEndTime > m_pMain->m_fReConnectStart + 120)
+			if (fReConnectEndTime > _main->m_fReConnectStart + 120)
 			{
 				// all sockets reconnected within 2 minutes
 				spdlog::info("AISocket::LoginProcess: sockets reconnected in under 2 minutes [sockets={}]",
-					m_pMain->m_sReSocketCount);
-				m_pMain->m_sReSocketCount = 0;
-				m_pMain->m_fReConnectStart = 0.0f;
+					_main->m_sReSocketCount);
+				_main->m_sReSocketCount = 0;
+				_main->m_fReConnectStart = 0.0f;
 			}
 
-			if (m_pMain->m_sReSocketCount == MAX_AI_SOCKET)
+			if (_main->m_sReSocketCount == MAX_AI_SOCKET)
 			{
 				fReConnectEndTime = TimeGet();
 
 				// 1분안에 모든 소켓이 재접됐다면...
-				if (fReConnectEndTime < m_pMain->m_fReConnectStart + 60)
+				if (fReConnectEndTime < _main->m_fReConnectStart + 60)
 				{
 					spdlog::info("AISocket::LoginProcess: sockets reconnected in under a minute [sockets={}]",
-					m_pMain->m_sReSocketCount);
-					m_pMain->m_bServerCheckFlag = true;
-					m_pMain->m_sReSocketCount = 0;
+					_main->m_sReSocketCount);
+					_main->m_bServerCheckFlag = true;
+					_main->m_sReSocketCount = 0;
 					spdlog::debug("AISocket::LoginProcess: sending all user info...");
-					m_pMain->SendAllUserInfo();
+					_main->SendAllUserInfo();
 				}
 				// 하나의 떨어진 소켓이라면...
 				else
 				{
-					m_pMain->m_sReSocketCount = 0;
-					m_pMain->m_fReConnectStart = 0.0f;
+					_main->m_sReSocketCount = 0;
+					_main->m_fReConnectStart = 0.0f;
 				}
 			}
 		}
@@ -233,7 +330,7 @@ void CAISocket::RecvServerInfo(char* pBuf)
 	uint8_t type = GetByte(pBuf, index);
 	uint8_t byZone = GetByte(pBuf, index);
 	CString logstr;
-	int size = static_cast<int>(m_pMain->m_ZoneArray.size());
+	int size = static_cast<int>(_main->m_ZoneArray.size());
 
 	if (type == SERVER_INFO_START)
 	{
@@ -243,23 +340,23 @@ void CAISocket::RecvServerInfo(char* pBuf)
 	{
 		int16_t sTotalMonster = GetShort(pBuf, index);
 		std::wstring logStr = std::format(L"NPC info received for zoneId {}", byZone);
-		m_pMain->AddOutputMessage(logStr);
+		_main->AddOutputMessage(logStr);
 		//Sleep(100);
 
-		m_pMain->m_sZoneCount++;
+		_main->m_sZoneCount++;
 		
-		if (m_pMain->m_sZoneCount == size)
+		if (_main->m_sZoneCount == size)
 		{
-			m_pMain->AddOutputMessage(_T("NPC info received for all zones"));
-			if (!m_pMain->m_bFirstServerFlag)
+			_main->AddOutputMessage(_T("NPC info received for all zones"));
+			if (!_main->m_bFirstServerFlag)
 			{
-				m_pMain->UserAcceptThread();
+				_main->UserAcceptThread();
 				spdlog::info("AISocket::RecvServerInfo: accepting user connections...");
 			}
 
-			m_pMain->m_sZoneCount = 0;
-			m_pMain->m_bFirstServerFlag = true;
-			m_pMain->m_bPointCheckFlag = true;
+			_main->m_sZoneCount = 0;
+			_main->m_bFirstServerFlag = true;
+			_main->m_bPointCheckFlag = true;
 			// 여기에서 Event Monster의 포인터를 미리 할당 하도록 하장~~
 			//InitEventMonster( sTotalMonster );
 		}
@@ -336,7 +433,7 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 			continue;		// 잘못된 monster 아이디 
 		}
 
-		C3DMap* pMap = m_pMain->GetMapByIndex(sZoneIndex);
+		C3DMap* pMap = _main->GetMapByIndex(sZoneIndex);
 		if (pMap == nullptr)
 		{
 			spdlog::error("AISocket::RecvNpcInfoAll: map not found for zoneIndex [serial={} npcId={} pictureId={} npcName={} zoneIndex={} x={} z={}]",
@@ -421,7 +518,7 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 
 		// TRACE(_T("Recv --> NpcUserInfoAll : uid=%d, sid=%d, name=%hs, x=%f, z=%f. gate=%d, objecttype=%d \n"), nid, sPid, szName, fPosX, fPosZ, byGateOpen, byObjectType);
 
-		if (!m_pMain->m_NpcMap.PutData(pNpc->m_sNid, pNpc))
+		if (!_main->m_NpcMap.PutData(pNpc->m_sNid, pNpc))
 		{
 			spdlog::error("AISocket::RecvNpcInfoAll: NpcMap put failed [serial={} npcId={} npcName={} zoneId={} x={} z={}]",
 				instanceId, npcId, npcName, pMap->m_nZoneNumber, fPosX, fPosZ);
@@ -461,7 +558,7 @@ void CAISocket::RecvNpcMoveResult(char* pBuf)
 	fPosY = Getfloat(pBuf, index);
 	fSecForMetor = Getfloat(pBuf, index);
 
-	CNpc* pNpc = m_pMain->m_NpcMap.GetData(nid);
+	CNpc* pNpc = _main->m_NpcMap.GetData(nid);
 	if (pNpc == nullptr)
 		return;
 
@@ -508,7 +605,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 	// user attack -> npc
 	if (type == 0x01)
 	{
-		pNpc = m_pMain->m_NpcMap.GetData(tid);
+		pNpc = _main->m_NpcMap.GetData(tid);
 		if (pNpc == nullptr)
 			return;
 
@@ -521,7 +618,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 		{
 			SetByte(pOutBuf, WIZ_DEAD, send_index);
 			SetShort(pOutBuf, tid, send_index);
-			m_pMain->Send_Region(pOutBuf, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
+			_main->Send_Region(pOutBuf, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
 		}
 		else
 		{
@@ -534,54 +631,52 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 			SetShort(pOutBuf, sid, send_index);
 			SetShort(pOutBuf, tid, send_index);
 
-			m_pMain->Send_Region(pOutBuf, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
-
+			_main->Send_Region(pOutBuf, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
 		}
 
-		if (sid >= 0
-			&& sid < MAX_USER
-			&& m_pMain->m_Iocport.m_SockArray[sid] != nullptr)
+		CUser* pSrcUser = _main->GetUserPtr(sid);
+		if (pSrcUser != nullptr)
 		{
-			((CUser*) (m_pMain->m_Iocport.m_SockArray[sid]))->SendTargetHP(0, tid, -damage);
+			pSrcUser->SendTargetHP(0, tid, -damage);
 			if (byAttackType != MAGIC_ATTACK && byAttackType != DURATION_ATTACK)
 			{
-				((CUser*) (m_pMain->m_Iocport.m_SockArray[sid]))->ItemWoreOut(DURABILITY_TYPE_ATTACK, damage);
+				pSrcUser->ItemWoreOut(DURABILITY_TYPE_ATTACK, damage);
 
 				// LEFT HAND!!! by Yookozuna
-				temp_damage = damage * ((CUser*) (m_pMain->m_Iocport.m_SockArray[sid]))->m_bMagicTypeLeftHand / 100;
+				temp_damage = damage * pSrcUser->m_bMagicTypeLeftHand / 100;
 
 				// LEFT HAND!!!
-				switch (((CUser*) (m_pMain->m_Iocport.m_SockArray[sid]))->m_bMagicTypeLeftHand)
+				switch (pSrcUser->m_bMagicTypeLeftHand)
 				{
 					// HP Drain
 					case ITEM_TYPE_HP_DRAIN:
-						((CUser*) (m_pMain->m_Iocport.m_SockArray[sid]))->HpChange(temp_damage, 0);
-						// TRACE(_T("%d : 흡수 HP : %d  ,  현재 HP : %d"), sid, temp_damage, ((CUser*)(m_pMain->m_Iocport.m_SockArray[sid]))->m_pUserData->m_sHp);
+						pSrcUser->HpChange(temp_damage, 0);
+						// TRACE(_T("%d : 흡수 HP : %d  ,  현재 HP : %d"), sid, temp_damage, pSrcUser->m_pUserData->m_sHp);
 						break;
 
 					// MP Drain
 					case ITEM_TYPE_MP_DRAIN:
-						((CUser*) (m_pMain->m_Iocport.m_SockArray[sid]))->MSpChange(temp_damage);
+						pSrcUser->MSpChange(temp_damage);
 						break;
 				}
 
 				temp_damage = 0;	// reset data;
 
 				// RIGHT HAND!!! by Yookozuna
-				temp_damage = damage * ((CUser*) (m_pMain->m_Iocport.m_SockArray[sid]))->m_bMagicTypeRightHand / 100;
+				temp_damage = damage * pSrcUser->m_bMagicTypeRightHand / 100;
 
 				// LEFT HAND!!!
-				switch (((CUser*) (m_pMain->m_Iocport.m_SockArray[sid]))->m_bMagicTypeRightHand)
+				switch (pSrcUser->m_bMagicTypeRightHand)
 				{
 					// HP Drain
 					case ITEM_TYPE_HP_DRAIN:
-						((CUser*) (m_pMain->m_Iocport.m_SockArray[sid]))->HpChange(temp_damage, 0);
-						// TRACE(_T("%d : 흡수 HP : %d  ,  현재 HP : %d"), sid, temp_damage, ((CUser*)(m_pMain->m_Iocport.m_SockArray[sid]))->m_pUserData->m_sHp);
+						pSrcUser->HpChange(temp_damage, 0);
+						// TRACE(_T("%d : 흡수 HP : %d  ,  현재 HP : %d"), sid, temp_damage, pSrcUser->m_pUserData->m_sHp);
 						break;
 
 					// MP Drain
 					case ITEM_TYPE_MP_DRAIN:
-						((CUser*) (m_pMain->m_Iocport.m_SockArray[sid]))->MSpChange(temp_damage);
+						pSrcUser->MSpChange(temp_damage);
 						break;
 				}
 			}
@@ -591,7 +686,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 		if (result == 0x02
 			|| result == 0x04)
 		{
-			C3DMap* pMap = m_pMain->GetMapByIndex(pNpc->m_sZoneIndex);
+			C3DMap* pMap = _main->GetMapByIndex(pNpc->m_sZoneIndex);
 			if (pMap == nullptr)
 				return;
 
@@ -611,18 +706,14 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 
 			//	성용씨! 대만 재미있어요? --;
 			if (pNpc->m_tNpcType == 2
-				&& sid >= 0
-				&& sid < MAX_USER)
-			{
-				if (m_pMain->m_Iocport.m_SockArray[sid] != nullptr)
-					((CUser*) (m_pMain->m_Iocport.m_SockArray[sid]))->GiveItem(900001000, 1);
-			}
+				&& pSrcUser != nullptr)
+				pSrcUser->GiveItem(900001000, 1);
 		}
 	}
 	// npc attack -> user
 	else if (type == 0x02)
 	{
-		pNpc = m_pMain->m_NpcMap.GetData(sid);
+		pNpc = _main->m_NpcMap.GetData(sid);
 		if (pNpc == nullptr)
 			return;
 
@@ -631,11 +722,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 		if (tid >= USER_BAND
 			&& tid < NPC_BAND)
 		{
-			if (tid >= 0
-				&& tid < MAX_USER
-				&& m_pMain->m_Iocport.m_SockArray[tid] != nullptr)
-				pUser = (CUser*) m_pMain->m_Iocport.m_SockArray[tid];
-
+			pUser = _main->GetUserPtr(tid);
 			if (pUser == nullptr)
 				return;
 
@@ -665,7 +752,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 			SetShort(pOutBuf, sid, send_index);
 			SetShort(pOutBuf, tid, send_index);
 
-			m_pMain->Send_Region(pOutBuf, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
+			_main->Send_Region(pOutBuf, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
 
 //			TRACE(_T("RecvNpcAttack : id=%hs, result=%d, AI_HP=%d, GM_HP=%d\n"), pUser->m_pUserData->m_id, result, sHP, pUser->m_pUserData->m_sHp);
 			//TRACE(_T("RecvNpcAttack ==> sid = %d, tid = %d, result = %d\n"), sid, tid, result);
@@ -697,15 +784,15 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 					SetByte(pOutBuf, COMMAND_AUTHORITY, send_index);
 					SetShort(pOutBuf, pUser->GetSocketID(), send_index);
 					SetByte(pOutBuf, pUser->m_pUserData->m_bFame, send_index);
-					m_pMain->Send_Region(pOutBuf, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX, pUser->m_RegionZ);
+					_main->Send_Region(pOutBuf, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX, pUser->m_RegionZ);
 					// sungyong tw
 					pUser->Send(pOutBuf, send_index);
 					// ~sungyong tw
 					spdlog::debug("AISocket::RecvNpcAttack: Dead Captain Deprive [charId={}]", pUser->m_pUserData->m_id);
 					if (pUser->m_pUserData->m_bNation == KARUS)
-						m_pMain->Announcement(KARUS_CAPTAIN_DEPRIVE_NOTIFY, KARUS);
+						_main->Announcement(KARUS_CAPTAIN_DEPRIVE_NOTIFY, KARUS);
 					else if (pUser->m_pUserData->m_bNation == ELMORAD)
-						m_pMain->Announcement(ELMORAD_CAPTAIN_DEPRIVE_NOTIFY, ELMORAD);
+						_main->Announcement(ELMORAD_CAPTAIN_DEPRIVE_NOTIFY, ELMORAD);
 				}
 
 				// 경비병에게 죽는 경우라면..
@@ -732,7 +819,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 		// npc attack -> monster
 		else if (tid >= NPC_BAND)
 		{
-			pMon = m_pMain->m_NpcMap.GetData(tid);
+			pMon = _main->m_NpcMap.GetData(tid);
 			if (pMon == nullptr)
 				return;
 
@@ -751,7 +838,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 			// npc dead
 			if (result == 0x02)
 			{
-				C3DMap* pMap = m_pMain->GetMapByIndex(pMon->m_sZoneIndex);
+				C3DMap* pMap = _main->GetMapByIndex(pMon->m_sZoneIndex);
 				if (pMap == nullptr)
 					return;
 
@@ -768,7 +855,7 @@ void CAISocket::RecvNpcAttack(char* pBuf)
 				}
 			}
 
-			m_pMain->Send_Region(pOutBuf, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
+			_main->Send_Region(pOutBuf, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
 		}
 	}
 }
@@ -811,13 +898,13 @@ void CAISocket::RecvMagicAttackResult(char* pBuf)
 	// casting
 	if (byCommand == MAGIC_CASTING)
 	{
-		pNpc = m_pMain->m_NpcMap.GetData(sid);
+		pNpc = _main->m_NpcMap.GetData(sid);
 		if (pNpc == nullptr)
 			return;
 
 		index = 0;
 		SetByte(send_buff, WIZ_MAGIC_PROCESS, index);
-		m_pMain->Send_Region(send_buff, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
+		_main->Send_Region(send_buff, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
 	}
 	// effecting
 	else if (byCommand == MAGIC_EFFECTING)
@@ -825,26 +912,26 @@ void CAISocket::RecvMagicAttackResult(char* pBuf)
 		if (sid >= USER_BAND
 			&& sid < NPC_BAND)
 		{
-			pUser = (CUser*) m_pMain->m_Iocport.m_SockArray[sid];
+			pUser = _main->GetUserPtr(sid);
 			if (pUser == nullptr
 				|| pUser->m_bResHpType == USER_DEAD)
 				return;
 
 			index = 0;
 			SetByte(send_buff, WIZ_MAGIC_PROCESS, index);
-			m_pMain->Send_Region(send_buff, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX, pUser->m_RegionZ, nullptr, false);
+			_main->Send_Region(send_buff, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX, pUser->m_RegionZ, nullptr, false);
 		}
 		else if (sid >= NPC_BAND)
 		{
 			if (tid >= NPC_BAND)
 			{
-				pNpc = m_pMain->m_NpcMap.GetData(tid);
+				pNpc = _main->m_NpcMap.GetData(tid);
 				if (pNpc == nullptr)
 					return;
 
 				index = 0;
 				SetByte(send_buff, WIZ_MAGIC_PROCESS, index);
-				m_pMain->Send_Region(send_buff, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
+				_main->Send_Region(send_buff, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
 				return;
 			}
 
@@ -860,7 +947,7 @@ void CAISocket::RecvMagicAttackResult(char* pBuf)
 			SetShort(send_buff, data3, send_index);
 			SetShort(send_buff, data4, send_index);
 			SetShort(send_buff, data5, send_index);
-			m_MagicProcess.MagicPacket(send_buff, send_index);
+			_magicProcess.MagicPacket(send_buff, send_index);
 		}
 	}
 }
@@ -877,8 +964,8 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 	int16_t		sSize = 100;				// NPC Size
 	int			iWeapon_1;					// 오른손 무기
 	int			iWeapon_2;					// 왼손  무기
-	int16_t       sZone;						// Current zone number
-	int16_t       sZoneIndex;					// Current zone index
+	int16_t		sZone;						// Current zone number
+	int16_t		sZoneIndex;					// Current zone index
 	char		npcName[MAX_NPC_NAME_SIZE + 1];	// NPC Name
 	uint8_t		byGroup;					// 소속 집단
 	uint8_t		byLevel;					// level
@@ -931,7 +1018,7 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 	byObjectType = GetByte(pBuf, index);
 	byTrapNumber = GetByte(pBuf, index);
 
-	CNpc* pNpc = m_pMain->m_NpcMap.GetData(instanceId);
+	CNpc* pNpc = _main->m_NpcMap.GetData(instanceId);
 	if (pNpc == nullptr)
 		return;
 
@@ -979,7 +1066,7 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 	pNpc->m_sRegion_X = nRegX;
 	pNpc->m_sRegion_Z = nRegZ;
 
-	C3DMap* pMap = m_pMain->GetMapByIndex(pNpc->m_sZoneIndex);
+	C3DMap* pMap = _main->GetMapByIndex(pNpc->m_sZoneIndex);
 	if (pMap == nullptr)
 	{
 		pNpc->m_NpcState = NPC_DEAD;
@@ -1011,11 +1098,11 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 	SetShort(pOutBuf, pNpc->m_sNid, send_index);
 	pNpc->GetNpcInfo(pOutBuf, send_index);
 
-	m_pMain->Send_Region(pOutBuf, send_index, pNpc->m_sCurZone, nRegX, nRegZ);
+	_main->Send_Region(pOutBuf, send_index, pNpc->m_sCurZone, nRegX, nRegZ);
 
 	pMap->RegionNpcAdd(pNpc->m_sRegion_X, pNpc->m_sRegion_Z, pNpc->m_sNid);
 
-//	int nTotMon = m_pMain->m_NpcMap.GetSize();
+//	int nTotMon = _main->m_NpcMap.GetSize();
 //	TRACE(_T("Recv --> NpcUserInfo : uid = %d, x=%f, z=%f.. ,, tot = %d\n"), nid, fPosX, fPosZ, nTotMon);
 }
 
@@ -1033,7 +1120,7 @@ void CAISocket::RecvUserHP(char* pBuf)
 	if (nid >= USER_BAND
 		&& nid < NPC_BAND)
 	{
-		CUser* pUser = (CUser*) m_pMain->m_Iocport.m_SockArray[nid];
+		CUser* pUser = _main->GetUserPtr(nid);
 		if (pUser == nullptr)
 			return;
 
@@ -1041,7 +1128,7 @@ void CAISocket::RecvUserHP(char* pBuf)
 	}
 	else if (nid >= NPC_BAND)
 	{
-		CNpc* pNpc = m_pMain->m_NpcMap.GetData(nid);
+		CNpc* pNpc = _main->m_NpcMap.GetData(nid);
 		if (pNpc == nullptr)
 			return;
 
@@ -1059,7 +1146,7 @@ void CAISocket::RecvUserExp(char* pBuf)
 	int16_t sExp = GetShort(pBuf, index);
 	int16_t sLoyalty = GetShort(pBuf, index);
 
-	CUser* pUser = (CUser*) m_pMain->m_Iocport.m_SockArray[userId];
+	CUser* pUser = _main->GetUserPtr(userId);
 	if (pUser == nullptr)
 	{
 		spdlog::error("AISocket::RecvUserExp: attempting to grant exp or loyalty to invalid user [userId={}]",
@@ -1119,7 +1206,7 @@ void CAISocket::RecvSystemMsg(char* pBuf)
 			SetShort(send_buff, -1, send_index);		// sid
 			SetByte(send_buff, 0, send_index);			// sender name length
 			SetString2(send_buff, strSysMsg, sLength, send_index);
-			m_pMain->Send_All(send_buff, send_index);
+			_main->Send_All(send_buff, send_index);
 			break;
 
 		case SEND_ZONE:
@@ -1157,11 +1244,11 @@ void CAISocket::RecvNpcGiveItem(char* pBuf)
 		sCount[i] = GetShort(pBuf, index);
 	}
 
-	if (sUid < 0
-		|| sUid >= MAX_USER)
+	pUser = _main->GetUserPtr(sUid);
+	if (pUser == nullptr)
 		return;
 
-	pMap = m_pMain->GetMapByID(sZone);
+	pMap = _main->GetMapByID(sZone);
 	if (pMap == nullptr)
 	{
 		delete pItem;
@@ -1183,7 +1270,7 @@ void CAISocket::RecvNpcGiveItem(char* pBuf)
 
 	for (int i = 0; i < byCount; i++)
 	{
-		if (m_pMain->m_ItemTableMap.GetData(nItemNumber[i]) != nullptr)
+		if (_main->m_ItemTableMap.GetData(nItemNumber[i]) != nullptr)
 		{
 			pItem->itemid[i] = nItemNumber[i];
 			pItem->count[i] = sCount[i];
@@ -1196,10 +1283,6 @@ void CAISocket::RecvNpcGiveItem(char* pBuf)
 		return;
 	}
 
-	pUser = (CUser*) m_pMain->m_Iocport.m_SockArray[sUid];
-	if (pUser == nullptr)
-		return;
-
 	send_index = 0;
 	memset(send_buff, 0, sizeof(send_buff));
 
@@ -1209,7 +1292,7 @@ void CAISocket::RecvNpcGiveItem(char* pBuf)
 	if (pUser->m_sPartyIndex == -1)
 		pUser->Send(send_buff, send_index);
 	else
-		m_pMain->Send_PartyMember(pUser->m_sPartyIndex, send_buff, send_index);
+		_main->Send_PartyMember(pUser->m_sPartyIndex, send_buff, send_index);
 }
 
 void CAISocket::RecvUserFail(char* pBuf)
@@ -1221,7 +1304,7 @@ void CAISocket::RecvUserFail(char* pBuf)
 	instanceId = GetShort(pBuf, index);
 	npcId = GetShort(pBuf, index);
 
-	CUser* pUser = (CUser*) m_pMain->m_Iocport.m_SockArray[instanceId];
+	CUser* pUser = _main->GetUserPtr(instanceId);
 	if (pUser == nullptr)
 		return;
 
@@ -1251,8 +1334,7 @@ void CAISocket::RecvUserFail(char* pBuf)
 	spdlog::trace("AISocket::RecvUserFail: [npcId={} serial={} charId={}]",
 		npcId, instanceId, pUser->m_pUserData->m_id);
 
-	m_pMain->Send_Region(pOutBuf, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX, pUser->m_RegionZ);
-
+	_main->Send_Region(pOutBuf, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX, pUser->m_RegionZ);
 }
 
 void CAISocket::RecvCompressedData(char* pBuf)
@@ -1317,7 +1399,7 @@ void CAISocket::InitEventMonster(int instanceId)
 		pNpc->m_sNid = i + NPC_BAND;
 		//TRACE(_T("InitEventMonster : uid = %d\n"), pNpc->m_sNid);
 
-		if (!m_pMain->m_NpcMap.PutData(pNpc->m_sNid, pNpc))
+		if (!_main->m_NpcMap.PutData(pNpc->m_sNid, pNpc))
 		{
 			spdlog::error("AISocket::InitEventMonster: NpcMap Put failed for serial={}", pNpc->m_sNid);
 			delete pNpc;
@@ -1325,13 +1407,13 @@ void CAISocket::InitEventMonster(int instanceId)
 		}
 	}
 	
-	spdlog::debug("AISocket::InitEventMonster: TotalMonster = {}", m_pMain->m_NpcMap.GetSize());
+	spdlog::debug("AISocket::InitEventMonster: TotalMonster = {}", _main->m_NpcMap.GetSize());
 }
 
 void CAISocket::RecvCheckAlive(char* pBuf)
 {
 //	TRACE(_T("CAISocket-RecvCheckAlive : zone_num=%d\n"), m_iZoneNum);
-	m_pMain->m_sErrorSocketCount = 0;
+	_main->m_sErrorSocketCount = 0;
 
 	int len = 0;
 	char pSendBuf[256] = {};
@@ -1353,7 +1435,7 @@ void CAISocket::RecvGateDestroy(char* pBuf)
 
 	if (instanceId >= NPC_BAND)
 	{
-		CNpc* pNpc = m_pMain->m_NpcMap.GetData(instanceId);
+		CNpc* pNpc = _main->m_NpcMap.GetData(instanceId);
 		if (pNpc == nullptr)
 		{
 			spdlog::error("AISocket::RecvGateDestroy: NPC not found serial={}", instanceId);
@@ -1369,7 +1451,7 @@ void CAISocket::RecvGateDestroy(char* pBuf)
 		SetByte( send_buff, 1, send_index );
 		SetShort( send_buff, nid, send_index );
 		SetByte( send_buff, pNpc->m_byGateOpen, send_index );
-		m_pMain->Send_Region( send_buff, send_index, cur_zone, rx, rz );	*/
+		_main->Send_Region( send_buff, send_index, cur_zone, rx, rz );	*/
 	}
 }
 
@@ -1384,11 +1466,11 @@ void CAISocket::RecvNpcDead(char* pBuf)
 
 	if (nid >= NPC_BAND)
 	{
-		CNpc* pNpc = m_pMain->m_NpcMap.GetData(nid);
+		CNpc* pNpc = _main->m_NpcMap.GetData(nid);
 		if (pNpc == nullptr)
 			return;
 
-		C3DMap* pMap = m_pMain->GetMapByIndex(pNpc->m_sZoneIndex);
+		C3DMap* pMap = _main->GetMapByIndex(pNpc->m_sZoneIndex);
 		if (pMap == nullptr)
 			return;
 
@@ -1407,7 +1489,7 @@ void CAISocket::RecvNpcDead(char* pBuf)
 
 		SetByte(send_buff, WIZ_DEAD, send_index);
 		SetShort(send_buff, nid, send_index);
-		m_pMain->Send_Region(send_buff, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
+		_main->Send_Region(send_buff, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
 
 		pNpc->m_sRegion_X = 0;
 		pNpc->m_sRegion_Z = 0;
@@ -1429,7 +1511,7 @@ void CAISocket::RecvNpcInOut(char* pBuf)
 
 	if (nid >= NPC_BAND)
 	{
-		CNpc* pNpc = m_pMain->m_NpcMap.GetData(nid);
+		CNpc* pNpc = _main->m_NpcMap.GetData(nid);
 		if (pNpc == nullptr)
 			return;
 
@@ -1460,22 +1542,22 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 	}
 	else if (nType == BATTLE_MAP_EVENT_RESULT)
 	{
-		if (m_pMain->m_byBattleOpen == NO_BATTLE)
+		if (_main->m_byBattleOpen == NO_BATTLE)
 		{
 			spdlog::error("AISocket::RecvBattleEvent: No active battle [battleOpen={} type={}]",
-				m_pMain->m_byBattleOpen, nType);
+				_main->m_byBattleOpen, nType);
 			return;
 		}
 
 		if (nResult == KARUS)
 		{
 			//TRACE(_T("--> RecvBattleEvent : 카루스 땅으로 넘어갈 수 있어\n"));
-			m_pMain->m_byKarusOpenFlag = 1;		// 카루스 땅으로 넘어갈 수 있어
+			_main->m_byKarusOpenFlag = 1;		// 카루스 땅으로 넘어갈 수 있어
 		}
 		else if (nResult == ELMORAD)
 		{
 			//TRACE(_T("--> RecvBattleEvent : 엘모 땅으로 넘어갈 수 있어\n"));
-			m_pMain->m_byElmoradOpenFlag = 1;	// 엘모 땅으로 넘어갈 수 있어
+			_main->m_byElmoradOpenFlag = 1;	// 엘모 땅으로 넘어갈 수 있어
 		}
 
 		SetByte(udp_buff, UDP_BATTLE_EVENT_PACKET, udp_index);
@@ -1484,10 +1566,10 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 	}
 	else if (nType == BATTLE_EVENT_RESULT)
 	{
-		if (m_pMain->m_byBattleOpen == NO_BATTLE)
+		if (_main->m_byBattleOpen == NO_BATTLE)
 		{
 			spdlog::error("AISocket::RecvBattleEvent: No active battle [battleOpen={} type={}]",
-				m_pMain->m_byBattleOpen, nType);
+				_main->m_byBattleOpen, nType);
 			return;
 		}
 
@@ -1506,7 +1588,7 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 			&& nLen < MAX_ID_SIZE + 1)
 		{
 			GetString(strMaxUserName, pBuf, nLen, index);
-			if (m_pMain->m_byBattleSave == 0)
+			if (_main->m_byBattleSave == 0)
 			{
 				// 승리국가를 sql에 저장
 				memset(send_buff, 0, sizeof(send_buff));
@@ -1516,24 +1598,24 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 				SetByte(send_buff, nResult, send_index);
 				SetByte(send_buff, nLen, send_index);
 				SetString(send_buff, strMaxUserName, nLen, send_index);
-				retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
+				retvalue = _main->m_LoggerSendQueue.PutData(send_buff, send_index);
 				if (retvalue >= SMQ_FULL)
 				{
 					std::wstring logStr = std::format(L"WIZ_BATTLE_EVENT send fail [retValue={} type={}]",
 						retvalue, nType);
-					m_pMain->AddOutputMessage(logStr);
+					_main->AddOutputMessage(logStr);
 					spdlog::error("AISocket::RecvBattleEvent: WIZ_BATTLE_EVENT send fail [retValue={} type={}]",
 						retvalue, nType);
 				}
-				m_pMain->m_byBattleSave = 1;
+				_main->m_byBattleSave = 1;
 			}
 		}
 
-		m_pMain->m_bVictory = nResult;
-		m_pMain->m_byOldVictory = nResult;
-		m_pMain->m_byKarusOpenFlag = 0;		// 카루스 땅으로 넘어갈 수 없도록
-		m_pMain->m_byElmoradOpenFlag = 0;	// 엘모 땅으로 넘어갈 수 없도록
-		m_pMain->m_byBanishFlag = 1;
+		_main->m_bVictory = nResult;
+		_main->m_byOldVictory = nResult;
+		_main->m_byKarusOpenFlag = 0;		// 카루스 땅으로 넘어갈 수 없도록
+		_main->m_byElmoradOpenFlag = 0;	// 엘모 땅으로 넘어갈 수 없도록
+		_main->m_byBanishFlag = 1;
 
 		SetByte(udp_buff, UDP_BATTLE_EVENT_PACKET, udp_index);	// udp로 다른서버에 정보 전달
 		SetByte(udp_buff, nType, udp_index);
@@ -1547,10 +1629,10 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 			&& nLen < MAX_ID_SIZE + 1)
 		{
 			GetString(strMaxUserName, pBuf, nLen, index);
-			pUser = m_pMain->GetUserPtr(strMaxUserName, NameType::Character);
+			pUser = _main->GetUserPtr(strMaxUserName, NameType::Character);
 			if (pUser != nullptr)
 			{
-				pKnights = m_pMain->m_KnightsMap.GetData(pUser->m_pUserData->m_bKnights);
+				pKnights = _main->m_KnightsMap.GetData(pUser->m_pUserData->m_bKnights);
 				if (pKnights != nullptr)
 					strcpy(strKnightsName, pKnights->m_strName);
 			}
@@ -1562,24 +1644,24 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 			{
 				chatstr = fmt::format_db_resource(IDS_KILL_CAPTAIN, strKnightsName, strMaxUserName);
 
-		/*		if (m_pMain->m_byBattleSave == 0)
+		/*		if (_main->m_byBattleSave == 0)
 				{
 					// 승리국가를 sql에 저장
 					memset(send_buff, 0, sizeof(send_buff));
 					send_index = 0;
 					SetByte(send_buff, WIZ_BATTLE_EVENT, send_index);
 					SetByte(send_buff, nType, send_index);
-					SetByte(send_buff, m_pMain->m_bVictory, send_index);
+					SetByte(send_buff, _main->m_bVictory, send_index);
 					SetByte(send_buff, nLen, send_index);
 					SetString(send_buff, strMaxUserName, nLen, send_index);
-					retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
+					retvalue = _main->m_LoggerSendQueue.PutData(send_buff, send_index);
 					if (retvalue >= SMQ_FULL)
 					{
 						char logstr[256] = {};
 						sprintf(logstr, "WIZ_BATTLE_EVENT Send Fail : %d, %d", retvalue, nType);
-						m_pMain->m_StatusList.AddString(logstr);
+						_main->m_StatusList.AddString(logstr);
 					}
-					m_pMain->m_byBattleSave = 1;
+					_main->m_byBattleSave = 1;
 				}*/
 			}
 			else if (nResult == 2)
@@ -1617,7 +1699,7 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 			SetShort(send_buff, -1, send_index);
 			SetByte(send_buff, 0, send_index);			// sender name length
 			SetString2(send_buff, chatstr, send_index);
-			m_pMain->Send_All(send_buff, send_index);
+			_main->Send_All(send_buff, send_index);
 
 			memset(send_buff, 0, sizeof(send_buff));
 			send_index = 0;
@@ -1627,7 +1709,7 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 			SetShort(send_buff, -1, send_index);
 			SetByte(send_buff, 0, send_index);			// sender name length
 			SetString2(send_buff, chatstr, send_index);
-			m_pMain->Send_All(send_buff, send_index);
+			_main->Send_All(send_buff, send_index);
 
 			SetByte(udp_buff, UDP_BATTLE_EVENT_PACKET, udp_index);
 			SetByte(udp_buff, nType, udp_index);
@@ -1637,7 +1719,7 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 		}
 	}
 
-	m_pMain->Send_UDP_All(udp_buff, udp_index);
+	_main->Send_UDP_All(udp_buff, udp_index);
 }
 
 void CAISocket::RecvNpcEventItem(char* pBuf)
@@ -1653,11 +1735,7 @@ void CAISocket::RecvNpcEventItem(char* pBuf)
 	nItemNumber = GetDWORD(pBuf, index);
 	nCount = GetDWORD(pBuf, index);
 
-	if (sUid < 0
-		|| sUid >= MAX_USER)
-		return;
-
-	pUser = (CUser*) m_pMain->m_Iocport.m_SockArray[sUid];
+	pUser = _main->GetUserPtr(sUid);
 	if (pUser == nullptr)
 		return;
 
@@ -1676,7 +1754,7 @@ void CAISocket::RecvGateOpen(char* pBuf)
 	npcId = GetShort(pBuf, index);
 	nGateFlag = GetByte(pBuf, index);
 
-	pNpc = m_pMain->m_NpcMap.GetData(instanceId);
+	pNpc = _main->m_NpcMap.GetData(instanceId);
 	if (pNpc == nullptr)
 	{
 		spdlog::error("AISocket::RecvGateOpen: Npc not found [serial={} npcId={}]",
@@ -1686,7 +1764,7 @@ void CAISocket::RecvGateOpen(char* pBuf)
 
 	pNpc->m_byGateOpen = nGateFlag;
 
-	pEvent = m_pMain->m_ZoneArray[pNpc->m_sZoneIndex]->GetObjectEvent(npcId);
+	pEvent = _main->m_ZoneArray[pNpc->m_sZoneIndex]->GetObjectEvent(npcId);
 	if (pEvent == nullptr)
 	{
 		spdlog::error("AISocket::RecvGateOpen: Npc ObjectEvent not found [serial={} npcId={}]",
@@ -1705,6 +1783,6 @@ void CAISocket::RecvGateOpen(char* pBuf)
 		SetByte(send_buff, 0x01, send_index);
 		SetShort(send_buff, instanceId, send_index);
 		SetByte(send_buff, pNpc->m_byGateOpen, send_index);
-		m_pMain->Send_Region(send_buff, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
+		_main->Send_Region(send_buff, send_index, pNpc->m_sCurZone, pNpc->m_sRegion_X, pNpc->m_sRegion_Z, nullptr, false);
 	}
 }

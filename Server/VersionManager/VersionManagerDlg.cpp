@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "VersionManager.h"
 #include "VersionManagerDlg.h"
-#include "IOCPSocket2.h"
 #include "SettingDlg.h"
 #include "User.h"
 
@@ -24,7 +23,7 @@ static char THIS_FILE[] = __FILE__;
 
 import VersionManagerBinder;
 
-CIOCPort CVersionManagerDlg::IocPort;
+constexpr int WM_PROCESS_LISTBOX_QUEUE = WM_APP + 1;
 
 constexpr int DB_POOL_CHECK = 100;
 
@@ -33,6 +32,7 @@ constexpr int DB_POOL_CHECK = 100;
 
 CVersionManagerDlg::CVersionManagerDlg(CWnd* parent)
 	: CDialog(IDD, parent),
+	_socketManager(SOCKET_BUFF_SIZE, SOCKET_BUFF_SIZE),
 	DbProcess(this),
 	_logger(logger::VersionManager)
 {
@@ -69,6 +69,7 @@ BEGIN_MESSAGE_MAP(CVersionManagerDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_SETTING, OnVersionSetting)
+	ON_MESSAGE(WM_PROCESS_LISTBOX_QUEUE, &CVersionManagerDlg::OnProcessListBoxQueue)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -81,13 +82,11 @@ BOOL CVersionManagerDlg::OnInitDialog()
 
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
-	SetIcon(_icon, TRUE);			// Set big icon
+	SetIcon(_icon, TRUE);		// Set big icon
 	SetIcon(_icon, FALSE);		// Set small icon
 	
-	IocPort.Init(MAX_USER, CLIENT_SOCKSIZE, 1);
-
-	for (int i = 0; i < MAX_USER; i++)
-		IocPort.m_SockArrayInActive[i] = new CUser(this);
+	_socketManager.Init(MAX_USER, 0, 1);
+	_socketManager.AllocateServerSockets<CUser>(this);
 
 	if (!GetInfoFromIni())
 	{
@@ -115,14 +114,14 @@ BOOL CVersionManagerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	if (!IocPort.Listen(_LISTEN_PORT))
+	if (!_socketManager.Listen(_LISTEN_PORT))
 	{
 		AfxMessageBox(_T("FAIL TO CREATE LISTEN STATE"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	::ResumeThread(IocPort.m_hAcceptThread);
+	_socketManager.StartAccept();
 
 	AddOutputMessage(fmt::format("Listening on 0.0.0.0:{}",
 		_LISTEN_PORT));
@@ -272,10 +271,29 @@ void CVersionManagerDlg::OnTimer(UINT EventId)
 
 	CDialog::OnTimer(EventId);
 }
+
+LRESULT CVersionManagerDlg::OnProcessListBoxQueue(WPARAM, LPARAM)
+{
+	std::queue<std::wstring> localQueue;
+
+	{
+		std::lock_guard<std::mutex> lock(_listBoxQueueMutex);
+		localQueue.swap(_listBoxQueue);
+	}
+
+	while (!localQueue.empty())
+	{
+		const std::wstring& message = localQueue.front();
+		AddOutputMessage(message);
+		localQueue.pop();
+	}
+
+	return 0;
+}
+
 // If you add a minimize button to your dialog, you will need the code below
 //  to draw the icon.  For MFC applications using the document/view model,
 //  this is automatically done for you by the framework.
-
 void CVersionManagerDlg::OnPaint()
 {
 	if (IsIconic())
@@ -331,6 +349,8 @@ BOOL CVersionManagerDlg::DestroyWindow()
 		delete pInfo;
 	ServerList.clear();
 
+	_socketManager.Shutdown();
+
 	return CDialog::DestroyWindow();
 }
 
@@ -384,9 +404,21 @@ void CVersionManagerDlg::AddOutputMessage(const std::string& msg)
 /// \see _outputList
 void CVersionManagerDlg::AddOutputMessage(const std::wstring& msg)
 {
+	// Be sure to exclusively handle UI updates in the UI's thread
+	if (AfxGetThread() != AfxGetApp())
+	{
+		{
+			std::lock_guard<std::mutex> lock(_listBoxQueueMutex);
+			_listBoxQueue.push(msg);
+		}
+
+		PostMessage(WM_PROCESS_LISTBOX_QUEUE);
+		return;
+	}
+
 	_outputList.AddString(msg.data());
-	
+
 	// Set the focus to the last item and ensure it is visible
-	int lastIndex = _outputList.GetCount()-1;
+	int lastIndex = _outputList.GetCount() - 1;
 	_outputList.SetTopIndex(lastIndex);
 }

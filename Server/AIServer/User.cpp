@@ -62,7 +62,6 @@ CUser::~CUser()
 void CUser::Initialize()
 {
 	m_pMain = (CServerDlg*) AfxGetApp()->GetMainWnd();
-	m_pIocport = (CIOCPort*) &m_pMain->m_Iocport;
 
 	m_MagicProcess.m_pMain = m_pMain;
 	m_MagicProcess.m_pSrcUser = this;
@@ -155,10 +154,10 @@ void CUser::Attack(int sid, int tid)
 	int16_t sOldNpcHP = pNpc->m_iHP;
 
 	// Npc가 죽은 경우,,
-	if (!pNpc->SetDamage(0, nFinalDamage, m_strUserID, m_iUserId + USER_BAND, m_pIocport))
+	if (!pNpc->SetDamage(0, nFinalDamage, m_strUserID, m_iUserId + USER_BAND))
 	{
 		pNpc->SendExpToUserList(); // 경험치 분배!!
-		pNpc->SendDead(m_pIocport);
+		pNpc->SendDead();
 		SendAttackSuccess(tid, ATTACK_TARGET_DEAD, nFinalDamage, pNpc->m_iHP);
 
 	//	CheckMaxValue(m_dwXP, 1);		// 몹이 죽을때만 1 증가!	
@@ -230,7 +229,7 @@ void CUser::SendMagicAttackResult(int tuid, uint8_t result, int16_t sDamage, int
 void CUser::SendAll(const char* pBuf, int nLength)
 {
 	if (nLength <= 0
-		|| nLength > sizeof(SEND_DATA::pBuf))
+		|| nLength > sizeof(_SEND_DATA::pBuf))
 		return;
 
 	if (m_iUserId < 0
@@ -241,27 +240,19 @@ void CUser::SendAll(const char* pBuf, int nLength)
 		return;
 	}
 
-	if (m_pIocport == nullptr)
-		return;
-
 	MAP* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 		return;
 
-	SEND_DATA* pNewData = nullptr;
-	pNewData = new SEND_DATA;
+	_SEND_DATA* pNewData = new _SEND_DATA;
 	if (pNewData == nullptr)
 		return;
 
 	pNewData->sCurZone = m_curZone;
 	pNewData->sLength = nLength;
-	::CopyMemory(pNewData->pBuf, pBuf, nLength);
+	memcpy(pNewData->pBuf, pBuf, nLength);
 
-	EnterCriticalSection(&m_pIocport->m_critSendData);
-	m_pIocport->m_SendDataList.push_back(pNewData);
-	LeaveCriticalSection(&m_pIocport->m_critSendData);
-
-	PostQueuedCompletionStatus(m_pIocport->m_hSendIOCP, 0, 0, nullptr);
+	m_pMain->_socketManager.QueueSendData(pNewData);
 }
 // ~sungyong 2002.05.22
 
@@ -1086,7 +1077,7 @@ void CUser::HealAreaCheck(int rx, int rz)
 			if (fDis > fRadius)
 				continue;
 
-			pNpc->ChangeTarget(1004, this, m_pIocport);
+			pNpc->ChangeTarget(1004, this);
 		}
 	}
 
