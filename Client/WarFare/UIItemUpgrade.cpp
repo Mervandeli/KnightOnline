@@ -918,10 +918,13 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 							pInven->m_pMyInvWnd[iOrder] = nullptr;
 						}
 
-						if (spItem != nullptr)
-							spItem->pUIIcon = nullptr;
-						delete spItem;
-						spItem = nullptr;
+						if (m_pMyUpgradeInv[iOrder] != nullptr)
+						{
+							delete m_pMyUpgradeInv[iOrder]->pUIIcon;
+							m_pMyUpgradeInv[iOrder]->pUIIcon = nullptr;
+							delete m_pMyUpgradeInv[iOrder];
+							m_pMyUpgradeInv[iOrder] = nullptr;
+						}
 
 						m_pMaterialSlot[i] = nullptr;
 					}
@@ -1002,10 +1005,13 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 							pInven->m_pMyInvWnd[iOrder] = nullptr;
 						}
 
-						if (spItem != nullptr)
-							spItem->pUIIcon = nullptr;
-						delete spItem;
-						spItem = nullptr;
+						if (m_pMyUpgradeInv[iOrder] != nullptr)
+						{
+							delete m_pMyUpgradeInv[iOrder]->pUIIcon;
+							m_pMyUpgradeInv[iOrder]->pUIIcon = nullptr;
+							delete m_pMyUpgradeInv[iOrder];
+							m_pMyUpgradeInv[iOrder] = nullptr;
+						}
 
 						m_pMaterialSlot[i] = nullptr;
 					}
