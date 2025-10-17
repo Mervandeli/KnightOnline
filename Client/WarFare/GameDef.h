@@ -3,8 +3,9 @@
 
 #include <string>
 #include <dinput.h>
+#include <stdint.h>
+#include <inttypes.h>
 
-#include <shared/types.h>
 #include <shared/version.h>
 
 // TODO: Shift this logic into a separate header and generally clean this shared logic up

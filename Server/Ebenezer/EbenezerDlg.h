@@ -13,10 +13,10 @@
 #include "UdpSocket.h"
 
 #include <shared/Ini.h>
-#include <shared/logger.h>
-#include <shared/SharedMemoryBlock.h>
-#include <shared/SharedMemoryQueue.h>
-#include <shared/STLMap.h>
+#include <shared-server/logger.h>
+#include <shared-server/SharedMemoryBlock.h>
+#include <shared-server/SharedMemoryQueue.h>
+#include <shared-server/STLMap.h>
 
 #include <unordered_map>
 #include <vector>

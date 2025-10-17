@@ -10,7 +10,7 @@
 #include "EXEC.h"     
 
 #include <shared/JvCryption.h>
-#include <network/TcpServerSocket.h>
+#include <shared-server/TcpServerSocket.h>
 
 #include <list>
 

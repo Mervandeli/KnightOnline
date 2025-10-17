@@ -2,7 +2,7 @@
 
 #include "Define.h"
 
-#include <shared/SharedMemoryQueue.h>
+#include <shared-server/SharedMemoryQueue.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CItemManagerDlg dialog

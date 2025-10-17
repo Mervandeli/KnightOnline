@@ -19,15 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{66CDA900-206D-4A09-A6EC-ABBCBF5AAF44}</ProjectGuid>
+    <ProjectGuid>{C630CF44-84A8-4586-A710-C420BF54DC13}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>network</RootNamespace>
+    <RootNamespace>shared-server</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>network</ProjectName>
   </PropertyGroup>
   <Import Project="..\..\props\platform_root.props" />
   <PropertyGroup>
-    <OutDir>$(ProjectDir)..\bin\$(Configuration)\</OutDir>
+    <OutDir>$(BaseOutDir)</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
@@ -52,7 +51,8 @@
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
@@ -61,6 +61,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <Import Project="$(PropsDir)asio.props" />
+  <Import Project="$(PropsDir)boost.props" />
   <Import Project="$(PropsDir)server.props" />
   <Import Project="$(PropsDir)spdlog.props" />
   <PropertyGroup Label="UserMacros" />
@@ -71,14 +72,17 @@
       <MinimalRebuild>false</MinimalRebuild>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;VC_EXTRALEAN;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link>
-      <AdditionalLibraryDirectories>$(BaseOutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>shared.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
+    <PreBuildEvent>
+      <Command>
+        if exist "$(ProjectDir)server_config.h.default" if not exist "$(ProjectDir)server_config.h" (
+          copy /Y "$(ProjectDir)server_config.h.default" "$(ProjectDir)server_config.h"
+        )
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -136,17 +140,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="SharedMemoryQueue.cpp" />
+    <ClCompile Include="SharedMemoryBlock.cpp" />
     <ClCompile Include="SocketManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="logger.cpp" />
     <ClCompile Include="TcpClientSocket.cpp" />
     <ClCompile Include="TcpServerSocket.cpp" />
     <ClCompile Include="TcpSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="server_config.h" />
+    <ClInclude Include="SharedMemoryQueue.h" />
+    <ClInclude Include="SharedMemoryBlock.h" />
     <ClInclude Include="SocketManager.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="STLMap.h" />
+    <ClInclude Include="logger.h" />
     <ClInclude Include="TcpClientSocket.h" />
     <ClInclude Include="TcpServerSocket.h" />
     <ClInclude Include="TcpSocket.h" />

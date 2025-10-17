@@ -7,7 +7,7 @@
 
 #include <shared/globals.h>
 #include <shared/StringConversion.h>
-#include <shared/_USER_DATA.h>
+#include <shared-server/_USER_DATA.h>
 
 constexpr int MAX_USER			= 3000;
 
