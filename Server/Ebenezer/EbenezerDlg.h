@@ -6,7 +6,6 @@
 #include "GameDefine.h"
 #include "AISocket.h"
 #include "Npc.h"
-#include "SharedMem.h"
 #include "Knights.h"
 #include "KnightsManager.h"
 #include "KnightsSiegeWar.h"
@@ -15,6 +14,8 @@
 
 #include <shared/Ini.h>
 #include <shared/logger.h>
+#include <shared/SharedMemoryBlock.h>
+#include <shared/SharedMemoryQueue.h>
 #include <shared/STLMap.h>
 
 #include <unordered_map>
@@ -205,14 +206,14 @@ public:
 	static CEbenezerDlg* s_pInstance;
 	EbenezerSocketManager _socketManager;
 
-	CSharedMemQueue	m_LoggerSendQueue;
-	CSharedMemQueue	m_LoggerRecvQueue;
-	CSharedMemQueue m_ItemLoggerSendQ;
+	SharedMemoryQueue m_LoggerSendQueue;
+	SharedMemoryQueue m_LoggerRecvQueue;
+	SharedMemoryQueue m_ItemLoggerSendQ;
 
 	HANDLE	m_hReadQueueThread;
-	HANDLE	m_hMMFile;
-	char*	m_lpMMFile;
-	bool	m_bMMFCreate;
+
+	SharedMemoryBlock m_UserDataBlock;
+
 	uint32_t	m_ServerOffset;
 
 	char	m_ppNotice[20][128];
