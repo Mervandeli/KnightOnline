@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "define.h"
+#include "Define.h"
 #include "GameDefine.h"
 #include <shared-server/STLMap.h>
 

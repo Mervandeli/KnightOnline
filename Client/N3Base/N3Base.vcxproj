@@ -184,9 +184,7 @@
     <ClCompile Include="N3Scene.cpp" />
     <ClCompile Include="N3Shape.cpp" />
     <ClCompile Include="N3ShapeExtra.cpp" />
-    <ClCompile Include="N3ShapeMgr.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="N3ShapeMgr.cpp" />
     <ClCompile Include="N3Skin.cpp" />
     <ClCompile Include="N3Sky.cpp" />
     <ClCompile Include="N3SkyMng.cpp" />
