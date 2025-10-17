@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="SharedMemoryQueue.cpp" />
+    <ClCompile Include="SharedMemoryBlock.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="logger.cpp" />
+    <ClCompile Include="SocketManager.cpp" />
+    <ClCompile Include="TcpClientSocket.cpp" />
+    <ClCompile Include="TcpServerSocket.cpp" />
+    <ClCompile Include="TcpSocket.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="server_config.h" />
+    <ClInclude Include="SharedMemoryQueue.h" />
+    <ClInclude Include="SharedMemoryBlock.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="STLMap.h" />
+    <ClInclude Include="logger.h" />
+    <ClInclude Include="SocketManager.h" />
+    <ClInclude Include="TcpClientSocket.h" />
+    <ClInclude Include="TcpServerSocket.h" />
+    <ClInclude Include="TcpSocket.h" />
+  </ItemGroup>
+</Project>

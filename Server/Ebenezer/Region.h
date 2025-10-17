@@ -11,7 +11,7 @@
 
 #include "define.h"
 #include "GameDefine.h"
-#include <shared/STLMap.h>
+#include <shared-server/STLMap.h>
 
 typedef CSTLMap <_ZONE_ITEM>	ZoneItemArray;
 typedef CSTLMap <int>			ZoneUserArray;

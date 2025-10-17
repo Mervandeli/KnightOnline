@@ -12,7 +12,7 @@
 #include <N3Base/N3ShapeMgr.h>
 #include "Region.h"
 #include "GameEvent.h"
-#include <shared/STLMap.h>
+#include <shared-server/STLMap.h>
 
 typedef CSTLMap <CGameEvent>		EventArray;
 typedef CSTLMap <_OBJECT_EVENT>		ObjectEventArray;

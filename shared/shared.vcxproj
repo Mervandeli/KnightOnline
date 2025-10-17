@@ -24,7 +24,7 @@
     <RootNamespace>shared</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
-  <Import Project="..\..\props\platform_root.props" />
+  <Import Project="..\props\platform_root.props" />
   <PropertyGroup>
     <OutDir>$(BaseOutDir)</OutDir>
     <IntDir>$(Configuration)\</IntDir>
@@ -60,7 +60,6 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <Import Project="$(PropsDir)boost.props" />
   <Import Project="$(PropsDir)spdlog.props" />
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
@@ -73,13 +72,6 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
-    <PreBuildEvent>
-      <Command>
-        if exist "$(ProjectDir)server_config.h.default" if not exist "$(ProjectDir)server_config.h" (
-          copy /Y "$(ProjectDir)server_config.h.default" "$(ProjectDir)server_config.h"
-        )
-      </Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -147,8 +139,6 @@
     <ClCompile Include="lzf.c">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="SharedMemoryQueue.cpp" />
-    <ClCompile Include="SharedMemoryBlock.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -156,7 +146,6 @@
     <ClCompile Include="StringUtils.cpp" />
     <ClCompile Include="Thread.cpp" />
     <ClCompile Include="TimeThread.cpp" />
-    <ClCompile Include="logger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ByteBuffer.h" />
@@ -169,18 +158,12 @@
     <ClInclude Include="lzf.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="packets.h" />
-    <ClInclude Include="server_config.h" />
-    <ClInclude Include="SharedMemoryQueue.h" />
-    <ClInclude Include="SharedMemoryBlock.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="STLMap.h" />
     <ClInclude Include="StringConversion.h" />
     <ClInclude Include="StringUtils.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="TimeThread.h" />
-    <ClInclude Include="types.h" />
     <ClInclude Include="version.h" />
-    <ClInclude Include="logger.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
