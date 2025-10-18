@@ -1055,15 +1055,20 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 
 	if (spItem->pItemBasic != nullptr)
 	{
-		std::string szRemark = spItem->pItemBasic->szRemark;
+		const std::string& szRemark = spItem->pItemBasic->szRemark;
 	
-		int strSize = spItem->pItemBasic->szRemark.size();
+		size_t strSize = spItem->pItemBasic->szRemark.size();
 		if (strSize > 0)
 		{
 			int splitPos = 0;
-			for (int i = 0; i < strSize; i++)
+			int spaceCount = 0;
+			for (size_t i = 0; i < strSize; i++)
 			{
-				if (szRemark[i] == '(' || (szRemark[i] == ' ' && i > strSize / 2))
+				// Official client: split only on spaces (no '(' split). It only applies the split after 4 words.
+				if (szRemark[i] == ' ')
+					++spaceCount;
+
+				if (szRemark[i] == '(' || (szRemark[i] == ' ' && spaceCount > 3))
 				{
 					splitPos = i;
 					break;
@@ -1072,13 +1077,14 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 			if (splitPos > 0)
 			{
 				m_pStr[iIndex]->SetColor(m_CWhite);
-				m_pstdstr[iIndex] = fmt::format("*{}", szRemark.substr(0, splitPos));
+				m_pstdstr[iIndex] = fmt::format("*{}", std::string_view(szRemark.data(), splitPos));
 				m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
 
 				iIndex++;
+				ERROR_EXCEPTION
 
 				m_pStr[iIndex]->SetColor(m_CWhite);
-				m_pstdstr[iIndex] = fmt::format("{}*", szRemark.substr(splitPos));
+				m_pstdstr[iIndex] = fmt::format("{}*", std::string_view(szRemark.data() + splitPos, strSize - splitPos));
 				m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
 
 				iIndex++;
@@ -1101,7 +1107,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 		switch (eTA)
 		{
 			case ITEM_ATTRIB_UNIQUE:
-				m_pStr[iIndex]->SetColor(m_CGold);
+				m_pStr[iIndex]->SetColor(m_CGreen);
 				m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_UNIQUE);
 				m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
 				iIndex++;
