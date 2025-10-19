@@ -1,19 +1,20 @@
 ﻿#pragma once
 
 #include "Define.h"
+#include "resource.h"
 
 #include <shared-server/SharedMemoryQueue.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // CItemManagerDlg dialog
 
+class ReadQueueThread;
 class CItemManagerDlg : public CDialog
 {
 // Construction
 public:
 	SharedMemoryQueue m_LoggerRecvQueue;
-
-	HANDLE	m_hReadQueueThread;
+	std::unique_ptr<ReadQueueThread> _readQueueThread;
 
 	CFile m_ItemLogFile;		// log file
 	CFile m_ExpLogFile;			// log file
@@ -26,9 +27,10 @@ private:
 
 public:
 	CItemManagerDlg(CWnd* pParent = nullptr);	// standard constructor
+	~CItemManagerDlg() override;
 
-	void ItemLogWrite(char* pBuf);
-	void ExpLogWrite(char* pBuf);
+	void ItemLogWrite(const char* pBuf);
+	void ExpLogWrite(const char* pBuf);
 
 // Dialog Data
 	//{{AFX_DATA(CItemManagerDlg)

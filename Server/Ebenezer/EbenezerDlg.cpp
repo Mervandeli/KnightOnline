@@ -27,6 +27,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 // NOTE: Explicitly handled under DEBUG_NEW override
+#include "EbenezerReadQueueThread.h"
 #include <db-library/RecordSetLoader_STLMap.h>
 #include <db-library/RecordSetLoader_Vector.h>
 #include <shared/TimerThread.h>
@@ -44,136 +45,6 @@ CEbenezerDlg* CEbenezerDlg::s_pInstance = nullptr;
 uint16_t g_increase_serial = 1;
 bool g_serverdown_flag = false;
 
-DWORD WINAPI ReadQueueThread(LPVOID lp)
-{
-	CEbenezerDlg* pMain = (CEbenezerDlg*) lp;
-	int recvlen = 0, index = 0, uid = -1, send_index = 0, buff_length = 0;
-	uint8_t command, result;
-	char pBuf[MAX_PKTSIZE] = {}, send_buff[1024] = {};
-	CUser* pUser = nullptr;
-	int currenttime = 0;
-
-	while (true)
-	{
-		index = 0;
-		recvlen = pMain->m_LoggerRecvQueue.GetData(pBuf);
-
-		if (recvlen > MAX_PKTSIZE
-			|| recvlen == 0)
-		{
-			Sleep(1);
-			continue;
-		}
-
-		command = GetByte(pBuf, index);
-		uid = GetShort(pBuf, index);
-
-		if (command == (KNIGHTS_ALLLIST_REQ + 0x10)
-			&& uid == -1)
-		{
-			pMain->m_KnightsManager.RecvKnightsAllList(pBuf + index);
-			continue;
-		}
-
-		pUser = pMain->GetUserPtr(uid);
-		if (pUser == nullptr)
-			goto loop_pass;
-
-		switch (command)
-		{
-			case WIZ_LOGIN:
-				result = GetByte(pBuf, index);
-				if (result == 0xFF)
-					memset(pUser->m_strAccountID, 0, sizeof(pUser->m_strAccountID));
-				SetByte(send_buff, WIZ_LOGIN, send_index);
-				SetByte(send_buff, result, send_index);					// 성공시 국가 정보
-				pUser->Send(send_buff, send_index);
-				break;
-
-			case WIZ_SEL_NATION:
-				SetByte(send_buff, WIZ_SEL_NATION, send_index);
-				SetByte(send_buff, GetByte(pBuf, index), send_index);	// 국가 정보
-				pUser->Send(send_buff, send_index);
-				break;
-
-			case WIZ_NEW_CHAR:
-				result = GetByte(pBuf, index);
-				SetByte(send_buff, WIZ_NEW_CHAR, send_index);
-				SetByte(send_buff, result, send_index);					// 성공시 국가 정보
-				pUser->Send(send_buff, send_index);
-				break;
-
-			case WIZ_DEL_CHAR:
-				pUser->RecvDeleteChar(pBuf + index);
-			/*	result = GetByte( pBuf, index );
-				SetByte( send_buff, WIZ_DEL_CHAR, send_index );
-				SetByte( send_buff, result, send_index );					// 성공시 국가 정보
-				SetByte( send_buff, GetByte( pBuf, index ), send_index );
-				pUser->Send( send_buff, send_index );	*/
-				break;
-
-			case WIZ_SEL_CHAR:
-				pUser->SelectCharacter(pBuf + index);
-				break;
-
-			case WIZ_ALLCHAR_INFO_REQ:
-				buff_length = GetShort(pBuf, index);
-				if (buff_length > recvlen)
-					break;
-
-				SetByte(send_buff, WIZ_ALLCHAR_INFO_REQ, send_index);
-				SetString(send_buff, pBuf + index, buff_length, send_index);
-				pUser->Send(send_buff, send_index);
-				break;
-
-			case WIZ_LOGOUT:
-				if (pUser != nullptr
-					&& strlen(pUser->m_pUserData->m_id) != 0)
-				{
-					spdlog::debug("EbenezerDlg::ReadQueueThread: WIZ_LOGOUT [charId={}]",
-						pUser->m_pUserData->m_id);
-					pUser->Close();
-				}
-				break;
-
-			case KNIGHTS_CREATE + 0x10:
-			case KNIGHTS_JOIN + 0x10:
-			case KNIGHTS_WITHDRAW + 0x10:
-			case KNIGHTS_REMOVE + 0x10:
-			case KNIGHTS_ADMIT + 0x10:
-			case KNIGHTS_REJECT + 0x10:
-			case KNIGHTS_CHIEF + 0x10:
-			case KNIGHTS_VICECHIEF + 0x10:
-			case KNIGHTS_OFFICER + 0x10:
-			case KNIGHTS_PUNISH + 0x10:
-			case KNIGHTS_DESTROY + 0x10:
-			case KNIGHTS_MEMBER_REQ + 0x10:
-			case KNIGHTS_STASH + 0x10:
-			case KNIGHTS_LIST_REQ + 0x10:
-			case KNIGHTS_ALLLIST_REQ + 0x10:
-				pMain->m_KnightsManager.ReceiveKnightsProcess(pUser, pBuf + index, command);
-				break;
-
-			case DB_LOGIN_INFO:
-				result = GetByte(pBuf, index);
-				if (result == 0x00)
-					pUser->Close();
-				break;
-
-			case DB_COUPON_EVENT:
-				if (pUser != nullptr)
-					pUser->CouponEvent(pBuf + index);
-				break;
-		}
-
-	loop_pass:
-		recvlen = 0;
-		memset(pBuf, 0, sizeof(pBuf));
-		send_index = 0;
-		memset(send_buff, 0, sizeof(send_buff));
-	}
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // CEbenezerDlg dialog
 
@@ -185,8 +56,6 @@ CEbenezerDlg::CEbenezerDlg(CWnd* pParent /*=nullptr*/)
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-
-	m_hReadQueueThread = nullptr;
 
 	m_nYear = 0;
 	m_nMonth = 0;
@@ -273,6 +142,28 @@ CEbenezerDlg::CEbenezerDlg(CWnd* pParent /*=nullptr*/)
 	_monsterChallengePlayerCount = 0;
 
 	ConnectionManager::Create();
+
+	_gameTimeThread = std::make_unique<TimerThread>(
+		6s,
+		std::bind(&CEbenezerDlg::GameTimeTick, this));
+
+	_smqHeartbeatThread = std::make_unique<TimerThread>(
+		10s,
+		std::bind(&CEbenezerDlg::SendSMQHeartbeat, this));
+
+	_aliveTimeThread = std::make_unique<TimerThread>(
+		34s, // NOTE: oddly specific time which they preserved in newer builds
+		std::bind(&CEbenezerDlg::CheckAliveUser, this));
+
+	_marketBBSTimeThread = std::make_unique<TimerThread>(
+		5min,
+		std::bind(&CEbenezerDlg::MarketBBSTimeCheck, this));
+
+	_packetCheckThread = std::make_unique<TimerThread>(
+		6min,
+		std::bind(&CEbenezerDlg::WritePacketLog, this));
+
+	_readQueueThread = std::make_unique<EbenezerReadQueueThread>(this);
 }
 
 CEbenezerDlg::~CEbenezerDlg()
@@ -336,61 +227,6 @@ BOOL CEbenezerDlg::OnInitDialog()
 
 	LoadConfig();
 
-	_gameTimeThread = std::make_unique<TimerThread>(
-		6s,
-		std::bind(&CEbenezerDlg::GameTimeTick, this));
-
-	if (_gameTimeThread == nullptr)
-	{
-		AfxMessageBox(_T("Failed to allocate timer thread (game time). Out of memory."));
-		AfxPostQuitMessage(0);
-		return FALSE;
-	}
-
-	_smqHeartbeatThread = std::make_unique<TimerThread>(
-		10s,
-		std::bind(&CEbenezerDlg::SendSMQHeartbeat, this));
-
-	if (_smqHeartbeatThread == nullptr)
-	{
-		AfxMessageBox(_T("Failed to allocate timer thread (SMQ heartbeat). Out of memory."));
-		AfxPostQuitMessage(0);
-		return FALSE;
-	}
-
-	_aliveTimeThread = std::make_unique<TimerThread>(
-		34s, // NOTE: oddly specific time which they preserved in newer builds
-		std::bind(&CEbenezerDlg::CheckAliveUser, this));
-
-	if (_aliveTimeThread == nullptr)
-	{
-		AfxMessageBox(_T("Failed to allocate timer thread (alive time). Out of memory."));
-		AfxPostQuitMessage(0);
-		return FALSE;
-	}
-
-	_marketBBSTimeThread = std::make_unique<TimerThread>(
-		5min,
-		std::bind(&CEbenezerDlg::MarketBBSTimeCheck, this));
-
-	if (_marketBBSTimeThread == nullptr)
-	{
-		AfxMessageBox(_T("Failed to allocate timer thread (market BBS time). Out of memory."));
-		AfxPostQuitMessage(0);
-		return FALSE;
-	}
-
-	_packetCheckThread = std::make_unique<TimerThread>(
-		6min,
-		std::bind(&CEbenezerDlg::WritePacketLog, this));
-
-	if (_packetCheckThread == nullptr)
-	{
-		AfxMessageBox(_T("Failed to allocate timer thread (packet check). Out of memory."));
-		AfxPostQuitMessage(0);
-		return FALSE;
-	}
-
 	_socketManager.Init(MAX_USER, CLIENT_SOCKSIZE, 4);
 	_socketManager.AllocateServerSockets<CUser>();
 
@@ -419,21 +255,21 @@ BOOL CEbenezerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	if (!m_LoggerSendQueue.OpenOrCreate(SMQ_LOGGERSEND, MAX_PKTSIZE, MAX_COUNT))
+	if (!m_LoggerSendQueue.OpenOrCreate(SMQ_LOGGERSEND))
 	{
 		AfxMessageBox(_T("SMQ Send Shared Memory Initialize Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	if (!m_LoggerRecvQueue.OpenOrCreate(SMQ_LOGGERRECV, MAX_PKTSIZE, MAX_COUNT))
+	if (!m_LoggerRecvQueue.OpenOrCreate(SMQ_LOGGERRECV))
 	{
 		AfxMessageBox(_T("SMQ Recv Shared Memory Initialize Fail"));
 		AfxPostQuitMessage(0);
 		return FALSE;
 	}
 
-	if (!m_ItemLoggerSendQ.OpenOrCreate(SMQ_ITEMLOGGER, MAX_PKTSIZE, MAX_COUNT))
+	if (!m_ItemLoggerSendQ.OpenOrCreate(SMQ_ITEMLOGGER))
 	{
 		AfxMessageBox(_T("SMQ ItemLog Shared Memory Initialize Fail"));
 		AfxPostQuitMessage(0);
@@ -620,9 +456,6 @@ BOOL CEbenezerDlg::OnInitDialog()
 
 	LoadNoticeData();
 
-	DWORD id;
-	m_hReadQueueThread = CreateThread(nullptr, 0, ReadQueueThread, this, 0, &id);
-
 	m_pUdpSocket = new CUdpSocket(this);
 	if (!m_pUdpSocket->CreateSocket())
 	{
@@ -652,6 +485,8 @@ BOOL CEbenezerDlg::OnInitDialog()
 	_aliveTimeThread->start();
 	_marketBBSTimeThread->start();
 	_packetCheckThread->start();
+
+	_readQueueThread->start();
 
 	CTime cur = CTime::GetCurrentTime();
 	std::wstring starttime = std::format(L"Ebenezer started: {:02}/{:02} {:02}:{:02}",
@@ -725,8 +560,8 @@ BOOL CEbenezerDlg::DestroyWindow()
 
 	_socketManager.Shutdown();
 
-	if (m_hReadQueueThread != nullptr)
-		TerminateThread(m_hReadQueueThread, 0);
+	if (_readQueueThread != nullptr)
+		_readQueueThread->shutdown();
 
 	if (!m_ItemTableMap.IsEmpty())
 		m_ItemTableMap.DeleteAllData();

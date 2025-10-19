@@ -1178,7 +1178,7 @@ fail_return:
 	Send(send_buff, send_index);
 }
 
-void CUser::SelectCharacter(char* pBuf)
+void CUser::SelectCharacter(const char* pBuf)
 {
 	int index = 0, send_index = 0, retvalue = 0;
 	char send_buff[256] = {};
@@ -12839,7 +12839,7 @@ void CUser::LogCoupon(int itemid, int count)
 	}
 }
 
-void CUser::CouponEvent(char* pBuf)
+void CUser::CouponEvent(const char* pBuf)
 {
 	int index = 0, nEventNum = 0, nItemCount = 0, nResult = 0, nMessageNum = 0;
 	nResult = GetByte(pBuf, index);
@@ -12969,7 +12969,7 @@ bool CUser::ExistComEvent(int eventid) const
 	return false;
 }
 
-void CUser::RecvDeleteChar(char* pBuf)
+void CUser::RecvDeleteChar(const char* pBuf)
 {
 	int nResult = 0, nLen = 0, index = 0, send_index = 0, char_index = 0, knightsId = 0;
 	char charId[MAX_ID_SIZE + 1] = {};

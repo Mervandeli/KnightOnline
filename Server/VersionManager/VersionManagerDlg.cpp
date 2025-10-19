@@ -49,6 +49,10 @@ CVersionManagerDlg::CVersionManagerDlg(CWnd* parent)
 
 	db::ConnectionManager::DefaultConnectionTimeout = DB_PROCESS_TIMEOUT;
 	db::ConnectionManager::Create();
+
+	_dbPoolCheckThread = std::make_unique<TimerThread>(
+		1min,
+		std::bind(&db::ConnectionManager::ExpireUnusedPoolConnections));
 }
 
 CVersionManagerDlg::~CVersionManagerDlg()
@@ -84,17 +88,6 @@ BOOL CVersionManagerDlg::OnInitDialog()
 	//  when the application's main window is not a dialog
 	SetIcon(_icon, TRUE);		// Set big icon
 	SetIcon(_icon, FALSE);		// Set small icon
-
-	_dbPoolCheckThread = std::make_unique<TimerThread>(
-		1min,
-		std::bind(&db::ConnectionManager::ExpireUnusedPoolConnections));
-
-	if (_dbPoolCheckThread == nullptr)
-	{
-		AfxMessageBox(_T("Failed to allocate timer thread (DB pool check). Out of memory."));
-		AfxPostQuitMessage(0);
-		return FALSE;
-	}
 
 	_socketManager.Init(MAX_USER, 0, 1);
 	_socketManager.AllocateServerSockets<CUser>(this);

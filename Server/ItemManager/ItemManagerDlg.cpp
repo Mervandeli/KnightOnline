@@ -4,7 +4,6 @@
 #include "stdafx.h"
 #include "ItemManager.h"
 #include "ItemManagerDlg.h"
-#include <process.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -12,40 +11,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-DWORD WINAPI ReadQueueThread(LPVOID lp)
-{
-	CItemManagerDlg* pMain = (CItemManagerDlg*) lp;
-	int recvlen = 0, index = 0;
-	uint8_t command;
-	char recv_buff[MAX_PKTSIZE] = {};
-	CString string;
-
-	while (true)
-	{
-		index = 0;
-		recvlen = pMain->m_LoggerRecvQueue.GetData(recv_buff);
-		if (recvlen >= SMQ_ERROR_RANGE)
-		{
-			Sleep(1);
-			continue;
-		}
-
-		command = GetByte(recv_buff, index);
-		switch (command)
-		{
-			case WIZ_ITEM_LOG:
-				pMain->ItemLogWrite(recv_buff + index);
-				break;
-
-			case WIZ_DATASAVE:
-				pMain->ExpLogWrite(recv_buff + index);
-				break;
-		}
-
-		recvlen = 0;
-		memset(recv_buff, 0, sizeof(recv_buff));
-	}
-}
+// NOTE: Explicitly handled under DEBUG_NEW override
+#include "ItemManagerReadQueueThread.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CItemManagerDlg dialog
@@ -59,6 +26,13 @@ CItemManagerDlg::CItemManagerDlg(CWnd* pParent /*=nullptr*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
 	m_nItemLogFileDay = 0;
+	m_nExpLogFileDay = 0;
+
+	_readQueueThread = std::make_unique<ItemManagerReadQueueThread>(this);
+}
+
+CItemManagerDlg::~CItemManagerDlg()
+{
 }
 
 void CItemManagerDlg::DoDataExchange(CDataExchange* pDX)
@@ -110,8 +84,7 @@ BOOL CItemManagerDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	DWORD id;
-	m_hReadQueueThread = ::CreateThread(nullptr, 0, ReadQueueThread, this, 0, &id);
+	_readQueueThread->start();
 
 	CTime cur = CTime::GetCurrentTime();
 	CString starttime;
@@ -162,7 +135,7 @@ HCURSOR CItemManagerDlg::OnQueryDragIcon()
 	return (HCURSOR) m_hIcon;
 }
 
-void CItemManagerDlg::ItemLogWrite(char* pBuf)
+void CItemManagerDlg::ItemLogWrite(const char* pBuf)
 {
 	int index = 0, srclen = 0, tarlen = 0, type = 0, putitem = 0, putcount = 0, putdure = 0;
 	int getitem = 0, getcount = 0, getdure = 0;
@@ -272,8 +245,8 @@ void CItemManagerDlg::WriteExpLogFile(char* pData)
 BOOL CItemManagerDlg::DestroyWindow()
 {
 	// TODO: Add your specialized code here and/or call the base class
-	if (m_hReadQueueThread != nullptr)
-		::TerminateThread(m_hReadQueueThread, 0);
+	if (_readQueueThread != nullptr)
+		_readQueueThread->shutdown();
 
 	if (m_ItemLogFile.m_hFile != CFile::hFileNull)
 		m_ItemLogFile.Close();
@@ -284,7 +257,7 @@ BOOL CItemManagerDlg::DestroyWindow()
 	return CDialog::DestroyWindow();
 }
 
-void CItemManagerDlg::ExpLogWrite(char* pBuf)
+void CItemManagerDlg::ExpLogWrite(const char* pBuf)
 {
 	int index = 0, aclen = 0, charlen = 0, type = 0, level = 0, exp = 0, loyalty = 0, money = 0;
 	char acname[MAX_ID_SIZE + 1] = {},

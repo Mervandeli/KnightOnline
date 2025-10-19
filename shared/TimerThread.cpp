@@ -19,7 +19,7 @@ void TimerThread::thread_loop()
 			if (!_running)
 				break;
 
-			// Only tick every 1min, ignore spurious wakeups
+			// Only tick every _tickDelay, ignore spurious wakeups
 			if (status != std::cv_status::timeout)
 				continue;
 		}

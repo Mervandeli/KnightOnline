@@ -226,13 +226,13 @@ public:
 	void RecvZoneChange(char* pBuf);
 	void GameStart(char* pBuf);
 	void GetUserInfo(char* buff, int& buff_index);
-	void RecvDeleteChar(char* pBuf);
+	void RecvDeleteChar(const char* pBuf);
 	bool ExistComEvent(int eventid) const;
 	void SaveComEvent(int eventid);
 	bool CheckItemCount(int itemid, int16_t min, int16_t max) const;
 	bool CheckClanGrade(int min, int max) const;
 	bool CheckKnight() const;
-	void CouponEvent(char* pBuf);
+	void CouponEvent(const char* pBuf);
 	void LogCoupon(int itemid, int count);
 	void RecvEditBox(char* pBuf);
 	bool CheckCouponUsed() const;
@@ -395,7 +395,7 @@ public:
 	void LogOut();
 	void SelCharToAgent(char* pBuf);
 	void SendMyInfo(int type);
-	void SelectCharacter(char* pBuf);
+	void SelectCharacter(const char* pBuf);
 	void Send2AI_UserUpdateInfo();
 	void Attack(char* pBuf);
 	void UserInOut(uint8_t Type);

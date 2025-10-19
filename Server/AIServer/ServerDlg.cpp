@@ -136,6 +136,10 @@ CServerDlg::CServerDlg(CWnd* pParent /*=nullptr*/)
 	//m_ppUserInActive = nullptr;
 
 	ConnectionManager::Create();
+
+	_checkAliveThread = std::make_unique<TimerThread>(
+		10s,
+		std::bind(&CServerDlg::CheckAliveTest, this));
 }
 
 CServerDlg::~CServerDlg()
@@ -215,17 +219,6 @@ BOOL CServerDlg::OnInitDialog()
 		time.GetYear(), time.GetMonth(), time.GetDay(), time.GetHour(), time.GetMinute());
 	AddOutputMessage(logstr);
 	spdlog::info("ServerDlg::OnInitDialog: starting...");
-
-	_checkAliveThread = std::make_unique<TimerThread>(
-		10s,
-		std::bind(&CServerDlg::CheckAliveTest, this));
-
-	if (_checkAliveThread == nullptr)
-	{
-		AfxMessageBox(_T("Failed to allocate timer thread (check alive). Out of memory."));
-		AfxPostQuitMessage(0);
-		return FALSE;
-	}
 
 	//----------------------------------------------------------------------
 	//	DB part initialize
