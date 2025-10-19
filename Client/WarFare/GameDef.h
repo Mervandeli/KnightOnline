@@ -281,6 +281,13 @@ enum e_ItemClass	{	ITEM_CLASS_DAGGER = 11, // dagger
 
 						ITEM_CLASS_UNKNOWN = 0xffffffff }; // 
 
+enum e_ItemGrade
+{
+	ITEM_GRADE_LOW_CLASS = 1,
+	ITEM_GRADE_MIDDLE_CLASS = 2,
+	ITEM_GRADE_HIGH_CLASS = 3
+};
+
 enum e_Nation { NATION_NOTSELECTED = 0, NATION_KARUS, NATION_ELMORAD, NATION_UNKNOWN = 0xffffffff };
 
 struct __TABLE_ITEM_BASIC;
@@ -734,7 +741,7 @@ struct __TABLE_ITEM_BASIC
 
 	uint8_t		bySellGroup;			// 36 Selling group associated with vendor NPC
 
-	uint8_t		byIDK3;					// 37
+	uint8_t		byGrade;				// 37
 };
 
 constexpr int MAX_ITEM_EXTENSION	= 24; // Number of item extension tables. (Item_Ext_0..23.tbl is a total of 24)
