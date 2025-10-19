@@ -1,14 +1,11 @@
-﻿// Map.cpp: implementation of the CMap class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
-#include "Map.h"
-#include "Serverdlg.h"
-#include "Region.h"
+﻿#include "stdafx.h"
+#include "MAP.h"
 #include "Npc.h"
-#include "User.h"
+#include "NpcThread.h" // TimeGet()
+#include "Region.h"
 #include "RoomEvent.h"
+#include "ServerDlg.h"
+#include "User.h"
 
 #include <shared/globals.h>
 #include <shared/StringConversion.h>

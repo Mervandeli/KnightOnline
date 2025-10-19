@@ -1,11 +1,14 @@
 ﻿#include "stdafx.h"
-#include "math.h"
 #include "Npc.h"
-#include "Serverdlg.h"
-#include "Gamesocket.h"
+#include "NpcThread.h" // TimeGet()
+#include "GameSocket.h"
+#include "ServerDlg.h"
 #include "Region.h"
 #include "Party.h"
-#include "extern.h"
+#include "Extern.h"
+
+#include <math.h>
+
 #include <spdlog/spdlog.h>
 
 //bool g_bDebug = true;
@@ -179,7 +182,6 @@ CNpc::CNpc()
 	m_iRegion_Z = 0;
 	m_nLimitMinX = m_nLimitMinZ = 0;
 	m_nLimitMaxX = m_nLimitMaxZ = 0;
-	m_lEventNpc = 0;
 	m_fSecForRealMoveMetor = 0.0f;
 	InitUserList();
 	InitMagicValuable();
@@ -1099,31 +1101,6 @@ bool CNpc::SetLive()
 	InitUserList();					// 타겟을위한 리스트를 초기화.
 	//InitPos();
 
-	CNpc* pNpc = nullptr;
-
-	/* If the Event Monster respawns, kill it and null the pointer in the event thread. */
-	if (m_lEventNpc == 1
-		&& !m_bFirstLive)
-	{
-		for (int i = 0; i < NPC_NUM; i++)
-		{
-			pNpc = m_pMain->m_EventNpcThreadArray[0]->m_ThreadInfo.pNpc[i];
-			if (m_pMain->m_EventNpcThreadArray[0]->m_ThreadInfo.pNpc[i] != nullptr)
-			{
-				if (m_pMain->m_EventNpcThreadArray[0]->m_ThreadInfo.pNpc[i]->m_sNid == m_sNid)
-				{
-					m_pMain->m_EventNpcThreadArray[0]->m_ThreadInfo.m_byNpcUsed[i] = 0;
-					m_lEventNpc = 0;
-					m_pMain->m_EventNpcThreadArray[0]->m_ThreadInfo.pNpc[i] = nullptr;
-					spdlog::debug("Npc::SetLive: returning summoned monster pointer [threadIndex={} serial={} npcId={} npcName={}]",
-						i, m_sNid + NPC_BAND, m_sSid, m_strName);
-					return true;
-				}
-			}
-		}
-		return true;
-	}
-
 	// NPC 초기위치 결정 ------------------------//
 	MAP* pMap = m_pMain->GetMapByIndex(m_ZoneIndex);
 	if (pMap == nullptr)
@@ -1153,8 +1130,7 @@ bool CNpc::SetLive()
 
 	bool bMove = pMap->IsMovable(dest_x, dest_z);
 
-	if (m_tNpcType != NPCTYPE_MONSTER
-		|| m_lEventNpc == 1)
+	if (m_tNpcType != NPCTYPE_MONSTER)
 	{
 		m_fCurX = m_fPrevX = m_nInitX;
 		m_fCurY = m_fPrevY = m_nInitY;

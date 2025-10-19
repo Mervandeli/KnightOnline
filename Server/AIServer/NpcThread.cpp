@@ -3,31 +3,19 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "server.h"
 #include "NpcThread.h"
 #include "Npc.h"
 #include "Extern.h"
-#include "Mmsystem.h"
 #include "ServerDlg.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
-#define DELAY				250
+#include <mmsystem.h>
 
 //////////////////////////////////////////////////////////////////////
 // NPC Thread Callback Function
 //
-UINT NpcThreadProc(LPVOID pParam /* NPC_THREAD_INFO ptr */)
+void CNpcThread::thread_loop()
 {
-	NPC_THREAD_INFO*	pInfo		= (NPC_THREAD_INFO*) pParam;
-	CNpc*				pNpc		= nullptr;
-	CPoint				pt;
-
-	int					i			= 0;
 	uint32_t			dwDiffTime	= 0;
-	uint32_t			dwSleep		= 250;
 	uint32_t			dwTickTime	= 0;
 
 	srand((unsigned int) time(nullptr));
@@ -38,16 +26,13 @@ UINT NpcThreadProc(LPVOID pParam /* NPC_THREAD_INFO ptr */)
 	float  fTime3 = 0.0f;
 	int    duration_damage = 0;
 
-	if (pInfo == nullptr)
-		return 0;
-
-	while (!g_bNpcExit)
+	while (_running)
 	{
 		fTime2 = TimeGet();
 
-		for (i = 0; i < NPC_NUM; i++)
+		for (int i = 0; i < NPC_NUM; i++)
 		{
-			pNpc = pInfo->pNpc[i];
+			CNpc* pNpc = m_pNpc[i];
 			if (pNpc == nullptr)
 				continue;
 
@@ -147,56 +132,8 @@ UINT NpcThreadProc(LPVOID pParam /* NPC_THREAD_INFO ptr */)
 			}
 		}
 
-		dwSleep = 100;
-		Sleep(dwSleep);
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
-
-	return 0;
-}
-
-//////////////////////////////////////////////////////////////////////
-// NPC Thread Callback Function
-//
-UINT ZoneEventThreadProc(LPVOID pParam/* = nullptr */)
-{
-	CServerDlg* m_pMain = (CServerDlg*) pParam;
-
-	while (!g_bNpcExit)
-	{
-		float fCurrentTime = TimeGet();
-		for (MAP* pMap : m_pMain->m_ZoneArray)
-		{
-			if (pMap == nullptr)
-				continue;
-
-			// 현재의 존이 던젼담당하는 존이 아니면 리턴..
-			if (pMap->m_byRoomEvent == 0)
-				continue;
-
-			// 전체방이 클리어 되었다면
-			if (pMap->IsRoomStatusCheck())
-				continue;
-
-			// 방번호는 1번부터 시작
-			for (auto& [_, pRoom] : pMap->m_arRoomEventArray)
-			{
-				if (pRoom == nullptr)
-					continue;
-
-				// 1:init, 2:progress, 3:clear
-				if (pRoom->m_byStatus == 1
-					|| pRoom->m_byStatus == 3)  
-					continue;
-
-				// 여기서 처리하는 로직...
-				pRoom->MainRoom(fCurrentTime);
-			}
-		}
-
-		Sleep(1000);	// 1초당 한번
-	}
-
-	return 0;
 }
 
 float TimeGet()
@@ -231,27 +168,8 @@ float TimeGet()
 
 CNpcThread::CNpcThread()
 {
-	// m_pNpc = nullptr;
-	m_pThread = nullptr;
 	m_sThreadNumber = -1;
 
 	for (int i = 0; i < NPC_NUM; i++)
 		m_pNpc[i] = nullptr;
-}
-
-CNpcThread::~CNpcThread()
-{
-/*	for( int i = 0; i < NPC_NUM; i++ )
-	{
-		if(m_pNpc[i])
-		{
-			delete m_pNpc[i];
-			m_pNpc[i] = nullptr;
-		}
-	}	*/
-}
-
-void CNpcThread::InitThreadInfo(HWND hwnd)
-{
-	m_ThreadInfo.hWndMsg = hwnd;
 }

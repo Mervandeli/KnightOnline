@@ -2,11 +2,11 @@
 //
 
 #include "stdafx.h"
-#include "Server.h"
 #include "ServerDlg.h"
-
 #include "GameSocket.h"
+#include "NpcThread.h"
 #include "Region.h"
+#include "ZoneEventThread.h"
 
 #include <shared/crc32.h>
 #include <shared/lzf.h>
@@ -376,7 +376,7 @@ BOOL CServerDlg::OnInitDialog()
 	//----------------------------------------------------------------------
 	//	Start NPC THREAD
 	//----------------------------------------------------------------------
-	ResumeAI();
+	StartNpcThreads();
 
 	//----------------------------------------------------------------------
 	//	Start Accepting...
@@ -733,7 +733,7 @@ bool CServerDlg::CreateNpcThread()
 	for (auto& [_, pNpc] : m_NpcMap)
 	{
 		if (step == 0)
-			pNpcThread = new CNpcThread;
+			pNpcThread = new CNpcThread();
 
 		pNpcThread->m_pNpc[step] = pNpc;
 		pNpcThread->m_pNpc[step]->m_sThreadNumber = nThreadNumber;
@@ -744,7 +744,6 @@ bool CServerDlg::CreateNpcThread()
 		if (step == NPC_NUM)
 		{
 			pNpcThread->m_sThreadNumber = nThreadNumber++;
-			pNpcThread->m_pThread = AfxBeginThread(NpcThreadProc, &pNpcThread->m_ThreadInfo, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
 			m_NpcThreadArray.push_back(pNpcThread);
 			step = 0;
 		}
@@ -753,12 +752,11 @@ bool CServerDlg::CreateNpcThread()
 	if (step != 0)
 	{
 		pNpcThread->m_sThreadNumber = nThreadNumber++;
-		pNpcThread->m_pThread = AfxBeginThread(NpcThreadProc, &pNpcThread->m_ThreadInfo, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
 		m_NpcThreadArray.push_back(pNpcThread);
 	}
 
-	// Event Npc Logic
-	m_pZoneEventThread = AfxBeginThread(ZoneEventThreadProc, this, THREAD_PRIORITY_NORMAL, 0, CREATE_SUSPENDED);
+	if (m_pZoneEventThread == nullptr)
+		m_pZoneEventThread = new ZoneEventThread(this);
 	
 	std::wstring logstr = std::format(L"NPCs initialized: {}",
 		m_TotalNPC);
@@ -1037,30 +1035,12 @@ bool CServerDlg::LoadNpcPosTable(std::vector<model::NpcPos*>& rows)
 }
 
 //	NPC Thread 들을 작동시킨다.
-void CServerDlg::ResumeAI()
+void CServerDlg::StartNpcThreads()
 {
-	for (size_t i = 0; i < m_NpcThreadArray.size(); i++)
-	{
-		for (int j = 0; j < NPC_NUM; j++)
-			m_NpcThreadArray[i]->m_ThreadInfo.pNpc[j] = m_NpcThreadArray[i]->m_pNpc[j];
+	for (CNpcThread* npcThread : m_NpcThreadArray)
+		npcThread->start();
 
-		ResumeThread(m_NpcThreadArray[i]->m_pThread->m_hThread);
-	}
-
-
-	// Event Npc Logic
-/*	m_EventNpcThreadArray[0]->m_ThreadInfo.hWndMsg = this->GetSafeHwnd();
-	for(j = 0; j < NPC_NUM; j++)
-	{
-		m_EventNpcThreadArray[0]->m_ThreadInfo.pNpc[j] = nullptr;	// 초기 소환 몹이 당연히 없으므로 nullptr로 작동을 안시킴
-		m_EventNpcThreadArray[0]->m_ThreadInfo.m_byNpcUsed[j] = 0;
-	}
-	m_EventNpcThreadArray[0]->m_ThreadInfo.pIOCP = &_socketManager;
-
-	::ResumeThread(m_EventNpcThreadArray[0]->m_pThread->m_hThread);
-	*/
-
-	ResumeThread(m_pZoneEventThread->m_hThread);
+	m_pZoneEventThread->start();
 }
 
 //	메모리 정리
@@ -1070,27 +1050,22 @@ BOOL CServerDlg::DestroyWindow()
 	if (_checkAliveThread != nullptr)
 		_checkAliveThread->shutdown();
 
-	g_bNpcExit = true;
+	for (CNpcThread* npcThread : m_NpcThreadArray)
+		npcThread->shutdown();
 
-	for (size_t i = 0; i < m_NpcThreadArray.size(); i++)
-		WaitForSingleObject(m_NpcThreadArray[i]->m_pThread->m_hThread, INFINITE);
-
-	// Event Npc Logic
-/*	for(i = 0; i < m_EventNpcThreadArray.size(); i++)
-	{
-		WaitForSingleObject(m_EventNpcThreadArray[i]->m_pThread->m_hThread, INFINITE);
-	}	*/
-
-	WaitForSingleObject(m_pZoneEventThread, INFINITE);
+	m_pZoneEventThread->shutdown();
 
 	_socketManager.Shutdown();
 
 	// DB테이블 삭제 부분
 
 	// Map(Zone) Array Delete...
-	for (size_t i = 0; i < m_ZoneArray.size(); i++)
-		delete m_ZoneArray[i];
+	for (MAP* map : m_ZoneArray)
+		delete map;
 	m_ZoneArray.clear();
+
+	delete m_pZoneEventThread;
+	m_pZoneEventThread = nullptr;
 
 	// NpcTable Array Delete
 	if (!m_MonTableMap.IsEmpty())
@@ -1101,18 +1076,12 @@ BOOL CServerDlg::DestroyWindow()
 		m_NpcTableMap.DeleteAllData();
 
 	// NpcThread Array Delete
-	for (size_t i = 0; i < m_NpcThreadArray.size(); i++)
-		delete m_NpcThreadArray[i];
+	for (CNpcThread* npcThread : m_NpcThreadArray)
+		delete npcThread;
 	m_NpcThreadArray.clear();
 
-	// Event Npc Logic
-	// EventNpcThread Array Delete
-/*	for(i = 0; i < m_EventNpcThreadArray.size(); i++)
-		delete m_EventNpcThreadArray[i];
-	m_EventNpcThreadArray.clear();		*/
-
 	// Item Array Delete
-	if (m_NpcItem.m_ppItem)
+	if (m_NpcItem.m_ppItem != nullptr)
 	{
 		for (int i = 0; i < m_NpcItem.m_nRow; i++)
 		{
@@ -1778,177 +1747,6 @@ CNpc* CServerDlg::GetNpcPtr(const char* pNpcName)
 
 	spdlog::error("ServerDlg::GetNpcPtr: failed to find npc with name: {}", pNpcName);
 	return nullptr;
-}
-
-
-//	추가할 소환몹의 메모리를 참조하기위해 플래그가 0인 상태것만 넘긴다.
-CNpc* CServerDlg::GetEventNpcPtr()
-{
-	for (auto& [_, pNpc] : m_NpcMap)
-	{
-		if (pNpc == nullptr)
-			continue;
-
-		if (pNpc->m_lEventNpc != 0)
-			continue;
-
-		pNpc->m_lEventNpc = 1;
-		return pNpc;
-	}
-
-	return nullptr;
-}
-
-int CServerDlg::MonsterSummon(const char* pNpcName, int zone_id, float fx, float fz)
-{
-	MAP* pMap = GetMapByID(zone_id);
-	if (pMap == nullptr)
-	{
-		spdlog::error("ServerDlg::MonsterSummon: No map found for npcName={}, zoneId={}",
-			pNpcName, zone_id);
-		return -1;
-	}
-
-	CNpc* pNpc = GetNpcPtr(pNpcName);
-	if (pNpc == nullptr)
-	{
-		spdlog::error("ServerDlg::MonsterSummon: no NPC found for npcName={}",
-			pNpcName);
-		return  -1;
-	}
-
-	bool bFlag = SetSummonNpcData(pNpc, zone_id, fx, fz);
-
-	return 1;
-}
-
-//	소환할 몹의 데이타값을 셋팅한다.
-bool CServerDlg::SetSummonNpcData(CNpc* pNpc, int zone_id, float fx, float fz)
-{
-	int  iCount = 0;
-	CNpc* pEventNpc = GetEventNpcPtr();
-	if (pEventNpc == nullptr)
-	{
-		spdlog::error("ServerDlg::SetSummonNpcData: No EventNpc found");
-		return false;
-	}
-
-	pEventNpc->m_sSid = pNpc->m_sSid;						// MONSTER(NPC) Serial ID
-	pEventNpc->m_byMoveType = 1;
-	pEventNpc->m_byInitMoveType = 1;
-	pEventNpc->m_byBattlePos = 0;
-	pEventNpc->m_strName = pNpc->m_strName;					// MONSTER(NPC) Name
-	pEventNpc->m_sPid = pNpc->m_sPid;						// MONSTER(NPC) Picture ID
-	pEventNpc->m_sSize = pNpc->m_sSize;						// 캐릭터의 비율(100 퍼센트 기준)
-	pEventNpc->m_iWeapon_1 = pNpc->m_iWeapon_1;				// 착용무기
-	pEventNpc->m_iWeapon_2 = pNpc->m_iWeapon_2;				// 착용무기
-	pEventNpc->m_byGroup = pNpc->m_byGroup;					// 소속집단
-	pEventNpc->m_byActType = pNpc->m_byActType;				// 행동패턴
-	pEventNpc->m_byRank = pNpc->m_byRank;					// 작위
-	pEventNpc->m_byTitle = pNpc->m_byTitle;					// 지위
-	pEventNpc->m_iSellingGroup = pNpc->m_iSellingGroup;
-	pEventNpc->m_sLevel = pNpc->m_sLevel;					// level
-	pEventNpc->m_iExp = pNpc->m_iExp;						// 경험치
-	pEventNpc->m_iLoyalty = pNpc->m_iLoyalty;				// loyalty
-	pEventNpc->m_iHP = pNpc->m_iMaxHP;						// 최대 HP
-	pEventNpc->m_iMaxHP = pNpc->m_iMaxHP;					// 현재 HP
-	pEventNpc->m_sMP = pNpc->m_sMaxMP;						// 최대 MP
-	pEventNpc->m_sMaxMP = pNpc->m_sMaxMP;					// 현재 MP
-	pEventNpc->m_sAttack = pNpc->m_sAttack;					// 공격값
-	pEventNpc->m_sDefense = pNpc->m_sDefense;				// 방어값
-	pEventNpc->m_sHitRate = pNpc->m_sHitRate;				// 타격성공률
-	pEventNpc->m_sEvadeRate = pNpc->m_sEvadeRate;			// 회피성공률
-	pEventNpc->m_sDamage = pNpc->m_sDamage;					// 기본 데미지
-	pEventNpc->m_sAttackDelay = pNpc->m_sAttackDelay;		// 공격딜레이
-	pEventNpc->m_sSpeed = pNpc->m_sSpeed;					// 이동속도
-	pEventNpc->m_fSpeed_1 = pNpc->m_fSpeed_1;				// 기본 이동 타입
-	pEventNpc->m_fSpeed_2 = pNpc->m_fSpeed_2;				// 뛰는 이동 타입..
-	pEventNpc->m_fOldSpeed_1 = pNpc->m_fOldSpeed_1;			// 기본 이동 타입
-	pEventNpc->m_fOldSpeed_2 = pNpc->m_fOldSpeed_2;			// 뛰는 이동 타입..
-	pEventNpc->m_fSecForMetor = 4.0f;						// 초당 갈 수 있는 거리..
-	pEventNpc->m_sStandTime = pNpc->m_sStandTime;			// 서있는 시간
-	pEventNpc->m_iMagic1 = pNpc->m_iMagic1;					// 사용마법 1
-	pEventNpc->m_iMagic2 = pNpc->m_iMagic2;					// 사용마법 2
-	pEventNpc->m_iMagic3 = pNpc->m_iMagic3;					// 사용마법 3
-	pEventNpc->m_sFireR = pNpc->m_sFireR;					// 화염 저항력
-	pEventNpc->m_sColdR = pNpc->m_sColdR;					// 냉기 저항력
-	pEventNpc->m_sLightningR = pNpc->m_sLightningR;			// 전기 저항력
-	pEventNpc->m_sMagicR = pNpc->m_sMagicR;					// 마법 저항력
-	pEventNpc->m_sDiseaseR = pNpc->m_sDiseaseR;				// 저주 저항력
-	pEventNpc->m_sPoisonR = pNpc->m_sPoisonR;				// 독 저항력
-	pEventNpc->m_sLightR = pNpc->m_sLightR;					// 빛 저항력
-	pEventNpc->m_fBulk = pNpc->m_fBulk;
-	pEventNpc->m_bySearchRange = pNpc->m_bySearchRange;		// 적 탐지 범위
-	pEventNpc->m_byAttackRange = pNpc->m_byAttackRange;		// 사정거리
-	pEventNpc->m_byTracingRange = pNpc->m_byTracingRange;	// 추격거리
-	pEventNpc->m_tNpcType = pNpc->m_tNpcType;				// NPC Type
-	pEventNpc->m_byFamilyType = pNpc->m_byFamilyType;		// 몹들사이에서 가족관계를 결정한다.
-	pEventNpc->m_iMoney = pNpc->m_iMoney;					// 떨어지는 돈
-	pEventNpc->m_iItem = pNpc->m_iItem;						// 떨어지는 아이템
-	pEventNpc->m_tNpcLongType = pNpc->m_tNpcLongType;
-	pEventNpc->m_byWhatAttackType = pNpc->m_byWhatAttackType;
-
-	//////// MONSTER POS ////////////////////////////////////////
-	pEventNpc->m_sCurZone = static_cast<int16_t>(zone_id);
-	pEventNpc->m_fCurX = fx;
-	pEventNpc->m_fCurY = 0;
-	pEventNpc->m_fCurZ = fz;
-	pEventNpc->m_nInitMinX = pNpc->m_nInitMinX;
-	pEventNpc->m_nInitMinY = pNpc->m_nInitMinY;
-	pEventNpc->m_nInitMaxX = pNpc->m_nInitMaxX;
-	pEventNpc->m_nInitMaxY = pNpc->m_nInitMaxY;
-	pEventNpc->m_sRegenTime = pNpc->m_sRegenTime;			// 초(DB)단위-> 밀리세컨드로
-
-	pEventNpc->m_ZoneIndex = -1;
-
-	pEventNpc->m_NpcState = NPC_DEAD;						// 상태는 죽은것으로 해야 한다.. 
-	pEventNpc->m_bFirstLive = 1;							// 처음 살아난 경우로 해줘야 한다..
-
-	for (size_t i = 0; i < m_ZoneArray.size(); i++)
-	{
-		if (m_ZoneArray[i]->m_nZoneNumber == zone_id)
-		{
-			pEventNpc->m_ZoneIndex = static_cast<int16_t>(i);
-			break;
-		}
-	}
-
-	if (pEventNpc->m_ZoneIndex == -1)
-	{
-		spdlog::error("ServerDlg::SetSummonNpcData: invalid zone index");
-		return false;
-	}
-
-	pEventNpc->Init();
-
-	bool bSuccess = false;
-
-	int test = 0;
-
-	for (int i = 0; i < NPC_NUM; i++)
-	{
-		test = m_EventNpcThreadArray[0]->m_ThreadInfo.m_byNpcUsed[i];
-		spdlog::debug("ServerDlg::SetSummonNpcData: setsummon == {}, used={}", i, test);
-		if (m_EventNpcThreadArray[0]->m_ThreadInfo.m_byNpcUsed[i] == 0)
-		{
-			m_EventNpcThreadArray[0]->m_ThreadInfo.m_byNpcUsed[i] = 1;
-			bSuccess = true;
-			m_EventNpcThreadArray[0]->m_ThreadInfo.pNpc[i] = pEventNpc;
-			break;
-		}
-	}
-
-	if (!bSuccess)
-	{
-		pEventNpc->m_lEventNpc = 0;
-		spdlog::error("ServerDlg::SetSummonNpcData: summon failed");
-		return false;
-	}
-
-	spdlog::debug("ServerDlg::SetSummonNpcData: summoned serial={} npcName={} npcState={}",
-		pEventNpc->m_sNid + NPC_BAND, pEventNpc->m_strName, pEventNpc->m_NpcState);
-
-	return true;
 }
 
 void CServerDlg::TestCode()
