@@ -11,9 +11,6 @@
 
 constexpr int MAX_USER			= 3000;
 
-/// \brief AUTOSAVE_DELTA is the amount of time required since last save to trigger a UserDataSave()
-constexpr int AUTOSAVE_DELTA = 360000;
-
 constexpr long DB_PROCESS_TIMEOUT = 10;
 
 #define MAX_ITEM			28

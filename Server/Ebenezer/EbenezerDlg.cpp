@@ -17,12 +17,6 @@
 constexpr int WM_PROCESS_LISTBOX_QUEUE = WM_APP + 1;
 constexpr int MAX_SMQ_SEND_QUEUE_RETRY_COUNT = 50;
 
-constexpr int GAME_TIME       	= 100;
-constexpr int HEARTBEAT_SMQ		= 200;
-constexpr int PACKET_CHECK		= 300;
-constexpr int ALIVE_TIME		= 400;
-constexpr int MARKET_BBS_TIME	= 1000;
-
 constexpr int NUM_FLAG_VICTORY    = 4;
 constexpr int AWARD_GOLD          = 5000;
 
@@ -35,10 +29,12 @@ static char THIS_FILE[] = __FILE__;
 // NOTE: Explicitly handled under DEBUG_NEW override
 #include <db-library/RecordSetLoader_STLMap.h>
 #include <db-library/RecordSetLoader_Vector.h>
+#include <shared/TimerThread.h>
 
 import EbenezerBinder;
 
 using namespace db;
+using namespace std::chrono_literals;
 
 CRITICAL_SECTION g_serial_critical;
 CRITICAL_SECTION g_region_critical;
@@ -298,7 +294,6 @@ BEGIN_MESSAGE_MAP(CEbenezerDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_WM_TIMER()
 	ON_MESSAGE(WM_PROCESS_LISTBOX_QUEUE, &CEbenezerDlg::OnProcessListBoxQueue)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -340,6 +335,61 @@ BOOL CEbenezerDlg::OnInitDialog()
 	InitializeCriticalSection(&g_region_critical);
 
 	LoadConfig();
+
+	_gameTimeThread = std::make_unique<TimerThread>(
+		6s,
+		std::bind(&CEbenezerDlg::GameTimeTick, this));
+
+	if (_gameTimeThread == nullptr)
+	{
+		AfxMessageBox(_T("Failed to allocate timer thread (game time). Out of memory."));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
+
+	_smqHeartbeatThread = std::make_unique<TimerThread>(
+		10s,
+		std::bind(&CEbenezerDlg::SendSMQHeartbeat, this));
+
+	if (_smqHeartbeatThread == nullptr)
+	{
+		AfxMessageBox(_T("Failed to allocate timer thread (SMQ heartbeat). Out of memory."));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
+
+	_aliveTimeThread = std::make_unique<TimerThread>(
+		34s, // NOTE: oddly specific time which they preserved in newer builds
+		std::bind(&CEbenezerDlg::CheckAliveUser, this));
+
+	if (_aliveTimeThread == nullptr)
+	{
+		AfxMessageBox(_T("Failed to allocate timer thread (alive time). Out of memory."));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
+
+	_marketBBSTimeThread = std::make_unique<TimerThread>(
+		5min,
+		std::bind(&CEbenezerDlg::MarketBBSTimeCheck, this));
+
+	if (_marketBBSTimeThread == nullptr)
+	{
+		AfxMessageBox(_T("Failed to allocate timer thread (market BBS time). Out of memory."));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
+
+	_packetCheckThread = std::make_unique<TimerThread>(
+		6min,
+		std::bind(&CEbenezerDlg::WritePacketLog, this));
+
+	if (_packetCheckThread == nullptr)
+	{
+		AfxMessageBox(_T("Failed to allocate timer thread (packet check). Out of memory."));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
 
 	_socketManager.Init(MAX_USER, CLIENT_SOCKSIZE, 4);
 	_socketManager.AllocateServerSockets<CUser>();
@@ -597,6 +647,12 @@ BOOL CEbenezerDlg::OnInitDialog()
 	UserAcceptThread();
 #endif
 
+	_gameTimeThread->start();
+	_smqHeartbeatThread->start();
+	_aliveTimeThread->start();
+	_marketBBSTimeThread->start();
+	_packetCheckThread->start();
+
 	CTime cur = CTime::GetCurrentTime();
 	std::wstring starttime = std::format(L"Ebenezer started: {:02}/{:02} {:02}:{:02}",
 		cur.GetMonth(), cur.GetDay(), cur.GetHour(), cur.GetMinute());
@@ -649,10 +705,20 @@ HCURSOR CEbenezerDlg::OnQueryDragIcon()
 
 BOOL CEbenezerDlg::DestroyWindow()
 {
-	KillTimer(GAME_TIME);
-	KillTimer(ALIVE_TIME);
-	KillTimer(MARKET_BBS_TIME);
-	KillTimer(PACKET_CHECK);
+	if (_gameTimeThread != nullptr)
+		_gameTimeThread->shutdown();
+
+	if (_smqHeartbeatThread != nullptr)
+		_smqHeartbeatThread->shutdown();
+
+	if (_aliveTimeThread != nullptr)
+		_aliveTimeThread->shutdown();
+
+	if (_marketBBSTimeThread != nullptr)
+		_marketBBSTimeThread->shutdown();
+
+	if (_packetCheckThread != nullptr)
+		_packetCheckThread->shutdown();
 
 	delete m_pUdpSocket;
 	m_pUdpSocket = nullptr;
@@ -798,63 +864,6 @@ void CEbenezerDlg::AddOutputMessage(const std::wstring& msg)
 	// Set the focus to the last item and ensure it is visible
 	int lastIndex = _outputList.GetCount() - 1;
 	_outputList.SetTopIndex(lastIndex);
-}
-
-void CEbenezerDlg::OnTimer(UINT nIDEvent)
-{
-	// sungyong 2002.05.23
-	int retval = 0;
-
-	switch (nIDEvent)
-	{
-		case GAME_TIME:
-			UpdateGameTime();
-
-			// AIServer Socket Alive Check Routine
-			if (m_bFirstServerFlag)
-			{
-				int count = 0;
-				for (int i = 0; i < MAX_AI_SOCKET; i++)
-				{
-					CAISocket* pAISock = m_AISocketMap.GetData(i);
-					if (pAISock != nullptr
-						&& pAISock->GetState() == CONNECTION_STATE_DISCONNECTED)
-						AISocketConnect(i, true);
-					else if (pAISock == nullptr)
-						AISocketConnect(i, true);
-					else
-						count++;
-				}
-
-				if (count <= 0)
-					DeleteAllNpcList();
-			}
-			// sungyong~ 2002.05.23
-			break;
-
-		case HEARTBEAT_SMQ:
-		{
-			char sendBuffer[4];
-			int sendIndex = 0;
-			SetByte(sendBuffer, DB_HEARTBEAT, sendIndex);
-			m_LoggerSendQueue.PutData(sendBuffer, sendIndex);
-		}
-		break;
-
-		case ALIVE_TIME:
-			CheckAliveUser();
-			break;
-
-		case MARKET_BBS_TIME:
-			MarketBBSTimeCheck();
-			break;
-
-		case PACKET_CHECK:
-			WritePacketLog();
-			break;
-	}
-
-	CDialog::OnTimer(nIDEvent);
 }
 
 LRESULT CEbenezerDlg::OnProcessListBoxQueue(WPARAM, LPARAM)
@@ -1572,12 +1581,6 @@ void CEbenezerDlg::LoadConfig()
 
 	// Trigger a save to flush defaults to file.
 	m_Ini.Save();
-
-	SetTimer(GAME_TIME, 6000, nullptr);
-	SetTimer(HEARTBEAT_SMQ, 10000, nullptr);
-	SetTimer(ALIVE_TIME, 34000, nullptr);
-	SetTimer(MARKET_BBS_TIME, 300000, nullptr);
-	SetTimer(PACKET_CHECK, 360000, nullptr);
 }
 
 void EbenezerLogger::SetupExtraLoggers(CIni& ini,
@@ -3903,4 +3906,38 @@ int32_t CEbenezerDlg::GetEventTrigger(uint8_t byNpcType, uint16_t sTrapNumber) c
 		return -1;
 
 	return itr->second;
+}
+
+void CEbenezerDlg::SendSMQHeartbeat()
+{
+	char sendBuffer[4];
+	int sendIndex = 0;
+	SetByte(sendBuffer, DB_HEARTBEAT, sendIndex);
+	m_LoggerSendQueue.PutData(sendBuffer, sendIndex);
+}
+
+void CEbenezerDlg::GameTimeTick()
+{
+	UpdateGameTime();
+
+	// AIServer Socket Alive Check Routine
+	if (m_bFirstServerFlag)
+	{
+		int count = 0;
+		for (int i = 0; i < MAX_AI_SOCKET; i++)
+		{
+			CAISocket* pAISock = m_AISocketMap.GetData(i);
+			if (pAISock != nullptr
+				&& pAISock->GetState() == CONNECTION_STATE_DISCONNECTED)
+				AISocketConnect(i, true);
+			else if (pAISock == nullptr)
+				AISocketConnect(i, true);
+			else
+				count++;
+		}
+
+		if (count <= 0)
+			DeleteAllNpcList();
+	}
+	// sungyong~ 2002.05.23
 }

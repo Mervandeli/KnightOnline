@@ -19,6 +19,7 @@ namespace recordset_loader
 /////////////////////////////////////////////////////////////////////////////
 // CAujardDlg dialog
 
+class TimerThread;
 class CAujardDlg : public CDialog
 {
 // Construction
@@ -35,6 +36,10 @@ public:
 	/// \see DB_HEARTBEAT
 	void HeartbeatReceived();
 
+	/// \brief checks the time since the last received heartbeat and saves if
+	//  enough time has passed.
+	void CheckHeartbeat();
+
 	/// \brief handles DB_COUPON_EVENT requests
 	/// \todo related stored procedures are not implemented
 	/// \see DB_COUPON_EVENT
@@ -44,12 +49,6 @@ public:
     /// \details contains which nation won the war and which charId killed the commander
     /// \see WIZ_BATTLE_EVENT
 	void BattleEventResult(char* data);
-
-	/// \brief checks for users who have not saved their data in AUTOSAVE_DELTA milliseconds
-	/// and performs a UserDataSave() for them.
-	/// \note this is currently disabled in OnTimer()
-	/// \see UserDataSave(), OnTimer(), PACKET_CHECK
-	void SaveUserData();
 
 	/// \brief writes a packet summary line to the log file
 	void WritePacketLog();
@@ -66,7 +65,8 @@ public:
 	/// \see KnightsPacket(), KNIGHTS_LIST_REQ
 	void KnightsList(char* buffer);
 
-	/// \brief Called by OnTimer if __SAMMA is defined
+	/// \brief Called every 5min by _concurrentCheckThread
+	/// \see _concurrentCheckThread
 	void ConCurrentUserCount();
 
 	/// \brief attempts to return a list of all knights members
@@ -236,14 +236,18 @@ protected:
 	/// \brief triggered when the Exit button is clicked. Will ask user to confirm intent to close the program.
 	void OnOK() override;
 	
-	afx_msg void OnTimer(UINT EventId);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
 private:
 	/// \brief output message box for the application
-	CListBox _outputList;
-	time_t _heartbeatReceivedTime;
+	CListBox						_outputList;
+
+	time_t							_heartbeatReceivedTime;
+	std::unique_ptr<TimerThread>	_dbPoolCheckThread;
+	std::unique_ptr<TimerThread>	_heartbeatCheckThread;
+	std::unique_ptr<TimerThread>	_concurrentCheckThread;
+	std::unique_ptr<TimerThread>	_packetCheckThread;
 };
 
 //{{AFX_INSERT_LOCATION}}

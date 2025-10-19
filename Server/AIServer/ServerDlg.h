@@ -67,14 +67,7 @@ typedef CSTLMap <model::MakeItemRareCode>	MakeItemRareCodeTableMap;
 typedef std::list <int>						ZoneNpcInfoList;
 typedef std::vector <MAP*>					ZoneArray;
 
-/*
-	 ** Repent AI Server 작업시 참고 사항 **
-	1. 3개의 함수 추가
-		int GetSpeed(uint8_t bySpeed);
-		int GetAttackSpeed(uint8_t bySpeed);
-		int GetCatsSpeed(uint8_t bySpeed);
-*/
-
+class TimerThread;
 class CServerDlg : public CDialog
 {
 // Construction
@@ -207,7 +200,6 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
-	afx_msg void OnTimer(UINT nIDEvent);
 	afx_msg LRESULT OnProcessListBoxQueue(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 
@@ -225,8 +217,10 @@ private:
 	/// \brief output message box for the application
 	CListBox _outputList;
 
-	std::queue<std::wstring>	_listBoxQueue;
-	std::mutex					_listBoxQueueMutex;
+	std::queue<std::wstring>		_listBoxQueue;
+	std::mutex						_listBoxQueueMutex;
+
+	std::unique_ptr<TimerThread>	_checkAliveThread;
 
 	void ResumeAI();
 	bool LoadNpcPosTable(std::vector<model::NpcPos*>& rows);

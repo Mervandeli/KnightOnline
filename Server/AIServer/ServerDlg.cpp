@@ -30,17 +30,17 @@ static char THIS_FILE[] = __FILE__;
 // NOTE: Explicitly handled under DEBUG_NEW override
 #include <db-library/RecordSetLoader_STLMap.h>
 #include <db-library/RecordsetLoader_Vector.h>
+#include <shared/TimerThread.h>
 
 constexpr int WM_PROCESS_LISTBOX_QUEUE = WM_APP + 1;
+
+using namespace std::chrono_literals;
 
 bool g_bNpcExit = false;
 ZoneArray m_ZoneArray;
 
 CRITICAL_SECTION g_User_critical;
 CRITICAL_SECTION g_region_critical;
-
-#define CHECK_ALIVE 	100		//  게임서버와 통신이 끊김여부 판단, 타이머 변수
-#define REHP_TIME		200
 
 import AIServerBinder;
 
@@ -157,7 +157,6 @@ BEGIN_MESSAGE_MAP(CServerDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_WM_TIMER()
 	ON_MESSAGE(WM_PROCESS_LISTBOX_QUEUE, &CServerDlg::OnProcessListBoxQueue)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -186,8 +185,6 @@ BOOL CServerDlg::OnInitDialog()
 	//----------------------------------------------------------------------
 	//	Sets a random number starting point.
 	//----------------------------------------------------------------------
-	SetTimer(CHECK_ALIVE, 10000, nullptr);
-
 	srand((unsigned int) time(nullptr));
 	for (int i = 0; i < 10; i++)
 		myrand(1, 10000);	// don't delete
@@ -218,6 +215,17 @@ BOOL CServerDlg::OnInitDialog()
 		time.GetYear(), time.GetMonth(), time.GetDay(), time.GetHour(), time.GetMinute());
 	AddOutputMessage(logstr);
 	spdlog::info("ServerDlg::OnInitDialog: starting...");
+
+	_checkAliveThread = std::make_unique<TimerThread>(
+		10s,
+		std::bind(&CServerDlg::CheckAliveTest, this));
+
+	if (_checkAliveThread == nullptr)
+	{
+		AfxMessageBox(_T("Failed to allocate timer thread (check alive). Out of memory."));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
 
 	//----------------------------------------------------------------------
 	//	DB part initialize
@@ -386,10 +394,13 @@ BOOL CServerDlg::OnInitDialog()
 		return FALSE;
 	}
 
+	_checkAliveThread->start();
+
 	//::ResumeThread( _socketManager.m_hAcceptThread );
 	UpdateData(FALSE);
 
 	spdlog::info("AIServer successfully initialized");
+
 	return TRUE;
 }
 
@@ -1063,8 +1074,8 @@ void CServerDlg::ResumeAI()
 BOOL CServerDlg::DestroyWindow()
 {
 	// TODO: Add your specialized code here and/or call the base class
-	KillTimer(CHECK_ALIVE);
-	//KillTimer( REHP_TIME );
+	if (_checkAliveThread != nullptr)
+		_checkAliveThread->shutdown();
 
 	g_bNpcExit = true;
 
@@ -1440,22 +1451,6 @@ CUser* CServerDlg::GetUserPtr(int nid)
 		return pUser;
 
 	return nullptr;
-}
-
-void CServerDlg::OnTimer(UINT nIDEvent)
-{
-	switch (nIDEvent)
-	{
-		case CHECK_ALIVE:
-			CheckAliveTest();
-			break;
-
-		case REHP_TIME:
-			//RechargeHp();
-			break;
-	}
-
-	CDialog::OnTimer(nIDEvent);
 }
 
 LRESULT CServerDlg::OnProcessListBoxQueue(WPARAM, LPARAM)

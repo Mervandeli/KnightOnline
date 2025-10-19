@@ -20,18 +20,13 @@ static char THIS_FILE[] = __FILE__;
 
 // NOTE: Explicitly handled under DEBUG_NEW override
 #include <db-library/RecordSetLoader_STLMap.h>
+#include <shared/TimerThread.h>
 
 using namespace std::chrono_literals;
 
 // Minimum time without a heartbeat to consider saving player data.
 // This will only save periodically.
 static constexpr auto SECONDS_SINCE_LAST_HEARTBEAT_TO_SAVE = 30s;
-
-constexpr int PROCESS_CHECK		= 100;
-constexpr int CONCURRENT_CHECK	= 200;
-constexpr int SERIAL_TIME		= 300;
-constexpr int PACKET_CHECK		= 400;
-constexpr int DB_POOL_CHECK		= 500;
 
 constexpr int MAX_SMQ_SEND_QUEUE_RETRY_COUNT = 50;
 
@@ -170,7 +165,6 @@ BEGIN_MESSAGE_MAP(CAujardDlg, CDialog)
 	//{{AFX_MSG_MAP(CAujardDlg)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_WM_TIMER()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -250,11 +244,54 @@ BOOL CAujardDlg::OnInitDialog()
 		return FALSE;
 	}
 
-	SetTimer(PROCESS_CHECK, 40000, nullptr);
-	SetTimer(CONCURRENT_CHECK, 300000, nullptr);
-//	SetTimer( SERIAL_TIME, 60000, nullptr );
-	SetTimer(PACKET_CHECK, 120000, nullptr);
-	SetTimer(DB_POOL_CHECK, 60000, nullptr);
+	_dbPoolCheckThread = std::make_unique<TimerThread>(
+		1min,
+		std::bind(&db::ConnectionManager::ExpireUnusedPoolConnections));
+
+	if (_dbPoolCheckThread == nullptr)
+	{
+		AfxMessageBox(_T("Failed to allocate timer thread (DB pool check). Out of memory."));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
+
+	_heartbeatCheckThread = std::make_unique<TimerThread>(
+		40s,
+		std::bind(&CAujardDlg::CheckHeartbeat, this));
+
+	if (_heartbeatCheckThread == nullptr)
+	{
+		AfxMessageBox(_T("Failed to allocate timer thread (heartbeat check). Out of memory."));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
+
+	_concurrentCheckThread = std::make_unique<TimerThread>(
+		5min,
+		std::bind(&CAujardDlg::ConCurrentUserCount, this));
+
+	if (_concurrentCheckThread == nullptr)
+	{
+		AfxMessageBox(_T("Failed to allocate timer thread (concurrent check). Out of memory."));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
+
+	_packetCheckThread = std::make_unique<TimerThread>(
+		2min,
+		std::bind(&CAujardDlg::WritePacketLog, this));
+
+	if (_packetCheckThread == nullptr)
+	{
+		AfxMessageBox(_T("Failed to allocate timer thread (packet check). Out of memory."));
+		AfxPostQuitMessage(0);
+		return FALSE;
+	}
+
+	_dbPoolCheckThread->start();
+	_heartbeatCheckThread->start();
+	_concurrentCheckThread->start();
+	_packetCheckThread->start();
 
 	DWORD id;
 	_readQueueThread = ::CreateThread(nullptr, 0, ReadQueueThread, this, 0, &id);
@@ -302,18 +339,24 @@ HCURSOR CAujardDlg::OnQueryDragIcon()
 /// \brief destroys all resources associated with the dialog window
 BOOL CAujardDlg::DestroyWindow()
 {
-	KillTimer(PROCESS_CHECK);
-	KillTimer(CONCURRENT_CHECK);
-//	KillTimer(SERIAL_TIME);
-	KillTimer(PACKET_CHECK);
-	KillTimer(DB_POOL_CHECK);
-
 	if (_readQueueThread != nullptr)
 		::TerminateThread(_readQueueThread, 0);
 
 	if (!ItemArray.IsEmpty())
 		ItemArray.DeleteAllData();
-	
+
+	if (_dbPoolCheckThread != nullptr)
+		_dbPoolCheckThread->shutdown();
+
+	if (_heartbeatCheckThread != nullptr)
+		_heartbeatCheckThread->shutdown();
+
+	if (_concurrentCheckThread != nullptr)
+		_concurrentCheckThread->shutdown();
+
+	if (_packetCheckThread != nullptr)
+		_packetCheckThread->shutdown();
+
 	_instance = nullptr;
 
 	return CDialog::DestroyWindow();
@@ -813,44 +856,9 @@ void CAujardDlg::OnOK()
 	}
 }
 
-void CAujardDlg::OnTimer(UINT EventId)
-{
-	HANDLE	hProcess = nullptr;
-
-	switch (EventId)
-	{
-		case PROCESS_CHECK:
-			if (_heartbeatReceivedTime != 0
-				&& (time(nullptr) - _heartbeatReceivedTime) > SECONDS_SINCE_LAST_HEARTBEAT_TO_SAVE.count())
-				AllSaveRoutine();
-			break;
-
-		case CONCURRENT_CHECK:
-#ifdef __SAMMA
-			ConCurrentUserCount();
-#endif
-			break;
-
-		case SERIAL_TIME:
-			g_increase_serial = 50001;
-			break;
-
-		case PACKET_CHECK:
-			WritePacketLog();
-	//		SaveUserData();
-			break;
-
-		case DB_POOL_CHECK:
-			db::ConnectionManager::ExpireUnusedPoolConnections();
-			break;
-	}
-
-	CDialog::OnTimer(EventId);
-}
-
-/// \brief handling for when OnTimer fails a PROCESS_CHECK with ebenezer
+/// \brief handling for when CheckHeartbeat detects no heatbeat from Ebenezer for a time
 /// \details Logs ebenezer outage, attempts to save all UserData, and resets all UserData[userId] objects
-/// \see OnTimer()
+/// \see CheckHeartbeat()
 void CAujardDlg::AllSaveRoutine()
 {
 	// TODO:  100ms seems excessive
@@ -924,7 +932,8 @@ void CAujardDlg::AddOutputMessage(const std::wstring& msg)
 	_outputList.SetTopIndex(lastIndex);
 }
 
-/// \brief Called by OnTimer if __SAMMA is defined
+/// \brief Called every 5min by _concurrentCheckThread
+/// \see _concurrentCheckThread
 void CAujardDlg::ConCurrentUserCount()
 {
 	int usercount = 0;
@@ -1412,40 +1421,6 @@ void CAujardDlg::WritePacketLog()
 		_recvPacketCount, _packetCount, _sendPacketCount);
 }
 
-/// \brief checks for users who have not saved their data in AUTOSAVE_DELTA milliseconds
-/// and performs a UserDataSave() for them.
-/// \note this is currently disabled in OnTimer()
-/// \see UserDataSave(), OnTimer(), PACKET_CHECK
-void CAujardDlg::SaveUserData()
-{
-	uint32_t sleepTime = 100;
-	char sendBuff[256] = {};
-	int sendIndex = 0;
-
-	for (int userId = 0; userId < MAX_USER; userId++)
-	{
-		_USER_DATA* user = _dbAgent.UserData[userId];
-		// skip user slots that aren't in use
-		if (user == nullptr || strlen(user->m_id) == 0)
-			continue;
-
-		// GetTickCount(): Retrieves the number of milliseconds that have elapsed since the system was started, up to 49.7 days.
-		// (at which point it overflows. neat.)
-		if (GetTickCount() - user->m_dwTime > AUTOSAVE_DELTA)
-		{
-			memset(sendBuff, 0, sizeof(sendBuff));
-			sendIndex = 0;
-			SetShort(sendBuff, userId, sendIndex);
-			SetShort(sendBuff, strlen(user->m_Accountid), sendIndex);
-			SetString(sendBuff, user->m_Accountid, strlen(user->m_Accountid), sendIndex);
-			SetShort(sendBuff, strlen(user->m_id), sendIndex);
-			SetString(sendBuff, user->m_id, strlen(user->m_id), sendIndex);
-			UserDataSave(sendBuff);
-			Sleep(sleepTime);
-		}
-	}
-}
-
 /// \brief handles WIZ_BATTLE_EVENT requests
 /// \details contains which nation won the war and which charId killed the commander
 /// \see WIZ_BATTLE_EVENT
@@ -1520,6 +1495,18 @@ void CAujardDlg::CouponEvent(char* data)
 		// TODO: not implemented.  Allow nResult to default to 0
 		// nResult = _dbAgent.UpdateCouponEvent(strAccountName, strCharName, strCouponID, nItemID, nItemCount);
 	}
+}
+
+void CAujardDlg::CheckHeartbeat()
+{
+	if (_heartbeatReceivedTime == 0)
+		return;
+
+	time_t currentTime = time(nullptr);
+	time_t secondsSinceLastHeartbeat = currentTime - _heartbeatReceivedTime;
+
+	if (secondsSinceLastHeartbeat > SECONDS_SINCE_LAST_HEARTBEAT_TO_SAVE.count())
+		AllSaveRoutine();
 }
 
 void CAujardDlg::HeartbeatReceived()
