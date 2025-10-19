@@ -239,13 +239,6 @@ enum e_ItemAttrib	{
 						ITEM_ATTRIB_UPGRADE_REVERSE = 12,
 						ITEM_ATTRIB_UNKNOWN = 0xffffffff };	
 
-enum e_ItemGrade
-{
-	ITEM_GRADE_LOW_CLASS = 1,
-	ITEM_GRADE_MIDDLE_CLASS = 2,
-	ITEM_GRADE_HIGH_CLASS = 3
-};
-
 enum e_ItemClass	{	ITEM_CLASS_DAGGER = 11, // dagger
 						ITEM_CLASS_SWORD = 21, // onehandsword
 						ITEM_CLASS_SWORD_2H = 22, // 3 : twohandsword
@@ -286,6 +279,13 @@ enum e_ItemClass	{	ITEM_CLASS_DAGGER = 11, // dagger
 						ITEM_CLASS_CONSUMABLE = 255, // Consumable items with 'charges' that use the durability/duration instead of stacks
 
 						ITEM_CLASS_UNKNOWN = 0xffffffff }; // 
+
+enum e_ItemGrade
+{
+	ITEM_GRADE_LOW_CLASS = 1,
+	ITEM_GRADE_MIDDLE_CLASS = 2,
+	ITEM_GRADE_HIGH_CLASS = 3
+};
 
 enum e_Nation { NATION_NOTSELECTED = 0, NATION_KARUS, NATION_ELMORAD, NATION_UNKNOWN = 0xffffffff };
 
@@ -740,7 +740,7 @@ struct __TABLE_ITEM_BASIC
 
 	uint8_t		bySellGroup;			// 36 Selling group associated with vendor NPC
 
-	uint8_t		byIDK3;					// 37
+	uint8_t		byGrade;				// 37
 };
 
 constexpr int MAX_ITEM_EXTENSION	= 24; // Number of item extension tables. (Item_Ext_0..23.tbl is a total of 24)

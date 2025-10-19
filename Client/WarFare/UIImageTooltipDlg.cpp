@@ -1057,25 +1057,33 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	{
 		const std::string& szRemark = spItem->pItemBasic->szRemark;
 	
-		size_t strSize = spItem->pItemBasic->szRemark.size();
-		if (strSize > 0)
+		if (!szRemark.empty())
 		{
-			int splitPos = 0;
-			int spaceCount = 0;
-			for (size_t i = 0; i < strSize; i++)
+			size_t totalWords = 1;
+			for (char c : szRemark)
 			{
-				// Official client: split only on spaces (no '(' split). It only applies the split after 4 words.
-				if (szRemark[i] == ' ')
-					++spaceCount;
-
-				if (szRemark[i] == '(' || (szRemark[i] == ' ' && spaceCount > MAX_WORDS_COUNT))
-				{
-					splitPos = i;
-					break;
-				}
+				if (c == ' ')
+					++totalWords;
 			}
-			if (splitPos > 0)
+
+			if (totalWords >= MIN_WORDS_TO_SPLIT_DESC)
 			{
+				size_t wordsInFirstHalf = (totalWords + 1) / 2;
+				size_t wordsSeen = 1, splitPos = std::string::npos;
+				for (size_t i = 0; i < szRemark.size(); i++)
+				{
+					if (szRemark[i] != ' ')
+						continue;
+
+					if (++wordsSeen > wordsInFirstHalf)
+					{
+						splitPos = i;
+						break;
+					}
+				}
+
+				_ASSERT(splitPos != std::string::npos);
+
 				m_pStr[iIndex]->SetColor(m_CWhite);
 				m_pstdstr[iIndex] = fmt::format("*{}", std::string_view(szRemark.data(), splitPos));
 				m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
@@ -1083,8 +1091,11 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 				iIndex++;
 				ERROR_EXCEPTION
 
+				// NOTE: This doesn't perfectly match official's behaviour; they rebuild the lines, always appending a space.
+				// This means that there's a guaranteed space after the word here, before the '*'
+				// To replicate this behaviour, we can manually add a space in the format string, but it's not really necessary.
 				m_pStr[iIndex]->SetColor(m_CWhite);
-				m_pstdstr[iIndex] = fmt::format("{}*", std::string_view(szRemark.data() + splitPos, strSize - splitPos));
+				m_pstdstr[iIndex] = fmt::format("{}*", std::string_view(szRemark.data() + splitPos, szRemark.size() - splitPos));
 				m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
 
 				iIndex++;
@@ -1112,18 +1123,20 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 				m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
 				iIndex++;
 				break;
+
 			case ITEM_ATTRIB_UPGRADE:
 				if (spItem->pItemBasic != nullptr && spItem->pItemExt != nullptr)
 				{
-					const int itemGrade = spItem->pItemBasic->byIDK3 + spItem->pItemExt->bySoulBind;
-					if (itemGrade == ITEM_GRADE_LOW_CLASS)
+					const int iItemGrade = (std::min)(3, spItem->pItemBasic->byGrade + spItem->pItemExt->bySoulBind);
+					if (iItemGrade == ITEM_GRADE_LOW_CLASS)
 						m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_LOW_CLASS);
-					else if (itemGrade == ITEM_GRADE_MIDDLE_CLASS)
+					else if (iItemGrade == ITEM_GRADE_MIDDLE_CLASS)
 						m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_MIDDLE_CLASS);
-					else if (itemGrade == ITEM_GRADE_HIGH_CLASS)
+					else if (iItemGrade == ITEM_GRADE_HIGH_CLASS)
 						m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_HIGH_CLASS);
 					else
 						break;
+
 					m_pStr[iIndex]->SetColor(m_CGreen);
 					m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 					iIndex++;
