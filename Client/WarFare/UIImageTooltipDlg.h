@@ -16,6 +16,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #define MAX_TOOLTIP_COUNT 30
+static constexpr int MAX_WORDS_COUNT = 3;
 
 class CUIImageTooltipDlg : public CN3UIBase
 {

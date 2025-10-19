@@ -1068,7 +1068,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 				if (szRemark[i] == ' ')
 					++spaceCount;
 
-				if (szRemark[i] == '(' || (szRemark[i] == ' ' && spaceCount > 3))
+				if (szRemark[i] == '(' || (szRemark[i] == ' ' && spaceCount > MAX_WORDS_COUNT))
 				{
 					splitPos = i;
 					break;
@@ -1113,13 +1113,14 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 				iIndex++;
 				break;
 			case ITEM_ATTRIB_UPGRADE:
-				if (spItem->pItemBasic != nullptr)
+				if (spItem->pItemBasic != nullptr && spItem->pItemExt != nullptr)
 				{
-					if (spItem->pItemBasic->byIDK3 == 1)
+					const int itemGrade = spItem->pItemBasic->byIDK3 + spItem->pItemExt->bySoulBind;
+					if (itemGrade == ITEM_GRADE_LOW_CLASS)
 						m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_LOW_CLASS);
-					else if (spItem->pItemBasic->byIDK3 == 2)
+					else if (itemGrade == ITEM_GRADE_MIDDLE_CLASS)
 						m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_MIDDLE_CLASS);
-					else if (spItem->pItemBasic->byIDK3 == 3)
+					else if (itemGrade == ITEM_GRADE_HIGH_CLASS)
 						m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_HIGH_CLASS);
 					else
 						break;

@@ -239,6 +239,13 @@ enum e_ItemAttrib	{
 						ITEM_ATTRIB_UPGRADE_REVERSE = 12,
 						ITEM_ATTRIB_UNKNOWN = 0xffffffff };	
 
+enum e_ItemGrade
+{
+	ITEM_GRADE_LOW_CLASS = 1,
+	ITEM_GRADE_MIDDLE_CLASS = 2,
+	ITEM_GRADE_HIGH_CLASS = 3
+};
+
 enum e_ItemClass	{	ITEM_CLASS_DAGGER = 11, // dagger
 						ITEM_CLASS_SWORD = 21, // onehandsword
 						ITEM_CLASS_SWORD_2H = 22, // 3 : twohandsword
