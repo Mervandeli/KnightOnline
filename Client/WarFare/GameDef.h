@@ -3,8 +3,9 @@
 
 #include <string>
 #include <dinput.h>
+#include <stdint.h>
+#include <inttypes.h>
 
-#include <shared/types.h>
 #include <shared/version.h>
 
 // TODO: Shift this logic into a separate header and generally clean this shared logic up
@@ -282,9 +283,16 @@ enum e_ItemClass	{	ITEM_CLASS_DAGGER = 11, // dagger
 
 enum e_ItemEffect2
 {
-	ITEM_EFFECT2_RING_UPGRADE_REQ	= 253,
-	ITEM_EFFECT2_RENTAL_SCROLL		= 254,
-	ITEM_EFFECT2_ITEM_UPGRADE_REQ	= 255
+	ITEM_EFFECT2_RING_UPGRADE_REQ = 253,
+	ITEM_EFFECT2_RENTAL_SCROLL = 254,
+	ITEM_EFFECT2_ITEM_UPGRADE_REQ = 255
+};
+
+enum e_ItemGrade
+{
+	ITEM_GRADE_LOW_CLASS = 1,
+	ITEM_GRADE_MIDDLE_CLASS = 2,
+	ITEM_GRADE_HIGH_CLASS = 3
 };
 
 enum e_Nation { NATION_NOTSELECTED = 0, NATION_KARUS, NATION_ELMORAD, NATION_UNKNOWN = 0xffffffff };
@@ -740,7 +748,7 @@ struct __TABLE_ITEM_BASIC
 
 	uint8_t		bySellGroup;			// 36 Selling group associated with vendor NPC
 
-	uint8_t		byIDK3;					// 37
+	uint8_t		byGrade;				// 37
 };
 
 constexpr int MAX_ITEM_EXTENSION	= 24; // Number of item extension tables. (Item_Ext_0..23.tbl is a total of 24)

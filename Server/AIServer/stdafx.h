@@ -29,7 +29,7 @@
 #include "global.h"			// 전역 funtion
 #include "define.h"			// define
 
-#include <shared/server_config.h>
+#include <shared-server/server_config.h>
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
