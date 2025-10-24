@@ -3,15 +3,14 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "Server.h"
 #include "GameSocket.h"
+#include "Extern.h"
+#include "MAP.h"
+#include "NpcThread.h" // TimeGet
+#include "Party.h"
+#include "Region.h"
 #include "ServerDlg.h"
 #include "User.h"
-#include "Map.h"
-#include "Region.h"
-#include "Party.h"
-
-#include "extern.h"
 
 #include <shared/crc32.h>
 #include <shared/lzf.h>

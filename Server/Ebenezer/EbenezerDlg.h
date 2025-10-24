@@ -76,6 +76,8 @@ enum class NameType
 };
 
 class CUser;
+class ReadQueueThread;
+class TimerThread;
 class CEbenezerDlg : public CDialog
 {
 // Construction
@@ -84,6 +86,8 @@ public:
 		return s_pInstance;
 	}
 
+	void GameTimeTick();
+	void SendSMQHeartbeat();
 	uint32_t GetEventTriggerKey(uint8_t byNpcType, uint16_t sTrapNumber) const;
 	int32_t GetEventTrigger(uint8_t byNpcType, uint16_t sTrapNumber) const;
 	bool LoadEventTriggerTable();
@@ -209,8 +213,6 @@ public:
 	SharedMemoryQueue m_LoggerSendQueue;
 	SharedMemoryQueue m_LoggerRecvQueue;
 	SharedMemoryQueue m_ItemLoggerSendQ;
-
-	HANDLE	m_hReadQueueThread;
 
 	SharedMemoryBlock m_UserDataBlock;
 
@@ -349,17 +351,24 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
-	afx_msg void OnTimer(UINT nIDEvent);
 	afx_msg LRESULT OnProcessListBoxQueue(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 	
 private:
-	CIni	m_Ini;
-	EbenezerLogger _logger;
+	CIni								m_Ini;
+	EbenezerLogger						_logger;
 
 	/// \brief output message box for the application
-	CListBox _outputList;
+	CListBox							_outputList;
+
+	std::unique_ptr<TimerThread>		_gameTimeThread;
+	std::unique_ptr<TimerThread>		_smqHeartbeatThread;
+	std::unique_ptr<TimerThread>		_aliveTimeThread;
+	std::unique_ptr<TimerThread>		_marketBBSTimeThread;
+	std::unique_ptr<TimerThread>		_packetCheckThread;
+
+	std::unique_ptr<ReadQueueThread>	_readQueueThread;
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -3,13 +3,12 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "server.h"
 #include "MagicProcess.h"
-
+#include "Npc.h"
+#include "NpcThread.h" // TimeGet()
+#include "Region.h"
 #include "ServerDlg.h"
 #include "User.h"
-#include "Npc.h"
-#include "Region.h"
 
 #include <spdlog/spdlog.h>
 

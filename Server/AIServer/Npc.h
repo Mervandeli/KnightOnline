@@ -320,8 +320,6 @@ public:
 	int		m_nLimitMaxX;
 	int		m_nLimitMaxZ;
 
-	long	m_lEventNpc;
-
 	float	m_fAdd_x;
 	float	m_fAdd_z;
 			
