@@ -14,6 +14,8 @@
 
 #include <db-library/ConnectionManager.h>
 
+#include <fstream>
+
 constexpr int WM_PROCESS_LISTBOX_QUEUE = WM_APP + 1;
 constexpr int MAX_SMQ_SEND_QUEUE_RETRY_COUNT = 50;
 
@@ -1106,9 +1108,9 @@ bool CEbenezerDlg::MapFileLoad()
 	recordset_loader::Base<ModelType> loader;
 	loader.SetProcessFetchCallback([&](db::ModelRecordSet<ModelType>& recordset)
 	{
-		CString szFullPath, errormsg;
+		CString errormsg;
 
-		m_ZoneArray.reserve(10);
+		m_ZoneArray.reserve(20);
 
 		// Build the base MAP directory
 		std::filesystem::path mapDir(GetProgPath().GetString());
@@ -1126,12 +1128,10 @@ bool CEbenezerDlg::MapFileLoad()
 			std::filesystem::path mapPath
 				= mapDir / row.Name;
 
-			szFullPath.Format(_T("%ls"), mapPath.c_str());
-
-			CFile file;
-			if (!file.Open(szFullPath, CFile::modeRead))
+			std::ifstream file(mapPath, std::ios::in | std::ios::binary);
+			if (!file)
 			{
-				errormsg.Format(_T("File Open Fail - %s\n"), szFullPath);
+				errormsg.Format(_T("File Open Fail - %s\n"), mapPath.wstring().c_str());
 				AfxMessageBox(errormsg);
 				return;
 			}
@@ -1145,15 +1145,15 @@ bool CEbenezerDlg::MapFileLoad()
 			pMap->m_fInitY = (float) (row.InitY / 100.0);
 			pMap->m_bType = row.Type;
 
-			if (!pMap->LoadMap(file.m_hFile))
+			if (!pMap->LoadMap(file))
 			{
-				errormsg.Format(_T("Map Load Fail - %s\n"), szFullPath);
+				errormsg.Format(_T("Map Load Fail - %s\n"), mapPath.wstring().c_str());
 				AfxMessageBox(errormsg);
 				delete pMap;
 				return;
 			}
 
-			file.Close();
+			file.close();
 
 			m_ZoneArray.push_back(pMap);
 
@@ -2198,11 +2198,11 @@ bool CEbenezerDlg::LoadNoticeData()
 {
 	CString ProgPath = GetProgPath();
 	CString NoticePath = ProgPath + "Notice.txt";
-	CString buff;
-	CStdioFile txt_file;
+	std::string line;
 	int count = 0;
 
-	if (!txt_file.Open(NoticePath, CFile::modeRead))
+	std::ifstream file(NoticePath, std::ios::in);
+	if (!file)
 	{
 #if !defined(_DEBUG)
 		AfxMessageBox(_T("cannot open Notice.txt!!"));
@@ -2211,19 +2211,20 @@ bool CEbenezerDlg::LoadNoticeData()
 		return false;
 	}
 
-	while (txt_file.ReadString(buff))
+	while (std::getline(file, line))
 	{
 		if (count > 19)
 		{
 			AfxMessageBox(_T("Notice Count Overflow!!"));
 			spdlog::error("EbenezerDlg::LoadNoticeData: notice count overflow [count={}]", count);
+			break;
 		}
 
-		strcpy(m_ppNotice[count], CT2A(buff));
+		strcpy(m_ppNotice[count], line.c_str());
 		count++;
 	}
 
-	txt_file.Close();
+	file.close();
 
 	return true;
 }
