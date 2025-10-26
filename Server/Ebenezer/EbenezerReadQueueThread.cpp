@@ -15,7 +15,7 @@ void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 	uint8_t command, result;
 	char send_buff[1024] = {};
 	CUser* pUser = nullptr;
-	int currenttime = 0;
+	int currentTime = 0;
 
 	command = GetByte(buffer, index);
 	uid = GetShort(buffer, index);

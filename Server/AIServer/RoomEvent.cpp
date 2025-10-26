@@ -49,7 +49,7 @@ CRoomEvent::~CRoomEvent()
 
 void CRoomEvent::Initialize()
 {
-	m_fDelayTime = 0.0f;
+	m_fDelayTime = 0.0;
 	m_byLogicNumber = 1;
 
 	for (int i = 0; i < MAX_CHECK_EVENT; i++)
@@ -63,7 +63,7 @@ void CRoomEvent::Initialize()
 	}
 }
 
-void CRoomEvent::MainRoom(float fcurtime)
+void CRoomEvent::MainRoom(double currentTime)
 {
 	// 조건 검색먼저 해야 겠지..
 	bool bCheck = false, bRunCheck = false;
@@ -71,7 +71,7 @@ void CRoomEvent::MainRoom(float fcurtime)
 
 	int event_num = m_Logic[m_byLogicNumber - 1].sNumber;
 
-	bCheck = CheckEvent(event_num, fcurtime);
+	bCheck = CheckEvent(event_num, currentTime);
 	if (bCheck)
 	{
 		event_num = m_Exec[m_byLogicNumber - 1].sNumber;
@@ -85,7 +85,7 @@ void CRoomEvent::MainRoom(float fcurtime)
 	}
 }
 
-bool CRoomEvent::CheckEvent(int event_num, float fcurtime)
+bool CRoomEvent::CheckEvent(int event_num, double currentTime)
 {
 	int nMinute = 0, nOption_1 = 0, nOption_2 = 0;
 	CNpc* pNpc = nullptr;
@@ -133,13 +133,13 @@ bool CRoomEvent::CheckEvent(int event_num, float fcurtime)
 			nMinute = nMinute * 60;								// 분을 초로 변환
 
 			// Time limit exceeded
-			if (fcurtime >= m_fDelayTime + nMinute)
+			if (currentTime >= m_fDelayTime + nMinute)
 			{
 				spdlog::debug("RoomEvent::CheckEvent: Time limit met, survival success [currTime={} delayTime={}]",
-					fcurtime, m_fDelayTime);
+					currentTime, m_fDelayTime);
 				return true;
 			}
-			//TRACE(_T("---Check Event : curtime=%.2f, starttime=%.2f \n"), fcurtime, m_fDelayTime);
+			//TRACE(_T("---Check Event : curtime=%.2f, starttime=%.2f \n"), currentTime, m_fDelayTime);
 			break;
 
 		// 목표지점까지 이동
@@ -415,7 +415,7 @@ bool CRoomEvent::CheckMonsterCount(int sid, int count, int type)
 void CRoomEvent::InitializeRoom()
 {
 	m_byStatus = 1;
-	m_fDelayTime = 0.0f;
+	m_fDelayTime = 0.0;
 	m_byLogicNumber = 1;
 
 	CheckMonsterCount(0, 0, 4);	// 몬스터의 m_byChangeType=0으로 초기화 

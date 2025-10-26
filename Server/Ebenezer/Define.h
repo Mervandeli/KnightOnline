@@ -511,34 +511,4 @@ inline int myrand(int min, int max)
 	return (int) (min + (int) rand_result);
 }
 
-inline float TimeGet()
-{
-	static bool bInit = false;
-	static bool bUseHWTimer = false;
-	static LARGE_INTEGER nTime, nFrequency;
-
-	if (!bInit)
-	{
-		if (::QueryPerformanceCounter(&nTime))
-		{
-			::QueryPerformanceFrequency(&nFrequency);
-			bUseHWTimer = true;
-		}
-		else
-		{
-			bUseHWTimer = false;
-		}
-
-		bInit = true;
-	}
-
-	if (bUseHWTimer)
-	{
-		::QueryPerformanceCounter(&nTime);
-		return (float) ((double) (nTime.QuadPart) / (double) nFrequency.QuadPart);
-	}
-
-	return (float) timeGetTime();
-}
-
 #endif

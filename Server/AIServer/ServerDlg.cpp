@@ -203,7 +203,7 @@ BOOL CServerDlg::OnInitDialog()
 	m_sErrorSocketCount = 0;
 	m_sMapEventNpc = 0;
 	m_sReSocketCount = 0;
-	m_fReConnectStart = 0.0f;
+	m_fReConnectStart = 0.0;
 	m_bFirstServerFlag = false;
 	m_byTestMode = NOW_TEST_MODE;
 

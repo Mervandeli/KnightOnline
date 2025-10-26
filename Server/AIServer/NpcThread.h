@@ -4,8 +4,6 @@
 
 #include "Define.h" // NPC_NUM
 
-float TimeGet();
-
 class CNpc;
 class CNpcThread : public Thread
 {

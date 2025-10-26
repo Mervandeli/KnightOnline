@@ -8,6 +8,7 @@
 #include "Extern.h"
 #include "ServerDlg.h"
 
+#include <chrono>
 #include <mmsystem.h>
 
 //////////////////////////////////////////////////////////////////////
@@ -22,9 +23,8 @@ void CNpcThread::thread_loop()
 	myrand(1, 10000);
 	myrand(1, 10000);
 
-	float  fTime2 = 0.0f;
-	float  fTime3 = 0.0f;
-	int    duration_damage = 0;
+	double	fTime2 = 0.0, fTime3 = 0.0;
+	int		duration_damage = 0;
 
 	while (_running)
 	{
@@ -134,36 +134,6 @@ void CNpcThread::thread_loop()
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
-}
-
-float TimeGet()
-{
-	static bool bInit = false;
-	static bool bUseHWTimer = false;
-	static LARGE_INTEGER nTime, nFrequency;
-
-	if (!bInit)
-	{
-		if (::QueryPerformanceCounter(&nTime))
-		{
-			::QueryPerformanceFrequency(&nFrequency);
-			bUseHWTimer = true;
-		}
-		else
-		{
-			bUseHWTimer = false;
-		}
-
-		bInit = true;
-	}
-
-	if (bUseHWTimer)
-	{
-		::QueryPerformanceCounter(&nTime);
-		return (float) ((double) (nTime.QuadPart) / (double) nFrequency.QuadPart);
-	}
-
-	return (float) timeGetTime();
 }
 
 CNpcThread::CNpcThread()

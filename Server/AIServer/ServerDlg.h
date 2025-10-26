@@ -159,7 +159,7 @@ public:
 	bool			m_bFirstServerFlag;	// 서버가 처음시작한 후 게임서버가 붙은 경우에는 1, 붙지 않은 경우 0
 	int16_t			m_sSocketCount;		// GameServer와 처음접시 필요
 	int16_t			m_sReSocketCount;	// GameServer와 재접시 필요
-	float			m_fReConnectStart;	// 처음 소켓이 도착한 시간
+	double			m_fReConnectStart;	// 처음 소켓이 도착한 시간
 	int16_t			m_sErrorSocketCount;  // 이상소켓 감시용
 	// ~sungyong 2002.05.23
 	uint8_t			m_byBattleEvent;	// 전쟁 이벤트 관련 플래그( 1:전쟁중이 아님, 0:전쟁중)
