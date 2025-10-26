@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "MagicProcess.h"
 #include "Npc.h"
-#include "NpcThread.h" // TimeGet()
+#include "NpcThread.h"
 #include "Region.h"
 #include "ServerDlg.h"
 #include "User.h"

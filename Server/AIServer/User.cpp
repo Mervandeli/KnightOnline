@@ -3,12 +3,11 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "Server.h"
 #include "User.h"
-#include "Serverdlg.h"
-#include "define.h"
+#include "ServerDlg.h"
 #include "Region.h"
 #include "GameSocket.h"
+
 #include <spdlog/spdlog.h>
 
 #ifdef _DEBUG
@@ -17,7 +16,7 @@ static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
-#include "extern.h"
+#include "Extern.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -167,8 +166,6 @@ void CUser::Attack(int sid, int tid)
 	{
 		SendAttackSuccess(tid, ATTACK_SUCCESS, nFinalDamage, pNpc->m_iHP);
 	}
-
-	//	m_dwLastAttackTime = GetTickCount();
 }
 
 void CUser::SendAttackSuccess(int tuid, uint8_t result, int16_t sDamage, int nHP, uint8_t byAttackType)

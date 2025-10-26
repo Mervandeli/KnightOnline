@@ -1870,7 +1870,6 @@ void CEbenezerDlg::RegionNpcInfoForMe(CUser* pSendUser, int nType)
 	C3DMap* pMap = nullptr;
 	int region_x = -1, region_z = -1, npcCount = 0, nid_sendindex = 0;
 	char nid_buff[1024] = {}, send_buff[8192] = {};
-	CString string;
 
 	if (pSendUser == nullptr)
 		return;
@@ -2128,8 +2127,7 @@ BOOL CEbenezerDlg::PreTranslateMessage(MSG* pMsg)
 
 bool CEbenezerDlg::LoadNoticeData()
 {
-	CString ProgPath = GetProgPath();
-	CString NoticePath = ProgPath + "Notice.txt";
+	CString NoticePath = GetProgPath() + "Notice.txt";
 	std::string line;
 	int count = 0;
 

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Npc.h"
-#include "NpcThread.h" // TimeGet()
+#include "NpcThread.h"
 #include "GameSocket.h"
 #include "ServerDlg.h"
 #include "Region.h"

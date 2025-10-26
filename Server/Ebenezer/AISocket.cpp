@@ -327,7 +327,6 @@ void CAISocket::RecvServerInfo(char* pBuf)
 	int index = 0;
 	uint8_t type = GetByte(pBuf, index);
 	uint8_t byZone = GetByte(pBuf, index);
-	CString logstr;
 	int size = static_cast<int>(_main->m_ZoneArray.size());
 
 	if (type == SERVER_INFO_START)

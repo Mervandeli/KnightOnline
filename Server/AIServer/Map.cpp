@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "MAP.h"
 #include "Npc.h"
-#include "NpcThread.h" // TimeGet()
+#include "NpcThread.h"
 #include "Region.h"
 #include "RoomEvent.h"
 #include "ServerDlg.h"

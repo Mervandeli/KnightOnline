@@ -6,7 +6,7 @@
 #include "GameSocket.h"
 #include "Extern.h"
 #include "MAP.h"
-#include "NpcThread.h" // TimeGet
+#include "NpcThread.h"
 #include "Party.h"
 #include "Region.h"
 #include "ServerDlg.h"
