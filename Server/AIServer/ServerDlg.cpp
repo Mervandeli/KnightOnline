@@ -20,6 +20,7 @@
 #include <db-library/ConnectionManager.h>
 
 #include <math.h>
+#include <fstream>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -1193,8 +1194,6 @@ bool CServerDlg::MapFileLoad()
 	recordset_loader::Base<ModelType> loader;
 	loader.SetProcessFetchCallback([&](db::ModelRecordSet<ModelType>& recordset)
 	{
-		CString szFullPath;
-
 		// Build the base MAP directory
 		std::filesystem::path mapDir(GetProgPath().GetString());
 		mapDir /= MAP_DIR;
@@ -1211,12 +1210,8 @@ bool CServerDlg::MapFileLoad()
 			std::filesystem::path mapPath
 				= mapDir / row.Name;
 
-			szFullPath.Format(
-				_T("%ls"),
-				mapPath.c_str());
-
-			CFile file;
-			if (!file.Open(szFullPath, CFile::modeRead))
+			std::ifstream file(mapPath, std::ios::in | std::ios::binary);
+			if (!file)
 			{
 				std::wstring werror = std::format(L"ServerDlg::MapFileLoad: Failed to open file: {}",
 					mapPath.c_str());
@@ -1230,10 +1225,10 @@ bool CServerDlg::MapFileLoad()
 			pMap->m_nServerNo = row.ServerId;
 			pMap->m_nZoneNumber = row.ZoneId;
 
-			if (!pMap->LoadMap(file.m_hFile))
+			if (!pMap->LoadMap(file))
 			{
 				std::wstring werror = std::format(L"ServerDlg::MapFileLoad: Failed to load map file: {}",
-					mapPath.c_str());
+					mapPath.wstring());
 				std::string error = WideToUtf8(werror);
 				AfxMessageBox(werror.c_str());
 				spdlog::error(error);
@@ -1241,7 +1236,7 @@ bool CServerDlg::MapFileLoad()
 				return;
 			}
 
-			file.Close();
+			file.close();
 
 			// dungeon work
 			if (row.RoomEvent > 0)
