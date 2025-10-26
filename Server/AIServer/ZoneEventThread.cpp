@@ -13,7 +13,7 @@ void ZoneEventThread::thread_loop()
 {
 	while (_running)
 	{
-		float fCurrentTime = TimeGet();
+		double fCurrentTime = TimeGet();
 		for (MAP* pMap : _main->m_ZoneArray)
 		{
 			if (pMap == nullptr)

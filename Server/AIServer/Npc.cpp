@@ -173,7 +173,7 @@ CNpc::CNpc()
 	m_bFirstLive = true;
 
 	m_fHPChangeTime = TimeGet();
-	m_fFaintingTime = 0.0f;
+	m_fFaintingTime = 0.0;
 
 	::ZeroMemory(m_pMap, sizeof(m_pMap));// 일차원 맵으로 초기화한다.
 
@@ -403,7 +403,7 @@ void CNpc::InitMagicValuable()
 	{
 		m_MagicType4[i].byAmount = 100;
 		m_MagicType4[i].sDurationTime = 0;
-		m_MagicType4[i].fStartTime = 0.0f;
+		m_MagicType4[i].fStartTime = 0.0;
 	}
 
 	for (int i = 0; i < MAX_MAGIC_TYPE3; i++)
@@ -412,7 +412,7 @@ void CNpc::InitMagicValuable()
 		m_MagicType3[i].sHPAmount = 0;
 		m_MagicType3[i].byHPDuration = 0;
 		m_MagicType3[i].byHPInterval = 2;
-		m_MagicType3[i].fStartTime = 0.0f;
+		m_MagicType3[i].fStartTime = 0.0;
 	}
 }
 
@@ -1221,7 +1221,7 @@ bool CNpc::SetLive()
 
 	// 상태이상 정보 초기화
 	m_fHPChangeTime = TimeGet();
-	m_fFaintingTime = 0.0f;
+	m_fFaintingTime = 0.0;
 	InitMagicValuable();
 
 	// NPC 가 처음 살아나는 경우
@@ -7066,7 +7066,7 @@ int CNpc::GetItemGroupNumber(int groupId) const
 	return makeItemGroup->Item[randomSlot];
 }
 
-void CNpc::DurationMagic_4(float currenttime)
+void CNpc::DurationMagic_4(double currentTime)
 {
 	int send_index = 0, buff_type = 0;
 	char send_buff[128] = {};
@@ -7125,10 +7125,10 @@ void CNpc::DurationMagic_4(float currenttime)
 	{
 		if (m_MagicType4[i].sDurationTime)
 		{
-			if (currenttime > (m_MagicType4[i].fStartTime + m_MagicType4[i].sDurationTime))
+			if (currentTime > (m_MagicType4[i].fStartTime + m_MagicType4[i].sDurationTime))
 			{
 				m_MagicType4[i].sDurationTime = 0;
-				m_MagicType4[i].fStartTime = 0.0f;
+				m_MagicType4[i].fStartTime = 0.0;
 				m_MagicType4[i].byAmount = 0;
 				buff_type = i + 1;
 
@@ -7203,7 +7203,7 @@ void CNpc::ChangeMonsterInfo(int iChangeType)
 	Load(pNpcTable, false);
 }
 
-void CNpc::DurationMagic_3(float currenttime)
+void CNpc::DurationMagic_3(double currentTime)
 {
 	int duration_damage = 0;
 
@@ -7213,11 +7213,11 @@ void CNpc::DurationMagic_3(float currenttime)
 			continue;
 
 		// 2초간격으로
-		if (currenttime < (m_MagicType3[i].fStartTime + m_MagicType3[i].byHPInterval))
+		if (currentTime < (m_MagicType3[i].fStartTime + m_MagicType3[i].byHPInterval))
 			continue;
 
 		m_MagicType3[i].byHPInterval += 2;
-		//TRACE(_T("DurationMagic_3,, [%d] curtime = %.2f, dur=%.2f, nid=%d, damage=%d\n"), i, currenttime, m_MagicType3[i].fStartTime, m_sNid+NPC_BAND, m_MagicType3[i].sHPAmount);
+		//TRACE(_T("DurationMagic_3,, [%d] curtime = %.2f, dur=%.2f, nid=%d, damage=%d\n"), i, currentTime, m_MagicType3[i].fStartTime, m_sNid+NPC_BAND, m_MagicType3[i].sHPAmount);
 
 		// healing
 		if (m_MagicType3[i].sHPAmount >= 0)
@@ -7236,7 +7236,7 @@ void CNpc::DurationMagic_3(float currenttime)
 				SendDead();
 				SendAttackSuccess(MAGIC_ATTACK_TARGET_DEAD, m_MagicType3[i].sHPAttackUserID, duration_damage, m_iHP, 1, DURATION_ATTACK);
 				//TRACE(_T("&&&& Duration Magic attack .. pNpc->m_byHPInterval[%d] = %d &&&& \n"), i, m_MagicType3[i].byHPInterval);
-				m_MagicType3[i].fStartTime = 0.0f;
+				m_MagicType3[i].fStartTime = 0.0;
 				m_MagicType3[i].byHPDuration = 0;
 				m_MagicType3[i].byHPInterval = 2;
 				m_MagicType3[i].sHPAmount = 0;
@@ -7250,9 +7250,9 @@ void CNpc::DurationMagic_3(float currenttime)
 			}
 		}
 
-		if (currenttime >= (m_MagicType3[i].fStartTime + m_MagicType3[i].byHPDuration))
+		if (currentTime >= (m_MagicType3[i].fStartTime + m_MagicType3[i].byHPDuration))
 		{	// 총 공격시간..
-			m_MagicType3[i].fStartTime = 0.0f;
+			m_MagicType3[i].fStartTime = 0.0;
 			m_MagicType3[i].byHPDuration = 0;
 			m_MagicType3[i].byHPInterval = 2;
 			m_MagicType3[i].sHPAmount = 0;
@@ -7297,17 +7297,17 @@ void CNpc::NpcSleeping()
 
 /////////////////////////////////////////////////////////////////////////////
 // 몬스터가 기절상태로..........
-void CNpc::NpcFainting(float currenttime)
+void CNpc::NpcFainting(double currentTime)
 {
 	NpcTrace("NpcFainting()");
 
 	// 2초동안 기절해 있다가,,  standing상태로....
-	if (currenttime > (m_fFaintingTime + FAINTING_TIME))
+	if (currentTime > (m_fFaintingTime + FAINTING_TIME))
 	{
 		m_NpcState = NPC_STANDING;
 		m_Delay = 0;
 		m_fDelayTime = TimeGet();
-		m_fFaintingTime = 0.0f;
+		m_fFaintingTime = 0.0;
 	}
 }
 

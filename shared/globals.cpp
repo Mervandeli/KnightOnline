@@ -26,11 +26,11 @@ uint64_t RandUInt64()
 	return dist(s_randomNumberGenerator);
 }
 
-float TimeGet()
+double TimeGet()
 {
 	using clock = std::chrono::high_resolution_clock;
 	static const auto startTime = clock::now();
 
-	std::chrono::duration<float> elapsed = clock::now() - startTime;
-	return elapsed.count(); // seconds as float
+	std::chrono::duration<double> elapsed = clock::now() - startTime;
+	return elapsed.count(); // seconds as double
 }

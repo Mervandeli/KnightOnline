@@ -115,13 +115,13 @@ CEbenezerDlg::CEbenezerDlg(CWnd* pParent /*=nullptr*/)
 		memset(m_strBuyTitle[h], 0, sizeof(m_strBuyTitle[h]));
 		memset(m_strBuyMessage[h], 0, sizeof(m_strBuyMessage[h]));
 		m_iBuyPrice[h] = 0;
-		m_fBuyStartTime[h] = 0.0f;
+		m_fBuyStartTime[h] = 0.0;
 
 		m_sSellID[h] = -1;
 		memset(m_strSellTitle[h], 0, sizeof(m_strSellTitle[h]));
 		memset(m_strSellMessage[h], 0, sizeof(m_strSellMessage[h]));
 		m_iSellPrice[h] = 0;
-		m_fSellStartTime[h] = 0.0f;
+		m_fSellStartTime[h] = 0.0;
 	}
 
 	memset(m_ppNotice, 0, sizeof(m_ppNotice));
@@ -220,7 +220,7 @@ BOOL CEbenezerDlg::OnInitDialog()
 	m_bFirstServerFlag = false;
 	m_bServerCheckFlag = false;
 	m_sReSocketCount = 0;
-	m_fReConnectStart = 0.0f;
+	m_fReConnectStart = 0.0;
 	// sungyong~ 2002.05.23
 
 	LoadConfig();
@@ -2512,7 +2512,7 @@ void CEbenezerDlg::WithdrawUserOut()
 
 void CEbenezerDlg::AliveUserCheck()
 {
-	float currenttime = TimeGet();
+	double currentTime = TimeGet();
 
 	int socketCount = GetUserSocketCount();
 	for (int i = 0; i < socketCount; i++)
@@ -2525,12 +2525,12 @@ void CEbenezerDlg::AliveUserCheck()
 			continue;
 
 /*
-		if ((currenttime - pUser->m_fHPLastTime) > 300)
+		if ((currentTime - pUser->m_fHPLastTime) > 300)
 			pUser->Close();
 */
 		for (int k = 0; k < MAX_TYPE3_REPEAT; k++)
 		{
-			if ((currenttime - pUser->m_fHPLastTime[k]) > 300)
+			if ((currentTime - pUser->m_fHPLastTime[k]) > 300)
 			{
 				pUser->Close();
 				break;
@@ -3125,9 +3125,7 @@ void CEbenezerDlg::MarketBBSTimeCheck()
 {
 	int send_index = 0;
 	char send_buff[256] = {};
-	float currenttime = 0.0f;
-
-	currenttime = TimeGet();
+	double currentTime = TimeGet();
 
 	for (int i = 0; i < MAX_BBS_POST; i++)
 	{
@@ -3141,7 +3139,7 @@ void CEbenezerDlg::MarketBBSTimeCheck()
 				continue;
 			}
 
-			if (m_fBuyStartTime[i] + BBS_CHECK_TIME < currenttime)
+			if (m_fBuyStartTime[i] + BBS_CHECK_TIME < currentTime)
 			{
 //				if (pUser->m_pUserData->m_iGold >= BUY_POST_PRICE) {
 //					pUser->m_pUserData->m_iGold -= BUY_POST_PRICE ;
@@ -3171,7 +3169,7 @@ void CEbenezerDlg::MarketBBSTimeCheck()
 				continue;
 			}
 
-			if (m_fSellStartTime[i] + BBS_CHECK_TIME < currenttime)
+			if (m_fSellStartTime[i] + BBS_CHECK_TIME < currentTime)
 			{
 //				if (pUser->m_pUserData->m_iGold >= SELL_POST_PRICE) {
 //					pUser->m_pUserData->m_iGold -= SELL_POST_PRICE ;
@@ -3199,7 +3197,7 @@ void CEbenezerDlg::MarketBBSBuyDelete(int16_t index)
 	memset(m_strBuyTitle[index], 0, sizeof(m_strBuyTitle[index]));
 	memset(m_strBuyMessage[index], 0, sizeof(m_strBuyMessage[index]));
 	m_iBuyPrice[index] = 0;
-	m_fBuyStartTime[index] = 0.0f;
+	m_fBuyStartTime[index] = 0.0;
 }
 
 void CEbenezerDlg::MarketBBSSellDelete(int16_t index)
@@ -3208,7 +3206,7 @@ void CEbenezerDlg::MarketBBSSellDelete(int16_t index)
 	memset(m_strSellTitle[index], 0, sizeof(m_strSellTitle[index]));
 	memset(m_strSellMessage[index], 0, sizeof(m_strSellMessage[index]));
 	m_iSellPrice[index] = 0;
-	m_fSellStartTime[index] = 0.0f;
+	m_fSellStartTime[index] = 0.0;
 }
 
 void CEbenezerDlg::WritePacketLog()

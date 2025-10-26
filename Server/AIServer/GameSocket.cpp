@@ -268,7 +268,7 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 {
 	int index = 1;
 	int outindex = 0, zone_index = 0;
-	float fReConnectEndTime = 0.0f;
+	double fReConnectEndTime = 0.0;
 	char pData[1024] = {};
 	uint8_t byZoneNumber = GetByte(pBuf, index);
 	uint8_t byReConnect = GetByte(pBuf, index);	// 0 : 처음접속, 1 : 재접속
@@ -310,7 +310,7 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 			spdlog::info("GameSocket::RecvServerConnect: Ebenezer sockets reconnected in under 2 minutes [sockets={}]",
 				m_pMain->m_sReSocketCount);
 			m_pMain->m_sReSocketCount = 0;
-			m_pMain->m_fReConnectStart = 0.0f;
+			m_pMain->m_fReConnectStart = 0.0;
 		}
 
 		if (m_pMain->m_sReSocketCount == MAX_AI_SOCKET)
@@ -330,7 +330,7 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 			else
 			{
 				m_pMain->m_sReSocketCount = 0;
-				m_pMain->m_fReConnectStart = 0.0f;
+				m_pMain->m_fReConnectStart = 0.0;
 			}
 		}
 	}

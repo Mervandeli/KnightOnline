@@ -23,9 +23,8 @@ void CNpcThread::thread_loop()
 	myrand(1, 10000);
 	myrand(1, 10000);
 
-	float  fTime2 = 0.0f;
-	float  fTime3 = 0.0f;
-	int    duration_damage = 0;
+	double	fTime2 = 0.0, fTime3 = 0.0;
+	int		duration_damage = 0;
 
 	while (_running)
 	{
