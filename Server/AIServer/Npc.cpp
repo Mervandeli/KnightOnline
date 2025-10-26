@@ -48,8 +48,7 @@ constexpr int MAX_MAKE_ITEM_GROUP_ITEM	= sizeof(model::MakeItemGroup::Item) / si
 #define ATTACK_LIMIT_LEVEL		10
 #define FAINTING_TIME			2
 
-extern CRITICAL_SECTION g_region_critical;
-extern CRITICAL_SECTION g_LogFileWrite;
+extern std::mutex g_region_mutex;
 
 /*
 	 ** Repent AI Server 작업시 참고 사항 **
@@ -2498,30 +2497,28 @@ float CNpc::FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType)
 	// user을 타겟으로 잡는 경우
 	if (nType == 1)
 	{
-		int nUserid = 0, count = 0;
+		int nUserid = 0, count = 0, nUser = 0;
 		CUser* pUser = nullptr;
 
-		EnterCriticalSection(&g_region_critical);
-
-		auto Iter1 = pMap->m_ppRegion[nRX][nRZ].m_RegionUserArray.begin();
-		auto Iter2 = pMap->m_ppRegion[nRX][nRZ].m_RegionUserArray.end();
-
-		int nUser = pMap->m_ppRegion[nRX][nRZ].m_RegionUserArray.GetSize();
-		//TRACE(_T("FindEnemyExpand type1,, region_x=%d, region_z=%d, user=%d, mon=%d\n"), nRX, nRZ, nUser, nMonster);
-		if (nUser == 0)
 		{
-			LeaveCriticalSection(&g_region_critical);
-			return 0.0f;
-		}
+			std::lock_guard<std::mutex> lock(g_region_mutex);
 
-		pIDList = new int[nUser];
-		for (; Iter1 != Iter2; Iter1++)
-		{
-			nUserid = *((*Iter1).second);
-			pIDList[count] = nUserid;
-			count++;
+			auto Iter1 = pMap->m_ppRegion[nRX][nRZ].m_RegionUserArray.begin();
+			auto Iter2 = pMap->m_ppRegion[nRX][nRZ].m_RegionUserArray.end();
+
+			nUser = pMap->m_ppRegion[nRX][nRZ].m_RegionUserArray.GetSize();
+			//TRACE(_T("FindEnemyExpand type1,, region_x=%d, region_z=%d, user=%d, mon=%d\n"), nRX, nRZ, nUser, nMonster);
+			if (nUser == 0)
+				return 0.0f;
+
+			pIDList = new int[nUser];
+			for (; Iter1 != Iter2; Iter1++)
+			{
+				nUserid = *((*Iter1).second);
+				pIDList[count] = nUserid;
+				count++;
+			}
 		}
-		LeaveCriticalSection(&g_region_critical);
 
 		for (int i = 0; i < nUser; i++)
 		{
@@ -2589,30 +2586,28 @@ float CNpc::FindEnemyExpand(int nRX, int nRZ, float fCompDis, int nType)
 	// 경비병이 몬스터를 타겟으로 잡는 경우
 	else if (nType == 2)
 	{
-		int nNpcid = 0, count = 0;
+		int nNpcid = 0, count = 0, nMonster = 0;
 		CNpc* pNpc = nullptr;
 
-		EnterCriticalSection(&g_region_critical);
-
-		auto Iter1 = pMap->m_ppRegion[nRX][nRZ].m_RegionNpcArray.begin();
-		auto Iter2 = pMap->m_ppRegion[nRX][nRZ].m_RegionNpcArray.end();
-
-		int nMonster = pMap->m_ppRegion[nRX][nRZ].m_RegionNpcArray.GetSize();
-		//TRACE(_T("FindEnemyExpand type1,, region_x=%d, region_z=%d, user=%d, mon=%d\n"), nRX, nRZ, nUser, nMonster);
-		if (nMonster == 0)
 		{
-			LeaveCriticalSection(&g_region_critical);
-			return 0.0f;
-		}
+			std::lock_guard<std::mutex> lock(g_region_mutex);
 
-		pIDList = new int[nMonster];
-		for (; Iter1 != Iter2; Iter1++)
-		{
-			nNpcid = *((*Iter1).second);
-			pIDList[count] = nNpcid;
-			count++;
+			auto Iter1 = pMap->m_ppRegion[nRX][nRZ].m_RegionNpcArray.begin();
+			auto Iter2 = pMap->m_ppRegion[nRX][nRZ].m_RegionNpcArray.end();
+
+			int nMonster = pMap->m_ppRegion[nRX][nRZ].m_RegionNpcArray.GetSize();
+			//TRACE(_T("FindEnemyExpand type1,, region_x=%d, region_z=%d, user=%d, mon=%d\n"), nRX, nRZ, nUser, nMonster);
+			if (nMonster == 0)
+				return 0.0f;
+
+			pIDList = new int[nMonster];
+			for (; Iter1 != Iter2; Iter1++)
+			{
+				nNpcid = *((*Iter1).second);
+				pIDList[count] = nNpcid;
+				count++;
+			}
 		}
-		LeaveCriticalSection(&g_region_critical);
 
 		//TRACE(_T("FindEnemyExpand type2,, region_x=%d, region_z=%d, user=%d, mon=%d\n"), nRX, nRZ, nUser, nMonster);
 
@@ -5403,20 +5398,22 @@ void CNpc::FindFriendRegion(int x, int z, MAP* pMap, _TargetHealer* pHealer, int
 	int* pNpcIDList = nullptr;
 	int total_mon = 0, count = 0, nid = 0;
 
-	EnterCriticalSection(&g_region_critical);
-
-	auto Iter1 = pMap->m_ppRegion[x][z].m_RegionNpcArray.begin();
-	auto Iter2 = pMap->m_ppRegion[x][z].m_RegionNpcArray.end();
-
-	total_mon = pMap->m_ppRegion[x][z].m_RegionNpcArray.GetSize();
-	pNpcIDList = new int[total_mon];
-	for (; Iter1 != Iter2; Iter1++)
 	{
-		nid = *((*Iter1).second);
-		pNpcIDList[count] = nid;
-		count++;
+		std::lock_guard<std::mutex> lock(g_region_mutex);
+
+		auto Iter1 = pMap->m_ppRegion[x][z].m_RegionNpcArray.begin();
+		auto Iter2 = pMap->m_ppRegion[x][z].m_RegionNpcArray.end();
+
+		total_mon = pMap->m_ppRegion[x][z].m_RegionNpcArray.GetSize();
+
+		pNpcIDList = new int[total_mon];
+		for (; Iter1 != Iter2; Iter1++)
+		{
+			nid = *((*Iter1).second);
+			pNpcIDList[count] = nid;
+			count++;
+		}
 	}
-	LeaveCriticalSection(&g_region_critical);
 
 	CNpc* pNpc = nullptr;
 	__Vector3 vStart, vEnd;
@@ -5877,7 +5874,8 @@ bool CNpc::GetUserInViewRange(int x, int z)
 		return false;
 	}
 
-	EnterCriticalSection(&g_region_critical);
+	std::lock_guard<std::mutex> lock(g_region_mutex);
+
 	CUser* pUser = nullptr;
 	__Vector3 vStart, vEnd;
 	vStart.Set(m_fCurX, 0, m_fCurZ);
@@ -5902,13 +5900,9 @@ bool CNpc::GetUserInViewRange(int x, int z)
 		vEnd.Set(pUser->m_curx, 0, pUser->m_curz);
 		fDis = GetDistance(vStart, vEnd);
 		if (fDis <= NPC_VIEW_RANGE)
-		{
-			LeaveCriticalSection(&g_region_critical);
 			return true;
-		}
 	}
 
-	LeaveCriticalSection(&g_region_critical);
 	return false;
 }
 

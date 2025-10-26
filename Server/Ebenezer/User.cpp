@@ -21,8 +21,7 @@ static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
-extern CRITICAL_SECTION g_region_critical;
-extern CRITICAL_SECTION g_LogFile_critical;
+extern std::recursive_mutex g_region_mutex;
 extern bool g_serverdown_flag;
 
 CUser::CUser(SocketManager* socketManager)
@@ -283,7 +282,7 @@ void CUser::SendCompressingPacket(const char* pData, int len)
 
 void CUser::RegionPacketAdd(char* pBuf, int len)
 {
-	std::lock_guard<std::mutex> lock(_regionBufferMutex);
+	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 
 	SetShort(_regionBuffer->pDataBuff, len, _regionBuffer->iLength);
 	SetString(_regionBuffer->pDataBuff, pBuf, len, _regionBuffer->iLength);
@@ -295,7 +294,7 @@ int CUser::RegionPacketClear(char* GetBuf)
 	SetByte(GetBuf, WIZ_CONTINOUS_PACKET, index);
 
 	{
-		std::lock_guard<std::mutex> lock(_regionBufferMutex);
+		std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 
 		if (_regionBuffer->iLength <= 0)
 			return 0;
@@ -5948,6 +5947,7 @@ void CUser::PartyRequest(int memberid, bool bCreate)
 	CUser* pUser = nullptr;
 	_PARTY_GROUP* pParty = nullptr;
 	char send_buff[256] = {};
+	bool inserted = false;
 
 	pUser = m_pMain->GetUserPtr(memberid);
 	if (pUser == nullptr)
@@ -5994,29 +5994,30 @@ void CUser::PartyRequest(int memberid, bool bCreate)
 		if (m_sPartyIndex != -1)
 			goto fail_return;
 
-		m_sPartyIndex = m_pMain->m_sPartyIndex++;
-		if (m_pMain->m_sPartyIndex == 32767)
-			m_pMain->m_sPartyIndex = 0;
-
-		EnterCriticalSection(&g_region_critical);
-
 		pParty = new _PARTY_GROUP;
-		pParty->wIndex = m_sPartyIndex;
 		pParty->uid[0] = _socketId;
 		pParty->sMaxHp[0] = m_iMaxHp;
 		pParty->sHp[0] = m_pUserData->m_sHp;
 		pParty->bLevel[0] = m_pUserData->m_bLevel;
 		pParty->sClass[0] = m_pUserData->m_sClass;
 
-		if (!m_pMain->m_PartyMap.PutData(pParty->wIndex, pParty))
+		{
+			std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
+
+			m_sPartyIndex = m_pMain->m_sPartyIndex++;
+			if (m_pMain->m_sPartyIndex == 32767)
+				m_pMain->m_sPartyIndex = 0;
+
+			pParty->wIndex = m_sPartyIndex;
+			inserted = m_pMain->m_PartyMap.PutData(pParty->wIndex, pParty);
+		}
+
+		if (!inserted)
 		{
 			delete pParty;
 			m_sPartyIndex = -1;
-			LeaveCriticalSection(&g_region_critical);
 			goto fail_return;
 		}
-
-		LeaveCriticalSection(&g_region_critical);
 
 		// AI Server
 		send_index = 0;
@@ -6315,11 +6316,8 @@ void CUser::PartyDelete()
 	SetShort(send_buff, pParty->wIndex, send_index);
 	m_pMain->Send_AIServer(m_pUserData->m_bZone, send_buff, send_index);
 
-	EnterCriticalSection(&g_region_critical);
-
+	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 	m_pMain->m_PartyMap.DeleteData(pParty->wIndex);
-
-	LeaveCriticalSection(&g_region_critical);
 }
 
 void CUser::ExchangeProcess(char* pBuf)

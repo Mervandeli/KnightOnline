@@ -48,8 +48,7 @@ static char THIS_FILE[] = __FILE__;
 float surround_fx[8] = { 0.0f, -0.7071f, -1.0f, -0.7083f,  0.0f,  0.7059f,  1.0000f, 0.7083f };
 float surround_fz[8] = { 1.0f,  0.7071f,  0.0f, -0.7059f, -1.0f, -0.7083f, -0.0017f, 0.7059f };
 
-extern CRITICAL_SECTION g_region_critical;
-extern CRITICAL_SECTION g_LogFileWrite;
+extern std::mutex g_region_mutex;
 
 CUser::CUser()
 {
@@ -1041,20 +1040,22 @@ void CUser::HealAreaCheck(int rx, int rz)
 	int nid = 0, send_index = 0, result = 1, count = 0, total_mon = 0;
 	int* pNpcIDList = nullptr;
 
-	EnterCriticalSection(&g_region_critical);
-
-	auto Iter1 = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.begin();
-	auto Iter2 = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.end();
-
-	total_mon = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.GetSize();
-	pNpcIDList = new int[total_mon];
-	for (; Iter1 != Iter2; Iter1++)
 	{
-		nid = *((*Iter1).second);
-		pNpcIDList[count] = nid;
-		count++;
+		std::lock_guard<std::mutex> lock(g_region_mutex);
+
+		auto Iter1 = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.begin();
+		auto Iter2 = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.end();
+
+		total_mon = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.GetSize();
+
+		pNpcIDList = new int[total_mon];
+		for (; Iter1 != Iter2; Iter1++)
+		{
+			nid = *((*Iter1).second);
+			pNpcIDList[count] = nid;
+			count++;
+		}
 	}
-	LeaveCriticalSection(&g_region_critical);
 
 	for (int i = 0; i < total_mon; i++)
 	{

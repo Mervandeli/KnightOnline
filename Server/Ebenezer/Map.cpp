@@ -24,7 +24,7 @@ import EbenezerBinder;
 
 using namespace db;
 
-extern CRITICAL_SECTION g_region_critical;
+extern std::recursive_mutex g_region_mutex;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -366,15 +366,13 @@ bool C3DMap::RegionItemAdd(int rx, int rz, _ZONE_ITEM* pItem)
 	if (pItem == nullptr)
 		return false;
 
-	EnterCriticalSection(&g_region_critical);
+	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 
 	m_ppRegion[rx][rz].m_RegionItemArray.PutData(pItem->bundle_index, pItem);
 
 	m_wBundle++;
 	if (m_wBundle > ZONEITEM_MAX)
 		m_wBundle = 1;
-
-	LeaveCriticalSection(&g_region_critical);
 
 	return true;
 }
@@ -392,7 +390,7 @@ bool C3DMap::RegionItemRemove(int rx, int rz, int bundle_index, int itemid, int 
 	bool bFind = false;
 	int16_t t_count = 0;
 
-	EnterCriticalSection(&g_region_critical);
+	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 
 	pItem = region->m_RegionItemArray.GetData(bundle_index);
 	if (pItem != nullptr)
@@ -421,8 +419,6 @@ bool C3DMap::RegionItemRemove(int rx, int rz, int bundle_index, int itemid, int 
 		}
 	}
 
-	LeaveCriticalSection(&g_region_critical);
-
 	return bFind;
 }
 
@@ -437,12 +433,12 @@ void C3DMap::RegionUserAdd(int rx, int rz, int uid)
 	int* pInt = new int;
 	*pInt = uid;
 
-	EnterCriticalSection(&g_region_critical);
+	{
+		std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 
-	if (!m_ppRegion[rx][rz].m_RegionUserArray.PutData(uid, pInt))
-		delete pInt;
-
-	LeaveCriticalSection(&g_region_critical);
+		if (!m_ppRegion[rx][rz].m_RegionUserArray.PutData(uid, pInt))
+			delete pInt;
+	}
 
 	//TRACE(_T("++++ Region Add(%d) : x=%d, z=%d, uid=%d ++++\n"), m_nZoneNumber, rx, rz, uid);
 }
@@ -457,9 +453,10 @@ void C3DMap::RegionUserRemove(int rx, int rz, int uid)
 
 	CRegion* region = &m_ppRegion[rx][rz];
 
-	EnterCriticalSection(&g_region_critical);
-	region->m_RegionUserArray.DeleteData(uid);
-	LeaveCriticalSection(&g_region_critical);
+	{
+		std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
+		region->m_RegionUserArray.DeleteData(uid);
+	}
 
 	//TRACE(_T("---- Region Remove(%d) : x=%d, z=%d, uid=%d ----\n"), m_nZoneNumber, rx, rz, uid);
 }
@@ -477,12 +474,9 @@ void C3DMap::RegionNpcAdd(int rx, int rz, int nid)
 	int* pInt = new int;
 	*pInt = nid;
 
-	EnterCriticalSection(&g_region_critical);
-
+	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 	if (!region->m_RegionNpcArray.PutData(nid, pInt))
 		delete pInt;
-
-	LeaveCriticalSection(&g_region_critical);
 }
 
 void C3DMap::RegionNpcRemove(int rx, int rz, int nid)
@@ -495,9 +489,8 @@ void C3DMap::RegionNpcRemove(int rx, int rz, int nid)
 
 	CRegion* region = &m_ppRegion[rx][rz];
 
-	EnterCriticalSection(&g_region_critical);
+	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 	region->m_RegionNpcArray.DeleteData(nid);
-	LeaveCriticalSection(&g_region_critical);
 }
 
 bool C3DMap::CheckEvent(float x, float z, CUser* pUser)

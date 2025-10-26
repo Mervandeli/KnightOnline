@@ -23,7 +23,7 @@ static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
-extern CRITICAL_SECTION g_region_critical;
+extern std::mutex g_region_mutex;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -1146,7 +1146,7 @@ void CGameSocket::RecvPartyInfoAllData(char* pBuf)
 		return;
 	}
 
-	EnterCriticalSection(&g_region_critical);
+	std::lock_guard<std::mutex> lock(g_region_mutex);
 
 	pParty = new _PARTY_GROUP;
 	pParty->wIndex = sPartyIndex;
@@ -1170,8 +1170,6 @@ void CGameSocket::RecvPartyInfoAllData(char* pBuf)
 	{
 		spdlog::debug("GameSocket::RecvPartyInfoAllData: created partyIndex={}", sPartyIndex);
 	}
-
-	LeaveCriticalSection(&g_region_critical);
 }
 
 void CGameSocket::RecvCheckAlive(char* pBuf)

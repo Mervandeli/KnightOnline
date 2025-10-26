@@ -18,7 +18,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-extern CRITICAL_SECTION g_region_critical;
+extern std::mutex g_region_mutex;
 
 CMapInfo::CMapInfo()
 {
@@ -280,12 +280,10 @@ void MAP::RegionUserAdd(int rx, int rz, int uid)
 
 	CRegion* region = &m_ppRegion[rx][rz];
 
-	EnterCriticalSection(&g_region_critical);
-	
+	std::lock_guard<std::mutex> lock(g_region_mutex);
+
 	if (!region->m_RegionUserArray.PutData(uid, pInt))
 		delete pInt;
-
-	LeaveCriticalSection(&g_region_critical);
 }
 
 void MAP::RegionUserRemove(int rx, int rz, int uid)
@@ -298,11 +296,8 @@ void MAP::RegionUserRemove(int rx, int rz, int uid)
 
 	CRegion* region = &m_ppRegion[rx][rz];
 
-	EnterCriticalSection(&g_region_critical);
-
+	std::lock_guard<std::mutex> lock(g_region_mutex);
 	region->m_RegionUserArray.DeleteData(uid);
-
-	LeaveCriticalSection(&g_region_critical);
 }
 
 void MAP::RegionNpcAdd(int rx, int rz, int nid)
@@ -318,7 +313,7 @@ void MAP::RegionNpcAdd(int rx, int rz, int nid)
 
 	CRegion* region = &m_ppRegion[rx][rz];
 
-	EnterCriticalSection(&g_region_critical);
+	std::lock_guard<std::mutex> lock(g_region_mutex);
 
 	if (!region->m_RegionNpcArray.PutData(nid, pInt))
 	{
@@ -328,8 +323,6 @@ void MAP::RegionNpcAdd(int rx, int rz, int nid)
 
 	int nSize = m_ppRegion[rx][rz].m_RegionNpcArray.GetSize();
 	//TRACE(_T("+++ Map - RegionNpcAdd : x=%d,z=%d, nid=%d, total=%d \n"), rx,rz,nid, nSize);
-
-	LeaveCriticalSection(&g_region_critical);
 }
 
 void MAP::RegionNpcRemove(int rx, int rz, int nid)
@@ -342,11 +335,8 @@ void MAP::RegionNpcRemove(int rx, int rz, int nid)
 
 	CRegion* region = &m_ppRegion[rx][rz];
 
-	EnterCriticalSection(&g_region_critical);
-
+	std::lock_guard<std::mutex> lock(g_region_mutex);
 	region->m_RegionNpcArray.DeleteData(nid);
-
-	LeaveCriticalSection(&g_region_critical);
 }
 
 void MAP::LoadMapTile(std::istream& fs)
@@ -429,11 +419,8 @@ int MAP::GetRegionUserSize(int rx, int rz)
 
 	CRegion* region = &m_ppRegion[rx][rz];
 
-	EnterCriticalSection(&g_region_critical);
-	int nRet = region->m_RegionUserArray.GetSize();
-	LeaveCriticalSection(&g_region_critical);
-
-	return nRet;
+	std::lock_guard<std::mutex> lock(g_region_mutex);
+	return region->m_RegionUserArray.GetSize();
 }
 
 int  MAP::GetRegionNpcSize(int rx, int rz)
@@ -446,11 +433,8 @@ int  MAP::GetRegionNpcSize(int rx, int rz)
 
 	CRegion* region = &m_ppRegion[rx][rz];
 
-	EnterCriticalSection(&g_region_critical);
-	int nRet = region->m_RegionNpcArray.GetSize();
-	LeaveCriticalSection(&g_region_critical);
-
-	return nRet;
+	std::lock_guard<std::mutex> lock(g_region_mutex);
+	return region->m_RegionNpcArray.GetSize();
 }
 
 void MAP::LoadObjectEvent(std::istream& fs)
