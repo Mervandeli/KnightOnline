@@ -105,25 +105,4 @@ inline CString GetProgPath()
 	return Path;
 }
 
-inline void LogFileWrite(LPCTSTR logstr)
-{
-	CString LogFileName;
-	LogFileName.Format(_T("%s\\ItemManager.log"), GetProgPath().GetString());
-
-	CFile file;
-	if (!file.Open(LogFileName, CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite))
-		return;
-
-	file.SeekToEnd();
-
-#if defined(_UNICODE)
-	const std::string utf8 = WideToUtf8(logstr, wcslen(logstr));
-	file.Write(utf8.c_str(), static_cast<int>(utf8.size()));
-#else
-	file.Write(logstr, strlen(logstr));
-#endif
-
-	file.Close();
-}
-
 #endif
