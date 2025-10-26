@@ -19,7 +19,7 @@ static char THIS_FILE[] = __FILE__;
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-extern CRITICAL_SECTION g_region_critical;
+extern std::mutex g_region_mutex;
 
 CRoomEvent::CRoomEvent()
 {
@@ -269,29 +269,30 @@ CNpc* CRoomEvent::GetNpcPtr(int sid)
 {
 	CNpc* pNpc = nullptr;
 	int* pIDList = nullptr;
-	int nMonsterid = 0, count = 0;
+	int nMonsterid = 0, count = 0, nMonster = 0;
 
-	EnterCriticalSection(&g_region_critical);
-
-	int nMonster = m_mapRoomNpcArray.GetSize();
-	if (nMonster == 0)
 	{
-		LeaveCriticalSection(&g_region_critical);
-		spdlog::error("RoomEvent::GetNpcPtr: mapRoomNpcArray empty");
-		return nullptr;
-	}
+		std::unique_lock<std::mutex> lock(g_region_mutex);
 
-	auto Iter1 = m_mapRoomNpcArray.begin();
-	auto Iter2 = m_mapRoomNpcArray.end();
+		nMonster = m_mapRoomNpcArray.GetSize();
+		if (nMonster == 0)
+		{
+			lock.unlock();
+			spdlog::error("RoomEvent::GetNpcPtr: mapRoomNpcArray empty");
+			return nullptr;
+		}
 
-	pIDList = new int[nMonster];
-	for (; Iter1 != Iter2; Iter1++)
-	{
-		nMonsterid = *((*Iter1).second);
-		pIDList[count] = nMonsterid;
-		count++;
+		auto Iter1 = m_mapRoomNpcArray.begin();
+		auto Iter2 = m_mapRoomNpcArray.end();
+
+		pIDList = new int[nMonster];
+		for (; Iter1 != Iter2; Iter1++)
+		{
+			nMonsterid = *((*Iter1).second);
+			pIDList[count] = nMonsterid;
+			count++;
+		}
 	}
-	LeaveCriticalSection(&g_region_critical);
 
 	for (int i = 0; i < nMonster; i++)
 	{
@@ -330,30 +331,31 @@ bool CRoomEvent::CheckMonsterCount(int sid, int count, int type)
 	int nMonsterCount = 0;
 	CNpc* pNpc = nullptr;
 	int* pIDList = nullptr;
-	int nMonsterid = 0, nTotalMonster = 0;
+	int nMonsterid = 0, nTotalMonster = 0, nMonster = 0;
 	bool bRetValue = false;
 
-	EnterCriticalSection(&g_region_critical);
-
-	int nMonster = m_mapRoomNpcArray.GetSize();
-	if (nMonster == 0)
 	{
-		LeaveCriticalSection(&g_region_critical);
-		spdlog::error("RoomEvent::CheckMonsterCount: mapRoomNpcArray empty");
-		return false;
-	}
+		std::unique_lock<std::mutex> lock(g_region_mutex);
 
-	auto Iter1 = m_mapRoomNpcArray.begin();
-	auto Iter2 = m_mapRoomNpcArray.end();
+		int nMonster = m_mapRoomNpcArray.GetSize();
+		if (nMonster == 0)
+		{
+			lock.unlock();
+			spdlog::error("RoomEvent::CheckMonsterCount: mapRoomNpcArray empty");
+			return false;
+		}
 
-	pIDList = new int[nMonster];
-	for (; Iter1 != Iter2; Iter1++)
-	{
-		nMonsterid = *((*Iter1).second);
-		pIDList[nTotalMonster] = nMonsterid;
-		nTotalMonster++;
+		auto Iter1 = m_mapRoomNpcArray.begin();
+		auto Iter2 = m_mapRoomNpcArray.end();
+
+		pIDList = new int[nMonster];
+		for (; Iter1 != Iter2; Iter1++)
+		{
+			nMonsterid = *((*Iter1).second);
+			pIDList[nTotalMonster] = nMonsterid;
+			nTotalMonster++;
+		}
 	}
-	LeaveCriticalSection(&g_region_critical);
 
 	for (int i = 0; i < nMonster; i++)
 	{

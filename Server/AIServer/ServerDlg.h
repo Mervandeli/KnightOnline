@@ -78,7 +78,6 @@ public:
 	bool AddObjectEventNpc(_OBJECT_EVENT* pEvent, int zone_number);
 	void AllNpcInfo();			// ~sungyong 2002.05.23
 	CUser* GetUserPtr(int nid);
-	CUser* GetActiveUserPtr(int index);
 	CNpc* GetNpcPtr(const char* pNpcName);
 	int GetZoneIndex(int zoneId) const;
 	int GetServerNumber(int zoneId) const;

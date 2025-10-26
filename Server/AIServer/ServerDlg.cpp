@@ -40,8 +40,8 @@ using namespace std::chrono_literals;
 bool g_bNpcExit = false;
 ZoneArray m_ZoneArray;
 
-CRITICAL_SECTION g_User_critical;
-CRITICAL_SECTION g_region_critical;
+std::mutex g_user_mutex;
+std::mutex g_region_mutex;
 
 import AIServerBinder;
 
@@ -198,9 +198,6 @@ BOOL CServerDlg::OnInitDialog()
 	memset(m_CompBuf, 0, sizeof(m_CompBuf));	// 압축할 데이터를 모으는 버퍼
 	m_iCompIndex = 0;							// 압축할 데이터의 길이
 	m_CompCount = 0;							// 압축할 데이터의 개수
-
-	InitializeCriticalSection(&g_User_critical);
-	InitializeCriticalSection(&g_region_critical);
 
 	m_sSocketCount = 0;
 	m_sErrorSocketCount = 0;
@@ -1069,12 +1066,8 @@ BOOL CServerDlg::DestroyWindow()
 	m_pZoneEventThread = nullptr;
 
 	// NpcTable Array Delete
-	if (!m_MonTableMap.IsEmpty())
-		m_MonTableMap.DeleteAllData();
-
-	// NpcTable Array Delete
-	if (!m_NpcTableMap.IsEmpty())
-		m_NpcTableMap.DeleteAllData();
+	m_MonTableMap.DeleteAllData();
+	m_NpcTableMap.DeleteAllData();
 
 	// NpcThread Array Delete
 	for (CNpcThread* npcThread : m_NpcThreadArray)
@@ -1093,40 +1086,21 @@ BOOL CServerDlg::DestroyWindow()
 		m_NpcItem.m_ppItem = nullptr;
 	}
 
-	if (!m_MakeWeaponTableMap.IsEmpty())
-		m_MakeWeaponTableMap.DeleteAllData();
-
-	if (!m_MakeDefensiveTableMap.IsEmpty())
-		m_MakeDefensiveTableMap.DeleteAllData();
-
-	if (!m_MakeGradeItemArray.IsEmpty())
-		m_MakeGradeItemArray.DeleteAllData();
-
-	if (!m_MakeItemRareCodeTableMap.IsEmpty())
-		m_MakeItemRareCodeTableMap.DeleteAllData();
+	m_MakeWeaponTableMap.DeleteAllData();
+	m_MakeDefensiveTableMap.DeleteAllData();
+	m_MakeGradeItemArray.DeleteAllData();
+	m_MakeItemRareCodeTableMap.DeleteAllData();
 
 	// MagicTable Array Delete
-	if (!m_MagicTableMap.IsEmpty())
-		m_MagicTableMap.DeleteAllData();
-
-	if (!m_MagicType1TableMap.IsEmpty())
-		m_MagicType1TableMap.DeleteAllData();
-
-	if (!m_MagicType2TableMap.IsEmpty())
-		m_MagicType2TableMap.DeleteAllData();
-
-	if (!m_MagicType3TableMap.IsEmpty())
-		m_MagicType3TableMap.DeleteAllData();
-
-	if (!m_MagicType4TableMap.IsEmpty())
-		m_MagicType4TableMap.DeleteAllData();
-
-	if (!m_MagicType7TableMap.IsEmpty())
-		m_MagicType7TableMap.DeleteAllData();
+	m_MagicTableMap.DeleteAllData();
+	m_MagicType1TableMap.DeleteAllData();
+	m_MagicType2TableMap.DeleteAllData();
+	m_MagicType3TableMap.DeleteAllData();
+	m_MagicType4TableMap.DeleteAllData();
+	m_MagicType7TableMap.DeleteAllData();
 
 	// Npc Array Delete
-	if (!m_NpcMap.IsEmpty())
-		m_NpcMap.DeleteAllData();
+	m_NpcMap.DeleteAllData();
 
 	// User Array Delete
 	for (int i = 0; i < MAX_USER; i++)
@@ -1136,14 +1110,10 @@ BOOL CServerDlg::DestroyWindow()
 	}
 
 	// Party Array Delete 
-	if (!m_PartyMap.IsEmpty())
-		m_PartyMap.DeleteAllData();
+	m_PartyMap.DeleteAllData();
 
 	while (!m_ZoneNpcList.empty())
 		m_ZoneNpcList.pop_front();
-
-	DeleteCriticalSection(&g_User_critical);
-	DeleteCriticalSection(&g_region_critical);
 
 	s_pInstance = nullptr;
 
@@ -1159,28 +1129,33 @@ void CServerDlg::DeleteUserList(int uid)
 		return;
 	}
 
-	EnterCriticalSection(&g_User_critical);
-	CUser* pUser = nullptr;
-	pUser = m_pUser[uid];
-	if (!pUser)
+	std::string characterName;
+
+	std::unique_lock<std::mutex> lock(g_user_mutex);
+
+	CUser* pUser = m_pUser[uid];
+	if (pUser == nullptr)
 	{
-		LeaveCriticalSection(&g_User_critical);
+		lock.unlock();
 		spdlog::error("ServerDlg::DeleteUserList: userId not found: {}", uid);
 		return;
 	}
-	if (pUser->m_iUserId == uid)
+
+	if (pUser->m_iUserId != uid)
 	{
-		spdlog::debug("ServerDlg::DeleteUserList: User Logout: userId={}, charId={}", uid, pUser->m_strUserID);
-		pUser->m_lUsed = 1;
-		delete m_pUser[uid];
-		m_pUser[uid] = nullptr;
-	}
-	else
-	{
+		lock.unlock();
 		spdlog::warn("ServerDlg::DeleteUserList: userId mismatch : userId={} pUserId={}", uid, pUser->m_iUserId);
+		return;
 	}
 
-	LeaveCriticalSection(&g_User_critical);
+	characterName = pUser->m_strUserID;
+
+	pUser->m_lUsed = 1;
+	delete m_pUser[uid];
+	m_pUser[uid] = nullptr;
+
+	lock.unlock();
+	spdlog::debug("ServerDlg::DeleteUserList: User Logout: userId={}, charId={}", uid, characterName);
 }
 
 bool CServerDlg::MapFileLoad()
@@ -1481,34 +1456,38 @@ void CServerDlg::DeleteAllUserList(int zone)
 	{
 		spdlog::debug("ServerDlg::DeleteAllUserList: start");
 
-		for (MAP* pMap : m_ZoneArray)
 		{
-			if (pMap == nullptr)
-				continue;
+			std::lock_guard<std::mutex> lock(g_region_mutex);
 
-			for (int i = 0; i < pMap->m_sizeRegion.cx; i++)
+			for (MAP* pMap : m_ZoneArray)
 			{
-				for (int j = 0; j < pMap->m_sizeRegion.cy; j++)
+				if (pMap == nullptr)
+					continue;
+
+				for (int i = 0; i < pMap->m_sizeRegion.cx; i++)
 				{
-					if (!pMap->m_ppRegion[i][j].m_RegionUserArray.IsEmpty())
+					for (int j = 0; j < pMap->m_sizeRegion.cy; j++)
 						pMap->m_ppRegion[i][j].m_RegionUserArray.DeleteAllData();
 				}
 			}
 		}
 
-		EnterCriticalSection(&g_User_critical);
-		// User Array Delete
-		for (int i = 0; i < MAX_USER; i++)
 		{
-			delete m_pUser[i];
-			m_pUser[i] = nullptr;
+			std::lock_guard<std::mutex> lock(g_user_mutex);
+
+			// User Array Delete
+			for (int i = 0; i < MAX_USER; i++)
+			{
+				delete m_pUser[i];
+				m_pUser[i] = nullptr;
+			}
 		}
-		// 파티 정보 삭제..
-		LeaveCriticalSection(&g_User_critical);
 
 		// Party Array Delete 
-		if (!m_PartyMap.IsEmpty())
+		{
+			std::lock_guard<std::mutex> lock(g_region_mutex);
 			m_PartyMap.DeleteAllData();
+		}
 
 		m_bFirstServerFlag = false;
 		spdlog::debug("ServerDlg::DeleteAllUserList: end");
@@ -1628,107 +1607,6 @@ void CServerDlg::SyncTest()
 
 		spdlog::info("ServerDlg::SyncTest: size={}, zoneNo={}", size, pSocket->_zoneNo);
 	}
-
-/*
-	int size = m_NpcMap.GetSize();
-	CNpc* pNpc = nullptr;
-	CUser* pUser = nullptr;
-	__Vector3 vUser;
-	__Vector3 vNpc;
-	__Vector3 vDistance;
-	float fDis = 0.0f;
-	int count = 0;
-
-	fprintf(stream, "***** NPC List : %d *****\n", size);
-	for(int i=0; i<size; i++)
-	{
-		pNpc = m_NpcMap.GetData(i);
-		if(pNpc == nullptr)
-		{
-			TRACE(_T("##### allNpcInfo Fail = %d\n"), i);
-			continue;
-		}
-
-		fprintf(stream, "nid=(%d, %s), zone=%d, x=%.2f, z=%.2f, rx=%d, rz=%d\n", pNpc->m_sNid+NPC_BAND, pNpc->m_strName,pNpc->m_sCurZone, pNpc->m_fCurX, pNpc->m_fCurZ, pNpc->m_iRegion_X, pNpc->m_iRegion_Z);
-
-	/*	vNpc.Set(pNpc->m_fCurX, 0, pNpc->m_fCurZ);
-		if(pNpc->m_byAttackPos)	{
-			//EnterCriticalSection( &g_User_critical );
-			pUser = m_arUser.GetData(pNpc->m_Target.id);
-			if(pUser == nullptr) {
-				fprintf(stream, "## Fail ## nid=(%d, %s), att_pos=%d, x=%.2f, z=%.2f\n", pNpc->m_sNid+NPC_BAND, pNpc->m_strName, pNpc->m_byAttackPos, pNpc->m_fCurX, pNpc->m_fCurZ);
-				continue;
-			}
-			vUser.Set(pNpc->m_Target.x, 0, pNpc->m_Target.z);
-			fDis = pNpc->GetDistance(vNpc, vUser);
-			//fprintf(stream, "[ target : x=%.2f, z=%.2f ] [ user : x=%.2f, z=%.2f ] \n", pNpc->m_Target.x, pNpc->m_Target.z, pUser->m_curx, pUser->m_curz);
-			fprintf(stream, "nid=(%d, %s), att_pos=%d, dis=%.2f, x=%.2f, z=%.2f\n", pNpc->m_sNid+NPC_BAND, pNpc->m_strName, pNpc->m_byAttackPos, fDis, pNpc->m_fCurX, pNpc->m_fCurZ);
-			//LeaveCriticalSection( &g_User_critical );
-		}	*/
-	//}	
-/*
-	fprintf(stream, "*****   User List  *****\n");
-
-	for(i=0; i<MAX_USER; i++)	{
-		//pUser = m_ppUserActive[i];
-		pUser = m_pUser[i];
-		if(pUser == nullptr)		continue;
-		fprintf(stream, "nid=(%d, %s), zone=%d, x=%.2f, z=%.2f, rx=%d, rz=%d\n", pUser->m_iUserId, pUser->m_strUserID, pUser->m_curZone, pUser->m_curx, pUser->m_curz, pUser->m_sRegionX, pUser->m_sRegionZ);
-	}
-
-	fprintf(stream, "*****   Region List  *****\n");
-	int k=0, total_user = 0, total_mon=0;
-	MAP* pMap = nullptr;
-
-	for(k=0; k<m_sTotalMap; k++)	{
-		pMap = m_ZoneArray[k];
-		if(pMap == nullptr)	continue;
-		for( i=0; i<pMap->m_sizeRegion.cx; i++ ) {
-			for( int j=0; j<pMap->m_sizeRegion.cy; j++ ) {
-				EnterCriticalSection( &g_User_critical );
-				total_user = pMap->m_ppRegion[i][j].m_RegionUserArray.GetSize();
-				total_mon = pMap->m_ppRegion[i][j].m_RegionNpcArray.GetSize();
-				LeaveCriticalSection( &g_User_critical );
-
-				if(total_user > 0 || total_mon > 0)	{
-					fprintf(stream, "rx=%d, rz=%d, user=%d, monster=%d\n", i, j, total_user, total_mon);
-				}
-			}
-		}
-	}	*/
-}
-
-CUser* CServerDlg::GetActiveUserPtr(int index)
-{
-	CUser* pUser = nullptr;
-
-/*	if(index < 0 || index > MAX_USER)	{
-		TRACE(_T("### Fail :: User Array Overflow[%d] ###\n"), index );
-		return nullptr;
-	}
-
-	EnterCriticalSection( &g_User_critical );
-
-	if ( m_ppUserActive[index] ) {
-		LeaveCriticalSection( &g_User_critical );
-		TRACE(_T("### Fail : ActiveUser Array Invalid[%d] ###\n"), index );
-		return nullptr;
-	}
-	else {
-		pUser = (CUser *)m_ppUserInActive[index];
-		if( !pUser ) {
-			LeaveCriticalSection( &g_User_critical );
-			TRACE(_T("### Fail : InActiveUser Array Invalid[%d] ###\n"), index );
-			return nullptr;
-		}
-	}
-
-	m_ppUserActive[index] = pUser;
-	m_ppUserInActive[index] = nullptr;
-
-	LeaveCriticalSection( &g_User_critical );	*/
-
-	return pUser;
 }
 
 CNpc* CServerDlg::GetNpcPtr(const char* pNpcName)
@@ -1763,7 +1641,6 @@ void CServerDlg::TestCode()
 	}
 
 	//TRACE(_T("$$$ random test == 1=%d, 2=%d, 3=%d,, %d,%hs $$$\n"), count_1, count_2, count_3, __FILE__, __LINE__);
-
 }
 
 bool CServerDlg::GetMagicType1Data()
@@ -1838,13 +1715,16 @@ void CServerDlg::RegionCheck()
 		if (pMap == nullptr)
 			continue;
 
+		int total_user = 0;
 		for (int i = 0; i < pMap->m_sizeRegion.cx; i++)
 		{
 			for (int j = 0; j < pMap->m_sizeRegion.cy; j++)
 			{
-				EnterCriticalSection(&g_User_critical);
-				int total_user = pMap->m_ppRegion[i][j].m_RegionUserArray.GetSize();
-				LeaveCriticalSection(&g_User_critical);
+				{
+					std::lock_guard<std::mutex> lock(g_user_mutex);
+					total_user = pMap->m_ppRegion[i][j].m_RegionUserArray.GetSize();
+				}
+
 				if (total_user > 0)  
 					pMap->m_ppRegion[i][j].m_byMoving = 1;
 				else

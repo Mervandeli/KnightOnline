@@ -369,6 +369,8 @@ private:
 	std::unique_ptr<TimerThread>		_packetCheckThread;
 
 	std::unique_ptr<ReadQueueThread>	_readQueueThread;
+
+	std::mutex							_serialMutex;
 };
 
 //{{AFX_INSERT_LOCATION}}

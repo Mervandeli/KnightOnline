@@ -39,8 +39,7 @@ import EbenezerBinder;
 using namespace db;
 using namespace std::chrono_literals;
 
-CRITICAL_SECTION g_serial_critical;
-CRITICAL_SECTION g_region_critical;
+std::recursive_mutex g_region_mutex;
 
 CEbenezerDlg* CEbenezerDlg::s_pInstance = nullptr;
 
@@ -223,9 +222,6 @@ BOOL CEbenezerDlg::OnInitDialog()
 	m_sReSocketCount = 0;
 	m_fReConnectStart = 0.0f;
 	// sungyong~ 2002.05.23
-	
-	InitializeCriticalSection(&g_serial_critical);
-	InitializeCriticalSection(&g_region_critical);
 
 	LoadConfig();
 
@@ -565,59 +561,24 @@ BOOL CEbenezerDlg::DestroyWindow()
 	if (_readQueueThread != nullptr)
 		_readQueueThread->shutdown();
 
-	if (!m_ItemTableMap.IsEmpty())
-		m_ItemTableMap.DeleteAllData();
-
-	if (!m_MagicTableMap.IsEmpty())
-		m_MagicTableMap.DeleteAllData();
-
-	if (!m_MagicType1TableMap.IsEmpty())
-		m_MagicType1TableMap.DeleteAllData();
-
-	if (!m_MagicType2TableMap.IsEmpty())
-		m_MagicType2TableMap.DeleteAllData();
-
-	if (!m_MagicType3TableMap.IsEmpty())
-		m_MagicType3TableMap.DeleteAllData();
-
-	if (!m_MagicType4TableMap.IsEmpty())
-		m_MagicType4TableMap.DeleteAllData();
-
-	if (!m_MagicType5TableMap.IsEmpty())
-		m_MagicType5TableMap.DeleteAllData();
-
-	if (!m_MagicType7TableMap.IsEmpty())
-		m_MagicType7TableMap.DeleteAllData();
-
-	if (!m_MagicType8TableMap.IsEmpty())
-		m_MagicType8TableMap.DeleteAllData();
-
-	if (!m_NpcMap.IsEmpty())
-		m_NpcMap.DeleteAllData();
-
-	if (!m_AISocketMap.IsEmpty())
-		m_AISocketMap.DeleteAllData();
-
-	if (!m_PartyMap.IsEmpty())
-		m_PartyMap.DeleteAllData();
-
-	if (!m_CoefficientTableMap.IsEmpty())
-		m_CoefficientTableMap.DeleteAllData();
-
-	if (!m_KnightsMap.IsEmpty())
-		m_KnightsMap.DeleteAllData();
-
-	if (!m_ServerArray.IsEmpty())
-		m_ServerArray.DeleteAllData();
-
-	if (!m_ServerGroupArray.IsEmpty())
-		m_ServerGroupArray.DeleteAllData();
-
-	if (!m_HomeTableMap.IsEmpty())
-		m_HomeTableMap.DeleteAllData();
-
-	if (!m_StartPositionTableMap.IsEmpty())
-		m_StartPositionTableMap.DeleteAllData();
+	m_ItemTableMap.DeleteAllData();
+	m_MagicTableMap.DeleteAllData();
+	m_MagicType1TableMap.DeleteAllData();
+	m_MagicType2TableMap.DeleteAllData();
+	m_MagicType3TableMap.DeleteAllData();
+	m_MagicType4TableMap.DeleteAllData();
+	m_MagicType5TableMap.DeleteAllData();
+	m_MagicType7TableMap.DeleteAllData();
+	m_MagicType8TableMap.DeleteAllData();
+	m_NpcMap.DeleteAllData();
+	m_AISocketMap.DeleteAllData();
+	m_PartyMap.DeleteAllData();
+	m_CoefficientTableMap.DeleteAllData();
+	m_KnightsMap.DeleteAllData();
+	m_ServerArray.DeleteAllData();
+	m_ServerGroupArray.DeleteAllData();
+	m_HomeTableMap.DeleteAllData();
+	m_StartPositionTableMap.DeleteAllData();
 
 	for (C3DMap* pMap : m_ZoneArray)
 		delete pMap;
@@ -627,13 +588,9 @@ BOOL CEbenezerDlg::DestroyWindow()
 		delete pLevelUp;
 	m_LevelUpTableArray.clear();
 
-	if (!m_EventMap.IsEmpty())
-		m_EventMap.DeleteAllData();
+	m_EventMap.DeleteAllData();
 
 	s_pInstance = nullptr;
-
-	DeleteCriticalSection(&g_serial_critical);
-	DeleteCriticalSection(&g_region_critical);
 
 	return CDialog::DestroyWindow();
 }
@@ -890,7 +847,7 @@ void CEbenezerDlg::Send_UnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int
 		|| z > pMap->GetZRegionMax())
 		return;
 
-	EnterCriticalSection(&g_region_critical);
+	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 
 	for (const auto& [_, pUid] : pMap->m_ppRegion[x][z].m_RegionUserArray)
 	{
@@ -909,8 +866,6 @@ void CEbenezerDlg::Send_UnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int
 				pUser->RegionPacketAdd(pBuf, len);
 		}
 	}
-
-	LeaveCriticalSection(&g_region_critical);
 }
 
 void CEbenezerDlg::Send_NearRegion(char* pBuf, int len, int zone, int region_x, int region_z, float curx, float curz, CUser* pExceptUser)
@@ -972,7 +927,7 @@ void CEbenezerDlg::Send_FilterUnitRegion(C3DMap* pMap, char* pBuf, int len, int 
 		|| z > pMap->GetZRegionMax())
 		return;
 
-	EnterCriticalSection(&g_region_critical);
+	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 
 	auto Iter1 = pMap->m_ppRegion[x][z].m_RegionUserArray.begin();
 	auto Iter2 = pMap->m_ppRegion[x][z].m_RegionUserArray.end();
@@ -995,8 +950,6 @@ void CEbenezerDlg::Send_FilterUnitRegion(C3DMap* pMap, char* pBuf, int len, int 
 				pUser->RegionPacketAdd(pBuf, len);
 		}
 	}
-
-	LeaveCriticalSection(&g_region_critical);
 }
 
 void CEbenezerDlg::Send_PartyMember(int party, char* pBuf, int len)
@@ -1746,7 +1699,7 @@ int CEbenezerDlg::GetRegionUserIn(C3DMap* pMap, int region_x, int region_z, char
 
 	int buff_index = 0;
 
-	EnterCriticalSection(&g_region_critical);
+	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 
 	for (const auto& [_, pUid] : pMap->m_ppRegion[region_x][region_z].m_RegionUserArray)
 	{
@@ -1769,8 +1722,6 @@ int CEbenezerDlg::GetRegionUserIn(C3DMap* pMap, int region_x, int region_z, char
 		++t_count;
 	}
 
-	LeaveCriticalSection(&g_region_critical);
-
 	return buff_index;
 }
 
@@ -1787,7 +1738,7 @@ int CEbenezerDlg::GetRegionUserList(C3DMap* pMap, int region_x, int region_z, ch
 
 	int buff_index = 0;
 
-	EnterCriticalSection(&g_region_critical);
+	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 
 	for (const auto& [_, pUid] : pMap->m_ppRegion[region_x][region_z].m_RegionUserArray)
 	{
@@ -1801,8 +1752,6 @@ int CEbenezerDlg::GetRegionUserList(C3DMap* pMap, int region_x, int region_z, ch
 			t_count++;
 		}
 	}
-
-	LeaveCriticalSection(&g_region_critical);
 
 	return buff_index;
 }
@@ -1890,12 +1839,7 @@ int CEbenezerDlg::GetRegionNpcIn(C3DMap* pMap, int region_x, int region_z, char*
 
 	int buff_index = 0;
 
-	EnterCriticalSection(&g_region_critical);
-
-	//string.Format("---- GetRegionNpcIn , x=%d, z=%d ----\r\n", region_x, region_z);
-	//EnterCriticalSection( &g_LogFile_critical );
-	//m_RegionLogFile.Write( string, string.GetLength() );
-	//LeaveCriticalSection( &g_LogFile_critical );
+	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 
 	for (const auto& [_, pNid] : pMap->m_ppRegion[region_x][region_z].m_RegionNpcArray)
 	{
@@ -1915,17 +1859,7 @@ int CEbenezerDlg::GetRegionNpcIn(C3DMap* pMap, int region_x, int region_z, char*
 		pNpc->GetNpcInfo(buff, buff_index);
 
 		t_count++;
-
-		//string.Format("nid=%d, name=%s, count=%d \r\n", pNpc->m_sNid, pNpc->m_strName, t_count);
-		//EnterCriticalSection( &g_LogFile_critical );
-		//m_RegionLogFile.Write( string, string.GetLength() );
-		//LeaveCriticalSection( &g_LogFile_critical );
-
-		//if( pNpc->m_sCurZone > 100 ) 
-		//	TRACE(_T("GetRegionNpcIn rx=%d, rz=%d, nid=%d, name=%hs, count=%d\n"), region_x, region_z, pNpc->m_sNid, pNpc->m_strName, t_count);
 	}
-
-	LeaveCriticalSection(&g_region_critical);
 
 	return buff_index;
 }
@@ -2037,13 +1971,13 @@ int CEbenezerDlg::GetRegionNpcList(C3DMap* pMap, int region_x, int region_z, cha
 
 	int buff_index = 0;
 
-	EnterCriticalSection(&g_region_critical);
-
 	if (nType == 1)
 	{
 		spdlog::get(logger::EbenezerRegion)->info("GetRegionNpcList: x={} z={}",
 			region_x, region_z);
 	}
+
+	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 
 	for (const auto& [_, pNid] : pMap->m_ppRegion[region_x][region_z].m_RegionNpcArray)
 	{
@@ -2069,8 +2003,6 @@ int CEbenezerDlg::GetRegionNpcList(C3DMap* pMap, int region_x, int region_z, cha
 				npcId);
 		}
 	}
-
-	LeaveCriticalSection(&g_region_critical);
 
 	return buff_index;
 }
@@ -2273,10 +2205,14 @@ void CEbenezerDlg::SyncTest(int nType)
 		{
 			for (int j = 0; j < pMap->GetZRegionMax(); j++)
 			{
-				EnterCriticalSection(&g_region_critical);
-				int total_user = pMap->m_ppRegion[i][j].m_RegionUserArray.GetSize();
-				int total_mon = pMap->m_ppRegion[i][j].m_RegionNpcArray.GetSize();
-				LeaveCriticalSection(&g_region_critical);
+				int total_user, total_mon;
+
+				{
+					std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
+
+					total_user = pMap->m_ppRegion[i][j].m_RegionUserArray.GetSize();
+					total_mon = pMap->m_ppRegion[i][j].m_RegionNpcArray.GetSize();
+				}
 
 				if (total_user > 0
 					|| total_mon > 0)
@@ -2298,7 +2234,7 @@ void CEbenezerDlg::SyncRegionTest(C3DMap* pMap, int rx, int rz, FILE* pfile, int
 	std::map<int, int*>::iterator		Iter1;
 	std::map<int, int*>::iterator		Iter2;
 
-	EnterCriticalSection(&g_region_critical);
+	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
 
 	if (nType == 2)
 	{
@@ -2341,8 +2277,6 @@ void CEbenezerDlg::SyncRegionTest(C3DMap* pMap, int rx, int rz, FILE* pfile, int
 	}
 
 	fprintf(pfile, "\n");
-
-	LeaveCriticalSection(&g_region_critical);
 }
 
 void CEbenezerDlg::SendAllUserInfo()
@@ -2402,7 +2336,7 @@ void CEbenezerDlg::SendAllUserInfo()
 	}
 
 	// 파티에 대한 정보도 보내도록 한다....
-	EnterCriticalSection(&g_region_critical);
+	std::unique_lock<std::recursive_mutex> lock(g_region_mutex);
 
 	for (int i = 0; i < m_PartyMap.GetSize(); i++)
 	{
@@ -2425,8 +2359,7 @@ void CEbenezerDlg::SendAllUserInfo()
 
 		Send_AIServer(1000, send_buff, send_index);
 	}
-
-	LeaveCriticalSection(&g_region_critical);
+	lock.unlock();
 
 	send_index = 0;
 	ZeroMemory(send_buff, sizeof(send_buff));
@@ -3356,7 +3289,7 @@ int64_t CEbenezerDlg::GenerateItemSerial()
 
 	CTime t = CTime::GetCurrentTime();
 
-	EnterCriticalSection(&g_serial_critical);
+	std::lock_guard<std::mutex> lock(_serialMutex);
 
 	increase.w = g_increase_serial++;
 
@@ -3368,8 +3301,6 @@ int64_t CEbenezerDlg::GenerateItemSerial()
 	serial.b[2] = (uint8_t) t.GetMinute();
 	serial.b[1] = increase.b[1];
 	serial.b[0] = increase.b[0];
-
-	LeaveCriticalSection(&g_serial_critical);
 
 //	TRACE(_T("Generate Item Serial : %I64d\n"), serial.i);
 	return serial.i;

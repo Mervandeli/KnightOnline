@@ -27,8 +27,6 @@ static char THIS_FILE[] = __FILE__;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-extern CRITICAL_SECTION g_LogFile_critical;
-
 CAISocket::CAISocket(SocketManager* socketManager, int zoneNum)
 	: TcpClientSocket(socketManager)
 {
