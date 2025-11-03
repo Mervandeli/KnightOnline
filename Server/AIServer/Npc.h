@@ -15,6 +15,7 @@
 #include "NpcMagicProcess.h"
 
 #include <shared-server/My_3DStruct.h>
+#include <shared-server/GeometricStructs.h>
 
 #define MAX_MAP_SIZE		10000
 #define MAX_PATH_SIZE		100
@@ -111,7 +112,7 @@ struct _TargetHealer
 	int16_t	sValue;				// 점수
 };
 
-class CServerDlg;
+class AiServerInstance;
 
 /*
 	 ** Repent AI Server 작업시 참고 사항 **
@@ -120,8 +121,8 @@ class CServerDlg;
 class CNpc
 {
 public:
-	CServerDlg* m_pMain;
-	CNpcMagicProcess m_MagicProcess;
+	AiServerInstance*	m_pMain;
+	CNpcMagicProcess	m_MagicProcess;
 
 	_Target		m_Target;			// 공격할 유저 저장,,
 	int16_t		m_ItemUserLevel;	// 죽을때 매직 이상 아이템를 떨구기위해 참조해야하는 유저의레벨
@@ -459,7 +460,7 @@ public:
 	__Vector3 ComputeDestPos(__Vector3 vCur, float fDegree, float fDegreeOffset, float fDistance);
 	void Yaw2D(float fDirX, float fDirZ, float& fYawResult);
 	float GetDistance(__Vector3 vOrig, __Vector3 vDest);
-	int  PathFind(CPoint start, CPoint end, float fDistance);
+	int  PathFind(_POINT start, _POINT end, float fDistance);
 	bool GetUserInView();	// Npc의 가시 거리안에 User가 있는지를 판단
 	bool GetUserInViewRange(int x, int z);
 	void MoveAttack();

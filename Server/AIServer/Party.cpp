@@ -2,18 +2,11 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "server.h"
-#include "ServerDlg.h"
+#include "pch.h"
+#include "AiServerInstance.h"
 #include "Party.h"
 
 #include <spdlog/spdlog.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
 
 extern std::mutex g_region_mutex;
 //////////////////////////////////////////////////////////////////////
@@ -22,16 +15,12 @@ extern std::mutex g_region_mutex;
 
 CParty::CParty()
 {
-	m_pMain = nullptr;
+	m_pMain = AiServerInstance::instance();
 }
 
 CParty::~CParty()
 {
-}
-
-void CParty::Initialize()
-{
-	m_pMain = (CServerDlg*) AfxGetApp()->GetMainWnd();
+	m_pMain = nullptr;
 }
 
 void CParty::PartyProcess(char* pBuf)

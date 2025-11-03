@@ -1,8 +1,8 @@
-﻿#include "stdafx.h"
+﻿#include "pch.h"
 #include "Npc.h"
 #include "NpcThread.h"
 #include "GameSocket.h"
-#include "ServerDlg.h"
+#include "AiServerInstance.h"
 #include "Region.h"
 #include "Party.h"
 #include "Extern.h"
@@ -135,6 +135,8 @@ inline bool CNpc::SetUid(float x, float z, int id)
 
 CNpc::CNpc()
 {
+	m_pMain = AiServerInstance::instance();
+
 	m_NpcState = NPC_LIVE;
 	m_byGateOpen = GATE_CLOSE;
 	m_byObjectType = NORMAL_OBJECT;
@@ -185,8 +187,6 @@ CNpc::CNpc()
 	InitUserList();
 	InitMagicValuable();
 
-	m_pMain = (CServerDlg*) AfxGetApp()->GetMainWnd();
-	m_MagicProcess.m_pMain = m_pMain;
 	m_MagicProcess.m_pSrcNpc = this;
 
 	for (int i = 0; i < NPC_MAX_PATH_LIST; i++)
@@ -274,7 +274,7 @@ void CNpc::Load(const model::Npc* pNpcTable, bool transformSpeeds)
 {
 	constexpr int16_t MONSTER_SPEED = 1500;
 
-	_ASSERT(pNpcTable != nullptr);
+	assert(pNpcTable != nullptr);
 
 	if (pNpcTable == nullptr)
 		return;
@@ -1230,17 +1230,14 @@ bool CNpc::SetLive()
 		NpcTypeParser();
 		m_bFirstLive = false;
 
-		InterlockedIncrement(&m_pMain->m_CurrentNPC);
+		++m_pMain->m_CurrentNPC;
 
 		//TRACE(_T("Npc - SerLive :  cur = %d\n"), m_pMain->m_CurrentNPC);
 
 		// 몬스터 총 수와 초기화한 몬스터의 수가 같다면
 		if (m_pMain->m_TotalNPC == m_pMain->m_CurrentNPC)
 		{
-			std::string logstr = fmt::format("All NPCs initialized [count={}]",
-				m_pMain->m_CurrentNPC);
-			m_pMain->AddOutputMessage(logstr);
-			spdlog::info("Npc::SetLive: {}", logstr);
+			spdlog::info("Npc::SetLive: All NPCs initialized [count={}]", m_pMain->m_TotalNPC);
 			m_pMain->GameServerAcceptThread();				// 게임서버 Accept
 		}
 		//TRACE(_T("Npc - SerLive : CurrentNpc = %d\n"), m_pMain->m_CurrentNPC);
@@ -1568,7 +1565,7 @@ bool CNpc::RandomMove()
 	if (min_z >= pMap->m_sizeMap.cy)
 		min_z = pMap->m_sizeMap.cy-1;
 
-	CPoint start, end;
+	_POINT start, end;
 	start.x = (int) (m_fCurX / TILE_SIZE) - min_x;
 	start.y = (int) (m_fCurZ / TILE_SIZE) - min_z;
 	end.x = (int) (fDestX / TILE_SIZE) - min_x;
@@ -1742,7 +1739,7 @@ bool CNpc::RandomBackMove()
 	{
 	}
 
-	CPoint start, end;
+	_POINT start, end;
 	start.x = (int) (m_fCurX / TILE_SIZE) - min_x;
 	start.y = (int) (m_fCurZ / TILE_SIZE) - min_z;
 	end.x = (int) (fDestX / TILE_SIZE) - min_x;
@@ -1885,7 +1882,7 @@ bool CNpc::IsInRange(int nX, int nZ)
 /////////////////////////////////////////////////////////////////////////////////////////
 //	PathFind 를 수행한다.
 //
-int CNpc::PathFind(CPoint start, CPoint end, float fDistance)
+int CNpc::PathFind(_POINT start, _POINT end, float fDistance)
 {
 	ClearPathFindData();
 
@@ -2051,7 +2048,6 @@ void CNpc::Dead(int iDeadType)
 	pMap->RegionNpcRemove(m_iRegion_X, m_iRegion_Z, m_sNid + NPC_BAND);
 
 	//TRACE(_T("-- Npc-Dead RegionRemove : [nid=%d, name=%hs], nRX=%d, nRZ=%d \n"), m_sNid+NPC_BAND, m_strName, m_iRegion_X, m_iRegion_Z);
-	CTime t = CTime::GetCurrentTime();
 	//TRACE(_T("****** (%hs,%d) Dead regentime = %d , m_byDeadType=%d, dungeonfam=%d, time=%d:%d-%d ****************\n"), m_strName, m_sNid+NPC_BAND, m_sRegenTime, m_byDeadType, m_byDungeonFamily, t.GetHour(), t.GetMinute(), t.GetSecond());
 
 	// User에 의해 죽은것이 아니기 때문에... 클라이언트에 Dead패킷전송...
@@ -3242,8 +3238,9 @@ int CNpc::GetTargetPath(int option)
 	if (targetUser != nullptr)
 	{
 		// Check if user is within search range
-		CRect r(min_x, min_z, max_x + 1, max_z + 1);
-		if (!r.PtInRect(CPoint((int) targetUser->m_curx / TILE_SIZE, (int) targetUser->m_curz / TILE_SIZE)))
+		_RECT r(min_x, min_z, max_x + 1, max_z + 1);
+		if (!IsPointInRect( _POINT(static_cast<int>(targetUser->m_curx / TILE_SIZE),
+			static_cast<int>(targetUser->m_curz / TILE_SIZE)), r))
 		{
 			spdlog::debug("Npc::GetTargetPath: user outside of search range [serial={} npcId={} npcName={} charId={} attackPos={}]",
 				m_sNid + NPC_BAND, m_sSid, m_strName, targetUser->m_strUserID, m_byAttackPos);
@@ -3287,8 +3284,9 @@ int CNpc::GetTargetPath(int option)
 	else if (npcTarget != nullptr)
 	{
 		// check if target is in search range
-		CRect r(min_x, min_z, max_x + 1, max_z + 1);
-		if (!r.PtInRect( { (int) npcTarget->m_fCurX / TILE_SIZE, (int) npcTarget->m_fCurZ / TILE_SIZE }))
+		_RECT r(min_x, min_z, max_x + 1, max_z + 1);
+		if (!IsPointInRect( _POINT(static_cast<int>(npcTarget->m_fCurX / TILE_SIZE),
+			static_cast<int>(npcTarget->m_fCurZ / TILE_SIZE)), r))
 		{
 			spdlog::debug("Npc::GetTargetPath: target outside of search range [serial={} npcId={} npcName={} targetSerial={} targetId={} targetName={} attackPos={}]",
 				m_sNid + NPC_BAND, m_sSid, m_strName,
@@ -3337,7 +3335,7 @@ int CNpc::GetTargetPath(int option)
 			return 0;
 	}
 
-	CPoint start, end;
+	_POINT start, end;
 	start.x = (int) (m_fCurX / TILE_SIZE) - min_x;
 	start.y = (int) (m_fCurZ / TILE_SIZE) - min_z;
 	end.x = (int) (vEnd22.x / TILE_SIZE) - min_x;
@@ -5745,19 +5743,7 @@ __Vector3 CNpc::GetDirection(__Vector3 vStart, __Vector3 vEnd)
 // sungyong 2002.05.22
 void CNpc::SendAll(const char* pBuf, int nLength)
 {
-	if (nLength <= 0
-		|| nLength > sizeof(_SEND_DATA::pBuf))
-		return;
-
-	_SEND_DATA* pNewData = new _SEND_DATA;
-	if (pNewData == nullptr)
-		return;
-
-	pNewData->sCurZone = m_sCurZone;
-	pNewData->sLength = nLength;
-	memcpy(pNewData->pBuf, pBuf, nLength);
-
-	m_pMain->_socketManager.QueueSendData(pNewData);
+	m_pMain->Send(pBuf, nLength, m_sCurZone);
 }
 // ~sungyong 2002.05.22
 

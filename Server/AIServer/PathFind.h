@@ -9,6 +9,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include <shared-server/GeometricStructs.h>
+
 class _PathNode {
 public:
 	int f;
@@ -27,7 +29,7 @@ public:
 	STACK* NextStackPtr;
 };
 
-class CServerDlg;
+class AiServerInstance;
 
 class CPathFind
 {
@@ -50,13 +52,14 @@ public:
 	_PathNode* Pop();
 
 protected:
-	_PathNode*	m_pOpen, *m_pClosed;
-	STACK*		m_pStack;
-//	int**		m_pMap;
-	int*		m_pMap;
-	CSize		m_vMapSize;
+	_PathNode*			m_pOpen;
+	_PathNode*			m_pClosed;
+	STACK*				m_pStack;
+//	int**				m_pMap;
+	int*				m_pMap;
+	_SIZE				m_vMapSize;
 
-	CServerDlg*	m_pMain;
+	AiServerInstance*	m_pMain;
 };
 
 #endif // !defined(AFX_PATHFIND_H__395FDD6E_C35A_43A2_BBB2_FCDCD17E8CE8__INCLUDED_)

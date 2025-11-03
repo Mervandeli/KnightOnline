@@ -1,10 +1,10 @@
-﻿#include "stdafx.h"
+﻿#include "pch.h"
 #include "MAP.h"
 #include "Npc.h"
 #include "NpcThread.h"
 #include "Region.h"
 #include "RoomEvent.h"
-#include "ServerDlg.h"
+#include "AiServerInstance.h"
 #include "User.h"
 
 #include <shared/globals.h>
@@ -31,7 +31,7 @@ CMapInfo::~CMapInfo()
 
 MAP::MAP()
 {
-	m_pMain = (CServerDlg*) AfxGetApp()->GetMainWnd();
+	m_pMain = AiServerInstance::instance();
 	m_nMapSize = 0;
 	m_fUnitDist = 0.0f;
 	m_fHeight = nullptr;
@@ -57,6 +57,7 @@ MAP::MAP()
 MAP::~MAP()
 {
 	RemoveMapData();
+	m_pMain = nullptr;
 }
 
 void MAP::RemoveMapData()
@@ -182,7 +183,7 @@ float MAP::GetHeight(float x, float z)
 	int iX, iZ;
 	iX = (int) (x / m_fUnitDist);
 	iZ = (int) (z / m_fUnitDist);
-	//_ASSERT( iX, iZ가 범위내에 있는 값인지 체크하기);
+	//assert( iX, iZ가 범위내에 있는 값인지 체크하기);
 
 	float y;
 	float h1, h2, h3;
@@ -190,7 +191,7 @@ float MAP::GetHeight(float x, float z)
 	dX = (x - iX * m_fUnitDist) / m_fUnitDist;
 	dZ = (z - iZ * m_fUnitDist) / m_fUnitDist;
 
-//	_ASSERT(dX>=0.0f && dZ>=0.0f && dX<1.0f && dZ<1.0f);
+//	assert(dX>=0.0f && dZ>=0.0f && dX<1.0f && dZ<1.0f);
 	if (!(dX >= 0.0f
 		&& dZ >= 0.0f
 		&& dX < 1.0f
@@ -494,7 +495,7 @@ bool MAP::LoadRoomEvent(int zone_number)
 	CRoomEvent* pEvent = nullptr;
 
 	// Build the base MAP directory
-	std::filesystem::path evtPath(GetProgPath().GetString());
+	std::filesystem::path evtPath(GetProgPath());
 	evtPath /= MAP_DIR;
 	evtPath /= std::to_string(zone_number) + ".evt";
 
@@ -683,9 +684,7 @@ bool MAP::LoadRoomEvent(int zone_number)
 	return true;
 
 cancel_event_load:
-	CString str;
-	str.Format(_T("LoadRoomEvent Failed [zoneId=%d eventId=%d]"), zone_number, event_num);
-	AfxMessageBox(str);
+	spdlog::error("LoadRoomEvent Failed [zoneId={} eventId={}]", zone_number, event_num);
 //	DeleteAll();
 	return false;
 }
@@ -799,7 +798,7 @@ CRoomEvent* MAP::SetRoomEvent(int number)
 		return nullptr;
 	}
 
-	pEvent = new CRoomEvent;
+	pEvent = new CRoomEvent();
 	pEvent->m_iZoneNumber = m_nZoneNumber;
 	pEvent->m_sRoomNumber = number;
 	if (!m_arRoomEventArray.PutData(pEvent->m_sRoomNumber, pEvent))

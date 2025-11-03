@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+﻿#include "pch.h"
 #include "SendThreadMain.h"
 #include "GameSocket.h"
 #include "AISocketManager.h"
@@ -21,7 +21,10 @@ void SendThreadMain::queue(_SEND_DATA* sendData)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 		if (!_canTick)
+		{
+			delete sendData;
 			return;
+		}
 
 		_insertionQueue.push(sendData);
 	}

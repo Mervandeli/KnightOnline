@@ -2,21 +2,15 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "pch.h"
 #include "MagicProcess.h"
 #include "Npc.h"
 #include "NpcThread.h"
 #include "Region.h"
-#include "ServerDlg.h"
+#include "AiServerInstance.h"
 #include "User.h"
 
 #include <spdlog/spdlog.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
 
 extern std::mutex g_region_mutex;
 
@@ -26,7 +20,7 @@ extern std::mutex g_region_mutex;
 
 CMagicProcess::CMagicProcess()
 {
-	m_pMain = nullptr;
+	m_pMain = AiServerInstance::instance();
 	m_pSrcUser = nullptr;
 	m_bMagicState = NONE;
 }

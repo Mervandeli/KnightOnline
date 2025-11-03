@@ -56,12 +56,12 @@
       <LanguageStandard>stdcpp23</LanguageStandard>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;AI_SERVER;_WINDOWS;_3DSERVER;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(DependencyDir);$(RootDir);$(RootDir)Server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>$(BaseOutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>shared-server.lib;shared.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -131,6 +131,8 @@
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalLibraryDirectories>..\..\Client\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -152,16 +154,15 @@
     <ClCompile Include="Region.cpp" />
     <ClCompile Include="RoomEvent.cpp" />
     <ClCompile Include="SendThreadMain.cpp" />
-    <ClCompile Include="Server.cpp" />
-    <ClCompile Include="ServerDlg.cpp" />
-    <ClCompile Include="StdAfx.cpp">
+    <ClCompile Include="AiServer.cpp" />
+    <ClCompile Include="AiServerInstance.cpp" />
+    <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="User.cpp" />
     <ClCompile Include="ZoneEventThread.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AIResourceFormatter.h" />
     <ClInclude Include="AISocketManager.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Extern.h" />
@@ -178,22 +179,24 @@
     <ClInclude Include="PartyUser.h" />
     <ClInclude Include="PathFind.h" />
     <ClInclude Include="Region.h" />
-    <ClInclude Include="Resource.h" />
     <ClInclude Include="RoomEvent.h" />
     <ClInclude Include="SendThreadMain.h" />
-    <ClInclude Include="Server.h" />
-    <ClInclude Include="ServerDlg.h" />
-    <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="AiServerInstance.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="User.h" />
     <ClInclude Include="ZoneEventThread.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\Server.ico" />
+    <ResourceCompile Include="AIServer.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Server.rc" />
+    <Image Include="RES\Server.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <PropertyGroup Label="Debugger defaults">
+    <LocalDebuggerWorkingDirectory>$(RootDir)Server\bin\$(Configuration)\</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

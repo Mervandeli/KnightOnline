@@ -2,26 +2,19 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "pch.h"
 #include "GameSocket.h"
 #include "Extern.h"
 #include "MAP.h"
 #include "NpcThread.h"
 #include "Party.h"
 #include "Region.h"
-#include "ServerDlg.h"
+#include "AiServerInstance.h"
 #include "User.h"
 
 #include <shared/crc32.h>
 #include <shared/lzf.h>
-
 #include <spdlog/spdlog.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
 
 extern std::mutex g_region_mutex;
 
@@ -38,6 +31,7 @@ CGameSocket::CGameSocket(SocketManager* socketManager)
 	: TcpServerSocket(socketManager)
 {
 	//m_pParty = nullptr;
+	m_pMain = AiServerInstance::instance();
 }
 
 CGameSocket::~CGameSocket()
@@ -51,10 +45,8 @@ CGameSocket::~CGameSocket()
 void CGameSocket::Initialize()
 {
 	_zoneNo = -1;
-	m_pMain = (CServerDlg*) AfxGetApp()->GetMainWnd();
 	//m_pParty = new CParty;
-	//m_pParty->Initialize();
-	m_Party.Initialize();
+	//m_pParty->Init();
 
 	TcpServerSocket::Initialize();
 }
@@ -139,8 +131,8 @@ int CGameSocket::Send(char* pBuf, int length)
 {
 	constexpr int PacketHeaderSize = 6;
 
-	_ASSERT(length >= 0);
-	_ASSERT((length + PacketHeaderSize) <= MAX_PACKET_SIZE);
+	assert(length >= 0);
+	assert((length + PacketHeaderSize) <= MAX_PACKET_SIZE);
 
 	if (length < 0
 		|| (length + PacketHeaderSize) > MAX_PACKET_SIZE)
@@ -273,9 +265,7 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 	uint8_t byZoneNumber = GetByte(pBuf, index);
 	uint8_t byReConnect = GetByte(pBuf, index);	// 0 : 처음접속, 1 : 재접속
 
-	std::string logstr = fmt::format("Ebenezer connected to zone={}", byZoneNumber);
-	m_pMain->AddOutputMessage(logstr);
-	spdlog::info("GameSocket::RecvServerConnect: {}", logstr);
+	spdlog::info("GameSocket::RecvServerConnect: Ebenezer connected to zone={}", byZoneNumber);
 
 	if (byZoneNumber < 0)
 	{
@@ -395,7 +385,7 @@ void CGameSocket::RecvUserInfo(char* pBuf)
 
 	//CUser* pUser = m_pMain->GetActiveUserPtr(uid);
 	//if( pUser == nullptr )		return;
-	CUser* pUser = new CUser;
+	CUser* pUser = new CUser();
 	pUser->Initialize();
 
 	pUser->m_iUserId = uid;
@@ -427,13 +417,8 @@ void CGameSocket::RecvUserInfo(char* pBuf)
 		&& uid < MAX_USER)
 		m_pMain->m_pUser[uid] = pUser;
 
-	_USERLOG* pUserLog = nullptr;
-	pUserLog = new _USERLOG;
-	pUserLog->t = CTime::GetCurrentTime();
-	pUserLog->byFlag = USER_LOGIN;
-	pUserLog->byLevel = pUser->m_byLevel;
-	strcpy(pUserLog->strUserID, pUser->m_strUserID);
-	pUser->m_UserLogList.push_back(pUserLog);
+	spdlog::get(logger::AIServerUser)->info("Login: level={}, charId={}",
+		pUser->m_byLevel, pUser->m_strUserID);
 }
 
 void CGameSocket::RecvUserInOut(char* pBuf)
@@ -487,7 +472,7 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 			}
 			
 			spdlog::warn("GameSocket::RecvUserInOut: UserHeal error[charId={} isAlive={} hp={} fX={} fZ={}]",
-					pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP, fX, fZ);
+				pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP, fX, fZ);
 		}
 
 		pMap = m_pMain->GetMapByIndex(pUser->m_sZoneIndex);
@@ -774,16 +759,9 @@ void CGameSocket::RecvUserLogOut(char* pBuf)
 	if (pUser == nullptr)
 		return;
 
-	_USERLOG* pUserLog = nullptr;
-	pUserLog = new _USERLOG;
-	pUserLog->t = CTime::GetCurrentTime();
-	pUserLog->byFlag = USER_LOGOUT;
-	pUserLog->byLevel = pUser->m_byLevel;
-	strcpy(pUserLog->strUserID, pUser->m_strUserID);
-	pUser->m_UserLogList.push_back(pUserLog);
-
 	// UserLogFile write
-	pUser->WriteUserLog();
+	spdlog::get(logger::AIServerUser)->info("Logout: level={}, charId={}",
+		pUser->m_byLevel, pUser->m_strUserID);
 
 	m_pMain->DeleteUserList(uid);
 	spdlog::debug("GameSocket::RecvUserLogOut: processed [userId={} charId={}]",
@@ -872,13 +850,9 @@ void CGameSocket::RecvUserUpdate(char* pBuf)
 		pUser->m_sHP = sHP;
 		pUser->m_sMP = sMP;
 		//pUser->m_sSP = sSP;
-		_USERLOG* pUserLog = nullptr;
-		pUserLog = new _USERLOG;
-		pUserLog->t = CTime::GetCurrentTime();
-		pUserLog->byFlag = USER_LEVEL_UP;
-		pUserLog->byLevel = byLevel;
-		strcpy(pUserLog->strUserID, pUser->m_strUserID);
-		pUser->m_UserLogList.push_back(pUserLog);
+
+		spdlog::get(logger::AIServerUser)->info("LevelUp: level={}, charId={}",
+			byLevel, pUser->m_strUserID);
 	}
 
 	pUser->m_byLevel = byLevel;
@@ -996,14 +970,14 @@ void CGameSocket::RecvCompressedData(char* pBuf)
 		&decompressedBuffer[0],
 		sOrgLen);
 
-	_ASSERT(nDecompressedLength == sOrgLen);
+	assert(nDecompressedLength == sOrgLen);
 
 	if (nDecompressedLength != sOrgLen)
 		return;
 
 	dwActualCrcValue = crc32(&decompressedBuffer[0], sOrgLen);
 
-	_ASSERT(dwCrcValue == dwActualCrcValue);
+	assert(dwCrcValue == dwActualCrcValue);
 
 	if (dwCrcValue != dwActualCrcValue)
 		return;
@@ -1203,7 +1177,7 @@ void CGameSocket::RecvHealMagic(char* pBuf)
 		else
 		{
 			spdlog::warn("GameSocket::RecvHealMagic:  user is dead [userId={} charId={} isAlive={} hp={}]",
-			pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
+				pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 			// 죽은 유저이므로 게임서버에 죽은 처리를 한다...
 			//Send_UserError(sid, tid);
 			return;

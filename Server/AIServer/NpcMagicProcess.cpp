@@ -2,18 +2,11 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "server.h"
+#include "pch.h"
 #include "NpcMagicProcess.h"
-#include "ServerDlg.h"
+#include "AiServerInstance.h"
 #include "User.h"
 #include "Npc.h"
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -21,7 +14,7 @@ static char THIS_FILE[] = __FILE__;
 
 CNpcMagicProcess::CNpcMagicProcess()
 {
-	m_pMain = nullptr;
+	m_pMain = AiServerInstance::instance();
 	m_pSrcNpc = nullptr;
 	m_bMagicState = NONE;
 }

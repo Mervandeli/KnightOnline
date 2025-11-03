@@ -2,19 +2,12 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "server.h"
+#include "pch.h"
 #include "PathFind.h"
 #include "math.h"
-#include "Serverdlg.h"
+#include "AiServerInstance.h"
 
 //#include "Extern.h"
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
 
 #define LEVEL_ONE_FIND_CROSS			2
 #define LEVEL_ONE_FIND_DIAGONAL			3
@@ -31,7 +24,7 @@ CPathFind::CPathFind()
 	m_pOpen = nullptr;
 	m_pClosed = nullptr;
 	m_pMap = nullptr;
-	m_pMain = (CServerDlg*) AfxGetApp()->GetMainWnd();
+	m_pMain = AiServerInstance::instance();
 }
 
 CPathFind::~CPathFind()

@@ -2,19 +2,13 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "pch.h"
 #include "User.h"
-#include "ServerDlg.h"
+#include "AiServerInstance.h"
 #include "Region.h"
 #include "GameSocket.h"
 
 #include <spdlog/spdlog.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
 
 #include "Extern.h"
 
@@ -51,6 +45,7 @@ extern std::mutex g_region_mutex;
 
 CUser::CUser()
 {
+	m_pMain = AiServerInstance::instance();
 }
 
 CUser::~CUser()
@@ -59,9 +54,6 @@ CUser::~CUser()
 
 void CUser::Initialize()
 {
-	m_pMain = (CServerDlg*) AfxGetApp()->GetMainWnd();
-
-	m_MagicProcess.m_pMain = m_pMain;
 	m_MagicProcess.m_pSrcUser = this;
 
 	memset(m_strUserID, 0, sizeof(m_strUserID));// 캐릭터의 이름
@@ -224,10 +216,6 @@ void CUser::SendMagicAttackResult(int tuid, uint8_t result, int16_t sDamage, int
 // sungyong 2002.05.22
 void CUser::SendAll(const char* pBuf, int nLength)
 {
-	if (nLength <= 0
-		|| nLength > sizeof(_SEND_DATA::pBuf))
-		return;
-
 	if (m_iUserId < 0
 		|| m_iUserId >= MAX_USER)
 	{
@@ -240,15 +228,7 @@ void CUser::SendAll(const char* pBuf, int nLength)
 	if (pMap == nullptr)
 		return;
 
-	_SEND_DATA* pNewData = new _SEND_DATA;
-	if (pNewData == nullptr)
-		return;
-
-	pNewData->sCurZone = m_curZone;
-	pNewData->sLength = nLength;
-	memcpy(pNewData->pBuf, pBuf, nLength);
-
-	m_pMain->_socketManager.QueueSendData(pNewData);
+	m_pMain->Send(pBuf, nLength, m_curZone);
 }
 // ~sungyong 2002.05.22
 
@@ -1081,32 +1061,4 @@ void CUser::HealAreaCheck(int rx, int rz)
 
 	delete[] pNpcIDList;
 	pNpcIDList = nullptr;
-}
-
-void CUser::WriteUserLog()
-{
-	for (const _USERLOG* pUserLog : m_UserLogList)
-	{
-		if (pUserLog->byFlag == USER_LOGIN)
-			spdlog::get(logger::AIServerUser)->info("Login: level={}, charId={}",
-				pUserLog->byLevel, pUserLog->strUserID);
-		else if (pUserLog->byFlag == USER_LOGOUT)
-			spdlog::get(logger::AIServerUser)->info("Logout: level={}, charId={}",
-				pUserLog->byLevel, pUserLog->strUserID);
-		else if (pUserLog->byFlag == USER_LEVEL_UP)
-			spdlog::get(logger::AIServerUser)->info("LevelUp: level={}, charId={}",
-				pUserLog->byLevel, pUserLog->strUserID);
-	}
-
-	InitUserLog();
-}
-
-void CUser::InitUserLog()
-{
-	while (!m_UserLogList.empty())
-	{
-		delete m_UserLogList.front();
-		m_UserLogList.pop_front();
-	}
-	m_UserLogList.clear();
 }
