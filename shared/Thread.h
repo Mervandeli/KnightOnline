@@ -7,17 +7,25 @@
 class Thread
 {
 public:
-	bool IsRunning() const
+	bool CanTick() const
 	{
-		return _running;
+		return _canTick;
+	}
+
+	bool IsShutdown() const
+	{
+		return _isShutdown;
 	}
 
 	Thread();
 	virtual void start();
-	virtual bool shutdown(bool join = true);
+	virtual void shutdown(bool waitForShutdown = true);
+	void join();
 	virtual ~Thread();
 
 protected:
+	void thread_loop_wrapper();
+
 	virtual void thread_loop() = 0;
 	virtual void before_shutdown() {}
 
@@ -25,5 +33,6 @@ protected:
 	std::mutex				_mutex;
 	std::condition_variable	_cv;
 	std::thread				_thread;
-	bool					_running;
+	bool					_canTick;
+	bool					_isShutdown;
 };
