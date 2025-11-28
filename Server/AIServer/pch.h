@@ -9,7 +9,9 @@
 #include <asio.hpp>
 
 #include "Packet.h"
-#include "global.h"
 #include "Define.h"
 
 #include <shared-server/server_config.h>
+#include <shared-server/utilities.h>
+
+#define myrand myrand_ai

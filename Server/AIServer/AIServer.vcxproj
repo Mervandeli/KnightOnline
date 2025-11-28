@@ -139,7 +139,6 @@
   <ItemGroup>
     <ClCompile Include="AISocketManager.cpp" />
     <ClCompile Include="GameSocket.cpp" />
-    <ClCompile Include="global.cpp" />
     <ClCompile Include="MagicProcess.cpp" />
     <ClCompile Include="MAP.cpp" />
     <ClCompile Include="Npc.cpp" />
@@ -165,7 +164,6 @@
     <ClInclude Include="Define.h" />
     <ClInclude Include="Extern.h" />
     <ClInclude Include="GameSocket.h" />
-    <ClInclude Include="global.h" />
     <ClInclude Include="MagicProcess.h" />
     <ClInclude Include="MAP.h" />
     <ClInclude Include="Npc.h" />

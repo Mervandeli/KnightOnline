@@ -2,7 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "pch.h"
 #include "N3ShapeMgr.h"
 
 #include <spdlog/fmt/bundled/format.h>

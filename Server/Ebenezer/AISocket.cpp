@@ -407,9 +407,9 @@ void CAISocket::RecvNpcInfoAll(char* pBuf)
 		int nLength = GetVarString(npcName, pBuf, sizeof(uint8_t), index);
 		byGroup = GetByte(pBuf, index);
 		byLevel = GetByte(pBuf, index);
-		fPosX = Getfloat(pBuf, index);
-		fPosZ = Getfloat(pBuf, index);
-		fPosY = Getfloat(pBuf, index);
+		fPosX = GetFloat(pBuf, index);
+		fPosZ = GetFloat(pBuf, index);
+		fPosY = GetFloat(pBuf, index);
 		byDirection = GetByte(pBuf, index);
 		tNpcType = GetByte(pBuf, index);
 		iSellingGroup = GetDWORD(pBuf, index);
@@ -550,10 +550,10 @@ void CAISocket::RecvNpcMoveResult(char* pBuf)
 	float		fSecForMetor;	// Sec당 metor
 	flag = GetByte(pBuf, index);
 	nid = GetShort(pBuf, index);
-	fPosX = Getfloat(pBuf, index);
-	fPosZ = Getfloat(pBuf, index);
-	fPosY = Getfloat(pBuf, index);
-	fSecForMetor = Getfloat(pBuf, index);
+	fPosX = GetFloat(pBuf, index);
+	fPosZ = GetFloat(pBuf, index);
+	fPosY = GetFloat(pBuf, index);
+	fSecForMetor = GetFloat(pBuf, index);
 
 	CNpc* pNpc = _main->m_NpcMap.GetData(nid);
 	if (pNpc == nullptr)
@@ -1001,9 +1001,9 @@ void CAISocket::RecvNpcInfo(char* pBuf)
 
 	byGroup = GetByte(pBuf, index);
 	byLevel = GetByte(pBuf, index);
-	fPosX = Getfloat(pBuf, index);
-	fPosZ = Getfloat(pBuf, index);
-	fPosY = Getfloat(pBuf, index);
+	fPosX = GetFloat(pBuf, index);
+	fPosZ = GetFloat(pBuf, index);
+	fPosY = GetFloat(pBuf, index);
 	byDirection = GetByte(pBuf, index);
 	tState = GetByte(pBuf, index);
 	tNpcKind = GetByte(pBuf, index);
@@ -1230,9 +1230,9 @@ void CAISocket::RecvNpcGiveItem(char* pBuf)
 	sZone = GetShort(pBuf, index);
 	regionx = GetShort(pBuf, index);
 	regionz = GetShort(pBuf, index);
-	fX = Getfloat(pBuf, index);
-	fZ = Getfloat(pBuf, index);
-	fY = Getfloat(pBuf, index);
+	fX = GetFloat(pBuf, index);
+	fZ = GetFloat(pBuf, index);
+	fY = GetFloat(pBuf, index);
 	byCount = GetByte(pBuf, index);
 
 	for (int i = 0; i < byCount; i++)
@@ -1502,9 +1502,9 @@ void CAISocket::RecvNpcInOut(char* pBuf)
 
 	nType = GetByte(pBuf, index);
 	nid = GetShort(pBuf, index);
-	fx = Getfloat(pBuf, index);
-	fz = Getfloat(pBuf, index);
-	fy = Getfloat(pBuf, index);
+	fx = GetFloat(pBuf, index);
+	fz = GetFloat(pBuf, index);
+	fy = GetFloat(pBuf, index);
 
 	if (nid >= NPC_BAND)
 	{

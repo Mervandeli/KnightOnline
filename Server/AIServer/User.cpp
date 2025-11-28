@@ -325,8 +325,8 @@ void CUser::Dead(int tid, int nDamage)
 
 /*	SetByte(buff, AG_DEAD, send_index );
 	SetShort(buff, m_iUserId, send_index );
-	Setfloat(buff, m_curx, send_index);
-	Setfloat(buff, m_curz, send_index);
+	SetFloat(buff, m_curx, send_index);
+	SetFloat(buff, m_curz, send_index);
 
 	SendAll(buff, send_index);   // thread 에서 send	*/
 }

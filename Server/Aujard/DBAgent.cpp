@@ -657,7 +657,7 @@ bool CDBAgent::LoadCharInfo(char* charId_, char* buff, int& buffIndex)
 		}
 	}
 
-	SetString2(buff, charId.c_str(), static_cast<int16_t>(charId.length()), buffIndex);
+	SetString2(buff, charId, buffIndex);
 	SetByte(buff, Race, buffIndex);
 	SetShort(buff, Class, buffIndex);
 	SetByte(buff, Level, buffIndex);
@@ -865,7 +865,7 @@ int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int
 				rtrim(charId);
 #endif
 
-				SetString2(buffOut, charId.c_str(), static_cast<int16_t>(charId.length()), tempIndex);
+				SetString2(buffOut, charId, tempIndex);
 				SetByte(buffOut, Fame, tempIndex);
 				SetByte(buffOut, Level, tempIndex);
 				SetShort(buffOut, Class, tempIndex);
@@ -1148,7 +1148,7 @@ bool CDBAgent::LoadKnightsInfo(int knightsId, char* buffOut, int& buffIndex)
 
 		SetShort(buffOut, knights.ID, buffIndex);
 		SetByte(buffOut, knights.Nation, buffIndex);
-		SetString2(buffOut, knights.Name.c_str(), static_cast<int16_t>(knights.Name.length()), buffIndex);
+		SetString2(buffOut, knights.Name, buffIndex);
 		SetShort(buffOut, knights.Members, buffIndex);
 		SetDWORD(buffOut, knights.Points, buffIndex);
 	}

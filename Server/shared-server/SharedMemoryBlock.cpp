@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+﻿#include "pch.h"
 #include "SharedMemoryBlock.h"
 
 #include <boost/interprocess/mapped_region.hpp>

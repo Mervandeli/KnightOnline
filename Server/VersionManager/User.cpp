@@ -139,8 +139,8 @@ void CUser::Parsing(int len, char* pData)
 
 			for (const _SERVER_INFO* pInfo : appInstance->ServerList)
 			{
-				SetString2(buff, pInfo->strServerIP, static_cast<int16_t>(strlen(pInfo->strServerIP)), send_index);
-				SetString2(buff, pInfo->strServerName, static_cast<int16_t>(strlen(pInfo->strServerName)), send_index);
+				SetString2(buff, pInfo->strServerIP, send_index);
+				SetString2(buff, pInfo->strServerName, send_index);
 
 				if (pInfo->sUserCount <= pInfo->sUserLimit)
 					SetShort(buff, pInfo->sUserCount, send_index);   // 기범이가 ^^;
@@ -204,7 +204,7 @@ void CUser::LogInReq(char* pBuf)
 			result = AUTH_IN_GAME;
 
 			SetByte(send_buff, result, send_index);
-			SetString2(send_buff, serverip, (int16_t) strlen(serverip), send_index);
+			SetString2(send_buff, serverip, send_index);
 			SetShort(send_buff, serverno, send_index);
 		}
 		else
@@ -246,12 +246,12 @@ void CUser::SendDownloadInfo(int version)
 
 	SetByte(buff, LS_DOWNLOADINFO_REQ, send_index);
 
-	SetString2(buff, appInstance->FtpUrl(), static_cast<int16_t>(strlen(appInstance->FtpUrl())), send_index);
-	SetString2(buff, appInstance->FtpPath(), static_cast<int16_t>(strlen(appInstance->FtpPath())), send_index);
+	SetString2(buff, appInstance->FtpUrl(), send_index);
+	SetString2(buff, appInstance->FtpPath(), send_index);
 	SetShort(buff, static_cast<int>(downloadset.size()), send_index);
 
 	for (const std::string& filename : downloadset)
-		SetString2(buff, filename.data(), static_cast<int16_t>(filename.length()), send_index);
+		SetString2(buff, filename.data(), send_index);
 
 	Send(buff, send_index);
 }

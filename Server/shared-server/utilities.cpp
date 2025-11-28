@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "global.h"
+#include "utilities.h"
 
 #include <shared/StringConversion.h>
 
@@ -59,10 +59,16 @@ uint32_t GetDWORD(const char* sBuf, int& index)
 	return *(uint32_t*) (sBuf + index - 4);
 }
 
-float Getfloat(const char* sBuf, int& index)
+float GetFloat(const char* sBuf, int& index)
 {
 	index += 4;
 	return *(float*) (sBuf + index - 4);
+}
+
+int64_t GetInt64(const char* sBuf, int& index)
+{
+	index += 8;
+	return *(int64_t*) (sBuf + index - 8);
 }
 
 void SetString(char* tBuf, const char* sBuf, int len, int& index)
@@ -106,10 +112,16 @@ void SetDWORD(char* tBuf, uint32_t sDword, int& index)
 	index += 4;
 }
 
-void Setfloat(char* tBuf, float sFloat, int& index)
+void SetFloat(char* tBuf, float sFloat, int& index)
 {
 	memcpy(tBuf + index, &sFloat, 4);
 	index += 4;
+}
+
+void SetInt64(char* tBuf, int64_t nInt64, int& index)
+{
+	memcpy(tBuf + index, &nInt64, 8);
+	index += 8;
 }
 
 void SetString1(char* tBuf, const std::string_view str, int& index)
@@ -119,11 +131,25 @@ void SetString1(char* tBuf, const std::string_view str, int& index)
 	SetString(tBuf, str.data(), len, index);
 }
 
+void SetString1(char* tBuf, const char* str, int length, int& index)
+{
+	uint8_t len = static_cast<uint8_t>(length);
+	SetByte(tBuf, len, index);
+	SetString(tBuf, str, len, index);
+}
+
 void SetString2(char* tBuf, const std::string_view str, int& index)
 {
 	int16_t len = static_cast<int16_t>(str.length());
 	SetShort(tBuf, len, index);
 	SetString(tBuf, str.data(), len, index);
+}
+
+void SetString2(char* tBuf, const char* str, int length, int& index)
+{
+	int16_t len = static_cast<int16_t>(length);
+	SetShort(tBuf, len, index);
+	SetString(tBuf, str, len, index);
 }
 
 int ParseSpace(char* tBuf, const char* sBuf)
@@ -159,7 +185,7 @@ std::filesystem::path GetProgPath()
 	return std::filesystem::current_path();
 }
 
-int myrand(int min, int max, bool bSame)
+int myrand_ai(int min, int max, bool bSame)
 {
 	static int nOld = 0;
 	int nRet = 0;
@@ -184,66 +210,26 @@ int myrand(int min, int max, bool bSame)
 	return nRet;
 }
 
-///////////////////////////////////////////////////////////////////////////
-//	XdY 형식의 주사위 굴리기
-//
-int XdY(int x, int y)
+int myrand_generic(int min, int max)
 {
-	int temp = 0;
-	if (x <= 0)
-		return myrand(x, y, true);
+	if (min == max)
+		return min;
 
-	for (int i = 0; i < x; i++)
-		temp += myrand(1, y, true);
+	if (min > max)
+		std::swap(min, max);
 
-	return temp;
-}
+	double gap = max - min + 1;
+	double rrr = (double) RAND_MAX / gap;
 
-///////////////////////////////////////////////////////////////////////////
-//	uint32_t 의 Max 값을 채크하면서 증가시킨다.
-//
-void CheckMaxValue(uint32_t& dest, uint32_t add)
-{
-	uint32_t Diff = _MAX_DWORD - dest;
+	double rand_result;
 
-	if (add <= Diff)
-		dest += add;
-	else
-		dest = _MAX_DWORD;
-}
+	rand_result = (double) rand() / rrr;
 
-///////////////////////////////////////////////////////////////////////////
-//	int 의 Max 값을 채크하면서 증가시킨다.
-//
-void CheckMaxValue(int& dest, int add)
-{
-	int Diff = _MAX_INT - dest;
+	if ((int) (min + (int) rand_result) < min)
+		return min;
 
-	if (add <= Diff)
-		dest += add;
-	else
-		dest = _MAX_INT;
-}
+	if ((int) (min + (int) rand_result) > max)
+		return max;
 
-///////////////////////////////////////////////////////////////////////////
-//	int16_t 의 Max 값을 채크하면서 증가시킨다.
-//
-void CheckMaxValue(int16_t& dest, int16_t add)
-{
-	int16_t Diff = _MAX_SHORT - dest;
-
-	if (add <= Diff)
-		dest += add;
-	else
-		dest = _MAX_SHORT;
-}
-
-bool CheckMaxValueReturn(uint32_t& dest, uint32_t add)
-{
-	uint32_t Diff = _MAX_DWORD - dest;
-
-	if (add <= Diff)
-		return true;//dest += add;
-	else
-		return false;//dest = _MAX_DWORD;
+	return (int) (min + (int) rand_result);
 }

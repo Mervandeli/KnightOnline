@@ -50,8 +50,7 @@ bool EVENT::LoadEvent(int zone)
 	std::error_code ec;
 
 	// Build the base MAP directory
-	std::filesystem::path evtPath(GetProgPath().GetString());
-	evtPath /= QUESTS_DIR;
+	std::filesystem::path evtPath = GetProgPath() / QUESTS_DIR;
 	evtPath /= std::to_string(zone) + ".evt";
 
 	// Doesn't exist but this isn't a problem; we don't expect it to exist.
