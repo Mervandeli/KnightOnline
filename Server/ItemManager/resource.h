@@ -1,14 +1,9 @@
 ﻿//{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by ItemManager.rc
 //
 #define IDM_ABOUTBOX                    0x0010
-#define IDD_ABOUTBOX                    100
-#define IDS_ABOUTBOX                    101
-#define IDD_ITEMMANAGER_DIALOG          102
 #define IDR_MAINFRAME                   128
-#define IDC_OUT_LIST                    1000
-#define IDC_EXIT_BTN                    1001
 
 // Next default values for new objects
 // 
