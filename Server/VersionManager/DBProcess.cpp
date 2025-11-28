@@ -2,37 +2,24 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
+#include "pch.h"
 #include "DBProcess.h"
 #include "Define.h"
-#include "VersionManagerDlg.h"
+#include "VersionManagerInstance.h"
 
 #include <db-library/Connection.h>
 #include <db-library/Exceptions.h>
+#include <db-library/RecordSetLoader_STLMap.h>
+#include <db-library/StoredProc.h>
 #include <db-library/utils.h>
 
 #include <nanodbc/nanodbc.h>
 #include <spdlog/spdlog.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
 import VersionManagerBinder;
 import StoredProc;
 
-// NOTE: Explicitly handled under DEBUG_NEW override
-#include <db-library/RecordSetLoader_STLMap.h>
-#include <db-library/StoredProc.h>
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
-CDBProcess::CDBProcess(CVersionManagerDlg* main)
-	: _main(main)
+CDBProcess::CDBProcess()
 {
 }
 
@@ -67,7 +54,8 @@ bool CDBProcess::LoadVersionList(VersionInfoList* versionList)
 	recordset_loader::STLMap loader(*versionList);
 	if (!loader.Load_ForbidEmpty())
 	{
-		_main->ReportTableLoadError(loader.GetError(), __func__);
+		spdlog::error("DBProcess::LoadVersionList: failed: {}",
+			loader.GetError().Message);
 		return false;
 	}
 
@@ -191,6 +179,7 @@ bool CDBProcess::DeleteVersion(int version)
 /// \return true on success, false on failure
 bool CDBProcess::LoadUserCountList()
 {
+	VersionManagerInstance* appInstance = VersionManagerInstance::instance();
 	try
 	{
 		db::ModelRecordSet<model::Concurrent> recordSet;
@@ -201,10 +190,10 @@ bool CDBProcess::LoadUserCountList()
 			model::Concurrent concurrent = recordSet.get();
 
 			int serverId = concurrent.ServerId - 1;
-			if (serverId >= static_cast<int>(_main->ServerList.size()))
+			if (serverId >= static_cast<int>(appInstance->ServerList.size()))
 				continue;
 
-			_main->ServerList[serverId]->sUserCount = concurrent.Zone1Count + concurrent.Zone2Count + concurrent.Zone3Count;
+			appInstance->ServerList[serverId]->sUserCount = concurrent.Zone1Count + concurrent.Zone2Count + concurrent.Zone3Count;
 		}
 
 		return true;

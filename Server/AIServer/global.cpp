@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "global.h"
 
-#include <filesystem>
 #include <shared/StringConversion.h>
 
 bool CheckGetVarString(int nLength, char* tBuf, const char* sBuf, int nSize, int& index)
@@ -122,7 +121,7 @@ void SetString1(char* tBuf, const std::string_view str, int& index)
 
 void SetString2(char* tBuf, const std::string_view str, int& index)
 {
-	int16_t len = static_cast<int16_t >(str.length());
+	int16_t len = static_cast<int16_t>(str.length());
 	SetShort(tBuf, len, index);
 	SetString(tBuf, str.data(), len, index);
 }
@@ -155,9 +154,9 @@ int ParseSpace(char* tBuf, const char* sBuf)
 	return index;
 }
 
-std::string GetProgPath()
+std::filesystem::path GetProgPath()
 {
-	return std::filesystem::current_path().string();
+	return std::filesystem::current_path();
 }
 
 int myrand(int min, int max, bool bSame)

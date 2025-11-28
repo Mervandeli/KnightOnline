@@ -19,13 +19,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
-    <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v143</PlatformToolset>
-    <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
@@ -50,21 +48,20 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <LanguageStandard>stdcpp23</LanguageStandard>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;_WINDOWS;LOGIN_SERVER;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(DependencyDir);$(RootDir);$(RootDir)Server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(BaseOutDir);$(DependencyDir)ZipArchive\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>shared-server.lib;shared.lib;ZipArchive.lib;zlib.lib;ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>$(BaseOutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>shared-server.lib;shared.lib;ws2_32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -94,7 +91,6 @@
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -127,15 +123,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DBProcess.cpp" />
-    <ClCompile Include="DlgBrowsePath.cpp" />
-    <ClCompile Include="SettingDlg.cpp" />
-    <ClCompile Include="ShellTree.cpp" />
-    <ClCompile Include="StdAfx.cpp">
+    <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="User.cpp" />
     <ClCompile Include="VersionManager.cpp" />
-    <ClCompile Include="VersionManagerDlg.cpp" />
+    <ClCompile Include="VersionManagerInstance.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VersionManager.rc" />
@@ -143,21 +136,13 @@
   <ItemGroup>
     <ClInclude Include="DBProcess.h" />
     <ClInclude Include="Define.h" />
-    <ClInclude Include="DlgBrowsePath.h" />
-    <ClInclude Include="Resource.h" />
-    <ClInclude Include="SettingDlg.h" />
-    <ClInclude Include="ShellTree.h" />
-    <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="STLMap.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="User.h" />
-    <ClInclude Include="VersionManager.h" />
-    <ClInclude Include="VersionManagerDlg.h" />
+    <ClInclude Include="VersionManagerInstance.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\VersionManager.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="res\VersionManager.rc2" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

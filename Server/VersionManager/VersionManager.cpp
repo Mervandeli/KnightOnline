@@ -1,68 +1,52 @@
-﻿// VersionManager.cpp : Defines the class behaviors for the application.
+﻿// VersionManager.cpp : contains the main() function to start the server
 //
 
-#include "stdafx.h"
-#include "VersionManager.h"
-#include "VersionManagerDlg.h"
+#include "pch.h"
+#include "VersionManagerInstance.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
+#include <signal.h>
+#include <spdlog/spdlog.h>
 
-/////////////////////////////////////////////////////////////////////////////
-// CVersionManagerApp
+VersionManagerInstance* _appThread = nullptr;
 
-BEGIN_MESSAGE_MAP(CVersionManagerApp, CWinApp)
-	//{{AFX_MSG_MAP(CVersionManagerApp)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-		//    DO NOT EDIT what you see in these blocks of generated code!
-	//}}AFX_MSG
-	ON_COMMAND(ID_HELP, CWinApp::OnHelp)
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// CVersionManagerApp construction
-
-CVersionManagerApp::CVersionManagerApp()
+void signalHandler(int signalNumber)
 {
-	// TODO: add construction code here,
-	// Place all significant initialization in InitInstance
+	spdlog::info("VersionManager::signalHandler: Caught {}", signalNumber);
+	switch (signalNumber)
+	{
+		case SIGINT:
+		case SIGABRT:
+		case SIGTERM:
+			// Shutdown the application thread
+			if (_appThread != nullptr)
+			{
+				_appThread->shutdown(false);
+				_appThread = nullptr;
+			}
+			break;
+	}
+
+	signal(signalNumber, signalHandler);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// The one and only CVersionManagerApp object
-
-CVersionManagerApp theApp;
-
-/////////////////////////////////////////////////////////////////////////////
-// CVersionManagerApp initialization
-
-BOOL CVersionManagerApp::InitInstance()
+int main()
 {
-	AfxEnableControlContainer();
+	logger::Logger logger(logger::VersionManager);
 
-	// Standard initialization
-	// If you are not using these features and wish to reduce the size
-	//  of your final executable, you should remove from the following
-	//  the specific initialization routines you do not need.
+	// catch interrupt signals for graceful shutdowns.
+	signal(SIGINT, signalHandler);
+	signal(SIGABRT, signalHandler);
+	signal(SIGTERM, signalHandler);
 
-	CVersionManagerDlg dlg;
-	m_pMainWnd = &dlg;
-	int nResponse = dlg.DoModal();
-	if (nResponse == IDOK)
-	{
-		// TODO: Place code here to handle when the dialog is
-		//  dismissed with OK
-	}
-	else if (nResponse == IDCANCEL)
-	{
-		// TODO: Place code here to handle when the dialog is
-		//  dismissed with Cancel
-	}
+	// Logger config/setup is handled by the server instance.
+	// We just instantiate it early for signal handling.
+	VersionManagerInstance appThread(logger);
+	_appThread = &appThread;
+	appThread.start();
 
-	// Since the dialog has been closed, return FALSE so that we exit the
-	//  application, rather than start the application's message pump.
-	return FALSE;
+	// We keep the main() thread alive to catch interrupt signals and call shutdown
+	appThread.join();
+	_appThread = nullptr;
+
+	return EXIT_SUCCESS;
 }

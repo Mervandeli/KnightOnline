@@ -57,7 +57,6 @@ typedef std::vector <MAP*>					ZoneArray;
 class TimerThread;
 class AiServerInstance : public Thread
 {
-// Construction
 public:
 	static AiServerInstance* instance()
 	{
