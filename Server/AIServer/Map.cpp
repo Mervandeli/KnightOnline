@@ -495,8 +495,7 @@ bool MAP::LoadRoomEvent(int zone_number)
 	CRoomEvent* pEvent = nullptr;
 
 	// Build the base MAP directory
-	std::filesystem::path evtPath(GetProgPath());
-	evtPath /= MAP_DIR;
+	std::filesystem::path evtPath = GetProgPath() / MAP_DIR;
 	evtPath /= std::to_string(zone_number) + ".evt";
 
 	if (!std::filesystem::exists(evtPath))

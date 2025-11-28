@@ -71,7 +71,7 @@ AiServerInstance::AiServerInstance(AIServerLogger& logger)
 
 AiServerInstance::~AiServerInstance()
 {
-	spdlog::info("AiServerInstance::~AiServerInstance: Graceful shutdown triggered, releasing resources.");
+	spdlog::info("AiServerInstance::~AiServerInstance: Shutting down, releasing resources.");
 	_socketManager.Shutdown();
 	spdlog::info("AiServerInstance::~AiServerInstance: SocketManager stopped.");
 
@@ -960,8 +960,7 @@ bool AiServerInstance::MapFileLoad()
 	loader.SetProcessFetchCallback([&](db::ModelRecordSet<ModelType>& recordset)
 	{
 		// Build the base MAP directory
-		std::filesystem::path mapDir(GetProgPath());
-		mapDir /= MAP_DIR;
+		std::filesystem::path mapDir = GetProgPath() / MAP_DIR;
 
 		// Resolve it to strip the relative references to be nice.
 		if (std::filesystem::exists(mapDir))
@@ -1587,15 +1586,14 @@ int AiServerInstance::GetServerNumber(int zoneId) const
 
 void AiServerInstance::GetServerInfoIni()
 {
-	std::string exePath = GetProgPath();
-	std::filesystem::path iniPath(exePath);
-	iniPath /= L"server.ini";
+	std::filesystem::path exePath = GetProgPath();
+	std::filesystem::path iniPath = exePath / "server.ini";
 	
 	CIni inifile;
 	inifile.Load(iniPath);
 
 	// logger setup
-	_logger.Setup(inifile, exePath);
+	_logger.Setup(inifile, exePath.string());
 	
 	m_byZone = inifile.GetInt("SERVER", "ZONE", 1);
 

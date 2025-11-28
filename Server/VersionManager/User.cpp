@@ -1,28 +1,13 @@
-﻿// User.cpp: implementation of the CUser class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
-#include "VersionManager.h"
-#include "VersionManagerdlg.h"
+﻿#include "pch.h"
+#include "VersionManagerInstance.h"
 #include "User.h"
 
 #include <shared/packets.h>
 
 #include <set>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
-CUser::CUser(CVersionManagerDlg* main, SocketManager* socketManager)
-	: TcpServerSocket(socketManager), _main(main)
+CUser::CUser(SocketManager* socketManager)
+	: TcpServerSocket(socketManager)
 {
 }
 
@@ -133,22 +118,29 @@ void CUser::Parsing(int len, char* pData)
 	switch (command)
 	{
 		case LS_VERSION_REQ:
+		{
+			VersionManagerInstance* appInstance = VersionManagerInstance::instance();
+
 			SetByte(buff, LS_VERSION_REQ, send_index);
-			SetShort(buff, _main->LastVersion(), send_index);
+			SetShort(buff, appInstance->LastVersion(), send_index);
 			Send(buff, send_index);
-			break;
+		}
+		break;
 
 		case LS_SERVERLIST:
+		{
+			VersionManagerInstance* appInstance = VersionManagerInstance::instance();
+
 			// 기범이가 ^^;
-			_main->DbProcess.LoadUserCountList();
+			appInstance->DbProcess.LoadUserCountList();
 
 			SetByte(buff, LS_SERVERLIST, send_index);
-			SetByte(buff, static_cast<uint8_t>(_main->ServerList.size()), send_index);
+			SetByte(buff, static_cast<uint8_t>(appInstance->ServerList.size()), send_index);
 
-			for (const _SERVER_INFO* pInfo : _main->ServerList)
+			for (const _SERVER_INFO* pInfo : appInstance->ServerList)
 			{
-				SetString2(buff, pInfo->strServerIP, (int16_t) strlen(pInfo->strServerIP), send_index);
-				SetString2(buff, pInfo->strServerName, (int16_t) strlen(pInfo->strServerName), send_index);
+				SetString2(buff, pInfo->strServerIP, static_cast<int16_t>(strlen(pInfo->strServerIP)), send_index);
+				SetString2(buff, pInfo->strServerName, static_cast<int16_t>(strlen(pInfo->strServerName)), send_index);
 
 				if (pInfo->sUserCount <= pInfo->sUserLimit)
 					SetShort(buff, pInfo->sUserCount, send_index);   // 기범이가 ^^;
@@ -157,7 +149,8 @@ void CUser::Parsing(int len, char* pData)
 			}
 
 			Send(buff, send_index);
-			break;
+		}
+		break;
 
 		case LS_DOWNLOADINFO_REQ:
 			client_version = GetShort(pData, index);
@@ -183,6 +176,7 @@ void CUser::LogInReq(char* pBuf)
 		accountid[MAX_ID_SIZE + 1] = {},
 		pwd[MAX_PW_SIZE + 1] = {};
 	int16_t sPremiumTimeDaysRemaining = -1;
+	VersionManagerInstance* appInstance = VersionManagerInstance::instance();
 
 	idlen = GetShort(pBuf, index);
 	if (idlen > MAX_ID_SIZE
@@ -198,12 +192,12 @@ void CUser::LogInReq(char* pBuf)
 
 	GetString(pwd, pBuf, pwdlen, index);
 
-	result = _main->DbProcess.AccountLogin(accountid, pwd);
+	result = appInstance->DbProcess.AccountLogin(accountid, pwd);
 	SetByte(send_buff, LS_LOGIN_REQ, send_index);
 
 	if (result == AUTH_OK)
 	{
-		bCurrentuser = _main->DbProcess.IsCurrentUser(accountid, serverip, serverno);
+		bCurrentuser = appInstance->DbProcess.IsCurrentUser(accountid, serverip, serverno);
 		if (bCurrentuser)
 		{
 			// Kick out
@@ -217,7 +211,7 @@ void CUser::LogInReq(char* pBuf)
 		{
 			SetByte(send_buff, result, send_index);
 
-			if (!_main->DbProcess.LoadPremiumServiceUser(accountid, &sPremiumTimeDaysRemaining))
+			if (!appInstance->DbProcess.LoadPremiumServiceUser(accountid, &sPremiumTimeDaysRemaining))
 				sPremiumTimeDaysRemaining = -1;
 
 			SetShort(send_buff, sPremiumTimeDaysRemaining, send_index);
@@ -242,8 +236,9 @@ void CUser::SendDownloadInfo(int version)
 	int send_index = 0;
 	std::set<std::string> downloadset;
 	char buff[2048];
+	VersionManagerInstance* appInstance = VersionManagerInstance::instance();
 
-	for (const auto& [_, pInfo] : _main->VersionList)
+	for (const auto& [_, pInfo] : appInstance->VersionList)
 	{
 		if (pInfo->Number > version)
 			downloadset.insert(pInfo->CompressName);
@@ -251,28 +246,29 @@ void CUser::SendDownloadInfo(int version)
 
 	SetByte(buff, LS_DOWNLOADINFO_REQ, send_index);
 
-	SetString2(buff, _main->FtpUrl(), (int16_t) strlen(_main->FtpUrl()), send_index);
-	SetString2(buff, _main->FtpPath(), (int16_t) strlen(_main->FtpPath()), send_index);
+	SetString2(buff, appInstance->FtpUrl(), static_cast<int16_t>(strlen(appInstance->FtpUrl())), send_index);
+	SetString2(buff, appInstance->FtpPath(), static_cast<int16_t>(strlen(appInstance->FtpPath())), send_index);
 	SetShort(buff, static_cast<int>(downloadset.size()), send_index);
 
 	for (const std::string& filename : downloadset)
-		SetString2(buff, filename.c_str(), (int16_t) filename.size(), send_index);
+		SetString2(buff, filename.data(), static_cast<int16_t>(filename.length()), send_index);
 
 	Send(buff, send_index);
 }
 
 void CUser::NewsReq(char* pBuf)
 {
+	constexpr char szHeader[] = "Login Notice";	// this isn't really used, but it's always set to this
+	constexpr char szEmpty[] = "<empty>";		// unofficial but when used, will essentially cause it to skip since it's not formatted.
+
 	char send_buff[8192];
 	int send_index = 0;
-
-	const char szHeader[]	= "Login Notice";	// this isn't really used, but it's always set to this
-	const char szEmpty[]	= "<empty>";		// unofficial but when used, will essentially cause it to skip since it's not formatted.
+	VersionManagerInstance* appInstance = VersionManagerInstance::instance();
 
 	SetByte(send_buff, LS_NEWS, send_index);
 	SetString2(send_buff, szHeader, _countof(szHeader) - 1, send_index);
 
-	const _NEWS& news = _main->News;
+	const _NEWS& news = appInstance->News;
 	if (news.Size > 0)
 		SetString2(send_buff, news.Content, news.Size, send_index);
 	else

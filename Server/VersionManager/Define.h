@@ -1,6 +1,6 @@
-﻿#ifndef _DEFINE_H
-#define _DEFINE_H
+﻿#pragma once
 
+#include <filesystem>
 #if defined(_DEBUG)
 #include <iostream>
 #endif
@@ -30,7 +30,6 @@ constexpr int DB_PROCESS_TIMEOUT	= 100;
 // status
 #define STATE_CONNECTED			0X01
 #define STATE_DISCONNECTED		0X02
-#define STATE_GAMESTART			0x03
 ////////////////////////////////////////////////////////////
 
 typedef union
@@ -38,18 +37,6 @@ typedef union
 	int16_t		i;
 	uint8_t		b[2];
 } MYSHORT;
-
-typedef union
-{
-	int32_t		i;
-	uint8_t		b[4];
-} MYINT;
-
-typedef union
-{
-	uint32_t	w;
-	uint8_t		b[4];
-} MYDWORD;
 
 import VersionManagerModel;
 namespace model = versionmanager_model; 
@@ -178,16 +165,9 @@ inline void SetVarString(char* tBuf, char* sBuf, int len, int& index)
 	index += len;
 }
 
-inline CString GetProgPath()
+inline std::filesystem::path GetProgPath()
 {
-	TCHAR Buf[256], Path[256];
-	TCHAR drive[_MAX_DRIVE], dir[_MAX_DIR], fname[_MAX_FNAME], ext[_MAX_EXT];
-
-	::GetModuleFileName(AfxGetApp()->m_hInstance, Buf, 256);
-	_tsplitpath(Buf, drive, dir, fname, ext);
-	_tcscpy(Path, drive);
-	_tcscat(Path, dir);
-	return Path;
+	return std::filesystem::current_path();
 }
 
 // ini config variable names
@@ -198,11 +178,6 @@ namespace ini
 	static constexpr char DSN[] = "DSN";
 	static constexpr char UID[] = "UID";
 	static constexpr char PWD[] = "PWD";
-	static constexpr char TABLE[] = "TABLE";
-
-	// CONFIGURATION section
-	static constexpr char CONFIGURATION[] = "CONFIGURATION";
-	static constexpr char DEFAULT_PATH[] = "DEFAULT_PATH";
 
 	// SERVER_LIST section
 	static constexpr char SERVER_LIST[] = "SERVER_LIST";
@@ -213,5 +188,3 @@ namespace ini
 	static constexpr char URL[] = "URL";
 	static constexpr char PATH[] = "PATH";
 }
-
-#endif
