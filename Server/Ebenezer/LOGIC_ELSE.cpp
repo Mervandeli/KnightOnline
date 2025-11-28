@@ -1,24 +1,9 @@
-﻿// LOGIC_ELSE.cpp: implementation of the LOGIC_ELSE class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
-#include "ebenezer.h"
+﻿#include "pch.h"
 #include "Define.h"
 #include "LOGIC_ELSE.h"
 
 #include <djb2/djb2_hasher.h>
 #include <spdlog/spdlog.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 LOGIC_ELSE::LOGIC_ELSE()
 {

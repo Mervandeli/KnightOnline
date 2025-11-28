@@ -1,9 +1,4 @@
-﻿// EVENT.cpp: implementation of the EVENT class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
-#include "Ebenezer.h"
+﻿#include "pch.h"
 #include "Define.h"
 #include "EVENT.h"
 #include "EVENT_DATA.h"
@@ -14,16 +9,6 @@
 #include <fstream>
 
 #include <spdlog/spdlog.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 EVENT::EVENT()
 {
@@ -176,9 +161,7 @@ bool EVENT::LoadEvent(int zone)
 	return true;
 
 cancel_event_load:
-	CString str;
-	str.Format(_T("QUEST INFO READ FAIL (%d)(%d)"), zone, event_num);
-	AfxMessageBox(str);
+	spdlog::error("QUEST INFO READ FAIL ({})({})", zone, event_num);
 	file.close();
 	DeleteAll();
 	return false;

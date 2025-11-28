@@ -13,6 +13,7 @@
 #include "UdpSocket.h"
 
 #include <shared/Ini.h>
+#include <shared-server/AppThread.h>
 #include <shared-server/logger.h>
 #include <shared-server/SharedMemoryBlock.h>
 #include <shared-server/SharedMemoryQueue.h>
@@ -41,9 +42,6 @@ public:
 		std::shared_ptr<spdlog::details::thread_pool> threadPool,
 		const std::string& baseDir) override;
 };
-
-/////////////////////////////////////////////////////////////////////////////
-// CEbenezerDlg dialog
 
 typedef std::vector <C3DMap*>				ZoneArray;
 typedef std::vector <model::LevelUp*>		LevelUpTableArray;
@@ -78,12 +76,12 @@ enum class NameType
 class CUser;
 class ReadQueueThread;
 class TimerThread;
-class CEbenezerDlg : public CDialog
+class EbenezerInstance : public AppThread
 {
-// Construction
 public:
-	static inline CEbenezerDlg* GetInstance() {
-		return s_pInstance;
+	static EbenezerInstance* instance()
+	{
+		return static_cast<EbenezerInstance*>(s_instance);
 	}
 
 	void GameTimeTick();
@@ -133,7 +131,7 @@ public:
 	void KillUser(const char* strbuff);
 	void Send_PartyMember(int party, char* pBuf, int len);
 	void Send_KnightsMember(int index, char* pBuf, int len, int zone = 100);
-	bool AISocketConnect(int zone, bool flag, std::string* errorReason = nullptr);
+	bool AISocketConnect(int zone, bool flag);
 	int GetAIServerPort() const;
 	int GetRegionNpcIn(C3DMap* pMap, int region_x, int region_z, char* buff, int& t_count);
 	bool LoadNoticeData();
@@ -196,18 +194,9 @@ public:
 		return _socketManager.IsValidServerSocketId(socketId);
 	}
 
-	/// \brief adds a message to the application's output box and updates scrollbar position
-	/// \see _outputList
-	void AddOutputMessage(const std::string& msg);
+	EbenezerInstance(EbenezerLogger& logger);
+	~EbenezerInstance();
 
-	/// \brief adds a message to the application's output box and updates scrollbar position
-	/// \see _outputList
-	void AddOutputMessage(const std::wstring& msg);
-
-	CEbenezerDlg(CWnd* pParent = nullptr);	// standard constructor
-	~CEbenezerDlg();
-
-	static CEbenezerDlg* s_pInstance;
 	EbenezerSocketManager _socketManager;
 
 	SharedMemoryQueue m_LoggerSendQueue;
@@ -325,42 +314,11 @@ public:
 	ServerMap			m_ServerGroupArray;
 	CUdpSocket*			m_pUdpSocket;
 
-	std::queue<std::wstring>	_listBoxQueue;
-	std::mutex					_listBoxQueueMutex;
-
-// Dialog Data
-	//{{AFX_DATA(CEbenezerDlg)
-	enum { IDD = IDD_EBENEZER_DIALOG };
-	CEdit	m_AnnounceEdit;
-	//}}AFX_DATA
-
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CEbenezerDlg)
-	virtual BOOL DestroyWindow();
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
-	//}}AFX_VIRTUAL
-// Implementation
-
-	HICON m_hIcon;
-
-	// Generated message map functions
-	//{{AFX_MSG(CEbenezerDlg)
-	virtual BOOL OnInitDialog();
-	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	afx_msg void OnPaint();
-	afx_msg HCURSOR OnQueryDragIcon();
-	afx_msg LRESULT OnProcessListBoxQueue(WPARAM wParam, LPARAM lParam);
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+	bool OnStart() override;
 	
 private:
 	CIni								m_Ini;
-	EbenezerLogger						_logger;
-
-	/// \brief output message box for the application
-	CListBox							_outputList;
 
 	std::unique_ptr<TimerThread>		_gameTimeThread;
 	std::unique_ptr<TimerThread>		_smqHeartbeatThread;
@@ -372,6 +330,3 @@ private:
 
 	std::mutex							_serialMutex;
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

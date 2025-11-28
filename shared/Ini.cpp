@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+﻿#include "pch.h"
 #include "Ini.h"
 #include <iostream>
 #include <fstream>

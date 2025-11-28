@@ -1,6 +1,6 @@
-﻿#include "StdAfx.h"
+﻿#include "pch.h"
 #include "OperationMessage.h"
-#include "EbenezerDlg.h"
+#include "EbenezerInstance.h"
 #include "User.h"
 
 #include <djb2/djb2_hasher.h>
@@ -12,7 +12,7 @@
 
 extern bool g_serverdown_flag;
 
-OperationMessage::OperationMessage(CEbenezerDlg* main, CUser* srcUser)
+OperationMessage::OperationMessage(EbenezerInstance* main, CUser* srcUser)
 	: _main(main), _srcUser(srcUser)
 {
 }

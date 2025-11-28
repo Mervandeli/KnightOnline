@@ -1,24 +1,9 @@
-﻿// EXEC.cpp: implementation of the EXEC class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
-#include "Ebenezer.h"
+﻿#include "pch.h"
 #include "Define.h"
 #include "EXEC.h"
 
 #include <djb2/djb2_hasher.h>
 #include <spdlog/spdlog.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 EXEC::EXEC()
 {

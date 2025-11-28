@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+﻿#include "pch.h"
 #include "StringUtils.h"
 #include <stdarg.h>
 #include <cctype>

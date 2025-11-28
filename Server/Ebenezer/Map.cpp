@@ -1,34 +1,19 @@
-﻿// Map.cpp: implementation of the CMap class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
+﻿#include "pch.h"
 #include "Map.h"
 #include "Region.h"
 #include "Define.h"
 #include "User.h"
-#include "EbenezerDlg.h"
+#include "EbenezerInstance.h"
+
+#include <db-library/RecordSetLoader.h>
 
 #include <istream>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-// NOTE: Explicitly handled under DEBUG_NEW override
-#include <db-library/RecordSetLoader.h>
 
 import EbenezerBinder;
 
 using namespace db;
 
 extern std::recursive_mutex g_region_mutex;
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 C3DMap::C3DMap()
 {
@@ -99,7 +84,7 @@ C3DMap::~C3DMap()
 
 bool C3DMap::LoadMap(std::istream& fs)
 {
-	m_pMain = (CEbenezerDlg*) AfxGetApp()->GetMainWnd();
+	m_pMain = EbenezerInstance::instance();
 
 	LoadTerrain(fs);
 
@@ -131,7 +116,7 @@ bool C3DMap::LoadMap(std::istream& fs)
 
 	if (!LoadEvent())
 	{
-		AfxMessageBox(_T("Event Load Fail!!"));
+		spdlog::error("Event Load Fail!!");
 		return false;
 	}
 

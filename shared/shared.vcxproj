@@ -65,6 +65,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -132,6 +133,7 @@
     <ClCompile Include="crc32.c">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="DateTime.cpp" />
     <ClCompile Include="DebugUtils.cpp" />
     <ClCompile Include="globals.cpp" />
     <ClCompile Include="Ini.cpp" />
@@ -139,7 +141,7 @@
     <ClCompile Include="lzf.c">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="StringConversion.cpp" />
@@ -151,6 +153,7 @@
     <ClInclude Include="ByteBuffer.h" />
     <ClInclude Include="CircularBuffer.h" />
     <ClInclude Include="crc32.h" />
+    <ClInclude Include="DateTime.h" />
     <ClInclude Include="DebugUtils.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="Ini.h" />
@@ -158,7 +161,7 @@
     <ClInclude Include="lzf.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="packets.h" />
-    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="StringConversion.h" />
     <ClInclude Include="StringUtils.h" />
     <ClInclude Include="Thread.h" />

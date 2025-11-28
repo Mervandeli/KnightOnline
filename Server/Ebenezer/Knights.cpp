@@ -1,25 +1,10 @@
-﻿// Knights.cpp: implementation of the CKnights class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
-#include "ebenezer.h"
+﻿#include "pch.h"
 #include "Knights.h"
 #include "User.h"
 #include "GameDefine.h"
-#include "EbenezerDlg.h"
+#include "EbenezerInstance.h"
 
 #include <shared/packets.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CKnights::CKnights()
 {
