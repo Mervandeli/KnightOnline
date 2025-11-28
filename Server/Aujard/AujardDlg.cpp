@@ -113,16 +113,13 @@ BOOL CAujardDlg::OnInitDialog()
 	SetIcon(_icon, TRUE);			// Set big icon
 	SetIcon(_icon, FALSE);		// Set small icon
 
-	CString exePath(GetProgPath());
-	std::string exePathUtf8(CT2A(exePath, CP_UTF8));
-
-	std::filesystem::path iniPath(exePath.GetString());
-	iniPath /= L"Aujard.ini";
+	std::filesystem::path exePath = GetProgPath();
+	std::filesystem::path iniPath = exePath / "Aujard.ini";
 
 	CIni ini(iniPath);
 
 	// configure logger
-	_logger.Setup(ini, exePathUtf8);
+	_logger.Setup(ini, exePath.string());
 
 	LoggerRecvQueue.Open(SMQ_LOGGERSEND);	// Dispatcher 의 Send Queue
 	LoggerSendQueue.Open(SMQ_LOGGERRECV);	// Dispatcher 의 Read Queue

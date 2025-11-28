@@ -68,6 +68,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -140,12 +141,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="utilities.cpp" />
     <ClCompile Include="N3ShapeMgr.cpp" />
     <ClCompile Include="ReadQueueThread.cpp" />
     <ClCompile Include="SharedMemoryQueue.cpp" />
     <ClCompile Include="SharedMemoryBlock.cpp" />
     <ClCompile Include="SocketManager.cpp" />
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="logger.cpp" />
@@ -154,6 +156,7 @@
     <ClCompile Include="TcpSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="utilities.h" />
     <ClInclude Include="My_3DStruct.h" />
     <ClInclude Include="GeometricStructs.h" />
     <ClInclude Include="N3ShapeMgr.h" />
@@ -162,7 +165,7 @@
     <ClInclude Include="SharedMemoryQueue.h" />
     <ClInclude Include="SharedMemoryBlock.h" />
     <ClInclude Include="SocketManager.h" />
-    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="STLMap.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="TcpClientSocket.h" />

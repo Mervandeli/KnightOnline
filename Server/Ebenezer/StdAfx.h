@@ -29,6 +29,9 @@
 #include <afxdb.h>
 
 #include <shared-server/server_config.h>
+#include <shared-server/utilities.h>
+
+#define myrand myrand_generic
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

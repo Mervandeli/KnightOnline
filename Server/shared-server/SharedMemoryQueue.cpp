@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+﻿#include "pch.h"
 #include "SharedMemoryQueue.h"
 
 #include <boost/interprocess/ipc/message_queue.hpp>

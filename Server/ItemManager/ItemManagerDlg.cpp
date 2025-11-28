@@ -68,16 +68,13 @@ BOOL CItemManagerDlg::OnInitDialog()
 	//----------------------------------------------------------------------
 	//	Logfile initialize
 	//----------------------------------------------------------------------
-	CString exePath(GetProgPath());
-	std::string exePathUtf8(CT2A(exePath, CP_UTF8));
-
-	std::filesystem::path iniPath(exePath.GetString());
-	iniPath /= L"ItemManager.ini";
+	std::filesystem::path exePath = GetProgPath();
+	std::filesystem::path iniPath = exePath / "ItemManager.ini";
 
 	CIni ini(iniPath);
 
 	// configure logger
-	_logger.Setup(ini, exePathUtf8);
+	_logger.Setup(ini, exePath.string());
 
 	if (!m_LoggerRecvQueue.Open(SMQ_ITEMLOGGER))
 	{

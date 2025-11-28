@@ -1066,8 +1066,7 @@ bool CEbenezerDlg::MapFileLoad()
 		m_ZoneArray.reserve(20);
 
 		// Build the base MAP directory
-		std::filesystem::path mapDir(GetProgPath().GetString());
-		mapDir /= MAP_DIR;
+		std::filesystem::path mapDir = GetProgPath() / MAP_DIR;
 
 		// Resolve it to strip the relative references to be nice.
 		if (std::filesystem::exists(mapDir))
@@ -1281,15 +1280,12 @@ void CEbenezerDlg::LoadConfig()
 	int year = 0, month = 0, date = 0, hour = 0, serverCount = 0, sgroup_count = 0;
 	std::string key;
 
-	CString exePath(GetProgPath());
-	std::string exePathUtf8(CT2A(exePath, CP_UTF8));
-
-	std::filesystem::path iniPath(exePath.GetString());
-	iniPath /= L"gameserver.ini";
+	std::filesystem::path exePath = GetProgPath();
+	std::filesystem::path iniPath = exePath / "gameserver.ini";
 
 	m_Ini.Load(iniPath);
 
-	_logger.Setup(m_Ini, exePathUtf8);
+	_logger.Setup(m_Ini, exePath.string());
 	
 	m_nYear = m_Ini.GetInt("TIMER", "YEAR", 1);
 	m_nMonth = m_Ini.GetInt("TIMER", "MONTH", 1);
@@ -2127,7 +2123,7 @@ BOOL CEbenezerDlg::PreTranslateMessage(MSG* pMsg)
 
 bool CEbenezerDlg::LoadNoticeData()
 {
-	CString NoticePath = GetProgPath() + "Notice.txt";
+	std::filesystem::path NoticePath = GetProgPath() / "Notice.txt";
 	std::string line;
 	int count = 0;
 

@@ -302,7 +302,7 @@ void CNpc::GetNpcInfo(char* buff, int& buff_index)
 	SetShort(buff, m_sSize, buff_index);
 	SetDWORD(buff, m_iWeapon_1, buff_index);
 	SetDWORD(buff, m_iWeapon_2, buff_index);
-	SetString1(buff, m_strName, static_cast<uint8_t>(strlen(m_strName)), buff_index);
+	SetString1(buff, m_strName, buff_index);
 	SetByte(buff, m_byGroup, buff_index);
 	SetByte(buff, m_byLevel, buff_index);
 	SetShort(buff, (uint16_t) m_fCurX * 10, buff_index);

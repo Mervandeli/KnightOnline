@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+﻿#include "pch.h"
 #include "SocketManager.h"
 #include "TcpSocket.h"
 #include "TcpClientSocket.h"

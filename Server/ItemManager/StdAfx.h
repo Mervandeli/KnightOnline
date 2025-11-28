@@ -24,6 +24,7 @@
 #include <afxtempl.h>
 
 #include <shared-server/server_config.h>
+#include <shared-server/utilities.h>
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+﻿#include "pch.h"
 #include "ReadQueueThread.h"
 #include "SharedMemoryQueue.h"
 

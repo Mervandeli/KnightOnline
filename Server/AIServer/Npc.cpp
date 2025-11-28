@@ -603,10 +603,10 @@ void CNpc::NpcTracing()
 		SetByte(pBuf, MOVE_RESULT, index);
 		SetByte(pBuf, SUCCESS, index);
 		SetShort(pBuf, m_sNid + NPC_BAND, index);
-		Setfloat(pBuf, m_fCurX, index);
-		Setfloat(pBuf, m_fCurZ, index);
-		Setfloat(pBuf, m_fCurY, index);
-		Setfloat(pBuf, 0, index);
+		SetFloat(pBuf, m_fCurX, index);
+		SetFloat(pBuf, m_fCurZ, index);
+		SetFloat(pBuf, m_fCurY, index);
+		SetFloat(pBuf, 0, index);
 		//TRACE(_T("Npc TRACE end --> nid = %d, cur=[x=%.2f, y=%.2f, metor=%d], prev=[x=%.2f, z=%.2f], frame=%d, speed = %d \n"), m_sNid, m_fCurX, m_fCurZ, 0, m_fPrevX, m_fPrevZ, m_sStepCount, 0);
 		SendAll(pBuf, index);   // thread 에서 send
 	}
@@ -615,12 +615,12 @@ void CNpc::NpcTracing()
 		SetByte(pBuf, MOVE_RESULT, index);
 		SetByte(pBuf, SUCCESS, index);
 		SetShort(pBuf, m_sNid + NPC_BAND, index);
-		Setfloat(pBuf, m_fPrevX, index);
-		Setfloat(pBuf, m_fPrevZ, index);
-		Setfloat(pBuf, m_fPrevY, index);
+		SetFloat(pBuf, m_fPrevX, index);
+		SetFloat(pBuf, m_fPrevZ, index);
+		SetFloat(pBuf, m_fPrevY, index);
 		fMoveSpeed = m_fSecForRealMoveMetor / (m_sSpeed / 1000.0f);
-		Setfloat(pBuf, fMoveSpeed, index);
-		//Setfloat(pBuf, m_fSecForRealMoveMetor, index);
+		SetFloat(pBuf, fMoveSpeed, index);
+		//SetFloat(pBuf, m_fSecForRealMoveMetor, index);
 		//TRACE(_T("Npc Tracing --> nid = %d, cur=[x=%.2f, z=%.2f], prev=[x=%.2f, z=%.2f, metor = %.2f], frame=%d, speed = %d \n"), m_sNid, m_fCurX, m_fCurZ, m_fPrevX, m_fPrevZ, m_fSecForRealMoveMetor, m_sStepCount, m_sSpeed);
 		SendAll(pBuf, index);   // thread 에서 send
 	}
@@ -830,10 +830,10 @@ void CNpc::NpcMoving()
 		SetByte(pBuf, MOVE_RESULT, index);
 		SetByte(pBuf, SUCCESS, index);
 		SetShort(pBuf, m_sNid + NPC_BAND, index);
-		Setfloat(pBuf, m_fPrevX, index);
-		Setfloat(pBuf, m_fPrevZ, index);
-		Setfloat(pBuf, m_fPrevY, index);
-		Setfloat(pBuf, 0, index);
+		SetFloat(pBuf, m_fPrevX, index);
+		SetFloat(pBuf, m_fPrevZ, index);
+		SetFloat(pBuf, m_fPrevY, index);
+		SetFloat(pBuf, 0, index);
 		//TRACE(_T("Npc Move end --> nid = %d, cur=[x=%.2f, y=%.2f, metor=%d], prev=[x=%.2f, z=%.2f], frame=%d, speed = %d \n"), m_sNid+NPC_BAND, m_fCurX, m_fCurZ, 0, m_fPrevX, m_fPrevZ, m_sStepCount, 0);
 		SendAll(pBuf, index);   // thread 에서 send
 	}
@@ -842,12 +842,12 @@ void CNpc::NpcMoving()
 		SetByte(pBuf, MOVE_RESULT, index);
 		SetByte(pBuf, SUCCESS, index);
 		SetShort(pBuf, m_sNid + NPC_BAND, index);
-		Setfloat(pBuf, m_fPrevX, index);
-		Setfloat(pBuf, m_fPrevZ, index);
-		Setfloat(pBuf, m_fPrevY, index);
+		SetFloat(pBuf, m_fPrevX, index);
+		SetFloat(pBuf, m_fPrevZ, index);
+		SetFloat(pBuf, m_fPrevY, index);
 		fMoveSpeed = m_fSecForRealMoveMetor / (m_sSpeed / 1000.0f);
-		Setfloat(pBuf, fMoveSpeed, index);
-		//Setfloat(pBuf, m_fSecForRealMoveMetor, index);
+		SetFloat(pBuf, fMoveSpeed, index);
+		//SetFloat(pBuf, m_fSecForRealMoveMetor, index);
 		//TRACE(_T("Npc Move --> nid = %d, cur=[x=%.2f, z=%.2f], prev=[x=%.2f, z=%.2f, metor = %.2f], frame=%d, speed = %d \n"), m_sNid+NPC_BAND, m_fCurX, m_fCurZ, m_fPrevX, m_fPrevZ, m_fSecForRealMoveMetor, m_sStepCount, m_sSpeed);
 		SendAll(pBuf, index);   // thread 에서 send
 	}
@@ -1010,10 +1010,10 @@ void CNpc::NpcBack()
 		SetByte(pBuf, MOVE_RESULT, index);
 		SetByte(pBuf, SUCCESS, index);
 		SetShort(pBuf, m_sNid + NPC_BAND, index);
-		Setfloat(pBuf, m_fCurX, index);
-		Setfloat(pBuf, m_fCurZ, index);
-		Setfloat(pBuf, m_fCurY, index);
-		Setfloat(pBuf, 0, index);
+		SetFloat(pBuf, m_fCurX, index);
+		SetFloat(pBuf, m_fCurZ, index);
+		SetFloat(pBuf, m_fCurY, index);
+		SetFloat(pBuf, 0, index);
 //		TRACE(_T("NpcBack end --> nid = %d, cur=[x=%.2f, y=%.2f, metor=%d], prev=[x=%.2f, z=%.2f], frame=%d, speed = %d \n"), m_sNid, m_fCurX, m_fCurZ, 0, m_fPrevX, m_fPrevZ, m_sStepCount, 0);
 		SendAll(pBuf, index);   // thread 에서 send
 
@@ -1059,12 +1059,12 @@ void CNpc::NpcBack()
 	SetByte(pBuf, MOVE_RESULT, index);
 	SetByte(pBuf, SUCCESS, index);
 	SetShort(pBuf, m_sNid + NPC_BAND, index);
-	Setfloat(pBuf, m_fPrevX, index);
-	Setfloat(pBuf, m_fPrevZ, index);
-	Setfloat(pBuf, m_fPrevY, index);
+	SetFloat(pBuf, m_fPrevX, index);
+	SetFloat(pBuf, m_fPrevZ, index);
+	SetFloat(pBuf, m_fPrevY, index);
 	fMoveSpeed = m_fSecForRealMoveMetor / (m_sSpeed / 1000.0f);
-	Setfloat(pBuf, fMoveSpeed, index);
-	//Setfloat(pBuf, m_fSecForRealMoveMetor, index);
+	SetFloat(pBuf, fMoveSpeed, index);
+	//SetFloat(pBuf, m_fSecForRealMoveMetor, index);
 
 //	TRACE(_T("NpcBack --> nid = %d, cur=[x=%.2f, z=%.2f], prev=[x=%.2f, z=%.2f, metor = %.2f], frame=%d, speed = %d \n"), m_sNid, m_fCurX, m_fCurZ, m_fPrevX, m_fPrevZ, m_fSecForRealMoveMetor, m_sStepCount, m_sSpeed);
 	SendAll(pBuf, index);   // thread 에서 send
@@ -4012,10 +4012,10 @@ void CNpc::MoveAttack()
 	SetByte(pBuf, MOVE_RESULT, index);
 	SetByte(pBuf, SUCCESS, index);
 	SetShort(pBuf, m_sNid + NPC_BAND, index);
-	Setfloat(pBuf, m_fCurX, index);
-	Setfloat(pBuf, m_fCurZ, index);
-	Setfloat(pBuf, m_fCurY, index);
-	Setfloat(pBuf, fDis, index);
+	SetFloat(pBuf, m_fCurX, index);
+	SetFloat(pBuf, m_fCurZ, index);
+	SetFloat(pBuf, m_fCurY, index);
+	SetFloat(pBuf, fDis, index);
 	//TRACE(_T("Npc moveattack --> nid = %d, cur=[x=%.2f, y=%.2f, metor=%.2f]\n"), m_sNid+NPC_BAND, m_fCurX, m_fCurZ, fDis);
 	SendAll(pBuf, index);   // thread 에서 send
 
@@ -4025,10 +4025,10 @@ void CNpc::MoveAttack()
 	SetByte(pBuf, MOVE_RESULT, index);
 	SetByte(pBuf, SUCCESS, index);
 	SetShort(pBuf, m_sNid + NPC_BAND, index);
-	Setfloat(pBuf, m_fCurX, index);
-	Setfloat(pBuf, m_fCurZ, index);
-	Setfloat(pBuf, m_fCurY, index);
-	Setfloat(pBuf, 0, index);
+	SetFloat(pBuf, m_fCurX, index);
+	SetFloat(pBuf, m_fCurZ, index);
+	SetFloat(pBuf, m_fCurY, index);
+	SetFloat(pBuf, 0, index);
 	//TRACE(_T("Npc moveattack end --> nid = %d, cur=[x=%.2f, y=%.2f, metor=%d]\n"), m_sNid+NPC_BAND, m_fCurX, m_fCurZ, 0);
 	SendAll(pBuf, index);   // thread 에서 send
 
@@ -5536,9 +5536,9 @@ void CNpc::FillNpcInfo(char* temp_send, int& index, uint8_t flag)
 	SetVarString(temp_send, m_strName.c_str(), static_cast<int>(m_strName.length()), index);
 	SetByte(temp_send, m_byGroup, index);
 	SetByte(temp_send, (uint8_t) m_sLevel, index);
-	Setfloat(temp_send, m_fCurX, index);
-	Setfloat(temp_send, m_fCurZ, index);
-	Setfloat(temp_send, m_fCurY, index);
+	SetFloat(temp_send, m_fCurX, index);
+	SetFloat(temp_send, m_fCurZ, index);
+	SetFloat(temp_send, m_fCurY, index);
 	SetByte(temp_send, m_byDirection, index);
 
 	if (m_iHP <= 0)
@@ -5575,9 +5575,9 @@ void CNpc::SendNpcInfoAll(char* temp_send, int& index, int count)
 	SetVarString(temp_send, m_strName.c_str(), static_cast<int>(m_strName.length()), index);
 	SetByte(temp_send, m_byGroup, index);
 	SetByte(temp_send, (uint8_t) m_sLevel, index);
-	Setfloat(temp_send, m_fCurX, index);
-	Setfloat(temp_send, m_fCurZ, index);
-	Setfloat(temp_send, m_fCurY, index);
+	SetFloat(temp_send, m_fCurX, index);
+	SetFloat(temp_send, m_fCurZ, index);
+	SetFloat(temp_send, m_fCurY, index);
 	SetByte(temp_send, m_byDirection, index);
 	SetByte(temp_send, m_tNpcType, index);
 	SetInt(temp_send, m_iSellingGroup, index);
@@ -5765,10 +5765,10 @@ void CNpc::NpcMoveEnd()
 	SetByte(pBuf, MOVE_RESULT, index);
 	SetByte(pBuf, SUCCESS, index);
 	SetShort(pBuf, m_sNid + NPC_BAND, index);
-	Setfloat(pBuf, m_fCurX, index);
-	Setfloat(pBuf, m_fCurZ, index);
-	Setfloat(pBuf, m_fCurY, index);
-	Setfloat(pBuf, 0, index);
+	SetFloat(pBuf, m_fCurX, index);
+	SetFloat(pBuf, m_fCurZ, index);
+	SetFloat(pBuf, m_fCurY, index);
+	SetFloat(pBuf, 0, index);
 
 	// TRACE(_T("NpcMoveEnd() --> nid = %d, x=%f, y=%f, rx=%d,rz=%d, frame=%d, speed = %d \n"),
 	// m_sNid, m_fCurX, m_fCurZ, static_cast<int>(m_fCurX / VIEW_DIST), static_cast<int>(m_fCurZ / VIEW_DIST),
@@ -6437,9 +6437,9 @@ void CNpc::GiveNpcHaveItem()
 	SetShort(pBuf, m_sCurZone, index);
 	SetShort(pBuf, (int16_t) m_iRegion_X, index);
 	SetShort(pBuf, (int16_t) m_iRegion_Z, index);
-	Setfloat(pBuf, m_fCurX, index);
-	Setfloat(pBuf, m_fCurZ, index);
-	Setfloat(pBuf, m_fCurY, index);
+	SetFloat(pBuf, m_fCurX, index);
+	SetFloat(pBuf, m_fCurZ, index);
+	SetFloat(pBuf, m_fCurY, index);
 	SetByte(pBuf, nCount, index);
 	for (i = 0; i < nCount; i++)
 	{
@@ -7646,9 +7646,9 @@ bool CNpc::Teleport()
 	SetByte(buff, AG_NPC_INOUT, send_index);
 	SetByte(buff, NPC_OUT, send_index);
 	SetShort(buff, m_sNid + NPC_BAND, send_index);
-	Setfloat(buff, m_fCurX, send_index);
-	Setfloat(buff, m_fCurZ, send_index);
-	Setfloat(buff, m_fCurY, send_index);
+	SetFloat(buff, m_fCurX, send_index);
+	SetFloat(buff, m_fCurZ, send_index);
+	SetFloat(buff, m_fCurY, send_index);
 	SendAll(buff, send_index);   // thread 에서 send
 
 	m_fCurX = static_cast<float>(nX);
@@ -7659,9 +7659,9 @@ bool CNpc::Teleport()
 	SetByte(buff, AG_NPC_INOUT, send_index);
 	SetByte(buff, NPC_IN, send_index);
 	SetShort(buff, m_sNid + NPC_BAND, send_index);
-	Setfloat(buff, m_fCurX, send_index);
-	Setfloat(buff, m_fCurZ, send_index);
-	Setfloat(buff, 0, send_index);
+	SetFloat(buff, m_fCurX, send_index);
+	SetFloat(buff, m_fCurZ, send_index);
+	SetFloat(buff, 0, send_index);
 	SendAll(buff, send_index);   // thread 에서 send
 
 	SetUid(m_fCurX, m_fCurZ, m_sNid + NPC_BAND);

@@ -1620,9 +1620,9 @@ void CUser::MoveProcess(char* pBuf)
 
 	SetByte(ai_send_buff, AG_USER_MOVE, ai_send_index);
 	SetShort(ai_send_buff, _socketId, ai_send_index);
-	Setfloat(ai_send_buff, m_fWill_x, ai_send_index);
-	Setfloat(ai_send_buff, m_fWill_z, ai_send_index);
-	Setfloat(ai_send_buff, m_fWill_y, ai_send_index);
+	SetFloat(ai_send_buff, m_fWill_x, ai_send_index);
+	SetFloat(ai_send_buff, m_fWill_z, ai_send_index);
+	SetFloat(ai_send_buff, m_fWill_y, ai_send_index);
 	SetShort(ai_send_buff, speed, ai_send_index);
 
 	m_pMain->Send_AIServer(m_pUserData->m_bZone, ai_send_buff, ai_send_index);
@@ -1660,8 +1660,8 @@ void CUser::UserInOut(uint8_t Type)
 		SetShort(send_buff, _socketId, send_index);
 		SetShort(send_buff, strlen(m_pUserData->m_id), send_index);
 		SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
-		Setfloat(send_buff, m_pUserData->m_curx, send_index);
-		Setfloat(send_buff, m_pUserData->m_curz, send_index);
+		SetFloat(send_buff, m_pUserData->m_curx, send_index);
+		SetFloat(send_buff, m_pUserData->m_curz, send_index);
 		m_pMain->Send_AIServer(m_pUserData->m_bZone, send_buff, send_index);
 		return;
 	}
@@ -1682,8 +1682,8 @@ void CUser::UserInOut(uint8_t Type)
 		SetShort(send_buff, _socketId, send_index);
 		SetShort(send_buff, strlen(m_pUserData->m_id), send_index);
 		SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
-		Setfloat(send_buff, m_pUserData->m_curx, send_index);
-		Setfloat(send_buff, m_pUserData->m_curz, send_index);
+		SetFloat(send_buff, m_pUserData->m_curx, send_index);
+		SetFloat(send_buff, m_pUserData->m_curz, send_index);
 		m_pMain->Send_AIServer(m_pUserData->m_bZone, send_buff, send_index);
 	}
 //
@@ -1900,8 +1900,8 @@ void CUser::Attack(char* pBuf)
 			SetShort(send_buff, tid, send_index);
 			SetShort(send_buff, m_sTotalHit * m_bAttackAmount / 100, send_index);   // 표시
 			SetShort(send_buff, m_sTotalAc + m_sACAmount, send_index);   // 표시
-			Setfloat(send_buff, m_fTotalHitRate, send_index);
-			Setfloat(send_buff, m_fTotalEvasionRate, send_index);
+			SetFloat(send_buff, m_fTotalHitRate, send_index);
+			SetFloat(send_buff, m_fTotalEvasionRate, send_index);
 			SetShort(send_buff, m_sItemAc, send_index);
 			SetByte(send_buff, m_bMagicTypeLeftHand, send_index);
 			SetByte(send_buff, m_bMagicTypeRightHand, send_index);
@@ -2013,7 +2013,7 @@ void CUser::SendMyInfo(int type)
 
 	SetByte(send_buff, WIZ_MYINFO, send_index);
 	SetShort(send_buff, _socketId, send_index);
-	SetString1(send_buff, m_pUserData->m_id, static_cast<uint8_t>(strlen(m_pUserData->m_id)), send_index);
+	SetString1(send_buff, m_pUserData->m_id, send_index);
 
 	SetShort(send_buff, (uint16_t) m_pUserData->m_curx * 10, send_index);
 	SetShort(send_buff, (uint16_t) m_pUserData->m_curz * 10, send_index);
@@ -2043,7 +2043,7 @@ void CUser::SendMyInfo(int type)
 	{
 		SetShort(send_buff, pKnights->m_sAllianceKnights, send_index);
 		SetByte(send_buff, pKnights->m_byFlag, send_index);
-		SetString1(send_buff, pKnights->m_strName, static_cast<uint8_t>(strlen(pKnights->m_strName)), send_index);
+		SetString1(send_buff, pKnights->m_strName, send_index);
 		SetByte(send_buff, pKnights->m_byGrade, send_index); // Knights grade
 		SetByte(send_buff, pKnights->m_byRanking, send_index);
 		SetShort(send_buff, pKnights->m_sMarkVersion, send_index);
@@ -2131,7 +2131,7 @@ void CUser::SendMyInfo(int type)
 
 	SetByte(ai_send_buff, AG_USER_INFO, ai_send_index);
 	SetShort(ai_send_buff, _socketId, ai_send_index);
-	SetString2(ai_send_buff, m_pUserData->m_id, static_cast<int16_t>(strlen(m_pUserData->m_id)), ai_send_index);
+	SetString2(ai_send_buff, m_pUserData->m_id, ai_send_index);
 	SetByte(ai_send_buff, m_pUserData->m_bZone, ai_send_index);
 	SetShort(ai_send_buff, m_iZoneIndex, ai_send_index);
 	SetByte(ai_send_buff, m_pUserData->m_bNation, ai_send_index);
@@ -2140,8 +2140,8 @@ void CUser::SendMyInfo(int type)
 	SetShort(ai_send_buff, m_pUserData->m_sMp, ai_send_index);
 	SetShort(ai_send_buff, m_sTotalHit * m_bAttackAmount / 100, ai_send_index);  // 표시
 	SetShort(ai_send_buff, m_sTotalAc + m_sACAmount, ai_send_index);  // 표시
-	Setfloat(ai_send_buff, m_fTotalHitRate, ai_send_index);
-	Setfloat(ai_send_buff, m_fTotalEvasionRate, ai_send_index);
+	SetFloat(ai_send_buff, m_fTotalHitRate, ai_send_index);
+	SetFloat(ai_send_buff, m_fTotalEvasionRate, ai_send_index);
 
 // Yookozuna
 	SetShort(ai_send_buff, m_sItemAc, ai_send_index);
@@ -2204,7 +2204,7 @@ void CUser::Chat(char* pBuf)
 	SetByte(send_buff, type, send_index);
 	SetByte(send_buff, m_pUserData->m_bNation, send_index);
 	SetShort(send_buff, _socketId, send_index);
-	SetString1(send_buff, m_pUserData->m_id, static_cast<uint8_t>(strlen(m_pUserData->m_id)), send_index);
+	SetString1(send_buff, m_pUserData->m_id, send_index);
 	SetString2(send_buff, finalstr, send_index);
 
 	switch (type)
@@ -4082,8 +4082,8 @@ void CUser::Send2AI_UserUpdateInfo()
 	SetShort(send_buff, m_pUserData->m_sMp, send_index);
 	SetShort(send_buff, m_sTotalHit * m_bAttackAmount / 100, send_index); // 표시
 	SetShort(send_buff, m_sTotalAc + m_sACAmount, send_index);  // 표시
-	Setfloat(send_buff, m_fTotalHitRate, send_index);
-	Setfloat(send_buff, m_fTotalEvasionRate, send_index);
+	SetFloat(send_buff, m_fTotalHitRate, send_index);
+	SetFloat(send_buff, m_fTotalEvasionRate, send_index);
 
 //
 	SetShort(send_buff, m_sItemAc, send_index);
@@ -7254,8 +7254,8 @@ void CUser::SendUserInfo(char* temp_send, int& index)
 	SetShort(temp_send, m_pUserData->m_sMp, index);
 	SetShort(temp_send, m_sTotalHit * m_bAttackAmount / 100, index);    // 표시
 	SetShort(temp_send, m_sTotalAc + m_sACAmount, index);	// 표시
-	Setfloat(temp_send, m_fTotalHitRate, index);
-	Setfloat(temp_send, m_fTotalEvasionRate, index);
+	SetFloat(temp_send, m_fTotalHitRate, index);
+	SetFloat(temp_send, m_fTotalEvasionRate, index);
 	SetShort(temp_send, m_sPartyIndex, index);
 	SetByte(temp_send, m_pUserData->m_bAuthority, index);
 }
@@ -8411,7 +8411,7 @@ void CUser::SpeedHackTime(char* pBuf)
 	double serverTime = 0.0, clientTime = 0.0, clientGap = 0.0, serverGap = 0.0;
 
 	b_first = GetByte(pBuf, index);
-	clientTime = Getfloat(pBuf, index);
+	clientTime = GetFloat(pBuf, index);
 
 	if (b_first)
 	{
@@ -9695,8 +9695,8 @@ bool CUser::GetWarpList(int warp_group)
 
 		SetShort(buff, pWarp->sWarpID, send_index);
 
-		SetString2(buff, pWarp->strWarpName, static_cast<int16_t>(strlen(pWarp->strWarpName)), send_index);
-		SetString2(buff, pWarp->strAnnounce, static_cast<int16_t>(strlen(pWarp->strAnnounce)), send_index);
+		SetString2(buff, pWarp->strWarpName, send_index);
+		SetString2(buff, pWarp->strAnnounce, send_index);
 		SetShort(buff, pWarp->sZone, send_index);
 
 		C3DMap* pTargetMap = m_pMain->GetMapByID(pWarp->sZone);
@@ -10694,16 +10694,12 @@ void CUser::MarketBBSReport(char* pBuf, uint8_t type)
 				title_length = MAX_BBS_TITLE;
 
 			SetString2(send_buff, m_pMain->m_strBuyTitle[i], title_length, send_index);
-//			SetShort(send_buff, strlen(m_pMain->m_strBuyTitle[i]), send_index);
-//			SetString(send_buff, m_pMain->m_strBuyTitle[i], strlen(m_pMain->m_strBuyTitle[i]), send_index);
 
 			message_length = static_cast<int16_t>(strlen(m_pMain->m_strBuyMessage[i]));
 			if (message_length > MAX_BBS_MESSAGE)
 				message_length = MAX_BBS_MESSAGE;
 
 			SetString2(send_buff, m_pMain->m_strBuyMessage[i], message_length, send_index);
-//			SetShort(send_buff, strlen(m_pMain->m_strBuyMessage[i]), send_index);
-//			SetString(send_buff, m_pMain->m_strBuyMessage[i], strlen(m_pMain->m_strBuyMessage[i]), send_index);
 
 			SetDWORD(send_buff, m_pMain->m_iBuyPrice[i], send_index);
 			SetShort(send_buff, i, send_index);
@@ -10740,16 +10736,12 @@ void CUser::MarketBBSReport(char* pBuf, uint8_t type)
 				title_length = MAX_BBS_TITLE;
 
 			SetString2(send_buff, m_pMain->m_strSellTitle[i], title_length, send_index);
-//			SetShort(send_buff, strlen(m_pMain->m_strSellTitle[i]), send_index);
-//			SetString(send_buff, m_pMain->m_strSellTitle[i], strlen(m_pMain->m_strSellTitle[i]), send_index);
 
 			message_length = static_cast<int16_t>(strlen(m_pMain->m_strSellMessage[i]));
 			if (message_length > MAX_BBS_MESSAGE)
 				message_length = MAX_BBS_MESSAGE;
 
 			SetString2(send_buff, m_pMain->m_strSellMessage[i], message_length, send_index);
-//			SetShort(send_buff, strlen(m_pMain->m_strSellMessage[i]), send_index);
-//			SetString(send_buff, m_pMain->m_strSellMessage[i], strlen(m_pMain->m_strSellMessage[i]), send_index);
 
 			SetDWORD(send_buff, m_pMain->m_iSellPrice[i], send_index);
 			SetShort(send_buff, i, send_index);
@@ -11134,8 +11126,8 @@ void CUser::BlinkTimeCheck(double currentTime)
 		SetShort(send_buff, _socketId, send_index);
 		SetShort(send_buff, strlen(m_pUserData->m_id), send_index);
 		SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
-		Setfloat(send_buff, m_pUserData->m_curx, send_index);
-		Setfloat(send_buff, m_pUserData->m_curz, send_index);
+		SetFloat(send_buff, m_pUserData->m_curx, send_index);
+		SetFloat(send_buff, m_pUserData->m_curz, send_index);
 		m_pMain->Send_AIServer(m_pUserData->m_bZone, send_buff, send_index);
 //
 	}
@@ -12973,7 +12965,7 @@ void CUser::GetUserInfo(char* buff, int& buff_index)
 {
 	CKnights* pKnights = nullptr;
 
-	SetString1(buff, m_pUserData->m_id, static_cast<uint8_t>(strlen(m_pUserData->m_id)), buff_index);
+	SetString1(buff, m_pUserData->m_id, buff_index);
 	SetByte(buff, m_pUserData->m_bNation, buff_index);
 	SetShort(buff, m_pUserData->m_bKnights, buff_index);
 	SetByte(buff, m_pUserData->m_bFame, buff_index);
@@ -12984,7 +12976,7 @@ void CUser::GetUserInfo(char* buff, int& buff_index)
 	if (pKnights != nullptr)
 	{
 		SetShort(buff, pKnights->m_sAllianceKnights, buff_index);
-		SetString1(buff, pKnights->m_strName, static_cast<uint8_t>(strlen(pKnights->m_strName)), buff_index);
+		SetString1(buff, pKnights->m_strName, buff_index);
 		SetByte(buff, pKnights->m_byGrade, buff_index);  // knights grade
 		SetByte(buff, pKnights->m_byRanking, buff_index);
 		SetShort(buff, pKnights->m_sMarkVersion, buff_index);
@@ -13114,7 +13106,7 @@ void CUser::GameStart(
 			SetByte(send_buff, KARUS, send_index);
 			SetShort(send_buff, -1, send_index);		// sid
 			SetByte(send_buff, 0, send_index);			// sender name length
-			SetString2(send_buff, m_pMain->m_strPermanentChat, static_cast<int16_t>(strlen(m_pMain->m_strPermanentChat)), send_index);
+			SetString2(send_buff, m_pMain->m_strPermanentChat, send_index);
 			Send(send_buff, send_index);
 		}
 

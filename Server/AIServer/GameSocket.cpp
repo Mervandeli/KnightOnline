@@ -372,8 +372,8 @@ void CGameSocket::RecvUserInfo(char* pBuf)
 	sMp = GetShort(pBuf, index);
 	sDamage = GetShort(pBuf, index);
 	sAC = GetShort(pBuf, index);
-	fHitAgi = Getfloat(pBuf, index);
-	fAvoidAgi = Getfloat(pBuf, index);
+	fHitAgi = GetFloat(pBuf, index);
+	fAvoidAgi = GetFloat(pBuf, index);
 //
 	sItemAC = GetShort(pBuf, index);
 	bTypeLeft = GetByte(pBuf, index);
@@ -433,8 +433,8 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 	uid = GetShort(pBuf, index);
 	len = GetShort(pBuf, index);
 	GetString(strName, pBuf, len, index);
-	fX = Getfloat(pBuf, index);
-	fZ = Getfloat(pBuf, index);
+	fX = GetFloat(pBuf, index);
+	fZ = GetFloat(pBuf, index);
 
 	if (fX < 0
 		|| fZ < 0)
@@ -539,9 +539,9 @@ void CGameSocket::RecvUserMove(char* pBuf)
 	float fX = -1.0f, fZ = -1.0f, fY = -1.0f;
 
 	uid = GetShort(pBuf, index);
-	fX = Getfloat(pBuf, index);
-	fZ = Getfloat(pBuf, index);
-	fY = Getfloat(pBuf, index);
+	fX = GetFloat(pBuf, index);
+	fZ = GetFloat(pBuf, index);
+	fY = GetFloat(pBuf, index);
 	speed = GetShort(pBuf, index);
 
 	SetUid(fX, fZ, uid, speed);
@@ -556,9 +556,9 @@ void CGameSocket::RecvUserMoveEdge(char* pBuf)
 	float fX = -1.0f, fZ = -1.0f, fY = -1.0f;
 
 	uid = GetShort(pBuf, index);
-	fX = Getfloat(pBuf, index);
-	fZ = Getfloat(pBuf, index);
-	fY = Getfloat(pBuf, index);
+	fX = GetFloat(pBuf, index);
+	fZ = GetFloat(pBuf, index);
+	fY = GetFloat(pBuf, index);
 
 	SetUid(fX, fZ, uid, speed);
 //	TRACE(_T("RecvUserMoveEdge()---> uid = %d, x=%f, z=%f \n"), uid, fX, fZ);
@@ -683,8 +683,8 @@ void CGameSocket::RecvAttackReq(char* pBuf)
 	tid = GetShort(pBuf, index);
 	sDamage = GetShort(pBuf, index);
 	sAC = GetShort(pBuf, index);
-	fHitAgi = Getfloat(pBuf, index);
-	fAvoidAgi = Getfloat(pBuf, index);
+	fHitAgi = GetFloat(pBuf, index);
+	fAvoidAgi = GetFloat(pBuf, index);
 //
 	sItemAC = GetShort(pBuf, index);
 	bTypeLeft = GetByte(pBuf, index);
@@ -830,8 +830,8 @@ void CGameSocket::RecvUserUpdate(char* pBuf)
 	sMP = GetShort(pBuf, index);
 	sDamage = GetShort(pBuf, index);
 	sAC = GetShort(pBuf, index);
-	fHitAgi = Getfloat(pBuf, index);
-	fAvoidAgi = Getfloat(pBuf, index);
+	fHitAgi = GetFloat(pBuf, index);
+	fAvoidAgi = GetFloat(pBuf, index);
 //
 	sItemAC = GetShort(pBuf, index);
 	bTypeLeft = GetByte(pBuf, index);
@@ -1014,8 +1014,8 @@ void CGameSocket::RecvUserInfoAllData(char* pBuf)
 		sMp = GetShort(pBuf, index);
 		sDamage = GetShort(pBuf, index);
 		sAC = GetShort(pBuf, index);
-		fHitAgi = Getfloat(pBuf, index);
-		fAvoidAgi = Getfloat(pBuf, index);
+		fHitAgi = GetFloat(pBuf, index);
+		fAvoidAgi = GetFloat(pBuf, index);
 		sPartyIndex = GetShort(pBuf, index);
 		bAuthority = GetByte(pBuf, index);
 
