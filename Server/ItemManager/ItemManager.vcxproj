@@ -139,7 +139,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h" />
-    <ClInclude Include="ItemManager.h" />
     <ClInclude Include="ItemManagerInstance.h" />
     <ClInclude Include="ItemManagerReadQueueThread.h" />
     <ClInclude Include="Resource.h" />

@@ -1,14 +1,11 @@
-﻿// _dbAgent.cpp: implementation of the CDBAgent class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
+﻿#include "pch.h"
 #include "DBAgent.h"
-#include "AujardDlg.h"
+#include "AujardInstance.h"
 
 #include <db-library/Exceptions.h>
 #include <db-library/ModelRecordSet.h>
 #include <db-library/PoolConnection.h>
+#include <db-library/StoredProc.h>
 #include <db-library/SqlBuilder.h>
 #include <db-library/utils.h>
 
@@ -19,20 +16,8 @@
 #include <nanodbc/nanodbc.h>
 #include <spdlog/spdlog.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-#include <db-library/StoredProc.h>
-
 import AujardBinder;
 import StoredProc;
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CDBAgent::CDBAgent()
 {
@@ -46,9 +31,7 @@ CDBAgent::~CDBAgent()
 /// \returns true is successful, false otherwise
 bool CDBAgent::InitDatabase()
 {
-	//	_main DB Connecting..
-	/////////////////////////////////////////////////////////////////////////////////////
-	_main = (CAujardDlg*) AfxGetApp()->GetMainWnd();
+	_main = AujardInstance::instance();
 
 	// initialize each connection inside its own try/catch block so we can catch
 	// exceptions per-connection
@@ -123,7 +106,7 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 	int16_t rowCount = 0;
 	try
 	{
-		_main->DBProcessNumber(2);
+		// _main->DBProcessNumber(2);
 
 		db::StoredProc<storedProc::LoadUserData> proc;
 		auto weak_result = proc.execute(accountId, charId, &rowCount);
@@ -480,7 +463,7 @@ bool CDBAgent::UpdateUser(const char* charId, int userId, int updateType)
 	
 	try
 	{
-		_main->DBProcessNumber(3);
+		// _main->DBProcessNumber(3);
 
 		db::StoredProc<storedProc::UpdateUserData> proc;
 
@@ -527,7 +510,7 @@ int CDBAgent::AccountLogInReq(char* accountId, char* password)
 	int16_t retCode = 0;
 	try
 	{
-		_main->DBProcessNumber(4);
+		// _main->DBProcessNumber(4);
 
 		db::StoredProc<storedProc::AccountLogin> proc;
 		proc.execute(accountId, password, &retCode);
@@ -549,7 +532,7 @@ bool CDBAgent::NationSelect(char* accountId, int nation)
 	int16_t retCode = 0;
 	try
 	{
-		_main->DBProcessNumber(5);
+		// _main->DBProcessNumber(5);
 
 		db::StoredProc<storedProc::NationSelect> proc;
 		proc.execute(&retCode, accountId, nation);
@@ -577,7 +560,7 @@ int CDBAgent::CreateNewChar(char* accountId, int index, char* charId, int race, 
 	int16_t retCode = 0;
 	try
 	{
-		_main->DBProcessNumber(6);
+		// _main->DBProcessNumber(6);
 
 		db::StoredProc<storedProc::CreateNewChar> proc;
 		proc.execute(
@@ -618,7 +601,7 @@ bool CDBAgent::LoadCharInfo(char* charId_, char* buff, int& buffIndex)
 	{
 		try
 		{
-			_main->DBProcessNumber(8);
+			// _main->DBProcessNumber(8);
 
 			db::StoredProc<storedProc::LoadCharInfo> proc;
 
@@ -701,7 +684,7 @@ bool CDBAgent::GetAllCharID(const char* accountId, char* charId1_, char* charId2
 	int32_t rowCount = 0;
 	try
 	{
-		_main->DBProcessNumber(9);
+		// _main->DBProcessNumber(9);
 
 		db::StoredProc<storedProc::LoadAccountCharid> proc;
 
@@ -769,7 +752,7 @@ int CDBAgent::CreateKnights(int knightsId, int nation, char* name, char* chief, 
 	int16_t retCode = 0;
 	try
 	{
-		_main->DBProcessNumber(10);
+		// _main->DBProcessNumber(10);
 
 		db::StoredProc<storedProc::CreateKnights> proc;
 		proc.execute(&retCode, knightsId, nation, flag, name, chief);
@@ -796,7 +779,7 @@ int CDBAgent::UpdateKnights(int type, char* charId, int knightsId, int dominatio
 	int16_t retCode = 0;
 	try
 	{
-		_main->DBProcessNumber(11);
+		// _main->DBProcessNumber(11);
 
 		db::StoredProc<storedProc::UpdateKnights> proc;
 		proc.execute(&retCode, type, charId, knightsId, domination);
@@ -817,7 +800,7 @@ int CDBAgent::DeleteKnights(int knightsId)
 	int16_t retCode = 0;
 	try
 	{
-		_main->DBProcessNumber(12);
+		// _main->DBProcessNumber(12);
 
 		db::StoredProc<storedProc::DeleteKnights> proc;
 		proc.execute(&retCode, knightsId);
@@ -845,7 +828,7 @@ int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int
 	int32_t rowCount = 0;
 	try
 	{
-		_main->DBProcessNumber(13);
+		// _main->DBProcessNumber(13);
 
 		db::StoredProc<storedProc::LoadKnightsMembers> proc;
 		auto weak_result = proc.execute(knightsId);
@@ -909,7 +892,7 @@ bool CDBAgent::UpdateConCurrentUserCount(int serverId, int zoneId, int userCount
 	std::string updateQuery = fmt::format("UPDATE CONCURRENT SET [zone{}_count] = ? WHERE [serverid] = ?", zoneId);
 	try
 	{
-		_main->DBProcessNumber(14);
+		// _main->DBProcessNumber(14);
 
 		auto conn = db::ConnectionManager::CreatePoolConnection(modelUtil::DbType::ACCOUNT, DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)
@@ -951,7 +934,7 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 	sql.IsWherePK = true;
 	try
 	{
-		_main->DBProcessNumber(15);
+		// _main->DBProcessNumber(15);
 
 		db::ModelRecordSet<model::Warehouse> recordSet;
 
@@ -1072,7 +1055,7 @@ bool CDBAgent::UpdateWarehouseData(const char* accountId, int userId, int update
 
 	try
 	{
-		_main->DBProcessNumber(16);
+		// _main->DBProcessNumber(16);
 
 		db::StoredProc<storedProc::UpdateWarehouse> proc;
 
@@ -1114,7 +1097,7 @@ bool CDBAgent::LoadKnightsInfo(int knightsId, char* buffOut, int& buffIndex)
 	sql.IsWherePK = true;
 	try
 	{
-		_main->DBProcessNumber(17);
+		// _main->DBProcessNumber(17);
 
 		db::ModelRecordSet<model::Knights> recordSet;
 
@@ -1193,7 +1176,7 @@ bool CDBAgent::SetLogInInfo(const char* accountId, const char* charId, const cha
 
 	try
 	{
-		_main->DBProcessNumber(18);
+		// _main->DBProcessNumber(18);
 
 		auto conn = db::ConnectionManager::CreatePoolConnection(ModelType::DbType(), DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)
@@ -1225,7 +1208,7 @@ bool CDBAgent::AccountLogout(const char* accountId, int logoutCode)
 	int16_t ret1 = 0, ret2 = 0;
 	try
 	{
-		_main->DBProcessNumber(19);
+		// _main->DBProcessNumber(19);
 
 		db::StoredProc<storedProc::AccountLogout> proc;
 
@@ -1284,7 +1267,7 @@ bool CDBAgent::CheckUserData(const char* accountId, const char* charId, int chec
 	
 	try
 	{
-		_main->DBProcessNumber(20);
+		// _main->DBProcessNumber(20);
 
 		auto conn = db::ConnectionManager::CreatePoolConnection(dbType, DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)
@@ -1347,7 +1330,7 @@ void CDBAgent::LoadKnightsAllList(int nation)
 
 	try
 	{
-		_main->DBProcessNumber(21);
+		// _main->DBProcessNumber(21);
 
 		db::ModelRecordSet<model::Knights> recordSet;
 		recordSet.open(sql);
@@ -1380,7 +1363,6 @@ void CDBAgent::LoadKnightsAllList(int nation)
 
 				if (retryCount >= maxRetry)
 				{
-					_main->AddOutputMessage(_T("Packet Drop: KNIGHTS_ALLLIST_REQ"));
 					spdlog::error("DBAgent::LoadKnightsAllList: Packet Drop: KNIGHTS_ALLLIST_REQ");
 					return;
 				}
@@ -1417,10 +1399,7 @@ void CDBAgent::LoadKnightsAllList(int nation)
 		while (retryCount < maxRetry);
 
 		if (retryCount >= maxRetry)
-		{
-			_main->AddOutputMessage(_T("Packet Drop: KNIGHTS_ALLLIST_REQ"));
 			spdlog::error("DBAgent::LoadKnightsAllList: Packet Drop: KNIGHTS_ALLLIST_REQ");
-		}
 	}
 }
 
@@ -1433,7 +1412,7 @@ bool CDBAgent::UpdateBattleEvent(const char* charId, int nation)
 	std::string query = "UPDATE BATTLE SET byNation = ?, strUserName = ? WHERE sIndex = 1";
 	try
 	{
-		_main->DBProcessNumber(22);
+		// _main->DBProcessNumber(22);
 
 		auto conn = db::ConnectionManager::CreatePoolConnection(ModelType::DbType(), DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)

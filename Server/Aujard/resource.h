@@ -2,10 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by Aujard.rc
 //
-#define IDD_AUJARD_DIALOG               102
 #define IDR_MAINFRAME                   128
-#define IDC_OUT_LIST                    1000
-#define IDC_DB_PROCESS                  1002
 
 // Next default values for new objects
 // 

@@ -9,11 +9,6 @@
 #include <vector>
 #include <string>
 
-namespace recordset_loader
-{
-	struct Error;
-}
-
 class TimerThread;
 class VersionManagerInstance : public AppThread
 {

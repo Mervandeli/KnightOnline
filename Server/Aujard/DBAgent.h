@@ -1,13 +1,4 @@
-﻿// _dbAgent.h: interface for the CDBAgent class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_DBAGENT_H__C7580B9A_10FF_46DE_93C2_B0C9BA9D0422__INCLUDED_)
-#define AFX_DBAGENT_H__C7580B9A_10FF_46DE_93C2_B0C9BA9D0422__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+﻿#pragma once
 
 #include <memory>
 
@@ -18,7 +9,7 @@
 
 typedef std::vector <_USER_DATA*>			UserDataArray;
 
-class CAujardDlg;
+class AujardInstance;
 class CDBAgent
 {
 public:
@@ -157,8 +148,6 @@ public:
 	UserDataArray	UserData;
 	
 private:
-	/// \brief reference back to the main AujardDlg instance
-	CAujardDlg* _main;
+	/// \brief reference back to the main AujardInstance instance
+	AujardInstance* _main;
 };
-
-#endif // !defined(AFX_DBAGENT_H__C7580B9A_10FF_46DE_93C2_B0C9BA9D0422__INCLUDED_)

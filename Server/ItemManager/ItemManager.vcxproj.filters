@@ -32,9 +32,6 @@
     <ClInclude Include="Define.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ItemManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ItemManagerInstance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
