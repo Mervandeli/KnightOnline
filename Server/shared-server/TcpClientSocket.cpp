@@ -67,7 +67,7 @@ bool TcpClientSocket::Connect(const char* remoteAddress, uint16_t remotePort)
 		return false;
 	}
 
-	ASSERT(_socketManager != nullptr);
+	assert(_socketManager != nullptr);
 
 	if (!_socketManager->AcquireClientSocket(this))
 	{

@@ -64,7 +64,7 @@ bool TcpSocket::AsyncSend(bool fromAsyncChain)
 	// When we finish a send, we should pop the last entry before queueing up another send.
 	if (fromAsyncChain)
 	{
-		_ASSERT(_sendInProgress);
+		assert(_sendInProgress);
 		_sendInProgress = false;
 
 		if (!_sendQueue.empty())

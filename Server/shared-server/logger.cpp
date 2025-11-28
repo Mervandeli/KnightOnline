@@ -10,8 +10,6 @@
 #include <spdlog/async.h>
 #include <spdlog/async_logger.h>
 
-#include <filesystem>
-
 logger::Logger::Logger(const std::string& appName)
 	: _appName(appName)
 {
@@ -21,14 +19,14 @@ logger::Logger::Logger(const std::string& appName)
 /// \brief Sets up spdlog from an ini file using standardized server settings
 /// \param ini server application's ini file (already loaded)
 /// \param baseDir base directory to store logs folder under
-void logger::Logger::Setup(CIni& ini, const std::string& baseDir)
+void logger::Logger::Setup(CIni& ini, const std::filesystem::path& baseDir)
 {
 	// setup file logger
 	std::string fileName = ini.GetString(ini::LOGGER, ini::FILE, _defaultLogPath);
 
 	std::filesystem::path configuredLogPath(fileName);
 	if (configuredLogPath.is_relative())
-		configuredLogPath = std::filesystem::path(baseDir) / fileName;
+		configuredLogPath = baseDir / fileName;
 
 	std::u8string utf8String = configuredLogPath.u8string();
 	fileName.assign(utf8String.begin(), utf8String.end());
@@ -71,7 +69,7 @@ void logger::Logger::Setup(CIni& ini, const std::string& baseDir)
 
 void logger::Logger::SetupExtraLoggers(CIni& ini,
 	std::shared_ptr<spdlog::details::thread_pool> threadPool,
-	const std::string& baseDir)
+	const std::filesystem::path& baseDir)
 {
 	/* do nothing - consumers will implement this */
 	ini;
@@ -81,7 +79,7 @@ void logger::Logger::SetupExtraLoggers(CIni& ini,
 
 void logger::Logger::SetupExtraLogger(CIni& ini,
 	std::shared_ptr<spdlog::details::thread_pool> threadPool,
-	const std::string& baseDir,
+	const std::filesystem::path& baseDir,
 	const std::string& appName, const std::string& logFileConfigProp)
 {
 	// setup file logger
@@ -89,7 +87,7 @@ void logger::Logger::SetupExtraLogger(CIni& ini,
 
 	std::filesystem::path configuredLogPath(fileName);
 	if (configuredLogPath.is_relative())
-		configuredLogPath = std::filesystem::path(baseDir) / fileName;
+		configuredLogPath = baseDir / fileName;
 
 	std::u8string utf8String = configuredLogPath.u8string();
 	fileName.assign(utf8String.begin(), utf8String.end());

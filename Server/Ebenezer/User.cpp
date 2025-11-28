@@ -187,8 +187,8 @@ int CUser::Send(char* pBuf, int length)
 
 	if (_jvCryptionEnabled)
 	{
-		_ASSERT(length >= 0);
-		_ASSERT((length + PacketHeaderSize + EncryptedPacketHeaderSize) <= MAX_PACKET_SIZE);
+		assert(length >= 0);
+		assert((length + PacketHeaderSize + EncryptedPacketHeaderSize) <= MAX_PACKET_SIZE);
 
 		if (length < 0
 			|| length + (PacketHeaderSize + EncryptedPacketHeaderSize) > MAX_PACKET_SIZE)
@@ -219,8 +219,8 @@ int CUser::Send(char* pBuf, int length)
 	}
 	else
 	{
-		_ASSERT(length >= 0);
-		_ASSERT((length + PacketHeaderSize) <= MAX_PACKET_SIZE);
+		assert(length >= 0);
+		assert((length + PacketHeaderSize) <= MAX_PACKET_SIZE);
 
 		if (length < 0
 			|| (length + PacketHeaderSize) > MAX_PACKET_SIZE)

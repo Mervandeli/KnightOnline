@@ -7,7 +7,6 @@
 #include <string>
 
 #include <shared/globals.h>
-#include <shared/StringConversion.h>
 #include <shared-server/STLMap.h>
 
 constexpr int MAX_USER				= 3000;

@@ -8,7 +8,6 @@
 #include <db-library/RecordSetLoader_STLMap.h>
 
 #include <shared/Ini.h>
-#include <shared/StringConversion.h>
 #include <shared/TimerThread.h>
 
 #include <spdlog/spdlog.h>
@@ -119,7 +118,7 @@ bool AujardInstance::OnStart()
 	CIni ini(iniPath);
 
 	// configure logger
-	_logger.Setup(ini, exePath.string());
+	_logger.Setup(ini, exePath);
 
 	LoggerRecvQueue.Open(SMQ_LOGGERSEND);	// Dispatcher 의 Send Queue
 	LoggerSendQueue.Open(SMQ_LOGGERRECV);	// Dispatcher 의 Read Queue

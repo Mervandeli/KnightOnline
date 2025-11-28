@@ -2,46 +2,48 @@
 #include "Ini.h"
 #include <iostream>
 #include <fstream>
-#include "StringConversion.h"
 #include "StringUtils.h"
 
-constexpr wchar_t INI_SECTION_START	= L'[';
-constexpr wchar_t INI_SECTION_END	= L']';
-constexpr wchar_t INI_KEY_SEPARATOR	= L'=';
+#include <spdlog/spdlog.h>
 
-CIni::CIni(
-	const std::filesystem::path& path)
+constexpr char INI_SECTION_START	= '[';
+constexpr char INI_SECTION_END		= ']';
+constexpr char INI_KEY_SEPARATOR	= '=';
+
+CIni::CIni(const std::filesystem::path& path)
 {
 	Load(path);
 }
 
 bool CIni::Load()
 {
-	return Load(
-		m_szPath);
+	return Load(_path);
 }
 
-bool CIni::Load(
-	const std::filesystem::path& path)
+bool CIni::Load(const std::filesystem::path& path)
 {
-	m_szPath = path;
+	_path = path;
 
-	std::wifstream file(m_szPath);
+	std::ifstream file(path);
 	if (!file)
 	{
-		TRACE("Warning: %ls does not exist, will use configured defaults.\n", m_szPath.c_str());
+		std::u8string filenameUtf8 = path.u8string();
+		std::string filename(filenameUtf8.begin(), filenameUtf8.end());
+
+		spdlog::warn("Ini::Load: {} does not exist, will use configured defaults.",
+			filename);
 		return false;
 	}
 
-	std::wstring currentSection;
+	std::string currentSection;
 
 	// If an invalid section is hit
 	// Ensure that we don't place key/value pairs
 	// from the invalid section into the previously loaded section.
-	bool bSkipNextSection = false;
+	bool skipNextSection = false;
 	while (!file.eof())
 	{
-		std::wstring line;
+		std::string line;
 		getline(file, line);
 
 		rtrim(line);
@@ -53,24 +55,24 @@ bool CIni::Load(
 		// at the expense of of not being able to use '=' in section names.
 		// As this is uncommon behaviour, this is a suitable trade-off.
 		size_t keySeparatorPos = line.find(INI_KEY_SEPARATOR);
-		if (keySeparatorPos != std::wstring::npos)
+		if (keySeparatorPos != std::string::npos)
 		{
-			if (bSkipNextSection)
+			if (skipNextSection)
 				continue;
 
-			std::wstring key = line.substr(0, keySeparatorPos);
-			std::wstring value = line.substr(keySeparatorPos + 1);
+			std::string key = line.substr(0, keySeparatorPos);
+			std::string value = line.substr(keySeparatorPos + 1);
 
 			// Clean up key/value to allow for 'key = value'
 			rtrim(key);   /* remove trailing whitespace from keys */
 			ltrim(value); /* remove preleading whitespace from values */
 
-			auto itr = m_configMap.find(currentSection);
-			if (itr == m_configMap.end())
+			auto itr = _configMap.find(currentSection);
+			if (itr == _configMap.end())
 			{
-				m_configMap.insert(
+				_configMap.insert(
 					std::make_pair(currentSection, std::move(ConfigEntryMap())));
-				itr = m_configMap.find(currentSection);
+				itr = _configMap.find(currentSection);
 			}
 
 			itr->second[key] = value;
@@ -78,20 +80,20 @@ bool CIni::Load(
 		}
 
 		// Not a value, so assume it's a section
-		size_t sectionStart = line.find_first_of(INI_SECTION_START),
-			sectionEnd = line.find_last_of(INI_SECTION_END);
+		size_t sectionStart = line.find_first_of(INI_SECTION_START);
+		size_t sectionEnd = line.find_last_of(INI_SECTION_END);
 
-		if (sectionStart == std::wstring::npos
-			|| sectionEnd == std::wstring::npos
+		if (sectionStart == std::string::npos
+			|| sectionEnd == std::string::npos
 			|| sectionStart > sectionEnd)
 		{
 			/* invalid section */
-			bSkipNextSection = true;
+			skipNextSection = true;
 			continue;
 		}
 
 		currentSection = line.substr(sectionStart + 1, sectionEnd - 1);
-		bSkipNextSection = false;
+		skipNextSection = false;
 	}
 
 	file.close();
@@ -100,29 +102,30 @@ bool CIni::Load(
 
 void CIni::Save()
 {
-	Save(m_szPath);
+	Save(_path);
 }
 
-void CIni::Save(
-	const std::filesystem::path& path)
+void CIni::Save(const std::filesystem::path& path)
 {
-	FILE* fp = _wfopen(path.c_str(), L"w");
+	FILE* fp = nullptr;
+	
+#ifdef _MSC_VER
+	_wfopen_s(&fp, path.c_str(), L"w");
+#else
+	fp = fopen(path.string().c_str(), "w");
+#endif
+
 	if (fp == nullptr)
 		return;
 
-	for (const auto& [sectionName, keyValuePairs] : m_configMap)
+	for (const auto& [sectionName, keyValuePairs] : _configMap)
 	{
 		// Start the section
-		std::string sectionA = WideToLocal(sectionName);
-		fprintf(fp, "[%s]\n", sectionA.c_str());
+		fprintf(fp, "[%s]\n", sectionName.c_str());
 
 		// Now list out all the key/value pairs
 		for (const auto& [key, value] : keyValuePairs)
-		{
-			std::string keyA	= WideToLocal(key);
-			std::string valueA	= WideToLocal(value);
-			fprintf(fp, "%s=%s\n", keyA.c_str(), valueA.c_str());
-		}
+			fprintf(fp, "%s=%s\n", key.c_str(), value.c_str());
 
 		// Use a trailing newline to finish the section, to make it easier to read
 		fputc('\n', fp);
@@ -131,203 +134,83 @@ void CIni::Save(
 	fclose(fp);
 }
 
-int CIni::GetInt(
-	std::string_view szAppNameA,
-	std::string_view szKeyNameA,
-	const int iDefault)
+int CIni::GetInt(std::string_view svAppName, std::string_view svKeyName, const int iDefault)
 {
-	std::wstring szAppNameW = LocalToWide(szAppNameA);
-	std::wstring szKeyNameW = LocalToWide(szKeyNameA);
-
-	return GetInt(szAppNameW, szKeyNameW, iDefault);
-}
-
-int CIni::GetInt(
-	std::wstring_view szAppName,
-	std::wstring_view szKeyName,
-	const int iDefault)
-{
-	std::wstring szAppNameW(szAppName.data(), szAppName.length());
-
-	auto sectionItr = m_configMap.find(szAppNameW);
-	if (sectionItr != m_configMap.end())
+	auto sectionItr = _configMap.find(svAppName);
+	if (sectionItr != _configMap.end())
 	{
-		std::wstring szKeyNameW(szKeyName.data(), szKeyName.length());
-
-		auto keyItr = sectionItr->second.find(szKeyNameW);
+		auto keyItr = sectionItr->second.find(svKeyName);
 		if (keyItr != sectionItr->second.end())
-			return _wtoi(keyItr->second.c_str());
+			return atoi(keyItr->second.c_str());
 	}
 
-	SetInt(szAppName, szKeyName, iDefault);
+	SetInt(svAppName, svKeyName, iDefault);
 	return iDefault;
 }
 
-bool CIni::GetBool(
-	std::string_view szAppName,
-	std::string_view szKeyName,
-	const bool bDefault)
+bool CIni::GetBool(std::string_view svAppName, std::string_view svKeyName, const bool bDefault)
 {
-	return GetInt(szAppName, szKeyName, bDefault) == 1;
+	return GetInt(svAppName, svKeyName, bDefault) == 1;
 }
 
-bool CIni::GetBool(
-	std::wstring_view szAppName,
-	std::wstring_view szKeyName,
-	const bool bDefault)
+std::string CIni::GetString(std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault)
 {
-	return GetInt(szAppName, szKeyName, bDefault) == 1;
-}
-
-std::string CIni::GetString(
-	std::string_view szAppNameA,
-	std::string_view szKeyNameA,
-	std::string_view szDefaultA)
-{
-	std::wstring szAppNameW = LocalToWide(szAppNameA);
-	std::wstring szKeyNameW = LocalToWide(szKeyNameA);
-	std::wstring szDefaultW = LocalToWide(szDefaultA);
-
-	auto sectionItr = m_configMap.find(szAppNameW);
-	if (sectionItr != m_configMap.end())
+	auto sectionItr = _configMap.find(svAppName);
+	if (sectionItr != _configMap.end())
 	{
-		auto keyItr = sectionItr->second.find(szKeyNameW);
-		if (keyItr != sectionItr->second.end())
-			return WideToLocal(keyItr->second);
-	}
-
-	std::string szResult(szDefaultA.data(), szDefaultA.length());
-	SetString(szAppNameW, szKeyNameW, szDefaultW);
-	return szResult;
-}
-
-std::wstring CIni::GetString(
-	std::wstring_view szAppName,
-	std::wstring_view szKeyName,
-	std::wstring_view szDefault)
-{
-	std::wstring szAppNameW(szAppName.data(), szAppName.length());
-
-	auto sectionItr = m_configMap.find(szAppNameW);
-	if (sectionItr != m_configMap.end())
-	{
-		std::wstring szKeyNameW(szKeyName.data(), szKeyName.length());
-
-		auto keyItr = sectionItr->second.find(szKeyNameW);
+		auto keyItr = sectionItr->second.find(svKeyName);
 		if (keyItr != sectionItr->second.end())
 			return keyItr->second;
 	}
 
-	std::wstring szResult(szDefault.data(), szDefault.length());
-	SetString(szAppName, szKeyName, szDefault);
+	std::string szResult(svDefault.data(), svDefault.length());
+	SetString(svAppName, svKeyName, svDefault);
 	return szResult;
 }
 
-void CIni::GetString(
-	std::string_view szAppNameA,
-	std::string_view szKeyNameA,
-	std::string_view szDefaultA,
-	char* szOutBuffer,
-	size_t nBufferLength)
+void CIni::GetString(std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault, char* szOutBuffer, size_t nBufferLength)
 {
-	std::wstring szAppNameW	= LocalToWide(szAppNameA);
-	std::wstring szKeyNameW	= LocalToWide(szKeyNameA);
-	std::wstring szDefaultW	= LocalToWide(szDefaultA);
-	std::wstring szResultW	= GetString(szAppNameW, szKeyNameW, szDefaultW);
-	std::string szResultA	= WideToLocal(szResultW);
-
-	snprintf(
-		szOutBuffer,
-		nBufferLength,
-		"%s",
-		szResultA.c_str());
-}
-
-void CIni::GetString(
-	std::wstring_view szAppName,
-	std::wstring_view szKeyName,
-	std::wstring_view szDefault,
-	wchar_t* szOutBuffer,
-	size_t nBufferLength)
-{
-	std::wstring szAppNameW(szAppName.data(), szAppName.length());
-
-	auto sectionItr = m_configMap.find(szAppNameW);
-	if (sectionItr != m_configMap.end())
+	auto sectionItr = _configMap.find(svAppName);
+	if (sectionItr != _configMap.end())
 	{
-		std::wstring szKeyNameW(szKeyName.data(), szKeyName.length());
-
-		auto keyItr = sectionItr->second.find(szKeyNameW);
+		auto keyItr = sectionItr->second.find(svKeyName);
 		if (keyItr != sectionItr->second.end())
 		{
-			_snwprintf(
-				szOutBuffer,
-				nBufferLength - 1,
-				L"%s",
-				keyItr->second.c_str());
+			snprintf(szOutBuffer, nBufferLength, "%s", keyItr->second.c_str());
 			return;
 		}
 	}
 
-	SetString(szAppName, szKeyName, szDefault);
+	SetString(svAppName, svKeyName, svDefault);
 
-	_snwprintf(
+	snprintf(
 		szOutBuffer,
-		nBufferLength - 1,
-		L"%.*s",
-		static_cast<int>(szDefault.length()),
-		szDefault.data());
+		nBufferLength,
+		"%.*s",
+		static_cast<int>(svDefault.length()),
+		svDefault.data());
 }
 
-int CIni::SetInt(
-	std::string_view szAppName,
-	std::string_view szKeyName,
-	const int iDefault)
+int CIni::SetInt(std::string_view svAppName, std::string_view svKeyName, const int iDefault)
 {
 	std::string szDefault = std::to_string(iDefault);
-	return SetString(szAppName, szKeyName, szDefault);
+	return SetString(svAppName, svKeyName, szDefault);
 }
 
-int CIni::SetInt(
-	std::wstring_view szAppName,
-	std::wstring_view szKeyName,
-	const int iDefault)
+int CIni::SetString(std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault)
 {
-	std::wstring szDefault = std::to_wstring(iDefault);
-	return SetString(szAppName, szKeyName, szDefault);
-}
-
-int CIni::SetString(
-	std::string_view szAppNameA,
-	std::string_view szKeyNameA,
-	std::string_view szDefaultA)
-{
-	std::wstring szAppNameW	= LocalToWide(szAppNameA);
-	std::wstring szKeyNameW	= LocalToWide(szKeyNameA);
-	std::wstring szDefaultW	= LocalToWide(szDefaultA);
-
-	return SetString(szAppNameW, szKeyNameW, szDefaultW);
-}
-
-int CIni::SetString(
-	std::wstring_view szAppName,
-	std::wstring_view szKeyName,
-	std::wstring_view szDefault)
-{
-	std::wstring szAppNameW(szAppName.data(), szAppName.length());
-
-	auto itr = m_configMap.find(szAppNameW);
-	if (itr == m_configMap.end())
+	auto itr = _configMap.find(svAppName);
+	if (itr == _configMap.end())
 	{
-		auto ret = m_configMap.insert(
-			std::make_pair(szAppNameW, std::move(ConfigEntryMap())));
+		auto ret = _configMap.insert(
+			std::make_pair(svAppName, std::move(ConfigEntryMap())));
 		if (!ret.second)
 			return 0;
 
 		itr = ret.first;
 	}
 
-	std::wstring szKeyNameW(szKeyName.data(), szKeyName.length());
-	itr->second[szKeyNameW].assign(szDefault.data(), szDefault.length());
+	std::string szKeyName(svKeyName.data(), svKeyName.length());
+	itr->second[szKeyName].assign(svDefault.data(), svDefault.length());
 	return 1;
 }

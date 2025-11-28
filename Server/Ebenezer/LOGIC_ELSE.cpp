@@ -25,7 +25,7 @@ void LOGIC_ELSE::Init()
 	m_bAnd = true;
 }
 
-void LOGIC_ELSE::Parse_and(const char* line, const std::wstring& filename, int lineNumber)
+void LOGIC_ELSE::Parse_and(const char* line, const std::string& filename, int lineNumber)
 {
 	int index = 0, argsToParse = 0;
 	char temp[1024];
@@ -265,11 +265,11 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::wstring& filename, int l
 			break;
 
 		default:
-			spdlog::warn("LOGIC_ELSE::Parse_and: unhandled opcode '{}' ({}:{})", temp, WideToUtf8(filename), lineNumber);
+			spdlog::warn("LOGIC_ELSE::Parse_and: unhandled opcode '{}' ({}:{})", temp, filename, lineNumber);
 			break;
 	}
 
-	_ASSERT(argsToParse >= 0 && argsToParse <= MAX_LOGIC_ELSE_INT);
+	assert(argsToParse >= 0 && argsToParse <= MAX_LOGIC_ELSE_INT);
 	for (int i = 0; i < argsToParse; i++)
 	{
 		index += ParseSpace(temp, line + index);

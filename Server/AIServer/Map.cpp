@@ -8,7 +8,6 @@
 #include "User.h"
 
 #include <shared/globals.h>
-#include <shared/StringConversion.h>
 #include <spdlog/spdlog.h>
 
 #include <filesystem>

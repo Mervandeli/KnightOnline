@@ -886,13 +886,17 @@ bool EbenezerInstance::MapFileLoad()
 			ModelType row = {};
 			recordset.get_ref(row);
 
-			std::filesystem::path mapPath
-				= mapDir / row.Name;
+			std::filesystem::path mapPath = mapDir / row.Name;
+
+			// NOTE: spdlog is a C++11 library that doesn't support std::filesystem or std::u8string
+			// This just ensures the path is always explicitly UTF-8 in a cross-platform way.
+			std::u8string filenameUtf8 = mapPath.u8string();
+			std::string filename(filenameUtf8.begin(), filenameUtf8.end());
 
 			std::ifstream file(mapPath, std::ios::in | std::ios::binary);
 			if (!file)
 			{
-				spdlog::error("EbenezerInstance::MapFileLoad: File Open Fail - {}", mapPath.string());
+				spdlog::error("EbenezerInstance::MapFileLoad: File Open Fail - {}", filename);
 				return;
 			}
 
@@ -907,7 +911,7 @@ bool EbenezerInstance::MapFileLoad()
 
 			if (!pMap->LoadMap(file))
 			{
-				spdlog::error("EbenezerInstance::MapFileLoad: Map Load Fail - {}", mapPath.string());
+				spdlog::error("EbenezerInstance::MapFileLoad: Map Load Fail - {}", filename);
 				delete pMap;
 				return;
 			}
@@ -1089,7 +1093,7 @@ void EbenezerInstance::LoadConfig()
 
 	m_Ini.Load(iniPath);
 
-	_logger.Setup(m_Ini, exePath.string());
+	_logger.Setup(m_Ini, exePath);
 	
 	m_nYear = m_Ini.GetInt("TIMER", "YEAR", 1);
 	m_nMonth = m_Ini.GetInt("TIMER", "MONTH", 1);
@@ -1173,7 +1177,7 @@ void EbenezerInstance::LoadConfig()
 
 void EbenezerLogger::SetupExtraLoggers(CIni& ini,
 	std::shared_ptr<spdlog::details::thread_pool> threadPool,
-	const std::string& baseDir)
+	const std::filesystem::path& baseDir)
 {
 	SetupExtraLogger(ini, threadPool, baseDir, logger::EbenezerEvent, ini::EVENT_LOG_FILE);
 	SetupExtraLogger(ini, threadPool, baseDir, logger::EbenezerRegion, ini::REGION_LOG_FILE);
@@ -2184,7 +2188,7 @@ void EbenezerInstance::SendCompressedData()
 
 	comp_data_len = lzf_compress(m_CompBuf, m_iCompIndex, comp_buff, sizeof(comp_buff));
 
-	_ASSERT(comp_data_len != 0 && comp_data_len <= sizeof(comp_buff));
+	assert(comp_data_len != 0 && comp_data_len <= sizeof(comp_buff));
 
 	if (comp_data_len == 0
 		|| comp_data_len > sizeof(comp_buff))

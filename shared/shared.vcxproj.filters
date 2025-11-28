@@ -14,9 +14,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DebugUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="globals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -30,9 +27,6 @@
       <Filter>LZF</Filter>
     </ClCompile>
     <ClCompile Include="StringUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StringConversion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Thread.cpp">
@@ -56,9 +50,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="crc32.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="globals.h">
@@ -86,9 +77,6 @@
       <Filter>LZF</Filter>
     </ClInclude>
     <ClInclude Include="StringUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StringConversion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CircularBuffer.h">

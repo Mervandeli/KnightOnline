@@ -13,7 +13,7 @@ EXEC::~EXEC()
 {
 }
 
-void EXEC::Parse(const char* line, const std::wstring& filename, int lineNumber)
+void EXEC::Parse(const char* line, const std::string& filename, int lineNumber)
 {
 	int index = 0, argsToParse = 0;
 	char temp[1024];
@@ -82,11 +82,11 @@ void EXEC::Parse(const char* line, const std::wstring& filename, int lineNumber)
 			break;
 
 		default:
-			spdlog::warn("EXEC::Parse: unhandled opcode '{}' ({}:{})", temp, WideToUtf8(filename), lineNumber);
+			spdlog::warn("EXEC::Parse: unhandled opcode '{}' ({}:{})", temp, filename, lineNumber);
 			break;
 	}
 
-	_ASSERT(argsToParse >= 0 && argsToParse <= MAX_EXEC_INT);
+	assert(argsToParse >= 0 && argsToParse <= MAX_EXEC_INT);
 	for (int i = 0; i < argsToParse; i++)
 	{
 		index += ParseSpace(temp, line + index);

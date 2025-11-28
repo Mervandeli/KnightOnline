@@ -2,7 +2,6 @@
 
 #include <mmsystem.h>
 #include <shared/globals.h>
-#include <shared/StringConversion.h>
 
 constexpr int MAX_USER				= 3000;
 

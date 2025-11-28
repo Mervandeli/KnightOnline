@@ -10,7 +10,7 @@
 #if defined(_N3TOOL) || defined(_3DSERVER)
 #include <afx.h>
 #else
-#include <shared/DebugUtils.h>
+#include "DebugUtils.h"
 #endif
 
 const float __PI = 3.141592654f;

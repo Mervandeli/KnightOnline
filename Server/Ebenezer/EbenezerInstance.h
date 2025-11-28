@@ -40,7 +40,7 @@ public:
 
 	void SetupExtraLoggers(CIni& ini,
 		std::shared_ptr<spdlog::details::thread_pool> threadPool,
-		const std::string& baseDir) override;
+		const std::filesystem::path& baseDir) override;
 };
 
 typedef std::vector <C3DMap*>				ZoneArray;

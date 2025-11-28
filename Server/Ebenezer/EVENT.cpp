@@ -56,7 +56,11 @@ bool EVENT::LoadEvent(int zone)
 	if (!file)
 		return false;
 
-	std::wstring filenameWide = evtPath.wstring();
+	std::u8string filenameUtf8 = evtPath.u8string();
+
+	// NOTE: spdlog is a C++11 library that doesn't support std::filesystem or std::u8string
+	// This just ensures the path is always explicitly UTF-8 in a cross-platform way.
+	std::string filename(filenameUtf8.begin(), filenameUtf8.end());
 
 	int lineNumber = 0;
 	count = 0;
@@ -125,7 +129,7 @@ bool EVENT::LoadEvent(int zone)
 					goto cancel_event_load;
 
 				EXEC* newExec = new EXEC;
-				newExec->Parse(buf + t_index, filenameWide, lineNumber);
+				newExec->Parse(buf + t_index, filename, lineNumber);
 				newData->m_arExec.push_back(newExec);
 			}
 			else if (0 == strcmp(first, "A"))
@@ -134,7 +138,7 @@ bool EVENT::LoadEvent(int zone)
 					goto cancel_event_load;
 
 				LOGIC_ELSE* newLogicElse = new LOGIC_ELSE;
-				newLogicElse->Parse_and(buf + t_index, filenameWide, lineNumber);
+				newLogicElse->Parse_and(buf + t_index, filename, lineNumber);
 				newData->m_arLogicElse.push_back(newLogicElse);
 			}
 			else if (0 == strcmp(first, "END"))
@@ -147,10 +151,7 @@ bool EVENT::LoadEvent(int zone)
 			else if (isalnum(first[0]))
 			{
 				spdlog::warn("EVENT::LoadEvent({}): unhandled opcode '{}' ({}:{})",
-					zone, first,
-					// NOTE: spdlog is a C++11 library that doesn't support std::filesystem or std::u8string
-					// This just ensures the path is always explicitly UTF-8 in a cross-platform way.
-					reinterpret_cast<const char*>(evtPath.u8string().c_str()), lineNumber);
+					zone, first, filename, lineNumber);
 			}
 			index = 0;
 		}
