@@ -1,77 +1,78 @@
-﻿#include "StdAfx.h"
+﻿#include "pch.h"
 #include "AujardReadQueueThread.h"
-#include "AujardDlg.h"
+#include "AujardInstance.h"
 
-AujardReadQueueThread::AujardReadQueueThread(CAujardDlg* main)
-	: ReadQueueThread(main->LoggerRecvQueue),
-	_main(main)
+AujardReadQueueThread::AujardReadQueueThread()
+	: ReadQueueThread(AujardInstance::instance()->LoggerRecvQueue)
 {
 }
 
 void AujardReadQueueThread::process_packet(const char* buffer, int len)
 {
+	AujardInstance* appInstance = AujardInstance::instance();
+
 	int index = 0;
 	uint8_t command = GetByte(buffer, index);
 	switch (command)
 	{
 		case WIZ_LOGIN:
-			_main->AccountLogIn(buffer + index);
+			appInstance->AccountLogIn(buffer + index);
 			break;
 
 		case WIZ_NEW_CHAR:
-			_main->CreateNewChar(buffer + index);
+			appInstance->CreateNewChar(buffer + index);
 			break;
 
 		case WIZ_DEL_CHAR:
-			_main->DeleteChar(buffer + index);
+			appInstance->DeleteChar(buffer + index);
 			break;
 
 		case WIZ_SEL_CHAR:
-			_main->SelectCharacter(buffer + index);
+			appInstance->SelectCharacter(buffer + index);
 			break;
 
 		case WIZ_SEL_NATION:
-			_main->SelectNation(buffer + index);
+			appInstance->SelectNation(buffer + index);
 			break;
 
 		case WIZ_ALLCHAR_INFO_REQ:
-			_main->AllCharInfoReq(buffer + index);
+			appInstance->AllCharInfoReq(buffer + index);
 			break;
 
 		case WIZ_LOGOUT:
-			_main->UserLogOut(buffer + index);
+			appInstance->UserLogOut(buffer + index);
 			break;
 
 		case WIZ_DATASAVE:
-			_main->UserDataSave(buffer + index);
+			appInstance->UserDataSave(buffer + index);
 			break;
 
 		case WIZ_KNIGHTS_PROCESS:
-			_main->KnightsPacket(buffer + index);
+			appInstance->KnightsPacket(buffer + index);
 			break;
 
 		case WIZ_CLAN_PROCESS:
-			_main->KnightsPacket(buffer + index);
+			appInstance->KnightsPacket(buffer + index);
 			break;
 
 		case WIZ_LOGIN_INFO:
-			_main->SetLogInInfo(buffer + index);
+			appInstance->SetLogInInfo(buffer + index);
 			break;
 
 		case WIZ_KICKOUT:
-			_main->UserKickOut(buffer + index);
+			appInstance->UserKickOut(buffer + index);
 			break;
 
 		case WIZ_BATTLE_EVENT:
-			_main->BattleEventResult(buffer + index);
+			appInstance->BattleEventResult(buffer + index);
 			break;
 
 		case DB_COUPON_EVENT:
-			_main->CouponEvent(buffer + index);
+			appInstance->CouponEvent(buffer + index);
 			break;
 
 		case DB_HEARTBEAT:
-			_main->HeartbeatReceived();
+			appInstance->HeartbeatReceived();
 			break;
 	}
 }

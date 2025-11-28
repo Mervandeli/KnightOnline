@@ -18,13 +18,13 @@
     <ClCompile Include="Aujard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AujardDlg.cpp">
+    <ClCompile Include="AujardInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DBAgent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="StdAfx.cpp">
+    <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AujardReadQueueThread.cpp">
@@ -37,10 +37,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Aujard.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AujardDlg.h">
+    <ClInclude Include="AujardInstance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DBAgent.h">
@@ -52,7 +49,7 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StdAfx.h">
+    <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\shared-server\_USER_DATA.h">
@@ -66,10 +63,5 @@
     <Image Include="res\Aujard.ico">
       <Filter>Resource Files</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="res\Aujard.rc2">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
   </ItemGroup>
 </Project>

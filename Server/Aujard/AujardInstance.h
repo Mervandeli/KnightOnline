@@ -2,8 +2,8 @@
 
 #include "DBAgent.h"
 #include "Define.h"
-#include "Resource.h"
 
+#include <shared-server/AppThread.h>
 #include <shared-server/logger.h>
 #include <shared-server/SharedMemoryBlock.h>
 #include <shared-server/SharedMemoryQueue.h>
@@ -11,27 +11,18 @@
 
 using ItemtableArray = CSTLMap<model::Item>;
 
-namespace recordset_loader
-{
-	struct Error;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// CAujardDlg dialog
-
 class ReadQueueThread;
 class TimerThread;
-class CAujardDlg : public CDialog
+class AujardInstance : public AppThread
 {
-// Construction
 public:
-	static inline CAujardDlg* GetInstance() {
-		return _instance;
+	static AujardInstance* instance()
+	{
+		return static_cast<AujardInstance*>(s_instance);
 	}
 
-	/// \brief Updates the IDC_DB_PROCESS text with the DB Process Number
-	/// \note I'm not sure how practical this is under load
-	void DBProcessNumber(int number);
+	AujardInstance(logger::Logger& logger);
+	~AujardInstance();
 
 	/// \brief handles DB_HEARTBEAT requests
 	/// \see DB_HEARTBEAT
@@ -131,9 +122,6 @@ public:
 	/// \brief loads information needed from the ITEM table to a cache map
 	bool LoadItemTable();
 	
-	/// \brief writes a recordset_loader::Error to an error pop-up
-	void ReportTableLoadError(const recordset_loader::Error& err, const char* source);
-
 	/// \brief handles a WIZ_DATASAVE request
 	/// \see WIZ_DATASAVE
 	/// \see HandleUserUpdate()
@@ -149,17 +137,6 @@ public:
 	/// \see OnTimer(), HandleUserLogout()
 	void AllSaveRoutine();
 
-	/// \brief adds a message to the application's output box and updates scrollbar position
-	/// \see _outputList
-	void AddOutputMessage(const std::string& msg);
-
-	/// \brief adds a message to the application's output box and updates scrollbar position
-	/// \see _outputList
-	void AddOutputMessage(const std::wstring& msg);
-
-	CAujardDlg(CWnd* parent = nullptr);	// standard constructor
-	~CAujardDlg();
-
 	/// \brief initializes shared memory with other server applications
 	bool InitSharedMemory();
 
@@ -171,15 +148,7 @@ public:
 
 	ItemtableArray		ItemArray;
 
-	// Dialog Data
-	//{{AFX_DATA(CAujardDlg)
-	enum { IDD = IDD_AUJARD_DIALOG };
-	CStatic	    DBProcessNum;
-	//}}AFX_DATA
-
 protected:
-	static CAujardDlg*	_instance;
-
 	CDBAgent			_dbAgent;
 	SharedMemoryBlock	_userDataBlock;
 
@@ -189,18 +158,6 @@ protected:
 	int					_packetCount;		// packet의 수를 체크
 	int					_sendPacketCount;	// packet의 수를 체크
 	int					_recvPacketCount;	// packet의 수를 체크
-
-	HICON				_icon;
-
-	logger::Logger		_logger;
-
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CAujardDlg)
-
-	/// \brief destroys all resources associated with the dialog window
-	BOOL DestroyWindow() override;
-	
-	BOOL PreTranslateMessage(MSG* msg) override;
 
 protected:
 	/// \brief handles user logout functions
@@ -217,31 +174,9 @@ protected:
 	/// \see UserDataSave(), HandleUserLogout()
 	bool HandleUserUpdate(int userId, const _USER_DATA& user, uint8_t saveType);
 
-	/// \brief performs MFC data exchange
-	/// \see https://learn.microsoft.com/en-us/cpp/mfc/dialog-data-exchange?view=msvc-170
-	void DoDataExchange(CDataExchange* data) override;	// DDX/DDV support
-
-	//}}AFX_VIRTUAL
-
-	// Generated message map functions
-	//{{AFX_MSG(CAujardDlg)
-	BOOL OnInitDialog() override;
-	afx_msg void OnPaint();
-
-	/// \brief The system calls this to obtain the cursor to display while the user drags
-	///  the minimized window.
-	afx_msg HCURSOR OnQueryDragIcon();
-
-	/// \brief triggered when the Exit button is clicked. Will ask user to confirm intent to close the program.
-	void OnOK() override;
-	
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
+	bool OnStart() override;
 
 private:
-	/// \brief output message box for the application
-	CListBox							_outputList;
-										
 	time_t								_heartbeatReceivedTime;
 	std::unique_ptr<TimerThread>		_dbPoolCheckThread;
 	std::unique_ptr<TimerThread>		_heartbeatCheckThread;
@@ -250,6 +185,3 @@ private:
 										
 	std::unique_ptr<ReadQueueThread>	_readQueueThread;
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
