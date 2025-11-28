@@ -18,20 +18,15 @@
     <ClCompile Include="ItemManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ItemManagerDlg.cpp">
+    <ClCompile Include="ItemManagerInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="StdAfx.cpp">
+    <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ItemManagerReadQueueThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="ItemManager.rc">
-      <Filter>Source Files</Filter>
-    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -40,13 +35,13 @@
     <ClInclude Include="ItemManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ItemManagerDlg.h">
+    <ClInclude Include="ItemManagerInstance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StdAfx.h">
+    <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ItemManagerReadQueueThread.h">
@@ -59,8 +54,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="res\ItemManager.rc2">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
+    <ResourceCompile Include="ItemManager.rc" />
   </ItemGroup>
 </Project>
