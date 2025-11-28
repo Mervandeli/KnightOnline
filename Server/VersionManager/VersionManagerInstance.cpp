@@ -15,16 +15,10 @@ constexpr int WM_PROCESS_LISTBOX_QUEUE = WM_APP + 1;
 
 using namespace std::chrono_literals;
 
-VersionManagerInstance* VersionManagerInstance::s_instance = nullptr;
-
 VersionManagerInstance::VersionManagerInstance(logger::Logger& logger)
-	: Thread(),
-	_socketManager(SOCKET_BUFF_SIZE, SOCKET_BUFF_SIZE),
-	_logger(logger)
+	: AppThread(logger),
+	_socketManager(SOCKET_BUFF_SIZE, SOCKET_BUFF_SIZE)
 {
-	assert(s_instance == nullptr);
-	s_instance = this;
-
 	memset(_ftpUrl, 0, sizeof(_ftpUrl));
 	memset(_ftpPath, 0, sizeof(_ftpPath));
 	_lastVersion = 0;
@@ -63,9 +57,6 @@ VersionManagerInstance::~VersionManagerInstance()
 	spdlog::info("VersionManagerInstance::~VersionManagerInstance: All resources safely released.");
 
 	db::ConnectionManager::Destroy();
-
-	assert(s_instance != nullptr);
-	s_instance = nullptr;
 }
 
 bool VersionManagerInstance::OnStart()
@@ -109,18 +100,6 @@ bool VersionManagerInstance::OnStart()
 	_dbPoolCheckThread->start();
 
 	return true;
-}
-
-void VersionManagerInstance::thread_loop()
-{
-	if (!OnStart())
-		return;
-
-	while (_canTick)
-	{
-		std::unique_lock<std::mutex> lock(_mutex);
-		_cv.wait(lock);
-	}
 }
 
 bool VersionManagerInstance::GetInfoFromIni()

@@ -10,8 +10,7 @@
 
 #include "Extern.h"			// 전역 객체
 
-#include <shared/Thread.h>
-
+#include <shared-server/AppThread.h>
 #include <shared-server/logger.h>
 #include <shared-server/STLMap.h>
 
@@ -55,12 +54,12 @@ typedef std::list <int>						ZoneNpcInfoList;
 typedef std::vector <MAP*>					ZoneArray;
 
 class TimerThread;
-class AiServerInstance : public Thread
+class AiServerInstance : public AppThread
 {
 public:
 	static AiServerInstance* instance()
 	{
-		return s_instance;
+		return static_cast<AiServerInstance*>(s_instance);
 	}
 
 	void GameServerAcceptThread();
@@ -135,10 +134,7 @@ public:
 protected:
 	/// \brief Loads config, database caches, then starts sockets and thread pools.
 	/// \returns true when successful, false otherwise
-	bool OnStart();
-
-	/// \brief The main thread loop for the server instance
-	void thread_loop() override;
+	bool OnStart() override;
 
 	/// \brief attempts to listen on the port associated with m_byZone
 	/// \see m_byZone
@@ -159,11 +155,7 @@ private:
 
 	uint8_t				m_byZone;
 
-	AIServerLogger&		_logger;
-
 	std::unique_ptr<TimerThread>	_checkAliveThread;
-
-	static AiServerInstance* s_instance;
 
 	void StartNpcThreads();
 	bool LoadNpcPosTable(std::vector<model::NpcPos*>& rows);

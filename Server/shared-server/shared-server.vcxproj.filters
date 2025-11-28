@@ -28,6 +28,9 @@
       <Filter>Threads</Filter>
     </ClCompile>
     <ClCompile Include="utilities.cpp" />
+    <ClCompile Include="AppThread.cpp">
+      <Filter>Threads</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="server_config.h" />
@@ -63,6 +66,9 @@
     </ClInclude>
     <ClInclude Include="GeometricStructs.h" />
     <ClInclude Include="utilities.h" />
+    <ClInclude Include="AppThread.h">
+      <Filter>Threads</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="N3Base">

@@ -37,14 +37,9 @@ import AIServerBinder;
 
 using namespace db;
 
-AiServerInstance* AiServerInstance::s_instance = nullptr;
-
 AiServerInstance::AiServerInstance(AIServerLogger& logger)
-	: _logger(logger)
+	: AppThread(logger)
 {
-	assert(s_instance == nullptr);
-	s_instance = this;
-
 	m_iYear = 0;
 	m_iMonth = 0;
 	m_iDate = 0;
@@ -146,9 +141,6 @@ AiServerInstance::~AiServerInstance()
 	spdlog::info("AiServerInstance::~AiServerInstance: All resources safely released.");
 
 	ConnectionManager::Destroy();
-
-	assert(s_instance != nullptr);
-	s_instance = nullptr;
 }
 
 bool AiServerInstance::OnStart()
@@ -344,18 +336,6 @@ bool AiServerInstance::OnStart()
 	spdlog::info("AiServerInstance::OnStart: AIServer successfully initialized");
 
 	return true;
-}
-
-void AiServerInstance::thread_loop()
-{
-	if (!OnStart())
-		return;
-		
-	while (_canTick)
-	{
-		std::unique_lock<std::mutex> lock(_mutex);
-		_cv.wait(lock);
-	}
 }
 
 /// \brief attempts to listen on the port associated with m_byZone
