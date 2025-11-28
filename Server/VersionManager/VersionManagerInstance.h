@@ -3,9 +3,7 @@
 #include "Define.h"
 #include "DBProcess.h"
 
-#include <shared/Thread.h>
-
-#include <shared-server/logger.h>
+#include <shared-server/AppThread.h>
 #include <shared-server/SocketManager.h>
 
 #include <vector>
@@ -17,14 +15,14 @@ namespace recordset_loader
 }
 
 class TimerThread;
-class VersionManagerInstance : public Thread
+class VersionManagerInstance : public AppThread
 {
 	using ServerInfoList = std::vector<_SERVER_INFO*>;
 
 public:
 	static VersionManagerInstance* instance()
 	{
-		return s_instance;
+		return static_cast<VersionManagerInstance*>(s_instance);
 	}
 
 	const char* FtpUrl() const
@@ -57,10 +55,7 @@ public:
 protected:
 	/// \brief Loads config, database caches, then starts sockets and thread pools.
 	/// \returns true when successful, false otherwise
-	bool OnStart();
-
-	/// \brief The main thread loop for the server instance
-	void thread_loop() override;
+	bool OnStart() override;
 
 protected:
 	char			_ftpUrl[256];
@@ -68,9 +63,5 @@ protected:
 
 	int				_lastVersion;
 
-	logger::Logger&	_logger;
-
 	std::unique_ptr<TimerThread>	_dbPoolCheckThread;
-
-	static VersionManagerInstance* s_instance;
 };

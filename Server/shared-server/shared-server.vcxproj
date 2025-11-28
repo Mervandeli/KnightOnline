@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppThread.cpp" />
     <ClCompile Include="utilities.cpp" />
     <ClCompile Include="N3ShapeMgr.cpp" />
     <ClCompile Include="ReadQueueThread.cpp" />
@@ -156,6 +157,7 @@
     <ClCompile Include="TcpSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppThread.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="My_3DStruct.h" />
     <ClInclude Include="GeometricStructs.h" />
