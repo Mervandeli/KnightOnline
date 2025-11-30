@@ -21,7 +21,7 @@
 #define LIGHT_R				7
 #define DARKNESS_R			8
 
-class CEbenezerDlg;
+class EbenezerInstance;
 class CUser;
 
 class CMagicProcess
@@ -50,7 +50,7 @@ public:
 	CMagicProcess();
 	virtual ~CMagicProcess();
 
-	CEbenezerDlg*	m_pMain;
+	EbenezerInstance*	m_pMain;
 	CUser*			m_pSrcUser;
 
 	uint8_t	m_bMagicState;

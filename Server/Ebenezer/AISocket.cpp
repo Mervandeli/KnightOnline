@@ -1,10 +1,6 @@
-﻿// AISocket.cpp: implementation of the CAISocket class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
+﻿#include "pch.h"
 #include "AISocket.h"
-#include "EbenezerDlg.h"
+#include "EbenezerInstance.h"
 #include "Define.h"
 #include "Npc.h"
 #include "User.h"
@@ -17,16 +13,6 @@
 
 #include <spdlog/spdlog.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CAISocket::CAISocket(SocketManager* socketManager, int zoneNum)
 	: TcpClientSocket(socketManager)
 {
@@ -35,7 +21,7 @@ CAISocket::CAISocket(SocketManager* socketManager, int zoneNum)
 
 void CAISocket::Initialize()
 {
-	_main = (CEbenezerDlg*) AfxGetApp()->GetMainWnd();
+	_main = EbenezerInstance::instance();
 	_magicProcess.m_pMain = _main;
 
 	TcpClientSocket::Initialize();
@@ -121,8 +107,8 @@ int CAISocket::Send(char* pBuf, int length)
 {
 	constexpr int PacketHeaderSize = 6;
 
-	_ASSERT(length >= 0);
-	_ASSERT((length + PacketHeaderSize) <= MAX_PACKET_SIZE);
+	assert(length >= 0);
+	assert((length + PacketHeaderSize) <= MAX_PACKET_SIZE);
 
 	if (length < 0
 		|| (length + PacketHeaderSize) > MAX_PACKET_SIZE)
@@ -257,13 +243,11 @@ void CAISocket::LoginProcess(char* pBuf)
 	// zone 틀리면 에러 
 	if (zone == 0xff)
 	{
-		AfxMessageBox(_T("AI Server Version Fail!!"));
+		spdlog::error("AI Server Version Fail!!");
 	}
 	// 틀리면 에러 
 	else
 	{
-		std::wstring logstr = std::format(L"AIServer zone connected: {}", zone);
-		_main->AddOutputMessage(logstr);
 		spdlog::info("AISocket::LoginProcess: AIServer zone={} connected", zone);
 
 		if (byReConnect == 0)
@@ -336,15 +320,15 @@ void CAISocket::RecvServerInfo(char* pBuf)
 	else if (type == SERVER_INFO_END)
 	{
 		int16_t sTotalMonster = GetShort(pBuf, index);
-		std::wstring logStr = std::format(L"NPC info received for zoneId {}", byZone);
-		_main->AddOutputMessage(logStr);
+		spdlog::info("NPC info received for zoneId {}", byZone);
 		//Sleep(100);
 
 		_main->m_sZoneCount++;
 		
 		if (_main->m_sZoneCount == size)
 		{
-			_main->AddOutputMessage(_T("NPC info received for all zones"));
+			spdlog::info("NPC info received for all zones");
+
 			if (!_main->m_bFirstServerFlag)
 			{
 				_main->UserAcceptThread();
@@ -1359,14 +1343,14 @@ void CAISocket::RecvCompressedData(char* pBuf)
 		&decompressedBuffer[0],
 		sOrgLen);
 
-	_ASSERT(nDecompressedLength == sOrgLen);
+	assert(nDecompressedLength == sOrgLen);
 
 	if (nDecompressedLength != sOrgLen)
 		return;
 
 	dwActualCrcValue = crc32(&decompressedBuffer[0], sOrgLen);
 
-	_ASSERT(dwCrcValue == dwActualCrcValue);
+	assert(dwCrcValue == dwActualCrcValue);
 
 	if (dwCrcValue != dwActualCrcValue)
 		return;
@@ -1598,9 +1582,6 @@ void CAISocket::RecvBattleEvent(char* pBuf)
 				retvalue = _main->m_LoggerSendQueue.PutData(send_buff, send_index);
 				if (retvalue >= SMQ_FULL)
 				{
-					std::wstring logStr = std::format(L"WIZ_BATTLE_EVENT send fail [retValue={} type={}]",
-						retvalue, nType);
-					_main->AddOutputMessage(logStr);
 					spdlog::error("AISocket::RecvBattleEvent: WIZ_BATTLE_EVENT send fail [retValue={} type={}]",
 						retvalue, nType);
 				}

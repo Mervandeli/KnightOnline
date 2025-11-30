@@ -12,7 +12,6 @@
 #include <shared/lzf.h>
 #include <shared/globals.h>
 #include <shared/Ini.h>
-#include <shared/StringConversion.h>
 #include <shared/StringUtils.h>
 
 #include <spdlog/spdlog.h>
@@ -951,14 +950,18 @@ bool AiServerInstance::MapFileLoad()
 			ModelType row = {};
 			recordset.get_ref(row);
 
-			std::filesystem::path mapPath
-				= mapDir / row.Name;
+			std::filesystem::path mapPath = mapDir / row.Name;
+
+			// NOTE: spdlog is a C++11 library that doesn't support std::filesystem or std::u8string
+			// This just ensures the path is always explicitly UTF-8 in a cross-platform way.
+			std::u8string filenameUtf8 = mapPath.u8string();
+			std::string filename(filenameUtf8.begin(), filenameUtf8.end());
 
 			std::ifstream file(mapPath, std::ios::in | std::ios::binary);
 			if (!file)
 			{
 				spdlog::error("AiServerInstance::MapFileLoad: Failed to open file: {}",
-					mapPath.string());
+					filename);
 				return;
 			}
 
@@ -969,7 +972,7 @@ bool AiServerInstance::MapFileLoad()
 			if (!pMap->LoadMap(file))
 			{
 				spdlog::error("AiServerInstance::MapFileLoad: Failed to load map file: {}",
-					mapPath.string());
+					filename);
 				delete pMap;
 				return;
 			}
@@ -982,7 +985,7 @@ bool AiServerInstance::MapFileLoad()
 				if (!pMap->LoadRoomEvent(row.RoomEvent))
 				{
 					spdlog::error("AiServerInstance::MapFileLoad: LoadRoomEvent failed: {}",
-						mapPath.string());
+						filename);
 					delete pMap;
 					return;
 				}
@@ -1573,7 +1576,7 @@ void AiServerInstance::GetServerInfoIni()
 	inifile.Load(iniPath);
 
 	// logger setup
-	_logger.Setup(inifile, exePath.string());
+	_logger.Setup(inifile, exePath);
 	
 	m_byZone = inifile.GetInt("SERVER", "ZONE", 1);
 
@@ -1591,7 +1594,7 @@ void AiServerInstance::GetServerInfoIni()
 
 void AIServerLogger::SetupExtraLoggers(CIni& ini,
 	std::shared_ptr<spdlog::details::thread_pool> threadPool,
-	const std::string& baseDir)
+	const std::filesystem::path& baseDir)
 {
 	SetupExtraLogger(ini, threadPool, baseDir, logger::AIServerItem, ini::ITEM_LOG_FILE);
 	SetupExtraLogger(ini, threadPool, baseDir, logger::AIServerUser, ini::USER_LOG_FILE);

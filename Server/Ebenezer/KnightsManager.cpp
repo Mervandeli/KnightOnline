@@ -1,26 +1,13 @@
-﻿// KnightsManager.cpp: implementation of the CKnightsManager class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
+﻿#include "pch.h"
 #include "KnightsManager.h"
 #include "User.h"
 #include "GameDefine.h"
-#include "EbenezerDlg.h"
+#include "EbenezerInstance.h"
 #include "db_resources.h"
 
+#include <shared/DateTime.h>
 #include <shared/packets.h>
 #include <spdlog/spdlog.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CKnightsManager::CKnightsManager()
 {
@@ -92,7 +79,7 @@ void CKnightsManager::CreateKnights(CUser* pUser, char* pBuf)
 {
 	int index = 0, send_index = 0, idlen = 0, knightindex = 0, ret_value = 3, week = 0;
 	char idname[MAX_ID_SIZE + 1] = {};
-	CTime time = CTime::GetCurrentTime();
+	DateTime time = DateTime::GetNow();
 
 	char send_buff[256] = {};
 

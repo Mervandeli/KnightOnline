@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+﻿#include "pch.h"
 #include "TimerThread.h"
 
 #include <spdlog/spdlog.h>

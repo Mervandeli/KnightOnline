@@ -1,16 +1,17 @@
-﻿#include "StdAfx.h"
+﻿#include "pch.h"
 #include "EbenezerReadQueueThread.h"
-#include "EbenezerDlg.h"
+#include "EbenezerInstance.h"
 #include "User.h"
 
-EbenezerReadQueueThread::EbenezerReadQueueThread(CEbenezerDlg* main)
-	: ReadQueueThread(main->m_LoggerRecvQueue),
-	_main(main)
+EbenezerReadQueueThread::EbenezerReadQueueThread()
+	: ReadQueueThread(EbenezerInstance::instance()->m_LoggerRecvQueue)
 {
 }
 
 void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 {
+	EbenezerInstance* appInstance = EbenezerInstance::instance();
+
 	int index = 0, uid = -1, send_index = 0, buff_length = 0;
 	uint8_t command, result;
 	char send_buff[1024] = {};
@@ -23,11 +24,11 @@ void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 	if (command == (KNIGHTS_ALLLIST_REQ + 0x10)
 		&& uid == -1)
 	{
-		_main->m_KnightsManager.RecvKnightsAllList(buffer + index);
+		appInstance->m_KnightsManager.RecvKnightsAllList(buffer + index);
 		return;
 	}
 
-	pUser = _main->GetUserPtr(uid);
+	pUser = appInstance->GetUserPtr(uid);
 	if (pUser == nullptr)
 		return;
 
@@ -82,7 +83,7 @@ void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 			if (pUser != nullptr
 				&& strlen(pUser->m_pUserData->m_id) != 0)
 			{
-				spdlog::debug("EbenezerDlg::ReadQueueThread: WIZ_LOGOUT [charId={}]",
+				spdlog::debug("EbenezerInstance::ReadQueueThread: WIZ_LOGOUT [charId={}]",
 					pUser->m_pUserData->m_id);
 				pUser->Close();
 			}
@@ -103,7 +104,7 @@ void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 		case KNIGHTS_STASH + 0x10:
 		case KNIGHTS_LIST_REQ + 0x10:
 		case KNIGHTS_ALLLIST_REQ + 0x10:
-			_main->m_KnightsManager.ReceiveKnightsProcess(pUser, buffer + index, command);
+			appInstance->m_KnightsManager.ReceiveKnightsProcess(pUser, buffer + index, command);
 			break;
 
 		case DB_LOGIN_INFO:

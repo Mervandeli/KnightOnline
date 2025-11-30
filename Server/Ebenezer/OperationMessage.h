@@ -4,12 +4,12 @@
 #include <string>
 #include <string_view>
 
-class CEbenezerDlg;
+class EbenezerInstance;
 class CUser;
 class OperationMessage
 {
 public:
-	OperationMessage(CEbenezerDlg* main, CUser* srcUser);
+	OperationMessage(EbenezerInstance* main, CUser* srcUser);
 	bool Process(const std::string_view command);
 
 protected:
@@ -89,6 +89,8 @@ protected:
 	void ItemDown();
 	void ItemDownReset();
 	void ChallengeStop();
+	void Permanent();
+	void OffPermanent();
 
 	bool ParseCommand(const std::string_view command, size_t& key);
 
@@ -99,7 +101,7 @@ protected:
 	const std::string& ParseString(size_t argIndex) const;
 
 protected:
-	CEbenezerDlg* _main;
+	EbenezerInstance* _main;
 	CUser* _srcUser;
 	std::string _command;
 	std::vector<std::string> _args;

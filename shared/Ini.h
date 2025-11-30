@@ -1,29 +1,42 @@
 ﻿#pragma once
 
-#include <map>
-#include <string_view>
-#include <string>
+#include <algorithm>
 #include <filesystem>
+#include <map>
+#include <string>
+#include <string_view>
 
 class CIni
 {
 protected:
 	struct ci_less
 	{
-		inline bool operator() (const std::wstring& str1, const std::wstring& str2) const {
-			return _wcsicmp(str1.c_str(), str2.c_str()) < 0;
+		using is_transparent = void;
+
+		bool operator()(std::string_view lhs, std::string_view rhs) const
+		{
+			const size_t minLength = (std::min)(lhs.size(), rhs.size()); // NOTE: allow for Windows.h defining min
+			for (size_t i = 0; i < minLength; i++)
+			{
+				int a = std::tolower(lhs[i]);
+				int b = std::tolower(rhs[i]);
+				if (a != b)
+					return a < b;
+			}
+
+			return lhs.length() < rhs.length();
 		}
 	};
 
-	std::wstring m_szPath;
+	std::filesystem::path _path;
 
 	// Defines key/value pairs within sections
-	using ConfigEntryMap = std::map<std::wstring, std::wstring, ci_less>;
+	using ConfigEntryMap = std::map<std::string, std::string, ci_less>;
 
 	// Defines the sections containing the key/value pairs
-	using ConfigMap = std::map<std::wstring, ConfigEntryMap, ci_less>;
+	using ConfigMap = std::map<std::string, ConfigEntryMap, ci_less>;
 
-	ConfigMap m_configMap;
+	ConfigMap _configMap;
 
 public:
 	CIni() = default;
@@ -35,21 +48,11 @@ public:
 	void Save();
 	void Save(const std::filesystem::path& path);
 
-	int GetInt(std::string_view szAppName, std::string_view szKeyName, const int iDefault);
-	int GetInt(std::wstring_view szAppName, std::wstring_view szKeyName, const int iDefault);
+	int GetInt(std::string_view svAppName, std::string_view svKeyName, const int iDefault);
+	bool GetBool(std::string_view svAppName, std::string_view svKeyName, const bool bDefault);
+	std::string GetString(std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault);
+	void GetString(std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault, char* szOutBuffer, size_t nBufferLength);
 
-	bool GetBool(std::string_view szAppName, std::string_view szKeyName, const bool bDefault);
-	bool GetBool(std::wstring_view szAppName, std::wstring_view szKeyName, const bool bDefault);
-
-	std::string GetString(std::string_view szAppName, std::string_view szKeyName, std::string_view szDefault);
-	std::wstring GetString(std::wstring_view szAppName, std::wstring_view szKeyName, std::wstring_view szDefault);
-
-	void GetString(std::string_view szAppName, std::string_view szKeyName, std::string_view szDefault, char* szOutBuffer, size_t nBufferLength);
-	void GetString(std::wstring_view szAppName, std::wstring_view szKeyName, std::wstring_view szDefault, wchar_t* szOutBuffer, size_t nBufferLength);
-
-	int SetInt(std::string_view szAppName, std::string_view szKeyName, const int iDefault);
-	int SetInt(std::wstring_view szAppName, std::wstring_view szKeyName, const int iDefault);
-
-	int SetString(std::string_view szAppName, std::string_view szKeyName, std::string_view szDefault);
-	int SetString(std::wstring_view szAppName, std::wstring_view szKeyName, std::wstring_view szDefault);
+	int SetInt(std::string_view svAppName, std::string_view svKeyName, const int iDefault);
+	int SetString(std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault);
 };

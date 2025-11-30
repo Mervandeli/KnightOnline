@@ -46,6 +46,7 @@
   <ItemGroup>
     <ClInclude Include="AVIPlayer.h" />
     <ClInclude Include="BitMapFile.h" />
+    <ClInclude Include="DebugUtils.h" />
     <ClInclude Include="DFont.h" />
     <ClInclude Include="LogWriter.h" />
     <ClInclude Include="My_3DStruct.h" />
@@ -137,6 +138,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BitMapFile.cpp" />
+    <ClCompile Include="DebugUtils.cpp" />
     <ClCompile Include="DFont.cpp" />
     <ClCompile Include="LogWriter.cpp" />
     <ClCompile Include="N3AlphaPrimitiveManager.cpp" />

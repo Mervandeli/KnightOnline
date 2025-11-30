@@ -1,22 +1,7 @@
-﻿// GameEvent.cpp: implementation of the CGameEvent class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
-#include "ebenezer.h"
+﻿#include "pch.h"
 #include "GameEvent.h"
 #include "User.h"
 #include "GameDefine.h"
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CGameEvent::CGameEvent()
 {

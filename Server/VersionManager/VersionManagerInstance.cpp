@@ -114,7 +114,7 @@ bool VersionManagerInstance::GetInfoFromIni()
 	ini.GetString(ini::DOWNLOAD, ini::PATH, "/", _ftpPath, _countof(_ftpPath));
 
 	// configure logger
-	_logger.Setup(ini, exePath.string());
+	_logger.Setup(ini, exePath);
 	
 	// TODO: KN_online should be Knight_Account
 	std::string datasourceName = ini.GetString(ini::ODBC, ini::DSN, "KN_online");

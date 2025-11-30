@@ -1,7 +1,8 @@
 ﻿#pragma once
 
-#include <string>
+#include <filesystem>
 #include <memory>
+#include <string>
 
 // forward declarations
 class CIni;
@@ -9,6 +10,11 @@ class CIni;
 namespace spdlog::details
 {
 	class thread_pool;
+}
+
+namespace ftxui
+{
+	class sink_mt;
 }
 
 namespace logger
@@ -21,21 +27,26 @@ namespace logger
 		static constexpr uint8_t ThreadPoolSize = 1;
 
 	public:
+		std::shared_ptr<ftxui::sink_mt> fxtuiSink()
+		{
+			return _fxtuiSink;
+		}
+
 		/// \param appName application name (VersionManager, Aujard, AIServer, Ebenezer)
 		Logger(const std::string& appName);
 
 		/// \brief Sets up spdlog from an ini file using standardized server settings
 		/// \param ini server application's ini file (already loaded)
 		/// \param baseDir base directory to store logs folder under
-		void Setup(CIni& ini, const std::string& baseDir);
+		void Setup(CIni& ini, const std::filesystem::path& baseDir);
 
 		virtual void SetupExtraLoggers(CIni& ini,
 			std::shared_ptr<spdlog::details::thread_pool> threadPool,
-			const std::string& baseDir);
+			const std::filesystem::path& baseDir);
 
 		void SetupExtraLogger(CIni& ini,
 			std::shared_ptr<spdlog::details::thread_pool> threadPool,
-			const std::string& baseDir,
+			const std::filesystem::path& baseDir,
 			const std::string& appName, const std::string& logFileConfigProp);
 
 		virtual ~Logger();
@@ -43,6 +54,8 @@ namespace logger
 	protected:
 		std::string _appName;
 		std::string _defaultLogPath;
+
+		std::shared_ptr<ftxui::sink_mt> _fxtuiSink;
 	};
 
 	//

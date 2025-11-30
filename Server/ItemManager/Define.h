@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <shared/globals.h>
-#include <shared/StringConversion.h>
 
 // DEFINE Shared Memory Costumizing
 

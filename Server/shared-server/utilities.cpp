@@ -1,8 +1,6 @@
 ﻿#include "pch.h"
 #include "utilities.h"
 
-#include <shared/StringConversion.h>
-
 bool CheckGetVarString(int nLength, char* tBuf, const char* sBuf, int nSize, int& index)
 {
 	int nRet = GetVarString(tBuf, sBuf, nSize, index);

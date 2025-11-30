@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 class CUser;
-class CEbenezerDlg;
+class EbenezerInstance;
 class CKnightsManager
 {
 public:
@@ -42,7 +42,7 @@ public:
 	CKnightsManager();
 	virtual ~CKnightsManager();
 
-	CEbenezerDlg* m_pMain;
+	EbenezerInstance* m_pMain;
 //	CDatabase	m_KnightsDB;
 private:
 

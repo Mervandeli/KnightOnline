@@ -11,12 +11,12 @@
 
 #include "define.h"
 
-class CEbenezerDlg;
+class EbenezerInstance;
 
 class CNpc
 {
 public:
-	CEbenezerDlg* m_pMain;
+	EbenezerInstance* m_pMain;
 
 	/// \brief Serial number of NPC (server-side) || NPC (서버상의)일련번호
 	int16_t	m_sNid;

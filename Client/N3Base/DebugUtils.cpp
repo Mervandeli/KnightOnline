@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+﻿#include "StdAfxBase.h"
 #include <stdarg.h>
 
 void FormattedDebugString(const char* fmt, ...)

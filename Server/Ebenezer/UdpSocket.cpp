@@ -1,11 +1,7 @@
-﻿// UdpSocket.cpp: implementation of the CUdpSocket class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
+﻿#include "pch.h"
 #include "UdpSocket.h"
 #include "Define.h"
-#include "EbenezerDlg.h"
+#include "EbenezerInstance.h"
 #include "Knights.h"
 #include "User.h"
 #include "db_resources.h"
@@ -13,17 +9,7 @@
 #include <shared/packets.h>
 #include <spdlog/spdlog.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
-CUdpSocket::CUdpSocket(CEbenezerDlg* main)
+CUdpSocket::CUdpSocket(EbenezerInstance* main)
 	: _recvUdpThread(this),
 	_socket(_io)	
 {
@@ -238,8 +224,8 @@ void CUdpSocket::ServerChat(char* pBuf)
 		return;
 
 	GetString(chatstr, pBuf, chatlen, index);
-	
-	_main->AddOutputMessage(chatstr);
+
+	spdlog::info("UdpSocket::ServerChat: {}", chatstr);
 }
 
 void CUdpSocket::RecvBattleEvent(char* pBuf)

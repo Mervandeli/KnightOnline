@@ -56,6 +56,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fetch-boost", "deps\fetch-a
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fetch-djb2", "deps\fetch-and-build-wrappers\fetch-djb2.vcxproj", "{9E410F3D-EF94-41FA-A373-B2136D5F3D1E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fetch-FTXUI", "deps\fetch-and-build-wrappers\fetch-FTXUI.vcxproj", "{418A7A17-10EC-4159-8D0F-CC49BAF6EC35}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -122,6 +124,10 @@ Global
 		{9E410F3D-EF94-41FA-A373-B2136D5F3D1E}.Debug|Win32.Build.0 = Debug|Win32
 		{9E410F3D-EF94-41FA-A373-B2136D5F3D1E}.Release|Win32.ActiveCfg = Release|Win32
 		{9E410F3D-EF94-41FA-A373-B2136D5F3D1E}.Release|Win32.Build.0 = Release|Win32
+		{418A7A17-10EC-4159-8D0F-CC49BAF6EC35}.Debug|Win32.ActiveCfg = Debug|Win32
+		{418A7A17-10EC-4159-8D0F-CC49BAF6EC35}.Debug|Win32.Build.0 = Debug|Win32
+		{418A7A17-10EC-4159-8D0F-CC49BAF6EC35}.Release|Win32.ActiveCfg = Release|Win32
+		{418A7A17-10EC-4159-8D0F-CC49BAF6EC35}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -136,6 +142,7 @@ Global
 		{98F92112-9EC7-4F20-A6C3-A0346ACB271C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{1B69C1F8-B156-4BCA-AAD3-168FB37B08CF} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{9E410F3D-EF94-41FA-A373-B2136D5F3D1E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{418A7A17-10EC-4159-8D0F-CC49BAF6EC35} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D9937074-3E07-4102-9EF1-BE6E87CF35E4}

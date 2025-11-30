@@ -1,13 +1,11 @@
-﻿// EbenezerDlg.cpp : implementation file
-//
-
-#include "stdafx.h"
-#include "EbenezerDlg.h"
+﻿#include "pch.h"
+#include "EbenezerInstance.h"
 #include "OperationMessage.h"
 #include "User.h"
 #include "db_resources.h"
 
 #include <shared/crc32.h>
+#include <shared/DateTime.h>
 #include <shared/lzf.h>
 #include <shared/packets.h>
 #include <shared/StringUtils.h>
@@ -16,17 +14,10 @@
 
 #include <fstream>
 
-constexpr int WM_PROCESS_LISTBOX_QUEUE = WM_APP + 1;
 constexpr int MAX_SMQ_SEND_QUEUE_RETRY_COUNT = 50;
 
 constexpr int NUM_FLAG_VICTORY    = 4;
 constexpr int AWARD_GOLD          = 5000;
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 // NOTE: Explicitly handled under DEBUG_NEW override
 #include "EbenezerReadQueueThread.h"
@@ -41,23 +32,14 @@ using namespace std::chrono_literals;
 
 std::recursive_mutex g_region_mutex;
 
-CEbenezerDlg* CEbenezerDlg::s_pInstance = nullptr;
-
 uint16_t g_increase_serial = 1;
 bool g_serverdown_flag = false;
 
-/////////////////////////////////////////////////////////////////////////////
-// CEbenezerDlg dialog
-
-CEbenezerDlg::CEbenezerDlg(CWnd* pParent /*=nullptr*/)
-	: CDialog(CEbenezerDlg::IDD, pParent),
-	m_LoggerSendQueue(MAX_SMQ_SEND_QUEUE_RETRY_COUNT), m_ItemLoggerSendQ(MAX_SMQ_SEND_QUEUE_RETRY_COUNT)
+EbenezerInstance::EbenezerInstance(EbenezerLogger& logger)
+	: AppThread(logger),
+	m_LoggerSendQueue(MAX_SMQ_SEND_QUEUE_RETRY_COUNT),
+	m_ItemLoggerSendQ(MAX_SMQ_SEND_QUEUE_RETRY_COUNT)
 {
-	//{{AFX_DATA_INIT(CEbenezerDlg)
-	//}}AFX_DATA_INIT
-	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-
 	m_nYear = 0;
 	m_nMonth = 0;
 	m_nDate = 0;
@@ -146,64 +128,110 @@ CEbenezerDlg::CEbenezerDlg(CWnd* pParent /*=nullptr*/)
 
 	_gameTimeThread = std::make_unique<TimerThread>(
 		6s,
-		std::bind(&CEbenezerDlg::GameTimeTick, this));
+		std::bind(&EbenezerInstance::GameTimeTick, this));
 
 	_smqHeartbeatThread = std::make_unique<TimerThread>(
 		10s,
-		std::bind(&CEbenezerDlg::SendSMQHeartbeat, this));
+		std::bind(&EbenezerInstance::SendSMQHeartbeat, this));
 
 	_aliveTimeThread = std::make_unique<TimerThread>(
 		34s, // NOTE: oddly specific time which they preserved in newer builds
-		std::bind(&CEbenezerDlg::CheckAliveUser, this));
+		std::bind(&EbenezerInstance::CheckAliveUser, this));
 
 	_marketBBSTimeThread = std::make_unique<TimerThread>(
 		5min,
-		std::bind(&CEbenezerDlg::MarketBBSTimeCheck, this));
+		std::bind(&EbenezerInstance::MarketBBSTimeCheck, this));
 
 	_packetCheckThread = std::make_unique<TimerThread>(
 		6min,
-		std::bind(&CEbenezerDlg::WritePacketLog, this));
+		std::bind(&EbenezerInstance::WritePacketLog, this));
 
-	_readQueueThread = std::make_unique<EbenezerReadQueueThread>(this);
+	_readQueueThread = std::make_unique<EbenezerReadQueueThread>();
 }
 
-CEbenezerDlg::~CEbenezerDlg()
+EbenezerInstance::~EbenezerInstance()
 {
+	spdlog::info("EbenezerInstance::~EbenezerInstance: Shutting down, releasing resources.");
+
+	// wait for all of these threads to be fully shut down.
+	spdlog::info("EbenezerInstance::~EbenezerInstance: Waiting for worker threads to fully shut down.");
+
+	if (_gameTimeThread != nullptr)
+	{
+		spdlog::info("EbenezerInstance::~EbenezerInstance: Shutting down game time thread...");
+
+		_gameTimeThread->shutdown();
+
+		spdlog::info("EbenezerInstance::~EbenezerInstance: game time thread stopped.");
+	}
+
+	if (_smqHeartbeatThread != nullptr)
+	{
+		spdlog::info("EbenezerInstance::~EbenezerInstance: Shutting down shared memory queue heartbeat thread...");
+
+		_smqHeartbeatThread->shutdown();
+
+		spdlog::info("EbenezerInstance::~EbenezerInstance: shared memory queue heartbeat stopped.");
+	}
+
+	if (_aliveTimeThread != nullptr)
+	{
+		spdlog::info("EbenezerInstance::~EbenezerInstance: Shutting down alive time thread...");
+
+		_aliveTimeThread->shutdown();
+
+		spdlog::info("EbenezerInstance::~EbenezerInstance: alive time thread stopped.");
+	}
+
+	if (_marketBBSTimeThread != nullptr)
+	{
+		spdlog::info("EbenezerInstance::~EbenezerInstance: Shutting down market BBS time thread...");
+
+		_marketBBSTimeThread->shutdown();
+
+		spdlog::info("EbenezerInstance::~EbenezerInstance: market BBS time thread stopped.");
+	}
+
+	if (_packetCheckThread != nullptr)
+	{
+		spdlog::info("EbenezerInstance::~EbenezerInstance: Shutting down packet check thread...");
+
+		_packetCheckThread->shutdown();
+
+		spdlog::info("EbenezerInstance::~EbenezerInstance: packet check thread stopped.");
+	}
+
+	if (_readQueueThread != nullptr)
+	{
+		spdlog::info("EbenezerInstance::~EbenezerInstance: Shutting down ReadQueueThread...");
+
+		_readQueueThread->shutdown();
+
+		spdlog::info("EbenezerInstance::~EbenezerInstance: ReadQueueThread stopped.");
+	}
+
+	delete m_pUdpSocket;
+	m_pUdpSocket = nullptr;
+
+	_socketManager.Shutdown();
+
+	spdlog::info("EbenezerInstance::~EbenezerInstance: SocketManager stopped.");
+
+	for (C3DMap* pMap : m_ZoneArray)
+		delete pMap;
+	m_ZoneArray.clear();
+
+	for (model::LevelUp* pLevelUp : m_LevelUpTableArray)
+		delete pLevelUp;
+	m_LevelUpTableArray.clear();
+
+	spdlog::info("EbenezerInstance::~EbenezerInstance: All resources safely released.");
+
 	ConnectionManager::Destroy();
 }
 
-void CEbenezerDlg::DoDataExchange(CDataExchange* pDX)
+bool EbenezerInstance::OnStart()
 {
-	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CEbenezerDlg)
-	DDX_Control(pDX, IDC_GONGJI_EDIT, m_AnnounceEdit);
-	DDX_Control(pDX, IDC_LIST1, _outputList);
-	//}}AFX_DATA_MAP
-}
-
-BEGIN_MESSAGE_MAP(CEbenezerDlg, CDialog)
-	//{{AFX_MSG_MAP(CEbenezerDlg)
-	ON_WM_SYSCOMMAND()
-	ON_WM_PAINT()
-	ON_WM_QUERYDRAGICON()
-	ON_MESSAGE(WM_PROCESS_LISTBOX_QUEUE, &CEbenezerDlg::OnProcessListBoxQueue)
-	//}}AFX_MSG_MAP
-END_MESSAGE_MAP()
-
-/////////////////////////////////////////////////////////////////////////////
-// CEbenezerDlg message handlers
-
-BOOL CEbenezerDlg::OnInitDialog()
-{
-	CDialog::OnInitDialog();
-
-	s_pInstance = this;
-
-	// Set the icon for this dialog.  The framework does this automatically
-	//  when the application's main window is not a dialog
-	SetIcon(m_hIcon, TRUE);			// Set big icon
-	SetIcon(m_hIcon, FALSE);		// Set small icon
-
 	srand(static_cast<uint32_t>(time(nullptr)));
 
 	// Compress Init
@@ -231,225 +259,181 @@ BOOL CEbenezerDlg::OnInitDialog()
 	_ZONE_SERVERINFO* pInfo = m_ServerArray.GetData(m_nServerNo);
 	if (pInfo == nullptr)
 	{
-		AfxMessageBox(_T("No Listen Port!!"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("No Listen Port!!");
+		return false;
 	}
 
 	if (!_socketManager.Listen(pInfo->sPort))
 	{
-		AfxMessageBox(_T("FAIL TO CREATE LISTEN STATE"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("FAIL TO CREATE LISTEN STATE");
+		return false;
 	}
 
-	AddOutputMessage(fmt::format("Listening on 0.0.0.0:{} - not accepting user connections yet",
-		pInfo->sPort));
+	spdlog::info("Listening on 0.0.0.0:{} - not accepting user connections yet",
+		pInfo->sPort);
 
 	if (!InitializeMMF())
 	{
-		AfxMessageBox(_T("Main Shared Memory Initialize Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("Main Shared Memory Initialize Fail");
+		return false;
 	}
 
 	if (!m_LoggerSendQueue.OpenOrCreate(SMQ_LOGGERSEND))
 	{
-		AfxMessageBox(_T("SMQ Send Shared Memory Initialize Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("SMQ Send Shared Memory Initialize Fail");
+		return false;
 	}
 
 	if (!m_LoggerRecvQueue.OpenOrCreate(SMQ_LOGGERRECV))
 	{
-		AfxMessageBox(_T("SMQ Recv Shared Memory Initialize Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("SMQ Recv Shared Memory Initialize Fail");
+		return false;
 	}
 
 	if (!m_ItemLoggerSendQ.OpenOrCreate(SMQ_ITEMLOGGER))
 	{
-		AfxMessageBox(_T("SMQ ItemLog Shared Memory Initialize Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("SMQ ItemLog Shared Memory Initialize Fail");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading ITEM table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading ITEM table");
 	if (!LoadItemTable())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache ITEM table, closing");
-		AfxMessageBox(_T("ItemTable Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache ITEM table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading MAGIC table");
 	if (!LoadMagicTable())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC table, closing");
-		AfxMessageBox(_T("MagicTable Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache MAGIC table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE1 table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading MAGIC_TYPE1 table");
 	if (!LoadMagicType1())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE1 table, closing");
-		AfxMessageBox(_T("MagicType1 Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache MAGIC_TYPE1 table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE2 table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading MAGIC_TYPE2 table");
 	if (!LoadMagicType2())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE2 table, closing");
-		AfxMessageBox(_T("MagicType2 Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache MAGIC_TYPE2 table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE3 table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading MAGIC_TYPE3 table");
 	if (!LoadMagicType3())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE3 table, closing");
-		AfxMessageBox(_T("MagicType3 Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache MAGIC_TYPE3 table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE4 table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading MAGIC_TYPE4 table");
 	if (!LoadMagicType4())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE4 table, closing");
-		AfxMessageBox(_T("MagicType4 Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache MAGIC_TYPE4 table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE5 table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading MAGIC_TYPE5 table");
 	if (!LoadMagicType5())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE5 table, closing");
-		AfxMessageBox(_T("MagicType5 Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache MAGIC_TYPE5 table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE7 table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading MAGIC_TYPE7 table");
 	if (!LoadMagicType7())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE7 table, closing");
-		AfxMessageBox(_T("MagicType7 Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache MAGIC_TYPE7 table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading MAGIC_TYPE8 table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading MAGIC_TYPE8 table");
 	if (!LoadMagicType8())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache MAGIC_TYPE8 table, closing");
-		AfxMessageBox(_T("MagicType8 Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache MAGIC_TYPE8 table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading COEFFICIENT table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading COEFFICIENT table");
 	if (!LoadCoefficientTable())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache COEFFICIENT table, closing");
-		AfxMessageBox(_T("COEFFICIENT Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache COEFFICIENT table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading LEVEL_UP table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading LEVEL_UP table");
 	if (!LoadLevelUpTable())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache LEVEL_UP table, closing");
-		AfxMessageBox(_T("LevelUpTable Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache LEVEL_UP table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading KNIGHTS table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading KNIGHTS table");
 	if (!LoadAllKnights())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache KNIGHTS table, closing");
-		AfxMessageBox(_T("KnightsData Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache KNIGHTS table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading KNIGHTS_USER table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading KNIGHTS_USER table");
 	if (!LoadAllKnightsUserData())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache KNIGHTS_USER table, closing");
-		AfxMessageBox(_T("LoadAllKnightsUserData Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache KNIGHTS_USER table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading KNIGHTS_SIEGE_WARFARE table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading KNIGHTS_SIEGE_WARFARE table");
 	if (!LoadKnightsSiegeWarfareTable())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache KNIGHTS_SIEGE_WARFARE table, closing");
-		AfxMessageBox(_T("LoadKnightsSiegeWarfareTable Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache KNIGHTS_SIEGE_WARFARE table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading HOME table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading HOME table");
 	if (!LoadHomeTable())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache HOME table, closing");
-		AfxMessageBox(_T("LoadHomeTable Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache HOME table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading START_POSITION table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading START_POSITION table");
 	if (!LoadStartPositionTable())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache START_POSITION table, closing");
-		AfxMessageBox(_T("LoadStartPositionTable Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache START_POSITION table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading BATTLE table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading BATTLE table");
 	if (!LoadBattleTable())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache BATTLE table, closing");
-		AfxMessageBox(_T("LoadBattleTable Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache BATTLE table, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading SERVER_RESOURCE table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading SERVER_RESOURCE table");
 	if (!LoadServerResourceTable())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache SERVER_RESOURCE, closing");
-		AfxMessageBox(_T("LoadServerResourceTable Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache SERVER_RESOURCE, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading EVENT_TRIGGER table");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading EVENT_TRIGGER table");
 	if (!LoadEventTriggerTable())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to cache EVENT_TRIGGER, closing");
-		AfxMessageBox(_T("LoadEventTriggerTable Load Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to cache EVENT_TRIGGER, closing");
+		return false;
 	}
 
-	spdlog::info("EbenezerDlg::OnInitDialog: loading maps");
+	spdlog::info("EbenezerInstance::OnInitDialog: loading maps");
 	if (!MapFileLoad())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to load maps, closing");
-		AfxPostQuitMessage(0);
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to load maps, closing");
+		return false;
 	}
 
 	LoadNoticeData();
@@ -457,17 +441,15 @@ BOOL CEbenezerDlg::OnInitDialog()
 	m_pUdpSocket = new CUdpSocket(this);
 	if (!m_pUdpSocket->CreateSocket())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to create UDP socket");
-		AfxMessageBox(_T("Udp Socket Create Fail"));
-		AfxPostQuitMessage(0);
-		return FALSE;
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to create UDP socket");
+		return false;
 	}
 
 	if (!AIServerConnect())
 	{
-		spdlog::error("EbenezerDlg::OnInitDialog: failed to connect to the AIServer");
+		spdlog::error("EbenezerInstance::OnInitDialog: failed to connect to the AIServer");
 #ifndef _DEBUG
-		AfxPostQuitMessage(0);
+		return false;
 #endif
 	}
 
@@ -486,122 +468,18 @@ BOOL CEbenezerDlg::OnInitDialog()
 
 	_readQueueThread->start();
 
-	CTime cur = CTime::GetCurrentTime();
-	std::wstring starttime = std::format(L"Ebenezer started: {:02}/{:02} {:02}:{:02}",
-		cur.GetMonth(), cur.GetDay(), cur.GetHour(), cur.GetMinute());
-	AddOutputMessage(starttime);
-	spdlog::info("EbenezerDlg::OnInitDialog: successfully initialized");
+	spdlog::info("EbenezerInstance::OnInitDialog: successfully initialized");
 
 	return TRUE;
 }
 
-void CEbenezerDlg::OnSysCommand(UINT nID, LPARAM lParam)
-{
-	CDialog::OnSysCommand(nID, lParam);
-}
-
-// If you add a minimize button to your dialog, you will need the code below
-//  to draw the icon.  For MFC applications using the document/view model,
-//  this is automatically done for you by the framework.
-
-void CEbenezerDlg::OnPaint()
-{
-	if (IsIconic())
-	{
-		CPaintDC dc(this); // device context for painting
-
-		SendMessage(WM_ICONERASEBKGND, (WPARAM) dc.GetSafeHdc(), 0);
-
-		// Center icon in client rectangle
-		int cxIcon = GetSystemMetrics(SM_CXICON);
-		int cyIcon = GetSystemMetrics(SM_CYICON);
-		CRect rect;
-		GetClientRect(&rect);
-		int x = (rect.Width() - cxIcon + 1) / 2;
-		int y = (rect.Height() - cyIcon + 1) / 2;
-
-		// Draw the icon
-		dc.DrawIcon(x, y, m_hIcon);
-	}
-	else
-	{
-		CDialog::OnPaint();
-	}
-}
-
-// The system calls this to obtain the cursor to display while the user drags
-//  the minimized window.
-HCURSOR CEbenezerDlg::OnQueryDragIcon()
-{
-	return (HCURSOR) m_hIcon;
-}
-
-BOOL CEbenezerDlg::DestroyWindow()
-{
-	if (_gameTimeThread != nullptr)
-		_gameTimeThread->shutdown();
-
-	if (_smqHeartbeatThread != nullptr)
-		_smqHeartbeatThread->shutdown();
-
-	if (_aliveTimeThread != nullptr)
-		_aliveTimeThread->shutdown();
-
-	if (_marketBBSTimeThread != nullptr)
-		_marketBBSTimeThread->shutdown();
-
-	if (_packetCheckThread != nullptr)
-		_packetCheckThread->shutdown();
-
-	delete m_pUdpSocket;
-	m_pUdpSocket = nullptr;
-
-	_socketManager.Shutdown();
-
-	if (_readQueueThread != nullptr)
-		_readQueueThread->shutdown();
-
-	m_ItemTableMap.DeleteAllData();
-	m_MagicTableMap.DeleteAllData();
-	m_MagicType1TableMap.DeleteAllData();
-	m_MagicType2TableMap.DeleteAllData();
-	m_MagicType3TableMap.DeleteAllData();
-	m_MagicType4TableMap.DeleteAllData();
-	m_MagicType5TableMap.DeleteAllData();
-	m_MagicType7TableMap.DeleteAllData();
-	m_MagicType8TableMap.DeleteAllData();
-	m_NpcMap.DeleteAllData();
-	m_AISocketMap.DeleteAllData();
-	m_PartyMap.DeleteAllData();
-	m_CoefficientTableMap.DeleteAllData();
-	m_KnightsMap.DeleteAllData();
-	m_ServerArray.DeleteAllData();
-	m_ServerGroupArray.DeleteAllData();
-	m_HomeTableMap.DeleteAllData();
-	m_StartPositionTableMap.DeleteAllData();
-
-	for (C3DMap* pMap : m_ZoneArray)
-		delete pMap;
-	m_ZoneArray.clear();
-
-	for (model::LevelUp* pLevelUp : m_LevelUpTableArray)
-		delete pLevelUp;
-	m_LevelUpTableArray.clear();
-
-	m_EventMap.DeleteAllData();
-
-	s_pInstance = nullptr;
-
-	return CDialog::DestroyWindow();
-}
-
-void CEbenezerDlg::UserAcceptThread()
+void EbenezerInstance::UserAcceptThread()
 {
 	_socketManager.StartAccept();
-	AddOutputMessage(_T("Accepting user connections"));
+	spdlog::info("Accepting user connections");
 }
 
-CUser* CEbenezerDlg::GetUserPtr(const char* userid, NameType type)
+CUser* EbenezerInstance::GetUserPtr(const char* userid, NameType type)
 {
 	int socketCount = GetUserSocketCount();
 
@@ -629,79 +507,23 @@ CUser* CEbenezerDlg::GetUserPtr(const char* userid, NameType type)
 	return nullptr;
 }
 
-/// \brief adds a message to the application's output box and updates scrollbar position
-/// \see _outputList
-void CEbenezerDlg::AddOutputMessage(const std::string& msg)
-{
-	std::wstring wMsg = LocalToWide(msg);
-	AddOutputMessage(wMsg);
-}
-
-/// \brief adds a message to the application's output box and updates scrollbar position
-/// \see _outputList
-void CEbenezerDlg::AddOutputMessage(const std::wstring& msg)
-{
-	// Be sure to exclusively handle UI updates in the UI's thread
-	if (AfxGetThread() != AfxGetApp())
-	{
-		{
-			std::lock_guard<std::mutex> lock(_listBoxQueueMutex);
-			_listBoxQueue.push(msg);
-		}
-
-		PostMessage(WM_PROCESS_LISTBOX_QUEUE);
-		return;
-	}
-
-	_outputList.AddString(msg.data());
-
-	// Set the focus to the last item and ensure it is visible
-	int lastIndex = _outputList.GetCount() - 1;
-	_outputList.SetTopIndex(lastIndex);
-}
-
-LRESULT CEbenezerDlg::OnProcessListBoxQueue(WPARAM, LPARAM)
-{
-	std::queue<std::wstring> localQueue;
-
-	{
-		std::lock_guard<std::mutex> lock(_listBoxQueueMutex);
-		localQueue.swap(_listBoxQueue);
-	}
-
-	while (!localQueue.empty())
-	{
-		const std::wstring& message = localQueue.front();
-		AddOutputMessage(message);
-		localQueue.pop();
-	}
-	
-	return 0;
-}
-
 // sungyong 2002.05.22
-bool CEbenezerDlg::AIServerConnect()
+bool EbenezerInstance::AIServerConnect()
 {
-	std::string errorReason;
 	for (int i = 0; i < MAX_AI_SOCKET; i++)
 	{
-		if (!AISocketConnect(i, false, &errorReason))
-		{
-			std::wstring msg = Utf8ToWide(errorReason);
-			AfxMessageBox(msg.c_str());
+		if (!AISocketConnect(i, false))
 			return false;
-		}
 	}
 
 	return true;
 }
 
-bool CEbenezerDlg::AISocketConnect(int zone, bool flag, std::string* errorReason_ /*= nullptr*/)
+bool EbenezerInstance::AISocketConnect(int zone, bool flag)
 {
 	CAISocket* pAISock = nullptr;
 	int send_index = 0;
 	char pBuf[128] = {};
-	std::string errorReason;
 
 	//if( m_nServerNo == 3 ) return false;
 
@@ -720,11 +542,8 @@ bool CEbenezerDlg::AISocketConnect(int zone, bool flag, std::string* errorReason
 	{
 		delete pAISock;
 
-		errorReason = fmt::format("Failed to create new AI socket for zone {}", zone);
-		spdlog::error("EbenezerDlg::AISocketConnect: {}", errorReason);
-
-		if (errorReason_ != nullptr)
-			*errorReason_ = errorReason;
+		spdlog::error("EbenezerInstance::AISocketConnect: Failed to create new AI socket for zone {}",
+			zone);
 
 		return false;
 	}
@@ -734,11 +553,8 @@ bool CEbenezerDlg::AISocketConnect(int zone, bool flag, std::string* errorReason
 	{
 		delete pAISock;
 
-		errorReason = fmt::format("Invalid port, unsupported m_nServerNo {} (zone {})", m_nServerNo, zone);
-		spdlog::error("EbenezerDlg::AISocketConnect: {}", errorReason);
-
-		if (errorReason_ != nullptr)
-			*errorReason_ = errorReason;
+		spdlog::error("EbenezerInstance::AISocketConnect: Invalid port, unsupported m_nServerNo {} (zone {})",
+			m_nServerNo, zone);
 
 		return false;
 	}
@@ -747,12 +563,8 @@ bool CEbenezerDlg::AISocketConnect(int zone, bool flag, std::string* errorReason
 	{
 		delete pAISock;
 
-		errorReason = fmt::format("Failed to connect to AI server (zone {}) ({}:{})",
+		spdlog::error("EbenezerInstance::AISocketConnect: Failed to connect to AI server (zone {}) ({}:{})",
 			zone, m_AIServerIP, port);
-		spdlog::error("EbenezerDlg::AISocketConnect: {}", errorReason);
-
-		if (errorReason_ != nullptr)
-			*errorReason_ = errorReason;
 
 		return false;
 	}
@@ -774,12 +586,12 @@ bool CEbenezerDlg::AISocketConnect(int zone, bool flag, std::string* errorReason
 	//m_sSocketCount = zone;
 	m_AISocketMap.PutData(zone, pAISock);
 
-	spdlog::debug("EbenezerDlg::AISocketConnect: connected to zone {}", zone);
+	spdlog::debug("EbenezerInstance::AISocketConnect: connected to zone {}", zone);
 	return true;
 }
 // ~sungyong 2002.05.22
 
-int CEbenezerDlg::GetAIServerPort() const
+int EbenezerInstance::GetAIServerPort() const
 {
 	switch (m_nServerNo)
 	{
@@ -797,7 +609,7 @@ int CEbenezerDlg::GetAIServerPort() const
 	}
 }
 
-void CEbenezerDlg::Send_All(char* pBuf, int len, CUser* pExceptUser, int nation)
+void EbenezerInstance::Send_All(char* pBuf, int len, CUser* pExceptUser, int nation)
 {
 	int socketCount = GetUserSocketCount();
 	for (int i = 0; i < socketCount; i++)
@@ -819,7 +631,7 @@ void CEbenezerDlg::Send_All(char* pBuf, int len, CUser* pExceptUser, int nation)
 	}
 }
 
-void CEbenezerDlg::Send_Region(char* pBuf, int len, int zone, int x, int z, CUser* pExceptUser, bool bDirect)
+void EbenezerInstance::Send_Region(char* pBuf, int len, int zone, int x, int z, CUser* pExceptUser, bool bDirect)
 {
 	C3DMap* pMap = GetMapByID(zone);
 	if (pMap == nullptr)
@@ -836,7 +648,7 @@ void CEbenezerDlg::Send_Region(char* pBuf, int len, int zone, int x, int z, CUse
 	Send_UnitRegion(pMap, pBuf, len, x + 1, z + 1, pExceptUser, bDirect);	// SE
 }
 
-void CEbenezerDlg::Send_UnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int z, CUser* pExceptUser, bool bDirect)
+void EbenezerInstance::Send_UnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int z, CUser* pExceptUser, bool bDirect)
 {
 	if (pMap == nullptr)
 		return;
@@ -868,7 +680,7 @@ void CEbenezerDlg::Send_UnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int
 	}
 }
 
-void CEbenezerDlg::Send_NearRegion(char* pBuf, int len, int zone, int region_x, int region_z, float curx, float curz, CUser* pExceptUser)
+void EbenezerInstance::Send_NearRegion(char* pBuf, int len, int zone, int region_x, int region_z, float curx, float curz, CUser* pExceptUser)
 {
 	C3DMap* pMap = GetMapByID(zone);
 	if (pMap == nullptr)
@@ -916,7 +728,7 @@ void CEbenezerDlg::Send_NearRegion(char* pBuf, int len, int zone, int region_x, 
 	}
 }
 
-void CEbenezerDlg::Send_FilterUnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int z, float ref_x, float ref_z, CUser* pExceptUser)
+void EbenezerInstance::Send_FilterUnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int z, float ref_x, float ref_z, CUser* pExceptUser)
 {
 	if (pMap == nullptr)
 		return;
@@ -952,7 +764,7 @@ void CEbenezerDlg::Send_FilterUnitRegion(C3DMap* pMap, char* pBuf, int len, int 
 	}
 }
 
-void CEbenezerDlg::Send_PartyMember(int party, char* pBuf, int len)
+void EbenezerInstance::Send_PartyMember(int party, char* pBuf, int len)
 {
 	if (party < 0)
 		return;
@@ -969,7 +781,7 @@ void CEbenezerDlg::Send_PartyMember(int party, char* pBuf, int len)
 	}
 }
 
-void CEbenezerDlg::Send_KnightsMember(int index, char* pBuf, int len, int zone)
+void EbenezerInstance::Send_KnightsMember(int index, char* pBuf, int len, int zone)
 {
 	if (index <= 0)
 		return;
@@ -997,7 +809,7 @@ void CEbenezerDlg::Send_KnightsMember(int index, char* pBuf, int len, int zone)
 }
 
 // sungyong 2002.05.22
-void CEbenezerDlg::Send_AIServer(int zone, char* pBuf, int len)
+void EbenezerInstance::Send_AIServer(int zone, char* pBuf, int len)
 {
 	for (int i = 0; i < MAX_AI_SOCKET; i++)
 	{
@@ -1028,7 +840,7 @@ void CEbenezerDlg::Send_AIServer(int zone, char* pBuf, int len)
 }
 // ~sungyong 2002.05.22
 
-bool CEbenezerDlg::InitializeMMF()
+bool EbenezerInstance::InitializeMMF()
 {
 	int socketCount = GetUserSocketCount();
 	uint32_t filesize = socketCount * ALLOCATED_USER_DATA_BLOCK;
@@ -1037,8 +849,7 @@ bool CEbenezerDlg::InitializeMMF()
 	if (memory == nullptr)
 		return false;
 
-	AddOutputMessage(_T("Shared memory created successfully"));
-	spdlog::info("EbenezerDlg::InitializeMMF: shared memory created successfully");
+	spdlog::info("EbenezerInstance::InitializeMMF: shared memory created successfully");
 
 	memset(memory, 0, filesize);
 
@@ -1052,7 +863,7 @@ bool CEbenezerDlg::InitializeMMF()
 	return true;
 }
 
-bool CEbenezerDlg::MapFileLoad()
+bool EbenezerInstance::MapFileLoad()
 {
 	using ModelType = model::ZoneInfo;
 
@@ -1061,8 +872,6 @@ bool CEbenezerDlg::MapFileLoad()
 	recordset_loader::Base<ModelType> loader;
 	loader.SetProcessFetchCallback([&](db::ModelRecordSet<ModelType>& recordset)
 	{
-		CString errormsg;
-
 		m_ZoneArray.reserve(20);
 
 		// Build the base MAP directory
@@ -1077,14 +886,17 @@ bool CEbenezerDlg::MapFileLoad()
 			ModelType row = {};
 			recordset.get_ref(row);
 
-			std::filesystem::path mapPath
-				= mapDir / row.Name;
+			std::filesystem::path mapPath = mapDir / row.Name;
+
+			// NOTE: spdlog is a C++11 library that doesn't support std::filesystem or std::u8string
+			// This just ensures the path is always explicitly UTF-8 in a cross-platform way.
+			std::u8string filenameUtf8 = mapPath.u8string();
+			std::string filename(filenameUtf8.begin(), filenameUtf8.end());
 
 			std::ifstream file(mapPath, std::ios::in | std::ios::binary);
 			if (!file)
 			{
-				errormsg.Format(_T("File Open Fail - %s\n"), mapPath.wstring().c_str());
-				AfxMessageBox(errormsg);
+				spdlog::error("EbenezerInstance::MapFileLoad: File Open Fail - {}", filename);
 				return;
 			}
 
@@ -1099,8 +911,7 @@ bool CEbenezerDlg::MapFileLoad()
 
 			if (!pMap->LoadMap(file))
 			{
-				errormsg.Format(_T("Map Load Fail - %s\n"), mapPath.wstring().c_str());
-				AfxMessageBox(errormsg);
+				spdlog::error("EbenezerInstance::MapFileLoad: Map Load Fail - {}", filename);
 				delete pMap;
 				return;
 			}
@@ -1134,16 +945,13 @@ bool CEbenezerDlg::MapFileLoad()
 	return loaded;
 }
 
-void CEbenezerDlg::ReportTableLoadError(const recordset_loader::Error& err, const char* source)
+void EbenezerInstance::ReportTableLoadError(const recordset_loader::Error& err, const char* source)
 {
-	std::string error = fmt::format("EbenezerDlg::ReportTableLoadError: {} failed: {}",
+	spdlog::error("EbenezerInstance::ReportTableLoadError: {} failed: {}",
 		source, err.Message);
-	std::wstring werror = LocalToWide(error);
-	AfxMessageBox(werror.c_str());
-	spdlog::error(error);
 }
 
-bool CEbenezerDlg::LoadItemTable()
+bool EbenezerInstance::LoadItemTable()
 {
 	recordset_loader::STLMap loader(m_ItemTableMap);
 	if (!loader.Load_ForbidEmpty())
@@ -1155,7 +963,7 @@ bool CEbenezerDlg::LoadItemTable()
 	return true;
 }
 
-bool CEbenezerDlg::LoadMagicTable()
+bool EbenezerInstance::LoadMagicTable()
 {
 	recordset_loader::STLMap loader(m_MagicTableMap);
 	if (!loader.Load_ForbidEmpty())
@@ -1167,7 +975,7 @@ bool CEbenezerDlg::LoadMagicTable()
 	return true;
 }
 
-bool CEbenezerDlg::LoadMagicType1()
+bool EbenezerInstance::LoadMagicType1()
 {
 	recordset_loader::STLMap loader(m_MagicType1TableMap);
 	if (!loader.Load_ForbidEmpty())
@@ -1179,7 +987,7 @@ bool CEbenezerDlg::LoadMagicType1()
 	return true;
 }
 
-bool CEbenezerDlg::LoadMagicType2()
+bool EbenezerInstance::LoadMagicType2()
 {
 	recordset_loader::STLMap loader(m_MagicType2TableMap);
 	if (!loader.Load_ForbidEmpty())
@@ -1191,7 +999,7 @@ bool CEbenezerDlg::LoadMagicType2()
 	return true;
 }
 
-bool CEbenezerDlg::LoadMagicType3()
+bool EbenezerInstance::LoadMagicType3()
 {
 	recordset_loader::STLMap loader(m_MagicType3TableMap);
 	if (!loader.Load_ForbidEmpty())
@@ -1203,7 +1011,7 @@ bool CEbenezerDlg::LoadMagicType3()
 	return true;
 }
 
-bool CEbenezerDlg::LoadMagicType4()
+bool EbenezerInstance::LoadMagicType4()
 {
 	recordset_loader::STLMap loader(m_MagicType4TableMap);
 	if (!loader.Load_ForbidEmpty())
@@ -1215,7 +1023,7 @@ bool CEbenezerDlg::LoadMagicType4()
 	return true;
 }
 
-bool CEbenezerDlg::LoadMagicType5()
+bool EbenezerInstance::LoadMagicType5()
 {
 	recordset_loader::STLMap loader(m_MagicType5TableMap);
 	if (!loader.Load_ForbidEmpty())
@@ -1227,7 +1035,7 @@ bool CEbenezerDlg::LoadMagicType5()
 	return true;
 }
 
-bool CEbenezerDlg::LoadMagicType7()
+bool EbenezerInstance::LoadMagicType7()
 {
 	recordset_loader::STLMap loader(m_MagicType7TableMap);
 	if (!loader.Load_ForbidEmpty())
@@ -1239,7 +1047,7 @@ bool CEbenezerDlg::LoadMagicType7()
 	return true;
 }
 
-bool CEbenezerDlg::LoadMagicType8()
+bool EbenezerInstance::LoadMagicType8()
 {
 	recordset_loader::STLMap loader(m_MagicType8TableMap);
 	if (!loader.Load_ForbidEmpty())
@@ -1251,7 +1059,7 @@ bool CEbenezerDlg::LoadMagicType8()
 	return true;
 }
 
-bool CEbenezerDlg::LoadCoefficientTable()
+bool EbenezerInstance::LoadCoefficientTable()
 {
 	recordset_loader::STLMap loader(m_CoefficientTableMap);
 	if (!loader.Load_ForbidEmpty())
@@ -1263,7 +1071,7 @@ bool CEbenezerDlg::LoadCoefficientTable()
 	return true;
 }
 
-bool CEbenezerDlg::LoadLevelUpTable()
+bool EbenezerInstance::LoadLevelUpTable()
 {
 	recordset_loader::Vector<model::LevelUp> loader(m_LevelUpTableArray);
 	if (!loader.Load_ForbidEmpty(true))
@@ -1275,7 +1083,7 @@ bool CEbenezerDlg::LoadLevelUpTable()
 	return true;
 }
 
-void CEbenezerDlg::LoadConfig()
+void EbenezerInstance::LoadConfig()
 {
 	int year = 0, month = 0, date = 0, hour = 0, serverCount = 0, sgroup_count = 0;
 	std::string key;
@@ -1285,7 +1093,7 @@ void CEbenezerDlg::LoadConfig()
 
 	m_Ini.Load(iniPath);
 
-	_logger.Setup(m_Ini, exePath.string());
+	_logger.Setup(m_Ini, exePath);
 	
 	m_nYear = m_Ini.GetInt("TIMER", "YEAR", 1);
 	m_nMonth = m_Ini.GetInt("TIMER", "MONTH", 1);
@@ -1317,8 +1125,7 @@ void CEbenezerDlg::LoadConfig()
 	serverCount = m_Ini.GetInt("ZONE_INFO", "SERVER_COUNT", 1);
 	if (serverCount < 1)
 	{
-		AfxMessageBox(_T("SERVER_COUNT must be greater than 0"));
-		spdlog::error("EbenezerDlg::LoadConfig: invalid SERVER_COUNT={}", serverCount);
+		spdlog::error("EbenezerInstance::LoadConfig: invalid SERVER_COUNT={}, must be 1+", serverCount);
 		return;
 	}
 
@@ -1343,7 +1150,8 @@ void CEbenezerDlg::LoadConfig()
 		sgroup_count = m_Ini.GetInt("SG_INFO", "GSERVER_COUNT", 1);
 		if (sgroup_count < 1)
 		{
-			AfxMessageBox(_T("Server group count error!!"));
+			spdlog::error("EbenezerInstance::LoadConfig: Invalid server group count={}, must be 1+",
+				sgroup_count);
 			return;
 		}
 
@@ -1369,13 +1177,13 @@ void CEbenezerDlg::LoadConfig()
 
 void EbenezerLogger::SetupExtraLoggers(CIni& ini,
 	std::shared_ptr<spdlog::details::thread_pool> threadPool,
-	const std::string& baseDir)
+	const std::filesystem::path& baseDir)
 {
 	SetupExtraLogger(ini, threadPool, baseDir, logger::EbenezerEvent, ini::EVENT_LOG_FILE);
 	SetupExtraLogger(ini, threadPool, baseDir, logger::EbenezerRegion, ini::REGION_LOG_FILE);
 }
 
-void CEbenezerDlg::UpdateGameTime()
+void EbenezerInstance::UpdateGameTime()
 {
 	CUser* pUser = nullptr;
 	bool bKnights = false;
@@ -1449,7 +1257,7 @@ void CEbenezerDlg::UpdateGameTime()
 	}
 }
 
-void CEbenezerDlg::UpdateWeather()
+void EbenezerInstance::UpdateWeather()
 {
 	int weather = 0, result = 0, send_index = 0;
 	char send_buff[256] = {};
@@ -1484,7 +1292,7 @@ void CEbenezerDlg::UpdateWeather()
 	Send_All(send_buff, send_index);
 }
 
-void CEbenezerDlg::SetGameTime()
+void EbenezerInstance::SetGameTime()
 {
 	m_Ini.SetInt("TIMER", "YEAR", m_nYear);
 	m_Ini.SetInt("TIMER", "MONTH", m_nMonth);
@@ -1494,7 +1302,7 @@ void CEbenezerDlg::SetGameTime()
 	m_Ini.Save();
 }
 
-void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
+void EbenezerInstance::UserInOutForMe(CUser* pSendUser)
 {
 	int send_index = 0, buff_index = 0, i = 0, j = 0, t_count = 0, prevIndex = 0;
 	C3DMap* pMap = nullptr;
@@ -1525,7 +1333,7 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 
 	if (prevIndex >= 49152)
 	{
-		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
+		spdlog::error("EbenezerInstance::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1538,7 +1346,7 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 
 	if (prevIndex >= 49152)
 	{
-		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
+		spdlog::error("EbenezerInstance::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1551,7 +1359,7 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 
 	if (prevIndex >= 49152)
 	{
-		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
+		spdlog::error("EbenezerInstance::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1563,7 +1371,7 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 	prevIndex = buff_index + send_index;
 	if (prevIndex >= 49152)
 	{
-		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
+		spdlog::error("EbenezerInstance::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1575,7 +1383,7 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 	prevIndex = buff_index + send_index;
 	if (prevIndex >= 49152)
 	{
-		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
+		spdlog::error("EbenezerInstance::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1588,7 +1396,7 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 
 	if (prevIndex >= 49152)
 	{
-		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
+		spdlog::error("EbenezerInstance::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1599,7 +1407,7 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 	prevIndex = buff_index + send_index;
 	if (prevIndex >= 49152)
 	{
-		spdlog::error("EbenezerDlg::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
+		spdlog::error("EbenezerInstance::UserInOutForMe: buffer overflow [prevIndex={}, line={}]", prevIndex, __LINE__);
 		return;
 	}
 
@@ -1612,7 +1420,7 @@ void CEbenezerDlg::UserInOutForMe(CUser* pSendUser)
 	pSendUser->SendCompressingPacket(send_buff, send_index);
 }
 
-void CEbenezerDlg::RegionUserInOutForMe(CUser* pSendUser)
+void EbenezerInstance::RegionUserInOutForMe(CUser* pSendUser)
 {
 	int send_index = 0, buff_index = 0, i = 0, j = 0, t_count = 0;
 	C3DMap* pMap = nullptr;
@@ -1679,10 +1487,10 @@ void CEbenezerDlg::RegionUserInOutForMe(CUser* pSendUser)
 	pSendUser->Send(send_buff, uid_sendindex);
 
 	if (userCount > 500)
-		spdlog::debug("EbenezerDlg::RegionUserInOutForMe: userCount={}", userCount);
+		spdlog::debug("EbenezerInstance::RegionUserInOutForMe: userCount={}", userCount);
 }
 
-int CEbenezerDlg::GetRegionUserIn(C3DMap* pMap, int region_x, int region_z, char* buff, int& t_count)
+int EbenezerInstance::GetRegionUserIn(C3DMap* pMap, int region_x, int region_z, char* buff, int& t_count)
 {
 	if (pMap == nullptr)
 		return 0;
@@ -1721,7 +1529,7 @@ int CEbenezerDlg::GetRegionUserIn(C3DMap* pMap, int region_x, int region_z, char
 	return buff_index;
 }
 
-int CEbenezerDlg::GetRegionUserList(C3DMap* pMap, int region_x, int region_z, char* buff, int& t_count)
+int EbenezerInstance::GetRegionUserList(C3DMap* pMap, int region_x, int region_z, char* buff, int& t_count)
 {
 	if (pMap == nullptr)
 		return 0;
@@ -1752,7 +1560,7 @@ int CEbenezerDlg::GetRegionUserList(C3DMap* pMap, int region_x, int region_z, ch
 	return buff_index;
 }
 
-void CEbenezerDlg::NpcInOutForMe(CUser* pSendUser)
+void EbenezerInstance::NpcInOutForMe(CUser* pSendUser)
 {
 	int send_index = 0, buff_index = 0, t_count = 0;
 	C3DMap* pMap = nullptr;
@@ -1818,7 +1626,7 @@ void CEbenezerDlg::NpcInOutForMe(CUser* pSendUser)
 	pSendUser->SendCompressingPacket(send_buff, send_index);
 }
 
-int CEbenezerDlg::GetRegionNpcIn(C3DMap* pMap, int region_x, int region_z, char* buff, int& t_count)
+int EbenezerInstance::GetRegionNpcIn(C3DMap* pMap, int region_x, int region_z, char* buff, int& t_count)
 {
 	// 포인터 참조하면 안됨
 	if (!m_bPointCheckFlag)
@@ -1860,7 +1668,7 @@ int CEbenezerDlg::GetRegionNpcIn(C3DMap* pMap, int region_x, int region_z, char*
 	return buff_index;
 }
 
-void CEbenezerDlg::RegionNpcInfoForMe(CUser* pSendUser, int nType)
+void EbenezerInstance::RegionNpcInfoForMe(CUser* pSendUser, int nType)
 {
 	int send_index = 0, buff_index = 0, i = 0, j = 0, t_count = 0;
 	C3DMap* pMap = nullptr;
@@ -1946,10 +1754,10 @@ void CEbenezerDlg::RegionNpcInfoForMe(CUser* pSendUser, int nType)
 	pSendUser->Send(send_buff, nid_sendindex);
 
 	if (npcCount > 500)
-		spdlog::debug("EbenezerDlg::RegionNpcInfoForMe: npcCount={}", npcCount);
+		spdlog::debug("EbenezerInstance::RegionNpcInfoForMe: npcCount={}", npcCount);
 }
 
-int CEbenezerDlg::GetRegionNpcList(C3DMap* pMap, int region_x, int region_z, char* nid_buff, int& t_count, int nType)
+int EbenezerInstance::GetRegionNpcList(C3DMap* pMap, int region_x, int region_z, char* nid_buff, int& t_count, int nType)
 {
 	// 포인터 참조하면 안됨
 	if (!m_bPointCheckFlag)
@@ -2002,7 +1810,7 @@ int CEbenezerDlg::GetRegionNpcList(C3DMap* pMap, int region_x, int region_z, cha
 	return buff_index;
 }
 
-int CEbenezerDlg::GetZoneIndex(int zonenumber)
+int EbenezerInstance::GetZoneIndex(int zonenumber) const
 {
 	for (size_t i = 0; i < m_ZoneArray.size(); i++)
 	{
@@ -2015,113 +1823,78 @@ int CEbenezerDlg::GetZoneIndex(int zonenumber)
 	return -1;
 }
 
-BOOL CEbenezerDlg::PreTranslateMessage(MSG* pMsg)
+bool EbenezerInstance::HandleCommand(const std::string& command)
 {
-	char buff[1024] = {};
-	char chatstr[256] = {}, killstr[256] = {};
-	int chatlen = 0, buffindex = 0;
+	OperationMessage opMessage(this, nullptr);
+	if (opMessage.Process(command))
+		return true;
 
-	std::string buff2;
-//
-	bool permanent_off = false;
-//
-	if (pMsg->message == WM_KEYDOWN)
+	std::string finalstr;
+
+	char sendBuff[1024] = {};
+	int sendIndex = 0;
+	SetByte(sendBuff, WIZ_CHAT, sendIndex);
+
+	if (m_bPermanentChatFlag)
 	{
-		if (pMsg->wParam == VK_RETURN)
+		finalstr = fmt::format("- {} -", command);
+		if (finalstr.length() >= sizeof(m_strPermanentChat))
 		{
-			::GetWindowTextA(m_AnnounceEdit.GetSafeHwnd(), chatstr, 256);
-
-			UpdateData(TRUE);
-			chatlen = strlen(chatstr);
-			if (chatlen == 0)
-				return TRUE;
-
-			m_AnnounceEdit.SetWindowText(_T(""));
-			UpdateData(FALSE);
-
-			OperationMessage opMessage(this, nullptr);
-			if (opMessage.Process(chatstr))
-				return TRUE;
-
-			// 비러머글 남는 공지 --;
-			if (_strnicmp("/permanent", chatstr, 10) == 0)
-			{
-				m_bPermanentChatMode = true;
-				m_bPermanentChatFlag = true;
-				return TRUE;
-			}
-
-			if (_strnicmp("/offpermanent", chatstr, 13) == 0)
-			{
-				m_bPermanentChatMode = false;
-				m_bPermanentChatFlag = false;
-				permanent_off = true;
-//				return TRUE;	//이것은 고의적으로 TRUE를 뺐었음
-			}
-//
-
-			std::string finalstr;
-
-			// 비러머글 남는 공지		
-			if (m_bPermanentChatFlag)
-				finalstr = fmt::format("- {} -", chatstr);
-			else
-				finalstr = fmt::format_db_resource(IDP_ANNOUNCEMENT, chatstr);
-
-			//
-			SetByte(buff, WIZ_CHAT, buffindex);
-			// SetByte( buff, PUBLIC_CHAT, buffindex );
-
-			// 비러머글 남는 공지
-			if (permanent_off)
-			{
-				SetByte(buff, END_PERMANENT_CHAT, buffindex);
-			}
-			else if (!m_bPermanentChatFlag)
-			{
-				SetByte(buff, PUBLIC_CHAT, buffindex);
-			}
-			else
-			{
-				SetByte(buff, PERMANENT_CHAT, buffindex);
-				strcpy(m_strPermanentChat, finalstr.c_str());
-				m_bPermanentChatFlag = false;
-			}
-//
-			SetByte(buff, 0x01, buffindex);		// nation
-			SetShort(buff, -1, buffindex);		// sid
-			SetByte(buff, 0, buffindex);		// sender name length
-			SetString2(buff, finalstr, buffindex);
-			Send_All(buff, buffindex);
-
-			buffindex = 0;
-			memset(buff, 0x00, 1024);
-			SetByte(buff, STS_CHAT, buffindex);
-			SetString2(buff, finalstr, buffindex);
-
-			for (const auto& [_, pInfo] : m_ServerArray)
-			{
-				if (pInfo != nullptr
-					&& pInfo->sServerNo != m_nServerNo)
-					m_pUdpSocket->SendUDPPacket(pInfo->strServerIP, buff, buffindex);
-			}
-
-			return TRUE;
+			spdlog::warn("Supplied permanent chat notice too long: {}", finalstr);
+			return false;
 		}
 
-		if (pMsg->wParam == VK_ESCAPE)
-			return TRUE;
+		SetByte(sendBuff, PERMANENT_CHAT, sendIndex);
+		strcpy(m_strPermanentChat, finalstr.c_str());
+		m_bPermanentChatFlag = false;
+	}
+	else
+	{
+		finalstr = fmt::format_db_resource(IDP_ANNOUNCEMENT, command);
+		SetByte(sendBuff, PUBLIC_CHAT, sendIndex);
 	}
 
-	if (pMsg->wParam == VK_F8)
-		SyncTest(1);
-	else if (pMsg->wParam == VK_F9)
-		SyncTest(2);
+	SetByte(sendBuff, 0x01, sendIndex);		// nation
+	SetShort(sendBuff, -1, sendIndex);		// sid
+	SetByte(sendBuff, 0, sendIndex);		// sender name length
+	SetString2(sendBuff, finalstr, sendIndex);
+	Send_All(sendBuff, sendIndex);
 
-	return CDialog::PreTranslateMessage(pMsg);
+	sendIndex = 0;
+	memset(sendBuff, 0, 1024);
+	SetByte(sendBuff, STS_CHAT, sendIndex);
+	SetString2(sendBuff, finalstr, sendIndex);
+
+	for (const auto& [_, pInfo] : m_ServerArray)
+	{
+		if (pInfo != nullptr
+			&& pInfo->sServerNo != m_nServerNo)
+			m_pUdpSocket->SendUDPPacket(pInfo->strServerIP, sendBuff, sendIndex);
+	}
+
+	return true;
 }
 
-bool CEbenezerDlg::LoadNoticeData()
+bool EbenezerInstance::HandleInputEvent(const ftxui::Event& event)
+{
+	using namespace ftxui;
+
+	if (event == Event::F8)
+	{
+		SyncTest(1);
+		return true;
+	}
+	
+	if (event == Event::F9)
+	{
+		SyncTest(2);
+		return true;
+	}
+
+	return false;
+}
+
+bool EbenezerInstance::LoadNoticeData()
 {
 	std::filesystem::path NoticePath = GetProgPath() / "Notice.txt";
 	std::string line;
@@ -2130,10 +1903,7 @@ bool CEbenezerDlg::LoadNoticeData()
 	std::ifstream file(NoticePath, std::ios::in);
 	if (!file)
 	{
-#if !defined(_DEBUG)
-		AfxMessageBox(_T("cannot open Notice.txt!!"));
-#endif
-		spdlog::warn("EbenezerDlg::LoadNoticeData: failed to open Notice.txt");
+		spdlog::warn("EbenezerInstance::LoadNoticeData: failed to open Notice.txt");
 		return false;
 	}
 
@@ -2141,8 +1911,7 @@ bool CEbenezerDlg::LoadNoticeData()
 	{
 		if (count > 19)
 		{
-			AfxMessageBox(_T("Notice Count Overflow!!"));
-			spdlog::error("EbenezerDlg::LoadNoticeData: notice count overflow [count={}]", count);
+			spdlog::warn("EbenezerInstance::LoadNoticeData: notice count overflow [count={}]", count);
 			break;
 		}
 
@@ -2155,7 +1924,7 @@ bool CEbenezerDlg::LoadNoticeData()
 	return true;
 }
 
-void CEbenezerDlg::SyncTest(int nType)
+void EbenezerInstance::SyncTest(int nType)
 {
 	char strPath[100] = {};
 	if (nType == 1)
@@ -2221,7 +1990,7 @@ void CEbenezerDlg::SyncTest(int nType)
 	fclose(stream);
 }
 
-void CEbenezerDlg::SyncRegionTest(C3DMap* pMap, int rx, int rz, FILE* pfile, int nType)
+void EbenezerInstance::SyncRegionTest(C3DMap* pMap, int rx, int rz, FILE* pfile, int nType)
 {
 	fprintf(pfile, "ZONE=%d, [%d,%d] : ", pMap->m_nZoneNumber, rx, rz);
 
@@ -2249,7 +2018,7 @@ void CEbenezerDlg::SyncRegionTest(C3DMap* pMap, int rx, int rz, FILE* pfile, int
 			CUser* pUser = GetUserPtr(nid);
 			if (pUser == nullptr)
 			{
-				spdlog::error("EbenezerDlg::SyncRegionTest: userId={} not found", nid);
+				spdlog::error("EbenezerInstance::SyncRegionTest: userId={} not found", nid);
 				fprintf(pfile, "%d(fail)	", nid);
 				continue;
 			}
@@ -2261,7 +2030,7 @@ void CEbenezerDlg::SyncRegionTest(C3DMap* pMap, int rx, int rz, FILE* pfile, int
 			CNpc* pNpc = m_NpcMap.GetData(nid);
 			if (pNpc == nullptr)
 			{
-				spdlog::error("EbenezerDlg::SyncRegionTest: npcId={} not found", nid);
+				spdlog::error("EbenezerInstance::SyncRegionTest: npcId={} not found", nid);
 				fprintf(pfile, "%d(fail)	", nid);
 				continue;
 			}
@@ -2273,7 +2042,7 @@ void CEbenezerDlg::SyncRegionTest(C3DMap* pMap, int rx, int rz, FILE* pfile, int
 	fprintf(pfile, "\n");
 }
 
-void CEbenezerDlg::SendAllUserInfo()
+void EbenezerInstance::SendAllUserInfo()
 {
 	int send_index = 0;
 	char send_buff[2048] = {};
@@ -2339,7 +2108,7 @@ void CEbenezerDlg::SendAllUserInfo()
 			continue;
 
 		send_index = 0;
-		ZeroMemory(send_buff, sizeof(send_buff));
+		memset(send_buff, 0, sizeof(send_buff));
 		SetByte(send_buff, AG_PARTY_INFO_ALL, send_index);
 		SetShort(send_buff, i, send_index);					// 파티 번호
 		//if( i == pParty->wIndex )
@@ -2356,15 +2125,15 @@ void CEbenezerDlg::SendAllUserInfo()
 	lock.unlock();
 
 	send_index = 0;
-	ZeroMemory(send_buff, sizeof(send_buff));
+	memset(send_buff, 0, sizeof(send_buff));
 	SetByte(send_buff, AG_SERVER_INFO, send_index);
 	SetByte(send_buff, SERVER_INFO_END, send_index);
 	Send_AIServer(1000, send_buff, send_index);
 
-	spdlog::trace("EbenezerDlg::SendAllUserInfo: completed");
+	spdlog::trace("EbenezerInstance::SendAllUserInfo: completed");
 }
 
-void CEbenezerDlg::SendCompressedData()
+void EbenezerInstance::SendCompressedData()
 {
 	if (m_CompCount <= 0
 		|| m_iCompIndex <= 0)
@@ -2382,12 +2151,12 @@ void CEbenezerDlg::SendCompressedData()
 
 	comp_data_len = lzf_compress(m_CompBuf, m_iCompIndex, comp_buff, sizeof(comp_buff));
 
-	_ASSERT(comp_data_len != 0 && comp_data_len <= sizeof(comp_buff));
+	assert(comp_data_len != 0 && comp_data_len <= sizeof(comp_buff));
 
 	if (comp_data_len == 0
 		|| comp_data_len > sizeof(comp_buff))
 	{
-		spdlog::error("EbenezerDlg::SendCompressedData: Failed to compress AI packet");
+		spdlog::error("EbenezerInstance::SendCompressedData: Failed to compress AI packet");
 		return;
 	}
 
@@ -2407,7 +2176,7 @@ void CEbenezerDlg::SendCompressedData()
 }
 
 // sungyong 2002. 05. 23
-void CEbenezerDlg::DeleteAllNpcList(int flag)
+void EbenezerInstance::DeleteAllNpcList(int flag)
 {
 	if (!m_bServerCheckFlag)
 		return;
@@ -2415,11 +2184,11 @@ void CEbenezerDlg::DeleteAllNpcList(int flag)
 	if (m_bPointCheckFlag)
 	{
 		m_bPointCheckFlag = false;
-		spdlog::error("EbenezerDlg::DeleteAllNpcList: pointCheckFlag set");
+		spdlog::error("EbenezerInstance::DeleteAllNpcList: pointCheckFlag set");
 		return;
 	}
 	
-	spdlog::debug("EbenezerDlg::DeleteAllNpcList: start");
+	spdlog::debug("EbenezerInstance::DeleteAllNpcList: start");
 
 	CUser* pUser = nullptr;
 
@@ -2445,12 +2214,11 @@ void CEbenezerDlg::DeleteAllNpcList(int flag)
 
 	m_bServerCheckFlag = false;
 
-	AddOutputMessage(_T("DeleteAllNpcList complete"));
-	spdlog::debug("EbenezerDlg::DeleteAllNpcList: end");
+	spdlog::debug("EbenezerInstance::DeleteAllNpcList: end");
 }
 // ~sungyong 2002. 05. 23
 
-void CEbenezerDlg::KillUser(const char* strbuff)
+void EbenezerInstance::KillUser(const char* strbuff)
 {
 	if (strlen(strbuff) <= 0
 		|| strlen(strbuff) > MAX_ID_SIZE)
@@ -2461,7 +2229,7 @@ void CEbenezerDlg::KillUser(const char* strbuff)
 		pUser->Close();
 }
 
-CNpc* CEbenezerDlg::GetNpcPtr(int sid, int cur_zone)
+CNpc* EbenezerInstance::GetNpcPtr(int sid, int cur_zone)
 {
 	// 포인터 참조하면 안됨
 	if (!m_bPointCheckFlag)
@@ -2482,7 +2250,7 @@ CNpc* CEbenezerDlg::GetNpcPtr(int sid, int cur_zone)
 	return nullptr;
 }
 
-CKnights* CEbenezerDlg::GetKnightsPtr(int16_t clanId)
+CKnights* EbenezerInstance::GetKnightsPtr(int16_t clanId)
 {
 	if (clanId <= 0)
 		return nullptr;
@@ -2490,7 +2258,7 @@ CKnights* CEbenezerDlg::GetKnightsPtr(int16_t clanId)
 	return m_KnightsMap.GetData(clanId);
 }
 
-void CEbenezerDlg::WithdrawUserOut()
+void EbenezerInstance::WithdrawUserOut()
 {
 	int socketCount = GetUserSocketCount();
 	for (int i = 0; i < socketCount; i++)
@@ -2506,7 +2274,7 @@ void CEbenezerDlg::WithdrawUserOut()
 	}
 }
 
-void CEbenezerDlg::AliveUserCheck()
+void EbenezerInstance::AliveUserCheck()
 {
 	double currentTime = TimeGet();
 
@@ -2536,9 +2304,9 @@ void CEbenezerDlg::AliveUserCheck()
 }
 
 /////// BATTLEZONE RELATED by Yookozuna 2002.6.18 /////////////////
-void CEbenezerDlg::BattleZoneOpenTimer()
+void EbenezerInstance::BattleZoneOpenTimer()
 {
-	CTime cur = CTime::GetCurrentTime();
+	DateTime cur = DateTime::GetNow();
 
 	// sungyong modify
 	int nWeek = cur.GetDayOfWeek();
@@ -2577,7 +2345,7 @@ void CEbenezerDlg::BattleZoneOpenTimer()
 			memset(m_strElmoradCaptain, 0, sizeof(m_strElmoradCaptain));
 
 			// original: 전쟁 종료 0단계
-			spdlog::debug("EbenezerDlg::BattleZoneOpenTimer: war ended, stage 0");
+			spdlog::debug("EbenezerInstance::BattleZoneOpenTimer: war ended, stage 0");
 
 			if (m_nServerNo == KARUS)
 			{
@@ -2629,7 +2397,7 @@ void CEbenezerDlg::BattleZoneOpenTimer()
 				Announcement(DECLARE_WINNER, m_bVictory);
 				Announcement(DECLARE_LOSER, loser_nation);
 			}
-			spdlog::debug("EbenezerDlg::BattleZoneOpenTimer: War ended, stage 1: m_bVictory={}",
+			spdlog::debug("EbenezerInstance::BattleZoneOpenTimer: War ended, stage 1: m_bVictory={}",
 				m_bVictory);
 		}
 		else if (m_sBanishDelay == 8)
@@ -2638,13 +2406,13 @@ void CEbenezerDlg::BattleZoneOpenTimer()
 		}
 		else if (m_sBanishDelay == 10)
 		{
-			spdlog::debug("EbenezerDlg::BattleZoneOpenTimer: War ended, stage 2: All users return to their own nation");
+			spdlog::debug("EbenezerInstance::BattleZoneOpenTimer: War ended, stage 2: All users return to their own nation");
 			BanishLosers();
 		}
 		else if (m_sBanishDelay == 20)
 		{
 			// original: 전쟁 종료 3단계 - 초기화 해주세여
-			spdlog::debug("EbenezerDlg::BattleZoneOpenTimer: War ended, stage 3: resetting battlezone");
+			spdlog::debug("EbenezerInstance::BattleZoneOpenTimer: War ended, stage 3: resetting battlezone");
 			SetByte(send_buff, AG_BATTLE_EVENT, send_index);
 			SetByte(send_buff, BATTLE_EVENT_OPEN, send_index);
 			SetByte(send_buff, BATTLEZONE_CLOSE, send_index);
@@ -2656,7 +2424,7 @@ void CEbenezerDlg::BattleZoneOpenTimer()
 	// ~
 }
 
-void CEbenezerDlg::BattleZoneOpen(int nType)
+void EbenezerInstance::BattleZoneOpen(int nType)
 {
 	int send_index = 0;
 	char send_buff[1024] = {};
@@ -2695,7 +2463,7 @@ void CEbenezerDlg::BattleZoneOpen(int nType)
 	Send_AIServer(1000, send_buff, send_index);
 }
 
-void CEbenezerDlg::BattleZoneVictoryCheck()
+void EbenezerInstance::BattleZoneVictoryCheck()
 {
 	// WINNER DECLARATION PROCEDURE !!!
 	if (m_bKarusFlag >= NUM_FLAG_VICTORY)
@@ -2722,7 +2490,7 @@ void CEbenezerDlg::BattleZoneVictoryCheck()
 	}
 }
 
-void CEbenezerDlg::BanishLosers()
+void EbenezerInstance::BanishLosers()
 {
 	// EVACUATION PROCEDURE FOR LOSERS !!!		
 	int socketCount = GetUserSocketCount();
@@ -2750,7 +2518,7 @@ void CEbenezerDlg::BanishLosers()
 	}
 }
 
-void CEbenezerDlg::ResetBattleZone()
+void EbenezerInstance::ResetBattleZone()
 {
 	m_bVictory = 0;
 	m_byBanishFlag = 0;
@@ -2767,7 +2535,7 @@ void CEbenezerDlg::ResetBattleZone()
 	// REMEMBER TO MAKE ALL FLAGS AND LEVERS NEUTRAL AGAIN!!!!!!!!!!
 }
 
-void CEbenezerDlg::Announcement(uint8_t type, int nation, int chat_type)
+void EbenezerInstance::Announcement(uint8_t type, int nation, int chat_type)
 {
 	int send_index = 0;
 	char send_buff[1024] = {};
@@ -2852,7 +2620,7 @@ void CEbenezerDlg::Announcement(uint8_t type, int nation, int chat_type)
 	}
 }
 
-bool CEbenezerDlg::LoadStartPositionTable()
+bool EbenezerInstance::LoadStartPositionTable()
 {
 	recordset_loader::STLMap loader(m_StartPositionTableMap);
 	if (!loader.Load_ForbidEmpty())
@@ -2864,7 +2632,7 @@ bool CEbenezerDlg::LoadStartPositionTable()
 	return true;
 }
 
-bool CEbenezerDlg::LoadServerResourceTable()
+bool EbenezerInstance::LoadServerResourceTable()
 {
 	ServerResourceTableMap tableMap;
 
@@ -2885,7 +2653,7 @@ bool CEbenezerDlg::LoadServerResourceTable()
 	return true;
 }
 
-bool CEbenezerDlg::LoadHomeTable()
+bool EbenezerInstance::LoadHomeTable()
 {
 	recordset_loader::STLMap loader(m_HomeTableMap);
 	if (!loader.Load_ForbidEmpty())
@@ -2897,7 +2665,7 @@ bool CEbenezerDlg::LoadHomeTable()
 	return true;
 }
 
-bool CEbenezerDlg::LoadAllKnights()
+bool EbenezerInstance::LoadAllKnights()
 {
 	using ModelType = model::Knights;
 
@@ -2968,7 +2736,7 @@ bool CEbenezerDlg::LoadAllKnights()
 
 			if (!m_KnightsMap.PutData(pKnights->m_sIndex, pKnights))
 			{
-				spdlog::error("EbenezerDlg::LoadAllKnights: failed to put into KnightsMap [knightsId={}]",
+				spdlog::error("EbenezerInstance::LoadAllKnights: failed to put into KnightsMap [knightsId={}]",
 					pKnights->m_sIndex);
 				delete pKnights;
 			}
@@ -2985,7 +2753,7 @@ bool CEbenezerDlg::LoadAllKnights()
 	return true;
 }
 
-bool CEbenezerDlg::LoadAllKnightsUserData()
+bool EbenezerInstance::LoadAllKnightsUserData()
 {
 	using ModelType = model::KnightsUser;
 
@@ -3014,7 +2782,7 @@ bool CEbenezerDlg::LoadAllKnightsUserData()
 	return true;
 }
 
-bool CEbenezerDlg::LoadKnightsSiegeWarfareTable()
+bool EbenezerInstance::LoadKnightsSiegeWarfareTable()
 {
 	using ModelType = model::KnightsSiegeWarfare;
 
@@ -3040,7 +2808,7 @@ bool CEbenezerDlg::LoadKnightsSiegeWarfareTable()
 	return true;
 }
 
-int CEbenezerDlg::GetKnightsAllMembers(int knightsindex, char* temp_buff, int& buff_index, int type)
+int EbenezerInstance::GetKnightsAllMembers(int knightsindex, char* temp_buff, int& buff_index, int type)
 {
 	if (knightsindex <= 0)
 		return 0;
@@ -3117,7 +2885,7 @@ int CEbenezerDlg::GetKnightsAllMembers(int knightsindex, char* temp_buff, int& b
 	return count;
 }
 
-void CEbenezerDlg::MarketBBSTimeCheck()
+void EbenezerInstance::MarketBBSTimeCheck()
 {
 	int send_index = 0;
 	char send_buff[256] = {};
@@ -3187,7 +2955,7 @@ void CEbenezerDlg::MarketBBSTimeCheck()
 	}
 }
 
-void CEbenezerDlg::MarketBBSBuyDelete(int16_t index)
+void EbenezerInstance::MarketBBSBuyDelete(int16_t index)
 {
 	m_sBuyID[index] = -1;
 	memset(m_strBuyTitle[index], 0, sizeof(m_strBuyTitle[index]));
@@ -3196,7 +2964,7 @@ void CEbenezerDlg::MarketBBSBuyDelete(int16_t index)
 	m_fBuyStartTime[index] = 0.0;
 }
 
-void CEbenezerDlg::MarketBBSSellDelete(int16_t index)
+void EbenezerInstance::MarketBBSSellDelete(int16_t index)
 {
 	m_sSellID[index] = -1;
 	memset(m_strSellTitle[index], 0, sizeof(m_strSellTitle[index]));
@@ -3205,13 +2973,13 @@ void CEbenezerDlg::MarketBBSSellDelete(int16_t index)
 	m_fSellStartTime[index] = 0.0;
 }
 
-void CEbenezerDlg::WritePacketLog()
+void EbenezerInstance::WritePacketLog()
 {
-	spdlog::info("EbenezerDlg::WritePacketLog: send={} realsend={} recv={}",
+	spdlog::info("EbenezerInstance::WritePacketLog: send={} realsend={} recv={}",
 		m_iPacketCount, m_iSendPacketCount, m_iRecvPacketCount);
 }
 
-int CEbenezerDlg::GetKnightsGrade(int nPoints)
+int EbenezerInstance::GetKnightsGrade(int nPoints)
 {
 	// 클랜등급 = 클랜원 국가 기여도의 총합 / 24
 	int nClanPoints = nPoints / 24;
@@ -3235,7 +3003,7 @@ int CEbenezerDlg::GetKnightsGrade(int nPoints)
 	return nGrade;
 }
 
-void CEbenezerDlg::CheckAliveUser()
+void EbenezerInstance::CheckAliveUser()
 {
 	int socketCount = GetUserSocketCount();
 	for (int i = 0; i < socketCount; i++)
@@ -3249,7 +3017,7 @@ void CEbenezerDlg::CheckAliveUser()
 			if (pUser->m_sAliveCount > 3)
 			{
 				pUser->Close();
-				spdlog::debug("EbenezerDlg::CheckAliveUser: User Alive Close [userId={} charId={}]",
+				spdlog::debug("EbenezerInstance::CheckAliveUser: User Alive Close [userId={} charId={}]",
 					pUser->GetSocketID(), pUser->m_pUserData->m_id);
 			}
 
@@ -3258,7 +3026,7 @@ void CEbenezerDlg::CheckAliveUser()
 	}
 }
 
-void CEbenezerDlg::KickOutAllUsers()
+void EbenezerInstance::KickOutAllUsers()
 {
 	int socketCount = GetUserSocketCount();
 	for (int i = 0; i < socketCount; i++)
@@ -3272,14 +3040,14 @@ void CEbenezerDlg::KickOutAllUsers()
 	}
 }
 
-int64_t CEbenezerDlg::GenerateItemSerial()
+int64_t EbenezerInstance::GenerateItemSerial()
 {
 	MYINT64 serial;
 	MYSHORT	increase;
 	serial.i = 0;
 	increase.w = 0;
 
-	CTime t = CTime::GetCurrentTime();
+	DateTime t = DateTime::GetNow();
 
 	std::lock_guard<std::mutex> lock(_serialMutex);
 
@@ -3298,7 +3066,7 @@ int64_t CEbenezerDlg::GenerateItemSerial()
 	return serial.i;
 }
 
-void CEbenezerDlg::KickOutZoneUsers(int16_t zone)
+void EbenezerInstance::KickOutZoneUsers(int16_t zone)
 {
 	int socketCount = GetUserSocketCount();
 	for (int i = 0; i < socketCount; i++)
@@ -3317,7 +3085,7 @@ void CEbenezerDlg::KickOutZoneUsers(int16_t zone)
 	}
 }
 
-void CEbenezerDlg::Send_UDP_All(char* pBuf, int len, int group_type)
+void EbenezerInstance::Send_UDP_All(char* pBuf, int len, int group_type)
 {
 	std::map<int, _ZONE_SERVERINFO*>::iterator Iter1;
 	std::map<int, _ZONE_SERVERINFO*>::iterator Iter2;
@@ -3346,7 +3114,7 @@ void CEbenezerDlg::Send_UDP_All(char* pBuf, int len, int group_type)
 	}
 }
 
-bool CEbenezerDlg::LoadBattleTable()
+bool EbenezerInstance::LoadBattleTable()
 {
 	using ModelType = model::Battle;
 
@@ -3372,7 +3140,7 @@ bool CEbenezerDlg::LoadBattleTable()
 	return true;
 }
 
-void CEbenezerDlg::Send_CommandChat(char* pBuf, int len, int nation, CUser* pExceptUser)
+void EbenezerInstance::Send_CommandChat(char* pBuf, int len, int nation, CUser* pExceptUser)
 {
 	int socketCount = GetUserSocketCount();
 	for (int i = 0; i < socketCount; i++)
@@ -3390,7 +3158,7 @@ void CEbenezerDlg::Send_CommandChat(char* pBuf, int len, int nation, CUser* pExc
 	}
 }
 
-bool CEbenezerDlg::LoadKnightsRankTable()
+bool EbenezerInstance::LoadKnightsRankTable()
 {
 	using ModelType = model::KnightsRating;
 
@@ -3503,7 +3271,7 @@ bool CEbenezerDlg::LoadKnightsRankTable()
 	std::string strElmoCaptainName = fmt::format_db_resource(IDS_ELMO_CAPTAIN,
 		strElmoCaptain[0], strElmoCaptain[1], strElmoCaptain[2], strElmoCaptain[3], strElmoCaptain[4]);
 
-	spdlog::trace("EbenezerDlg::LoadKnightsRankTable: success");
+	spdlog::trace("EbenezerInstance::LoadKnightsRankTable: success");
 
 	char send_buff[1024] = {},
 		temp_buff[1024] = {};
@@ -3542,7 +3310,7 @@ bool CEbenezerDlg::LoadKnightsRankTable()
 	return true;
 }
 
-void CEbenezerDlg::BattleZoneCurrentUsers()
+void EbenezerInstance::BattleZoneCurrentUsers()
 {
 	C3DMap* pMap = GetMapByID(ZONE_BATTLE);
 	if (pMap == nullptr)
@@ -3582,7 +3350,7 @@ void CEbenezerDlg::BattleZoneCurrentUsers()
 	Send_UDP_All(send_buff, send_index);
 }
 
-void CEbenezerDlg::FlySanta()
+void EbenezerInstance::FlySanta()
 {
 	int send_index = 0;
 	char send_buff[128] = {};
@@ -3592,7 +3360,7 @@ void CEbenezerDlg::FlySanta()
 	Send_All(send_buff, send_index);
 }
 
-C3DMap* CEbenezerDlg::GetMapByIndex(int iZoneIndex) const
+C3DMap* EbenezerInstance::GetMapByIndex(int iZoneIndex) const
 {
 	if (iZoneIndex < 0
 		|| iZoneIndex >= static_cast<int>(m_ZoneArray.size()))
@@ -3601,7 +3369,7 @@ C3DMap* CEbenezerDlg::GetMapByIndex(int iZoneIndex) const
 	return m_ZoneArray[iZoneIndex];
 }
 
-C3DMap* CEbenezerDlg::GetMapByID(int iZoneID) const
+C3DMap* EbenezerInstance::GetMapByID(int iZoneID) const
 {
 	for (C3DMap* pMap : m_ZoneArray)
 	{
@@ -3613,7 +3381,7 @@ C3DMap* CEbenezerDlg::GetMapByID(int iZoneID) const
 	return nullptr;
 }
 
-bool CEbenezerDlg::LoadEventTriggerTable()
+bool EbenezerInstance::LoadEventTriggerTable()
 {
 	using ModelType = model::EventTrigger;
 
@@ -3632,7 +3400,7 @@ bool CEbenezerDlg::LoadEventTriggerTable()
 			bool inserted = localMap.insert(std::make_pair(key, row.TriggerNumber)).second;
 			if (!inserted)
 			{
-				spdlog::error("EbenezerDlg::LoadEventTriggerTable: failed to insert into EventTriggerMap [NpcType={} NpcId={}]",
+				spdlog::error("EbenezerInstance::LoadEventTriggerTable: failed to insert into EventTriggerMap [NpcType={} NpcId={}]",
 					row.NpcType, row.NpcId);
 			}
 		}
@@ -3649,14 +3417,14 @@ bool CEbenezerDlg::LoadEventTriggerTable()
 	return true;
 }
 
-uint32_t CEbenezerDlg::GetEventTriggerKey(uint8_t byNpcType, uint16_t sTrapNumber) const
+uint32_t EbenezerInstance::GetEventTriggerKey(uint8_t byNpcType, uint16_t sTrapNumber) const
 {
 	// This is just a more efficient way of packing both components into a single key
 	// instead of using and comparing std::pair<> in our map.
 	return (static_cast<uint32_t>(byNpcType) << 16) | sTrapNumber;
 }
 
-int32_t CEbenezerDlg::GetEventTrigger(uint8_t byNpcType, uint16_t sTrapNumber) const
+int32_t EbenezerInstance::GetEventTrigger(uint8_t byNpcType, uint16_t sTrapNumber) const
 {
 	uint32_t key = GetEventTriggerKey(byNpcType, sTrapNumber);
 
@@ -3667,7 +3435,7 @@ int32_t CEbenezerDlg::GetEventTrigger(uint8_t byNpcType, uint16_t sTrapNumber) c
 	return itr->second;
 }
 
-void CEbenezerDlg::SendSMQHeartbeat()
+void EbenezerInstance::SendSMQHeartbeat()
 {
 	char sendBuffer[4];
 	int sendIndex = 0;
@@ -3675,7 +3443,7 @@ void CEbenezerDlg::SendSMQHeartbeat()
 	m_LoggerSendQueue.PutData(sendBuffer, sendIndex);
 }
 
-void CEbenezerDlg::GameTimeTick()
+void EbenezerInstance::GameTimeTick()
 {
 	UpdateGameTime();
 

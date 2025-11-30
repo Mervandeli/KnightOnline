@@ -21,7 +21,7 @@
     <ClCompile Include="Ebenezer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EbenezerDlg.cpp">
+    <ClCompile Include="EbenezerInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EVENT.cpp">
@@ -54,10 +54,7 @@
     <ClCompile Include="Npc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Region.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StdAfx.cpp">
+    <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UdpSocket.cpp">
@@ -95,10 +92,7 @@
     <ClInclude Include="Define.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Ebenezer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EbenezerDlg.h">
+    <ClInclude Include="EbenezerInstance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EVENT.h">
@@ -137,9 +131,6 @@
     <ClInclude Include="Region.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StdAfx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UdpSocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -176,6 +167,9 @@
     <ClInclude Include="EbenezerReadQueueThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\Ebenezer.ico">
@@ -186,10 +180,5 @@
     <ResourceCompile Include="Ebenezer.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="res\Ebenezer.rc2">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
   </ItemGroup>
 </Project>

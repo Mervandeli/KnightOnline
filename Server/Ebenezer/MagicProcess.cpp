@@ -1,23 +1,12 @@
-﻿// MagicProcess.cpp: implementation of the CMagicProcess class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
-#include "ebenezer.h"
+﻿#include "pch.h"
 #include "MagicProcess.h"
-#include "EbenezerDlg.h"
+#include "EbenezerInstance.h"
 #include "User.h"
 #include "Npc.h"
 #include "GameDefine.h"
 
 #include <shared/packets.h>
 #include <spdlog/spdlog.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
 
 #define MORAL_SELF				1		// 나 자신..
 #define MORAL_FRIEND_WITHME		2		// 나를 포함한 우리편(국가) 중 하나 ..
@@ -54,10 +43,6 @@ static char THIS_FILE[] = __FILE__;
 #define RESURRECTION			3
 #define	RESURRECTION_SELF		4
 #define REMOVE_BLESS			5
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CMagicProcess::CMagicProcess()
 {

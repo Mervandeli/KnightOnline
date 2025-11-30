@@ -235,7 +235,7 @@ TcpSocket* SocketManager::AcquireServerSocket(int& socketId)
 	socketId = _socketIdQueue.front();
 
 	// This is all self-contained so it should never be out of range.
-	_ASSERT(socketId >= 0 && socketId < _serverSocketCount);
+	assert(socketId >= 0 && socketId < _serverSocketCount);
 
 	TcpSocket* tcpSocket = _inactiveServerSocketArray[socketId];
 	if (tcpSocket == nullptr)

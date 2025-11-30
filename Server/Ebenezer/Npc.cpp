@@ -1,27 +1,12 @@
-﻿// Npc.cpp: implementation of the CNpc class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
-#include "Ebenezer.h"
+﻿#include "pch.h"
 #include "Npc.h"
-#include "EbenezerDlg.h"
+#include "EbenezerInstance.h"
 #include "Map.h"
 
 #include <shared/packets.h>
 #include <spdlog/spdlog.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
 extern std::recursive_mutex g_region_mutex;
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CNpc::CNpc()
 {
@@ -33,7 +18,7 @@ CNpc::~CNpc()
 
 void CNpc::Initialize()
 {
-	m_pMain = (CEbenezerDlg*) AfxGetApp()->GetMainWnd();
+	m_pMain = EbenezerInstance::instance();
 
 	m_sNid = -1;				// NPC (서버상의)일련번호
 	m_sSid = 0;

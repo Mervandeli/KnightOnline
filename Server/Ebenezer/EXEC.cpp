@@ -1,24 +1,9 @@
-﻿// EXEC.cpp: implementation of the EXEC class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
-#include "Ebenezer.h"
+﻿#include "pch.h"
 #include "Define.h"
 #include "EXEC.h"
 
 #include <djb2/djb2_hasher.h>
 #include <spdlog/spdlog.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 EXEC::EXEC()
 {
@@ -28,7 +13,7 @@ EXEC::~EXEC()
 {
 }
 
-void EXEC::Parse(const char* line, const std::wstring& filename, int lineNumber)
+void EXEC::Parse(const char* line, const std::string& filename, int lineNumber)
 {
 	int index = 0, argsToParse = 0;
 	char temp[1024];
@@ -97,11 +82,11 @@ void EXEC::Parse(const char* line, const std::wstring& filename, int lineNumber)
 			break;
 
 		default:
-			spdlog::warn("EXEC::Parse: unhandled opcode '{}' ({}:{})", temp, WideToUtf8(filename), lineNumber);
+			spdlog::warn("EXEC::Parse: unhandled opcode '{}' ({}:{})", temp, filename, lineNumber);
 			break;
 	}
 
-	_ASSERT(argsToParse >= 0 && argsToParse <= MAX_EXEC_INT);
+	assert(argsToParse >= 0 && argsToParse <= MAX_EXEC_INT);
 	for (int i = 0; i < argsToParse; i++)
 	{
 		index += ParseSpace(temp, line + index);

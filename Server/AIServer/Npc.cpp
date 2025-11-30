@@ -177,7 +177,7 @@ CNpc::CNpc()
 	m_fHPChangeTime = TimeGet();
 	m_fFaintingTime = 0.0;
 
-	::ZeroMemory(m_pMap, sizeof(m_pMap));// 일차원 맵으로 초기화한다.
+	memset(m_pMap, 0, sizeof(m_pMap));// 일차원 맵으로 초기화한다.
 
 	m_iRegion_X = 0;
 	m_iRegion_Z = 0;
@@ -209,7 +209,7 @@ CNpc::~CNpc()
 //
 void CNpc::ClearPathFindData()
 {
-	::ZeroMemory(m_pMap, sizeof(m_pMap));	// 일차원 맵을 위해
+	memset(m_pMap, 0, sizeof(m_pMap));	// 일차원 맵을 위해
 
 	m_bPathFlag = false;
 	m_sStepCount = 0;
@@ -240,7 +240,7 @@ void CNpc::InitUserList()
 		m_DamagedUserList[i].bIs = false;
 		m_DamagedUserList[i].iUid = -1;
 		m_DamagedUserList[i].nDamage = 0;
-		::ZeroMemory(m_DamagedUserList[i].strUserID, sizeof(m_DamagedUserList[i].strUserID));
+		memset(m_DamagedUserList[i].strUserID, 0, sizeof(m_DamagedUserList[i].strUserID));
 	}
 }
 

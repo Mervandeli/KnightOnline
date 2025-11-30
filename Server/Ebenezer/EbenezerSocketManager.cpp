@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+﻿#include "pch.h"
 #include "EbenezerSocketManager.h"
 #include "Define.h"
 #include "SendWorkerThread.h"
