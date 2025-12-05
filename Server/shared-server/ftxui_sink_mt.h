@@ -55,7 +55,8 @@ namespace ftxui
 		std::deque<ReplayLog>					_replayLogBuffer;
 		std::mutex								_logBufferMutex;
 		ftxui::ScreenInteractive*				_screen;
-		bool									_useStdout;
+		bool									_useConsoleSink;
+		bool									_storeLogBuffer;
 		size_t									_backlogSize;
 		std::shared_ptr<spdlog::sinks::sink>	_consoleSink;
 	};

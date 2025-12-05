@@ -11,7 +11,8 @@ namespace ftxui
 	sink_mt::sink_mt()
 	{
 		_screen = nullptr;
-		_useStdout = false;
+		_useConsoleSink = true;
+		_storeLogBuffer = true;
 		_backlogSize = DEFAULT_BACKLOG_SIZE;
 	}
 
@@ -50,7 +51,13 @@ namespace ftxui
 				_replayLogBuffer.pop_front();
 			}
 
-			_useStdout = true;
+			_useConsoleSink = true;
+			_storeLogBuffer = false;
+		}
+		else if (screen != nullptr)
+		{
+			_useConsoleSink = false;
+			_storeLogBuffer = true;
 		}
 	}
 
@@ -89,12 +96,11 @@ namespace ftxui
 
 	void sink_mt::sink_it_(const spdlog::details::log_msg& msg)
 	{
-		if (_useStdout)
+		if (_useConsoleSink)
 		{
 			auto consoleSink = _consoleSink;
 			if (consoleSink != nullptr)
 				consoleSink->log(msg);
-			return;
 		}
 
 		msg.color_range_start = 0;
@@ -153,8 +159,12 @@ namespace ftxui
 					_replayLogBuffer.pop_front();
 			}
 
-			_logBuffer.push_back(logLine);
-			_replayLogBuffer.push_back(std::move(replayLog));
+			if (_storeLogBuffer)
+				_logBuffer.push_back(logLine);
+
+			// No need to replay entries that have already been written to the console.
+			if (!_useConsoleSink)
+				_replayLogBuffer.push_back(std::move(replayLog));
 		}
 
 		// Trigger UI refresh when new log is added
@@ -164,7 +174,7 @@ namespace ftxui
 
 	void sink_mt::flush_()
 	{
-		if (_useStdout)
+		if (_useConsoleSink)
 		{
 			auto consoleSink = _consoleSink;
 			if (consoleSink != nullptr)
