@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "utilities.h"
+#include <algorithm>	// std::clamp()
+#include <limits>		// INT_MAX
 
 bool CheckGetVarString(int nLength, char* tBuf, const char* sBuf, int nSize, int& index)
 {
@@ -217,17 +219,11 @@ int myrand_generic(int min, int max)
 		std::swap(min, max);
 
 	double gap = max - min + 1;
-	double rrr = (double) RAND_MAX / gap;
+	double rrr = static_cast<double>(RAND_MAX) / gap;
 
-	double rand_result;
-
-	rand_result = (double) rand() / rrr;
-
-	if ((int) (min + (int) rand_result) < min)
-		return min;
-
-	if ((int) (min + (int) rand_result) > max)
+	int rand_result = static_cast<int>(static_cast<double>(rand()) / rrr);
+	if (min > (INT_MAX - rand_result))
 		return max;
 
-	return (int) (min + (int) rand_result);
+	return std::clamp(min + rand_result, min, max);
 }
