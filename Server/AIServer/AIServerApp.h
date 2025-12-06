@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+#include <shared-server/AppThread.h>
+#include <shared-server/STLMap.h>
+
 #include "AISocketManager.h"
 
 #include "MAP.h"
@@ -7,9 +10,6 @@
 #include "Npc.h"
 
 #include "Extern.h"			// 전역 객체
-
-#include <shared-server/AppThread.h>
-#include <shared-server/STLMap.h>
 
 #include <vector>
 #include <list>
@@ -160,7 +160,14 @@ private:
 	bool GetMakeRareItemTableData();
 	bool GetMakeItemGroupTableData();
 	bool MapFileLoad();
-	void GetServerInfoIni();
+
+	/// \returns The application's ini config path.
+	std::filesystem::path ConfigPath() const override;
+
+	/// \brief Loads application-specific config from the loaded application ini file (`iniFile`).
+	/// \param iniFile The loaded application ini file.
+	/// \returns true when successful, false otherwise
+	bool LoadConfig(CIni& iniFile) override;
 
 	void SyncTest();
 	void RegionCheck();		// region안에 들어오는 유저 체크 (스레드에서 FindEnermy()함수의 부하를 줄이기 위한 꽁수)

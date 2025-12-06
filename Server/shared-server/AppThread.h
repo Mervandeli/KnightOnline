@@ -5,20 +5,45 @@
 
 #include <ftxui/component/event.hpp>
 
+class CIni;
 class AppThread : public Thread
 {
 public:
-	int exitCode() const
+	int ExitCode() const
 	{
 		return _exitCode;
+	}
+
+	CIni& IniFile()
+	{
+		return *_iniFile;
 	}
 
 	AppThread(logger::Logger& logger);
 	~AppThread();
 
+	/// \returns The base directory for logs. By default this is the working directory.
+	virtual std::filesystem::path LogBaseDir() const;
+
+	/// \returns The application's ini config path.
+	virtual std::filesystem::path ConfigPath() const = 0;
+
 	/// \brief The main thread loop for the server instance
 	void thread_loop() override;
 
+protected:
+	/// \brief Loads application-specific config from the loaded application ini file (`iniFile`).
+	/// \param iniFile The loaded application ini file.
+	/// \returns true when successful, false otherwise
+	virtual bool LoadConfig(CIni& iniFile);
+
+private:
+	/// \brief Wraps the main startup logic so that error handling can be shared by the caller.
+	/// \param iniFile The loaded application ini file.
+	/// \returns true when successful, false otherwise
+	bool StartupImpl(CIni& iniFile);
+
+public:
 	/// \brief Initializes the server, loading caches, socket managers, etc.
 	/// \returns true when successful, false otherwise
 	virtual bool OnStart() = 0;
@@ -49,12 +74,15 @@ public:
 		// We keep the main() thread alive to catch interrupt signals and call shutdown
 		appThread.join();
 
-		return appThread.exitCode();
+		return appThread.ExitCode();
 	}
 
 private:
 	static void catchInterruptSignals();
 	static void signalHandler(int signalNumber);
+
+private:
+	CIni* _iniFile;
 
 protected:
 	logger::Logger&		_logger;

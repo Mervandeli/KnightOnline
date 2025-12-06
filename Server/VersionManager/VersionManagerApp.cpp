@@ -64,11 +64,7 @@ bool VersionManagerApp::OnStart()
 	_socketManager.Init(MAX_USER, 0, 1);
 	_socketManager.AllocateServerSockets<CUser>();
 
-	if (!GetInfoFromIni())
-	{
-		spdlog::error("Ini File Info Error!!");
-		return false;
-	}
+	spdlog::info("Version Manager initialized");
 
 	// print the ODBC connection string
 	// TODO: modelUtil::DbType::ACCOUNT;  Currently all models are assigned to GAME
@@ -102,24 +98,22 @@ bool VersionManagerApp::OnStart()
 	return true;
 }
 
-bool VersionManagerApp::GetInfoFromIni()
+/// \returns The application's ini config path.
+std::filesystem::path VersionManagerApp::ConfigPath() const
 {
-	std::filesystem::path exePath = GetProgPath();
-	std::filesystem::path iniPath = exePath / "Version.ini";
+	return GetProgPath() / "Version.ini";
+}
 
-	CIni ini(iniPath);
-
+bool VersionManagerApp::LoadConfig(CIni& iniFile)
+{
 	// ftp config
-	ini.GetString(ini::DOWNLOAD, ini::URL, "127.0.0.1", _ftpUrl, _countof(_ftpUrl));
-	ini.GetString(ini::DOWNLOAD, ini::PATH, "/", _ftpPath, _countof(_ftpPath));
-
-	// configure logger
-	_logger.Setup(ini, exePath);
+	iniFile.GetString(ini::DOWNLOAD, ini::URL, "127.0.0.1", _ftpUrl, _countof(_ftpUrl));
+	iniFile.GetString(ini::DOWNLOAD, ini::PATH, "/", _ftpPath, _countof(_ftpPath));
 	
 	// TODO: KN_online should be Knight_Account
-	std::string datasourceName = ini.GetString(ini::ODBC, ini::DSN, "KN_online");
-	std::string datasourceUser = ini.GetString(ini::ODBC, ini::UID, "knight");
-	std::string datasourcePass = ini.GetString(ini::ODBC, ini::PWD, "knight");
+	std::string datasourceName = iniFile.GetString(ini::ODBC, ini::DSN, "KN_online");
+	std::string datasourceUser = iniFile.GetString(ini::ODBC, ini::UID, "knight");
+	std::string datasourcePass = iniFile.GetString(ini::ODBC, ini::PWD, "knight");
 
 	db::ConnectionManager::SetDatasourceConfig(
 		modelUtil::DbType::ACCOUNT,
@@ -130,20 +124,34 @@ bool VersionManagerApp::GetInfoFromIni()
 		modelUtil::DbType::GAME,
 		datasourceName, datasourceUser, datasourcePass);
 
-	int serverCount = ini.GetInt(ini::SERVER_LIST, ini::COUNT, 1);
+	int serverCount = iniFile.GetInt(ini::SERVER_LIST, ini::COUNT, 1);
 
-	if (strlen(_ftpUrl) == 0
-		|| strlen(_ftpPath) == 0)
+	if (strlen(_ftpUrl) == 0)
+	{
+		spdlog::error("VersionManagerApp::LoadConfig: The FTP URL must be set.");
 		return false;
+	}
 
-	if (datasourceName.length() == 0
+	if (strlen(_ftpPath) == 0)
+	{
+		spdlog::error("VersionManagerApp::LoadConfig: The FTP path must be set.");
+		return false;
+	}
+
+	if (datasourceName.empty()
 		// TODO: Should we not validate UID/Pass length?  Would that allow Windows Auth?
-		|| datasourceUser.length() == 0
-		|| datasourcePass.length() == 0)
+		|| datasourceUser.empty()
+		|| datasourcePass.empty())
+	{
+		spdlog::error("VersionManagerApp::LoadConfig: Datasource config must be set.");
 		return false;
+	}
 
 	if (serverCount <= 0)
+	{
+		spdlog::error("VersionManagerApp::LoadConfig: At least 1 server must exist in the server list.");
 		return false;
+	}
 
 	char key[20] = {};
 	ServerList.reserve(serverCount);
@@ -153,16 +161,16 @@ bool VersionManagerApp::GetInfoFromIni()
 		_SERVER_INFO* pInfo = new _SERVER_INFO;
 
 		snprintf(key, sizeof(key), "SERVER_%02d", i);
-		ini.GetString(ini::SERVER_LIST, key, "127.0.0.1", pInfo->strServerIP, _countof(pInfo->strServerIP));
+		iniFile.GetString(ini::SERVER_LIST, key, "127.0.0.1", pInfo->strServerIP, _countof(pInfo->strServerIP));
 
 		snprintf(key, sizeof(key), "NAME_%02d", i);
-		ini.GetString(ini::SERVER_LIST, key, "TEST|Server 1", pInfo->strServerName, _countof(pInfo->strServerName));
+		iniFile.GetString(ini::SERVER_LIST, key, "TEST|Server 1", pInfo->strServerName, _countof(pInfo->strServerName));
 
 		snprintf(key, sizeof(key), "ID_%02d", i);
-		pInfo->sServerID = static_cast<int16_t>(ini.GetInt(ini::SERVER_LIST, key, 1));
+		pInfo->sServerID = static_cast<int16_t>(iniFile.GetInt(ini::SERVER_LIST, key, 1));
 
 		snprintf(key, sizeof(key), "USER_LIMIT_%02d", i);
-		pInfo->sUserLimit = static_cast<int16_t>(ini.GetInt(ini::SERVER_LIST, key, MAX_USER));
+		pInfo->sUserLimit = static_cast<int16_t>(iniFile.GetInt(ini::SERVER_LIST, key, MAX_USER));
 
 		ServerList.push_back(pInfo);
 	}
@@ -175,12 +183,12 @@ bool VersionManagerApp::GetInfoFromIni()
 	for (int i = 0; i < MAX_NEWS_COUNT; i++)
 	{
 		snprintf(key, sizeof(key), "TITLE_%02d", i);
-		title = ini.GetString("NEWS", key, "");
+		title = iniFile.GetString("NEWS", key, "");
 		if (title.empty())
 			continue;
 
 		snprintf(key, sizeof(key), "MESSAGE_%02d", i);
-		message = ini.GetString("NEWS", key, "");
+		message = iniFile.GetString("NEWS", key, "");
 		if (message.empty())
 			continue;
 
@@ -195,18 +203,13 @@ bool VersionManagerApp::GetInfoFromIni()
 	{
 		if (newsContent.size() > sizeof(News.Content))
 		{
-			spdlog::error("VersionManagerApp::GetInfoFromIni: News too long");
+			spdlog::error("VersionManagerApp::LoadConfig: News too long");
 			return false;
 		}
 
 		memcpy(&News.Content, newsContent.c_str(), newsContent.size());
 		News.Size = static_cast<int16_t>(newsContent.size());
 	}
-
-	// Trigger a save to flush defaults to file.
-	ini.Save();
-
-	spdlog::info("Version Manager initialized");
 
 	return true;
 }

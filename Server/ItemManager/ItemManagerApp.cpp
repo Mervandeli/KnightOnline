@@ -32,19 +32,14 @@ ItemManagerApp::~ItemManagerApp()
 	spdlog::info("ItemManagerApp::~ItemManagerApp: All resources safely released.");
 }
 
+/// \returns The application's ini config path.
+std::filesystem::path ItemManagerApp::ConfigPath() const
+{
+	return GetProgPath() / "ItemManager.ini";
+}
+
 bool ItemManagerApp::OnStart()
 {
-	//----------------------------------------------------------------------
-	//	Logfile initialize
-	//----------------------------------------------------------------------
-	std::filesystem::path exePath = GetProgPath();
-	std::filesystem::path iniPath = exePath / "ItemManager.ini";
-
-	CIni ini(iniPath);
-
-	// configure logger
-	_logger.Setup(ini, exePath);
-
 	if (!m_LoggerRecvQueue.Open(SMQ_ITEMLOGGER))
 	{
 		spdlog::error("Shared memory queue not yet available. Run Ebenezer first.");

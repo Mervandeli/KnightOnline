@@ -174,6 +174,14 @@ protected:
 	/// \see UserDataSave(), HandleUserLogout()
 	bool HandleUserUpdate(int userId, const _USER_DATA& user, uint8_t saveType);
 
+	/// \returns The application's ini config path.
+	std::filesystem::path ConfigPath() const override;
+
+	/// \brief Loads application-specific config from the loaded application ini file (`iniFile`).
+	/// \param iniFile The loaded application ini file.
+	/// \returns true when successful, false otherwise
+	bool LoadConfig(CIni& iniFile) override;
+
 	bool OnStart() override;
 
 private:
