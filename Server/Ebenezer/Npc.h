@@ -1,18 +1,8 @@
-﻿// Npc.h: interface for the CNpc class.
-//
-//////////////////////////////////////////////////////////////////////
+﻿#pragma once
 
-#if !defined(AFX_NPC_H__1DE71CDD_4040_4479_828D_E8EE07BD7A67__INCLUDED_)
-#define AFX_NPC_H__1DE71CDD_4040_4479_828D_E8EE07BD7A67__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
-
-#include "define.h"
+#include "Define.h"
 
 class EbenezerApp;
-
 class CNpc
 {
 public:
@@ -44,10 +34,10 @@ public:
 								// 1 : NPC
 								// 2 : 각 입구,출구 NPC
 								// 3 : 경비병
-	int		m_iSellingGroup;		// ItemGroup
+	int		m_iSellingGroup;	// ItemGroup
 
-	int16_t	m_sRegion_X;			// region x position
-	int16_t	m_sRegion_Z;			// region z position
+	int16_t	m_sRegion_X;		// region x position
+	int16_t	m_sRegion_Z;		// region z position
 	uint8_t	m_NpcState;			// NPC의 상태 - 살았다, 죽었다, 서있다 등등...
 	uint8_t	m_byGateOpen;		// Gate Npc Status -> 1 : open 0 : close
 	int16_t	m_sHitRate;			// 공격 성공률
@@ -70,9 +60,8 @@ public:
 	int GetRegionNpcList(int region_x, int region_z, char* buff, int& t_count);
 	void GetNpcInfo(char* buff, int& buff_index);
 
-	inline uint8_t GetState() const {
+	uint8_t GetState() const
+	{
 		return m_byState;
 	}
 };
-
-#endif // !defined(AFX_NPC_H__1DE71CDD_4040_4479_828D_E8EE07BD7A67__INCLUDED_)

@@ -1,13 +1,4 @@
-﻿// MagicProcess.h: interface for the CMagicProcess class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_MAGICPROCESS_H__C39F1966_3F41_47A9_B26A_77F311683A05__INCLUDED_)
-#define AFX_MAGICPROCESS_H__C39F1966_3F41_47A9_B26A_77F311683A05__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+﻿#pragma once
 
 #include "GameDefine.h"
 
@@ -23,7 +14,6 @@
 
 class EbenezerApp;
 class CUser;
-
 class CMagicProcess
 {
 public:
@@ -54,5 +44,3 @@ public:
 	CUser*			m_pSrcUser;
 	uint8_t			m_bMagicState;
 };
-
-#endif // !defined(AFX_MAGICPROCESS_H__C39F1966_3F41_47A9_B26A_77F311683A05__INCLUDED_)

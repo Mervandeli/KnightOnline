@@ -1,20 +1,10 @@
-﻿// MagicProcess.h: interface for the CMagicProcess class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_MAGICPROCESS_H__9FE02686_F482_4C68_849A_130DE441D38D__INCLUDED_)
-#define AFX_MAGICPROCESS_H__9FE02686_F482_4C68_849A_130DE441D38D__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+﻿#pragma once
 
 #include "Extern.h"
 
 class AIServerApp;
 class CUser;
 class CNpc;
-
 class CMagicProcess
 {
 public:
@@ -43,7 +33,4 @@ public:
 
 	model::Magic* IsAvailable(int magicid, int tid, uint8_t type);
 	void MagicPacket(char* pBuf);
-
 };
-
-#endif // !defined(AFX_MAGICPROCESS_H__9FE02686_F482_4C68_849A_130DE441D38D__INCLUDED_)

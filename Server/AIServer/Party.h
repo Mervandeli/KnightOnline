@@ -1,20 +1,10 @@
-﻿// Party.h: interface for the CParty class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_PARTY_H__4F806B4E_F764_4983_9A47_46254233A7BA__INCLUDED_)
-#define AFX_PARTY_H__4F806B4E_F764_4983_9A47_46254233A7BA__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+﻿#pragma once
 
 //#include "PartyUser.h"
 //#include "STLMap.h"
 
 //typedef CSTLMap <CPartyUser>			PartyUserArray;
 class AIServerApp;
-
 class CParty
 {
 public:
@@ -33,7 +23,4 @@ public:
 	void PartyInsert(char* pBuf);
 	void PartyCreate(char* pBuf);
 	void PartyProcess(char* pBuf);
-
 };
-
-#endif // !defined(AFX_PARTY_H__4F806B4E_F764_4983_9A47_46254233A7BA__INCLUDED_)

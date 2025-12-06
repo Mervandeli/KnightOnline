@@ -1,13 +1,4 @@
-﻿// NpcMagicProcess.h: interface for the CNpcMagicProcess class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_NPCMAGICPROCESS_H__7C457180_E271_45E6_BEFC_912BCCAB0604__INCLUDED_)
-#define AFX_NPCMAGICPROCESS_H__7C457180_E271_45E6_BEFC_912BCCAB0604__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+﻿#pragma once
 
 #include "Extern.h"
 
@@ -38,7 +29,4 @@ public:
 
 	model::Magic* IsAvailable(int magicid, int tid, uint8_t type);
 	void MagicPacket(char* pBuf, int len);
-
 };
-
-#endif // !defined(AFX_NPCMAGICPROCESS_H__7C457180_E271_45E6_BEFC_912BCCAB0604__INCLUDED_)

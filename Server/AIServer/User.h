@@ -1,16 +1,6 @@
-﻿// User.h: interface for the CUser class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_USER_H__1CC8CB68_CF95_4849_8E89_134826B1FAC2__INCLUDED_)
-#define AFX_USER_H__1CC8CB68_CF95_4849_8E89_134826B1FAC2__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+﻿#pragma once
 
 #include "MagicProcess.h"
-
 #include "Extern.h"
 
 #include <shared-server/STLMap.h>
@@ -70,7 +60,6 @@ public:
 	int16_t	m_sAC;						// 방어율
 	int16_t	m_sItemAC;                  // 아이템 방어률
 
-
 	int16_t	m_sSurroundNpcNumber[8];		// Npc 다굴~
 
 	uint8_t	m_byIsOP;					// 운영자인지를 판단..
@@ -110,5 +99,3 @@ public:
 	CUser();
 	virtual ~CUser();
 };
-
-#endif // !defined(AFX_USER_H__1CC8CB68_CF95_4849_8E89_134826B1FAC2__INCLUDED_)
