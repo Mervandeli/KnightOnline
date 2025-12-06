@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "EbenezerInstance.h"
+#include "EbenezerApp.h"
 #include "Map.h"
 #include "OperationMessage.h"
 #include "User.h"
@@ -31,7 +31,7 @@ CUser::~CUser()
 
 void CUser::Initialize()
 {
-	m_pMain = EbenezerInstance::instance();
+	m_pMain = EbenezerApp::instance();
 
 	_regionBuffer->iLength = 0;
 	memset(_regionBuffer->pDataBuff, 0, sizeof(_regionBuffer->pDataBuff));

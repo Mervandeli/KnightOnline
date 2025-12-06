@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "VersionManagerInstance.h"
+#include "VersionManagerApp.h"
 #include "User.h"
 
 #include <shared/packets.h>
@@ -119,7 +119,7 @@ void CUser::Parsing(int len, char* pData)
 	{
 		case LS_VERSION_REQ:
 		{
-			VersionManagerInstance* appInstance = VersionManagerInstance::instance();
+			VersionManagerApp* appInstance = VersionManagerApp::instance();
 
 			SetByte(buff, LS_VERSION_REQ, send_index);
 			SetShort(buff, appInstance->LastVersion(), send_index);
@@ -129,7 +129,7 @@ void CUser::Parsing(int len, char* pData)
 
 		case LS_SERVERLIST:
 		{
-			VersionManagerInstance* appInstance = VersionManagerInstance::instance();
+			VersionManagerApp* appInstance = VersionManagerApp::instance();
 
 			// 기범이가 ^^;
 			appInstance->DbProcess.LoadUserCountList();
@@ -176,7 +176,7 @@ void CUser::LogInReq(char* pBuf)
 		accountid[MAX_ID_SIZE + 1] = {},
 		pwd[MAX_PW_SIZE + 1] = {};
 	int16_t sPremiumTimeDaysRemaining = -1;
-	VersionManagerInstance* appInstance = VersionManagerInstance::instance();
+	VersionManagerApp* appInstance = VersionManagerApp::instance();
 
 	idlen = GetShort(pBuf, index);
 	if (idlen > MAX_ID_SIZE
@@ -236,7 +236,7 @@ void CUser::SendDownloadInfo(int version)
 	int send_index = 0;
 	std::set<std::string> downloadset;
 	char buff[2048];
-	VersionManagerInstance* appInstance = VersionManagerInstance::instance();
+	VersionManagerApp* appInstance = VersionManagerApp::instance();
 
 	for (const auto& [_, pInfo] : appInstance->VersionList)
 	{
@@ -263,7 +263,7 @@ void CUser::NewsReq(char* pBuf)
 
 	char send_buff[8192];
 	int send_index = 0;
-	VersionManagerInstance* appInstance = VersionManagerInstance::instance();
+	VersionManagerApp* appInstance = VersionManagerApp::instance();
 
 	SetByte(send_buff, LS_NEWS, send_index);
 	SetString2(send_buff, szHeader, _countof(szHeader) - 1, send_index);

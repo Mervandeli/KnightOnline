@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "OperationMessage.h"
-#include "EbenezerInstance.h"
+#include "EbenezerApp.h"
 #include "EbenezerResourceFormatter.h"
 #include "User.h"
 #include "db_resources.h"
@@ -14,7 +14,7 @@
 
 extern bool g_serverdown_flag;
 
-OperationMessage::OperationMessage(EbenezerInstance* main, CUser* srcUser)
+OperationMessage::OperationMessage(EbenezerApp* main, CUser* srcUser)
 	: _main(main), _srcUser(srcUser)
 {
 }

@@ -21,9 +21,6 @@
     <ClCompile Include="Ebenezer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EbenezerInstance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EVENT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,15 +81,15 @@
     <ClCompile Include="EbenezerReadQueueThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EbenezerApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AISocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Define.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EbenezerInstance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EVENT.h">
@@ -168,6 +165,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EbenezerApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

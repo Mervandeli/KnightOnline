@@ -1,16 +1,16 @@
 ﻿#include "pch.h"
 #include "EbenezerReadQueueThread.h"
-#include "EbenezerInstance.h"
+#include "EbenezerApp.h"
 #include "User.h"
 
 EbenezerReadQueueThread::EbenezerReadQueueThread()
-	: ReadQueueThread(EbenezerInstance::instance()->m_LoggerRecvQueue)
+	: ReadQueueThread(EbenezerApp::instance()->m_LoggerRecvQueue)
 {
 }
 
 void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 {
-	EbenezerInstance* appInstance = EbenezerInstance::instance();
+	EbenezerApp* appInstance = EbenezerApp::instance();
 
 	int index = 0, uid = -1, send_index = 0, buff_length = 0;
 	uint8_t command, result;
@@ -83,7 +83,7 @@ void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 			if (pUser != nullptr
 				&& strlen(pUser->m_pUserData->m_id) != 0)
 			{
-				spdlog::debug("EbenezerInstance::ReadQueueThread: WIZ_LOGOUT [charId={}]",
+				spdlog::debug("EbenezerApp::ReadQueueThread: WIZ_LOGOUT [charId={}]",
 					pUser->m_pUserData->m_id);
 				pUser->Close();
 			}

@@ -1,10 +1,10 @@
 ﻿#include "pch.h"
-#include "EbenezerInstance.h"
+#include "EbenezerApp.h"
 #include "EbenezerResourceFormatter.h"
 
 bool fmt::resource_helper::get_from_db(uint32_t resourceId, std::string& fmtStr)
 {
-	EbenezerInstance* appInstance = EbenezerInstance::instance();
+	EbenezerApp* appInstance = EbenezerApp::instance();
 	if (appInstance == nullptr)
 	{
 		spdlog::error("get_from_db({}) failed - server instance unavailable.",

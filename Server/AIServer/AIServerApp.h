@@ -1,4 +1,4 @@
-﻿// AiServerInstance.h : header file
+﻿// AIServerApp.h : header file
 //
 #pragma once
 
@@ -31,7 +31,7 @@ public:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// AiServerInstance dialog
+// AIServerApp dialog
 
 class CNpcThread;
 class ZoneEventThread;
@@ -55,12 +55,12 @@ typedef std::list <int>						ZoneNpcInfoList;
 typedef std::vector <MAP*>					ZoneArray;
 
 class TimerThread;
-class AiServerInstance : public AppThread
+class AIServerApp : public AppThread
 {
 public:
-	static AiServerInstance* instance()
+	static AIServerApp* instance()
 	{
-		return static_cast<AiServerInstance*>(s_instance);
+		return static_cast<AIServerApp*>(s_instance);
 	}
 
 	void GameServerAcceptThread();
@@ -80,8 +80,8 @@ public:
 	MAP* GetMapByIndex(int iZoneIndex) const;
 	MAP* GetMapByID(int iZoneID) const;
 
-	AiServerInstance(AIServerLogger& logger);
-	~AiServerInstance();
+	AIServerApp(AIServerLogger& logger);
+	~AIServerApp();
 
 	NpcMap						m_NpcMap;
 	NpcTableMap					m_MonTableMap;

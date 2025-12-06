@@ -2,10 +2,10 @@
 //
 
 #include "pch.h"
-#include "EbenezerInstance.h"
+#include "EbenezerApp.h"
 
 int main()
 {
 	EbenezerLogger logger;
-	return AppThread::main<EbenezerInstance>(logger);
+	return AppThread::main<EbenezerApp>(logger);
 }

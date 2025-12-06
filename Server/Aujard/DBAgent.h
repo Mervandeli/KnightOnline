@@ -9,7 +9,7 @@
 
 typedef std::vector <_USER_DATA*>			UserDataArray;
 
-class AujardInstance;
+class AujardApp;
 class CDBAgent
 {
 public:
@@ -148,6 +148,6 @@ public:
 	UserDataArray	UserData;
 	
 private:
-	/// \brief reference back to the main AujardInstance instance
-	AujardInstance* _main;
+	/// \brief reference back to the main AujardApp instance
+	AujardApp* _main;
 };

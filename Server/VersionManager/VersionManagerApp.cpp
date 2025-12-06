@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "VersionManagerInstance.h"
+#include "VersionManagerApp.h"
 #include "User.h"
 
 #include <db-library/ConnectionManager.h>
@@ -15,7 +15,7 @@ constexpr int WM_PROCESS_LISTBOX_QUEUE = WM_APP + 1;
 
 using namespace std::chrono_literals;
 
-VersionManagerInstance::VersionManagerInstance(logger::Logger& logger)
+VersionManagerApp::VersionManagerApp(logger::Logger& logger)
 	: AppThread(logger),
 	_socketManager(SOCKET_BUFF_SIZE, SOCKET_BUFF_SIZE)
 {
@@ -31,35 +31,35 @@ VersionManagerInstance::VersionManagerInstance(logger::Logger& logger)
 		std::bind(&db::ConnectionManager::ExpireUnusedPoolConnections));
 }
 
-VersionManagerInstance::~VersionManagerInstance()
+VersionManagerApp::~VersionManagerApp()
 {
-	spdlog::info("VersionManagerInstance::~VersionManagerInstance: Shutting down, releasing resources.");
+	spdlog::info("VersionManagerApp::~VersionManagerApp: Shutting down, releasing resources.");
 	_socketManager.Shutdown();
-	spdlog::info("VersionManagerInstance::~VersionManagerInstance: SocketManager stopped.");
+	spdlog::info("VersionManagerApp::~VersionManagerApp: SocketManager stopped.");
 
-	spdlog::info("VersionManagerInstance::~VersionManagerInstance: Waiting for worker threads to fully shut down.");
+	spdlog::info("VersionManagerApp::~VersionManagerApp: Waiting for worker threads to fully shut down.");
 
 	if (_dbPoolCheckThread != nullptr)
 	{
-		spdlog::info("VersionManagerInstance::~VersionManagerInstance: Shutting down CheckAliveThread...");
+		spdlog::info("VersionManagerApp::~VersionManagerApp: Shutting down CheckAliveThread...");
 
 		_dbPoolCheckThread->shutdown();
 
-		spdlog::info("VersionManagerInstance::~VersionManagerInstance: DB pool check thread stopped.");
+		spdlog::info("VersionManagerApp::~VersionManagerApp: DB pool check thread stopped.");
 	}
 
-	spdlog::info("VersionManagerInstance::~VersionManagerInstance: All worker threads stopped, freeing caches.");
+	spdlog::info("VersionManagerApp::~VersionManagerApp: All worker threads stopped, freeing caches.");
 
 	for (_SERVER_INFO* pInfo : ServerList)
 		delete pInfo;
 	ServerList.clear();
 
-	spdlog::info("VersionManagerInstance::~VersionManagerInstance: All resources safely released.");
+	spdlog::info("VersionManagerApp::~VersionManagerApp: All resources safely released.");
 
 	db::ConnectionManager::Destroy();
 }
 
-bool VersionManagerInstance::OnStart()
+bool VersionManagerApp::OnStart()
 {
 	_socketManager.Init(MAX_USER, 0, 1);
 	_socketManager.AllocateServerSockets<CUser>();
@@ -102,7 +102,7 @@ bool VersionManagerInstance::OnStart()
 	return true;
 }
 
-bool VersionManagerInstance::GetInfoFromIni()
+bool VersionManagerApp::GetInfoFromIni()
 {
 	std::filesystem::path exePath = GetProgPath();
 	std::filesystem::path iniPath = exePath / "Version.ini";
@@ -195,7 +195,7 @@ bool VersionManagerInstance::GetInfoFromIni()
 	{
 		if (newsContent.size() > sizeof(News.Content))
 		{
-			spdlog::error("VersionManagerInstance::GetInfoFromIni: News too long");
+			spdlog::error("VersionManagerApp::GetInfoFromIni: News too long");
 			return false;
 		}
 
@@ -211,7 +211,7 @@ bool VersionManagerInstance::GetInfoFromIni()
 	return true;
 }
 
-bool VersionManagerInstance::LoadVersionList()
+bool VersionManagerApp::LoadVersionList()
 {
 	VersionInfoList versionList;
 	if (!DbProcess.LoadVersionList(&versionList))

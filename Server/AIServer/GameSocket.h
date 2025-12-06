@@ -4,16 +4,16 @@
 
 #include <shared-server/TcpServerSocket.h>
 
-class AiServerInstance;
+class AIServerApp;
 class CUser;
 class MAP;
 class CIOCPort;
 class CGameSocket : public TcpServerSocket
 {
 public:
-	AiServerInstance*	m_pMain;
-	CParty				m_Party;
-	int16_t				_zoneNo;
+	AIServerApp*	m_pMain;
+	CParty			m_Party;
+	int16_t			_zoneNo;
 
 public:
 	CGameSocket(SocketManager* socketManager);

@@ -2,12 +2,12 @@
 #include "ZoneEventThread.h"
 #include "Map.h"
 #include "NpcThread.h"
-#include "AiServerInstance.h"
+#include "AIServerApp.h"
 
 ZoneEventThread::ZoneEventThread()
 	: Thread()
 {
-	_main = AiServerInstance::instance();
+	_main = AIServerApp::instance();
 }
 
 void ZoneEventThread::thread_loop()

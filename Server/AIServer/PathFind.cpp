@@ -5,7 +5,7 @@
 #include "pch.h"
 #include "PathFind.h"
 #include "math.h"
-#include "AiServerInstance.h"
+#include "AIServerApp.h"
 
 //#include "Extern.h"
 
@@ -24,7 +24,7 @@ CPathFind::CPathFind()
 	m_pOpen = nullptr;
 	m_pClosed = nullptr;
 	m_pMap = nullptr;
-	m_pMain = AiServerInstance::instance();
+	m_pMain = AIServerApp::instance();
 }
 
 CPathFind::~CPathFind()

@@ -4,12 +4,12 @@
 #include <string>
 #include <string_view>
 
-class EbenezerInstance;
+class EbenezerApp;
 class CUser;
 class OperationMessage
 {
 public:
-	OperationMessage(EbenezerInstance* main, CUser* srcUser);
+	OperationMessage(EbenezerApp* main, CUser* srcUser);
 	bool Process(const std::string_view command);
 
 protected:
@@ -101,7 +101,7 @@ protected:
 	const std::string& ParseString(size_t argIndex) const;
 
 protected:
-	EbenezerInstance* _main;
+	EbenezerApp* _main;
 	CUser* _srcUser;
 	std::string _command;
 	std::vector<std::string> _args;

@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "MagicProcess.h"
-#include "EbenezerInstance.h"
+#include "EbenezerApp.h"
 #include "User.h"
 #include "Npc.h"
 #include "GameDefine.h"

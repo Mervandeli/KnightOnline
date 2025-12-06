@@ -15,12 +15,12 @@
 
 #include <shared-server/STLMap.h>
 
-class AiServerInstance;
+class AIServerApp;
 class CUser
 {
 public:
-	AiServerInstance*	m_pMain;
-	CMagicProcess		m_MagicProcess;
+	AIServerApp*	m_pMain;
+	CMagicProcess	m_MagicProcess;
 
 	// 필요한 정보 변수만 선언,,,
 	// 캐릭터 기본 속성

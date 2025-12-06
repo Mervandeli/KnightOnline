@@ -13,7 +13,7 @@
 //#include "STLMap.h"
 
 //typedef CSTLMap <CPartyUser>			PartyUserArray;
-class AiServerInstance;
+class AIServerApp;
 
 class CParty
 {
@@ -21,7 +21,7 @@ public:
 	//int		m_iSid;				// Party Number
 	//int16_t	m_sCurUser;			// 파티 인원 수 
 	//int16_t	m_sCurLevel;		// 파티원의 총 레벨 합
-	AiServerInstance* m_pMain;
+	AIServerApp* m_pMain;
 	//PartyUserArray	m_arPartyUser;
 
 public:

@@ -2,7 +2,7 @@
 
 #include <shared/Thread.h>
 
-class AiServerInstance;
+class AIServerApp;
 class ZoneEventThread : public Thread
 {
 public:
@@ -10,5 +10,5 @@ public:
 	void thread_loop() override;
 
 protected:
-	AiServerInstance* _main;
+	AIServerApp* _main;
 };

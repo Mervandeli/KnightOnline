@@ -127,7 +127,7 @@
     </ClCompile>
     <ClCompile Include="User.cpp" />
     <ClCompile Include="VersionManager.cpp" />
-    <ClCompile Include="VersionManagerInstance.cpp" />
+    <ClCompile Include="VersionManagerApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VersionManager.rc" />
@@ -138,7 +138,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="User.h" />
-    <ClInclude Include="VersionManagerInstance.h" />
+    <ClInclude Include="VersionManagerApp.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\VersionManager.ico" />

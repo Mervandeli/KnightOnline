@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "Npc.h"
-#include "EbenezerInstance.h"
+#include "EbenezerApp.h"
 #include "Map.h"
 
 #include <shared/packets.h>
@@ -18,7 +18,7 @@ CNpc::~CNpc()
 
 void CNpc::Initialize()
 {
-	m_pMain = EbenezerInstance::instance();
+	m_pMain = EbenezerApp::instance();
 
 	m_sNid = -1;				// NPC (서버상의)일련번호
 	m_sSid = 0;

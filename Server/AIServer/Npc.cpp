@@ -2,7 +2,7 @@
 #include "Npc.h"
 #include "NpcThread.h"
 #include "GameSocket.h"
-#include "AiServerInstance.h"
+#include "AIServerApp.h"
 #include "Region.h"
 #include "Party.h"
 #include "Extern.h"
@@ -135,7 +135,7 @@ inline bool CNpc::SetUid(float x, float z, int id)
 
 CNpc::CNpc()
 {
-	m_pMain = AiServerInstance::instance();
+	m_pMain = AIServerApp::instance();
 
 	m_NpcState = NPC_LIVE;
 	m_byGateOpen = GATE_CLOSE;

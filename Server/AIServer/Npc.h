@@ -112,7 +112,7 @@ struct _TargetHealer
 	int16_t	sValue;				// 점수
 };
 
-class AiServerInstance;
+class AIServerApp;
 
 /*
 	 ** Repent AI Server 작업시 참고 사항 **
@@ -121,7 +121,7 @@ class AiServerInstance;
 class CNpc
 {
 public:
-	AiServerInstance*	m_pMain;
+	AIServerApp*		m_pMain;
 	CNpcMagicProcess	m_MagicProcess;
 
 	_Target		m_Target;			// 공격할 유저 저장,,

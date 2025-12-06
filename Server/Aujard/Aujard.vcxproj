@@ -133,7 +133,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Aujard.cpp" />
-    <ClCompile Include="AujardInstance.cpp" />
+    <ClCompile Include="AujardApp.cpp" />
     <ClCompile Include="AujardReadQueueThread.cpp" />
     <ClCompile Include="DBAgent.cpp" />
     <ClCompile Include="pch.cpp">
@@ -145,7 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared-server\_USER_DATA.h" />
-    <ClInclude Include="AujardInstance.h" />
+    <ClInclude Include="AujardApp.h" />
     <ClInclude Include="AujardReadQueueThread.h" />
     <ClInclude Include="DBAgent.h" />
     <ClInclude Include="Define.h" />

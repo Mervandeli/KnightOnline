@@ -9,7 +9,7 @@
 #include "NpcThread.h"
 #include "Party.h"
 #include "Region.h"
-#include "AiServerInstance.h"
+#include "AIServerApp.h"
 #include "User.h"
 
 #include <shared/crc32.h>
@@ -31,7 +31,7 @@ CGameSocket::CGameSocket(SocketManager* socketManager)
 	: TcpServerSocket(socketManager)
 {
 	//m_pParty = nullptr;
-	m_pMain = AiServerInstance::instance();
+	m_pMain = AIServerApp::instance();
 }
 
 CGameSocket::~CGameSocket()

@@ -13,13 +13,13 @@
 #include "RecvUDPThread.h"
 
 class RecvUDPThread;
-class EbenezerInstance;
+class EbenezerApp;
 class CUdpSocket
 {
 	friend class RecvUDPThread;
 
 public:
-	CUdpSocket(EbenezerInstance* main = nullptr);
+	CUdpSocket(EbenezerApp* main = nullptr);
 	virtual ~CUdpSocket();
 
 	bool CreateSocket();
@@ -45,7 +45,7 @@ protected:
 	asio::ip::udp::endpoint _sender;
 
 	char					_recvBuff[UDP_SOCKET_BUFFER_SIZE];
-	EbenezerInstance*			_main;
+	EbenezerApp*			_main;
 };
 
 #endif // !defined(AFX_UDPSOCKET_H__E53802D9_5A8C_47B6_9B3B_12D2DDDACD92__INCLUDED_)

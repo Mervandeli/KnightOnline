@@ -11,15 +11,14 @@
 
 #include "Extern.h"
 
-class AiServerInstance;
+class AIServerApp;
 class CNpc;
 class CNpcMagicProcess
 {
 public:
-	AiServerInstance*	m_pMain;
-	CNpc*				m_pSrcNpc;
-
-	uint8_t				m_bMagicState;
+	AIServerApp*	m_pMain;
+	CNpc*			m_pSrcNpc;
+	uint8_t			m_bMagicState;
 
 public:
 	CNpcMagicProcess();

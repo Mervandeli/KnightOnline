@@ -5,7 +5,7 @@
 #include "pch.h"
 #include "DBProcess.h"
 #include "Define.h"
-#include "VersionManagerInstance.h"
+#include "VersionManagerApp.h"
 
 #include <db-library/Connection.h>
 #include <db-library/Exceptions.h>
@@ -179,7 +179,7 @@ bool CDBProcess::DeleteVersion(int version)
 /// \return true on success, false on failure
 bool CDBProcess::LoadUserCountList()
 {
-	VersionManagerInstance* appInstance = VersionManagerInstance::instance();
+	VersionManagerApp* appInstance = VersionManagerApp::instance();
 	try
 	{
 		db::ModelRecordSet<model::Concurrent> recordSet;

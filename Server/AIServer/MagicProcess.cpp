@@ -7,7 +7,7 @@
 #include "Npc.h"
 #include "NpcThread.h"
 #include "Region.h"
-#include "AiServerInstance.h"
+#include "AIServerApp.h"
 #include "User.h"
 
 #include <spdlog/spdlog.h>
@@ -20,7 +20,7 @@ extern std::mutex g_region_mutex;
 
 CMagicProcess::CMagicProcess()
 {
-	m_pMain = AiServerInstance::instance();
+	m_pMain = AIServerApp::instance();
 	m_pSrcUser = nullptr;
 	m_bMagicState = NONE;
 }

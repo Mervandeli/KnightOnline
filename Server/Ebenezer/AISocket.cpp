@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "AISocket.h"
-#include "EbenezerInstance.h"
+#include "EbenezerApp.h"
 #include "Define.h"
 #include "Npc.h"
 #include "User.h"
@@ -21,7 +21,7 @@ CAISocket::CAISocket(SocketManager* socketManager, int zoneNum)
 
 void CAISocket::Initialize()
 {
-	_main = EbenezerInstance::instance();
+	_main = EbenezerApp::instance();
 	_magicProcess.m_pMain = _main;
 
 	TcpClientSocket::Initialize();

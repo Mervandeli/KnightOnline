@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "RoomEvent.h"
-#include "AiServerInstance.h"
+#include "AIServerApp.h"
 #include "Define.h"
 
 #include <spdlog/spdlog.h>
@@ -29,7 +29,7 @@ CRoomEvent::CRoomEvent()
 	m_iEndMaxZ = 0;
 	m_byCheck = 0;
 	m_byRoomType = 0;
-	m_pMain = AiServerInstance::instance();
+	m_pMain = AIServerApp::instance();
 
 	Initialize();
 }

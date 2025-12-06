@@ -126,7 +126,7 @@
   <ItemGroup>
     <ClCompile Include="AISocket.cpp" />
     <ClCompile Include="Ebenezer.cpp" />
-    <ClCompile Include="EbenezerInstance.cpp" />
+    <ClCompile Include="EbenezerApp.cpp" />
     <ClCompile Include="EbenezerReadQueueThread.cpp" />
     <ClCompile Include="EbenezerSocketManager.cpp" />
     <ClCompile Include="EVENT.cpp" />
@@ -155,7 +155,7 @@
     <ClInclude Include="AISocket.h" />
     <ClInclude Include="db_resources.h" />
     <ClInclude Include="Define.h" />
-    <ClInclude Include="EbenezerInstance.h" />
+    <ClInclude Include="EbenezerApp.h" />
     <ClInclude Include="EbenezerReadQueueThread.h" />
     <ClInclude Include="EbenezerResourceFormatter.h" />
     <ClInclude Include="EbenezerSocketManager.h" />
