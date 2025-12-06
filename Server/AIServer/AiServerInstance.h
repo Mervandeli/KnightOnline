@@ -50,6 +50,7 @@ typedef CSTLMap <model::MakeItemGroup>		MakeItemGroupMap;
 typedef CSTLMap <model::MakeWeapon>			MakeWeaponTableMap;
 typedef CSTLMap <model::MakeItemGradeCode>	MakeGradeItemCodeTableMap;
 typedef CSTLMap <model::MakeItemRareCode>	MakeItemRareCodeTableMap;
+typedef CSTLMap <model::ZoneInfo>			ZoneInfoTableMap;
 typedef std::list <int>						ZoneNpcInfoList;
 typedef std::vector <MAP*>					ZoneArray;
 
@@ -100,6 +101,7 @@ public:
 	MakeGradeItemCodeTableMap	m_MakeGradeItemArray;
 	MakeItemRareCodeTableMap	m_MakeItemRareCodeTableMap;
 	ZoneArray					m_ZoneArray;
+	ZoneInfoTableMap			m_ZoneInfoTableMap;
 
 	ZoneEventThread*			m_pZoneEventThread;		// zone
 
@@ -166,6 +168,7 @@ private:
 	bool GetMagicType3Data();
 	bool GetMagicType4Data();
 	bool GetMagicType7Data();
+	bool GetZoneInfoTableData();
 	bool GetMonsterTableData();
 	bool GetNpcTableData();
 	bool GetNpcItemTable();

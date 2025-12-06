@@ -274,9 +274,11 @@ bool AiServerInstance::OnStart()
 		return false;
 	}
 
-	//----------------------------------------------------------------------
-	//	Load NPC Chat Table
-	//----------------------------------------------------------------------
+	if (!GetZoneInfoTableData())
+	{
+		spdlog::error("AiServerInstance::OnStart: failed to load ZONE_INFO, closing server");
+		return false;
+	}
 
 	//----------------------------------------------------------------------
 	//	Load NPC Data & Activate NPC
@@ -516,6 +518,20 @@ bool AiServerInstance::GetNpcItemTable()
 	rows.clear();
 
 	spdlog::info("AiServerInstance::GetNpcItemTable: K_MONSTER_ITEM loaded");
+	return true;
+}
+
+bool AiServerInstance::GetZoneInfoTableData()
+{
+	recordset_loader::STLMap loader(m_ZoneInfoTableMap);
+	if (!loader.Load_ForbidEmpty())
+	{
+		spdlog::error("AiServerInstance::GetZoneInfoTableData: load failed - {}",
+			loader.GetError().Message);
+		return false;
+	}
+
+	spdlog::info("AiServerInstance::GetZoneInfoTableData: ZONE_INFO loaded");
 	return true;
 }
 
@@ -1461,14 +1477,10 @@ bool AiServerInstance::AddObjectEventNpc(_OBJECT_EVENT* pEvent, int zone_number)
 	model::Npc* pNpcTable = nullptr;
 	bool bFindNpcTable = false;
 	int offset = 0;
-	int nServerNum = 0;
-	nServerNum = GetServerNumber(zone_number);
-	//if(m_byZone != zone_number)	 return false;
-	//if(m_byZone != UNIFY_ZONE)	{
-	//	if(m_byZone != nServerNum)	 return false;
-	//}
+	int nServerNum = GetServerNumber(zone_number);
+	if (m_byZone != nServerNum)
+		return false;
 
-	//if( zone_number > 201 )	return false;	// test
 	pNpcTable = m_NpcTableMap.GetData(pEvent->sIndex);
 	if (pNpcTable == nullptr)
 	{
@@ -1556,15 +1568,14 @@ int AiServerInstance::GetZoneIndex(int zoneId) const
 
 int AiServerInstance::GetServerNumber(int zoneId) const
 {
-	for (MAP* pMap : m_ZoneArray)
+	const model::ZoneInfo* zoneInfo = m_ZoneInfoTableMap.GetData(zoneId);
+	if (zoneInfo == nullptr)
 	{
-		if (pMap != nullptr
-			&& pMap->m_nZoneNumber == zoneId)
-			return pMap->m_nServerNo;
+		spdlog::error("AiServerInstance::GetServerNumber: zoneId={} not found", zoneId);
+		return -1;
 	}
 
-	spdlog::error("AiServerInstance::GetServerNumber: zoneId={} not found", zoneId);
-	return -1;
+	return zoneInfo->ServerId;
 }
 
 void AiServerInstance::GetServerInfoIni()
