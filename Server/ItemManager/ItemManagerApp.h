@@ -22,8 +22,13 @@ public:
 	ItemManagerApp(ItemManagerLogger& logger);
 	~ItemManagerApp() override;
 
+protected:
+	/// \returns The application's ini config path.
+	std::filesystem::path ConfigPath() const override;
+
 	bool OnStart() override;
 
+public:
 	void ItemLogWrite(const char* pBuf);
 	void ExpLogWrite(const char* pBuf);
 };

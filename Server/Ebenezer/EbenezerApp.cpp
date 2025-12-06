@@ -250,8 +250,6 @@ bool EbenezerApp::OnStart()
 	m_fReConnectStart = 0.0;
 	// sungyong~ 2002.05.23
 
-	LoadConfig();
-
 	_socketManager.Init(MAX_USER, CLIENT_SOCKSIZE, 4);
 	_socketManager.AllocateServerSockets<CUser>();
 
@@ -1088,50 +1086,52 @@ bool EbenezerApp::LoadLevelUpTable()
 	return true;
 }
 
-void EbenezerApp::LoadConfig()
+/// \returns The application's ini config path.
+std::filesystem::path EbenezerApp::ConfigPath() const
+{
+	return GetProgPath() / "gameserver.ini";
+}
+
+/// \brief Loads application-specific config from the loaded application ini file (`iniFile`).
+/// \param iniFile The loaded application ini file.
+/// \returns true when successful, false otherwise
+bool EbenezerApp::LoadConfig(CIni& iniFile)
 {
 	int year = 0, month = 0, date = 0, hour = 0, serverCount = 0, sgroup_count = 0;
 	std::string key;
 
-	std::filesystem::path exePath = GetProgPath();
-	std::filesystem::path iniPath = exePath / "gameserver.ini";
+	m_nYear = iniFile.GetInt("TIMER", "YEAR", 1);
+	m_nMonth = iniFile.GetInt("TIMER", "MONTH", 1);
+	m_nDate = iniFile.GetInt("TIMER", "DATE", 1);
+	m_nHour = iniFile.GetInt("TIMER", "HOUR", 1);
+	m_nWeather = iniFile.GetInt("TIMER", "WEATHER", 1);
 
-	m_Ini.Load(iniPath);
+//	m_nBattleZoneOpenWeek  = iniFile.GetInt("BATTLE", "WEEK", 3);
+	m_nBattleZoneOpenWeek = iniFile.GetInt("BATTLE", "WEEK", 5);
+	m_nBattleZoneOpenHourStart = iniFile.GetInt("BATTLE", "START_TIME", 20);
+	m_nBattleZoneOpenHourEnd = iniFile.GetInt("BATTLE", "END_TIME", 0);
 
-	_logger.Setup(m_Ini, exePath);
-	
-	m_nYear = m_Ini.GetInt("TIMER", "YEAR", 1);
-	m_nMonth = m_Ini.GetInt("TIMER", "MONTH", 1);
-	m_nDate = m_Ini.GetInt("TIMER", "DATE", 1);
-	m_nHour = m_Ini.GetInt("TIMER", "HOUR", 1);
-	m_nWeather = m_Ini.GetInt("TIMER", "WEATHER", 1);
-
-//	m_nBattleZoneOpenWeek  = m_Ini.GetInt("BATTLE", "WEEK", 3);
-	m_nBattleZoneOpenWeek = m_Ini.GetInt("BATTLE", "WEEK", 5);
-	m_nBattleZoneOpenHourStart = m_Ini.GetInt("BATTLE", "START_TIME", 20);
-	m_nBattleZoneOpenHourEnd = m_Ini.GetInt("BATTLE", "END_TIME", 0);
-
-	std::string datasourceName = m_Ini.GetString("ODBC", "GAME_DSN", "KN_online");
-	std::string datasourceUser = m_Ini.GetString("ODBC", "GAME_UID", "knight");
-	std::string datasourcePass = m_Ini.GetString("ODBC", "GAME_PWD", "knight");
+	std::string datasourceName = iniFile.GetString("ODBC", "GAME_DSN", "KN_online");
+	std::string datasourceUser = iniFile.GetString("ODBC", "GAME_UID", "knight");
+	std::string datasourcePass = iniFile.GetString("ODBC", "GAME_PWD", "knight");
 
 	ConnectionManager::SetDatasourceConfig(
 		modelUtil::DbType::GAME,
 		datasourceName, datasourceUser, datasourcePass);
 
-	m_Ini.GetString("AI_SERVER", "IP", "127.0.0.1", m_AIServerIP, _countof(m_AIServerIP));
+	iniFile.GetString("AI_SERVER", "IP", "127.0.0.1", m_AIServerIP, _countof(m_AIServerIP));
 
 	// NOTE: officially this is required to be explicitly set, so it defaults to 0 and fails.
-	m_nServerIndex = m_Ini.GetInt("SG_INFO", "SERVER_INDEX", 1);
+	m_nServerIndex = iniFile.GetInt("SG_INFO", "SERVER_INDEX", 1);
 
-	m_nCastleCapture = m_Ini.GetInt("CASTLE", "NATION", 1);
-	m_nServerNo = m_Ini.GetInt("ZONE_INFO", "MY_INFO", 1);
-	m_nServerGroup = m_Ini.GetInt("ZONE_INFO", "SERVER_NUM", 0);
-	serverCount = m_Ini.GetInt("ZONE_INFO", "SERVER_COUNT", 1);
+	m_nCastleCapture = iniFile.GetInt("CASTLE", "NATION", 1);
+	m_nServerNo = iniFile.GetInt("ZONE_INFO", "MY_INFO", 1);
+	m_nServerGroup = iniFile.GetInt("ZONE_INFO", "SERVER_NUM", 0);
+	serverCount = iniFile.GetInt("ZONE_INFO", "SERVER_COUNT", 1);
 	if (serverCount < 1)
 	{
 		spdlog::error("EbenezerApp::LoadConfig: invalid SERVER_COUNT={}, must be 1+", serverCount);
-		return;
+		return false;
 	}
 
 	for (int i = 0; i < serverCount; i++)
@@ -1139,10 +1139,10 @@ void EbenezerApp::LoadConfig()
 		_ZONE_SERVERINFO* pInfo = new _ZONE_SERVERINFO;
 
 		key = fmt::format("SERVER_{:02}", i);
-		pInfo->sServerNo = m_Ini.GetInt("ZONE_INFO", key, 1);
+		pInfo->sServerNo = iniFile.GetInt("ZONE_INFO", key, 1);
 
 		key = fmt::format("SERVER_IP_{:02}", i);
-		m_Ini.GetString("ZONE_INFO", key, "127.0.0.1", pInfo->strServerIP, _countof(pInfo->strServerIP));
+		iniFile.GetString("ZONE_INFO", key, "127.0.0.1", pInfo->strServerIP, _countof(pInfo->strServerIP));
 
 		pInfo->sPort = _LISTEN_PORT + pInfo->sServerNo;
 
@@ -1151,13 +1151,13 @@ void EbenezerApp::LoadConfig()
 
 	if (m_nServerGroup != 0)
 	{
-		m_nServerGroupNo = m_Ini.GetInt("SG_INFO", "GMY_INFO", 1);
-		sgroup_count = m_Ini.GetInt("SG_INFO", "GSERVER_COUNT", 1);
+		m_nServerGroupNo = iniFile.GetInt("SG_INFO", "GMY_INFO", 1);
+		sgroup_count = iniFile.GetInt("SG_INFO", "GSERVER_COUNT", 1);
 		if (sgroup_count < 1)
 		{
 			spdlog::error("EbenezerApp::LoadConfig: Invalid server group count={}, must be 1+",
 				sgroup_count);
-			return;
+			return false;
 		}
 
 		for (int i = 0; i < sgroup_count; i++)
@@ -1165,10 +1165,10 @@ void EbenezerApp::LoadConfig()
 			_ZONE_SERVERINFO* pInfo = new _ZONE_SERVERINFO;
 
 			key = fmt::format("GSERVER_{:02}", i);
-			pInfo->sServerNo = m_Ini.GetInt("SG_INFO", key, 1);
+			pInfo->sServerNo = iniFile.GetInt("SG_INFO", key, 1);
 
 			key = fmt::format("GSERVER_IP_{:02}", i);
-			m_Ini.GetString("SG_INFO", key, "127.0.0.1", pInfo->strServerIP, _countof(pInfo->strServerIP));
+			iniFile.GetString("SG_INFO", key, "127.0.0.1", pInfo->strServerIP, _countof(pInfo->strServerIP));
 
 			pInfo->sPort = _LISTEN_PORT + pInfo->sServerNo;
 
@@ -1176,8 +1176,7 @@ void EbenezerApp::LoadConfig()
 		}
 	}
 
-	// Trigger a save to flush defaults to file.
-	m_Ini.Save();
+	return true;
 }
 
 void EbenezerApp::UpdateGameTime()
@@ -1291,12 +1290,13 @@ void EbenezerApp::UpdateWeather()
 
 void EbenezerApp::SetGameTime()
 {
-	m_Ini.SetInt("TIMER", "YEAR", m_nYear);
-	m_Ini.SetInt("TIMER", "MONTH", m_nMonth);
-	m_Ini.SetInt("TIMER", "DATE", m_nDate);
-	m_Ini.SetInt("TIMER", "HOUR", m_nHour);
-	m_Ini.SetInt("TIMER", "WEATHER", m_nWeather);
-	m_Ini.Save();
+	CIni& iniFile = IniFile();
+	iniFile.SetInt("TIMER", "YEAR", m_nYear);
+	iniFile.SetInt("TIMER", "MONTH", m_nMonth);
+	iniFile.SetInt("TIMER", "DATE", m_nDate);
+	iniFile.SetInt("TIMER", "HOUR", m_nHour);
+	iniFile.SetInt("TIMER", "WEATHER", m_nWeather);
+	iniFile.Save();
 }
 
 void EbenezerApp::UserInOutForMe(CUser* pSendUser)

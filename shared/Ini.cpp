@@ -4,8 +4,6 @@
 #include <fstream>
 #include "StringUtils.h"
 
-#include <spdlog/spdlog.h>
-
 constexpr char INI_SECTION_START	= '[';
 constexpr char INI_SECTION_END		= ']';
 constexpr char INI_KEY_SEPARATOR	= '=';
@@ -26,14 +24,7 @@ bool CIni::Load(const std::filesystem::path& path)
 
 	std::ifstream file(path);
 	if (!file)
-	{
-		std::u8string filenameUtf8 = path.u8string();
-		std::string filename(filenameUtf8.begin(), filenameUtf8.end());
-
-		spdlog::warn("Ini::Load: {} does not exist, will use configured defaults.",
-			filename);
 		return false;
-	}
 
 	std::string currentSection;
 

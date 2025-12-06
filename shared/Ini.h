@@ -39,6 +39,11 @@ protected:
 	ConfigMap _configMap;
 
 public:
+	const std::filesystem::path& GetPath() const
+	{
+		return _path;
+	}
+
 	CIni() = default;
 	CIni(const std::filesystem::path& path);
 

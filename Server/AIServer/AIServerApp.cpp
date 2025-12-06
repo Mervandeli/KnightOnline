@@ -135,9 +135,6 @@ AIServerApp::~AIServerApp()
 
 bool AIServerApp::OnStart()
 {
-	// load config
-	GetServerInfoIni();
-
 	// TestCode
 	TestCode();
 
@@ -165,7 +162,7 @@ bool AIServerApp::OnStart()
 	for (int i = 0; i < MAX_USER; i++)
 		_users[i] = nullptr;
 
-	// Server Start message
+	// Server start message
 	spdlog::info("AIServerApp::OnStart: starting...");
 
 	//----------------------------------------------------------------------
@@ -1564,29 +1561,28 @@ int AIServerApp::GetServerNumber(int zoneId) const
 	return zoneInfo->ServerId;
 }
 
-void AIServerApp::GetServerInfoIni()
+/// \returns The application's ini config path.
+std::filesystem::path AIServerApp::ConfigPath() const
 {
-	std::filesystem::path exePath = GetProgPath();
-	std::filesystem::path iniPath = exePath / "server.ini";
-	
-	CIni inifile;
-	inifile.Load(iniPath);
+	return GetProgPath() / "server.ini";
+}
 
-	// logger setup
-	_logger.Setup(inifile, exePath);
-	
-	_serverZoneType = inifile.GetInt("SERVER", "ZONE", 1);
+/// \brief Loads application-specific config from the loaded application ini file (`iniFile`).
+/// \param iniFile The loaded application ini file.
+/// \returns true when successful, false otherwise
+bool AIServerApp::LoadConfig(CIni& iniFile)
+{
+	_serverZoneType = iniFile.GetInt("SERVER", "ZONE", 1);
 
-	std::string datasourceName = inifile.GetString("ODBC", "GAME_DSN", "KN_online");
-	std::string datasourceUser = inifile.GetString("ODBC", "GAME_UID", "knight");
-	std::string datasourcePass = inifile.GetString("ODBC", "GAME_PWD", "knight");
+	std::string datasourceName = iniFile.GetString("ODBC", "GAME_DSN", "KN_online");
+	std::string datasourceUser = iniFile.GetString("ODBC", "GAME_UID", "knight");
+	std::string datasourcePass = iniFile.GetString("ODBC", "GAME_PWD", "knight");
 
 	ConnectionManager::SetDatasourceConfig(
 		modelUtil::DbType::GAME,
 		datasourceName, datasourceUser, datasourcePass);
 
-	// Trigger a save to flush defaults to file.
-	inifile.Save();
+	return true;
 }
 
 void AIServerApp::SendSystemMsg(const std::string_view msg, int zone, int type, int who)

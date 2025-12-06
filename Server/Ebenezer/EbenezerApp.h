@@ -127,7 +127,6 @@ public:
 	void SetGameTime();
 	void UpdateWeather();
 	void UpdateGameTime();
-	void LoadConfig();
 	void Send_NearRegion(char* pBuf, int len, int zone, int region_x, int region_z, float curx, float curz, CUser* pExceptUser = nullptr);
 	void Send_FilterUnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int z, float ref_x, float ref_z, CUser* pExceptUser = nullptr);
 	void Send_UnitRegion(C3DMap* pMap, char* pBuf, int len, int x, int z, CUser* pExceptUser = nullptr, bool bDirect = true);
@@ -296,11 +295,17 @@ public:
 	CUdpSocket*			m_pUdpSocket;
 
 protected:
+	/// \returns The application's ini config path.
+	std::filesystem::path ConfigPath() const override;
+
+	/// \brief Loads application-specific config from the loaded application ini file (`iniFile`).
+	/// \param iniFile The loaded application ini file.
+	/// \returns true when successful, false otherwise
+	bool LoadConfig(CIni& iniFile) override;
+
 	bool OnStart() override;
 	
 private:
-	CIni								m_Ini;
-
 	std::unique_ptr<TimerThread>		_gameTimeThread;
 	std::unique_ptr<TimerThread>		_smqHeartbeatThread;
 	std::unique_ptr<TimerThread>		_aliveTimeThread;

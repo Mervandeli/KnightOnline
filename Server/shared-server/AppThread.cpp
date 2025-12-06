@@ -1,6 +1,9 @@
 ﻿#include "pch.h"
 #include "AppThread.h"
 #include "ftxui_sink_mt.h"
+#include "utilities.h"
+
+#include <shared/Ini.h>
 
 #include <spdlog/spdlog.h>
 
@@ -23,25 +26,46 @@ AppThread::AppThread(logger::Logger& logger)
 {
 	assert(s_instance == nullptr);
 	s_instance = this;
+
+	_iniFile = new CIni();
 }
 
 AppThread::~AppThread()
 {
+	delete _iniFile;
+
 	assert(s_instance != nullptr);
 	s_instance = nullptr;
+}
+
+std::filesystem::path AppThread::LogBaseDir() const
+{
+	return GetProgPath();
 }
 
 /// \brief The main thread loop for the server instance
 void AppThread::thread_loop()
 {
-	if (!OnStart())
+	int exitCode = EXIT_SUCCESS;
+
+	CIni& iniFile = IniFile();
+	bool configFileLoaded = iniFile.Load(ConfigPath());
+
+	// Setup the logger
+	_logger.Setup(iniFile, LogBaseDir());
+
+	if (!configFileLoaded)
 	{
-		_exitCode = EXIT_FAILURE;
-		return;
+		std::u8string filenameUtf8 = iniFile.GetPath().u8string();
+		std::string filename(filenameUtf8.begin(), filenameUtf8.end());
+
+		spdlog::warn("AppThread::thread_loop: {} does not exist, will use configured defaults.",
+			filename);
 	}
 
 	using namespace ftxui;
 
+	bool isServerLoaded = false;
 	auto fxtuiSink = _logger.fxtuiSink();
 
 	std::string inputText;
@@ -55,7 +79,8 @@ void AppThread::thread_loop()
 
 	input |= CatchEvent([&](Event event)
 	{
-		if (event == Event::Return)
+		if (event == Event::Return
+			&& isServerLoaded)
 		{
 			ParseCommand(inputText);
 			inputText.clear();
@@ -102,6 +127,9 @@ void AppThread::thread_loop()
 			text(" Command: ") | bold,
 			input->Render() | flex
 		}) | border;
+
+		if (!isServerLoaded)
+			return logDisplay;
 
 		return vbox({
 			logDisplay,
@@ -191,6 +219,16 @@ void AppThread::thread_loop()
 		shutdown(false);
 	});
 
+	if (StartupImpl(iniFile))
+	{
+		isServerLoaded = true;
+	}
+	else
+	{
+		exitCode = EXIT_FAILURE;
+		shutdown(false);
+	}
+
 	while (_canTick)
 	{
 		std::unique_lock<std::mutex> lock(_mutex);
@@ -202,7 +240,45 @@ void AppThread::thread_loop()
 	if (uiThread.joinable())
 		uiThread.join();
 
-	_exitCode = EXIT_SUCCESS;
+	_exitCode = exitCode;
+}
+
+/// \brief Loads application-specific config from the loaded application ini file (`iniFile`).
+/// \param iniFile The loaded application ini file.
+/// \returns true when successful, false otherwise
+bool AppThread::LoadConfig(CIni& iniFile)
+{
+	return true;
+}
+
+bool AppThread::StartupImpl(CIni& iniFile)
+{
+	try
+	{
+		// Load application-specific config
+		if (!LoadConfig(iniFile))
+		{
+			spdlog::error("AppThread::StartupImpl: LoadConfig() failed.");
+			return false;
+		}
+
+		// Trigger a save to flush defaults to file.
+		iniFile.Save();
+
+		// Load application-specific startup logic
+		if (!OnStart())
+		{
+			spdlog::error("AppThread::StartupImpl: OnStart() failed.");
+			return false;
+		}
+
+		return true;
+	}
+	catch (const std::exception& ex)
+	{
+		spdlog::error("AppThread::StartupImpl: unhandled exception - {}", ex.what());
+		return false;
+	}
 }
 
 bool AppThread::HandleInputEvent(const ftxui::Event& event)

@@ -37,7 +37,6 @@ public:
 
 	VersionManagerApp(logger::Logger& logger);
 	~VersionManagerApp();
-	bool GetInfoFromIni();
 	bool LoadVersionList();
 
 	SocketManager	_socketManager;
@@ -48,6 +47,14 @@ public:
 	CDBProcess		DbProcess;
 
 protected:
+	/// \returns The application's ini config path.
+	std::filesystem::path ConfigPath() const override;
+
+	/// \brief Loads application-specific config from the loaded application ini file (`iniFile`).
+	/// \param iniFile The loaded application ini file.
+	/// \returns true when successful, false otherwise
+	bool LoadConfig(CIni& iniFile) override;
+
 	/// \brief Loads config, database caches, then starts sockets and thread pools.
 	/// \returns true when successful, false otherwise
 	bool OnStart() override;

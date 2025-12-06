@@ -110,16 +110,48 @@ AujardApp::~AujardApp()
 	db::ConnectionManager::Destroy();
 }
 
+
+/// \returns The application's ini config path.
+std::filesystem::path AujardApp::ConfigPath() const
+{
+	return GetProgPath() / "Aujard.ini";
+}
+
+/// \brief Loads application-specific config from the loaded application ini file (`iniFile`).
+/// \param iniFile The loaded application ini file.
+/// \returns true when successful, false otherwise
+bool AujardApp::LoadConfig(CIni& iniFile)
+{
+	// TODO: This should be Knight_Account
+	// TODO: This should only fetch the once.
+	// The above won't be necessary after stored procedures are replaced, so it can be replaced then.
+	std::string datasourceName, datasourceUser, datasourcePass;
+
+	// TODO: This should be Knight_Account
+	datasourceName = iniFile.GetString(ini::ODBC, ini::ACCOUNT_DSN, "KN_online");
+	datasourceUser = iniFile.GetString(ini::ODBC, ini::ACCOUNT_UID, "knight");
+	datasourcePass = iniFile.GetString(ini::ODBC, ini::ACCOUNT_PWD, "knight");
+
+	db::ConnectionManager::SetDatasourceConfig(
+		modelUtil::DbType::ACCOUNT,
+		datasourceName, datasourceUser, datasourcePass);
+
+	datasourceName = iniFile.GetString(ini::ODBC, ini::GAME_DSN, "KN_online");
+	datasourceUser = iniFile.GetString(ini::ODBC, ini::GAME_UID, "knight");
+	datasourcePass = iniFile.GetString(ini::ODBC, ini::GAME_PWD, "knight");
+
+	db::ConnectionManager::SetDatasourceConfig(
+		modelUtil::DbType::GAME,
+		datasourceName, datasourceUser, datasourcePass);
+
+	_serverId = iniFile.GetInt(ini::ZONE_INFO, ini::GROUP_INFO, 1);
+	_zoneId = iniFile.GetInt(ini::ZONE_INFO, ini::ZONE_INFO, 1);
+
+	return true;
+}
+
 bool AujardApp::OnStart()
 {
-	std::filesystem::path exePath = GetProgPath();
-	std::filesystem::path iniPath = exePath / "Aujard.ini";
-
-	CIni ini(iniPath);
-
-	// configure logger
-	_logger.Setup(ini, exePath);
-
 	LoggerRecvQueue.Open(SMQ_LOGGERSEND);	// Dispatcher 의 Send Queue
 	LoggerSendQueue.Open(SMQ_LOGGERRECV);	// Dispatcher 의 Read Queue
 
@@ -129,34 +161,6 @@ bool AujardApp::OnStart()
 		return false;
 	}
 	
-	// TODO: This should be Knight_Account
-	// TODO: This should only fetch the once.
-	// The above won't be necessary after stored procedures are replaced, so it can be replaced then.
-	std::string datasourceName, datasourceUser, datasourcePass;
-
-	// TODO: This should be Knight_Account
-	datasourceName = ini.GetString(ini::ODBC, ini::ACCOUNT_DSN, "KN_online");
-	datasourceUser = ini.GetString(ini::ODBC, ini::ACCOUNT_UID, "knight");
-	datasourcePass = ini.GetString(ini::ODBC, ini::ACCOUNT_PWD, "knight");
-
-	db::ConnectionManager::SetDatasourceConfig(
-		modelUtil::DbType::ACCOUNT,
-		datasourceName, datasourceUser, datasourcePass);
-
-	datasourceName = ini.GetString(ini::ODBC, ini::GAME_DSN, "KN_online");
-	datasourceUser = ini.GetString(ini::ODBC, ini::GAME_UID, "knight");
-	datasourcePass = ini.GetString(ini::ODBC, ini::GAME_PWD, "knight");
-
-	db::ConnectionManager::SetDatasourceConfig(
-		modelUtil::DbType::GAME,
-		datasourceName, datasourceUser, datasourcePass);
-
-	_serverId = ini.GetInt(ini::ZONE_INFO, ini::GROUP_INFO, 1);
-	_zoneId = ini.GetInt(ini::ZONE_INFO, ini::ZONE_INFO, 1);
-
-	// Trigger a save to flush defaults to file.
-	ini.Save();
-
 	if (!_dbAgent.InitDatabase())
 		return false;
 
@@ -170,7 +174,6 @@ bool AujardApp::OnStart()
 	_heartbeatCheckThread->start();
 	_concurrentCheckThread->start();
 	_packetCheckThread->start();
-
 	_readQueueThread->start();
 
 	spdlog::info("AujardApp::OnStart: initialized");
