@@ -1,13 +1,4 @@
-﻿// UdpSocket.h: interface for the CUdpSocket class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_UDPSOCKET_H__E53802D9_5A8C_47B6_9B3B_12D2DDDACD92__INCLUDED_)
-#define AFX_UDPSOCKET_H__E53802D9_5A8C_47B6_9B3B_12D2DDDACD92__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+﻿#pragma once
 
 #include "Define.h"
 #include "RecvUDPThread.h"
@@ -37,7 +28,7 @@ public:
 	void RecvBattleZoneCurrentUsers(char* pBuf);
 
 protected:
-	static constexpr int UDP_SOCKET_BUFFER_SIZE	= (1024*32);
+	static constexpr int UDP_SOCKET_BUFFER_SIZE	= (1024 * 32);
 
 	RecvUDPThread			_recvUdpThread;
 	asio::io_context		_io;
@@ -47,5 +38,3 @@ protected:
 	char					_recvBuff[UDP_SOCKET_BUFFER_SIZE];
 	EbenezerApp*			_main;
 };
-
-#endif // !defined(AFX_UDPSOCKET_H__E53802D9_5A8C_47B6_9B3B_12D2DDDACD92__INCLUDED_)
