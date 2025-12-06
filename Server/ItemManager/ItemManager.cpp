@@ -2,10 +2,10 @@
 //
 
 #include "pch.h"
-#include "ItemManagerInstance.h"
+#include "ItemManagerApp.h"
 
 int main()
 {
 	ItemManagerLogger logger;
-	return AppThread::main<ItemManagerInstance>(logger);
+	return AppThread::main<ItemManagerApp>(logger);
 }

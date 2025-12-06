@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "NpcMagicProcess.h"
-#include "AiServerInstance.h"
+#include "AIServerApp.h"
 #include "User.h"
 #include "Npc.h"
 
@@ -14,7 +14,7 @@
 
 CNpcMagicProcess::CNpcMagicProcess()
 {
-	m_pMain = AiServerInstance::instance();
+	m_pMain = AIServerApp::instance();
 	m_pSrcNpc = nullptr;
 	m_bMagicState = NONE;
 }

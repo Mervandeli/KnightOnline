@@ -6,7 +6,7 @@
 #include "NpcThread.h"
 #include "Npc.h"
 #include "Extern.h"
-#include "AiServerInstance.h"
+#include "AIServerApp.h"
 
 #include <chrono>
 #include <mmsystem.h>

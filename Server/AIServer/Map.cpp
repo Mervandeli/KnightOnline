@@ -4,7 +4,7 @@
 #include "NpcThread.h"
 #include "Region.h"
 #include "RoomEvent.h"
-#include "AiServerInstance.h"
+#include "AIServerApp.h"
 #include "User.h"
 
 #include <shared/globals.h>
@@ -30,7 +30,7 @@ CMapInfo::~CMapInfo()
 
 MAP::MAP()
 {
-	m_pMain = AiServerInstance::instance();
+	m_pMain = AIServerApp::instance();
 	m_nMapSize = 0;
 	m_fUnitDist = 0.0f;
 	m_fHeight = nullptr;

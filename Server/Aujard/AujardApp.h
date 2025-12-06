@@ -13,16 +13,16 @@ using ItemtableArray = CSTLMap<model::Item>;
 
 class ReadQueueThread;
 class TimerThread;
-class AujardInstance : public AppThread
+class AujardApp : public AppThread
 {
 public:
-	static AujardInstance* instance()
+	static AujardApp* instance()
 	{
-		return static_cast<AujardInstance*>(s_instance);
+		return static_cast<AujardApp*>(s_instance);
 	}
 
-	AujardInstance(logger::Logger& logger);
-	~AujardInstance();
+	AujardApp(logger::Logger& logger);
+	~AujardApp();
 
 	/// \brief handles DB_HEARTBEAT requests
 	/// \see DB_HEARTBEAT

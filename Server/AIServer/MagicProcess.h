@@ -11,17 +11,17 @@
 
 #include "Extern.h"
 
-class AiServerInstance;
+class AIServerApp;
 class CUser;
 class CNpc;
 
 class CMagicProcess
 {
 public:
-	AiServerInstance*	m_pMain;
-	CUser*				m_pSrcUser;
+	AIServerApp*	m_pMain;
+	CUser*			m_pSrcUser;
+	uint8_t			m_bMagicState;
 
-	uint8_t				m_bMagicState;
 public:
 	CMagicProcess();
 	virtual ~CMagicProcess();

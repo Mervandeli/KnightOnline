@@ -4,7 +4,7 @@
 
 #include "pch.h"
 #include "User.h"
-#include "AiServerInstance.h"
+#include "AIServerApp.h"
 #include "Region.h"
 #include "GameSocket.h"
 
@@ -45,7 +45,7 @@ extern std::mutex g_region_mutex;
 
 CUser::CUser()
 {
-	m_pMain = AiServerInstance::instance();
+	m_pMain = AIServerApp::instance();
 }
 
 CUser::~CUser()

@@ -3,7 +3,7 @@
 #include "Region.h"
 #include "Define.h"
 #include "User.h"
-#include "EbenezerInstance.h"
+#include "EbenezerApp.h"
 
 #include <db-library/RecordSetLoader.h>
 
@@ -84,7 +84,7 @@ C3DMap::~C3DMap()
 
 bool C3DMap::LoadMap(std::istream& fs)
 {
-	m_pMain = EbenezerInstance::instance();
+	m_pMain = EbenezerApp::instance();
 
 	LoadTerrain(fs);
 

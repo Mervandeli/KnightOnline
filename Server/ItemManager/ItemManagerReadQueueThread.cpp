@@ -1,15 +1,15 @@
 ﻿#include "pch.h"
 #include "ItemManagerReadQueueThread.h"
-#include "ItemManagerInstance.h"
+#include "ItemManagerApp.h"
 
 ItemManagerReadQueueThread::ItemManagerReadQueueThread()
-	: ReadQueueThread(ItemManagerInstance::instance()->m_LoggerRecvQueue)
+	: ReadQueueThread(ItemManagerApp::instance()->m_LoggerRecvQueue)
 {
 }
 
 void ItemManagerReadQueueThread::process_packet(const char* buffer, int len)
 {
-	ItemManagerInstance* appInstance = ItemManagerInstance::instance();
+	ItemManagerApp* appInstance = ItemManagerApp::instance();
 
 	int index = 0;
 	uint8_t command = GetByte(buffer, index);

@@ -23,7 +23,7 @@ typedef CSTLMap <_REGENE_EVENT>		ObjectRegeneArray;
 typedef	CSTLMap <_WARP_INFO>		WarpArray;
 
 class CUser;
-class EbenezerInstance;
+class EbenezerApp;
 
 class C3DMap
 {
@@ -96,9 +96,9 @@ public:
 	CRegion** m_ppRegion;
 	int16_t** m_ppnEvent;
 
-	WarpArray			m_WarpArray;
+	WarpArray	m_WarpArray;
 
-	EbenezerInstance* m_pMain;
+	EbenezerApp* m_pMain;
 
 	uint32_t m_wBundle;	// Zone Item Max Count
 };

@@ -50,10 +50,10 @@
     <ClCompile Include="RoomEvent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AiServer.cpp">
+    <ClCompile Include="AIServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AiServerInstance.cpp">
+    <ClCompile Include="AIServerApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
@@ -118,7 +118,7 @@
     <ClInclude Include="RoomEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AiServerInstance.h">
+    <ClInclude Include="AIServerApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">

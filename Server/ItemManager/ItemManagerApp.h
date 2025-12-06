@@ -20,20 +20,20 @@ public:
 };
 
 class ReadQueueThread;
-class ItemManagerInstance : public AppThread
+class ItemManagerApp : public AppThread
 {
 public:
 	SharedMemoryQueue m_LoggerRecvQueue;
 	std::unique_ptr<ReadQueueThread> _readQueueThread;
 
 public:
-	static ItemManagerInstance* instance()
+	static ItemManagerApp* instance()
 	{
-		return static_cast<ItemManagerInstance*>(s_instance);
+		return static_cast<ItemManagerApp*>(s_instance);
 	}
 
-	ItemManagerInstance(ItemManagerLogger& logger);
-	~ItemManagerInstance() override;
+	ItemManagerApp(ItemManagerLogger& logger);
+	~ItemManagerApp() override;
 
 	bool OnStart() override;
 

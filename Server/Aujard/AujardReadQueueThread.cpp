@@ -1,15 +1,15 @@
 ﻿#include "pch.h"
 #include "AujardReadQueueThread.h"
-#include "AujardInstance.h"
+#include "AujardApp.h"
 
 AujardReadQueueThread::AujardReadQueueThread()
-	: ReadQueueThread(AujardInstance::instance()->LoggerRecvQueue)
+	: ReadQueueThread(AujardApp::instance()->LoggerRecvQueue)
 {
 }
 
 void AujardReadQueueThread::process_packet(const char* buffer, int len)
 {
-	AujardInstance* appInstance = AujardInstance::instance();
+	AujardApp* appInstance = AujardApp::instance();
 
 	int index = 0;
 	uint8_t command = GetByte(buffer, index);

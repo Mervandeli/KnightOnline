@@ -19,7 +19,7 @@ typedef  std::list<int>					UserEventList;	// 이밴트를 위하여 ^^;
 
 #define BANISH_DELAY_TIME    30
 
-class EbenezerInstance;
+class EbenezerApp;
 class CUser : public TcpServerSocket
 {
 public:
@@ -145,7 +145,7 @@ public:
 	uint8_t	m_bType4Buff[MAX_TYPE4_BUFF];
 	bool	m_bType4Flag;
 
-	EbenezerInstance* m_pMain;
+	EbenezerApp* m_pMain;
 	CMagicProcess m_MagicProcess;
 
 	double	m_fSpeedHackClientTime, m_fSpeedHackServerTime;

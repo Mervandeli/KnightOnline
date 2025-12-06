@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "ItemManagerInstance.h"
+#include "ItemManagerApp.h"
 #include "ItemManagerReadQueueThread.h"
 
 #include <shared/Ini.h>
@@ -7,31 +7,31 @@
 
 #include <filesystem>
 
-ItemManagerInstance::ItemManagerInstance(ItemManagerLogger& logger)
+ItemManagerApp::ItemManagerApp(ItemManagerLogger& logger)
 	: AppThread(logger)
 {
 	_readQueueThread = std::make_unique<ItemManagerReadQueueThread>();
 }
 
-ItemManagerInstance::~ItemManagerInstance()
+ItemManagerApp::~ItemManagerApp()
 {
-	spdlog::info("ItemManagerInstance::~ItemManagerInstance: Shutting down, releasing resources.");
+	spdlog::info("ItemManagerApp::~ItemManagerApp: Shutting down, releasing resources.");
 
-	spdlog::info("ItemManagerInstance::~ItemManagerInstance: Waiting for worker threads to fully shut down.");
+	spdlog::info("ItemManagerApp::~ItemManagerApp: Waiting for worker threads to fully shut down.");
 
 	if (_readQueueThread != nullptr)
 	{
-		spdlog::info("ItemManagerInstance::~ItemManagerInstance: Shutting down ReadQueueThread...");
+		spdlog::info("ItemManagerApp::~ItemManagerApp: Shutting down ReadQueueThread...");
 
 		_readQueueThread->shutdown();
 
-		spdlog::info("ItemManagerInstance::~ItemManagerInstance: ReadQueueThread stopped.");
+		spdlog::info("ItemManagerApp::~ItemManagerApp: ReadQueueThread stopped.");
 	}
 
-	spdlog::info("ItemManagerInstance::~ItemManagerInstance: All resources safely released.");
+	spdlog::info("ItemManagerApp::~ItemManagerApp: All resources safely released.");
 }
 
-bool ItemManagerInstance::OnStart()
+bool ItemManagerApp::OnStart()
 {
 	//----------------------------------------------------------------------
 	//	Logfile initialize
@@ -65,7 +65,7 @@ void ItemManagerLogger::SetupExtraLoggers(CIni& ini,
 	SetupExtraLogger(ini, threadPool, baseDir, logger::ItemManagerExp, ini::EXP_LOG_FILE);
 }
 
-void ItemManagerInstance::ItemLogWrite(const char* pBuf)
+void ItemManagerApp::ItemLogWrite(const char* pBuf)
 {
 	int index = 0, srclen = 0, tarlen = 0, type = 0, putitem = 0, putcount = 0, putdure = 0;
 	int64_t putserial = 0;
@@ -102,7 +102,7 @@ void ItemManagerInstance::ItemLogWrite(const char* pBuf)
 		srcid, tarid, type, putserial, putitem, putcount, putdure);
 }
 
-void ItemManagerInstance::ExpLogWrite(const char* pBuf)
+void ItemManagerApp::ExpLogWrite(const char* pBuf)
 {
 	int index = 0, aclen = 0, charlen = 0, type = 0, level = 0, exp = 0, loyalty = 0, money = 0;
 	char acname[MAX_ID_SIZE + 1] = {},

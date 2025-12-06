@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "UdpSocket.h"
 #include "Define.h"
-#include "EbenezerInstance.h"
+#include "EbenezerApp.h"
 #include "Knights.h"
 #include "User.h"
 #include "db_resources.h"
@@ -9,7 +9,7 @@
 #include <shared/packets.h>
 #include <spdlog/spdlog.h>
 
-CUdpSocket::CUdpSocket(EbenezerInstance* main)
+CUdpSocket::CUdpSocket(EbenezerApp* main)
 	: _recvUdpThread(this),
 	_socket(_io)	
 {

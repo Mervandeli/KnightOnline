@@ -76,12 +76,12 @@ enum class NameType
 class CUser;
 class ReadQueueThread;
 class TimerThread;
-class EbenezerInstance : public AppThread
+class EbenezerApp : public AppThread
 {
 public:
-	static EbenezerInstance* instance()
+	static EbenezerApp* instance()
 	{
-		return static_cast<EbenezerInstance*>(s_instance);
+		return static_cast<EbenezerApp*>(s_instance);
 	}
 
 	void GameTimeTick();
@@ -196,8 +196,8 @@ public:
 		return _socketManager.IsValidServerSocketId(socketId);
 	}
 
-	EbenezerInstance(EbenezerLogger& logger);
-	~EbenezerInstance();
+	EbenezerApp(EbenezerLogger& logger);
+	~EbenezerApp();
 
 	EbenezerSocketManager _socketManager;
 

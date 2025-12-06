@@ -2,7 +2,7 @@
 #include "KnightsManager.h"
 #include "User.h"
 #include "GameDefine.h"
-#include "EbenezerInstance.h"
+#include "EbenezerApp.h"
 #include "db_resources.h"
 
 #include <shared/DateTime.h>

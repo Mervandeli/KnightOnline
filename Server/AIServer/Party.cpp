@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "pch.h"
-#include "AiServerInstance.h"
+#include "AIServerApp.h"
 #include "Party.h"
 
 #include <spdlog/spdlog.h>
@@ -15,7 +15,7 @@ extern std::mutex g_region_mutex;
 
 CParty::CParty()
 {
-	m_pMain = AiServerInstance::instance();
+	m_pMain = AIServerApp::instance();
 }
 
 CParty::~CParty()

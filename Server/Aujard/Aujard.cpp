@@ -2,10 +2,10 @@
 //
 
 #include "pch.h"
-#include "AujardInstance.h"
+#include "AujardApp.h"
 
 int main()
 {
 	logger::Logger logger(logger::Aujard);
-	return AppThread::main<AujardInstance>(logger);
+	return AppThread::main<AujardApp>(logger);
 }

@@ -2,7 +2,7 @@
 #include "Knights.h"
 #include "User.h"
 #include "GameDefine.h"
-#include "EbenezerInstance.h"
+#include "EbenezerApp.h"
 
 #include <shared/packets.h>
 

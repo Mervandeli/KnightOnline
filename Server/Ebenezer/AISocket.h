@@ -4,11 +4,11 @@
 
 #include "MagicProcess.h"
 
-class EbenezerInstance;
+class EbenezerApp;
 class CAISocket : public TcpClientSocket
 {
 private:
-	EbenezerInstance*	_main;
+	EbenezerApp*	_main;
 	CMagicProcess	_magicProcess;
 	int				_zoneNum;
 

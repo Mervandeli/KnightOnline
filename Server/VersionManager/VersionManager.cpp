@@ -2,10 +2,10 @@
 //
 
 #include "pch.h"
-#include "VersionManagerInstance.h"
+#include "VersionManagerApp.h"
 
 int main()
 {
 	logger::Logger logger(logger::VersionManager);
-	return AppThread::main<VersionManagerInstance>(logger);
+	return AppThread::main<VersionManagerApp>(logger);
 }

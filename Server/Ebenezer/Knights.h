@@ -13,7 +13,7 @@
 #include "gamedefine.h"
 
 class CUser;
-class EbenezerInstance;
+class EbenezerApp;
 class CKnights
 {
 public:

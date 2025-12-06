@@ -10,14 +10,14 @@
 #include <string>
 
 class TimerThread;
-class VersionManagerInstance : public AppThread
+class VersionManagerApp : public AppThread
 {
 	using ServerInfoList = std::vector<_SERVER_INFO*>;
 
 public:
-	static VersionManagerInstance* instance()
+	static VersionManagerApp* instance()
 	{
-		return static_cast<VersionManagerInstance*>(s_instance);
+		return static_cast<VersionManagerApp*>(s_instance);
 	}
 
 	const char* FtpUrl() const
@@ -35,8 +35,8 @@ public:
 		return _lastVersion;
 	}
 
-	VersionManagerInstance(logger::Logger& logger);
-	~VersionManagerInstance();
+	VersionManagerApp(logger::Logger& logger);
+	~VersionManagerApp();
 	bool GetInfoFromIni();
 	bool LoadVersionList();
 

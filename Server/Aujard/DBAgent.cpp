@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "DBAgent.h"
-#include "AujardInstance.h"
+#include "AujardApp.h"
 
 #include <db-library/Exceptions.h>
 #include <db-library/ModelRecordSet.h>
@@ -31,7 +31,7 @@ CDBAgent::~CDBAgent()
 /// \returns true is successful, false otherwise
 bool CDBAgent::InitDatabase()
 {
-	_main = AujardInstance::instance();
+	_main = AujardApp::instance();
 
 	// initialize each connection inside its own try/catch block so we can catch
 	// exceptions per-connection

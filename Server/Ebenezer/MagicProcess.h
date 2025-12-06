@@ -21,7 +21,7 @@
 #define LIGHT_R				7
 #define DARKNESS_R			8
 
-class EbenezerInstance;
+class EbenezerApp;
 class CUser;
 
 class CMagicProcess
@@ -50,10 +50,9 @@ public:
 	CMagicProcess();
 	virtual ~CMagicProcess();
 
-	EbenezerInstance*	m_pMain;
+	EbenezerApp*	m_pMain;
 	CUser*			m_pSrcUser;
-
-	uint8_t	m_bMagicState;
+	uint8_t			m_bMagicState;
 };
 
 #endif // !defined(AFX_MAGICPROCESS_H__C39F1966_3F41_47A9_B26A_77F311683A05__INCLUDED_)

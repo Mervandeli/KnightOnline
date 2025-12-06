@@ -23,7 +23,7 @@ struct _RoomEvent
 };
 
 class CNpc;
-class AiServerInstance;
+class AIServerApp;
 
 class CRoomEvent
 {
@@ -50,7 +50,7 @@ public:
 	double	m_fDelayTime;						// time
 
 	mapNpcArray	m_mapRoomNpcArray;				// room npc uid array
-	AiServerInstance* m_pMain;
+	AIServerApp* m_pMain;
 
 private:
 	uint8_t    m_byLogicNumber;	// 현재의 조건문 검사 번호 (조건번호는 1부터 시작됨) (m_byCheck와 m_byLogicNumber이 같다면 클리어 상태)
