@@ -20,7 +20,7 @@
     <ClCompile Include="MagicProcess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MAP.cpp">
+    <ClCompile Include="Map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Npc.cpp">
@@ -38,13 +38,7 @@
     <ClCompile Include="Party.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PartyUser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PathFind.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Region.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RoomEvent.cpp">
@@ -88,7 +82,7 @@
     <ClInclude Include="MagicProcess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MAP.h">
+    <ClInclude Include="Map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Npc.h">
@@ -107,9 +101,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Party.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PartyUser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PathFind.h">

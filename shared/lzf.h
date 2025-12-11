@@ -34,12 +34,10 @@
 * either the BSD or the GPL.
 */
 
-#ifndef __LZF_H
-#define __LZF_H
+#ifndef SHARED_LZF_H
+#define SHARED_LZF_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#pragma once
 
 #define LZF_MARGIN 128
 #define LZF_VERSION 0x0105 /* 1.5, API version */
@@ -73,7 +71,13 @@ extern "C" {
 * Unconditionally aligning does not cost very much, so do it if unsure
 */
 #ifndef STRICT_ALIGN
-# define STRICT_ALIGN !(defined(__i386) || defined (__amd64))
+
+# if !(defined(__i386) || defined (__amd64))
+#  define STRICT_ALIGN 1
+# else
+#  define STRICT_ALIGN 0
+# endif
+
 #endif
 
 /*
@@ -249,8 +253,4 @@ unsigned int
 	lzf_decompress (const void *const in_data,  unsigned int in_len,
 	void             *out_data, unsigned int out_len);
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+#endif // SHARED_LZF_H

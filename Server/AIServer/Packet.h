@@ -1,5 +1,7 @@
-﻿#ifndef _PACKET_H_
-#define _PACKET_H_
+﻿#ifndef SERVER_AISERVER_PACKET_H
+#define SERVER_AISERVER_PACKET_H
+
+#pragma once
 
 const uint8_t INFO_MODIFY			=	1;
 const uint8_t INFO_DELETE			= 	2;
@@ -24,4 +26,4 @@ const int TYPE_MONEY_SID			= 900000000;	// 아이템 과 돈을 구분하기위�
 #define SERVER_INFO_START			0X01
 #define SERVER_INFO_END				0X02
 
-#endif
+#endif // SERVER_AISERVER_PACKET_H

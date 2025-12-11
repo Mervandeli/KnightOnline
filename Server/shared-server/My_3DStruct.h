@@ -1,8 +1,12 @@
-﻿#pragma once
+﻿#ifndef SERVER_SHAREDSERVER_MY_3DSTRUCT_H
+#define SERVER_SHAREDSERVER_MY_3DSTRUCT_H
 
-#include <string>
-#include <stdint.h>
+#pragma once
+
 #include <inttypes.h>
+#include <stdint.h>
+#include <string>
+#include <math.h>
 
 constexpr float __PI = 3.141592654f;
 constexpr float __PI2 = 6.283185308f;
@@ -91,7 +95,7 @@ public:
 		float m[4][4];
 	};
 
-	__Matrix44();
+	__Matrix44() = default;
 	__Matrix44(const __Matrix44& mtx);
 	__Matrix44(const __Quaternion& qt);
 	void Zero();
@@ -127,7 +131,7 @@ struct __Quaternion
 public:
 	float x, y, z, w;
 
-	__Quaternion();
+	__Quaternion() = default;
 	__Quaternion(const __Matrix44& mtx);
 	__Quaternion(const __Quaternion& qt);
 
@@ -354,13 +358,9 @@ inline __Vector3 __Vector3::operator / (float fDelta) const
 	return vTmp;
 }
 
-inline __Matrix44::__Matrix44()
-{
-}
-
 inline __Matrix44::__Matrix44(const __Matrix44& mtx)
 {
-	memcpy(this, &mtx, sizeof(__Matrix44));
+	memcpy(&m, &mtx.m, sizeof(__Matrix44));
 }
 
 inline __Matrix44::__Matrix44(const __Quaternion& qt)
@@ -380,7 +380,7 @@ inline __Matrix44::__Matrix44(const __Quaternion& qt)
 
 inline void __Matrix44::Zero() 
 {
-	memset(this, 0, sizeof(__Matrix44)); 
+	memset(&m, 0, sizeof(__Matrix44));
 }
 
 inline void __Matrix44::Identity()
@@ -540,7 +540,7 @@ inline void __Matrix44::operator *= (const __Matrix44& mtx)
 {
 	__Matrix44 mtxTmp;
 
-	memcpy(&mtxTmp, this, sizeof(__Matrix44));
+	memcpy(&mtxTmp.m, &m, sizeof(__Matrix44));
 
 	_11 = mtxTmp._11 * mtx._11 + mtxTmp._12 * mtx._21 + mtxTmp._13 * mtx._31 + mtxTmp._14 * mtx._41;
 	_12 = mtxTmp._11 * mtx._12 + mtxTmp._12 * mtx._22 + mtxTmp._13 * mtx._32 + mtxTmp._14 * mtx._42;
@@ -751,10 +751,6 @@ inline bool __Matrix44::BuildInverse(__Matrix44* mtxOut, float* pdeterminant) co
 	return true;
 }
 
-inline __Quaternion::__Quaternion()
-{
-}
-
 inline __Quaternion::__Quaternion(const __Matrix44& mtx)
 {
 	Set(mtx);
@@ -882,19 +878,18 @@ inline float __Quaternion::Dot(const __Quaternion& qt) const
 	return (x*qt.x) + (y*qt.y) + (z*qt.z) + (w*qt.w);
 }
 
-#include "CrtDbg.h"
+#include <cassert>
+#include <spdlog/spdlog.h>
 
 #ifndef _DEBUG
-#define __ASSERT(expr, expMessage)
+#define __ASSERT(expression, expressionMessage) (void)0
 #else
-#define __ASSERT(expr, expMessage) \
-if (!(expr)) \
-{ \
-	_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, "N3 Custom Assert Function", expMessage); \
-	char __szErr[512] = {}; \
-	snprintf(__szErr, sizeof(__szErr), "%s(%d): %s\n", __FILE__, __LINE__, expMessage); \
-	OutputDebugStringA(__szErr); \
-	_CrtDbgBreak(); \
+#define __ASSERT(expression, expressionMessage) ASSERT_IMPL(#expression, expression, __FILE__, __LINE__, expressionMessage)
+
+inline static void ASSERT_IMPL(const char* expressionString, bool expressionResult, const char* file, int line, const char* expressionMessage)
+{
+	if (!expressionResult)
+		spdlog::error("Assertion failed: {}({}) - {} ({})", file, line, expressionMessage, expressionString);
 }
 #endif
 
@@ -1045,3 +1040,5 @@ inline float _Yaw2D(float fDirX, float fDirZ)
 	// 방향을 구하고..
 	////////////////////////////////
 }
+
+#endif // SERVER_SHAREDSERVER_MY_3DSTRUCT_H

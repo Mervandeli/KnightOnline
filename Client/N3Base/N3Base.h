@@ -41,15 +41,33 @@ struct __CameraData
 {
 	__CameraData()
 	{
-		Release();
+		vEye = {};
+		vAt = {};
+		vUp = {};
+
+		fFOV = 0.0f;
+		fAspect = 0.0f;
+		fNP = 0.0f;
+		fFP = 0.0f;
+
+		vp = {};
+
+		mtxView = {};
+		mtxViewInverse ={};
+		mtxProjection = {};
+
+		memset(&fFrustum, 0, sizeof(fFrustum));
 	}
-	void	Release()
+
+	void Release()
 	{
-		memset(this, 0, sizeof(__CameraData));
+		*this = {};
+
 		mtxView.Identity();
 		mtxViewInverse.Identity();
 		mtxProjection.Identity();
 	}
+
 	__Vector3		vEye; // Camera Position Vector
 	__Vector3		vAt; // Camera At Vector
 	__Vector3		vUp; // Camera Up Vector

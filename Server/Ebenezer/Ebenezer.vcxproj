@@ -34,7 +34,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <Import Project="$(PropsDir)asio.props" />
-  <Import Project="$(PropsDir)cp949_strings.props" />
   <Import Project="$(PropsDir)db-library.props" />
   <Import Project="$(PropsDir)server.props" />
   <Import Project="$(PropsDir)spdlog.props" />
@@ -51,7 +50,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <LanguageStandard>stdcpp23</LanguageStandard>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;_WINDOWS;_3DSERVER;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(DependencyDir);$(RootDir);$(RootDir)Server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

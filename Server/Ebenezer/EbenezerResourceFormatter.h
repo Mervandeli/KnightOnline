@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef SERVER_EBENEZER_EBENEZERRESOURCEFORMATTER_H
+#define SERVER_EBENEZER_EBENEZERRESOURCEFORMATTER_H
+
+#pragma once
 
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/bundled/format.h>
@@ -35,9 +38,6 @@ namespace fmt
 
 		return std::to_string(resourceId);
 	}
-
-	inline std::string format_db_resource(uint32_t resourceId, const std::string_view str)
-	{
-		return format_db_resource(resourceId, str);
-	}
 }
+
+#endif // SERVER_EBENEZER_EBENEZERRESOURCEFORMATTER_H

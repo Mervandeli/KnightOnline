@@ -14,6 +14,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ByteBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="globals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -23,7 +26,7 @@
     <ClCompile Include="JvCryption.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lzf.c">
+    <ClCompile Include="lzf.cpp">
       <Filter>LZF</Filter>
     </ClCompile>
     <ClCompile Include="StringUtils.cpp">
@@ -32,7 +35,7 @@
     <ClCompile Include="Thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="crc32.c">
+    <ClCompile Include="crc32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TimerThread.cpp">

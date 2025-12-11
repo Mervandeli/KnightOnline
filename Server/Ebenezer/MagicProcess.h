@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef SERVER_EBENEZER_MAGICPROCESS_H
+#define SERVER_EBENEZER_MAGICPROCESS_H
+
+#pragma once
 
 #include "GameDefine.h"
 
@@ -35,7 +38,7 @@ public:
 	uint8_t ExecuteType1(int magicid, int sid, int tid, int data1, int data2, int data3);
 
 	model::Magic* IsAvailable(int magicid, int tid, int sid, uint8_t type, int data1, int data2, int data3);
-	void MagicPacket(char* pBuf, int len);
+	void MagicPacket(char* pBuf);
 
 	CMagicProcess();
 	virtual ~CMagicProcess();
@@ -44,3 +47,5 @@ public:
 	CUser*			m_pSrcUser;
 	uint8_t			m_bMagicState;
 };
+
+#endif // SERVER_EBENEZER_MAGICPROCESS_H

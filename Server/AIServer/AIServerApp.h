@@ -1,11 +1,14 @@
-﻿#pragma once
+﻿#ifndef SERVER_AISERVER_AISERVERAPP_H
+#define SERVER_AISERVER_AISERVERAPP_H
+
+#pragma once
 
 #include <shared-server/AppThread.h>
 #include <shared-server/STLMap.h>
 
 #include "AISocketManager.h"
 
-#include "MAP.h"
+#include "Map.h"
 #include "NpcItem.h"
 #include "Npc.h"
 
@@ -171,5 +174,6 @@ private:
 
 	void SyncTest();
 	void RegionCheck();		// region안에 들어오는 유저 체크 (스레드에서 FindEnermy()함수의 부하를 줄이기 위한 꽁수)
-	void TestCode();
 };
+
+#endif // SERVER_AISERVER_AISERVERAPP_H

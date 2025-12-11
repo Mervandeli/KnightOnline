@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef SERVER_EBENEZER_KNIGHTSMANAGER_H
+#define SERVER_EBENEZER_KNIGHTSMANAGER_H
+
+#pragma once
 
 class CUser;
 class EbenezerApp;
@@ -6,7 +9,6 @@ class CKnightsManager
 {
 public:
 	void RecvKnightsAllList(const char* pBuf);
-	// knight packet
 	void SetKnightsUser(int knightsId, const char* charId);
 	bool ModifyKnightsUser(int knightsId, const char* charId);
 	bool RemoveKnightsUser(int knightsId, const char* charId);
@@ -18,11 +20,11 @@ public:
 	void RecvCreateKnights(CUser* pUser, const char* pBuf);
 	void ReceiveKnightsProcess(CUser* pUser, const char* pBuf, uint8_t command);
 	void CurrentKnightsMember(CUser* pUser, char* pBuf);
-	void AllKnightsMember(CUser* pUser, char* pBuf);
+	void AllKnightsMember(CUser* pUser);
 	void AllKnightsList(CUser* pUser, char* pBuf);
 	void ModifyKnightsMember(CUser* pUser, char* pBuf, uint8_t command);
 	void DestroyKnights(CUser* pUser);
-	void WithdrawKnights(CUser* pUser, char* pBuf);
+	void WithdrawKnights(CUser* pUser);
 	void JoinKnights(CUser* pUser, char* pBuf);
 	void JoinKnightsReq(CUser* pUser, char* pBuf);
 	int GetKnightsIndex(int nation);
@@ -34,5 +36,6 @@ public:
 	virtual ~CKnightsManager();
 
 	EbenezerApp* m_pMain;
-//	CDatabase	m_KnightsDB;
 };
+
+#endif // SERVER_EBENEZER_KNIGHTSMANAGER_H

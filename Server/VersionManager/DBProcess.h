@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef SERVER_VERSIONMANAGER_DBPROCESS_H
+#define SERVER_VERSIONMANAGER_DBPROCESS_H
+
+#pragma once
 
 #include <memory>
 
@@ -22,7 +25,7 @@ public:
 	/// \param[out] serverIp output of the server IP the user is connected to
 	/// \param[out] serverId output of the serverId the user is connected to
 	/// \return true on success, false on failure
-	bool IsCurrentUser(const char* accountId, char* serverIp, int& serverId);
+	bool IsCurrentUser(const char* accountId, std::string& serverIp, int& serverId);
 
 	/// \brief Deletes Version table entry tied to the specified key
 	/// \return true on success, false on failure
@@ -52,3 +55,5 @@ public:
 	CDBProcess();
 	virtual ~CDBProcess();
 };
+
+#endif // SERVER_VERSIONMANAGER_DBPROCESS_H

@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef SERVER_EBENEZER_AISOCKET_H
+#define SERVER_EBENEZER_AISOCKET_H
+
+#pragma once
 
 #include <shared-server/TcpClientSocket.h>
 
@@ -30,7 +33,7 @@ public:
 	void InitEventMonster(int index);
 	// Packet recv
 	void LoginProcess(char* pBuf);
-	void RecvCheckAlive(char* pBuf);
+	void RecvCheckAlive();
 	void RecvServerInfo(char* pBuf);
 	void RecvNpcInfoAll(char* pBuf);
 	void RecvNpcMoveResult(char* pBuf);
@@ -50,3 +53,5 @@ public:
 	void RecvNpcEventItem(char* pBuf);
 	void RecvGateOpen(char* pBuf);
 };
+
+#endif // SERVER_EBENEZER_AISOCKET_H

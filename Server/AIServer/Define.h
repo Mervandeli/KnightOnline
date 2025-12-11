@@ -1,6 +1,10 @@
-﻿#pragma once
+﻿#ifndef SERVER_AISERVER_DEFINE_H
+#define SERVER_AISERVER_DEFINE_H
+
+#pragma once
 
 #include <shared/globals.h>
+#include <shared-server/GeometricStructs.h>
 
 /*
 	 ** Repent AI Server 작업시 참고 사항 **
@@ -71,12 +75,11 @@ typedef union
 	uint8_t		b[2];
 } MYSHORT;
 
-
 struct _NpcPosition
 {
 	uint8_t	byType;			// type
 	uint8_t	bySpeed;		// speed
-	POINT	pPoint;			// position
+	_POINT	pPoint;			// position
 	float fXPos;
 	float fZPos;
 };
@@ -258,3 +261,5 @@ struct _OBJECT_EVENT
 #define ATTRIBUTE_FIRE			 1
 #define ATTRIBUTE_ICE			 2
 #define ATTRIBUTE_LIGHTNING		 3
+
+#endif // SERVER_AISERVER_DEFINE_H

@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef SERVER_EBENEZER_EVENT_H
+#define SERVER_EBENEZER_EVENT_H
+
+#pragma once
 
 #include "EVENT_DATA.h"
 #include <shared-server/STLMap.h>
@@ -9,7 +12,6 @@ class EVENT
 {
 public:
 	void DeleteAll();
-	void Parsing(char* pBuf);
 	void Init();
 	bool LoadEvent(int zone);
 	int m_Zone;
@@ -19,3 +21,5 @@ public:
 	EVENT();
 	virtual ~EVENT();
 };
+
+#endif // SERVER_EBENEZER_EVENT_H

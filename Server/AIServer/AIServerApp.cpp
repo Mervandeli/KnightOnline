@@ -15,20 +15,21 @@
 #include <spdlog/spdlog.h>
 
 #include <db-library/ConnectionManager.h>
+#include <db-library/RecordSetLoader_STLMap.h>
+#include <db-library/RecordSetLoader_Vector.h>
+
+#include <AIServer/binder/AIServerBinder.h>
+
+#include <shared/TimerThread.h>
 
 #include <math.h>
 #include <fstream>
-#include <db-library/RecordSetLoader_STLMap.h>
-#include <db-library/RecordsetLoader_Vector.h>
-#include <shared/TimerThread.h>
 
 using namespace std::chrono_literals;
 using namespace db;
 
 std::mutex g_user_mutex;
 std::mutex g_region_mutex;
-
-import AIServerBinder;
 
 AIServerApp::AIServerApp(AIServerLogger& logger)
 	: AppThread(logger)
@@ -135,9 +136,6 @@ AIServerApp::~AIServerApp()
 
 bool AIServerApp::OnStart()
 {
-	// TestCode
-	TestCode();
-
 	//----------------------------------------------------------------------
 	//	Sets a random number starting point.
 	//----------------------------------------------------------------------
@@ -485,16 +483,16 @@ bool AIServerApp::GetNpcItemTable()
 		ModelType* row = rows[i];
 
 		_npcItem.m_ppItem[i][0] = row->MonsterId;
-		_npcItem.m_ppItem[i][1] = row->ItemId1;
-		_npcItem.m_ppItem[i][2] = row->DropChance1;
-		_npcItem.m_ppItem[i][3] = row->ItemId2;
-		_npcItem.m_ppItem[i][4] = row->DropChance2;
-		_npcItem.m_ppItem[i][5] = row->ItemId3;
-		_npcItem.m_ppItem[i][6] = row->DropChance3;
-		_npcItem.m_ppItem[i][7] = row->ItemId4;
-		_npcItem.m_ppItem[i][8] = row->DropChance4;
-		_npcItem.m_ppItem[i][9] = row->ItemId5;
-		_npcItem.m_ppItem[i][10] = row->DropChance5;
+		_npcItem.m_ppItem[i][1] = row->ItemId[0];
+		_npcItem.m_ppItem[i][2] = row->DropChance[0];
+		_npcItem.m_ppItem[i][3] = row->ItemId[1];
+		_npcItem.m_ppItem[i][4] = row->DropChance[1];
+		_npcItem.m_ppItem[i][5] = row->ItemId[2];
+		_npcItem.m_ppItem[i][6] = row->DropChance[2];
+		_npcItem.m_ppItem[i][7] = row->ItemId[3];
+		_npcItem.m_ppItem[i][8] = row->DropChance[3];
+		_npcItem.m_ppItem[i][9] = row->ItemId[4];
+		_npcItem.m_ppItem[i][10] = row->DropChance[4];
 
 		delete row;
 	}
@@ -1019,7 +1017,7 @@ void AIServerApp::AllNpcInfo()
 	int nZone = 0;
 	int size = _npcMap.GetSize();
 
-	int send_index = 0, zone_index = 0, packet_size = 0;
+	int send_index = 0;
 	int count = 0, send_count = 0, send_tot = 0;
 	char send_buff[2048] = {};
 
@@ -1035,9 +1033,8 @@ void AIServerApp::AllNpcInfo()
 		SetByte(send_buff, AG_SERVER_INFO, send_index);
 		SetByte(send_buff, SERVER_INFO_START, send_index);
 		SetByte(send_buff, nZone, send_index);
-		packet_size = Send(send_buff, send_index, nZone);
+		Send(send_buff, send_index, nZone);
 
-		zone_index = GetZoneIndex(nZone);
 		send_index = 2;
 		count = 0;
 		send_count = 0;
@@ -1076,9 +1073,10 @@ void AIServerApp::AllNpcInfo()
 				send_count = 0;
 				count = 0;
 				send_tot++;
-				//TRACE(_T("AllNpcInfo - send_count=%d, count=%d, zone=%d\n"), send_tot, count, nZone);
+				spdlog::trace("AIServerApp::AllNpcInfo: send_count={}, count={}, zone={}",
+					send_tot, count, nZone);
 				memset(send_buff, 0, sizeof(send_buff));
-				Sleep(50);
+				std::this_thread::sleep_for(50ms);
 			}
 		}
 
@@ -1091,8 +1089,9 @@ void AIServerApp::AllNpcInfo()
 			SetByte(send_buff, (uint8_t) count, send_count);
 			Send(send_buff, send_index, nZone);
 			send_tot++;
-			//TRACE(_T("AllNpcInfo - send_count=%d, count=%d, zone=%d\n"), send_tot, count, nZone);
-			Sleep(50);
+			spdlog::trace("AIServerApp::AllNpcInfo: send_count={}, count={}, zone={}",
+				send_tot, count, nZone);
+			std::this_thread::sleep_for(50ms);
 		}
 
 		send_index = 0;
@@ -1101,12 +1100,12 @@ void AIServerApp::AllNpcInfo()
 		SetByte(send_buff, SERVER_INFO_END, send_index);
 		SetByte(send_buff, nZone, send_index);
 		SetShort(send_buff, (int16_t) _totalNpcCount, send_index);
-		packet_size = Send(send_buff, send_index, nZone);
+		Send(send_buff, send_index, nZone);
 
 		spdlog::debug("AIServerApp::AllNpcInfo: end for zoneId={}", nZone);
 	}
 
-	Sleep(1000);
+	std::this_thread::sleep_for(1s);
 }
 // ~sungyong 2002.05.23
 
@@ -1153,7 +1152,6 @@ void AIServerApp::CheckAliveTest()
 {
 	int send_index = 0;
 	char send_buff[256] = {};
-	int iErrorCode = 0;
 
 	SetByte(send_buff, AG_CHECK_ALIVE_REQ, send_index);
 
@@ -1290,7 +1288,7 @@ int AIServerApp::Send(const char* pData, int length, int nZone)
 		return 0;
 
 	if (length <= 0
-		|| length > sizeof(_SEND_DATA::pBuf))
+		|| length > static_cast<int>(sizeof(_SEND_DATA::pBuf)))
 		return 0;
 
 	_SEND_DATA* pNewData = new _SEND_DATA;
@@ -1318,7 +1316,6 @@ void AIServerApp::SyncTest()
 
 	int send_index = 0;
 	char send_buff[256] = {};
-	int iErrorCode = 0;
 
 	SetByte(send_buff, AG_CHECK_ALIVE_REQ, send_index);
 
@@ -1335,27 +1332,6 @@ void AIServerApp::SyncTest()
 
 		spdlog::info("AIServerApp::SyncTest: size={}, zoneNo={}", size, pSocket->_zoneNo);
 	}
-}
-
-void AIServerApp::TestCode()
-{
-	//InitTrigonometricFunction();
-
-	int random = 0, count_1 = 0, count_2 = 0, count_3 = 0;
-
-	// TestCoding
-	for (int i = 0; i < 100; i++)
-	{
-		random = myrand(1, 3);
-		if (random == 1)
-			count_1++;
-		else if (random == 2)
-			count_2++;
-		else if (random == 3)
-			count_3++;
-	}
-
-	//TRACE(_T("$$$ random test == 1=%d, 2=%d, 3=%d,, %d,%hs $$$\n"), count_1, count_2, count_3, __FILE__, __LINE__);
 }
 
 bool AIServerApp::GetMagicType1Data()
@@ -1456,10 +1432,7 @@ void AIServerApp::RegionCheck()
 
 bool AIServerApp::AddObjectEventNpc(_OBJECT_EVENT* pEvent, int zone_number)
 {
-	int i = 0, j = 0, objectid = 0;
 	model::Npc* pNpcTable = nullptr;
-	bool bFindNpcTable = false;
-	int offset = 0;
 	int nServerNum = GetServerNumber(zone_number);
 	if (_serverZoneType != nServerNum)
 		return false;
@@ -1467,13 +1440,10 @@ bool AIServerApp::AddObjectEventNpc(_OBJECT_EVENT* pEvent, int zone_number)
 	pNpcTable = _npcTableMap.GetData(pEvent->sIndex);
 	if (pNpcTable == nullptr)
 	{
-		bFindNpcTable = false;
 		spdlog::error("AIServerApp::AddObjectEventNpc error: eventId={} zoneId={}",
 			pEvent->sIndex, zone_number);
 		return false;
 	}
-
-	bFindNpcTable = true;
 
 	CNpc* pNpc = new CNpc();
 
@@ -1482,7 +1452,6 @@ bool AIServerApp::AddObjectEventNpc(_OBJECT_EVENT* pEvent, int zone_number)
 
 	pNpc->m_byMoveType = 100;
 	pNpc->m_byInitMoveType = 100;
-	bFindNpcTable = false;
 
 	pNpc->m_byMoveType = 0;
 	pNpc->m_byInitMoveType = 0;
@@ -1517,7 +1486,6 @@ bool AIServerApp::AddObjectEventNpc(_OBJECT_EVENT* pEvent, int zone_number)
 	//pNpc->m_ZoneIndex = GetZoneIndex(pNpc->m_sCurZone);
 /*
 	if(pNpc->m_ZoneIndex == -1)	{
-		AfxMessageBox("Invaild zone Index!!");
 		return false;
 	}	*/
 
@@ -1542,7 +1510,7 @@ int AIServerApp::GetZoneIndex(int zoneId) const
 		MAP* pMap = _zones[i];
 		if (pMap != nullptr
 			&& pMap->m_nZoneNumber == zoneId)
-			return i;
+			return static_cast<int>(i);
 	}
 
 	spdlog::error("AIServerApp::GetZoneIndex: zoneId={} not found", zoneId);

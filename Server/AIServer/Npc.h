@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef SERVER_AISERVER_NPC_H
+#define SERVER_AISERVER_NPC_H
+
+#pragma once
 
 #include "Map.h"
 #include "PathFind.h"
@@ -168,7 +171,7 @@ public:
 
 	int			m_pMap[MAX_MAP_SIZE]; // 2차원 -> 1차원 배열로 x * sizey + y
 
-	SIZE		m_vMapSize;
+	_SIZE		m_vMapSize;
 
 	float		m_fStartPoint_X, m_fStartPoint_Y;
 	float		m_fEndPoint_X, m_fEndPoint_Y;
@@ -470,3 +473,5 @@ public:
 	void ChangeAbility(int iChangeType);
 	bool Teleport();
 };
+
+#endif // SERVER_AISERVER_NPC_H

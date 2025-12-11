@@ -3,7 +3,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Build tools
+name: "Build client tools (MSBuild)"
 
 on:
   push:
@@ -11,17 +11,18 @@ on:
     - master
 
     paths:
-      - '.github/workflows/build_tools.yml'
+      - '.github/workflows/build_msbuild_client_tools.yml'
 
   pull_request:
     branches:
     - master
 
     paths:
-      - '.github/workflows/build_tools.yml'
-
+      - '.github/workflows/build_msbuild_client_tools.yml'
+ 
   workflow_dispatch:
 
+# These should really be moved into the one solution.
 jobs:
   build:
     runs-on: windows-latest
@@ -31,7 +32,7 @@ jobs:
         BUILD_CONFIGURATION: [Debug, Release]
         BUILD_PLATFORM: [Win32]
 
-    name: "Tools: ${{ matrix.BUILD_CONFIGURATION }} - ${{ matrix.BUILD_PLATFORM }}"
+    name: "Client tools: ${{ matrix.BUILD_CONFIGURATION }} - ${{ matrix.BUILD_PLATFORM }}"
 
     steps:
     - uses: actions/checkout@v4
@@ -43,4 +44,4 @@ jobs:
 
     - name: Build tools
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: msbuild /p:Configuration="${{matrix.BUILD_CONFIGURATION}}" /p:Platform="${{matrix.BUILD_PLATFORM}}" Tools.sln
+      run: msbuild /p:Configuration="${{matrix.BUILD_CONFIGURATION}}" /p:Platform="${{matrix.BUILD_PLATFORM}}" ClientTools.sln

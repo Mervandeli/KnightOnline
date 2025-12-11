@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef SERVER_AISERVER_REGION_H
+#define SERVER_AISERVER_REGION_H
+
+#pragma once
 
 #include <shared-server/STLMap.h>
 
@@ -7,9 +10,6 @@ class CNpc;
 
 typedef CSTLMap <int>			ZoneUserArray;
 typedef CSTLMap <int>			ZoneNpcArray;
-
-//typedef CTypedPtrArray <CPtrArray, int*>	ZoneUserArray;
-//typedef CTypedPtrArray <CPtrArray, int*>	ZoneNpcArray;
 
 class CRegion
 {
@@ -20,8 +20,6 @@ public:
 
 protected:
 	int		m_nIndex;
-
-public:
-	CRegion();
-	virtual ~CRegion();
 };
+
+#endif // SERVER_AISERVER_REGION_H

@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef SERVER_EBENEZER_EBENEZERAPP_H
+#define SERVER_EBENEZER_EBENEZERAPP_H
+
+#pragma once
 
 #include "EbenezerSocketManager.h"
 #include "Map.h"
@@ -115,8 +118,8 @@ public:
 	int GetAIServerPort() const;
 	int GetRegionNpcIn(C3DMap* pMap, int region_x, int region_z, char* buff, int& t_count);
 	bool LoadNoticeData();
-	bool HandleInputEvent(const ftxui::Event& event);
-	bool HandleCommand(const std::string& command);
+	bool HandleInputEvent(const ftxui::Event& event) override;
+	bool HandleCommand(const std::string& command) override;
 	int GetZoneIndex(int zonenumber) const;
 	int GetRegionNpcList(C3DMap* pMap, int region_x, int region_z, char* nid_buff, int& t_count, int nType = 0); // Region All Npcs nid Packaging Function
 	void RegionNpcInfoForMe(CUser* pSendUser, int nType = 0);	// 9 Regions All Npcs nid Packaging Function
@@ -316,3 +319,5 @@ private:
 
 	std::mutex							_serialMutex;
 };
+
+#endif // SERVER_EBENEZER_EBENEZERAPP_H

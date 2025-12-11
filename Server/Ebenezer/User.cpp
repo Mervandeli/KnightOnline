@@ -9,6 +9,7 @@
 #include <shared/globals.h>
 #include <shared/lzf.h>
 #include <shared/packets.h>
+#include <shared/StringUtils.h>
 #include <spdlog/spdlog.h>
 
 extern std::recursive_mutex g_region_mutex;
@@ -618,7 +619,7 @@ void CUser::Parsing(int len, char* pData)
 			break;
 
 		case WIZ_MAGIC_PROCESS:
-			m_MagicProcess.MagicPacket(pData + index, len);
+			m_MagicProcess.MagicPacket(pData + index);
 			break;
 
 		case WIZ_SKILLPT_CHANGE:
@@ -720,7 +721,7 @@ void CUser::Parsing(int len, char* pData)
 			break;
 
 		case WIZ_TEST_PACKET:
-			TestPacket(pData + index);
+			TestPacket();
 			break;
 
 		case WIZ_SELECT_MSG:
@@ -773,7 +774,7 @@ void CUser::Parsing(int len, char* pData)
 
 void CUser::VersionCheck()
 {
-	int index = 0, send_index = 0;
+	int send_index = 0;
 	char send_buff[128] = {};
 
 	SetByte(send_buff, WIZ_VERSION_CHECK, send_index);
@@ -834,7 +835,7 @@ void CUser::LoginProcess(char* pBuf)
 		goto fail_return;
 	}
 
-	strcpy(m_strAccountID, accountid);
+	strcpy_safe(m_strAccountID, accountid);
 	return;
 
 fail_return:
@@ -850,7 +851,7 @@ void CUser::NewCharToAgent(char* pBuf)
 	int charindex = 0, race = 0, Class = 0, hair = 0, face = 0, str = 0, sta = 0, dex = 0, intel = 0, cha = 0;
 	char charid[MAX_ID_SIZE + 1] = {},
 		send_buff[256] = {};
-	uint8_t result;
+	uint8_t result = 0;
 	int sum = 0;
 	model::Coefficient* p_TableCoefficient = nullptr;
 
@@ -914,8 +915,7 @@ void CUser::NewCharToAgent(char* pBuf)
 
 	SetByte(send_buff, WIZ_NEW_CHAR, send_index);
 	SetShort(send_buff, _socketId, send_index);
-	SetShort(send_buff, strlen(m_strAccountID), send_index);
-	SetString(send_buff, m_strAccountID, strlen(m_strAccountID), send_index);
+	SetString2(send_buff, m_strAccountID, send_index);
 	SetByte(send_buff, charindex, send_index);
 	SetShort(send_buff, idlen, send_index);
 	SetString(send_buff, charid, idlen, send_index);
@@ -982,13 +982,10 @@ void CUser::DelCharToAgent(char* pBuf)
 
 	SetByte(send_buff, WIZ_DEL_CHAR, send_index);
 	SetShort(send_buff, _socketId, send_index);
-	SetShort(send_buff, strlen(m_strAccountID), send_index);
-	SetString(send_buff, m_strAccountID, strlen(m_strAccountID), send_index);
+	SetString2(send_buff, m_strAccountID, send_index);
 	SetByte(send_buff, charindex, send_index);
-	SetShort(send_buff, idlen, send_index);
-	SetString(send_buff, charid, idlen, send_index);
-	SetShort(send_buff, soclen, send_index);
-	SetString(send_buff, socno, soclen, send_index);
+	SetString2(send_buff, charid, idlen, send_index);
+	SetString2(send_buff, socno, soclen, send_index);
 
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
@@ -1019,8 +1016,7 @@ void CUser::SelNationToAgent(char* pBuf)
 
 	SetByte(send_buff, WIZ_SEL_NATION, send_index);
 	SetShort(send_buff, _socketId, send_index);
-	SetShort(send_buff, strlen(m_strAccountID), send_index);
-	SetString(send_buff, m_strAccountID, strlen(m_strAccountID), send_index);
+	SetString2(send_buff, m_strAccountID, send_index);
 	SetByte(send_buff, nation, send_index);
 
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
@@ -1066,7 +1062,7 @@ void CUser::SelCharToAgent(char* pBuf)
 	bInit = GetByte(pBuf, index);
 	zoneId = GetByte(pBuf, index);
 
-	if (_strnicmp(accountId, m_strAccountID, MAX_ID_SIZE) != 0)
+	if (strnicmp(accountId, m_strAccountID, MAX_ID_SIZE) != 0)
 	{
 		pUser = m_pMain->GetUserPtr(accountId, NameType::Account);
 		if (pUser != nullptr
@@ -1076,7 +1072,7 @@ void CUser::SelCharToAgent(char* pBuf)
 			goto fail_return;
 		}
 
-		strcpy(m_strAccountID, accountId);	// 존이동 한 경우는 로그인 프로시져가 없으므로...
+		strcpy_safe(m_strAccountID, accountId);	// 존이동 한 경우는 로그인 프로시져가 없으므로...
 	}
 
 	pUser = m_pMain->GetUserPtr(charId, NameType::Character);
@@ -1112,8 +1108,7 @@ void CUser::SelCharToAgent(char* pBuf)
 		}
 
 		SetByte(send_buff, WIZ_SERVER_CHANGE, send_index);
-		SetShort(send_buff, strlen(pInfo->strServerIP), send_index);
-		SetString(send_buff, pInfo->strServerIP, strlen(pInfo->strServerIP), send_index);
+		SetString2(send_buff, pInfo->strServerIP, send_index);
 		SetShort(send_buff, pInfo->sPort, send_index);
 		SetByte(send_buff, bInit, send_index);
 		SetByte(send_buff, zoneId, send_index);
@@ -1126,10 +1121,8 @@ void CUser::SelCharToAgent(char* pBuf)
 
 	SetByte(send_buff, WIZ_SEL_CHAR, send_index);
 	SetShort(send_buff, _socketId, send_index);
-	SetShort(send_buff, strlen(m_strAccountID), send_index);
-	SetString(send_buff, m_strAccountID, strlen(m_strAccountID), send_index);
-	SetShort(send_buff, idlen2, send_index);
-	SetString(send_buff, charId, idlen2, send_index);
+	SetString2(send_buff, m_strAccountID, send_index);
+	SetString2(send_buff, charId, idlen2, send_index);
 	SetByte(send_buff, bInit, send_index);
 	SetDWORD(send_buff, m_pMain->m_iPacketCount, send_index);
 
@@ -1190,8 +1183,7 @@ void CUser::SelectCharacter(const char* pBuf)
 			goto fail_return;
 
 		SetByte(send_buff, WIZ_SERVER_CHANGE, send_index);
-		SetShort(send_buff, strlen(pInfo->strServerIP), send_index);
-		SetString(send_buff, pInfo->strServerIP, strlen(pInfo->strServerIP), send_index);
+		SetString2(send_buff, pInfo->strServerIP, send_index);
 		SetShort(send_buff, pInfo->sPort, send_index);
 		SetByte(send_buff, bInit, send_index);
 		SetByte(send_buff, m_pUserData->m_bZone, send_index);
@@ -1352,10 +1344,8 @@ void CUser::SelectCharacter(const char* pBuf)
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 	SetByte(send_buff, WIZ_DATASAVE, send_index);
-	SetShort(send_buff, strlen(m_pUserData->m_Accountid), send_index);
-	SetString(send_buff, m_pUserData->m_Accountid, strlen(m_pUserData->m_Accountid), send_index);
-	SetShort(send_buff, strlen(m_pUserData->m_id), send_index);
-	SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
+	SetString2(send_buff, m_pUserData->m_Accountid, send_index);
+	SetString2(send_buff, m_pUserData->m_id, send_index);
 	SetByte(send_buff, 0x01, send_index);	// login...
 	SetByte(send_buff, m_pUserData->m_bLevel, send_index);
 	SetDWORD(send_buff, m_pUserData->m_iExp, send_index);
@@ -1386,8 +1376,7 @@ void CUser::AllCharInfoToAgent()
 
 	SetByte(send_buff, WIZ_ALLCHAR_INFO_REQ, send_index);
 	SetShort(send_buff, _socketId, send_index);
-	SetShort(send_buff, strlen(m_strAccountID), send_index);
-	SetString(send_buff, m_strAccountID, strlen(m_strAccountID), send_index);
+	SetString2(send_buff, m_strAccountID, send_index);
 
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
@@ -1412,10 +1401,8 @@ void CUser::UserDataSaveToAgent()
 
 	SetByte(send_buff, WIZ_DATASAVE, send_index);
 	SetShort(send_buff, _socketId, send_index);
-	SetShort(send_buff, strlen(m_pUserData->m_Accountid), send_index);
-	SetString(send_buff, m_pUserData->m_Accountid, strlen(m_pUserData->m_Accountid), send_index);
-	SetShort(send_buff, strlen(m_pUserData->m_id), send_index);
-	SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
+	SetString2(send_buff, m_pUserData->m_Accountid, send_index);
+	SetString2(send_buff, m_pUserData->m_id, send_index);
 
 	retvalue = m_pMain->m_LoggerSendQueue.PutData(send_buff, send_index);
 	if (retvalue >= SMQ_FULL)
@@ -1424,10 +1411,8 @@ void CUser::UserDataSaveToAgent()
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 	SetByte(send_buff, WIZ_DATASAVE, send_index);
-	SetShort(send_buff, strlen(m_pUserData->m_Accountid), send_index);
-	SetString(send_buff, m_pUserData->m_Accountid, strlen(m_pUserData->m_Accountid), send_index);
-	SetShort(send_buff, strlen(m_pUserData->m_id), send_index);
-	SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
+	SetString2(send_buff, m_pUserData->m_Accountid, send_index);
+	SetString2(send_buff, m_pUserData->m_id, send_index);
 	SetByte(send_buff, 0x02, send_index);
 	SetByte(send_buff, m_pUserData->m_bLevel, send_index);
 	SetDWORD(send_buff, m_pUserData->m_iExp, send_index);
@@ -1441,7 +1426,7 @@ void CUser::UserDataSaveToAgent()
 
 void CUser::LogOut()
 {
-	int index = 0, idlen = 0, idindex = 0, send_index = 0, count = 0;
+	int index = 0, send_index = 0, count = 0;
 	CUser* pUser = nullptr;
 	char send_buff[256] = {};
 	
@@ -1463,10 +1448,8 @@ void CUser::LogOut()
 
 	SetByte(send_buff, WIZ_LOGOUT, send_index);
 	SetShort(send_buff, _socketId, send_index);
-	SetShort(send_buff, strlen(m_pUserData->m_Accountid), send_index);
-	SetString(send_buff, m_pUserData->m_Accountid, strlen(m_pUserData->m_Accountid), send_index);
-	SetShort(send_buff, strlen(m_pUserData->m_id), send_index);
-	SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
+	SetString2(send_buff, m_pUserData->m_Accountid, send_index);
+	SetString2(send_buff, m_pUserData->m_id, send_index);
 
 	do
 	{
@@ -1489,10 +1472,8 @@ void CUser::LogOut()
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 	SetByte(send_buff, WIZ_DATASAVE, send_index);
-	SetShort(send_buff, strlen(m_pUserData->m_Accountid), send_index);
-	SetString(send_buff, m_pUserData->m_Accountid, strlen(m_pUserData->m_Accountid), send_index);
-	SetShort(send_buff, strlen(m_pUserData->m_id), send_index);
-	SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
+	SetString2(send_buff, m_pUserData->m_Accountid, send_index);
+	SetString2(send_buff, m_pUserData->m_id, send_index);
 	SetByte(send_buff, 0x03, send_index);		// logout
 	SetByte(send_buff, m_pUserData->m_bLevel, send_index);
 	SetDWORD(send_buff, m_pUserData->m_iExp, send_index);
@@ -1517,7 +1498,7 @@ void CUser::MoveProcess(char* pBuf)
 	if (m_bWarp)
 		return;
 
-	int index = 0, send_index = 0, region = 0;
+	int index = 0, send_index = 0;
 	uint16_t will_x, will_z;
 	int16_t will_y, speed = 0;
 	float real_x, real_z, real_y;
@@ -1540,7 +1521,7 @@ void CUser::MoveProcess(char* pBuf)
 	if (pMap == nullptr)
 		return;
 
-	if (!pMap->IsValidPosition(real_x, real_z, real_y))
+	if (!pMap->IsValidPosition(real_x, real_z))
 		return;
 
 //	real_y = pMap->GetHeight(	real_x, real_y, real_z );
@@ -1567,15 +1548,15 @@ void CUser::MoveProcess(char* pBuf)
 		m_pUserData->m_curz = m_fWill_z;
 		m_pUserData->m_cury = m_fWill_y;
 
-		m_fWill_x = will_x / 10.0f;	// 다음좌표를 기억....
-		m_fWill_z = will_z / 10.0f;
-		m_fWill_y = will_y / 10.0f;
+		m_fWill_x = real_x;	// 다음좌표를 기억....
+		m_fWill_z = real_z;
+		m_fWill_y = real_y;
 	}
 	else
 	{
-		m_pUserData->m_curx = m_fWill_x = will_x / 10.0f;	// 다음좌표 == 현재 좌표...
-		m_pUserData->m_curz = m_fWill_z = will_z / 10.0f;
-		m_pUserData->m_cury = m_fWill_y = will_y / 10.0f;
+		m_pUserData->m_curx = m_fWill_x = real_x;	// 다음좌표 == 현재 좌표...
+		m_pUserData->m_curz = m_fWill_z = real_z;
+		m_pUserData->m_cury = m_fWill_y = real_y;
 	}
 
 	SetByte(send_buff, WIZ_MOVE, send_index);
@@ -1634,8 +1615,7 @@ void CUser::UserInOut(uint8_t Type)
 		SetByte(send_buff, AG_USER_INOUT, send_index);
 		SetByte(send_buff, Type, send_index);
 		SetShort(send_buff, _socketId, send_index);
-		SetShort(send_buff, strlen(m_pUserData->m_id), send_index);
-		SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
+		SetString2(send_buff, m_pUserData->m_id, send_index);
 		SetFloat(send_buff, m_pUserData->m_curx, send_index);
 		SetFloat(send_buff, m_pUserData->m_curz, send_index);
 		m_pMain->Send_AIServer(m_pUserData->m_bZone, send_buff, send_index);
@@ -1656,8 +1636,7 @@ void CUser::UserInOut(uint8_t Type)
 		SetByte(send_buff, AG_USER_INOUT, send_index);
 		SetByte(send_buff, Type, send_index);
 		SetShort(send_buff, _socketId, send_index);
-		SetShort(send_buff, strlen(m_pUserData->m_id), send_index);
-		SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
+		SetString2(send_buff, m_pUserData->m_id, send_index);
 		SetFloat(send_buff, m_pUserData->m_curx, send_index);
 		SetFloat(send_buff, m_pUserData->m_curz, send_index);
 		m_pMain->Send_AIServer(m_pUserData->m_bZone, send_buff, send_index);
@@ -1682,7 +1661,7 @@ void CUser::Rotate(char* pBuf)
 void CUser::Attack(char* pBuf)
 {
 	int index = 0, send_index = 0;
-	int sid = -1, tid = -1, damage = 0;
+	int tid = -1, damage = 0;
 	float delaytime = 0.0f, distance = 0.0f;
 	uint8_t type, result;
 	char send_buff[256] = {};
@@ -1694,7 +1673,6 @@ void CUser::Attack(char* pBuf)
 
 	type = GetByte(pBuf, index);
 	result = GetByte(pBuf, index);
-//	sid = GetShort(pBuf, index);
 	tid = GetShort(pBuf, index);
 // 비러머글 해킹툴 유저 --;
 	delaytime = static_cast<float>(GetShort(pBuf, index));
@@ -1871,7 +1849,6 @@ void CUser::Attack(char* pBuf)
 			SetByte(send_buff, AG_ATTACK_REQ, send_index);
 			SetByte(send_buff, type, send_index);
 			SetByte(send_buff, result, send_index);
-//			SetShort( send_buff, sid, send_index );
 			SetShort(send_buff, _socketId, send_index);
 			SetShort(send_buff, tid, send_index);
 			SetShort(send_buff, m_sTotalHit * m_bAttackAmount / 100, send_index);   // 표시
@@ -1893,7 +1870,6 @@ void CUser::Attack(char* pBuf)
 	SetByte(send_buff, WIZ_ATTACK, send_index);
 	SetByte(send_buff, type, send_index);
 	SetByte(send_buff, result, send_index);
-//	SetShort( send_buff, sid, send_index );
 	SetShort(send_buff, _socketId, send_index);
 	SetShort(send_buff, tid, send_index);
 	m_pMain->Send_Region(send_buff, send_index, (int) m_pUserData->m_bZone, m_RegionX, m_RegionZ, nullptr, false);
@@ -1935,7 +1911,7 @@ void CUser::SendMyInfo(int type)
 //	int map_size = (pMap->m_nMapSize - 1) * pMap->m_fUnitDist ;		// Are you within the map limits?
 //	if (m_pUserData->m_curx >= map_size || m_pUserData->m_curz >= map_size) {
 
-	if (!pMap->IsValidPosition(m_pUserData->m_curx, m_pUserData->m_curz, 0.0f))
+	if (!pMap->IsValidPosition(m_pUserData->m_curx, m_pUserData->m_curz))
 	{
 		model::Home* pHomeInfo = m_pMain->m_HomeTableMap.GetData(m_pUserData->m_bNation);
 		if (pHomeInfo == nullptr)
@@ -2136,7 +2112,7 @@ void CUser::SendMyInfo(int type)
 
 void CUser::Chat(char* pBuf)
 {
-	int index = 0, chatlen = 0, send_index = 0, tid = -1;
+	int index = 0, chatlen = 0, send_index = 0;
 	uint8_t type;
 	CUser* pUser = nullptr;
 	char chatstr[1024] = {},
@@ -2323,7 +2299,6 @@ void CUser::Regene(char* pBuf, int magicid)
 	InitType3();
 	InitType4();
 
-	CUser* pUser = nullptr;
 	_OBJECT_EVENT* pEvent = nullptr;
 	model::Home* pHomeInfo = nullptr;
 	model::MagicType5* pType = nullptr;
@@ -2731,8 +2706,7 @@ void CUser::ZoneChange(int zone, float x, float z)
 		m_pUserData->m_bLogout = 2;	// server change flag
 
 		SetByte(send_buff, WIZ_SERVER_CHANGE, send_index);
-		SetShort(send_buff, strlen(pInfo->strServerIP), send_index);
-		SetString(send_buff, pInfo->strServerIP, strlen(pInfo->strServerIP), send_index);
+		SetString2(send_buff, pInfo->strServerIP, send_index);
 		SetShort(send_buff, pInfo->sPort, send_index);
 		SetByte(send_buff, 0x02, send_index);				// 중간에 서버가 바뀌는 경우...
 		SetByte(send_buff, m_pUserData->m_bZone, send_index);
@@ -2805,7 +2779,7 @@ void CUser::Warp(char* pBuf)
 	real_x = warp_x / 10.0f;
 	real_z = warp_z / 10.0f;
 
-	if (!pMap->IsValidPosition(real_x, real_z, 0.0f))
+	if (!pMap->IsValidPosition(real_x, real_z))
 		return;
 
 	SetByte(send_buff, WIZ_WARP, send_index);
@@ -2923,7 +2897,6 @@ void CUser::RemoveRegion(int del_x, int del_z)
 {
 	int send_index = 0;
 	char send_buff[256] = {};
-	CUser* pUser = nullptr;
 
 	C3DMap* pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
@@ -3422,7 +3395,7 @@ int16_t CUser::GetDamage(int tid, int magicid)
 {
 	int16_t damage = 0;
 	int random = 0;
-	int16_t common_damage = 0, temp_hit = 0, temp_ac = 0, temp_hit_B = 0;
+	int16_t temp_hit = 0, temp_ac = 0, temp_hit_B = 0;
 	uint8_t result = FAIL;
 
 	model::Magic* pTable = nullptr;
@@ -4822,7 +4795,7 @@ void CUser::NpcEvent(char* pBuf)
 	if (!m_pMain->m_bPointCheckFlag)
 		return;
 
-	int index = 0, send_index = 0, nid = 0, i = 0, temp_index = 0;
+	int index = 0, send_index = 0, nid = 0;
 	char send_buff[2048] = {};
 	CNpc* pNpc = nullptr;
 
@@ -4959,7 +4932,7 @@ void CUser::NpcEvent(char* pBuf)
 
 void CUser::ItemTrade(char* pBuf)
 {
-	int index = 0, send_index = 0, itemid = 0, money = 0, count = 0, group = 0, npcid = 0;
+	int index = 0, send_index = 0, itemid = 0, count = 0, group = 0, npcid = 0;
 	model::Item* pTable = nullptr;
 	char send_buff[128] = {};
 	CNpc* pNpc = nullptr;
@@ -5347,8 +5320,7 @@ bool CUser::IsValidName(const char* name)
 		"~", "`", "!", "@", "#", "$", "%", "^", "&", "*",
 		"(", ")", "-", "+", "=", "|", "\\", "<", ">", ",",
 		".", "?", "/", "{", "[", "}", "]", "\"", "\'", " ", "　",
-		"운영자", "나이트", "도우미", "Knight", "Noahsystem", "Wizgate", "Mgame",
-		"노아시스템", "위즈게이트", "엠게임"
+		"Knight", "Noahsystem", "Wizgate", "Mgame"
 	};
 
 	// taiwan version
@@ -5359,9 +5331,9 @@ bool CUser::IsValidName(const char* name)
 		".", "?", "/", "{", "[", "}", "]", "\"", "\'", " ",	"　"
 	};*/
 
-	for (int i = 0; i < _countof(szInvalids); i++)
+	for (const char* invalidPartialName : szInvalids)
 	{
-		if (strstr(name, szInvalids[i]) != nullptr)
+		if (strstr(name, invalidPartialName) != nullptr)
 			return false;
 	}
 
@@ -5580,8 +5552,7 @@ void CUser::ItemGet(char* pBuf)
 		SetByte(send_buff, WIZ_ITEM_GET, send_index);
 		SetByte(send_buff, 0x03, send_index);
 		SetDWORD(send_buff, itemid, send_index);
-		SetShort(send_buff, strlen(pGetUser->m_pUserData->m_id), send_index);
-		SetString(send_buff, pGetUser->m_pUserData->m_id, strlen(pGetUser->m_pUserData->m_id), send_index);
+		SetString2(send_buff, pGetUser->m_pUserData->m_id, send_index);
 		m_pMain->Send_PartyMember(m_sPartyIndex, send_buff, send_index);
 
 		if (pGetUser != this)
@@ -5918,7 +5889,7 @@ void CUser::PartyCancel()
 //리더에게 패킷이 온거다..
 void CUser::PartyRequest(int memberid, bool bCreate)
 {
-	int index = 0, send_index = 0, result = -1, i = 0;
+	int send_index = 0, result = -1, i = 0;
 	CUser* pUser = nullptr;
 	_PARTY_GROUP* pParty = nullptr;
 	char send_buff[256] = {};
@@ -6032,8 +6003,7 @@ void CUser::PartyRequest(int memberid, bool bCreate)
 	SetByte(send_buff, PARTY_PERMIT, send_index);
 	SetShort(send_buff, _socketId, send_index);
 // 원거리가 않된데자나 씨~
-	SetShort(send_buff, strlen(m_pUserData->m_id), send_index);	// Create packet.
-	SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
+	SetString2(send_buff, m_pUserData->m_id, send_index);
 //
 	pUser->Send(send_buff, send_index);
 	return;
@@ -6079,8 +6049,7 @@ void CUser::PartyInsert()	// 본인이 추가 된다.  리더에게 패킷이 �
 		SetByte(send_buff, WIZ_PARTY, send_index);
 		SetByte(send_buff, PARTY_INSERT, send_index);
 		SetShort(send_buff, pParty->uid[i], send_index);
-		SetShort(send_buff, strlen(pUser->m_pUserData->m_id), send_index);
-		SetString(send_buff, pUser->m_pUserData->m_id, strlen(pUser->m_pUserData->m_id), send_index);
+		SetString2(send_buff, pUser->m_pUserData->m_id, send_index);
 		SetShort(send_buff, pParty->sMaxHp[i], send_index);
 		SetShort(send_buff, pParty->sHp[i], send_index);
 		SetByte(send_buff, pParty->bLevel[i], send_index);
@@ -6146,8 +6115,7 @@ void CUser::PartyInsert()	// 본인이 추가 된다.  리더에게 패킷이 �
 	SetByte(send_buff, WIZ_PARTY, send_index);
 	SetByte(send_buff, PARTY_INSERT, send_index);
 	SetShort(send_buff, _socketId, send_index);
-	SetShort(send_buff, strlen(m_pUserData->m_id), send_index);
-	SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
+	SetString2(send_buff, m_pUserData->m_id, send_index);
 	SetShort(send_buff, m_iMaxHp, send_index);
 	SetShort(send_buff, m_pUserData->m_sHp, send_index);
 	SetByte(send_buff, m_pUserData->m_bLevel, send_index);
@@ -6172,7 +6140,7 @@ void CUser::PartyInsert()	// 본인이 추가 된다.  리더에게 패킷이 �
 
 void CUser::PartyRemove(int memberid)
 {
-	int index = 0, send_index = 0, count = 0;
+	int send_index = 0, count = 0;
 	CUser* pUser = nullptr;
 	_PARTY_GROUP* pParty = nullptr;
 
@@ -6325,7 +6293,7 @@ void CUser::ExchangeProcess(char* pBuf)
 
 void CUser::ExchangeReq(char* pBuf)
 {
-	int index = 0, destid = -1, send_index = 0, type = 0;
+	int index = 0, destid = -1, send_index = 0;
 	CUser* pUser = nullptr;
 	char send_buff[256] = {};
 
@@ -6370,7 +6338,7 @@ fail_return:
 
 void CUser::ExchangeAgree(char* pBuf)
 {
-	int index = 0, destid = -1, send_index = 0;
+	int index = 0, send_index = 0;
 	CUser* pUser = nullptr;
 	char send_buff[256] = {};
 
@@ -6543,7 +6511,6 @@ void CUser::ExchangeDecide()
 {
 	int send_index = 0, getmoney = 0, putmoney = 0;
 	CUser* pUser = nullptr;
-	_EXCHANGE_ITEM* pItem = nullptr;
 	char send_buff[256] = {};
 	bool bSuccess = true;
 
@@ -6625,7 +6592,7 @@ void CUser::ExchangeDecide()
 			SetByte(send_buff, EXCHANGE_DONE, send_index);
 			SetByte(send_buff, 0x01, send_index);
 			SetDWORD(send_buff, m_pUserData->m_iGold, send_index);
-			SetShort(send_buff, pUser->m_ExchangeItemList.size(), send_index);
+			SetShort(send_buff, static_cast<int16_t>(pUser->m_ExchangeItemList.size()), send_index);
 
 			for (_EXCHANGE_ITEM* pExchangeItem : pUser->m_ExchangeItemList)
 			{
@@ -6652,7 +6619,7 @@ void CUser::ExchangeDecide()
 			SetByte(send_buff, EXCHANGE_DONE, send_index);
 			SetByte(send_buff, 1, send_index);
 			SetDWORD(send_buff, pUser->m_pUserData->m_iGold, send_index);
-			SetShort(send_buff, m_ExchangeItemList.size(), send_index);
+			SetShort(send_buff, static_cast<int16_t>(m_ExchangeItemList.size()), send_index);
 
 			for (_EXCHANGE_ITEM* pExchangeItem : m_ExchangeItemList)
 			{
@@ -6763,7 +6730,6 @@ bool CUser::ExecuteExchange()
 {
 	model::Item* pTable = nullptr;
 	CUser* pUser = nullptr;
-	uint32_t money = 0;
 	int16_t weight = 0;
 	uint8_t i = 0;
 
@@ -6771,7 +6737,6 @@ bool CUser::ExecuteExchange()
 	if (pUser == nullptr)
 		return false;
 
-	int iCount = pUser->m_ExchangeItemList.size();
 	auto Iter = pUser->m_ExchangeItemList.begin();
 	for (; Iter != pUser->m_ExchangeItemList.end(); ++Iter)
 	{
@@ -6781,7 +6746,7 @@ bool CUser::ExecuteExchange()
 
 		if ((*Iter)->itemid == ITEM_GOLD)
 		{
-			money = (*Iter)->count;
+			// money = (*Iter)->count;
 		}
 		else
 		{
@@ -6904,7 +6869,7 @@ int CUser::ExchangeDone()
 
 void CUser::SkillPointChange(char* pBuf)
 {
-	int index = 0, send_index = 0, value = 0;
+	int index = 0, send_index = 0;
 	uint8_t type = 0;
 	char send_buff[128] = {};
 
@@ -6969,7 +6934,7 @@ void CUser::UpdateGameWeather(char* pBuf, uint8_t type)
 
 void CUser::ClassChange(char* pBuf)
 {
-	int index = 0, classcode = 0, send_index = 0, type = 0, sub_type = 0, money = 0, old_money = 0;
+	int index = 0, classcode = 0, send_index = 0, type = 0, sub_type = 0, money = 0;
 	char send_buff[128] = {};
 	bool bSuccess = false;
 
@@ -7022,14 +6987,14 @@ void CUser::ClassChange(char* pBuf)
 			if (m_pMain->m_sDiscount == 1
 				&& m_pMain->m_byOldVictory == m_pUserData->m_bNation)
 			{
-				old_money = money;
+				// old_money = money;
 				money = static_cast<int>(money * 0.5);
 				//TRACE(_T("^^ ClassChange -  point Discount ,, money=%d->%d\n"), old_money, money);
 			}
 
 			if (m_pMain->m_sDiscount == 2)
 			{
-				old_money = money;
+				// old_money = money;
 				money = static_cast<int>(money * 0.5);
 			}
 
@@ -7048,14 +7013,14 @@ void CUser::ClassChange(char* pBuf)
 			if (m_pMain->m_sDiscount == 1
 				&& m_pMain->m_byOldVictory == m_pUserData->m_bNation)
 			{
-				old_money = money;
+				// old_money = money;
 				money = static_cast<int>(money * 0.5);
 				//TRACE(_T("^^ ClassChange -  skillpoint Discount ,, money=%d->%d\n"), old_money, money);
 			}
 
 			if (m_pMain->m_sDiscount == 2)
 			{
-				old_money = money;
+				// old_money = money;
 				money = static_cast<int>(money * 0.5);
 			}
 
@@ -7198,7 +7163,7 @@ void CUser::ChatTargetSelect(char* pBuf)
 		pUser = m_pMain->GetUserPtrUnchecked(i);
 		if (pUser != nullptr
 			&& pUser->GetState() == CONNECTION_STATE_GAMESTART
-			&& _strnicmp(chatid, pUser->m_pUserData->m_id, MAX_ID_SIZE) == 0)
+			&& strnicmp(chatid, pUser->m_pUserData->m_id, MAX_ID_SIZE) == 0)
 		{
 			m_sPrivateChatUser = i;
 			break;
@@ -7209,10 +7174,7 @@ void CUser::ChatTargetSelect(char* pBuf)
 	if (i == socketCount)
 		SetShort(send_buff, 0, send_index);
 	else
-	{
-		SetShort(send_buff, strlen(chatid), send_index);
-		SetString(send_buff, chatid, strlen(chatid), send_index);
-	}
+		SetString2(send_buff, chatid, send_index);
 	Send(send_buff, send_index);
 }
 
@@ -7220,8 +7182,7 @@ void CUser::ChatTargetSelect(char* pBuf)
 void CUser::SendUserInfo(char* temp_send, int& index)
 {
 	SetShort(temp_send, _socketId, index);
-	SetShort(temp_send, strlen(m_pUserData->m_id), index);
-	SetString(temp_send, m_pUserData->m_id, strlen(m_pUserData->m_id), index);
+	SetString2(temp_send, m_pUserData->m_id, index);
 	SetByte(temp_send, m_pUserData->m_bZone, index);
 	SetShort(temp_send, m_iZoneIndex, index);
 	SetByte(temp_send, m_pUserData->m_bNation, index);
@@ -7264,7 +7225,7 @@ void CUser::LoyaltyDivide(int tid)
 	char send_buff[256] = {};
 
 	int levelsum = 0, individualvalue = 0;
-	int16_t temp_loyalty = 0, level_difference = 0,
+	int16_t level_difference = 0,
 		loyalty_source = 0, loyalty_target = 0,
 		average_level = 0;
 	uint8_t total_member = 0;
@@ -7461,9 +7422,9 @@ void CUser::Dead()
 
 		pKnights = m_pMain->m_KnightsMap.GetData(m_pUserData->m_bKnights);
 		if (pKnights != nullptr)
-			strcpy(strKnightsName, pKnights->m_strName);
+			strcpy_safe(strKnightsName, pKnights->m_strName);
 		else
-			strcpy(strKnightsName, "*");
+			strcpy_safe(strKnightsName, "*");
 
 		std::string chatstr;
 
@@ -7681,8 +7642,6 @@ void CUser::ItemDurationChange(int slot, int maxvalue, int curvalue, int amount)
 
 void CUser::HPTimeChange(double currentTime)
 {
-	bool bFlag = false;
-
 	m_fHPLastTimeNormal = currentTime;
 
 	if (m_bResHpType == USER_DEAD)
@@ -8256,8 +8215,7 @@ void CUser::SendAllKnightsID()
 		//	continue;
 
 		SetShort(temp_buff, pKnights->m_sIndex, buff_index);
-		SetShort(temp_buff, strlen(pKnights->m_strName), buff_index);
-		SetString(temp_buff, pKnights->m_strName, strlen(pKnights->m_strName), buff_index);
+		SetString2(temp_buff, pKnights->m_strName, buff_index);
 		++count;
 	}
 
@@ -8731,21 +8689,21 @@ void CUser::WarehouseProcess(char* pBuf)
 			if (itemid != m_pUserData->m_sItemArray[SLOT_MAX + srcpos].nNum)
 				goto fail_return;
 
-				int16_t duration = m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sDuration;
-				int16_t itemcount = m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sCount;
-				int64_t serial = m_pUserData->m_sItemArray[SLOT_MAX + srcpos].nSerialNum;
+			int16_t duration = m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sDuration;
+			int16_t itemcount = m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sCount;
+			int64_t serial = m_pUserData->m_sItemArray[SLOT_MAX + srcpos].nSerialNum;
 
-				m_pUserData->m_sItemArray[SLOT_MAX + srcpos].nNum = m_pUserData->m_sItemArray[SLOT_MAX + destpos].nNum;
-				m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sDuration = m_pUserData->m_sItemArray[SLOT_MAX + destpos].sDuration;
-				m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sCount = m_pUserData->m_sItemArray[SLOT_MAX + destpos].sCount;
-				m_pUserData->m_sItemArray[SLOT_MAX + srcpos].nSerialNum = m_pUserData->m_sItemArray[SLOT_MAX + destpos].nSerialNum;
+			m_pUserData->m_sItemArray[SLOT_MAX + srcpos].nNum = m_pUserData->m_sItemArray[SLOT_MAX + destpos].nNum;
+			m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sDuration = m_pUserData->m_sItemArray[SLOT_MAX + destpos].sDuration;
+			m_pUserData->m_sItemArray[SLOT_MAX + srcpos].sCount = m_pUserData->m_sItemArray[SLOT_MAX + destpos].sCount;
+			m_pUserData->m_sItemArray[SLOT_MAX + srcpos].nSerialNum = m_pUserData->m_sItemArray[SLOT_MAX + destpos].nSerialNum;
 
-				m_pUserData->m_sItemArray[SLOT_MAX + destpos].nNum = itemid;
-				m_pUserData->m_sItemArray[SLOT_MAX + destpos].sDuration = duration;
-				m_pUserData->m_sItemArray[SLOT_MAX + destpos].sCount = itemcount;
-				m_pUserData->m_sItemArray[SLOT_MAX + destpos].nSerialNum = serial;
-			}
-			break;
+			m_pUserData->m_sItemArray[SLOT_MAX + destpos].nNum = itemid;
+			m_pUserData->m_sItemArray[SLOT_MAX + destpos].sDuration = duration;
+			m_pUserData->m_sItemArray[SLOT_MAX + destpos].sCount = itemcount;
+			m_pUserData->m_sItemArray[SLOT_MAX + destpos].nSerialNum = serial;
+		}
+		break;
 	}
 
 	m_pUserData->m_bWarehouse = 1;
@@ -8878,7 +8836,7 @@ void CUser::ReportBug(char* pBuf)
 {
 	// Beep(3000, 200);	// Let's hear a beep from the speaker.
 
-	int index = 0, chatlen = 0, send_index = 0;
+	int index = 0, chatlen = 0;
 	char chatMsg[1024] = {};
 
 	chatlen = GetShort(pBuf, index);
@@ -8931,7 +8889,7 @@ bool CUser::GetStartPosition(int16_t* x, int16_t* z)
 	return false;
 }
 
-CUser* CUser::GetItemRoutingUser(int itemid, int16_t itemcount)
+CUser* CUser::GetItemRoutingUser(int itemid, int16_t /*itemcount*/)
 {
 	if (m_sPartyIndex == -1)
 		return nullptr;
@@ -9029,8 +8987,7 @@ void CUser::FriendReport(char* pBuf)
 		idlen = GetShort(pBuf, index);
 		if (idlen > MAX_ID_SIZE)
 		{
-			SetShort(send_buff, strlen(userid), send_index);
-			SetString(send_buff, userid, strlen(userid), send_index);
+			SetString2(send_buff, userid, send_index);
 			SetShort(send_buff, -1, send_index);
 			SetByte(send_buff, 0, send_index);
 			continue;
@@ -9082,7 +9039,7 @@ void CUser::ClassChangeReq()
 void CUser::AllSkillPointChange()
 {
 	// 돈을 먼저 깍고.. 만약,, 돈이 부족하면.. 에러...
-	int index = 0, send_index = 0, skill_point = 0, money = 0, i = 0, j = 0, temp_value = 0, old_money = 0;
+	int send_index = 0, skill_point = 0, money = 0, i = 0, j = 0, temp_value = 0;
 	uint8_t type = 0;    // 0:돈이 부족, 1:성공, 2:초기화할 스킬이 없을때..
 	char send_buff[128] = {};
 
@@ -9107,14 +9064,14 @@ void CUser::AllSkillPointChange()
 	if (m_pMain->m_sDiscount == 1
 		&& m_pMain->m_byOldVictory == m_pUserData->m_bNation)
 	{
-		old_money = temp_value;
+		// old_money = temp_value;
 		temp_value = static_cast<int>(temp_value * 0.5);
 		//TRACE(_T("^^ AllSkillPointChange - Discount ,, money=%d->%d\n"), old_money, temp_value);
 	}
 
 	if (m_pMain->m_sDiscount == 2)
 	{
-		old_money = temp_value;
+		// old_money = temp_value;
 		temp_value = static_cast<int>(temp_value * 0.5);
 		//TRACE(_T("^^ AllSkillPointChange - Discount ,, money=%d->%d\n"), old_money, temp_value);
 	}
@@ -9164,8 +9121,7 @@ fail_return:
 void CUser::AllPointChange()
 {
 	// 돈을 먼저 깍고.. 만약,, 돈이 부족하면.. 에러...
-	int index = 0, send_index = 0, total_point = 0, money = 0, classcode = 0, temp_money = 0, old_money = 0;
-	double dwMoney = 0;
+	int send_index = 0, money = 0, temp_money = 0;
 	uint8_t type = 0;
 	char send_buff[128] = {};
 	int i = 0;
@@ -9649,8 +9605,8 @@ void CUser::ServerChangeOk(char* pBuf)
 
 bool CUser::GetWarpList(int warp_group)
 {
-	int warpid = 0, send_index = 0;	// 헤더와 카운트를 나중에 패킹...
-	int zoneindex = -1, temp_index = 0, count = 0;
+	int send_index = 0;	// 헤더와 카운트를 나중에 패킹...
+	int temp_index = 0, count = 0;
 	char buff[8192] = {};
 	char send_buff[8192] = {};
 // 비러머글 마을 이름 표시 >.<
@@ -9715,7 +9671,7 @@ void CUser::InitType3()
 	m_bType3Flag = false;
 }
 
-bool CUser::BindObjectEvent(int16_t objectindex, int16_t nid)
+bool CUser::BindObjectEvent(int16_t objectindex, int16_t /*nid*/)
 {
 	int send_index = 0, result = 0;
 	char send_buff[128] = {};
@@ -9995,11 +9951,8 @@ bool CUser::FlagObjectEvent(int16_t objectindex, int16_t nid)
 	return true;
 }
 
-bool CUser::WarpListObjectEvent(int16_t objectindex, int16_t nid)
+bool CUser::WarpListObjectEvent(int16_t objectindex, int16_t /*nid*/)
 {
-	int send_index = 0, result = 0;
-	char send_buff[128] = {};
-
 	C3DMap* pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		return false;
@@ -10026,7 +9979,7 @@ bool CUser::WarpListObjectEvent(int16_t objectindex, int16_t nid)
 
 void CUser::ObjectEvent(char* pBuf)
 {
-	int index = 0, objectindex = 0, send_index = 0, result = 0, nid = 0;
+	int index = 0, objectindex = 0, send_index = 0, nid = 0;
 	char send_buff[128] = {};
 	uint8_t objectType = 0;
 
@@ -10205,12 +10158,11 @@ void CUser::PartyBBS(char* pBuf)
 	}
 }
 
-void CUser::PartyBBSRegister(char* pBuf)
+void CUser::PartyBBSRegister(char* /*pBuf*/)
 {
 	CUser* pUser = nullptr;
-	int index = 0, send_index = 0;	// Basic Initializations. 			
+	int send_index = 0;
 	uint8_t result = 0;
-	int16_t bbs_len = 0;
 	char send_buff[256] = {};
 	int i = 0, counter = 0, socketCount;
 
@@ -10269,7 +10221,7 @@ fail_return:
 	Send(send_buff, send_index);
 }
 
-void CUser::PartyBBSDelete(char* pBuf)
+void CUser::PartyBBSDelete(char* /*pBuf*/)
 {
 	int send_index = 0;	// Basic Initializations. 			
 	uint8_t result = 0;
@@ -10306,8 +10258,7 @@ void CUser::PartyBBSNeeded(char* pBuf, uint8_t type)
 {
 	CUser* pUser = nullptr;	// Basic Initializations. 	
 	int index = 0, send_index = 0, i = 0, j = 0, socketCount = m_pMain->GetUserSocketCount();
-	;
-	int16_t page_index = 0, start_counter = 0, bbs_len = 0, BBS_Counter = 0;
+	int16_t page_index = 0, start_counter = 0, BBS_Counter = 0;
 	uint8_t result = 0, valid_counter = 0;
 	char send_buff[256] = {};
 
@@ -10354,8 +10305,7 @@ void CUser::PartyBBSNeeded(char* pBuf, uint8_t type)
 			continue;
 
 		// Create packet.
-		SetShort(send_buff, strlen(pUser->m_pUserData->m_id), send_index);
-		SetString(send_buff, pUser->m_pUserData->m_id, strlen(pUser->m_pUserData->m_id), send_index);
+		SetString2(send_buff, pUser->m_pUserData->m_id, send_index);
 		SetByte(send_buff, pUser->m_pUserData->m_bLevel, send_index);
 		SetShort(send_buff, pUser->m_pUserData->m_sClass, send_index);
 
@@ -10432,8 +10382,7 @@ void CUser::MarketBBS(char* pBuf)
 
 void CUser::MarketBBSRegister(char* pBuf)
 {
-	CUser* pUser = nullptr;	// Basic Initializations.
-	int index = 0, send_index = 0, i = 0, j = 0, page_index = 0;
+	int index = 0, send_index = 0, i = 0, page_index = 0;
 	int16_t title_len = 0, message_len = 0;
 	uint8_t result = 0, sub_result = 1, buysell_index = 0;
 	char send_buff[256] = {};
@@ -10548,8 +10497,7 @@ fail_return:
 
 void CUser::MarketBBSDelete(char* pBuf)
 {
-	CUser* pUser = nullptr;	// Basic Initializations. 	
-	int index = 0, send_index = 0, i = 0, j = 0;
+	int index = 0, send_index = 0;
 	int16_t delete_id = 0;
 	uint8_t result = 0, sub_result = 1, buysell_index = 0;
 	char send_buff[256] = {};
@@ -10603,9 +10551,9 @@ fail_return:
 
 void CUser::MarketBBSReport(char* pBuf, uint8_t type)
 {
-	CUser* pUser = nullptr;	// Basic Initializations. 	
+	CUser* pUser = nullptr;
 	int index = 0, send_index = 0, i = 0, j = 0;
-	int16_t bbs_len = 0, page_index = 0, start_counter = 0, valid_counter = 0, BBS_Counter = 0,
+	int16_t page_index = 0, start_counter = 0, valid_counter = 0, BBS_Counter = 0,
 		title_length = 0, message_length = 0;
 	uint8_t result = 0, sub_result = 1, buysell_index = 0;
 	char send_buff[8192] = {};
@@ -10661,9 +10609,7 @@ void CUser::MarketBBSReport(char* pBuf, uint8_t type)
 				continue;
 
 			SetShort(send_buff, m_pMain->m_sBuyID[i], send_index);
-
-			SetShort(send_buff, strlen(pUser->m_pUserData->m_id), send_index);
-			SetString(send_buff, pUser->m_pUserData->m_id, strlen(pUser->m_pUserData->m_id), send_index);
+			SetString2(send_buff, pUser->m_pUserData->m_id, send_index);
 
 			title_length = static_cast<int16_t>(strlen(m_pMain->m_strBuyTitle[i]));
 			if (title_length > MAX_BBS_TITLE)
@@ -10773,8 +10719,8 @@ fail_return1:
 void CUser::MarketBBSRemotePurchase(char* pBuf)
 {
 	CUser* pUser = nullptr;
-	int send_index = 0, index = 0, i = 0;
-	int16_t message_index = -1, tid = -1;
+	int send_index = 0, index = 0;
+	int16_t message_index = -1;
 	uint8_t result = 0, sub_result = 1, buysell_index = 0;
 
 	char send_buff[256] = {};
@@ -10857,8 +10803,8 @@ fail_return:
 
 void CUser::MarketBBSTimeCheck()
 {
-	CUser* pUser = nullptr;	// Basic Initializations. 	
-	int send_index = 0, price = 0;
+	CUser* pUser = nullptr;
+	int send_index = 0;
 	char send_buff[256] = {};
 	double currentTime = TimeGet();
 
@@ -11021,8 +10967,8 @@ void CUser::MarketBBSBuyPostFilter()
 			if (m_pMain->m_sBuyID[i] != -1)
 			{
 				m_pMain->m_sBuyID[i - empty_counter] = m_pMain->m_sBuyID[i];
-				strcpy(m_pMain->m_strBuyTitle[i - empty_counter], m_pMain->m_strBuyTitle[i]);
-				strcpy(m_pMain->m_strBuyMessage[i - empty_counter], m_pMain->m_strBuyMessage[i]);
+				strcpy_safe(m_pMain->m_strBuyTitle[i - empty_counter], m_pMain->m_strBuyTitle[i]);
+				strcpy_safe(m_pMain->m_strBuyMessage[i - empty_counter], m_pMain->m_strBuyMessage[i]);
 				m_pMain->m_iBuyPrice[i - empty_counter] = m_pMain->m_iBuyPrice[i];
 				m_pMain->m_fBuyStartTime[i - empty_counter] = m_pMain->m_fBuyStartTime[i];
 
@@ -11050,8 +10996,8 @@ void CUser::MarketBBSSellPostFilter()
 			if (m_pMain->m_sSellID[i] != -1)
 			{
 				m_pMain->m_sSellID[i - empty_counter] = m_pMain->m_sSellID[i];
-				strcpy(m_pMain->m_strSellTitle[i - empty_counter], m_pMain->m_strSellTitle[i]);
-				strcpy(m_pMain->m_strSellMessage[i - empty_counter], m_pMain->m_strSellMessage[i]);
+				strcpy_safe(m_pMain->m_strSellTitle[i - empty_counter], m_pMain->m_strSellTitle[i]);
+				strcpy_safe(m_pMain->m_strSellMessage[i - empty_counter], m_pMain->m_strSellMessage[i]);
 				m_pMain->m_iSellPrice[i - empty_counter] = m_pMain->m_iSellPrice[i];
 				m_pMain->m_fSellStartTime[i - empty_counter] = m_pMain->m_fSellStartTime[i];
 
@@ -11100,8 +11046,7 @@ void CUser::BlinkTimeCheck(double currentTime)
 		SetByte(send_buff, AG_USER_INOUT, send_index);
 		SetByte(send_buff, USER_REGENE, send_index);
 		SetShort(send_buff, _socketId, send_index);
-		SetShort(send_buff, strlen(m_pUserData->m_id), send_index);
-		SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
+		SetString2(send_buff, m_pUserData->m_id, send_index);
 		SetFloat(send_buff, m_pUserData->m_curx, send_index);
 		SetFloat(send_buff, m_pUserData->m_curz, send_index);
 		m_pMain->Send_AIServer(m_pUserData->m_bZone, send_buff, send_index);
@@ -11111,7 +11056,7 @@ void CUser::BlinkTimeCheck(double currentTime)
 
 void CUser::SetLogInInfoToDB(uint8_t bInit)
 {
-	int index = 0, send_index = 0, retvalue = 0;
+	int send_index = 0, retvalue = 0;
 	char send_buff[256] = {};
 	_ZONE_SERVERINFO* pInfo = nullptr;
 
@@ -11177,8 +11122,7 @@ void CUser::ClientEvent(char* pBuf)
 
 	int index = 0;
 	CNpc* pNpc = nullptr;
-	int nid = 0, eventnum = 0;
-	uint8_t code = 0;
+	int nid = 0;
 	EVENT* pEvent = nullptr;
 	EVENT_DATA* pEventData = nullptr;
 	int eventid = -1;
@@ -11871,7 +11815,7 @@ bool CUser::RunEvent(const EVENT_DATA* pEventData)
 }
 
 // 정애씨가 고생하면서 해주신 퀘스트 부분 끝
-void CUser::TestPacket(char* pBuf)
+void CUser::TestPacket()
 {
 	// npc의 리스트를 재 요청하는 군,,,,,
 	m_pMain->RegionNpcInfoForMe(this, 1);
@@ -11884,10 +11828,8 @@ void CUser::ItemLogToAgent(const char* srcid, const char* tarid, int type, int64
 	char send_buff[1024] = {};
 
 	SetByte(send_buff, WIZ_ITEM_LOG, send_index);
-	SetShort(send_buff, strlen(srcid), send_index);
-	SetString(send_buff, (char*) srcid, strlen(srcid), send_index);
-	SetShort(send_buff, strlen(tarid), send_index);
-	SetString(send_buff, (char*) tarid, strlen(tarid), send_index);
+	SetString2(send_buff, srcid, send_index);
+	SetString2(send_buff, tarid, send_index);
 	SetByte(send_buff, type, send_index);
 	SetInt64(send_buff, serial, send_index);
 	SetDWORD(send_buff, itemid, send_index);
@@ -12579,7 +12521,7 @@ void CUser::KickOutZoneUser(bool home)
 	}
 }
 
-void CUser::EventMoneyItemGet(int itemid, int count)
+void CUser::EventMoneyItemGet(int /*itemid*/, int /*count*/)
 {
 /*
 	int index = 0, send_index = 0, bundle_index = 0, itemid = 0, count = 0, i = 0;
@@ -12648,8 +12590,7 @@ void CUser::OpenEditBox(int message, int event)
 	SetByte(send_buff, DB_COUPON_EVENT, send_index);
 	SetByte(send_buff, CHECK_COUPON_EVENT, send_index);
 	SetShort(send_buff, _socketId, send_index);
-	SetShort(send_buff, strlen(m_strAccountID), send_index);
-	SetString(send_buff, m_strAccountID, strlen(m_strAccountID), send_index);
+	SetString2(send_buff, m_strAccountID, send_index);
 	SetDWORD(send_buff, event, send_index);
 //	비러머글 대사문 >.<
 	SetDWORD(send_buff, message, send_index);
@@ -12693,7 +12634,7 @@ void CUser::RecvEditBox(char* pBuf)
 
 	int index = 0, selevent = -1;
 	int16_t coupon_length = 0;
-	char send_buff[256] = {}; // , coupon_id[MAX_COUPON_ID_LENGTH];
+	// char coupon_id[MAX_COUPON_ID_LENGTH];
 
 	coupon_length = GetShort(pBuf, index);		// Get length of coupon number.
 	if (coupon_length < 0
@@ -12741,12 +12682,9 @@ void CUser::LogCoupon(int itemid, int count)
 	SetByte(send_buff, DB_COUPON_EVENT, send_index);
 	SetByte(send_buff, UPDATE_COUPON_EVENT, send_index);
 	SetShort(send_buff, _socketId, send_index);
-	SetShort(send_buff, strlen(m_strAccountID), send_index);
-	SetString(send_buff, m_strAccountID, strlen(m_strAccountID), send_index);
-	SetShort(send_buff, strlen(m_pUserData->m_id), send_index);
-	SetString(send_buff, m_pUserData->m_id, strlen(m_pUserData->m_id), send_index);
-	SetShort(send_buff, strlen(m_strCouponId), send_index);
-	SetString(send_buff, m_strCouponId, strlen(m_strCouponId), send_index);
+	SetString2(send_buff, m_strAccountID, send_index);
+	SetString2(send_buff, m_pUserData->m_id, send_index);
+	SetString2(send_buff, m_strCouponId, send_index);
 	SetDWORD(send_buff, itemid, send_index);
 	SetDWORD(send_buff, count, send_index);
 
@@ -12757,7 +12695,7 @@ void CUser::LogCoupon(int itemid, int count)
 
 void CUser::CouponEvent(const char* pBuf)
 {
-	int index = 0, nEventNum = 0, nItemCount = 0, nResult = 0, nMessageNum = 0;
+	int index = 0, nEventNum = 0, nResult = 0, nMessageNum = 0;
 	nResult = GetByte(pBuf, index);
 	nEventNum = GetDWORD(pBuf, index);
 // 비러머글 대사 >.<
@@ -13016,7 +12954,7 @@ void CUser::GameStart(
 	else if (opcode == 2)
 	{
 		// NOTE: This behaviour is flipped as compared to official to give it a more meaningful name.
-		bool bRecastSavedMagic = true;
+		// bool bRecastSavedMagic = true;
 
 		_state = CONNECTION_STATE_GAMESTART;
 
@@ -13054,7 +12992,7 @@ void CUser::GameStart(
 			HpChange(-m_iMaxHp);
 
 			// NOTE: This behaviour is flipped as compared to official to give it a more meaningful name.
-			bRecastSavedMagic = false;
+			// bRecastSavedMagic = false;
 		}
 
 		SendMyInfo(2);

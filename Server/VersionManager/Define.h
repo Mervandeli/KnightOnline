@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef SERVER_VERSIONMANAGER_DEFINE_H
+#define SERVER_VERSIONMANAGER_DEFINE_H
+
+#pragma once
 
 #include <filesystem>
 #if defined(_DEBUG)
@@ -36,7 +39,7 @@ typedef union
 	uint8_t		b[2];
 } MYSHORT;
 
-import VersionManagerModel;
+#include <VersionManager/model/VersionManagerModel.h>
 namespace model = versionmanager_model; 
 
 struct _NEWS
@@ -74,3 +77,5 @@ namespace ini
 	static constexpr char URL[] = "URL";
 	static constexpr char PATH[] = "PATH";
 }
+
+#endif // SERVER_VERSIONMANAGER_DEFINE_H

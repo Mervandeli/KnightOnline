@@ -1,6 +1,8 @@
-﻿#pragma once
+﻿#ifndef SERVER_EBENEZER_DEFINE_H
+#define SERVER_EBENEZER_DEFINE_H
 
-#include <mmsystem.h>
+#pragma once
+
 #include <shared/globals.h>
 
 constexpr int MAX_USER				= 3000;
@@ -299,3 +301,5 @@ struct _REGION_BUFFER
 		memset(pDataBuff, 0, sizeof(pDataBuff));
 	}
 };
+
+#endif // SERVER_EBENEZER_DEFINE_H
