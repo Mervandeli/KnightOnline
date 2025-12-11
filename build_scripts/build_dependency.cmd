@@ -34,6 +34,7 @@ POPD
 
 SET "BUILD_STATE_DIR=%REPO_ROOT%\deps\fetch-and-build-wrappers\last-build-states\%BUILD_PLATFORM%\%BUILD_CONFIG%"
 SET "BUILD_STATE_FILE=%BUILD_STATE_DIR%\%DEP_NAME%.txt"
+SET "GIT_LOCK_DIR=%BUILD_STATE_DIR%\git_lock"
 
 REM Create the build state directory if it doesn't already exist
 IF NOT EXIST "%BUILD_STATE_DIR%" (
@@ -98,12 +99,20 @@ IF "%INTENDED_COMMIT%"=="" (
 )
 
 IF "%UPDATE_SUBMODULE%"=="1" (
+	REM Trigger build lock to force other projects to wait until git's done
+	CALL "%~dp0build_lock_acquire.cmd" "%GIT_LOCK_DIR%"
+	IF ERRORLEVEL 1 EXIT /B 1
+
 	ECHO Please note that this may take some time, so please be patient.
 
 	REM Update submodule.
 	PUSHD "%REPO_ROOT%"
 	"%GitPath%" submodule update --init --recursive "%DEP_PATH%"
 	POPD
+
+	REM Release build lock
+	CALL "%~dp0build_lock_release.cmd" "%GIT_LOCK_DIR%"
+	IF ERRORLEVEL 1 EXIT /B 1
 )
 
 REM Not all dependencies need to be built (e.g. ko-client-assets).
