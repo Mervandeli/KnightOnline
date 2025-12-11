@@ -157,16 +157,22 @@ bool CN3CPart::Save(HANDLE hFile)
 
 	WriteFile(hFile, &m_dwReserved, 4, &dwRWC, nullptr);
 	WriteFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr);
-	
-	if(m_pTexRef) nL = m_pTexRef->FileName().size();
-	else nL = 0;
-	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
-	if(nL > 0) WriteFile(hFile, m_pTexRef->FileName().c_str(), nL, &dwRWC, nullptr);
 
-	if(m_pSkinsRef) nL = m_pSkinsRef->FileName().size();
-	else nL = 0;
+	if (m_pTexRef != nullptr)
+		nL = static_cast<int>(m_pTexRef->FileName().size());
+	else
+		nL = 0;
 	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
-	if(nL > 0) WriteFile(hFile, m_pSkinsRef->FileName().c_str(), nL, &dwRWC, nullptr);
+	if (nL > 0)
+		WriteFile(hFile, m_pTexRef->FileName().c_str(), nL, &dwRWC, nullptr);
+
+	if (m_pSkinsRef != nullptr)
+		nL = static_cast<int>(m_pSkinsRef->FileName().size());
+	else
+		nL = 0;
+	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+	if (nL > 0)
+		WriteFile(hFile, m_pSkinsRef->FileName().c_str(), nL, &dwRWC, nullptr);
 
 	return true;
 }
@@ -495,14 +501,18 @@ bool CN3CPlugBase::Save(HANDLE hFile)
 
 	nL = 0;
 	CN3PMesh* pPMesh = m_PMeshInst.GetMesh();
-	if(pPMesh) nL = pPMesh->FileName().size();
+	if (pPMesh != nullptr)
+		nL = static_cast<int>(pPMesh->FileName().size());
 	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
-	if(nL > 0) WriteFile(hFile, pPMesh->FileName().c_str(), nL, &dwRWC, nullptr);
+	if (nL > 0)
+		WriteFile(hFile, pPMesh->FileName().c_str(), nL, &dwRWC, nullptr);
 
 	nL = 0;
-	if(m_pTexRef) nL = m_pTexRef->FileName().size();
+	if (m_pTexRef != nullptr)
+		nL = static_cast<int>(m_pTexRef->FileName().size());
 	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
-	if(nL > 0) WriteFile(hFile, m_pTexRef->FileName().c_str(), nL, &dwRWC, nullptr);
+	if (nL > 0)
+		WriteFile(hFile, m_pTexRef->FileName().c_str(), nL, &dwRWC, nullptr);
 
 	return 0;
 }
@@ -510,10 +520,12 @@ bool CN3CPlugBase::Save(HANDLE hFile)
 
 e_PlugType CN3CPlugBase::GetPlugTypeByFileName(const std::string& szFN)
 {
-	if(szFN.empty()) return PLUGTYPE_UNDEFINED;
+	if (szFN.empty())
+		return PLUGTYPE_UNDEFINED;
+
 	// berserk
 	// 일단 확장자로 구분한다. 별로 좋은 방법 같지는 않지만.. N3CPlug, N3CPlug_Cloak
-	int nL = szFN.size();
+	int nL = static_cast<int>(szFN.size());
 	if (szFN[nL-2] == 'u' && szFN[nL-1] == 'g')
 	{	// PLUGTYPE_NORMAL
 		return PLUGTYPE_NORMAL;
@@ -1204,8 +1216,11 @@ bool CN3Chr::Load(HANDLE hFile)
 		this->AniCtrlSet(szFN);
 	}
 
-	ReadFile(hFile, m_nJointPartStarts, sizeof(m_nJointPartStarts), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
-	ReadFile(hFile, m_nJointPartEnds, sizeof(m_nJointPartEnds), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
+	for (int i = 0; i < 2; i++)
+		ReadFile(hFile, &m_nJointPartStarts[i], sizeof(int), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
+
+	for (int i = 0; i < 2; i++)
+		ReadFile(hFile, &m_nJointPartEnds[i], sizeof(int), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
 
 //////////////////////////////////////////////////
 //	Coded (By Dino On 2002-10-10 오후 2:33:07 )
@@ -1247,27 +1262,29 @@ bool CN3Chr::Save(HANDLE hFile)
 	int nL = 0;
 
 	// 관절 파일 이름 써주기..
-	if(m_pRootJointRef) nL = m_pRootJointRef->FileName().size();
+	if (m_pRootJointRef != nullptr)
+		nL = static_cast<int>(m_pRootJointRef->FileName().size());
 	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
-	if(nL > 0) WriteFile(hFile, m_pRootJointRef->FileName().c_str(), nL, &dwRWC, nullptr);
+	if (nL > 0)
+		WriteFile(hFile, m_pRootJointRef->FileName().c_str(), nL, &dwRWC, nullptr);
 
 	// 내용이 없는 Part Data는 걸러낸다..
 	std::vector<CN3CPart*> PartsTmp = m_Parts;
 	m_Parts.clear();
-	m_Parts.resize(64);
+	m_Parts.reserve(64);
 
 	it_CPart it = PartsTmp.begin(), itEnd = PartsTmp.end();
 	CN3CPart* pPart = nullptr;
-	for(; it != itEnd; it++)
+	for (; it != itEnd; it++)
 	{
 		pPart = *it;
-		
+
 		bool bHaveData = false;
-		if(pPart->m_pSkinsRef)
+		if (pPart->m_pSkinsRef)
 		{
-			for(int j = 0; j < MAX_CHR_LOD; j++)
+			for (int j = 0; j < MAX_CHR_LOD; j++)
 			{
-				if(pPart->m_pSkinsRef->m_Skins[j].VertexCount() > 0)
+				if (pPart->m_pSkinsRef->m_Skins[j].VertexCount() > 0)
 				{
 					bHaveData = true;
 					break;
@@ -1275,7 +1292,7 @@ bool CN3Chr::Save(HANDLE hFile)
 			}
 		}
 
-		if(bHaveData) // 실제 데이터가 있으면..
+		if (bHaveData) // 실제 데이터가 있으면..
 		{
 			m_Parts.push_back(pPart);
 		}
@@ -1287,65 +1304,69 @@ bool CN3Chr::Save(HANDLE hFile)
 	}
 
 	// 실제 저장..
-	int iPC = m_Parts.size();
+	int iPC = static_cast<int>(m_Parts.size());
 	WriteFile(hFile, &iPC, 4, &dwRWC, nullptr);
-	int i;
-	for(i = 0; i < iPC; i++)
+
+	for (int i = 0; i < iPC; i++)
 	{
-		nL = m_Parts[i]->FileName().size();
-		if(nL <= 0)
+		nL = static_cast<int>(m_Parts[i]->FileName().size());
+		if (nL <= 0)
 		{
 			std::string szFNTmp = fmt::format("{}_Default{}.N3CPart", m_szName, i);
 			m_Parts[i]->FileNameSet(szFNTmp);
 		}
-		nL = m_Parts[i]->FileName().size();
+
+		nL = static_cast<int>(m_Parts[i]->FileName().size());
 		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
 		WriteFile(hFile, m_Parts[i]->FileName().c_str(), nL, &dwRWC, nullptr);
 		m_Parts[i]->SaveToFile();
 	}
-	
-	iPC = m_Plugs.size();
+
+	iPC = static_cast<int>(m_Plugs.size());
 	WriteFile(hFile, &iPC, 4, &dwRWC, nullptr);
-	for(i = 0; i < iPC; i++)
+	for (int i = 0; i < iPC; i++)
 	{
-		nL = m_Plugs[i]->FileName().size();
-		if(nL <= 0)
+		nL = static_cast<int>(m_Plugs[i]->FileName().size());
+		if (nL <= 0)
 		{
 			std::string szFNTmp = fmt::format("{}_Default{}.N3CPlug", m_szName, i);
 			m_Plugs[i]->FileNameSet(szFNTmp);
 			i++;
 		}
 
-		nL = m_Plugs[i]->FileName().size();
+		nL = static_cast<int>(m_Plugs[i]->FileName().size());
 		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
 		WriteFile(hFile, m_Plugs[i]->FileName().c_str(), nL, &dwRWC, nullptr);
 		m_Plugs[i]->SaveToFile();
 	}
-	
+
 //	nL = 0;
 //	if(m_pSkinCollision) nL = m_pSkinCollision->m_szName.size();
 //	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
 //	if(nL > 0) WriteFile(hFile, m_pSkinCollision->m_szName.c_str(), nL, &dwRWC, nullptr);
-	
+
 	// Animation Control..
 	nL = 0;
-	if(m_pAniCtrlRef) nL = m_pAniCtrlRef->FileName().size();
+	if (m_pAniCtrlRef != nullptr)
+		nL = static_cast<int>(m_pAniCtrlRef->FileName().size());
 	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
-	if(nL > 0)
-	{
+	if (nL > 0)
 		WriteFile(hFile, m_pAniCtrlRef->FileName().c_str(), nL, &dwRWC, nullptr);
-	}
 
-	WriteFile(hFile, m_nJointPartStarts, sizeof(m_nJointPartStarts), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
-	WriteFile(hFile, m_nJointPartEnds, sizeof(m_nJointPartEnds), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
+	for (int i = 0; i < 2; i++)
+		WriteFile(hFile, &m_nJointPartStarts[i], sizeof(int), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
+
+	for (int i = 0; i < 2; i++)
+		WriteFile(hFile, &m_nJointPartEnds[i], sizeof(int), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
 
 //////////////////////////////////////////////////
 //	Coded (By Dino On 2002-10-11 오후 2:19:11 )
 //	FXPlug
 	nL = 0;
-	if (m_pFXPlug) nL = m_pFXPlug->FileName().size();
+	if (m_pFXPlug != nullptr)
+		nL = static_cast<int>(m_pFXPlug->FileName().size());
 	WriteFile(hFile, &nL, sizeof(nL), &dwRWC, nullptr);
-	if (nL>0)
+	if (nL > 0)
 	{
 		WriteFile(hFile, m_pFXPlug->FileName().c_str(), nL, &dwRWC, nullptr);
 		m_pFXPlug->SaveToFile();
@@ -1400,11 +1421,14 @@ void CN3Chr::Tick(float fFrm)
 	m_FrmCtrl.fFrmPrev = m_FrmCtrl.fFrmCur; // 마지막 에니메이션 프레임을 기억해 놓고..
 	m_FrmCtrlUpper.fFrmPrev = m_FrmCtrlUpper.fFrmCur;
 
-	if(fFrm == FRAME_SELFPLAY) this->TickAnimationFrame();
+	if (fFrm == FRAME_SELFPLAY)
+	{
+		TickAnimationFrame();
+	}
 	else
 	{
-		int iJC = m_JointRefs.size();
-		for(int i = 0; i < iJC; i++) // 걍 단순히 조인트만 Tick 해주고 나간다..
+		// 걍 단순히 조인트만 Tick 해주고 나간다..
+		for (size_t i = 0; i < m_JointRefs.size(); i++)
 		{
 			m_JointRefs[i]->TickAnimationKey(fFrm);
 			m_JointRefs[i]->ReCalcMatrix();
@@ -1533,12 +1557,12 @@ void CN3Chr::TickAnimationFrame()
 
 void CN3Chr::TickJoints()
 {
-	if(nullptr == m_FrmCtrlUpper.pAniData) // 상하체 통째로 처리..
+	// 상하체 통째로 처리..
+	if (m_FrmCtrlUpper.pAniData == nullptr)
 	{
-		int iJC = m_JointRefs.size();
-		for(int i = 0; i < iJC; i++)
+		for (size_t i = 0; i < m_JointRefs.size(); i++)
 		{
-			if(m_FrmCtrl.fBlendTime > 0)
+			if (m_FrmCtrl.fBlendTime > 0)
 			{
 				float fBlendFactor = m_FrmCtrl.fBlendTimeCur / m_FrmCtrl.fBlendTime;
 				m_JointRefs[i]->ReCalcMatrixBlended(m_FrmCtrl.fFrmCur, m_FrmCtrl.fBlendFrm, fBlendFactor); // Joint Animation Blending...
@@ -1551,15 +1575,16 @@ void CN3Chr::TickJoints()
 			m_MtxJoints[i] = m_JointRefs[i]->m_Matrix;
 		}
 	}
-	else // 상하체 따로 처리해야 한다면..
+	// 상하체 따로 처리해야 한다면..
+	else
 	{
 		__FrmCtrl* pFrmCtrls[2] = { &m_FrmCtrl, &m_FrmCtrlUpper };
-		for(int i = 0; i < MAX_CHR_ANI_PART; i++)
+		for (int i = 0; i < MAX_CHR_ANI_PART; i++)
 		{
 			// 하체일경우 루트 조인트 작동...
-			if(0 == i)
+			if (0 == i)
 			{
-				if(pFrmCtrls[i]->fBlendTime > 0) // Motion Blending 이 필요하면...
+				if (pFrmCtrls[i]->fBlendTime > 0) // Motion Blending 이 필요하면...
 				{
 					float fBlendFactor = pFrmCtrls[i]->fBlendTimeCur / pFrmCtrls[i]->fBlendTime;
 					m_pRootJointRef->ReCalcMatrixBlended(pFrmCtrls[i]->fFrmCur, pFrmCtrls[i]->fBlendFrm, fBlendFactor); // Joint Animation Blending...// 하체 일경우
@@ -1572,12 +1597,12 @@ void CN3Chr::TickJoints()
 				m_MtxJoints[i] = m_pRootJointRef->m_Matrix;
 			}
 
-			if(m_nJointPartStarts[i] > 0)
+			if (m_nJointPartStarts[i] > 0)
 			{
 				float fBlendFactor = pFrmCtrls[i]->fBlendTimeCur / pFrmCtrls[i]->fBlendTime;
-				for(int j = m_nJointPartStarts[i]; j <= m_nJointPartEnds[i]; j++)
+				for (int j = m_nJointPartStarts[i]; j <= m_nJointPartEnds[i]; j++)
 				{
-					if(pFrmCtrls[i]->fBlendTime > 0)
+					if (pFrmCtrls[i]->fBlendTime > 0)
 						m_JointRefs[j]->ReCalcMatrixBlended(pFrmCtrls[i]->fFrmCur, pFrmCtrls[i]->fBlendFrm, fBlendFactor); // Joint Animation Blending...
 					else
 					{
@@ -1595,16 +1620,14 @@ void CN3Chr::TickJoints()
 void CN3Chr::TickPlugs(float fLOD)
 {
 	if(nullptr == this->m_pRootJointRef) return;
-
-	CN3CPlug*	pPlug = nullptr;
 	
 	float fFrmCur = m_FrmCtrl.fFrmCur;
 //	if(m_FrmCtrlUpper.pAniData) fFrmCur = m_FrmCtrlUpper.fFrmCur; // 상체 에니메이션이 있으면...
 
-	int iPC = m_Plugs.size();
-	for(int i = 0; i < iPC; i++)
+	for (size_t i = 0; i < m_Plugs.size(); i++)
 	{
-		pPlug = m_Plugs[i];
+		CN3CPlug* pPlug = m_Plugs[i];
+
 		pPlug->m_PMeshInst.SetLOD(fLOD);
 		if (pPlug->m_ePlugType== PLUGTYPE_NORMAL)
 		{
@@ -1714,34 +1737,23 @@ void CN3Chr::Render()
 		if(m_nLOD >= MAX_CHR_LOD) m_nLOD = MAX_CHR_LOD - 1; // LOD 밖이면 ... 
 	}
 
-
-
-
-
-
-
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, &m_Matrix);
-	this->TickJoints(); // 조인트 행렬들 계산...
-	this->BuildMesh(); // 행렬에 따라 점위치 계산..
 
-	int iPC = m_Parts.size();
-	for(int i = 0; i < iPC; i++)
-	{
-		m_Parts[i]->Render(m_nLOD);
-	}
+	TickJoints(); // 조인트 행렬들 계산...
+	BuildMesh(); // 행렬에 따라 점위치 계산..
+
+	for (CN3CPart* pPart : m_Parts)
+		pPart->Render(m_nLOD);
 
 	// Plug - 붙이는 부분 Rendering
-	CN3CPlug* pPlug = nullptr;
-	iPC = m_Plugs.size();
-	for(int i = 0; i < iPC; i++)
+	for (size_t i = 0; i < m_Plugs.size(); i++)
 	{
-		pPlug = m_Plugs[i];
-		
-		if(false == pPlug->m_bVisible) continue;
-
-		if(pPlug->m_nJointIndex < 0) {
+		CN3CPlug* pPlug = m_Plugs[i];
+		if (!pPlug->m_bVisible)
 			continue;
-		}
+
+		if (pPlug->m_nJointIndex < 0)
+			continue;
 
 		pPlug->Render(m_Matrix, m_MtxJoints[pPlug->m_nJointIndex]);
 
@@ -1800,42 +1812,38 @@ void CN3Chr::BuildMesh()
 	float fWeight = 0;
 	int nJIndex = 0, nAffect = 0;
 
-	int i = 0, j = 0, k = 0, nVC = 0;
-	CN3IMesh* pIMesh = nullptr;
-	CN3Skin* pSkin = nullptr;
-
 	__Matrix44* pMtxJs = &(m_MtxJoints[0]);
 	__Matrix44* pMtxJIs = &(m_MtxInverses[0]);
 
-	int iPC = m_Parts.size();
-	for(i = 0; i < iPC; i++)
+	for (CN3CPart* pPart : m_Parts)
 	{
-		pSkin = m_Parts[i]->Skin(m_nLOD);
-		if(nullptr == pSkin) continue;
+		CN3Skin* pSkin = pPart->Skin(m_nLOD);
+		if (pSkin == nullptr)
+			continue;
 
 		__VertexXyzNormal* pVDest = pSkin->Vertices();
 		__VertexSkinned* pVSrc = pSkin->SkinVertices();
-		if(nullptr == pVDest || nullptr == pVSrc) continue;
+		if (pVDest == nullptr || pVSrc == nullptr)
+			continue;
 
-		nVC = pSkin->VertexCount();
+		int nVC = pSkin->VertexCount();
 		__Vector3 vFinal;
 		int nAffect = 0;
 		float* pfWeights = nullptr;
-		for(j = 0; j < nVC; j++) // j < m_nBoneVertices 와 같다..
+		for (int j = 0; j < nVC; j++) // j < m_nBoneVertices 와 같다..
 		{
-
 			nAffect = pVSrc[j].nAffect;
-			if(1 == nAffect)
+			if (1 == nAffect)
 			{
 				// 단일 뼈대...
 				nJIndex = pVSrc[j].pnJoints[0];
 				pVDest[j] = (pVSrc[j].vOrigin * pMtxJIs[nJIndex]) * pMtxJs[nJIndex];
 			}
-			else if(nAffect > 1) 
+			else if (nAffect > 1)
 			{
 				vFinal.Zero();
 				pfWeights = pVSrc[j].pfWeights;
-				for(k = 0; k < nAffect; k++)
+				for (int k = 0; k < nAffect; k++)
 				{
 					nJIndex = pVSrc[j].pnJoints[k];
 					vFinal += ((pVSrc[j].vOrigin * pMtxJIs[nJIndex]) * pMtxJs[nJIndex]) * pfWeights[k];
@@ -1899,46 +1907,45 @@ void CN3Chr::BuildMesh(int nLOD)
 	float fWeight = 0;
 	int nJIndex = 0, nAffect = 0;
 
-	int i = 0, j = 0, k = 0, nVC = 0;
 	CN3IMesh* pIMesh = nullptr;
-	CN3Skin* pSkin = nullptr;
 
-	__Matrix44* pMtxJs = &(m_MtxJoints[0]);
-	__Matrix44* pMtxJIs = &(m_MtxInverses[0]);
+	__Matrix44* pMtxJs = &m_MtxJoints[0];
+	__Matrix44* pMtxJIs = &m_MtxInverses[0];
 
-	int iPC = m_Parts.size();
-	for(i = 0; i < iPC; i++)
+	for (CN3CPart* pPart : m_Parts)
 	{
-		pSkin = m_Parts[i]->Skin(nLOD);
-		if(nullptr == pSkin) continue;
+		CN3Skin* pSkin = pPart->Skin(nLOD);
+		if (pSkin == nullptr)
+			continue;
 
 		__VertexXyzNormal* pVDest = pSkin->Vertices();
 		__VertexSkinned* pVSrc = pSkin->SkinVertices();
-		if(nullptr == pVDest || nullptr == pVSrc) continue;
+		if (pVDest == nullptr || pVSrc == nullptr)
+			continue;
 
-		nVC = pSkin->VertexCount();
+		int nVC = pSkin->VertexCount();
 		__Vector3 vFinal;
 		int nAffect = 0;
 		float* pfWeights = nullptr;
-		for(j = 0; j < nVC; j++) // j < m_nBoneVertices 와 같다..
+		for (int j = 0; j < nVC; j++) // j < m_nBoneVertices 와 같다..
 		{
-
 			nAffect = pVSrc[j].nAffect;
-			if(1 == nAffect)
+			if (1 == nAffect)
 			{
 				// 단일 뼈대...
 				nJIndex = pVSrc[j].pnJoints[0];
 				pVDest[j] = (pVSrc[j].vOrigin * pMtxJIs[nJIndex]) * pMtxJs[nJIndex];
 			}
-			else if(nAffect > 1) 
+			else if (nAffect > 1)
 			{
 				vFinal.Zero();
 				pfWeights = pVSrc[j].pfWeights;
-				for(k = 0; k < nAffect; k++)
+				for (int k = 0; k < nAffect; k++)
 				{
 					nJIndex = pVSrc[j].pnJoints[k];
 					vFinal += ((pVSrc[j].vOrigin * pMtxJIs[nJIndex]) * pMtxJs[nJIndex]) * pfWeights[k];
 				}
+
 				pVDest[j] = vFinal;
 			}
 		}
@@ -2001,14 +2008,15 @@ void CN3Chr::JointSet(const std::string& szFN)
 
 void CN3Chr::PartAlloc(int iCount)
 {
-	int iPC = m_Parts.size();
-	for(int i = 0; i < iPC; i++) delete m_Parts[i];
+	for (CN3CPart* pPart : m_Parts)
+		delete pPart;
 	m_Parts.clear();
-		
-	if(iCount > 0) 
+
+	if (iCount > 0)
 	{
 		m_Parts.assign(iCount, nullptr);
-		for(int i = 0; i < iCount; i++) m_Parts[i] = new CN3CPart();
+		for (int i = 0; i < iCount; i++)
+			m_Parts[i] = new CN3CPart();
 	}
 }
 
@@ -2097,15 +2105,12 @@ void CN3Chr::AniCtrlSet(const std::string& szFN)
 	s_MngAniCtrl.Delete(&m_pAniCtrlRef);
 	m_pAniCtrlRef = s_MngAniCtrl.Get(szFN);
 	
-	for(int i = 0; i < MAX_CHR_ANI_PART; i++)
-	{
-		m_FrmCtrl.iAni = -1;
-		m_FrmCtrl.bOnceAndFreeze = false;	// 한번만 하고 멈춰야 되는가??
-		m_FrmCtrl.fFrmCur = 0;
-		m_FrmCtrl.fFrmPrev = 0;				// 최근 프레임
-		m_FrmCtrl.iAniLoop = 0;
-		m_FrmCtrl.pAniData = nullptr;
-	}
+	m_FrmCtrl.iAni = -1;
+	m_FrmCtrl.bOnceAndFreeze = false;	// 한번만 하고 멈춰야 되는가??
+	m_FrmCtrl.fFrmCur = 0;
+	m_FrmCtrl.fFrmPrev = 0;				// 최근 프레임
+	m_FrmCtrl.iAniLoop = 0;
+	m_FrmCtrl.pAniData = nullptr;
 }
 
 int	CN3Chr::AniCurSet(	int iAni,					// Animation 번호,
@@ -2204,10 +2209,15 @@ void CN3Chr::AniDefaultSet()
 
 void CN3Chr::JointPartSet(int nAniPart, int nJS, int nJE)
 {
-	if(nAniPart < 0 || nAniPart >= MAX_CHR_ANI_PART) return;
-	if(m_JointRefs.empty()) return;
-	int iJC = m_JointRefs.size();
-	if(nJE - nJS < 0 || nJS >= iJC || nJE >= iJC) return;
+	if (nAniPart < 0 || nAniPart >= MAX_CHR_ANI_PART)
+		return;
+
+	if (m_JointRefs.empty())
+		return;
+
+	int iJC = static_cast<int>(m_JointRefs.size());
+	if (nJE - nJS < 0 || nJS >= iJC || nJE >= iJC)
+		return;
 
 	m_nJointPartStarts[nAniPart] = nJS;
 	m_nJointPartEnds[nAniPart] = nJE;
@@ -2219,27 +2229,27 @@ void CN3Chr::FindMinMax()
 	m_vMax.Zero();
 	m_fRadius = 0;
 
-	if(m_JointRefs.empty()) return;
-	
-	this->TickAnimationKey(m_FrmCtrl.fFrmCur);
-	this->TickJoints();
+	if (m_JointRefs.empty())
+		return;
 
-	int iJC = m_JointRefs.size();
+	TickAnimationKey(m_FrmCtrl.fFrmCur);
+	TickJoints();
 
 	__Vector3 vTmp;
 	m_vMin.Set(FLT_MAX, FLT_MAX, FLT_MAX);
 	m_vMax.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-	for(int i = 0; i < iJC; i++) // 관절 갯수 만큼 각 관절의 참조 포인터와 역행렬을 얻어놓는다..
+	// 관절 갯수 만큼 각 관절의 참조 포인터와 역행렬을 얻어놓는다..
+	for (CN3Joint* pJoint : m_JointRefs)
 	{
 		// 각 조인트의 관절 위치 값에 대해 최대 최소값을 찾는다.
-		vTmp = m_JointRefs[i]->m_Matrix.Pos();
-		if(vTmp.x < m_vMin.x) m_vMin.x = vTmp.x;
-		if(vTmp.y < m_vMin.y) m_vMin.y = vTmp.y;
-		if(vTmp.z < m_vMin.z) m_vMin.z = vTmp.z;
-		if(vTmp.x > m_vMax.x) m_vMax.x = vTmp.x;
-		if(vTmp.y > m_vMax.y) m_vMax.y = vTmp.y;
-		if(vTmp.z > m_vMax.z) m_vMax.z = vTmp.z;
+		vTmp = pJoint->m_Matrix.Pos();
+		if (vTmp.x < m_vMin.x) m_vMin.x = vTmp.x;
+		if (vTmp.y < m_vMin.y) m_vMin.y = vTmp.y;
+		if (vTmp.z < m_vMin.z) m_vMin.z = vTmp.z;
+		if (vTmp.x > m_vMax.x) m_vMax.x = vTmp.x;
+		if (vTmp.y > m_vMax.y) m_vMax.y = vTmp.y;
+		if (vTmp.z > m_vMax.z) m_vMax.z = vTmp.z;
 	}
 
 	// 너무 작으면 늘려준다..
@@ -2284,22 +2294,22 @@ int CN3Chr::CheckCollisionPrecisely(int ixScreen, int iyScreen, __Vector3* pvPic
 
 int CN3Chr::CheckCollisionPrecisely(const __Vector3 &vPos, const __Vector3 &vDir, __Vector3* pvPick)
 {
-	this->TickJoints(); // 조인트 행렬들 계산...
+	TickJoints(); // 조인트 행렬들 계산...
 	BuildMesh(m_nLOD);
 
 	__Vector3 v0, v1, v2;
 
-	CN3Skin* pSkin = nullptr;
 	__Vector3 vPos2 = vPos, vDir2 = vDir;
-	int iPC = m_Parts.size();
-	for(int i = 0; i < iPC; i++)
+	int iPC = static_cast<int>(m_Parts.size());
+	for (int i = 0; i < iPC; i++)
 	{
-		pSkin = m_Parts[i]->Skin(m_nLOD);
-		if(nullptr == pSkin) continue;
+		CN3Skin* pSkin = m_Parts[i]->Skin(m_nLOD);
+		if (pSkin == nullptr)
+			continue;
 
-		if(pSkin->CheckCollisionPrecisely(vPos2, vDir2, pvPick))
+		if (pSkin->CheckCollisionPrecisely(vPos2, vDir2, pvPick))
 		{
-			if(pvPick) (*pvPick) *= m_Matrix;
+			if (pvPick) (*pvPick) *= m_Matrix;
 			return i;
 		}
 	}

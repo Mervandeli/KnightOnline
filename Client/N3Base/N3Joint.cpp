@@ -77,15 +77,11 @@ bool CN3Joint::Save(HANDLE hFile)
 	
 	m_KeyOrient.Save(hFile); // 
 
-	int iSize = m_Children.size();
+	int iSize = static_cast<int>(m_Children.size());
 	WriteFile(hFile, &iSize, 4, &dwRWC, nullptr);
 
-	CN3Joint* pChild = nullptr;
-	it_Joint it = m_Children.begin();
-	for(int i = 0; i < iSize; i++, it++)
+	for (CN3Joint* pChild : m_Children)
 	{
-		pChild = *it;
-
 		__ASSERT(pChild, "Child joint pointer is NULL!");
 		pChild->Save(hFile);
 	}
@@ -187,13 +183,8 @@ void CN3Joint::Render(const __Matrix44* pMtxParent, float fUnitSize)
 	if(dwAlpha) s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlpha);
 	if(dwLight) s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, dwLight);
 
-	CN3Joint* pChild = nullptr;
-	it_Joint it = m_Children.begin();
-	int iSize = m_Children.size();
-	for(int i = 0; i < iSize; i++, it++)
+	for (CN3Joint* pChild : m_Children)
 	{
-		pChild = *it;
-
 		__ASSERT(pChild, "Child joint pointer is NULL!");
 		pChild->Render(pMtxParent, fUnitSize);
 	}
@@ -204,27 +195,25 @@ void CN3Joint::ChildAdd(CN3Joint *pChild)
 {
 	__ASSERT(pChild, "Child joint pointer is NULL!");
 
-	CN3Joint* pChild2 = nullptr;
-	it_Joint it = m_Children.begin();
-	int iSize = m_Children.size();
-	for(int i = 0; i < iSize; i++, it++)
+	for (CN3Joint* pChild2 : m_Children)
 	{
-		pChild2 = *it;
-		if(pChild2 == pChild) return;
+		if (pChild2 == pChild)
+			return;
 	}
 
 	m_Children.push_back(pChild);
 	pChild->ParentSet(this);
 }
 
-void CN3Joint::ChildDelete(CN3Joint *pChild)
+void CN3Joint::ChildDelete(CN3Joint* pChild)
 {
-	if(nullptr == pChild) return;
-	it_Joint it = m_Children.begin(), itEnd = m_Children.end();
-	int iSize = m_Children.size();
-	for(; it != itEnd; )
+	if (pChild == nullptr)
+		return;
+
+	auto it = m_Children.begin(), itEnd = m_Children.end();
+	for (; it != itEnd; )
 	{
-		if(*it == pChild) 
+		if (*it == pChild)
 		{
 			it = m_Children.erase(it);
 			pChild->ParentSet(nullptr);
@@ -250,17 +239,12 @@ void CN3Joint::ParentSet(CN3Joint* pParent)
 	}
 }
 
-void CN3Joint::NodeCount(int &nCount)
+void CN3Joint::NodeCount(int& nCount)
 {
 	nCount++;
-	
-	CN3Joint* pChild = nullptr;
-	it_Joint it = m_Children.begin();
-	int iSize = m_Children.size();
-	for(int i = 0; i < iSize; i++, it++)
-	{
-		pChild = *it;
 
+	for (CN3Joint* pChild : m_Children)
+	{
 		__ASSERT(pChild, "Child joint pointer is NULL!");
 		pChild->NodeCount(nCount);
 	}
@@ -278,41 +262,36 @@ BOOL CN3Joint::FindPointerByName(const std::string& szName, CN3Joint *&pJoint) /
 	if(m_szName == szName) return TRUE;
 	pJoint = this;
 		
-	CN3Joint* pChild = nullptr;
-	it_Joint it = m_Children.begin();
-	int iSize = m_Children.size();
-	for(int i = 0; i < iSize; i++, it++)
+	for (CN3Joint* pChild : m_Children)
 	{
-		pChild = *it;
-
 		__ASSERT(pChild, "Child joint pointer is NULL!");
-		if(TRUE == pChild->FindPointerByName(szName, pJoint)) return TRUE;
+		if (pChild->FindPointerByName(szName, pJoint))
+			return TRUE;
 	}
 	
 	return FALSE;
 }
 #endif // end of _N3TOOL
 
-BOOL CN3Joint::FindPointerByID(int nID, CN3Joint *&pJoint)
+BOOL CN3Joint::FindPointerByID(int nID, CN3Joint*& pJoint)
 {
 	static int stnID = 0;
-	if(pJoint == nullptr) stnID = 0;
+	if (pJoint == nullptr)
+		stnID = 0;
 
 	pJoint = this;
-	if(nID == stnID) return TRUE;
+	if (nID == stnID)
+		return TRUE;
+
 	stnID++;
 
-	CN3Joint* pChild = nullptr;
-	it_Joint it = m_Children.begin();
-	int iSize = m_Children.size();
-	for(int i = 0; i < iSize; i++, it++)
+	for (CN3Joint* pChild : m_Children)
 	{
-		pChild = *it;
-
 		__ASSERT(pChild, "Child joint pointer is NULL!");
-		if(TRUE == pChild->FindPointerByID(nID, pJoint)) return TRUE;
+		if (pChild->FindPointerByID(nID, pJoint))
+			return TRUE;
 	}
-	
+
 	return FALSE;
 }
 
@@ -328,15 +307,11 @@ BOOL CN3Joint::FindIndex(const std::string& szName, int &nIndex)
 	if(m_szName == szName) return TRUE;
 	nIndex++;
 		
-	CN3Joint* pChild = nullptr;
-	it_Joint it = m_Children.begin();
-	int iSize = m_Children.size();
-	for(int i = 0; i < iSize; i++, it++)
+	for (CN3Joint* pChild : m_Children)
 	{
-		pChild = *it;
-
 		__ASSERT(pChild, "Child joint pointer is NULL!");
-		if(TRUE == pChild->FindIndex(szName, nIndex)) return TRUE;
+		if (pChild->FindIndex(szName, nIndex))
+			return TRUE;
 	}
 	
 	return FALSE;
@@ -352,13 +327,8 @@ void CN3Joint::Tick(float fFrm)
 
 	CN3Joint::ReCalcMatrix();
 
-	CN3Joint* pChild = nullptr;
-	it_Joint it = m_Children.begin();
-	int iSize = m_Children.size();
-	for(int i = 0; i < iSize; i++, it++)
+	for (CN3Joint* pChild : m_Children)
 	{
-		pChild = *it;
-
 		__ASSERT(pChild, "Child joint pointer is NULL!");
 		pChild->Tick(fFrm);
 	}
@@ -415,19 +385,13 @@ void CN3Joint::ReCalcMatrix()
 	if(m_pParent) m_Matrix *= m_pParent->m_Matrix; // 부모 행렬
 }
 
-void CN3Joint::MatricesGet(__Matrix44 *pMtxs, int &nJointIndex)
+void CN3Joint::MatricesGet(__Matrix44* pMtxs, int& nJointIndex)
 {
-	memcpy(&(pMtxs[nJointIndex]), &m_Matrix, sizeof(__Matrix44));
+	memcpy(&pMtxs[nJointIndex], &m_Matrix, sizeof(__Matrix44));
 	nJointIndex++;
 
-	CN3Joint* pChild = nullptr;
-	it_Joint it = m_Children.begin();
-	int iSize = m_Children.size();
-	for(int i = 0; i < iSize; i++, it++)
-	{
-		pChild = *it;
+	for (CN3Joint* pChild : m_Children)
 		pChild->MatricesGet(pMtxs, nJointIndex);
-	}
 }
 
 void CN3Joint::ReCalcMatrixBlended(float fFrm0, float fFrm1, float fWeight0)
@@ -522,18 +486,18 @@ void CN3Joint::KeyDelete(CN3Joint *pJoint, int nKS, int nKE)
 #endif // end of _N3TOOL
 
 #ifdef _N3TOOL
-void CN3Joint::AddKey(CN3Joint *pJSrc, int nIndexS, int nIndexE)
+void CN3Joint::AddKey(CN3Joint* pJSrc, int nIndexS, int nIndexE)
 {
 	m_KeyPos.Add(pJSrc->m_KeyPos, nIndexS, nIndexE);
 	m_KeyRot.Add(pJSrc->m_KeyRot, nIndexS, nIndexE);
 	m_KeyScale.Add(pJSrc->m_KeyScale, nIndexS, nIndexE);
 
-	it_Joint it = pJSrc->m_Children.begin();
-	it_Joint it2 = m_Children.begin();
-	int iSize = pJSrc->m_Children.size();
-	int iSize2 = m_Children.size();
-	__ASSERT(iSize == iSize2, "can't copy animation key - because child count is different from each other.");
-	for(int i = 0; i < iSize; i++, it++, it2++)
+	auto it = pJSrc->m_Children.begin();
+	auto it2 = m_Children.begin();
+	size_t srcSize = pJSrc->m_Children.size();
+	size_t destSize = m_Children.size();
+	__ASSERT(srcSize == destSize, "can't copy animation key - because child count is different from each other.");
+	for (size_t i = 0; i < srcSize; i++, it++, it2++)
 	{
 		CN3Joint* pChildSrc = *it;
 		CN3Joint* pChildDest = *it2;

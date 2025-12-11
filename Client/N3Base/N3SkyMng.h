@@ -91,9 +91,10 @@ struct		__SKY_DAYCHANGE
 	{
 		DWORD dwRWC = 0;
 
-		int nL = szName.size();
+		int nL = static_cast<int>(szName.size());
 		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
-		if(nL > 0) WriteFile(hFile, szName.c_str(), nL, &dwRWC, nullptr);
+		if (nL > 0)
+			WriteFile(hFile, szName.c_str(), nL, &dwRWC, nullptr);
 
 		WriteFile(hFile, &eSkyDayChange, 4, &dwRWC, nullptr);
 		WriteFile(hFile, &dwWhen, 4, &dwRWC, nullptr);
@@ -166,7 +167,11 @@ public:
 	bool DayChangeParse(FILE* fp, __SKY_DAYCHANGE* pDayChange);
 	bool DayChangeWrite(FILE* fp, __SKY_DAYCHANGE* pDayChange);
 
-	int					DayChangeCount() { return m_DayChanges.size(); };
+	int DayChangeCount() const
+	{
+		return static_cast<int>(m_DayChanges.size());
+	}
+
 	__SKY_DAYCHANGE*	DayChangeGet(int iIndex);
 	__SKY_DAYCHANGE*	DayChangeAdd();
 	__SKY_DAYCHANGE*	DayChangeInsert(int iIndex);

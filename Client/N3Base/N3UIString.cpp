@@ -125,8 +125,10 @@ void CN3UIString::WordWrap()
 {
 	m_iLineCount = 0;
 
-	if (nullptr == m_pDFont) return;
-	int iStrLen = m_szString.size();
+	if (m_pDFont == nullptr)
+		return;
+
+	int iStrLen = static_cast<int>(m_szString.size());
 
 	if (0 == iStrLen)
 	{
@@ -159,7 +161,7 @@ void CN3UIString::WordWrap()
 	// 문자열의 pixel 길이 측정
 	SIZE size;
 	const std::string szString = GetString();
-	iStrLen = szString.size();
+	iStrLen = static_cast<int>(szString.size());
 	if (FALSE == m_pDFont->GetTextExtent(szString.c_str(), iStrLen, &size))
 	{	// 길이를 측정할 수 없을경우(m_hDC가 생성되지 않았을경우)
 		m_pDFont->SetText(szString);
@@ -328,33 +330,40 @@ void CN3UIString::SetStartLine(int iLine)
 		iEndLine = m_iLineCount;
 		bMoreLine = false;
 	}
-	int i, iCC, iSize;
+	int i, iCC;
 	std::string strNew;
-	for (i=m_iStartLine; i<iEndLine-1; ++i)
+	for (i = m_iStartLine; i < iEndLine - 1; ++i)
 	{
-		iCC = m_NewLineIndices[i+1] - m_NewLineIndices[i];
-		if (iCC>0)
+		iCC = m_NewLineIndices[i + 1] - m_NewLineIndices[i];
+		if (iCC > 0)
 		{
 			strNew += m_szString.substr(m_NewLineIndices[i], iCC);
-			iSize = strNew.size();
-			if ((iSize>0) && ('\n' != strNew[iSize-1])) strNew += "\n";
+			if (strNew.size() > 0
+				&& ('\n' != strNew[strNew.size() - 1]))
+				strNew += "\n";
 		}
 	}
+
 	// 마지막줄 처리
 	if (bMoreLine)
 	{
-		if (iEndLine > 0) {
+		if (iEndLine > 0)
+		{
 			iCC = m_NewLineIndices[iEndLine] - m_NewLineIndices[iEndLine - 1];
-			if (iCC > 0) strNew += m_szString.substr(m_NewLineIndices[i], iCC);
+			if (iCC > 0)
+				strNew += m_szString.substr(m_NewLineIndices[i], iCC);
 		}
 	}
 	else
 	{
-		if (iEndLine > 0) {
-			iCC = m_szString.size() - m_NewLineIndices[iEndLine - 1];
-			if (iCC > 0) strNew += m_szString.substr(m_NewLineIndices[i], iCC);
+		if (iEndLine > 0)
+		{
+			iCC = static_cast<int>(m_szString.size()) - m_NewLineIndices[iEndLine - 1];
+			if (iCC > 0)
+				strNew += m_szString.substr(m_NewLineIndices[i], iCC);
 		}
 	}
+
 	m_pDFont->SetText(strNew);
 }
 
@@ -421,37 +430,39 @@ void CN3UIString::operator = (const CN3UIString& other)
 #ifdef _N3TOOL
 bool CN3UIString::Save(HANDLE hFile)
 {
-	if (false == CN3UIBase::Save(hFile)) return false;
+	if (!CN3UIBase::Save(hFile))
+		return false;
+
 	DWORD dwNum;
+
 	// font 정보
 	char* pszFontName = nullptr;
 	__ASSERT(m_pDFont, "no font");
 	const std::string strFontName(m_pDFont->GetFontName());
-	int iStrLen = strFontName.size();
-	__ASSERT(iStrLen>0, "No font name");
+	int iStrLen = static_cast<int>(strFontName.size());
+	__ASSERT(iStrLen > 0, "No font name");
 	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이 
-	if (iStrLen>0)
+	if (iStrLen > 0)
 	{
 		WriteFile(hFile, strFontName.c_str(), iStrLen, &dwNum, nullptr);				// string
 		uint32_t dwFontFlags = 0, dwFontHeight = 0;
-		if (m_pDFont)
+
+		if (m_pDFont != nullptr)
 		{
 			dwFontHeight = m_pDFont->GetFontHeight();
 			dwFontFlags = m_pDFont->GetFontFlags();
 		}
+
 		WriteFile(hFile, &dwFontHeight, sizeof(dwFontHeight), &dwNum, nullptr);	// font height
 		WriteFile(hFile, &dwFontFlags, sizeof(dwFontFlags), &dwNum, nullptr);	// font flag (bold, italic)
 	}
 
 	// string
-	WriteFile(hFile, &m_Color, sizeof(m_Color), &dwNum, nullptr);			// 글자 색
-	iStrLen = 0;
-	iStrLen = m_szString.size();
-	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// string 길이 
-	if (iStrLen>0)
-	{
-		WriteFile(hFile, m_szString.c_str(), iStrLen, &dwNum, nullptr);				// string
-	}
+	WriteFile(hFile, &m_Color, sizeof(m_Color), &dwNum, nullptr);				// 글자 색
+	iStrLen = static_cast<int>(m_szString.size());
+	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);				// string 길이 
+	if (iStrLen > 0)
+		WriteFile(hFile, m_szString.c_str(), iStrLen, &dwNum, nullptr);			// string
 
 	if (m_iFileFormatVersion >= N3FORMAT_VER_1264)
 		WriteFile(hFile, &m_iIdk0, sizeof(int), &dwNum, nullptr);

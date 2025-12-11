@@ -216,7 +216,7 @@ BOOL CN3TableBase<Type>::WriteData(HANDLE hFile, DATA_TYPE DataType, const char*
 
 	case DT_NONE:
 	default:
-		__ASSERT(0,"");
+		assert(0);
 	}
 	return TRUE;
 }
@@ -477,40 +477,61 @@ int CN3TableBase<Type>::SizeOf(DATA_TYPE DataType) const
 template <class Type>
 BOOL CN3TableBase<Type>::MakeOffsetTable(std::vector<int>& offsets)
 {	
-	if (m_DataTypes.empty()) return false;
+	if (m_DataTypes.empty())
+		return false;
 
-	int i, iDataTypeCount = m_DataTypes.size();
+	static constexpr int StructAlignment = alignof(Type);
+
+	int iDataTypeCount = (int) m_DataTypes.size();
+
 	offsets.clear();
-	offsets.resize(iDataTypeCount+1);	// +1을 한 이유는 맨 마지막 값에 Type의 실제 사이즈를 넣기 위해서
+	offsets.resize(iDataTypeCount + 1);
 	offsets[0] = 0;
+
 	int iPrevDataSize = SizeOf(m_DataTypes[0]);
-	for (i=1; i<iDataTypeCount; ++i)
+	for (int i = 1; i < iDataTypeCount; i++)
 	{
 		int iCurDataSize = SizeOf(m_DataTypes[i]);
-		if (1 == iCurDataSize%4)	// 현재 데이터가 1바이트면 그냥 이전 데이터가 몇바이트든 상관 없다.
+		int iPreviousOffset = offsets[i - 1];
+
+		int modulo = (iCurDataSize % StructAlignment);
+		if (0 == modulo)
 		{
-			offsets[i] = offsets[i-1] + iPrevDataSize;
-		}
-		else if (2 == iCurDataSize%4) // 현재 데이터가 2바이트면 짝수번지에 위치해야 한다.
-		{
-			if (0 == ((offsets[i-1]+iPrevDataSize) % 2))
-				offsets[i] = offsets[i-1] + iPrevDataSize;
+			modulo = (iPreviousOffset + iPrevDataSize) % StructAlignment;
+			if (0 == modulo)
+				offsets[i] = iPreviousOffset + iPrevDataSize;
 			else
-				offsets[i] = offsets[i-1] + iPrevDataSize+1;
+				offsets[i] = ((int) (iPreviousOffset + iPrevDataSize + (StructAlignment - 1)) / StructAlignment) * StructAlignment;
 		}
-		else if (0 == iCurDataSize%4) // 현재 데이터가 4바이트면 4의 배수번지에 위치해야 한다.
+		else if (1 == modulo)
 		{
-			if (0 == ((offsets[i-1]+iPrevDataSize) % 4))
-				offsets[i] = offsets[i-1] + iPrevDataSize;
-			else
-				offsets[i] = ((int)(offsets[i-1] + iPrevDataSize + 3)/4)*4;	// 4의 배수로 만들기
+			offsets[i] = iPreviousOffset + iPrevDataSize;
 		}
+		else if (2 == modulo)
+		{
+			modulo = ((iPreviousOffset + iPrevDataSize) % 2);
+			if (0 == modulo)
+				offsets[i] = iPreviousOffset + iPrevDataSize;
+			else
+				offsets[i] = iPreviousOffset + iPrevDataSize + 1; // NOTE: Effectively this is (2 - modulo), but modulo can only be 1 here.
+		}
+		else if (4 == modulo)
+		{
+			modulo = ((iPreviousOffset + iPrevDataSize) % 4);
+			if (0 == modulo)
+				offsets[i] = iPreviousOffset + iPrevDataSize;
+			else
+				offsets[i] = iPreviousOffset + iPrevDataSize + (4 - modulo);
+		}
+		else
+		{
+			assert(0);
+		}
+
 		iPrevDataSize = iCurDataSize;
 	}
 
-	// 맨 마지막 값에 Type의 실제 사이즈를 넣자.
-	offsets[iDataTypeCount] = ((int)(offsets[iDataTypeCount-1] + iPrevDataSize + 3)/4)*4;	// 4의 배수로 만들기
-
+	offsets[iDataTypeCount] = ((int) (offsets[iDataTypeCount - 1] + iPrevDataSize + (StructAlignment - 1)) / StructAlignment) * StructAlignment;
 	return true;
 }
 
