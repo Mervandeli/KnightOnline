@@ -6,13 +6,25 @@ This code is for academic purposes only! If you have questions, or would like he
 
 ### Project Setup
 
-A guide to using this project is maintained on the wiki: [Project Setup - OpenKO Wiki](https://github.com/Open-KO/KnightOnline/wiki/Project-Setup)
+Currently, OpenKO supports 2 separate sets of builds:
+1. Windows (Visual Studio/MSBuild): Server, Client, Tools (preferred for overall development) 
+2. Cross-platform (CMake): Server only at this time
 
-### Run the solution
+Tested systems:
+ - Windows 11
+ - Ubuntu 24.04 (used by the GitHub workflows)
+ - Arch Linux
+
+Tested compilers:
+ - Microsoft Visual Studio 2022 (v143) & 2026 (v145)
+ - clang 18, 19, 20
+ - gcc 13, 14, 15
+
+A guide to setting up and building this project is maintained on the wiki: [Project Setup - OpenKO Wiki](https://github.com/Open-KO/KnightOnline/wiki/Project-Setup) 
+
+### Visual Studio solutions
 
 Solutions are available in the root directory:
-
-Currently we have:
 * `Client.sln` - for just the client project (WarFare) and its dependencies.
 * `ClientTools.sln` - for just the client tool projects (KscViewer, Launcher, Option) and their dependencies.
 * `Server.sln` - for just the server projects (AIServer, Aujard, Ebenezer, ItemManager, VersionManager) and their dependencies.
