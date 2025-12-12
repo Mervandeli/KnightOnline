@@ -183,7 +183,7 @@ int AppThread::thread_loop_ftxui(CIni& iniFile)
 		auto logDisplay = vbox(logElements)
 			| focusPositionRelative(0, scrollPosition)
 			| vscroll_indicator
-			| frame
+			| yframe
 			| flex;
 
 		auto inputBox = hbox({

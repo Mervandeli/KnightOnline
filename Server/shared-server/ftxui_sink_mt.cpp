@@ -134,7 +134,7 @@ namespace ftxui
 		auto logLine = hbox({
 			text(std::string(textBeforeColor)),
 			text(std::string(textColored)) | color(spdlog_level_to_fxtui_color(msg.level)),
-			text(std::string(textAfterColor))
+			paragraph(std::string(textAfterColor))
 		});
 
 		ReplayLog replayLog;
