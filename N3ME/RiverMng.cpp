@@ -176,7 +176,7 @@ void CRiverMng::Render()
 			__Matrix44 matView, matProj, matVP;
 			s_lpD3DDev->GetTransform(D3DTS_VIEW, &matView);
 			s_lpD3DDev->GetTransform(D3DTS_PROJECTION, &matProj);
-			D3DXMatrixMultiply(&matVP, &matView, &matProj);
+			matVP = matView * matProj;
 			D3DVIEWPORT9 vp = s_CameraData.vp;
 
 			__VertexTransformedColor Vertices[4];
@@ -187,8 +187,8 @@ void CRiverMng::Render()
 			{
 				__VertexXyzT2* pVtx = m_SelVtxArray.GetAt(i);
 				if (pVtx == nullptr) continue;
-				D3DXVECTOR4 v;
-				D3DXVec3Transform(&v, pVtx, &matVP);
+				__Vector4 v;
+				v.Transform(*pVtx, matVP);
 
 				float fScreenZ = (v.z/v.w);
 				if (fScreenZ>1.0 || fScreenZ<0.0) continue;
@@ -282,7 +282,7 @@ BOOL CRiverMng::MouseMsgFilter(LPMSG pMsg)
 				m_VtxPosDummy.GetPickRay(point, vRayDir, vRayOrig);	// 이함수 잠시 빌려씀.
 
 				__Vector3 vTmp = vPV - vRayOrig;
-				float fT = D3DXVec3Dot(&vPN, &vTmp) / D3DXVec3Dot(&vPN, &vRayDir);
+				float fT = vPN.Dot(vTmp) / vPN.Dot(vRayDir);
 				vPos = vRayOrig + vRayDir*fT;
 				m_CreateLine[1] = vPos;
 				return TRUE;
@@ -386,7 +386,7 @@ BOOL CRiverMng::MouseMsgFilter(LPMSG pMsg)
 				m_VtxPosDummy.GetPickRay(point, vRayDir, vRayOrig);	// 이함수 잠시 빌려씀.
 
 				__Vector3 vTmp = vPV - vRayOrig;
-				float fT = D3DXVec3Dot(&vPN, &vTmp) / D3DXVec3Dot(&vPN, &vRayDir);
+				float fT = vPN.Dot(vTmp) / vPN.Dot(vRayDir);
 				vPos = vRayOrig + vRayDir*fT;
 				m_CreateLine[1] = vPos;
 
@@ -466,7 +466,7 @@ void CRiverMng::SelectVtxByDragRect(RECT* pRect, BOOL bAdd)
 	__Matrix44 matView, matProj, matVP;
 	pD3DDev->GetTransform(D3DTS_VIEW, &matView);
 	pD3DDev->GetTransform(D3DTS_PROJECTION, &matProj);
-	D3DXMatrixMultiply(&matVP, &matView, &matProj);
+	matVP = matView * matProj;
 
 	D3DVIEWPORT9 vp = pEng->s_CameraData.vp;
 
@@ -480,8 +480,8 @@ void CRiverMng::SelectVtxByDragRect(RECT* pRect, BOOL bAdd)
 			if (pVtx == nullptr)
 				continue;
 
-			D3DXVECTOR4 v;
-			D3DXVec3Transform(&v, pVtx, &matVP);
+			__Vector4 v;
+			v.Transform(*pVtx, matVP);
 			float fScreenZ = (v.z / v.w);
 			if (fScreenZ > 1.0f || fScreenZ < 0.0f)
 				continue;
@@ -526,8 +526,8 @@ void CRiverMng::SelectVtxByDragRect(RECT* pRect, BOOL bAdd)
 				if (pVtx == nullptr)
 					continue;
 
-				D3DXVECTOR4 v;
-				D3DXVec3Transform(&v, pVtx, &matVP);
+				__Vector4 v;
+				v.Transform(*pVtx, matVP);
 				float fScreenZ = (v.z / v.w);
 				if (fScreenZ > 1.0f || fScreenZ < 0.0f)
 					continue;

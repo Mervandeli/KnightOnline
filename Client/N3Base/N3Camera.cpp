@@ -21,7 +21,7 @@ CN3Camera::CN3Camera()
 	m_Data.vAt = m_vAt = __Vector3(0,0,0);
 	m_Data.vUp = m_vScale = __Vector3(0,1,0);
 
-	m_Data.fFOV = D3DXToRadian(55.0f); // 기본값 55 도
+	m_Data.fFOV = DegreesToRadians(55.0f); // 기본값 55 도
 	m_Data.fNP = 0.7f;
 	m_Data.fFP = 512.0f;
 
@@ -46,7 +46,7 @@ void CN3Camera::Release()
 	m_Data.vAt = m_vAt = __Vector3(0,0,0);
 	m_Data.vUp = m_vScale = __Vector3(0,1,0);
 
-	m_Data.fFOV = D3DXToRadian(55.0f); // 기본값 55 도
+	m_Data.fFOV = DegreesToRadians(55.0f); // 기본값 55 도
 	m_Data.fNP = 0.7f;
 	m_Data.fFP = 512.0f;
 
@@ -435,20 +435,20 @@ void CN3Camera::Tick(float fFrm)
 
 //	m_Data.fInverse_SineHalfOfFOV = 1.0f/sinf(m_Data.fFOV*0.5f);
 
-	::D3DXMatrixLookAtLH(&m_Data.mtxView, &m_Data.vEye, &m_Data.vAt, &m_Data.vUp); // Look At 적용
-	::D3DXMatrixInverse(&m_Data.mtxViewInverse, nullptr, &m_Data.mtxView); // View Inverse 행렬 구하기..
+	m_Data.mtxView.LookAtLH(m_Data.vEye, m_Data.vAt, m_Data.vUp); // Look At 적용
+	m_Data.mtxViewInverse = m_Data.mtxView.Inverse(); // View Inverse 행렬 구하기..
 	CN3Base::s_lpD3DDev->GetViewport(&m_Data.vp); // View port 가져오기...
 	
 	m_Data.fAspect = (float)m_Data.vp.Width / (float)m_Data.vp.Height; // 종횡비
 	if(m_bOrtho)
 	{
 		float fL = (m_Data.vAt - m_Data.vEye).Magnitude() / 2.0f;
-		::D3DXMatrixOrthoLH(&m_Data.mtxProjection, fL, fL / m_Data.fAspect, m_Data.fNP * (1.0f + fL / 1000.0f), m_Data.fFP);  // Projection Matrix Setting
-//		::D3DXMatrixOrthoLH(&m_Data.mtxProjection, 2.0f, 2.0f, m_Data.fNP, m_Data.fFP);  // Projection Matrix Setting
+		m_Data.mtxProjection.OrthoLH(fL, fL / m_Data.fAspect, m_Data.fNP * (1.0f + fL / 1000.0f), m_Data.fFP);  // Projection Matrix Setting
+//		m_Data.mtxProjection.OrthoLH(2.0f, 2.0f, m_Data.fNP, m_Data.fFP);  // Projection Matrix Setting
 	}
 	else
 	{
-		::D3DXMatrixPerspectiveFovLH(&m_Data.mtxProjection, m_Data.fFOV, m_Data.fAspect, m_Data.fNP, m_Data.fFP); // Projection Matrix Setting
+		m_Data.mtxProjection.PerspectiveFovLH(m_Data.fFOV, m_Data.fAspect, m_Data.fNP, m_Data.fFP); // Projection Matrix Setting
 	}
 
 	__Matrix44 mtx = m_Data.mtxView * m_Data.mtxProjection;
@@ -532,9 +532,6 @@ void CN3Camera::Tick(float fFrm)
 
 	memcpy(m_Data.fFrustum, frustum, sizeof(float)*6*4);
 }
-
-
-
 
 void CN3Camera::LookAt(const __Vector3& vEye, const __Vector3& vAt, const __Vector3& vUp)
 {

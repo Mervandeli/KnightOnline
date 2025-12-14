@@ -120,12 +120,8 @@ void CN3Transform::Tick(float fFrm)
 void CN3Transform::ReCalcMatrix()
 {
 	m_Matrix.Scale(m_vScale);
-	if(m_qRot.w != 0)
-	{
-		static __Matrix44 mtxRot;
-		D3DXMatrixRotationQuaternion(&mtxRot, &m_qRot);
-		m_Matrix *= mtxRot;
-	}
+	if (m_qRot.w != 0)
+		m_Matrix *= m_qRot;
 	m_Matrix.PosSet(m_vPos);
 }
 
@@ -158,8 +154,8 @@ void CN3Transform::Render(const __Matrix44* pMtxParent, float fUnitSize)
 		for(int i = 0; i < 3; i++)
 		{
 			if(i == 0) { mtxRot.Identity(); } // X 축
-			else if(i == 1) { mtxRot.RotationZ(D3DXToRadian(90.0f)); } // Y 축
-			else if(i == 2) { mtxRot.RotationY(D3DXToRadian(-90.0f)); } // Z 축
+			else if(i == 1) { mtxRot.RotationZ(DegreesToRadians(90.0f)); } // Y 축
+			else if(i == 2) { mtxRot.RotationY(DegreesToRadians(-90.0f)); } // Z 축
 			
 			vAxis[i*3+0] = v0*mtxRot;
 			vAxis[i*3+1] = v1*mtxRot;

@@ -163,8 +163,8 @@ void CLightObjMgr::SetActive(bool active)
 		D3DCOLORVALUE crLgt;
 		crLgt.a = 0.0f;
 		crLgt.r = crLgt.g = crLgt.b = 1.0f;
-		pLO->pRefLight->m_Data.InitPoint(IDX_CURR_LIGHT, D3DXVECTOR3(0.0f, 0.0f, 0.0f), crLgt, 0.0f, 0.0f);
-		m_vCurrLOPos.Set(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f, 0.0f);
+		pLO->pRefLight->m_Data.InitPoint(IDX_CURR_LIGHT, { 0.0f, 0.0f, 0.0f }, crLgt, 0.0f, 0.0f);
+		m_vCurrLOPos.Set({ 0.0f, 0.0f, 0.0f }, 0.0f, 0.0f);
 
 		if(m_pCurrLO)
 		{
@@ -226,8 +226,8 @@ void CLightObjMgr::Render()
 	// set transform
 	HRESULT hr;
 
-	D3DXMATRIX mtx;
-	D3DXMatrixIdentity(&mtx);
+	__Matrix44 mtx;
+	mtx.Identity();
 		
 	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtx); // 월드 행렬 적용..
 	
@@ -392,7 +392,7 @@ void CLightObjMgr::DownLoad()
 
 void CLightObjMgr::UpLoad(const char* pName, float fRange, float fAtten, D3DCOLORVALUE crLgt)
 {
-	m_pCurrLO->pRefLight->m_Data.InitPoint(IDX_STANDBY_LIGHT, D3DXVECTOR3(0.0f, 0.0f, 0.0f), crLgt, fRange, fAtten);
+	m_pCurrLO->pRefLight->m_Data.InitPoint(IDX_STANDBY_LIGHT, { 0.0f, 0.0f, 0.0f }, crLgt, fRange, fAtten);
 	m_pCurrLO->pRefLight->m_Data.bOn = false;
 	sprintf(m_pCurrLO->szName, pName);
 	
@@ -408,8 +408,8 @@ void CLightObjMgr::UpLoad(const char* pName, float fRange, float fAtten, D3DCOLO
 	//set light..	
 	crLgt.a = 0.0f;
 	crLgt.r = crLgt.g = crLgt.b = 1.0f;
-	pLO->pRefLight->m_Data.InitPoint(IDX_CURR_LIGHT, D3DXVECTOR3(0.0f, 0.0f, 0.0f), crLgt, 0.0f, 0.0f);
-	m_vCurrLOPos.Set(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f, 0.0f);
+	pLO->pRefLight->m_Data.InitPoint(IDX_CURR_LIGHT, { 0.0f, 0.0f, 0.0f }, crLgt, 0.0f, 0.0f);
+	m_vCurrLOPos.Set({ 0.0f, 0.0f, 0.0f }, 0.0f, 0.0f);
 
 	m_pCurrLO = pLO;
 	

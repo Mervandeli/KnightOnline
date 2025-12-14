@@ -161,7 +161,7 @@ Used to set the view matrix for DirectX
 void CN3Eng::LookAt(const __Vector3& vEye, const __Vector3& vAt, const __Vector3& vUp)
 {
 	__Matrix44 matView;
-	D3DXMatrixLookAtLH(&matView, &vEye, &vAt, &vUp);
+	matView.LookAtLH(vEye, vAt, vUp);
 	s_lpD3DDev->SetTransform(D3DTS_VIEW, &matView);
 }
 
@@ -253,7 +253,7 @@ Set the projection matrix for DirectX
 void CN3Eng::SetProjection(float fNear, float fFar, float fLens, float fAspect)
 {
 	__Matrix44 matProjection;
-	D3DXMatrixPerspectiveFovLH(&matProjection, fLens, fAspect, fNear, fFar);
+	matProjection.PerspectiveFovLH(fLens, fAspect, fNear, fFar);
 	s_lpD3DDev->SetTransform(D3DTS_PROJECTION, &matProjection);
 }
 
@@ -423,7 +423,7 @@ bool CN3Eng::Init(
 
 	// 기본 뷰와 프로젝션 설정.
 	this->LookAt(__Vector3(5,5,-10), __Vector3(0,0,0), __Vector3(0,1,0));
-	this->SetProjection(0.1f, 256.0f, D3DXToRadian(45.0f), (float)dwHeight/dwWidth);
+	this->SetProjection(0.1f, 256.0f, DegreesToRadians(45.0f), (float)dwHeight/dwWidth);
 	
 	RECT rcView = { 0, 0, (int)dwWidth, (int)dwHeight };
 	this->SetViewPort(rcView);

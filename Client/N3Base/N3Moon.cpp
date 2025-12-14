@@ -19,7 +19,7 @@ static char THIS_FILE[]=__FILE__;
 CN3Moon::CN3Moon()
 {
 	m_pTexture = nullptr;
-	m_fCurRadian = D3DX_PI;
+	m_fCurRadian = __PI;
 	m_iMoonPhaseIndex = 0;
 }
 
@@ -32,7 +32,7 @@ void CN3Moon::Release()
 {
 	CN3Base::Release();
 	s_MngTex.Delete(&m_pTexture);
-	m_fCurRadian = D3DX_PI;
+	m_fCurRadian = __PI;
 	m_iMoonPhaseIndex = 0;
 }
 
@@ -63,9 +63,9 @@ void CN3Moon::Render(__Matrix44& matView, __Matrix44& matProj)
 	matFinal = matWorld*matView;
 	matFinal *= matProj;
 
-	__Vector3 vMoon;	vMoon.Set(5, 0, 0);
-	D3DXVECTOR4	 vOut;
-	D3DXVec3Transform(&vOut, (D3DXVECTOR3*)(&vMoon), &matFinal);
+	__Vector3 vMoon = { 5, 0, 0 };
+	__Vector4 vOut;
+	vOut.Transform(vMoon, matFinal);
 
 	int Width = s_CameraData.vp.Width;
 	int Height = s_CameraData.vp.Height;

@@ -67,7 +67,7 @@ CPlayerBase::CPlayerBase()
 	m_eStateDying = PSD_UNKNOWN; // 죽을때 방법
 	m_fTimeDying = 0; // 죽는 모션 취할때 지난 시간..
 
-	m_fRotRadianPerSec = D3DXToRadian(270.0f); // 초당 회전 라디안값
+	m_fRotRadianPerSec = DegreesToRadians(270.0f); // 초당 회전 라디안값
 	m_fMoveSpeedPerSec = 0; // 초당 움직임 값.. 이값은 기본값이고 상태(걷기, 달리기, 뒤로, 저주등) 에 따라 가감해서 쓴다..
 	m_fYawCur = 0; // 현재 회전값..
 	m_fYawToReach = 0;
@@ -200,7 +200,7 @@ void CPlayerBase::Release()
 	m_eStateDying = PSD_UNKNOWN; // 죽을때 방법
 	m_fTimeDying = 0; // 죽는 모션 취할때 지난 시간..
 
-	m_fRotRadianPerSec = D3DXToRadian(270.0f); // 초당 회전 라디안값
+	m_fRotRadianPerSec = DegreesToRadians(270.0f); // 초당 회전 라디안값
 	m_fMoveSpeedPerSec = 0; // 초당 움직임 값.. 이값은 기본값이고 상태(걷기, 달리기, 뒤로, 저주등) 에 따라 가감해서 쓴다..
 	m_fYawCur = 0; // 현재 회전값..
 	m_fYawToReach = 0;
@@ -515,16 +515,16 @@ void CPlayerBase::RenderChrInRect(CN3Chr* pChr, const RECT& Rect)
 	float fViewVolumeHeight = fChrHeight * vp.Height / iHeight;	// 캐릭터의 키(클리핑 될 경우 클리핑 되는 비율에 맞게 좁혀준다.)
 	float fViewVolumeWidth = fChrHeight * vp.Width / iHeight;	// 가로는 pRect의 가로 세로 비율에 맞게 (클리핑 될 경우 클리핑 되는 비율에 맞게 좁혀준다.)
 																// 원래는 이거 : fChrHeight * iWidth / iHeight * vp.Width / iWidth;
-	D3DXMatrixOrthoLH(&mtxProj, fViewVolumeWidth, fViewVolumeHeight, 0, 20);
+	mtxProj.OrthoLH(fViewVolumeWidth, fViewVolumeHeight, 0, 20);
 	
 	float fCameraMoveX = ((fChrHeight*iWidth/iHeight)-fViewVolumeWidth)/2.0f;	// 클리핑에 따른 카메라 이동 수치
 	float fCameraMoveY = (fChrHeight-fViewVolumeHeight)/2.0f;
 	if (rcViewport.left != Rect.left) fCameraMoveX = -fCameraMoveX;		// 왼쪽 영역이 짤리게 그려야 하므로 카메라를 오른쪽(카메라가 -Z축을 바라보기 때문에 카메라의 오른쪽은 -X쪽이다.)으로 이동
 	if (rcViewport.top != Rect.top) fCameraMoveY = -fCameraMoveY;			// 위쪽 영역이 짤리게 그려야 하므로 카메라를 아래쪽으로 이동
 
-//	D3DXMatrixLookAtLH( &mtxView, &D3DXVECTOR3( 0.0f + fCameraMoveX, fVCenter+2.0f + fCameraMoveY, 10.0f ),	// 여기서 View matrix는 카메라 각도와 상관있다. 거리는 원근에 아무 영향을 미치지 않는다.
-//								  &D3DXVECTOR3( 0.0f + fCameraMoveX, fVCenter + fCameraMoveY, 0.0f ),	// fVCenter: 캐릭터 키의 중간을 바라보기
-//								  &D3DXVECTOR3( 0.0f, 1.0f, 0.0f ) );
+//	mtxView.LookAtLH(	{ 0.0f + fCameraMoveX, fVCenter+2.0f + fCameraMoveY, 10.0f },	// 여기서 View matrix는 카메라 각도와 상관있다. 거리는 원근에 아무 영향을 미치지 않는다.
+//						{ 0.0f + fCameraMoveX, fVCenter + fCameraMoveY, 0.0f },	// fVCenter: 캐릭터 키의 중간을 바라보기
+//						{ 0.0f, 1.0f, 0.0f } );
 	const __Vector3& vChrPos = pChr->Pos();
 
 	// 여기서 View matrix는 카메라 각도와 상관있다. 거리는 원근에 아무 영향을 미치지 않는다.
@@ -542,7 +542,7 @@ void CPlayerBase::RenderChrInRect(CN3Chr* pChr, const RECT& Rect)
 	const __Vector3 vUp(
 		0.0f, 1.0f, 0.0f);
 
-	D3DXMatrixLookAtLH(&mtxView, &vEye, &vAt, &vUp);
+	mtxView.LookAtLH(vEye, vAt, vUp);
 	s_lpD3DDev->SetTransform( D3DTS_VIEW, &mtxView );
 	s_lpD3DDev->SetTransform( D3DTS_PROJECTION, &mtxProj);
 
@@ -2282,7 +2282,7 @@ void CPlayerBase::RenderShadow(float fAngle)
 			fAngle = 3.14f - fAngle;
 		}
 	}
-	float fAngleDeg = D3DXToDegree(fAngle);
+	float fAngleDeg = RadiansToDegrees(fAngle);
 
 	float zVal = s_vLightOffset.Magnitude();
 	int iDiv = (int)((int)fAngleDeg)%((int)(180));
@@ -2293,7 +2293,7 @@ void CPlayerBase::RenderShadow(float fAngle)
 	else if ( (fAngleDeg > 130.0f) && (fAngleDeg <= 180.0f) )
 		fAngleDeg = 130.0f;
 
-	__Matrix44 mtxRZ; mtxRZ.RotationZ(D3DXToRadian(fAngleDeg));
+	__Matrix44 mtxRZ; mtxRZ.RotationZ(DegreesToRadians(fAngleDeg));
 	__Vector3 vLP; vLP.Set(-zVal, 0.0f, 0.0f );	vLP *= mtxRZ;	vLP.Normalize();
 
 	int iPC = m_Chr.PartCount();

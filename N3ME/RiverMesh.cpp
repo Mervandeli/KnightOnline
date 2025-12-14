@@ -266,7 +266,7 @@ void CRiverMesh::RenderVertexPoint()	// 잘보이게 점만 다시 그리기
 	__Matrix44 matView, matProj, matVP;
 	s_lpD3DDev->GetTransform(D3DTS_VIEW, &matView);
 	s_lpD3DDev->GetTransform(D3DTS_PROJECTION, &matProj);
-	D3DXMatrixMultiply(&matVP, &matView, &matProj);
+	matVP = matView * matProj;
 	D3DVIEWPORT9 vp = s_CameraData.vp;
 
 	__VertexTransformedColor Vertices[4];
@@ -276,8 +276,8 @@ void CRiverMesh::RenderVertexPoint()	// 잘보이게 점만 다시 그리기
 	int i;
 	for (i=0; i<m_iVC; ++i)
 	{
-		D3DXVECTOR4 v;
-		D3DXVec3Transform(&v, &(m_pVertices[i]), &matVP);
+		__Vector4 v;
+		v.Transform(m_pVertices[i], matVP);
 
 		float fScreenZ = (v.z/v.w);
 		if (fScreenZ>1.0 || fScreenZ<0.0) continue;
@@ -338,7 +338,7 @@ int CRiverMesh::AddVertex()
 	v3 = m_pVertices[m_iVC-2];	v4 = m_pVertices[m_iVC-1];
 
 	v5 = v4 - v1;
-	__Matrix44 mat;	mat.RotationY(D3DXToRadian(-90.0f));
+	__Matrix44 mat;	mat.RotationY(DegreesToRadians(-90.0f));
 	vDir = v5*mat;	vDir.Normalize();
 	vDiff = vDir * (s_CameraData.vEye-(v1+(v5/2))).Magnitude() * 0.1f;
 

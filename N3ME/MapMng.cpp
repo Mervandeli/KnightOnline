@@ -1344,7 +1344,7 @@ void CMapMng::SelectObjectByDragRect(RECT* pRect, BOOL bAdd)
 	__Matrix44 matView, matProj, matVP;
 	pD3DDev->GetTransform(D3DTS_VIEW, &matView);
 	pD3DDev->GetTransform(D3DTS_PROJECTION, &matProj);
-	D3DXMatrixMultiply(&matVP, &matView, &matProj);
+	matVP = matView * matProj;
 
 	D3DVIEWPORT9 vp = pEng->s_CameraData.vp;
 
@@ -1352,8 +1352,8 @@ void CMapMng::SelectObjectByDragRect(RECT* pRect, BOOL bAdd)
 	for (int i = 0; i < iSC; i++)
 	{
 		CN3TransformCollision* pObj = m_pSceneOutput->ShapeGet(i);
-		D3DXVECTOR4 v;
-		D3DXVec3Transform(&v, &pObj->Pos(), &matVP);
+		__Vector4 v;
+		v.Transform(pObj->Pos(), matVP);
 		float fScreenZ = (v.z / v.w);
 		if (fScreenZ < 1.0 && fScreenZ>0.0)
 		{
@@ -1742,10 +1742,10 @@ void CMapMng::RenderObjectToWindow(CN3TransformCollision* pObj, HWND hWnd)
 
 	// View Matrix 및 Projection Matrix Setting
 //	__Matrix44 viewmtx;
-//	::D3DXMatrixLookAtLH(&viewmtx, &vEye, &vAt, &vUp);
+//	viewmtx.LookAtLH(vEye, vAt, vUp);
 //	pD3DDev->SetTransform(D3DTS_VIEW, &viewmtx);
 //	__Matrix44 prjmtx;
-//	::D3DXMatrixPerspectiveFovLH(&prjmtx, D3DXToRadian(54.0f), pEng->s_CameraData.fAspect, 0.01f, 1000.0f);
+//	prjmtx.PerspectiveFovLH(DegreesToRadians(54.0f), pEng->s_CameraData.fAspect, 0.01f, 1000.0f);
 //	pD3DDev->SetTransform(D3DTS_PROJECTION, &prjmtx);
 
 	// Set Render State

@@ -49,17 +49,13 @@ void CGrassBoard::Release()
 void CGrassBoard::ReCalcMatrix()
 {
 	Grass_Info* pGrass;
-	for(int i=0;i<m_ucTexNum;++i)
+	for (int i = 0; i < m_ucTexNum; ++i)
 	{
 		pGrass = &m_sGrassInfo[i];
 
 		pGrass->mtxWorld.Scale(m_vScale);
-		if(m_qRot.w != 0)
-		{
-			static __Matrix44 mtxRot;
-			D3DXMatrixRotationQuaternion(&mtxRot, &m_qRot);
-			pGrass->mtxWorld *= mtxRot;
-		}
+		if (m_qRot.w != 0)
+			pGrass->mtxWorld *= m_qRot;
 		pGrass->mtxWorld.PosSet(m_vPos);
 	}
 }
@@ -85,8 +81,8 @@ void CGrassBoard::Tick(CN3Terrain* pTerrain)
 		vDir = s_CameraData.vEye - pGrass->vPos;
 
 		//	카메라 방향으로 방향을 튼다
-		if(vDir.x > 0.0f) pGrass->mtxWorld.RotationY(-atanf(vDir.z/vDir.x) - (D3DX_PI * 0.5f));
-		else pGrass->mtxWorld.RotationY(-atanf(vDir.z/vDir.x) + (D3DX_PI * 0.5f));
+		if(vDir.x > 0.0f) pGrass->mtxWorld.RotationY(-atanf(vDir.z/vDir.x) - (__PI * 0.5f));
+		else pGrass->mtxWorld.RotationY(-atanf(vDir.z/vDir.x) + (__PI * 0.5f));
 		pGrass->mtxWorld.PosSet(m_sGrassInfo[i].vPos);
 
 		//	카메라와의 거리에 따라 알파먹임
