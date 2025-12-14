@@ -64,10 +64,13 @@ set(OPENKO_SERVER_MAP_DST_DIR "${OPENKO_BIN_DIR}/MAP")
 set(OPENKO_SERVER_QUESTS_SRC_DIR "${CMAKE_SOURCE_DIR}/Server/bin/QUESTS")
 set(OPENKO_SERVER_QUESTS_DST_DIR "${OPENKO_BIN_DIR}/QUESTS")
 
-# Set the default solution folder to place targets/projects in
-set(CMAKE_FOLDER "_deps")
+# Generate .gitignore in build directory
+if(NOT PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
+  file(WRITE "${PROJECT_BINARY_DIR}/.gitignore" "*")
+endif()
 
 # Add dependencies
+set(CMAKE_FOLDER "_deps")
 add_subdirectory(deps/asio-cmake)
 add_subdirectory(deps/spdlog-cmake)
 
