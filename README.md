@@ -25,11 +25,12 @@ A guide to setting up and building this project is maintained on the wiki: [Proj
 ### Visual Studio solutions
 
 Solutions are available in the root directory:
-* `Client.sln` - for just the client project (WarFare) and its dependencies.
-* `ClientTools.sln` - for just the client tool projects (KscViewer, Launcher, Option) and their dependencies.
-* `Server.sln` - for just the server projects (AIServer, Aujard, Ebenezer, ItemManager, VersionManager) and their dependencies.
-* `Tools.sln` - for just the tool projects (ItemEditor, N3CE, N3FXE, N3ME, N3TexViewer, N3Viewer, SkyViewer,  TblEditor, UIE) and their dependencies.
 * `All.sln` - all of the various projects.
+* `Client.sln` - just the client project (WarFare) and its dependencies.
+* `ClientTools.sln` - just the client tool projects (KscViewer, Launcher, Option) and their dependencies.
+* `Server.sln` - just the server projects (AIServer, Aujard, Ebenezer, ItemManager, VersionManager) and their dependencies.
+* `Tests.sln` - our various unit test projects.
+* `Tools.sln` - just the tool projects (ItemEditor, N3CE, N3FXE, N3ME, N3TexViewer, N3Viewer, SkyViewer,  TblEditor, UIE) and their dependencies.
 
 ## Goals
 
