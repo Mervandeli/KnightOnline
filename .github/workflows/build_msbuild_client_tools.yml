@@ -30,7 +30,7 @@ jobs:
     strategy:
       matrix:
         BUILD_CONFIGURATION: [Debug, Release]
-        BUILD_PLATFORM: [Win32]
+        BUILD_PLATFORM: [Win32, x64]
 
     name: "Client tools: ${{ matrix.BUILD_CONFIGURATION }} - ${{ matrix.BUILD_PLATFORM }}"
 
