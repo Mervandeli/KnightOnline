@@ -19,7 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="hello_test.cpp" />
+    <ClCompile Include="CollisionBox_test.cpp" />
+    <ClCompile Include="Convert2DTo3DCoordinate_test.cpp" />
+    <ClCompile Include="Convert3DTo2DCoordinate_test.cpp" />
+    <ClCompile Include="IntersectTriangle_test.cpp" />
+    <ClCompile Include="Matrix44_test.cpp" />
+    <ClCompile Include="Vector2_test.cpp" />
+    <ClCompile Include="Vector3_test.cpp" />
+    <ClCompile Include="Vector4_test.cpp" />
+    <ClCompile Include="Yaw2D_test.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MathHelpers.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <Keyword>Win32Proj</Keyword>
@@ -29,6 +40,7 @@
   <Import Project="..\..\props\platform_root.props" />
   <PropertyGroup Label="Configuration">
     <CharacterSet>Unicode</CharacterSet>
+    <OutDir>$(BaseOutDir)$(ProjectName)\</OutDir>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -38,7 +50,9 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <Import Project="$(PropsDir)client_application.props" />
   <Import Project="$(PropsDir)googletest.props" />
+  <Import Project="$(PropsDir)n3base-project.props" />
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
@@ -52,7 +66,8 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>gtest_main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>N3Base_client.lib;gtest_main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BaseOutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>

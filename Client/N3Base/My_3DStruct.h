@@ -62,13 +62,12 @@ public:
 	__Vector3() = default;
 	__Vector3(float fx, float fy, float fz);
 	__Vector3(const _D3DVECTOR& vec);
-	__Vector3(const D3DXVECTOR3& vec);
 
 	void	Normalize();
-	void	Normalize(const D3DXVECTOR3& vec);
+	void	Normalize(const _D3DVECTOR& vec);
 	float	Magnitude() const;
-	float	Dot(const D3DXVECTOR3& vec) const;
-	void	Cross(const D3DXVECTOR3& v1, const D3DXVECTOR3& v2);
+	float	Dot(const _D3DVECTOR& vec) const;
+	void	Cross(const _D3DVECTOR& v1, const _D3DVECTOR& v2);
 	void	Absolute();
 
 	void Zero();
@@ -79,15 +78,15 @@ public:
 	const __Vector3 operator * (const D3DXMATRIX& mtx) const;
 	void operator *= (float fDelta);
 	void operator *= (const D3DXMATRIX& mtx);
-	__Vector3 operator + (const D3DXVECTOR3& vec) const;
-	__Vector3 operator - (const D3DXVECTOR3& vec) const;
-	__Vector3 operator * (const D3DXVECTOR3& vec) const;
-	__Vector3 operator / (const D3DXVECTOR3& vec) const;
+	__Vector3 operator + (const _D3DVECTOR& vec) const;
+	__Vector3 operator - (const _D3DVECTOR& vec) const;
+	__Vector3 operator * (const _D3DVECTOR& vec) const;
+	__Vector3 operator / (const _D3DVECTOR& vec) const;
 
-	void operator += (const D3DXVECTOR3& vec);
-	void operator -= (const D3DXVECTOR3& vec);
-	void operator *= (const D3DXVECTOR3& vec);
-	void operator /= (const D3DXVECTOR3& vec);
+	void operator += (const _D3DVECTOR& vec);
+	void operator -= (const _D3DVECTOR& vec);
+	void operator *= (const _D3DVECTOR& vec);
+	void operator /= (const _D3DVECTOR& vec);
 
 	__Vector3 operator + (float fDelta) const;
 	__Vector3 operator - (float fDelta) const;
@@ -121,8 +120,8 @@ struct __Matrix44 : public D3DXMATRIX
 {
 public:
 	__Matrix44() = default;
+	__Matrix44(const float mtx[4][4]);
 	__Matrix44(const _D3DMATRIX& mtx);
-	__Matrix44(const D3DXMATRIX& mtx);
 	__Matrix44(const D3DXQUATERNION& qt);
 
 	void Zero();
@@ -138,9 +137,7 @@ public:
 	void Rotation(const D3DXVECTOR3& v);
 	void Scale(float sx, float sy, float sz);
 	void Scale(const D3DXVECTOR3& v);
-
 	void Direction(const D3DXVECTOR3& vDir);
-
 	void LookAtLH(const D3DXVECTOR3& vEye, const D3DXVECTOR3& vAt, const D3DXVECTOR3& vUp);
 	void OrthoLH(float w, float h, float zn, float zf);
 	void PerspectiveFovLH(float fovy, float Aspect, float zn, float zf);
@@ -573,8 +570,8 @@ D3DCOLORVALUE	_D3DCOLOR_To_D3DCOLORVALUE(D3DCOLOR cr);
 bool			_IntersectTriangle(const __Vector3& vOrig, const __Vector3& vDir , const __Vector3& v0, const __Vector3& v1, const __Vector3& v2, float& fT, float& fU, float& fV, __Vector3* pVCol = nullptr);
 bool			_IntersectTriangle(const __Vector3& vOrig, const __Vector3& vDir, const __Vector3& v0, const __Vector3& v1, const __Vector3& v2);
 bool			_CheckCollisionByBox(const __Vector3& vOrig, const __Vector3& vDir, const __Vector3& vMin, const __Vector3& vMax);
-POINT			_Convert3D_To_2DCoordinate(const __Vector3 &vPos, const __Matrix44& mtxView, const __Matrix44& mtxProjection, int nVPW, int nVPH);
-void			_Convert2D_To_3DCoordinate(	int ixScreen, int iyScreen, const __Matrix44& mtxView, const __Matrix44& mtxPrj, const D3DVIEWPORT9& vp, __Vector3& vPosResult, __Vector3& vDirResult);
+POINT			_Convert3D_To_2DCoordinate(const __Vector3 &vPos, const __Matrix44& mtxView, const __Matrix44& mtxProjection, uint32_t nViewportWidth, uint32_t nViewportHeight);
+void			_Convert2D_To_3DCoordinate(int ixScreen, int iyScreen, const __Matrix44& mtxView, const __Matrix44& mtxPrj, uint32_t nViewportWidth, uint32_t nViewportHeight, __Vector3& vPosResult, __Vector3& vDirResult);
 float			_Yaw2D(float fDirX, float fDirZ);
 int16_t			_IsKeyDown(int iVirtualKey);
 int16_t			_IsKeyDowned(int iVirtualKey);
