@@ -29,6 +29,14 @@ namespace test
 		EXPECT_NEAR(a.w, b.w, epsilon);
 	}
 
+	inline static void ExpectQuaternionNear(const __Quaternion& a, const __Quaternion& b, float epsilon = Epsilon)
+	{
+		EXPECT_NEAR(a.x, b.x, epsilon);
+		EXPECT_NEAR(a.y, b.y, epsilon);
+		EXPECT_NEAR(a.z, b.z, epsilon);
+		EXPECT_NEAR(a.w, b.w, epsilon);
+	}
+
 	inline static void ExpectMatrixNear(const __Matrix44& a, const __Matrix44& b, float epsilon = Epsilon)
 	{
 		for (int row = 0; row < 4; row++)

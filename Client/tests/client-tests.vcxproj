@@ -24,6 +24,7 @@
     <ClCompile Include="Convert3DTo2DCoordinate_test.cpp" />
     <ClCompile Include="IntersectTriangle_test.cpp" />
     <ClCompile Include="Matrix44_test.cpp" />
+    <ClCompile Include="Quaternion_test.cpp" />
     <ClCompile Include="Vector2_test.cpp" />
     <ClCompile Include="Vector3_test.cpp" />
     <ClCompile Include="Vector4_test.cpp" />

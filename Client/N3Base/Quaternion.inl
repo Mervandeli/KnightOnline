@@ -18,6 +18,11 @@ __Quaternion::__Quaternion(const D3DXQUATERNION& qt)
 	w = qt.w;
 }
 
+__Quaternion::__Quaternion(float fX, float fY, float fZ, float fW)
+{
+	Set(fX, fY, fZ, fW);
+}
+
 void __Quaternion::Identity()
 {
 	x = y = z = 0;
