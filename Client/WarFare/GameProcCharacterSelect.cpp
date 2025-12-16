@@ -143,9 +143,9 @@ void CGameProcCharacterSelect::Init()
 
 	// 배경..
 	m_pActiveBg = new CN3Shape;	
-	memset(&m_lgt[0], 0, sizeof(D3DLIGHT9));	
-	memset(&m_lgt[1], 0, sizeof(D3DLIGHT9));	
-	memset(&m_lgt[2], 0, sizeof(D3DLIGHT9));	
+	memset(&m_lgt[0], 0, sizeof(__D3DLight9));
+	memset(&m_lgt[1], 0, sizeof(__D3DLight9));
+	memset(&m_lgt[2], 0, sizeof(__D3DLight9));
 
 	// 0가운데.. 1왼쪽..
 	m_lgt[2].Type = m_lgt[1].Type = m_lgt[0].Type = D3DLIGHT_SPOT;
@@ -173,17 +173,20 @@ void CGameProcCharacterSelect::Init()
 
 			m_lgt[0].Position = m_vEye;	// 카루스
 			m_lgt[0].Position.y += 2.0f;	// 카루스
-			vTemp.Set(0.0f, 0.0f, 3.5f);	vTemp -= m_lgt[0].Position;
+			vTemp = { 0.0f, 0.0f, 3.5f };
+			vTemp -= m_lgt[0].Position;
 			m_lgt[0].Direction = vTemp;
 			m_lgt[0].Phi   = 0.6f;
 
-			m_lgt[1].Position = __Vector3(5.87f, 2.4f, 4.73f);	// 카루스
-			vTemp.Set(2.32f, 0.0f, 2.54f);	vTemp -= m_lgt[1].Position;
+			m_lgt[1].Position = { 5.87f, 2.4f, 4.73f };	// 카루스
+			vTemp = { 2.32f, 0.0f, 2.54f };
+			vTemp -= m_lgt[1].Position;
 			m_lgt[1].Direction = vTemp;
 			m_lgt[1].Phi   = 0.6f;
 
-			m_lgt[2].Position = __Vector3(-5.87f, 2.4f, 4.73f);	// 카루스
-			vTemp.Set(-2.32f, 0.0f, 2.54f);	vTemp -= m_lgt[2].Position;
+			m_lgt[2].Position = { -5.87f, 2.4f, 4.73f };	// 카루스
+			vTemp = { -2.32f, 0.0f, 2.54f };
+			vTemp -= m_lgt[2].Position;
 			m_lgt[2].Direction = vTemp;
 			m_lgt[2].Phi   = 0.6f;
 			break;
@@ -198,17 +201,20 @@ void CGameProcCharacterSelect::Init()
 
 			m_lgt[0].Position = m_vEye;	// 카루스
 			m_lgt[0].Position.y += 2.0f;	// 카루스
-			vTemp.Set(0.0f, -0.1f, 3.0f);	vTemp -= m_lgt[0].Position;
+			vTemp = { 0.0f, -0.1f, 3.0f };
+			vTemp -= m_lgt[0].Position;
 			m_lgt[0].Direction = vTemp;
 			m_lgt[0].Phi   = 0.45f;
 
-			m_lgt[1].Position = __Vector3(5.6f, 2.4f, 4.68f);	// 카루스
-			vTemp.Set(2.2f, -0.1f, 2.36f);	vTemp -= m_lgt[1].Position;
+			m_lgt[1].Position = { 5.6f, 2.4f, 4.68f };	// 카루스
+			vTemp = { 2.2f, -0.1f, 2.36f };
+			vTemp -= m_lgt[1].Position;
 			m_lgt[1].Direction = vTemp;
 			m_lgt[1].Phi   = 0.45f;
 
-			m_lgt[2].Position = __Vector3(-5.6f, 2.4f, 4.68f);	// 카루스
-			vTemp.Set(-2.4f, -0.1f, 2.23f);	vTemp -= m_lgt[2].Position;
+			m_lgt[2].Position = { -5.6f, 2.4f, 4.68f };	// 카루스
+			vTemp = { -2.4f, -0.1f, 2.23f };
+			vTemp -= m_lgt[2].Position;
 			m_lgt[2].Direction = vTemp;
 			m_lgt[2].Phi   = 0.45f;
 			break;
@@ -283,7 +289,7 @@ void CGameProcCharacterSelect::Render()
 
 	__Matrix44 mtxWorld;
 	mtxWorld.Identity();
-	CN3Base::s_lpD3DDev->SetTransform(D3DTS_WORLD, &mtxWorld); 
+	CN3Base::s_lpD3DDev->SetTransform(D3DTS_WORLD, mtxWorld.toD3D()); 
 
 	m_pCamera->EyePosSet(m_vEye);
 	m_pCamera->AtPosSet(m_vAt);
@@ -725,14 +731,14 @@ void CGameProcCharacterSelect::ProcessOnReturn()
 				m_lgt[iIndex].Theta = KARUS_THETA_MAX;
 
 				s_pEng->s_lpD3DDev->LightEnable(iIndex+4, TRUE);
-				s_pEng->s_lpD3DDev->SetLight(iIndex+4, &m_lgt[iIndex]);
+				s_pEng->s_lpD3DDev->SetLight(iIndex+4, m_lgt[iIndex].toD3D());
 				break;
 
 			case NATION_ELMORAD:
 				m_lgt[iIndex].Theta = ELMORAD_THERA_MAX;
 
 				s_pEng->s_lpD3DDev->LightEnable(iIndex+4, TRUE);
-				s_pEng->s_lpD3DDev->SetLight(iIndex+4, &m_lgt[iIndex]);
+				s_pEng->s_lpD3DDev->SetLight(iIndex+4, m_lgt[iIndex].toD3D());
 				break;
 		}
 
@@ -746,7 +752,7 @@ void CGameProcCharacterSelect::ProcessOnReturn()
 bool CGameProcCharacterSelect::CheckRotateLeft()
 {
 	__Matrix44 mtxrot; mtxrot.Identity();
-	__Vector3 vOffs, v1, v2, v3;
+	__Vector3 vOffs, v1, v2;
 	__Vector3 vEyeTemp;
 	bool	bReturn = false; 
 
@@ -809,7 +815,7 @@ bool CGameProcCharacterSelect::CheckRotateCenterToLeft()
 bool CGameProcCharacterSelect::CheckRotateRight()
 {
 	__Matrix44 mtxrot; mtxrot.Identity();
-	__Vector3 vOffs, v1, v2, v3;
+	__Vector3 vOffs, v1, v2;
 	__Vector3 vEyeTemp;
 	bool	bReturn = false; 
 
@@ -1053,7 +1059,7 @@ void CGameProcCharacterSelect::CharacterSelect()
 
 			m_lgt[iIndex].Theta = m_fCurTheta;	
 			s_pEng->s_lpD3DDev->LightEnable(iIndex+4, TRUE);
-			s_pEng->s_lpD3DDev->SetLight(iIndex+4, &m_lgt[iIndex]);
+			s_pEng->s_lpD3DDev->SetLight(iIndex+4, m_lgt[iIndex].toD3D());
 		}
 	}
 
@@ -1092,12 +1098,12 @@ void CGameProcCharacterSelect::DoSelectedChrProc()
 	{
 		case NATION_KARUS:
 			s_pEng->s_lpD3DDev->LightEnable(iIndex+4, TRUE);
-			s_pEng->s_lpD3DDev->SetLight(iIndex+4, &m_lgt[iIndex]);
+			s_pEng->s_lpD3DDev->SetLight(iIndex+4, m_lgt[iIndex].toD3D());
 			break;
 
 		case NATION_ELMORAD:
 			s_pEng->s_lpD3DDev->LightEnable(iIndex+4, TRUE);
-			s_pEng->s_lpD3DDev->SetLight(iIndex+4, &m_lgt[iIndex]);
+			s_pEng->s_lpD3DDev->SetLight(iIndex+4, m_lgt[iIndex].toD3D());
 			break;
 	}
 
@@ -1257,7 +1263,7 @@ void CGameProcCharacterSelect::DoProcPreselect()
 			if ( m_lgt[iPosIndex].Theta != 0.0f ) 
 			{
 				s_pEng->s_lpD3DDev->LightEnable(iPosIndex+4, TRUE);
-				s_pEng->s_lpD3DDev->SetLight(iPosIndex+4, &m_lgt[iPosIndex]);
+				s_pEng->s_lpD3DDev->SetLight(iPosIndex+4, m_lgt[iPosIndex].toD3D());
 			}
 			else
 				s_pEng->s_lpD3DDev->LightEnable(iPosIndex+4, FALSE);
@@ -1267,7 +1273,7 @@ void CGameProcCharacterSelect::DoProcPreselect()
 			if ( m_lgt[iPosIndex].Theta != 0.0f ) 
 			{
 				s_pEng->s_lpD3DDev->LightEnable(iPosIndex+4, TRUE);
-				s_pEng->s_lpD3DDev->SetLight(iPosIndex+4, &m_lgt[iPosIndex]);
+				s_pEng->s_lpD3DDev->SetLight(iPosIndex+4, m_lgt[iPosIndex].toD3D());
 			}
 			else
 				s_pEng->s_lpD3DDev->LightEnable(iPosIndex+4, FALSE);

@@ -116,7 +116,7 @@ void CN3Eng::SetDefaultEnvironment()
 	__Matrix44 matWorld;
 	matWorld.Identity();
 
-	s_lpD3DDev->SetTransform(D3DTS_WORLD, &matWorld);
+	s_lpD3DDev->SetTransform(D3DTS_WORLD, matWorld.toD3D());
 	s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 	s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, TRUE);
 
@@ -144,9 +144,9 @@ void CN3Eng::SetDefaultEnvironment()
 	for (int i = 0; i < 8; i++)
 	{
 		CN3Light::__Light Lgt;
-		_D3DCOLORVALUE LgtColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		Lgt.InitPoint(i, __Vector3(0, 0, 0), LgtColor);
-		s_lpD3DDev->SetLight(i, &Lgt);
+		__ColorValue LgtColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		Lgt.InitPoint(i, { 0, 0, 0 }, LgtColor);
+		s_lpD3DDev->SetLight(i, Lgt.toD3D());
 	}
 
 	D3DCLIPSTATUS9 cs;
@@ -162,7 +162,7 @@ void CN3Eng::LookAt(const __Vector3& vEye, const __Vector3& vAt, const __Vector3
 {
 	__Matrix44 matView;
 	matView.LookAtLH(vEye, vAt, vUp);
-	s_lpD3DDev->SetTransform(D3DTS_VIEW, &matView);
+	s_lpD3DDev->SetTransform(D3DTS_VIEW, matView.toD3D());
 }
 
 //-----------------------------------------------------------------------------
@@ -254,7 +254,7 @@ void CN3Eng::SetProjection(float fNear, float fFar, float fLens, float fAspect)
 {
 	__Matrix44 matProjection;
 	matProjection.PerspectiveFovLH(fLens, fAspect, fNear, fFar);
-	s_lpD3DDev->SetTransform(D3DTS_PROJECTION, &matProjection);
+	s_lpD3DDev->SetTransform(D3DTS_PROJECTION, matProjection.toD3D());
 }
 
 bool CN3Eng::Init(
@@ -648,7 +648,7 @@ void CN3Eng::ClearAuto(RECT* pRC)
 		s_lpD3DDev->GetLightEnable(0, &bEnable);
 		if(bEnable)
 		{
-			s_lpD3DDev->GetLight(0, &Lgt);
+			s_lpD3DDev->GetLight(0, Lgt.toD3D());
 			dwFillColor = D3DCOLOR_ARGB((uint8_t)(Lgt.Diffuse.a * 255.0f), (uint8_t)(Lgt.Diffuse.r * 255.0f), (uint8_t)(Lgt.Diffuse.g * 255.0f), (uint8_t)(Lgt.Diffuse.b * 255.0f));
 		}
 	}

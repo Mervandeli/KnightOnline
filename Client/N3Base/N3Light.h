@@ -14,9 +14,10 @@
 class CN3Light : public CN3Transform
 {
 public:
-	typedef struct __Light : public _D3DLIGHT9
+	struct __Light : public __D3DLight9
 	{
 	public:
+
 		BOOL		bOn; // 라이트가 켜져 있는지..
 		int			nNumber; // 0 ~ 8
 		
@@ -25,9 +26,10 @@ public:
 			*this = {};
 		}
 
-		void		InitPoint(int nLgtNumber, const D3DXVECTOR3& dvPos, _D3DCOLORVALUE& ltColor, float fRange = 10000.0f, float fAttenuation = 0.5f)
+		void InitPoint(int nLgtNumber, const __Vector3& dvPos, const __ColorValue& ltColor, float fRange = 10000.0f, float fAttenuation = 0.5f)
 		{
-			this->Zero();
+			Zero();
+
 			nNumber = nLgtNumber; // 라이트 번호..
 			Type = D3DLIGHT_POINT;
 			Position = dvPos;
@@ -38,17 +40,18 @@ public:
 			Ambient.b = ltColor.b * 0.7f;
 
 			Falloff = 1.0f;		// 효과가 미미하고 부하기 걸리기 때문에 보통 1.0으로 쓴다.
-			if(fRange < 0.0001f) fRange = 0.0001f;
+			if (fRange < 0.0001f) fRange = 0.0001f;
 			Attenuation0 = 1.0f - fAttenuation;
-			Attenuation1 = fAttenuation/fRange; // 감쇠 범위계산. 범위의 절반이 정확하게 절반의 감쇠가 되도록 한다..
-			Attenuation2 = fAttenuation/(fRange*fRange);
+			Attenuation1 = fAttenuation / fRange; // 감쇠 범위계산. 범위의 절반이 정확하게 절반의 감쇠가 되도록 한다..
+			Attenuation2 = fAttenuation / (fRange * fRange);
 			Range = fRange * 4.0f;
 			bOn = TRUE;
 		}
-		void		InitDirection(int nLgtNumber, const D3DXVECTOR3& dvDir, _D3DCOLORVALUE& ltColor)
+
+		void InitDirection(int nLgtNumber, const __Vector3& dvDir, const __ColorValue& ltColor)
 		{
-			this->Zero();
-			
+			Zero();
+
 			nNumber = nLgtNumber; // 라이트 번호..
 			bOn = TRUE;
 
@@ -61,9 +64,11 @@ public:
 			Ambient.g = ltColor.g * 0.7f;
 			Ambient.b = ltColor.b * 0.7f;
 		}
-		void		InitSpot(int nLgtNumber, const D3DXVECTOR3& dvPos, const D3DXVECTOR3& dvDir, _D3DCOLORVALUE& ltColor, float fTheta, float fPhi, float fRange = 10000.0f)
+
+		void InitSpot(int nLgtNumber, const __Vector3& dvPos, const __Vector3& dvDir, const __ColorValue& ltColor, float fTheta, float fPhi, float fRange = 10000.0f)
 		{
-			this->Zero();
+			Zero();
+
 			nNumber = nLgtNumber; // 라이트 번호..
 			Type = D3DLIGHT_SPOT;
 			Position = dvPos;
@@ -74,9 +79,11 @@ public:
 			Ambient.g = ltColor.g * 0.7f;
 			Ambient.b = ltColor.b * 0.7f;
 
-			if(fRange < 0.0001f) fRange = 0.0001f;
+			if (fRange < 0.0001f)
+				fRange = 0.0001f;
+
 			Attenuation0 = 1.0f;
-			Attenuation1 = 1.0f/(fRange/2.0f); // 감쇠 범위계산. 범위의 절반이 정확하게 절반의 감쇠가 되도록 한다..
+			Attenuation1 = 1.0f / (fRange / 2.0f); // 감쇠 범위계산. 범위의 절반이 정확하게 절반의 감쇠가 되도록 한다..
 			Range = fRange;
 
 			Falloff = 1.0f;		// 효과가 미미하고 부하기 걸리기 때문에 보통 1.0으로 쓴다.
@@ -84,16 +91,30 @@ public:
 			Phi = fPhi;
 			bOn = TRUE;
 		}
-	} __Light;
+	};
 
 	__Light m_Data;
 
 public:
-	void		DirSet(const __Vector3& vDir) { m_Data.Direction = vDir; }
-	void		DirSet(float fx, float fy, float fz) { m_Data.Direction.x = fx; m_Data.Direction.y = fy; m_Data.Direction.z = fz; }
-	
-	void		PosSet(const __Vector3& vPos) { m_vPos = m_Data.Position = vPos; }
-	void		PosSet(float fx, float fy, float fz) { m_Data.Position.x = fx; m_Data.Position.y = fy; m_Data.Position.z = fz; m_vPos = m_Data.Position; }
+	void DirSet(const __Vector3& vDir)
+	{
+		DirSet(vDir.x, vDir.y, vDir.z);
+	}
+
+	void DirSet(float fx, float fy, float fz)
+	{
+		m_Data.Direction = { fx, fy, fz };
+	}
+
+	void PosSet(const __Vector3& vPos)
+	{
+		PosSet(vPos.x, vPos.y, vPos.z);
+	}
+
+	void PosSet(float fx, float fy, float fz)
+	{
+		m_Data.Position = m_vPos = { fx, fy, fz };
+	}
 
 	void		Apply(); // 세팅된 라이트값을 실제 D3DDevice 에 적용
 	void		Tick(float fFrm = FRAME_SELFPLAY); // 라이트값만 세팅한다..

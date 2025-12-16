@@ -65,9 +65,11 @@ void CN3Light::Apply()
 {
 	__ASSERT(m_Data.nNumber >= 0 && m_Data.nNumber < 8, "Invalid Light Number");
 	s_lpD3DDev->LightEnable(m_Data.nNumber, m_Data.bOn);
-	if(m_Data.bOn)
+	if (m_Data.bOn)
 	{
-		if(D3DLIGHT_POINT == m_Data.Type || D3DLIGHT_DIRECTIONAL == m_Data.Type || D3DLIGHT_SPOT == m_Data.Type)
-			s_lpD3DDev->SetLight(m_Data.nNumber, &m_Data);
+		if (m_Data.Type == D3DLIGHT_POINT
+			|| m_Data.Type == D3DLIGHT_DIRECTIONAL
+			|| m_Data.Type == D3DLIGHT_SPOT)
+			s_lpD3DDev->SetLight(m_Data.nNumber, m_Data.toD3D());
 	}
 }
