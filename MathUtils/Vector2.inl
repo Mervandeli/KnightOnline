@@ -1,9 +1,9 @@
-﻿#ifndef CLIENT_N3BASE_VECTOR2_INL
-#define CLIENT_N3BASE_VECTOR2_INL
+﻿#ifndef MATHUTILS_VECTOR2_INL
+#define MATHUTILS_VECTOR2_INL
 
 #pragma once
 
-#include "My_3DStruct.h"
+#include "MathUtils.h"
 
 __Vector2::__Vector2(float fx, float fy)
 {
@@ -72,4 +72,4 @@ __Vector2 __Vector2::operator / (float f) const
 	return { x * fInv, y * fInv };
 }
 
-#endif // CLIENT_N3BASE_VECTOR2_INL
+#endif // MATHUTILS_VECTOR2_INL

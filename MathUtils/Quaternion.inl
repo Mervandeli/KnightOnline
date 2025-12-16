@@ -1,9 +1,10 @@
-﻿#ifndef CLIENT_N3BASE_QUATERNION_INL
-#define CLIENT_N3BASE_QUATERNION_INL
+﻿#ifndef MATHUTILS_QUATERNION_INL
+#define MATHUTILS_QUATERNION_INL
 
 #pragma once
 
-#include "My_3DStruct.h"
+#include "MathUtils.h"
+#include <cmath> // acosf(), cosf(), sinf(), sqrtf()
 
 __Quaternion::__Quaternion(const __Matrix44& mtx)
 {
@@ -179,4 +180,4 @@ void __Quaternion::operator *= (const __Quaternion& q)
 	__Quaternion tmp = this->operator*(q);
 	Set(tmp.x, tmp.y, tmp.z, tmp.w);
 }
-#endif // CLIENT_N3BASE_QUATERNION_INL
+#endif // MATHUTILS_QUATERNION_INL

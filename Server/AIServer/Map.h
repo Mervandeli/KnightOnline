@@ -5,7 +5,7 @@
 
 #include <shared-server/N3ShapeMgr.h>
 #include <shared-server/STLMap.h>
-#include <shared-server/GeometricStructs.h>
+#include <MathUtils/GeometricStructs.h>
 
 #include <iosfwd>
 

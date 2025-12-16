@@ -17,11 +17,8 @@ add_library(shared-server STATIC
   AppThread.h
   ftxui_sink_mt.cpp
   ftxui_sink_mt.h
-  GeometricStructs.h
   logger.cpp
   logger.h
-  Matrix44.inl
-  My_3DStruct.cpp
   My_3DStruct.h
   N3ShapeMgr.cpp
   N3ShapeMgr.h
@@ -41,7 +38,6 @@ add_library(shared-server STATIC
   TcpServerSocket.h
   TcpSocket.cpp
   TcpSocket.h
-  Vector3.inl
   utilities.cpp
   utilities.h
   "${TARGET_CONFIG_HEADER}"
@@ -64,6 +60,7 @@ target_link_libraries(shared-server
     ftxui::component
     ftxui::dom
     ftxui::screen
+	MathUtils
     nanodbc
     shared
   PRIVATE

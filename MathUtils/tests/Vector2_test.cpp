@@ -1,5 +1,4 @@
 ﻿#include <gtest/gtest.h>
-#include <N3Base/My_3DStruct.h>
 #include "MathHelpers.h"
 
 using test::ExpectVector2Near;

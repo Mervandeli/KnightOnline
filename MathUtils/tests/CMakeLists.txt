@@ -1,5 +1,4 @@
-# NOTE: Unused - no CMake client builds currently.
-add_executable(client-tests
+add_executable(MathUtils-tests
   CollisionBox_test.cpp
   Convert2DTo3DCoordinate_test.cpp
   Convert3DTo2DCoordinate_test.cpp
@@ -11,10 +10,11 @@ add_executable(client-tests
   Vector4_test.cpp
   Yaw2D_test.cpp)
 
-target_link_libraries(client-tests PRIVATE
+target_link_libraries(MathUtils-tests PRIVATE
   gtest
-  gtest_main)
+  gtest_main
+  MathUtils)
 
 add_test(
-  NAME ClientTests
-  COMMAND client-tests)
+  NAME MathUtilsTests
+  COMMAND MathUtils-tests)

@@ -1,11 +1,12 @@
-﻿#ifndef CLIENT_N3BASE_MATRIX44_INL
-#define CLIENT_N3BASE_MATRIX44_INL
+﻿#ifndef MATHUTILS_MATRIX44_INL
+#define MATHUTILS_MATRIX44_INL
 
 #pragma once
 
-#include "My_3DStruct.h"
+#include "MathUtils.h"
 
-#include <cstring> // std::memcpy(), std::memset()
+#include <cmath>	// cosf(), sinf()
+#include <cstring>	// std::memcpy(), std::memset()
 
 __Matrix44::__Matrix44(const float mtx[4][4])
 {
@@ -437,4 +438,4 @@ void __Matrix44::operator = (const __Quaternion& qt)
 	m[3][3] = 1.0f;
 }
 
-#endif // CLIENT_N3BASE_MATRIX44_INL
+#endif // MATHUTILS_MATRIX44_INL

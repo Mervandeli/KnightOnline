@@ -1,5 +1,5 @@
-﻿#ifndef SERVER_SHAREDSERVER_GEOMETRICSTRUCTS_H
-#define SERVER_SHAREDSERVER_GEOMETRICSTRUCTS_H
+﻿#ifndef MATHUTILS_GEOMETRICSTRUCTS_H
+#define MATHUTILS_GEOMETRICSTRUCTS_H
 
 #pragma once
 
@@ -32,4 +32,4 @@ inline bool IsPointInRect(const _POINT p, const _RECT r)
 		&& p.y >= r.top && p.y <= r.bottom;
 }
 
-#endif // SERVER_SHAREDSERVER_GEOMETRICSTRUCTS_H
+#endif // MATHUTILS_GEOMETRICSTRUCTS_H

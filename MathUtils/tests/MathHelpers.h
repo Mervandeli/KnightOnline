@@ -1,7 +1,7 @@
 ﻿#ifndef CLIENT_TESTS_MATHHELPERS_H
 #define CLIENT_TESTS_MATHHELPERS_H
 
-#include <N3Base/My_3DStruct.h>
+#include <MathUtils/MathUtils.h>
 
 namespace test
 {

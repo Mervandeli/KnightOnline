@@ -74,12 +74,13 @@ set(CMAKE_FOLDER "_deps")
 add_subdirectory(deps/asio-cmake)
 add_subdirectory(deps/spdlog-cmake)
 
-set(CMAKE_FOLDER) # reset so shared is placed in the root
-add_subdirectory(shared)
-
 include_directories(
   "${CMAKE_SOURCE_DIR}" # repo root, for <shared/...>
 )
+
+set(CMAKE_FOLDER) # reset so shared is placed in the root
+add_subdirectory(shared)
+add_subdirectory(MathUtils)
 
 if(OPENKO_BUILD_SERVERS)
   message(STATUS "OpenKO: Preparing to configure servers...")
@@ -127,10 +128,5 @@ if(OPENKO_BUILD_TESTS)
   add_subdirectory(deps/googletest-cmake)
 
   set(CMAKE_FOLDER "Tests")
-  add_subdirectory(Server/tests)
-
-  # TODO: Client builds via CMake (even just for MSVC for now)
-  #if(MSVC)
-  #  add_subdirectory(Client/tests)
-  #endif()
+  add_subdirectory(MathUtils/tests)
 endif()

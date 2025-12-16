@@ -1,9 +1,9 @@
-﻿#ifndef CLIENT_N3BASE_VECTOR4_INL
-#define CLIENT_N3BASE_VECTOR4_INL
+﻿#ifndef MATHUTILS_VECTOR4_INL
+#define MATHUTILS_VECTOR4_INL
 
 #pragma once
 
-#include "My_3DStruct.h"
+#include "MathUtils.h"
 
 __Vector4::__Vector4(float fx, float fy, float fz, float fw)
 {
@@ -92,4 +92,4 @@ __Vector4 __Vector4::operator / (float f) const
 	return { x * fInv, y * fInv, z * fInv, w * fInv };
 }
 
-#endif // CLIENT_N3BASE_VECTOR4_INL
+#endif // MATHUTILS_VECTOR4_INL

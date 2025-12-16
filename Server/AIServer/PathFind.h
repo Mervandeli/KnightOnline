@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <shared-server/GeometricStructs.h>
+#include <MathUtils/GeometricStructs.h>
 
 class _PathNode
 {
