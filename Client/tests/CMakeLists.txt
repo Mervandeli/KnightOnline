@@ -5,6 +5,7 @@ add_executable(client-tests
   Convert3DTo2DCoordinate_test.cpp
   IntersectTriangle_test.cpp
   Matrix44_test.cpp
+  Quaternion_test.cpp
   Vector2_test.cpp
   Vector3_test.cpp
   Vector4_test.cpp

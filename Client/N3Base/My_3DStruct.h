@@ -159,6 +159,7 @@ public:
 	__Quaternion() = default;
 	__Quaternion(const D3DXMATRIX& mtx);
 	__Quaternion(const D3DXQUATERNION& qt);
+	__Quaternion(float fX, float fY, float fZ, float fW);
 
 	void Identity();
 	void Set(float fX, float fY, float fZ, float fW);
