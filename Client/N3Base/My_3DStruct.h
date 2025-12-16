@@ -4,10 +4,10 @@
 #pragma once
 
 #include <d3dx9.h>
-#include <d3dx9math.h>
 #include <string>
 #include <stdint.h>
 #include <inttypes.h>
+#include <cmath>
 
 #if defined(_N3TOOL)
 #include <afx.h>
@@ -15,197 +15,9 @@
 #include "DebugUtils.h"
 #endif
 
-constexpr float __PI = 3.141592654f;
-constexpr float __PI2 = 6.283185308f;
-
-constexpr float DegreesToRadians(auto degrees)
-{
-	return static_cast<float>(degrees) * (__PI / 180.0f);
-}
-
-constexpr float RadiansToDegrees(auto radians)
-{
-	return static_cast<float>(radians) * (180.0f / __PI);
-}
+#include <MathUtils/MathUtils.h>
 
 const float FRAME_SELFPLAY = FLT_MIN;
-
-struct __Matrix44;
-struct __Quaternion;
-struct __Vector2;
-struct __Vector3;
-
-// 2D vertex
-struct __Vector2
-{
-public:
-	__Vector2() = default;
-	__Vector2(float fx, float fy);
-	void Zero();
-	void Set(float fx, float fy);
-
-	__Vector2& operator += (const __Vector2&);
-	__Vector2& operator -= (const __Vector2&);
-	__Vector2& operator *= (float);
-	__Vector2& operator /= (float);
-
-	__Vector2 operator + (const __Vector2&) const;
-	__Vector2 operator - (const __Vector2&) const;
-	__Vector2 operator * (float) const;
-	__Vector2 operator / (float) const;
-
-public:
-	float x, y;
-};
-
-// 3D vertex
-struct __Vector3
-{
-public:
-	__Vector3() = default;
-	__Vector3(float fx, float fy, float fz);
-	__Vector3(const __Vector3& vec);
-
-	void	Normalize();
-	void	Normalize(const __Vector3& vec);
-	float	Magnitude() const;
-	float	Dot(const __Vector3& vec) const;
-	void	Cross(const __Vector3& v1, const __Vector3& v2);
-	void	Absolute();
-
-	void Zero();
-	void Set(float fx, float fy, float fz);
-
-	const __Vector3& operator = (const __Vector3& vec);
-
-	const __Vector3 operator * (const __Matrix44& mtx) const;
-	void operator *= (float fDelta);
-	void operator *= (const __Matrix44& mtx);
-	__Vector3 operator + (const __Vector3& vec) const;
-	__Vector3 operator - (const __Vector3& vec) const;
-	__Vector3 operator * (const __Vector3& vec) const;
-	__Vector3 operator / (const __Vector3& vec) const;
-
-	void operator += (const __Vector3& vec);
-	void operator -= (const __Vector3& vec);
-	void operator *= (const __Vector3& vec);
-	void operator /= (const __Vector3& vec);
-
-	__Vector3 operator + (float fDelta) const;
-	__Vector3 operator - (float fDelta) const;
-	__Vector3 operator * (float fDelta) const;
-	__Vector3 operator / (float fDelta) const;
-
-	bool operator==(const __Vector3& rhs) const;
-	bool operator!=(const __Vector3& rhs) const;
-
-public:
-	float x, y, z;
-};
-
-// 4D vertex
-struct __Vector4
-{
-public:
-	__Vector4() = default;
-	__Vector4(float fx, float fy, float fz, float fw);
-	void Zero();
-	void Set(float fx, float fy, float fz, float fw);
-	void Transform(const __Vector3& v, const __Matrix44& m);
-
-	__Vector4& operator += (const __Vector4&);
-	__Vector4& operator -= (const __Vector4&);
-	__Vector4& operator *= (float);
-	__Vector4& operator /= (float);
-
-	__Vector4 operator + (const __Vector4&) const;
-	__Vector4 operator - (const __Vector4&) const;
-	__Vector4 operator * (float) const;
-	__Vector4 operator / (float) const;
-
-public:
-	float x, y, z, w;
-};
-
-struct _D3DMATRIX;
-
-// 4x4 matrix
-struct __Matrix44
-{
-public:
-	__Matrix44() = default;
-	__Matrix44(const float mtx[4][4]);
-	__Matrix44(const __Matrix44& mtx);
-	__Matrix44(const __Quaternion& qt);
-
-	_D3DMATRIX* toD3D()
-	{
-		return reinterpret_cast<_D3DMATRIX*>(this);
-	}
-
-	const _D3DMATRIX* toD3D() const
-	{
-		return reinterpret_cast<const _D3DMATRIX*>(this);
-	}
-
-	void Zero();
-	void Identity();
-	__Matrix44 Inverse() const;
-	void BuildInverse(__Matrix44& mtxOut) const;
-	const __Vector3 Pos() const;
-	void PosSet(float x, float y, float z);
-	void PosSet(const __Vector3& v);
-	void RotationX(float fDelta);
-	void RotationY(float fDelta);
-	void RotationZ(float fDelta);
-	void Rotation(float fX, float fY, float fZ);
-	void Rotation(const __Vector3& v);
-	void Scale(float sx, float sy, float sz);
-	void Scale(const __Vector3& v);
-	void Direction(const __Vector3& vDir);
-	void LookAtLH(const __Vector3& vEye, const __Vector3& vAt, const __Vector3& vUp);
-	void OrthoLH(float w, float h, float zn, float zf);
-	void PerspectiveFovLH(float fovy, float Aspect, float zn, float zf);
-
-	__Matrix44 operator * (const __Matrix44& mtx) const;
-	void operator *= (const __Matrix44& mtx);
-	void operator += (const __Vector3& v);
-	void operator -= (const __Vector3& v);
-
-	__Matrix44 operator * (const __Quaternion& qRot) const;
-	void operator *= (const __Quaternion& qRot);
-
-	void operator = (const __Quaternion& qt);
-
-public:
-	float m[4][4];
-};
-
-struct __Quaternion
-{
-public:
-	__Quaternion() = default;
-	__Quaternion(const __Matrix44& mtx);
-	__Quaternion(const __Quaternion& qt);
-	__Quaternion(float fX, float fY, float fZ, float fW);
-
-	void Identity();
-	void Set(float fX, float fY, float fZ, float fW);
-
-	void RotationAxis(const __Vector3& v, float fRadian);
-	void RotationAxis(float fX, float fY, float fZ, float fRadian);
-	void operator = (const __Matrix44& mtx);
-
-	void AxisAngle(__Vector3& vAxisResult, float& fRadianResult) const;
-	void Slerp(const __Quaternion& qt1, const __Quaternion& qt2, float fDelta);
-	void RotationYawPitchRoll(float Yaw, float Pitch, float Roll);
-
-	__Quaternion operator * (const __Quaternion& q) const;
-	void operator *= (const __Quaternion& q);
-
-public:
-	float x, y, z, w;
-};
 
 struct __ColorValue : public _D3DCOLORVALUE
 {
@@ -969,11 +781,11 @@ constexpr uint32_t OBJ_DUMMY					= 0x10000000;
 constexpr uint32_t OBJ_EFFECT					= 0x20000000;
 constexpr uint32_t OBJ_ANIM_CONTROL				= 0x40000000;
 
-#include "CrtDbg.h"
-
 #ifndef _DEBUG
 #define __ASSERT(expr, expMessage)
 #else
+#include "CrtDbg.h"
+
 #define __ASSERT(expr, expMessage) \
 if (!(expr)) \
 { \
@@ -991,12 +803,6 @@ COLORREF		_D3DCOLORVALUE_To_RGB(const D3DCOLORVALUE& cr);
 D3DCOLOR		_D3DCOLORVALUE_To_D3DCOLOR(const D3DCOLORVALUE& cr);
 D3DCOLORVALUE	_RGB_To_D3DCOLORVALUE(COLORREF cr, float fAlpha);
 D3DCOLORVALUE	_D3DCOLOR_To_D3DCOLORVALUE(D3DCOLOR cr);
-bool			_IntersectTriangle(const __Vector3& vOrig, const __Vector3& vDir , const __Vector3& v0, const __Vector3& v1, const __Vector3& v2, float& fT, float& fU, float& fV, __Vector3* pVCol = nullptr);
-bool			_IntersectTriangle(const __Vector3& vOrig, const __Vector3& vDir, const __Vector3& v0, const __Vector3& v1, const __Vector3& v2);
-bool			_CheckCollisionByBox(const __Vector3& vOrig, const __Vector3& vDir, const __Vector3& vMin, const __Vector3& vMax);
-POINT			_Convert3D_To_2DCoordinate(const __Vector3 &vPos, const __Matrix44& mtxView, const __Matrix44& mtxProjection, uint32_t nViewportWidth, uint32_t nViewportHeight);
-void			_Convert2D_To_3DCoordinate(int ixScreen, int iyScreen, const __Matrix44& mtxView, const __Matrix44& mtxPrj, uint32_t nViewportWidth, uint32_t nViewportHeight, __Vector3& vPosResult, __Vector3& vDirResult);
-float			_Yaw2D(float fDirX, float fDirZ);
 int16_t			_IsKeyDown(int iVirtualKey);
 int16_t			_IsKeyDowned(int iVirtualKey);
 

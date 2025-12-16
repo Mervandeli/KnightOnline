@@ -9,7 +9,6 @@
 #include "NpcMagicProcess.h"
 
 #include <shared-server/My_3DStruct.h>
-#include <shared-server/GeometricStructs.h>
 
 #define MAX_MAP_SIZE		10000
 #define MAX_PATH_SIZE		100

@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C630CF44-84A8-4586-A710-C420BF54DC13}</ProjectGuid>
+    <ProjectGuid>{07cd39fe-8cb1-46a2-81ab-485f2cae215f}</ProjectGuid>
+    <RootNamespace>MathUtils</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>shared-server</RootNamespace>
   </PropertyGroup>
-  <Import Project="..\..\props\platform_root.props" />
+  <Import Project="..\props\platform_root.props" />
   <PropertyGroup>
     <OutDir>$(BaseOutDir)</OutDir>
     <IntDir>$(Configuration)\</IntDir>
@@ -37,31 +37,17 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <Import Project="$(PropsDir)asio.props" />
-  <Import Project="$(PropsDir)boost.props" />
-  <Import Project="$(PropsDir)MathUtils.props" />
-  <Import Project="$(PropsDir)server.props" />
-  <Import Project="$(PropsDir)spdlog.props" />
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PreprocessorDefinitions>WIN32;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir);$(DependencyDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <PreBuildEvent>
-      <Command>
-        if exist "$(ProjectDir)server_config.h.default" if not exist "$(ProjectDir)server_config.h" (
-          copy /Y "$(ProjectDir)server_config.h.default" "$(ProjectDir)server_config.h"
-        )
-      </Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -80,7 +66,6 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -94,7 +79,6 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -109,7 +93,6 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -119,39 +102,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AppThread.cpp" />
-    <ClCompile Include="ftxui_sink_mt.cpp" />
-    <ClCompile Include="utilities.cpp" />
-    <ClCompile Include="N3ShapeMgr.cpp" />
-    <ClCompile Include="ReadQueueThread.cpp" />
-    <ClCompile Include="SharedMemoryQueue.cpp" />
-    <ClCompile Include="SharedMemoryBlock.cpp" />
-    <ClCompile Include="SocketManager.cpp" />
-    <ClCompile Include="pch.cpp">
-      <PrecompiledHeader>Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="logger.cpp" />
-    <ClCompile Include="TcpClientSocket.cpp" />
-    <ClCompile Include="TcpServerSocket.cpp" />
-    <ClCompile Include="TcpSocket.cpp" />
+    <ClCompile Include="MathUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AppThread.h" />
-    <ClInclude Include="ftxui_sink_mt.h" />
-    <ClInclude Include="utilities.h" />
-    <ClInclude Include="My_3DStruct.h" />
-    <ClInclude Include="N3ShapeMgr.h" />
-    <ClInclude Include="ReadQueueThread.h" />
-    <ClInclude Include="server_config.h" />
-    <ClInclude Include="SharedMemoryQueue.h" />
-    <ClInclude Include="SharedMemoryBlock.h" />
-    <ClInclude Include="SocketManager.h" />
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="STLMap.h" />
-    <ClInclude Include="logger.h" />
-    <ClInclude Include="TcpClientSocket.h" />
-    <ClInclude Include="TcpServerSocket.h" />
-    <ClInclude Include="TcpSocket.h" />
+    <None Include="Matrix44.inl" />
+    <None Include="Quaternion.inl" />
+    <None Include="Vector2.inl" />
+    <None Include="Vector3.inl" />
+    <None Include="Vector4.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MathUtils.h" />
+    <ClInclude Include="Matrix44.h" />
+    <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="Vector2.h" />
+    <ClInclude Include="Vector3.h" />
+    <ClInclude Include="Vector4.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

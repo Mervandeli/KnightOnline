@@ -34,6 +34,7 @@
   </ImportGroup>
   <Import Project="$(PropsDir)asio.props" />
   <Import Project="$(PropsDir)db-library.props" />
+  <Import Project="$(PropsDir)MathUtils.props" />
   <Import Project="$(PropsDir)server.props" />
   <Import Project="$(PropsDir)spdlog.props" />
   <PropertyGroup Label="UserMacros" />

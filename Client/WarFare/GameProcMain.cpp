@@ -7397,7 +7397,7 @@ bool CGameProcMain::OnMouseLBtnPress(POINT ptCur, POINT ptPrev)
 {
 	if(s_pUIMgr->m_bDoneSomething) return false;
 
-	POINT ptPlayer = ::_Convert3D_To_2DCoordinate(	s_pPlayer->Position(), 
+	_POINT ptPlayer = ::_Convert3D_To_2DCoordinate(	s_pPlayer->Position(), 
 													CN3Base::s_CameraData.mtxView,
 													CN3Base::s_CameraData.mtxProjection,
 													CN3Base::s_CameraData.vp.Width,
@@ -7528,7 +7528,7 @@ bool CGameProcMain::OnMouseLbtnDown(POINT ptCur, POINT ptPrev)
 {
 	if(s_pUIMgr->m_bDoneSomething) return false;
 
-	POINT ptPlayer = ::_Convert3D_To_2DCoordinate(	s_pPlayer->Position(), 
+	_POINT ptPlayer = ::_Convert3D_To_2DCoordinate(	s_pPlayer->Position(), 
 													CN3Base::s_CameraData.mtxView,
 													CN3Base::s_CameraData.mtxProjection,
 													CN3Base::s_CameraData.vp.Width,

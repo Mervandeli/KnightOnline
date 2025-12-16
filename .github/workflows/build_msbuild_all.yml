@@ -59,8 +59,11 @@ jobs:
       with:
         submodules: 'false'
 
-    - name: Clone OpenKO-runner-dependencies
-      run: git clone https://github.com/Open-KO/OpenKO-runner-dependencies --depth 1
+#     NOTE: This will only be needed when dealing with N3Base. This includes D3DX9_43.dll for that.
+#     It should be combined with a copy like so:
+#        xcopy "${{ github.workspace }}\OpenKO-runner-dependencies\${{matrix.BUILD_PLATFORM}}" . /E /I /Y
+#    - name: Clone OpenKO-runner-dependencies
+#      run: git clone https://github.com/Open-KO/OpenKO-runner-dependencies --depth 1
 
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
@@ -84,16 +87,8 @@ jobs:
     - name: Build tests
       run: msbuild /p:Configuration="${{matrix.BUILD_CONFIGURATION}}" /p:Platform="${{matrix.BUILD_PLATFORM}}" /p:NO_CLIENT_ASSETS="1" Tests.sln
 
-    - name: Run client tests
+    - name: Run tests - MathUtils
       shell: cmd
-      working-directory: "bin/${{matrix.BUILD_PLATFORM}}/${{matrix.BUILD_CONFIGURATION}}/client-tests"
+      working-directory: "bin/${{matrix.BUILD_PLATFORM}}/${{matrix.BUILD_CONFIGURATION}}/MathUtils-tests"
       run: |
-        xcopy "${{ github.workspace }}\OpenKO-runner-dependencies\${{matrix.BUILD_PLATFORM}}" . /E /I /Y
-        client-tests.exe --gtest_print_time=1 --gtest_catch_exceptions=1 --gtest_break_on_failure=0
-
-    - name: Run server tests
-      shell: cmd
-      working-directory: "bin/${{matrix.BUILD_PLATFORM}}/${{matrix.BUILD_CONFIGURATION}}/server-tests"
-      run: |
-        xcopy "${{ github.workspace }}\OpenKO-runner-dependencies\${{matrix.BUILD_PLATFORM}}" . /E /I /Y
-        server-tests.exe --gtest_print_time=1 --gtest_catch_exceptions=1 --gtest_break_on_failure=0
+        MathUtils-tests.exe --gtest_print_time=1 --gtest_catch_exceptions=1 --gtest_break_on_failure=0

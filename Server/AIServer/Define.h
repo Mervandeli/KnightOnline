@@ -4,7 +4,7 @@
 #pragma once
 
 #include <shared/globals.h>
-#include <shared-server/GeometricStructs.h>
+#include <MathUtils/GeometricStructs.h>
 
 /*
 	 ** Repent AI Server 작업시 참고 사항 **

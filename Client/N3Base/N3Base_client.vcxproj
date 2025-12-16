@@ -173,11 +173,6 @@
   <ItemGroup>
     <None Include="ColorValue.inl" />
     <None Include="Material.inl" />
-    <None Include="Matrix44.inl" />
-    <None Include="Quaternion.inl" />
-    <None Include="Vector2.inl" />
-    <None Include="Vector3.inl" />
-    <None Include="Vector4.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D06D505A-F28E-343F-09F4-C3809398B508}</ProjectGuid>

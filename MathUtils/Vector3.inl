@@ -1,9 +1,10 @@
-﻿#ifndef SERVER_SHAREDSERVER_VECTOR3_INL
-#define SERVER_SHAREDSERVER_VECTOR3_INL
+﻿#ifndef MATHUTILS_VECTOR3_INL
+#define MATHUTILS_VECTOR3_INL
 
 #pragma once
 
-#include "My_3DStruct.h"
+#include "MathUtils.h"
+#include <cmath> // sqrtf()
 
 __Vector3::__Vector3(float fx, float fy, float fz)
 {
@@ -28,6 +29,20 @@ void __Vector3::Normalize()
 	x /= fn;
 	y /= fn;
 	z /= fn;
+}
+
+void __Vector3::Normalize(const __Vector3& vec)
+{
+	float fn = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+	if (fn == 0)
+	{
+		x = y = z = 0;
+		return;
+	}
+
+	x = vec.x / fn;
+	y = vec.y / fn;
+	z = vec.z / fn;
 }
 
 float __Vector3::Magnitude() const
@@ -82,9 +97,11 @@ const __Vector3& __Vector3::operator = (const __Vector3& vec)
 const __Vector3 __Vector3::operator * (const __Matrix44& mtx) const
 {
 	__Vector3 vTmp;
-	vTmp.x = x * mtx._11 + y * mtx._21 + z * mtx._31 + mtx._41;
-	vTmp.y = x * mtx._12 + y * mtx._22 + z * mtx._32 + mtx._42;
-	vTmp.z = x * mtx._13 + y * mtx._23 + z * mtx._33 + mtx._43;
+
+	vTmp.x = x * mtx.m[0][0] + y * mtx.m[1][0] + z * mtx.m[2][0] + mtx.m[3][0];
+	vTmp.y = x * mtx.m[0][1] + y * mtx.m[1][1] + z * mtx.m[2][1] + mtx.m[3][1];
+	vTmp.z = x * mtx.m[0][2] + y * mtx.m[1][2] + z * mtx.m[2][2] + mtx.m[3][2];
+
 	return vTmp;
 }
 
@@ -97,47 +114,30 @@ void __Vector3::operator *= (float fDelta)
 
 void __Vector3::operator *= (const __Matrix44& mtx)
 {
-	__Vector3 vTmp = *this;
-	x = vTmp.x * mtx._11 + vTmp.y * mtx._21 + vTmp.z * mtx._31 + mtx._41;
-	y = vTmp.x * mtx._12 + vTmp.y * mtx._22 + vTmp.z * mtx._32 + mtx._42;
-	z = vTmp.x * mtx._13 + vTmp.y * mtx._23 + vTmp.z * mtx._33 + mtx._43;
+	__Vector3 vTmp = { x, y, z };
+	x = vTmp.x * mtx.m[0][0] + vTmp.y * mtx.m[1][0] + vTmp.z * mtx.m[2][0] + mtx.m[3][0];
+	y = vTmp.x * mtx.m[0][1] + vTmp.y * mtx.m[1][1] + vTmp.z * mtx.m[2][1] + mtx.m[3][1];
+	z = vTmp.x * mtx.m[0][2] + vTmp.y * mtx.m[1][2] + vTmp.z * mtx.m[2][2] + mtx.m[3][2];
 }
 
 __Vector3 __Vector3::operator + (const __Vector3& vec) const
 {
-	__Vector3 vTmp;
-	vTmp.x = x + vec.x;
-	vTmp.y = y + vec.y;
-	vTmp.z = z + vec.z;
-	return vTmp;
+	return { x + vec.x, y + vec.y, z + vec.z };
 }
 
 __Vector3 __Vector3::operator - (const __Vector3& vec) const
 {
-	__Vector3 vTmp;
-	vTmp.x = x - vec.x;
-	vTmp.y = y - vec.y;
-	vTmp.z = z - vec.z;
-	return vTmp;
+	return { x - vec.x, y - vec.y, z - vec.z };
 }
 
 __Vector3 __Vector3::operator * (const __Vector3& vec) const
 {
-	__Vector3 vTmp;
-	vTmp.x = x * vec.x;
-	vTmp.y = y * vec.y;
-	vTmp.z = z * vec.z;
-	return vTmp;
+	return { x * vec.x, y * vec.y, z * vec.z };
 }
 
 __Vector3 __Vector3::operator / (const __Vector3& vec) const
 {
-	__Vector3 vTmp;
-
-	vTmp.x = x / vec.x;
-	vTmp.y = y / vec.y;
-	vTmp.z = z / vec.z;
-	return vTmp;
+	return { x / vec.x, y / vec.y, z / vec.z };
 }
 
 void __Vector3::operator += (const __Vector3& vec)
@@ -170,38 +170,34 @@ void __Vector3::operator /= (const __Vector3& vec)
 
 __Vector3 __Vector3::operator + (float fDelta) const
 {
-	__Vector3 vTmp;
-	vTmp.x = x + fDelta;
-	vTmp.y = y + fDelta;
-	vTmp.z = z + fDelta;
-	return vTmp;
+	return { x + fDelta, y + fDelta, z + fDelta };
 }
 
 __Vector3 __Vector3::operator - (float fDelta) const
 {
-	__Vector3 vTmp;
-	vTmp.x = x - fDelta;
-	vTmp.y = y - fDelta;
-	vTmp.z = z - fDelta;
-	return vTmp;
+	return { x - fDelta, y - fDelta, z - fDelta };
 }
 
 __Vector3 __Vector3::operator * (float fDelta) const
 {
-	__Vector3 vTmp;
-	vTmp.x = x * fDelta;
-	vTmp.y = y * fDelta;
-	vTmp.z = z * fDelta;
-	return vTmp;
+	return { x * fDelta, y * fDelta, z * fDelta };
 }
 
 __Vector3 __Vector3::operator / (float fDelta) const
 {
-	__Vector3 vTmp;
-	vTmp.x = x / fDelta;
-	vTmp.y = y / fDelta;
-	vTmp.z = z / fDelta;
-	return vTmp;
+	return { x / fDelta, y / fDelta, z / fDelta };
 }
 
-#endif // SERVER_SHAREDSERVER_VECTOR3_INL
+bool __Vector3::operator==(const __Vector3& rhs) const
+{
+	return x == rhs.x
+		&& y == rhs.y
+		&& z == rhs.z;
+}
+
+bool __Vector3::operator!=(const __Vector3& rhs) const
+{
+	return !(*this == rhs);
+}
+
+#endif // MATHUTILS_VECTOR3_INL

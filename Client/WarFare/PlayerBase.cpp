@@ -1001,7 +1001,7 @@ void CPlayerBase::Render(float fSunAngle)
 			__Vector3 vHead = this->HeadPosition();
 			vHead.y += this->Height() / 10.0f;
 			if(PSA_SITDOWN == m_eState) vHead.y += this->RootPosition().y - this->Height()/2.0f; // 앉아 있으면..
-			POINT pt = ::_Convert3D_To_2DCoordinate(vHead, s_CameraData.mtxView, s_CameraData.mtxProjection, s_CameraData.vp.Width, s_CameraData.vp.Height);
+			_POINT pt = ::_Convert3D_To_2DCoordinate(vHead, s_CameraData.mtxView, s_CameraData.mtxProjection, s_CameraData.vp.Width, s_CameraData.vp.Height);
 
 			SIZE size = m_pIDFont->GetSize();
 			pt.y -= size.cy + 5;

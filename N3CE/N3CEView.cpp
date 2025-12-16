@@ -416,7 +416,7 @@ void CN3CEView::OnLButtonDown(UINT nFlags, CPoint point)
 			{
 				mtxs[i] *= pChr->m_Matrix;
 				__Vector3 vPos = mtxs[i].Pos();
-				CPoint pt = ::_Convert3D_To_2DCoordinate(vPos, 
+				_POINT pt = ::_Convert3D_To_2DCoordinate(vPos, 
 														pScene->s_CameraData.mtxView,
 														pScene->s_CameraData.mtxProjection,
 														pScene->s_CameraData.vp.Width,

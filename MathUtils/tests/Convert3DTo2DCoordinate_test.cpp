@@ -30,7 +30,7 @@ TEST(Convert3DTo2DCoordinate, ReturnedPoint_MatchesReference)
 
 	SCOPED_TRACE("Convert3DTo2DCoordinate::ReturnedPoint_MatchesReference");
 
-	POINT pt = _Convert3D_To_2DCoordinate(pos, viewMatrix, projectionMatrix, ViewportWidth, ViewportHeight);
+	_POINT pt = _Convert3D_To_2DCoordinate(pos, viewMatrix, projectionMatrix, ViewportWidth, ViewportHeight);
 
 	EXPECT_EQ(pt.x, 130);
 	EXPECT_EQ(pt.y, 1633);
@@ -46,7 +46,7 @@ TEST(Convert3DTo2DCoordinate, PointInFrontOfCamera_MapsInsideViewport)
 
 	SCOPED_TRACE("Convert3DTo2DCoordinate::PointInFrontOfCamera_MapsInsideViewport");
 
-	POINT pt = _Convert3D_To_2DCoordinate(pos, viewMatrix, projectionMatrix, ViewportWidth, ViewportHeight);
+	_POINT pt = _Convert3D_To_2DCoordinate(pos, viewMatrix, projectionMatrix, ViewportWidth, ViewportHeight);
 
 	EXPECT_GE(pt.x, 0);
 	EXPECT_LT(pt.x, static_cast<int>(ViewportWidth));
@@ -64,7 +64,7 @@ TEST(Convert3DTo2DCoordinate, PointBehindCamera_IsInvalid)
 
 	SCOPED_TRACE("Convert3DTo2DCoordinate::PointBehindCamera_IsInvalid");
 
-	POINT pt = _Convert3D_To_2DCoordinate(pos, viewMatrix, projectionMatrix, ViewportWidth, ViewportHeight);
+	_POINT pt = _Convert3D_To_2DCoordinate(pos, viewMatrix, projectionMatrix, ViewportWidth, ViewportHeight);
 
 	EXPECT_EQ(pt.x, -1);
 	EXPECT_EQ(pt.y, -1);
@@ -80,7 +80,7 @@ TEST(Convert3DTo2DCoordinate, PointOutsideFarPlane_IsInvalid)
 
 	SCOPED_TRACE("Convert3DTo2DCoordinate::PointOutsideFarPlane_IsInvalid");
 
-	POINT pt = _Convert3D_To_2DCoordinate(pos, viewMatrix, projectionMatrix, ViewportWidth, ViewportHeight);
+	_POINT pt = _Convert3D_To_2DCoordinate(pos, viewMatrix, projectionMatrix, ViewportWidth, ViewportHeight);
 
 	EXPECT_EQ(pt.x, -1);
 	EXPECT_EQ(pt.y, -1);
@@ -96,7 +96,7 @@ TEST(Convert3DTo2DCoordinate, WorldOrigin_MapsToMiddleOfScreen)
 
 	SCOPED_TRACE("Convert3DTo2DCoordinate::WorldOrigin_MapsToMiddleOfScreen");
 
-	POINT pt = _Convert3D_To_2DCoordinate(pos, viewMatrix, projectionMatrix, ViewportWidth, ViewportHeight);
+	_POINT pt = _Convert3D_To_2DCoordinate(pos, viewMatrix, projectionMatrix, ViewportWidth, ViewportHeight);
 
 	EXPECT_EQ(pt.x, ViewportWidth / 2);
 	EXPECT_EQ(pt.y, ViewportHeight / 2);

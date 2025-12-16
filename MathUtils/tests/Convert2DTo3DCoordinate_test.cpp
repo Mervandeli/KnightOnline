@@ -32,7 +32,7 @@ TEST(Convert2DTo3DCoordinate, ReturnedPoint_MatchesReferenceWithinTolerance)
 	const __Vector3 expectedDir = { 0.185912609f, -2.48673177f, 0.673640966f };
 
 	const __Matrix44 viewMatrix(View), projectionMatrix(Projection);
-	const POINT pt = { 130, 1633 };
+	const _POINT pt = { 130, 1633 };
 
 	__Vector3 posResult = { -FLT_MIN, -FLT_MIN, -FLT_MIN };
 	__Vector3 dirResult = { -FLT_MIN, -FLT_MIN, -FLT_MIN };
