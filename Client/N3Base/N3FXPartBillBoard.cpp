@@ -195,46 +195,45 @@ void CN3FXPartBillBoard::Init()
 //
 //
 //
-bool CN3FXPartBillBoard::Load(HANDLE hFile)
+bool CN3FXPartBillBoard::Load(File& file)
 {
-	if (!CN3FXPartBase::Load(hFile))
+	if (!CN3FXPartBase::Load(file))
 		return false;
 
-	DWORD dwRWC = 0;
-	ReadFile(hFile, &m_iNum, sizeof(int), &dwRWC, nullptr);
-	ReadFile(hFile, &m_fSizeX, sizeof(float), &dwRWC, nullptr);
-	ReadFile(hFile, &m_fSizeY, sizeof(float), &dwRWC, nullptr);
+	file.Read(&m_iNum, sizeof(int));
+	file.Read(&m_fSizeX, sizeof(float));
+	file.Read(&m_fSizeY, sizeof(float));
 
-	ReadFile(hFile, &m_bTexLoop, sizeof(bool), &dwRWC, nullptr);
-	ReadFile(hFile, &m_fRadius, sizeof(float), &dwRWC, nullptr);
+	file.Read(&m_bTexLoop, sizeof(bool));
+	file.Read(&m_fRadius, sizeof(float));
 
 	if (m_iVersion >= 3)
-		ReadFile(hFile, &m_bRoateOnlyY, sizeof(bool), &dwRWC, nullptr);
+		file.Read(&m_bRoateOnlyY, sizeof(bool));
 
 	if (m_iVersion >= 4)
 	{
-		ReadFile(hFile, &m_fScaleVelX, sizeof(float), &dwRWC, nullptr);
-		ReadFile(hFile, &m_fScaleVelY, sizeof(float), &dwRWC, nullptr);
-		ReadFile(hFile, &m_fScaleAccelX, sizeof(float), &dwRWC, nullptr);
-		ReadFile(hFile, &m_fScaleAccelY, sizeof(float), &dwRWC, nullptr);
+		file.Read(&m_fScaleVelX, sizeof(float));
+		file.Read(&m_fScaleVelY, sizeof(float));
+		file.Read(&m_fScaleAccelX, sizeof(float));
+		file.Read(&m_fScaleAccelY, sizeof(float));
 	}
 
 	if (m_iVersion >= 5)
-		ReadFile(hFile, &m_mtxRot, sizeof(m_mtxRot), &dwRWC, nullptr);
+		file.Read(&m_mtxRot, sizeof(m_mtxRot));
 
 	// TODO: implement m_bOnScreen
 	if (m_iVersion >= 6)
-		ReadFile(hFile, &m_bOnScreen, sizeof(bool), &dwRWC, nullptr);
+		file.Read(&m_bOnScreen, sizeof(bool));
 
 	// TODO: implement m_bRotationRate
 	if (m_iVersion >= 7)
-		ReadFile(hFile, &m_bRotationRate, sizeof(bool), &dwRWC, nullptr);
+		file.Read(&m_bRotationRate, sizeof(bool));
 
 	if (m_iVersion >= 8)
-		SetFilePointer(hFile, 13, nullptr, FILE_CURRENT);
+		file.Seek(13, SEEK_CUR);
 
 	if (m_iVersion >= 9)
-		SetFilePointer(hFile, 12, nullptr, FILE_CURRENT);
+		file.Seek(12, SEEK_CUR);
 
 	// NOTE: This should ideally just be an assertion, but we'll continue to allow it to run
 	// and otherwise be broken for now.
@@ -259,26 +258,26 @@ bool CN3FXPartBillBoard::Load(HANDLE hFile)
 //
 //
 //
-bool CN3FXPartBillBoard::Save(HANDLE hFile)
+bool CN3FXPartBillBoard::Save(File& file)
 {
-	if(!CN3FXPartBase::Save(hFile)) return false;
+	if (!CN3FXPartBase::Save(file))
+		return false;
 
-	DWORD dwRWC = 0;
-	WriteFile(hFile, &m_iNum, sizeof(int), &dwRWC, nullptr);
-	WriteFile(hFile, &m_fSizeX, sizeof(float), &dwRWC, nullptr);
-	WriteFile(hFile, &m_fSizeY, sizeof(float), &dwRWC, nullptr);
+	file.Write(&m_iNum, sizeof(int));
+	file.Write(&m_fSizeX, sizeof(float));
+	file.Write(&m_fSizeY, sizeof(float));
 
-	WriteFile(hFile, &m_bTexLoop, sizeof(bool), &dwRWC, nullptr);
-	WriteFile(hFile, &m_fRadius, sizeof(float), &dwRWC, nullptr);
+	file.Write(&m_bTexLoop, sizeof(bool));
+	file.Write(&m_fRadius, sizeof(float));
 
-	if(m_iVersion>=3) WriteFile(hFile, &m_bRoateOnlyY, sizeof(bool), &dwRWC, nullptr);
+	if(m_iVersion>=3) file.Write(&m_bRoateOnlyY, sizeof(bool));
 	
-	WriteFile(hFile, &m_fScaleVelX, sizeof(float), &dwRWC, nullptr);
-	WriteFile(hFile, &m_fScaleVelY, sizeof(float), &dwRWC, nullptr);
-	WriteFile(hFile, &m_fScaleAccelX, sizeof(float), &dwRWC, nullptr);
-	WriteFile(hFile, &m_fScaleAccelY, sizeof(float), &dwRWC, nullptr);
+	file.Write(&m_fScaleVelX, sizeof(float));
+	file.Write(&m_fScaleVelY, sizeof(float));
+	file.Write(&m_fScaleAccelX, sizeof(float));
+	file.Write(&m_fScaleAccelY, sizeof(float));
 
-	if(m_iVersion>=5) WriteFile(hFile, &m_mtxRot, sizeof(m_mtxRot), &dwRWC, nullptr);
+	if(m_iVersion>=5) file.Write(&m_mtxRot, sizeof(m_mtxRot));
 
 	return true;
 }

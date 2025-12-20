@@ -142,18 +142,16 @@ void CSoundCell::Render(DWORD color)
 	}
 }
 
-void CSoundCell::Load(HANDLE hFile)
+void CSoundCell::Load(File& file)
 {
-	DWORD dwRWC;
-	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
-	ReadFile(hFile, &m_dwSoundGroupID, sizeof(DWORD), &dwRWC, nullptr);
-	ReadFile(hFile, &m_Rect, sizeof(RECT), &dwRWC, nullptr);
+	file.Read(&m_iVersion, sizeof(int));
+	file.Read(&m_dwSoundGroupID, sizeof(DWORD));
+	file.Read(&m_Rect, sizeof(RECT));
 }
 
-void CSoundCell::Save(HANDLE hFile)
+void CSoundCell::Save(File& file)
 {
-	DWORD dwRWC;
-	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
-	WriteFile(hFile, &m_dwSoundGroupID, sizeof(DWORD), &dwRWC, nullptr);
-	WriteFile(hFile, &m_Rect, sizeof(RECT), &dwRWC, nullptr);
+	file.Write(&m_iVersion, sizeof(int));
+	file.Write(&m_dwSoundGroupID, sizeof(DWORD));
+	file.Write(&m_Rect, sizeof(RECT));
 }

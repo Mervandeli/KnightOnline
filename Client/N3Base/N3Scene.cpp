@@ -64,26 +64,24 @@ void CN3Scene::Release()
 	m_bDisableDefaultLight = false;
 }
 
-bool CN3Scene::Load(HANDLE hFile)
+bool CN3Scene::Load(File& file)
 {
-	DWORD dwRWC = 0;
-	
-	ReadFile(hFile, &m_nCameraActive, 4, &dwRWC, nullptr);
-	ReadFile(hFile, &m_fFrmCur, 4, &dwRWC, nullptr); // Animation Frame;
-	ReadFile(hFile, &m_fFrmStart, 4, &dwRWC, nullptr); // 전체 프레임.
-	ReadFile(hFile, &m_fFrmEnd, 4, &dwRWC, nullptr); // 전체 프레임.
+	file.Read(&m_nCameraActive, 4);
+	file.Read(&m_fFrmCur, 4); // Animation Frame;
+	file.Read(&m_fFrmStart, 4); // 전체 프레임.
+	file.Read(&m_fFrmEnd, 4); // 전체 프레임.
 
 	int i = 0, nL = 0;
 	char szName[512] = "";
 
 	int nCC = 0;
-	ReadFile(hFile, &nCC, 4, &dwRWC, nullptr); // 카메라..
+	file.Read(&nCC, 4); // 카메라..
 	for(i = 0; i < nCC; i++)
 	{
-		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
+		file.Read(&nL, 4);
 		if(nL <= 0) continue;
 
-		ReadFile(hFile, szName, nL, &dwRWC, nullptr);
+		file.Read(szName, nL);
 		szName[nL] = '\0';
 
 		CN3Camera* pCamera = new CN3Camera();
@@ -97,13 +95,13 @@ bool CN3Scene::Load(HANDLE hFile)
 	}
 
 	int nLC = 0;
-	ReadFile(hFile, &nLC, 4, &dwRWC, nullptr); // 카메라..
+	file.Read(&nLC, 4); // 카메라..
 	for(i = 0; i < nLC; i++) 
 	{
-		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
+		file.Read(&nL, 4);
 		if(nL <= 0) continue;
 
-		ReadFile(hFile, szName, nL, &dwRWC, nullptr);
+		file.Read(szName, nL);
 		szName[nL] = '\0';
 
 		CN3Light* pLight = new CN3Light();
@@ -117,13 +115,13 @@ bool CN3Scene::Load(HANDLE hFile)
 	}
 
 	int nSC = 0;
-	ReadFile(hFile, &nSC, 4, &dwRWC, nullptr); // Shapes..
+	file.Read(&nSC, 4); // Shapes..
 	for(i = 0; i < nSC; i++)
 	{
-		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
+		file.Read(&nL, 4);
 		if(nL <= 0) continue;
 
-		ReadFile(hFile, szName, nL, &dwRWC, nullptr);
+		file.Read(szName, nL);
 		szName[nL] = '\0';
 
 		CN3Shape* pShape = new CN3Shape();
@@ -137,13 +135,13 @@ bool CN3Scene::Load(HANDLE hFile)
 	}
 
 	int nChrC = 0;
-	ReadFile(hFile, &nChrC, 4, &dwRWC, nullptr); // 캐릭터
+	file.Read(&nChrC, 4); // 캐릭터
 	for(i = 0; i < nChrC; i++)
 	{
-		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
+		file.Read(&nL, 4);
 		if(nL <= 0) continue;
 
-		ReadFile(hFile, szName, nL, &dwRWC, nullptr);
+		file.Read(szName, nL);
 		szName[nL] = '\0';
 
 		CN3Chr* pChr = new CN3Chr();
@@ -162,61 +160,60 @@ bool CN3Scene::Load(HANDLE hFile)
 	return true;
 }
 
-bool CN3Scene::Save(HANDLE hFile)
+bool CN3Scene::Save(File& file)
 {
-	::CreateDirectory("Data", nullptr);
-	::CreateDirectory("Chr", nullptr);
-	::CreateDirectory("Object", nullptr);
-	::CreateDirectory("Item", nullptr);
-
-	DWORD dwRWC = 0;
+	std::error_code ec;
+	std::filesystem::create_directory(PathGet() + "/Data", ec);
+	std::filesystem::create_directory(PathGet() + "/Chr", ec);
+	std::filesystem::create_directory(PathGet() + "/Object", ec);
+	std::filesystem::create_directory(PathGet() + "/Item", ec);
 	
-	WriteFile(hFile, &m_nCameraActive, 4, &dwRWC, nullptr);
-	WriteFile(hFile, &m_fFrmCur, 4, &dwRWC, nullptr); // Animation Frame;
-	WriteFile(hFile, &m_fFrmStart, 4, &dwRWC, nullptr); // 전체 프레임.
-	WriteFile(hFile, &m_fFrmEnd, 4, &dwRWC, nullptr); // 전체 프레임.
+	file.Write(&m_nCameraActive, 4);
+	file.Write(&m_fFrmCur, 4); // Animation Frame;
+	file.Write(&m_fFrmStart, 4); // 전체 프레임.
+	file.Write(&m_fFrmEnd, 4); // 전체 프레임.
 	
-	WriteFile(hFile, &m_nCameraCount, 4, &dwRWC, nullptr); // 카메라..
+	file.Write(&m_nCameraCount, 4); // 카메라..
 	for (CN3Camera* camera : m_pCameras)
 	{
 		int nL = static_cast<int>(camera->FileName().size());
-		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
-		WriteFile(hFile, camera->FileName().c_str(), nL, &dwRWC, nullptr);
+		file.Write(&nL, 4);
+		file.Write(camera->FileName().c_str(), nL);
 		camera->SaveToFile();
 	}
 
-	WriteFile(hFile, &m_nLightCount, 4, &dwRWC, nullptr); // 카메라..
+	file.Write(&m_nLightCount, 4); // 카메라..
 	for (CN3Light* light : m_pLights)
 	{
 		int nL = static_cast<int>(light->FileName().size());
-		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
-		WriteFile(hFile, light->FileName().c_str(), nL, &dwRWC, nullptr);
+		file.Write(&nL, 4);
+		file.Write(light->FileName().c_str(), nL);
 		light->SaveToFile();
 	}
 
 	int iSC = static_cast<int>(m_Shapes.size());
-	WriteFile(hFile, &iSC, 4, &dwRWC, nullptr); // Shapes..
+	file.Write(&iSC, 4); // Shapes..
 	for (CN3Shape* shape : m_Shapes)
 	{
 		int nL = static_cast<int>(shape->FileName().size());
-		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+		file.Write(&nL, 4);
 		if (nL <= 0)
 			continue;
 
-		WriteFile(hFile, shape->FileName().c_str(), nL, &dwRWC, nullptr);
+		file.Write(shape->FileName().c_str(), nL);
 		shape->SaveToFile();
 	}
 
 	int iCC = static_cast<int>(m_Chrs.size());
-	WriteFile(hFile, &iCC, 4, &dwRWC, nullptr); // 캐릭터
+	file.Write(&iCC, 4); // 캐릭터
 	for (CN3Chr* chr : m_Chrs)
 	{
 		int nL = static_cast<int>(chr->FileName().size());
-		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+		file.Write(&nL, 4);
 		if (nL <= 0)
 			continue;
 
-		WriteFile(hFile, chr->FileName().c_str(), nL, &dwRWC, nullptr);
+		file.Write(chr->FileName().c_str(), nL);
 		chr->SaveToFile();
 	}
 

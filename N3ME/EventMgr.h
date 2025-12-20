@@ -28,7 +28,7 @@ public:
 	CDlgEditEvent*			m_pDlgEventList;
 
 public:
-	bool MakeGameFile(HANDLE hFile, int iSize);
+	bool MakeGameFile(File& file, int iSize);
 	bool MakeGameFile(char* szEventName, int iSize);
 	void LoadFromFile(const char* RealFileName);
 	void SaveToFile(const char* RealFileName);
@@ -41,11 +41,11 @@ public:
 	void SetActive(bool active);
 	void Render();
 
-	virtual bool	Load(HANDLE hFile);
-	virtual bool	Save(HANDLE hFile);
+	virtual bool	Load(File& file);
+	virtual bool	Save(File& file);
 
 	CEventMgr();
-	virtual ~CEventMgr();
+	~CEventMgr() override;
 };
 
 #endif // !defined(AFX_EVENTMGR_H__73272CD9_F059_4001_A116_871CEC8B25AE__INCLUDED_)

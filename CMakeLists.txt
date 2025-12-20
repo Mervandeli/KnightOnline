@@ -15,6 +15,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # We don't use modules, so there's no reason to scan
 set(CXX_SCAN_FOR_MODULES OFF)
 
+# Statically link to the MSVC runtime
+if(MSVC)
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 # Config
 option(OPENKO_BUILD_SERVERS "Build the server projects (default on)" ON)
 option(OPENKO_COMPILE_WARNINGS_AS_ERROR "Enable treating warnings as errors (default on)" ON)
@@ -72,6 +77,7 @@ endif()
 # Add dependencies
 set(CMAKE_FOLDER "_deps")
 add_subdirectory(deps/asio-cmake)
+add_subdirectory(deps/llfio-cmake)
 add_subdirectory(deps/spdlog-cmake)
 
 include_directories(
@@ -80,6 +86,7 @@ include_directories(
 
 set(CMAKE_FOLDER) # reset so shared is placed in the root
 add_subdirectory(shared)
+add_subdirectory(FileIO)
 add_subdirectory(MathUtils)
 
 if(OPENKO_BUILD_SERVERS)
@@ -128,5 +135,6 @@ if(OPENKO_BUILD_TESTS)
   add_subdirectory(deps/googletest-cmake)
 
   set(CMAKE_FOLDER "Tests")
+  add_subdirectory(FileIO/tests)
   add_subdirectory(MathUtils/tests)
 endif()

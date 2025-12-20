@@ -78,8 +78,8 @@ public:
 	float*			m_pfMaxVtx;		//	물결높이 계산을 위한 임시
 
 public:
-	void		Release();
-	bool		Load(HANDLE hFile);
+	void		Release() override;
+	bool		Load(File& file) override;
 	void		Render();
 	void		Tick();
 

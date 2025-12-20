@@ -13,9 +13,6 @@
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
 #endif
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CN3UIButton::CN3UIButton()
 {
@@ -245,45 +242,46 @@ uint32_t CN3UIButton::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POIN
 	return dwRet;
 }
 
-bool CN3UIButton::Load(HANDLE hFile)
+bool CN3UIButton::Load(File& file)
 {
-	if (false == CN3UIBase::Load(hFile)) return false;
+	if (!CN3UIBase::Load(file))
+		return false;
 
-	DWORD dwNum;
-	ReadFile(hFile, &m_rcClick, sizeof(m_rcClick), &dwNum, nullptr);	// click 영역
+	file.Read(&m_rcClick, sizeof(m_rcClick));	// click 영역
 
 	// m_ImageRef 설정하기
-	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
+	for (CN3UIBase* pChild : m_Children)
 	{
-		CN3UIBase* pChild = (*itor);
-		if (UI_TYPE_IMAGE != pChild->UIType()) continue;	// image만 골라내기
-		int iBtnState = (int)(pChild->GetReserved());
-		if (iBtnState<NUM_BTN_STATE)
-		{
-			m_ImageRef[iBtnState] = (CN3UIImage*)pChild;
-		}
+		if (UI_TYPE_IMAGE != pChild->UIType())
+			continue;	// image만 골라내기
+
+		int iBtnState = (int) (pChild->GetReserved());
+		if (iBtnState < NUM_BTN_STATE)
+			m_ImageRef[iBtnState] = (CN3UIImage*) pChild;
 	}
+
+	std::string filename;
 
 	// 이전 uif파일을 컨버팅 하려면 사운드 로드 하는 부분 막기
 	int iSndFNLen = 0;
-	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
-	if (iSndFNLen>0)
+	file.Read(&iSndFNLen, sizeof(iSndFNLen));		//	사운드 파일 문자열 길이
+	if (iSndFNLen > 0)
 	{
-		std::vector<char> buffer(iSndFNLen+1, '\0');
-		ReadFile(hFile, &buffer[0], iSndFNLen, &dwNum, nullptr);
+		filename.assign(iSndFNLen, '\0');
+		file.Read(&filename[0], iSndFNLen);
 
 		__ASSERT(nullptr == m_pSnd_On, "memory leak");
-		m_pSnd_On = s_SndMgr.CreateObj(&buffer[0], SNDTYPE_2D);
+		m_pSnd_On = s_SndMgr.CreateObj(filename, SNDTYPE_2D);
 	}
 
-	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
-	if (iSndFNLen>0)
+	file.Read(&iSndFNLen, sizeof(iSndFNLen));		//	사운드 파일 문자열 길이
+	if (iSndFNLen > 0)
 	{
-		std::vector<char> buffer(iSndFNLen+1, '\0');
-		ReadFile(hFile, &buffer[0], iSndFNLen, &dwNum, nullptr);
+		filename.assign(iSndFNLen, '\0');
+		file.Read(&filename[0], iSndFNLen);
 
 		__ASSERT(nullptr == m_pSnd_Click, "memory leak");
-		m_pSnd_Click = s_SndMgr.CreateObj(&buffer[0], SNDTYPE_2D);
+		m_pSnd_Click = s_SndMgr.CreateObj(filename, SNDTYPE_2D);
 	}
 
 	return true;
@@ -311,27 +309,26 @@ void CN3UIButton::operator = (const CN3UIButton& other)
 }
 
 #ifdef _N3TOOL
-bool CN3UIButton::Save(HANDLE hFile)
+bool CN3UIButton::Save(File& file)
 {
-	if (!CN3UIBase::Save(hFile))
+	if (!CN3UIBase::Save(file))
 		return false;
 
-	DWORD dwNum;
-	WriteFile(hFile, &m_rcClick, sizeof(m_rcClick), &dwNum, nullptr);		// click 영역
+	file.Write(&m_rcClick, sizeof(m_rcClick));		// click 영역
 
 	int iSndFNLen = 0;
 	if (m_pSnd_On != nullptr)
 		iSndFNLen = static_cast<int>(m_pSnd_On->m_szFileName.size());
-	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
+	file.Write(&iSndFNLen, sizeof(iSndFNLen));		//	사운드 파일 문자열 길이
 	if (iSndFNLen > 0)
-		WriteFile(hFile, m_pSnd_On->m_szFileName.c_str(), iSndFNLen, &dwNum, nullptr);
+		file.Write(m_pSnd_On->m_szFileName.c_str(), iSndFNLen);
 
 	iSndFNLen = 0;
 	if (m_pSnd_Click != nullptr)
 		iSndFNLen = static_cast<int>(m_pSnd_Click->m_szFileName.size());
-	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
+	file.Write(&iSndFNLen, sizeof(iSndFNLen));		//	사운드 파일 문자열 길이
 	if (iSndFNLen > 0)
-		WriteFile(hFile, m_pSnd_Click->m_szFileName.c_str(), iSndFNLen, &dwNum, nullptr);
+		file.Write(m_pSnd_Click->m_szFileName.c_str(), iSndFNLen);
 
 	return true;
 }

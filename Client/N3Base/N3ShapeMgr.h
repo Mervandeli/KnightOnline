@@ -27,11 +27,9 @@ public:
 		int 		nCCPolyCount; // Collision Check Polygon Count
 		uint32_t* pdwCCVertIndices; // Collision Check Polygon Vertex Indices - wCCPolyCount * 3 만큼 생성된다.
 
-		void Load(HANDLE hFile)
+		void Load(File& file)
 		{
-			DWORD dwRWC = 0;
-
-			ReadFile(hFile, &nCCPolyCount, 4, &dwRWC, nullptr);
+			file.Read(&nCCPolyCount, 4);
 
 			if (nCCPolyCount > 0)
 			{
@@ -39,19 +37,18 @@ public:
 				pdwCCVertIndices = new uint32_t[nCCPolyCount * 3];
 				__ASSERT(pdwCCVertIndices, "New memory failed");
 
-				ReadFile(hFile, pdwCCVertIndices, nCCPolyCount * 3 * 4, &dwRWC, nullptr);
+				file.Read(pdwCCVertIndices, nCCPolyCount * 3 * 4);
 
 				// TRACE(_T("CollisionCheckPolygon : %d\n"), nCCPolyCount);
 			}
 		}
 
 #ifdef _N3TOOL
-		void Save(HANDLE hFile)
+		void Save(File& file)
 		{
-			DWORD dwRWC = 0;
-			WriteFile(hFile, &nCCPolyCount, 4, &dwRWC, nullptr);
+			file.Write(&nCCPolyCount, 4);
 			if (nCCPolyCount > 0)
-				WriteFile(hFile, pdwCCVertIndices, nCCPolyCount * 3 * 4, &dwRWC, nullptr);
+				file.Write(pdwCCVertIndices, nCCPolyCount * 3 * 4);
 		}
 #endif // end of _N3TOOL
 
@@ -73,38 +70,35 @@ public:
 		uint16_t* pwShapeIndices; // Shape Indices
 		__CellSub SubCells[CELL_MAIN_DIVIDE][CELL_MAIN_DIVIDE];
 
-		void Load(HANDLE hFile)
+		void Load(File& file)
 		{
-			DWORD dwRWC = 0;
-
-			ReadFile(hFile, &nShapeCount, 4, &dwRWC, nullptr);
+			file.Read(&nShapeCount, 4);
 
 			if (nShapeCount > 0)
 			{
 				delete[] pwShapeIndices;
 				pwShapeIndices = new uint16_t[nShapeCount];
-				ReadFile(hFile, pwShapeIndices, nShapeCount * 2, &dwRWC, nullptr);
+				file.Read(pwShapeIndices, nShapeCount * 2);
 			}
 
 			for (int z = 0; z < CELL_MAIN_DIVIDE; z++)
 			{
 				for (int x = 0; x < CELL_MAIN_DIVIDE; x++)
-					SubCells[x][z].Load(hFile);
+					SubCells[x][z].Load(file);
 			}
 		}
 
 #ifdef _N3TOOL
-		void Save(HANDLE hFile)
+		void Save(File& file)
 		{
-			DWORD dwRWC = 0;
-			WriteFile(hFile, &nShapeCount, 4, &dwRWC, nullptr);
+			file.Write(&nShapeCount, 4);
 			if (nShapeCount > 0)
-				WriteFile(hFile, pwShapeIndices, nShapeCount * 2, &dwRWC, nullptr);
+				file.Write(pwShapeIndices, nShapeCount * 2);
 
 			for (int z = 0; z < CELL_MAIN_DIVIDE; z++)
 			{
 				for (int x = 0; x < CELL_MAIN_DIVIDE; x++)
-					SubCells[x][z].Save(hFile);
+					SubCells[x][z].Save(file);
 			}
 		}
 #endif // end of _N3TOOL
@@ -207,7 +201,7 @@ public:
 
 	void		Tick();
 	void		Render();
-	bool		Load(HANDLE hFile);
+	bool		Load(File& file);
 	bool		CheckCollisionCamera(__Vector3& vEye, const __Vector3& vAt, float fNP);
 	static int SortByCameraDistance(const void* pArg1, const void* pArg2);
 #endif // end of #ifndef _3DSERVER
@@ -221,7 +215,7 @@ public:
 		__Vector3* pVec = nullptr);		// 충돌한 면 의 폴리곤 __Vector3[3]
 
 	bool		Create(float fMapWidth, float fMapLength); // 맵의 너비와 높이를 미터 단위로 넣는다..
-	bool		LoadCollisionData(HANDLE hFile);
+	bool		LoadCollisionData(File& file);
 
 #ifdef _N3TOOL
 	//지형에서 shape가 있는 타일은 1, 없는 타일은 0으로 셋팅한 테이블을 만든다.
@@ -230,8 +224,8 @@ public:
 	int			Add(CN3Shape* pShape);
 	bool		AddCollisionTriangle(const __Vector3& v1, const __Vector3& v2, const __Vector3& v3);
 	void		GenerateCollisionData();
-	bool		Save(HANDLE hFile);
-	bool		SaveCollisionData(HANDLE hFile);
+	bool		Save(File& file);
+	bool		SaveCollisionData(File& file);
 #endif // end of _N3TOOL
 
 	void Release();

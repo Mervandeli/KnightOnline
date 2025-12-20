@@ -39,9 +39,9 @@ void CUINotice::Release()
 	CN3UIBase::Release();
 }
 
-bool CUINotice::Load(HANDLE hFile)
+bool CUINotice::Load(File& file)
 {
-	if(CN3UIBase::Load(hFile)==false) return false;
+	if(CN3UIBase::Load(file)==false) return false;
 
 	m_pText_Notice = GetChildByID<CN3UIString>("Text_Notice");
 	m_pScrollBar = GetChildByID<CN3UIScrollBar>("ScrollBar");
@@ -97,17 +97,18 @@ void CUINotice::GenerateText()
 	if (textLength == 0)
 		return;
 
-	std::vector<char> szBuff(textLength * 2, 0);
+	std::string szBuff;
+	szBuff.reserve(textLength * 2);
 
 	// 글자들을 붙이고  // LineFeed, Carriage return 을 붙인다.
 	it = m_Texts.begin(); itEnd = m_Texts.end();
 	for (; it != itEnd; it++)
 	{
-		lstrcat(&szBuff[0], it->c_str());
-		lstrcat(&szBuff[0], "\n");
+		szBuff += *it;
+		szBuff += "\n";
 	}
 
-	m_pText_Notice->SetString(&szBuff[0]); // 글자 적용..
+	m_pText_Notice->SetString(szBuff); // 글자 적용..
 }
 
 bool CUINotice::OnKeyPress(int iKey)

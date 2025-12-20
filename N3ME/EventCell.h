@@ -39,12 +39,12 @@ public:
 	void	InitRect(__Vector3 v);
 	void	AddRect(__Vector3 v);
 	void	Render(DWORD color);
-	void	Load(HANDLE hFile);
-	void	Save(HANDLE hFile);
+	void	Load(File& file);
+	void	Save(File& file);
 
 	CEventCell();
 	CEventCell(CLyTerrain* pRefTerrain);
-	virtual ~CEventCell();
+	~CEventCell() override;
 };
 
 #endif // !defined(AFX_EVENTCELL_H__B3DFDE57_2071_433F_A831_8B26FFE0004B__INCLUDED_)

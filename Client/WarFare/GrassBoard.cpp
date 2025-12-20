@@ -137,15 +137,15 @@ void CGrassBoard::Init(__Vector3 vPos, uint32_t dwBoardType)
 	m_dwBoardType = dwBoardType;
 }
 
-bool CGrassBoard::Load(HANDLE hFile)
+bool CGrassBoard::Load(File& file)
 {
-	return CN3Transform::Load(hFile);
+	return CN3Transform::Load(file);
 }
 
 #ifdef _N3TOOL
-bool CGrassBoard::Save(HANDLE hFile)
+bool CGrassBoard::Save(File& file)
 {
-	return CN3Transform::Save(hFile);
+	return CN3Transform::Save(file);
 }
 #endif // end of #ifdef _N3TOOL
 

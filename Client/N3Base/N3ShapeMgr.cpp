@@ -89,26 +89,25 @@ void CN3ShapeMgr::ReleaseShapes()
 #endif // end of #ifndef _3DSERVER
 
 #ifndef _3DSERVER
-bool CN3ShapeMgr::Load(HANDLE hFile)
+bool CN3ShapeMgr::Load(File& file)
 {
-	DWORD dwRWC;
 	int nL = 0;
 
 	if (m_iFileFormatVersion >= N3FORMAT_VER_1264)
 	{
 		int iIdk0;
-		ReadFile(hFile, &iIdk0, sizeof(int), &dwRWC, nullptr);
+		file.Read(&iIdk0, sizeof(int));
 
 		int iNL;
-		ReadFile(hFile, &iNL, sizeof(int), &dwRWC, nullptr);
+		file.Read(&iNL, sizeof(int));
 		if (iNL > 0)
 		{
 			m_szName.resize(iNL);
-			ReadFile(hFile, &m_szName[0], iNL, &dwRWC, nullptr);
+			file.Read(&m_szName[0], iNL);
 		}
 	}
 
-	if (!LoadCollisionData(hFile))
+	if (!LoadCollisionData(file))
 		return false;
 
 	int iSC = 0;
@@ -116,7 +115,7 @@ bool CN3ShapeMgr::Load(HANDLE hFile)
 		ReleaseShapes();
 	m_ShapesHaveID.clear();
 
-	ReadFile(hFile, &iSC, 4, &dwRWC, nullptr); // Shape Count
+	file.Read(&iSC, 4); // Shape Count
 	if (iSC > 0)
 	{
 		CN3Shape* pShape = nullptr;
@@ -125,7 +124,7 @@ bool CN3ShapeMgr::Load(HANDLE hFile)
 		uint32_t dwType = 0;
 		for (int i = 0; i < iSC; i++)
 		{
-			ReadFile(hFile, &dwType, 4, &dwRWC, nullptr); // Shape Type
+			file.Read(&dwType, 4); // Shape Type
 
 			// 성문등 확장된 Object 로 쓸경우..
 			if (dwType & OBJ_SHAPE_EXTRA)
@@ -142,7 +141,7 @@ bool CN3ShapeMgr::Load(HANDLE hFile)
 			// pShape->m_iNPC_ID; 조종할 Object ID
 			// pShape->m_iNPC_Status; toggle 0, 1
 
-			pShape->Load(hFile);
+			pShape->Load(file);
 
 			//  ID 가 있는 오브젝트 ... NPC 로 쓸수 있다..
 			if (pShape->m_iEventID != 0)
@@ -184,18 +183,16 @@ bool CN3ShapeMgr::Load(HANDLE hFile)
 }
 #endif // end of #ifndef _3DSERVER
 
-bool CN3ShapeMgr::LoadCollisionData(HANDLE hFile)
+bool CN3ShapeMgr::LoadCollisionData(File& file)
 {
-	DWORD dwRWC;
-
-	ReadFile(hFile, &m_fMapWidth, 4, &dwRWC, nullptr);
-	ReadFile(hFile, &m_fMapLength, 4, &dwRWC, nullptr);
+	file.Read(&m_fMapWidth, 4);
+	file.Read(&m_fMapLength, 4);
 
 	if (!Create(m_fMapWidth, m_fMapLength))
 		return false;
 
 	// 충돌 체크 폴리곤 데이터 읽기..
-	ReadFile(hFile, &m_nCollisionFaceCount, 4, &dwRWC, nullptr);
+	file.Read(&m_nCollisionFaceCount, 4);
 
 	delete[] m_pvCollisions;
 	m_pvCollisions = nullptr;
@@ -203,7 +200,7 @@ bool CN3ShapeMgr::LoadCollisionData(HANDLE hFile)
 	if (m_nCollisionFaceCount > 0)
 	{
 		m_pvCollisions = new __Vector3[m_nCollisionFaceCount * 3];
-		ReadFile(hFile, m_pvCollisions, sizeof(__Vector3) * m_nCollisionFaceCount * 3, &dwRWC, nullptr);
+		file.Read(m_pvCollisions, sizeof(__Vector3) * m_nCollisionFaceCount * 3);
 	}
 
 #if !defined(_3DSERVER)
@@ -211,7 +208,7 @@ bool CN3ShapeMgr::LoadCollisionData(HANDLE hFile)
 	{
 		// NOTE(srmeier): for the "ah_hapbi_zone.opd" the jump seems to be specifically 0x338 bytes
 		uint8_t* tmp = new uint8_t[0x338];
-		ReadFile(hFile, tmp, 0x338, &dwRWC, nullptr);
+		file.Read(tmp, 0x338);
 		delete[] tmp;
 	}
 #endif
@@ -226,13 +223,13 @@ bool CN3ShapeMgr::LoadCollisionData(HANDLE hFile)
 		{
 			delete m_pCells[x][z]; m_pCells[x][z] = nullptr;
 
-			ReadFile(hFile, &iExist, 4, &dwRWC, nullptr); // 데이터가 있는 셀인지 쓰고..
+			file.Read(&iExist, 4); // 데이터가 있는 셀인지 쓰고..
 
 			if (iExist == 0)
 				continue;
 
 			m_pCells[x][z] = new __CellMain;
-			m_pCells[x][z]->Load(hFile);
+			m_pCells[x][z]->Load(file);
 		}
 	}
 
@@ -240,16 +237,15 @@ bool CN3ShapeMgr::LoadCollisionData(HANDLE hFile)
 }
 
 #ifdef _N3TOOL
-bool CN3ShapeMgr::Save(HANDLE hFile)
+bool CN3ShapeMgr::Save(File& file)
 {
-	if (!SaveCollisionData(hFile))
+	if (!SaveCollisionData(file))
 		return false;
 
 #ifndef _3DSERVER
-	DWORD dwRWC;
 	int iSC = static_cast<int>(m_Shapes.size());
 
-	WriteFile(hFile, &iSC, 4, &dwRWC, nullptr); // Shape Count
+	file.Write(&iSC, 4); // Shape Count
 	for (CN3Shape* pShape : m_Shapes)
 	{
 		uint32_t dwType = pShape->Type();
@@ -259,10 +255,10 @@ bool CN3ShapeMgr::Save(HANDLE hFile)
 			|| pShape->m_iNPC_Status != 0)
 			dwType |= OBJ_SHAPE_EXTRA; // NPC ID 가 있으면.. 확장 Shape 로 ...
 
-		WriteFile(hFile, &dwType, 4, &dwRWC, nullptr); // Shape Type
+		file.Write(&dwType, 4); // Shape Type
 		pShape->CollisionMeshSet(""); // 충돌 메시는 지워준다..
 		pShape->ClimbMeshSet(""); // 충돌 메시는 지워준다..
-		pShape->Save(hFile);
+		pShape->Save(file);
 	}
 #endif // end of #ifndef _3DSERVER
 	return true;
@@ -270,17 +266,15 @@ bool CN3ShapeMgr::Save(HANDLE hFile)
 #endif // end of _N3TOOL
 
 #ifdef _N3TOOL
-bool CN3ShapeMgr::SaveCollisionData(HANDLE hFile)
+bool CN3ShapeMgr::SaveCollisionData(File& file)
 {
-	DWORD dwRWC;
-
-	WriteFile(hFile, &m_fMapWidth, 4, &dwRWC, nullptr); // 맵 실제 미터 단위 너비
-	WriteFile(hFile, &m_fMapLength, 4, &dwRWC, nullptr); // 맵 실제 미터 단위 길이
+	file.Write(&m_fMapWidth, 4); // 맵 실제 미터 단위 너비
+	file.Write(&m_fMapLength, 4); // 맵 실제 미터 단위 길이
 
 	// 충돌 체크 폴리곤 데이터 쓰기..
-	WriteFile(hFile, &m_nCollisionFaceCount, 4, &dwRWC, nullptr);
+	file.Write(&m_nCollisionFaceCount, 4);
 	if (m_nCollisionFaceCount > 0)
-		WriteFile(hFile, m_pvCollisions, sizeof(__Vector3) * m_nCollisionFaceCount * 3, &dwRWC, nullptr);
+		file.Write(m_pvCollisions, sizeof(__Vector3) * m_nCollisionFaceCount * 3);
 
 	// Cell Data 쓰기.
 	int z = 0;
@@ -294,10 +288,10 @@ bool CN3ShapeMgr::SaveCollisionData(HANDLE hFile)
 				iExist = 1;
 
 			// 데이터가 있는 셀인지 쓰고..
-			WriteFile(hFile, &iExist, 4, &dwRWC, nullptr);
+			file.Write(&iExist, 4);
 
 			if (m_pCells[x][z] != nullptr)
-				m_pCells[x][z]->Save(hFile);
+				m_pCells[x][z]->Save(file);
 		}
 	}
 

@@ -1256,9 +1256,8 @@ D3DCOLOR CN3SkyMng::GetLightAmbientColor(int iIndex)
 	return m_pLightColorAmbients[iIndex]->GetCurColor();
 }
 
-bool CN3SkyMng::Load(HANDLE hFile)
+bool CN3SkyMng::Load(File& file)
 {
-	DWORD dwRWC = 0;
 	std::string szSuns[NUM_SUNPART];
 	std::string szClouds[NUM_CLOUD];
 	std::string szMoon;
@@ -1267,31 +1266,31 @@ bool CN3SkyMng::Load(HANDLE hFile)
 	for(i = 0; i < NUM_SUNPART; i++) 
 	{
 		int iL = 0;
-		ReadFile(hFile, &iL, 4, &dwRWC, nullptr);
+		file.Read(&iL, 4);
 		if(iL > 0)
 		{
 			szSuns[i].assign(iL, ' ');
-			ReadFile(hFile, &(szSuns[i][0]), iL, &dwRWC, nullptr);
+			file.Read(&(szSuns[i][0]), iL);
 		}
 	}
 
 	for(i = 0; i < NUM_CLOUD; i++) 
 	{
 		int iL = 0;
-		ReadFile(hFile, &iL, 4, &dwRWC, nullptr);
+		file.Read(&iL, 4);
 		if(iL > 0)
 		{
 			szClouds[i].assign(iL, ' ');
-			ReadFile(hFile, &(szClouds[i][0]), iL, &dwRWC, nullptr);
+			file.Read(&(szClouds[i][0]), iL);
 		}
 	}
 	
 	int iL = 0;
-	ReadFile(hFile, &iL, 4, &dwRWC, nullptr);
+	file.Read(&iL, 4);
 	if(iL > 0)
 	{
 		szMoon.assign(iL, ' ');
-		ReadFile(hFile, &(szMoon[0]), iL, &dwRWC, nullptr);
+		file.Read(&(szMoon[0]), iL);
 	}
 
 	if(nullptr == m_pSky) m_pSky = new CN3Sky();
@@ -1318,13 +1317,13 @@ bool CN3SkyMng::Load(HANDLE hFile)
 	// Day Change .....
 	m_DayChanges.clear();
 	int iSDCC = 0;
-	ReadFile(hFile, &iSDCC, 4, &dwRWC, nullptr);
+	file.Read(&iSDCC, 4);
 	if(iSDCC > 0)
 	{
 		m_DayChanges.assign(iSDCC, __SKY_DAYCHANGE());
 		for(i = 0; i < iSDCC; i++)
 		{
-			m_DayChanges[i].Load(hFile);
+			m_DayChanges[i].Load(file);
 		}
 
 		qsort(&(m_DayChanges[0]), m_DayChanges.size(), sizeof(__SKY_DAYCHANGE), CompareTime); // 시간순으로 정렬
@@ -1335,10 +1334,8 @@ bool CN3SkyMng::Load(HANDLE hFile)
 }
 
 #ifdef _N3TOOL
-bool CN3SkyMng::Save(HANDLE hFile)
+bool CN3SkyMng::Save(File& file)
 {
-	DWORD dwRWC = 0;
-
 	std::string szSuns[NUM_SUNPART];
 	std::string szClouds[NUM_CLOUD];
 	std::string szMoon;
@@ -1361,29 +1358,29 @@ bool CN3SkyMng::Save(HANDLE hFile)
 	for (int i = 0; i < NUM_SUNPART; i++)
 	{
 		int iL = static_cast<int>(szSuns[i].size());
-		WriteFile(hFile, &iL, 4, &dwRWC, nullptr);
+		file.Write(&iL, 4);
 		if (iL > 0)
-			WriteFile(hFile, szSuns[i].c_str(), iL, &dwRWC, nullptr);
+			file.Write(szSuns[i].c_str(), iL);
 	}
 
 	for (int i = 0; i < NUM_CLOUD; i++)
 	{
 		int iL = static_cast<int>(szClouds[i].size());
-		WriteFile(hFile, &iL, 4, &dwRWC, nullptr);
+		file.Write(&iL, 4);
 		if (iL > 0)
-			WriteFile(hFile, szClouds[i].c_str(), iL, &dwRWC, nullptr);
+			file.Write(szClouds[i].c_str(), iL);
 	}
 
 	int iL = static_cast<int>(szMoon.size());
-	WriteFile(hFile, &iL, 4, &dwRWC, nullptr);
+	file.Write(&iL, 4);
 	if (iL > 0)
-		WriteFile(hFile, szMoon.c_str(), iL, &dwRWC, nullptr);
+		file.Write(szMoon.c_str(), iL);
 
 	// Day Change .....
 	int iSDCC = static_cast<int>(m_DayChanges.size());
-	WriteFile(hFile, &iSDCC, 4, &dwRWC, nullptr);
+	file.Write(&iSDCC, 4);
 	for (int i = 0; i < iSDCC; i++)
-		m_DayChanges[i].Save(hFile);
+		m_DayChanges[i].Save(file);
 
 	return true;
 }

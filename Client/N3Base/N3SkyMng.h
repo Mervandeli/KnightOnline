@@ -37,7 +37,7 @@ enum		eSKY_DAYCHANGE {	SDC_SKYCOLOR=0,		// 하늘색
 								SDC_UNKNOWN = 0xffffffff
 };
 
-struct		__SKY_DAYCHANGE
+struct __SKY_DAYCHANGE
 {
 	std::string		szName;			// 이름 붙이기..
 	eSKY_DAYCHANGE	eSkyDayChange;	// 어떤 변화인가?
@@ -64,43 +64,41 @@ struct		__SKY_DAYCHANGE
 		fHowLong = fHowLong_Arg;
 	}
 
-	bool Load(HANDLE hFile)
+	bool Load(File& file)
 	{
-		szName = "";
-
-		DWORD dwRWC = 0;
 		int nL = 0;
-		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
-		if(nL > 0) 
+		file.Read(&nL, 4);
+		if (nL > 0)
 		{
-			std::vector<char> buffer(nL+1, '\0');
-			ReadFile(hFile, &buffer[0], nL, &dwRWC, nullptr);
-			szName = &buffer[0];
+			szName.assign(nL, '\0');
+			file.Read(&szName[0], nL);
+		}
+		else
+		{
+			szName.clear();
 		}
 
-		ReadFile(hFile, &eSkyDayChange, 4, &dwRWC, nullptr);
-		ReadFile(hFile, &dwWhen, 4, &dwRWC, nullptr);
-		ReadFile(hFile, &dwParam1, 4, &dwRWC, nullptr);
-		ReadFile(hFile, &dwParam2, 4, &dwRWC, nullptr);
-		ReadFile(hFile, &fHowLong, 4, &dwRWC, nullptr);
+		file.Read(&eSkyDayChange, 4);
+		file.Read(&dwWhen, 4);
+		file.Read(&dwParam1, 4);
+		file.Read(&dwParam2, 4);
+		file.Read(&fHowLong, 4);
 
 		return true;
 	}
 	
-	bool Save(HANDLE hFile)
+	bool Save(File& file)
 	{
-		DWORD dwRWC = 0;
-
 		int nL = static_cast<int>(szName.size());
-		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+		file.Write(&nL, 4);
 		if (nL > 0)
-			WriteFile(hFile, szName.c_str(), nL, &dwRWC, nullptr);
+			file.Write(szName.c_str(), nL);
 
-		WriteFile(hFile, &eSkyDayChange, 4, &dwRWC, nullptr);
-		WriteFile(hFile, &dwWhen, 4, &dwRWC, nullptr);
-		WriteFile(hFile, &dwParam1, 4, &dwRWC, nullptr);
-		WriteFile(hFile, &dwParam2, 4, &dwRWC, nullptr);
-		WriteFile(hFile, &fHowLong, 4, &dwRWC, nullptr);
+		file.Write(&eSkyDayChange, 4);
+		file.Write(&dwWhen, 4);
+		file.Write(&dwParam1, 4);
+		file.Write(&dwParam2, 4);
+		file.Write(&fHowLong, 4);
 
 		return true;
 	}
@@ -187,14 +185,14 @@ public:
 	const char*			CloudTextureFileName(int iIndex);
 #endif
 
-	bool Load(HANDLE hFile) override;
+	bool Load(File& file) override;
 
 #ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다...
 	void ReleaseSound();
 #endif // #ifdef _N3GAME
 
 #ifdef _N3TOOL
-	bool Save(HANDLE hFile);
+	bool Save(File& file);
 #endif
 
 	D3DCOLOR	GetFogColor();
@@ -236,8 +234,7 @@ protected:
 	int			GetLatestChange(eSKY_DAYCHANGE eSDC, int iPos);// m_pDayChangeQueues에서 지정된 위치(iPos) 이전의 가장 최근에 변화하는 위치 얻어오기
 	void		ChangeSky(__SKY_DAYCHANGE* pSDC, float fTakeTime);
 	int			GetDayChangePos_AfterNSec(uint32_t dwCurGameTime, float fSec);		// 실시간 N초 후에 DayChangeQueue의 위치 구하기
-	static int		CompareTime(const void* pArg1, const void* pArg2);
-
+	static int	CompareTime(const void* pArg1, const void* pArg2);
 };
 
 #endif // !defined(AFX_N3SKYMNG_H__30DC78FB_6563_43BD_841E_B90928E850CD__INCLUDED_)

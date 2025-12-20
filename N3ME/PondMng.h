@@ -28,7 +28,7 @@ class CPondMng  : public CN3BaseFileAccess
 {
 public:
 	CPondMng(CMainFrame* pMainFrm);
-	virtual ~CPondMng();
+	~CPondMng() override;
 
 	struct __VertexPond
 	{
@@ -90,12 +90,12 @@ protected:
 public:
 	void			Tick();
 	void			Render();
-	virtual void	Release();
-	virtual bool	Load(HANDLE hFile);
-	virtual bool	Save(HANDLE hFile);
+	void			Release() override;
+	bool			Load(File& file) override;
+	bool			Save(File& file) override;
 
 	BOOL			MouseMsgFilter(LPMSG pMsg);								// Mouse 메세지 처리
-	void			MakeGameFiles(HANDLE hFile, float fSize);				// Game file로 저장
+	void			MakeGameFiles(File& file, float fSize);				// Game file로 저장
 
 	CPondMesh*		CreateNewPondMesh();									// 시작점과 끝난점(사각형)으로 새로운 연못을 추가한다.
 	

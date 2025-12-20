@@ -43,9 +43,9 @@ protected:
 	float	m_fTexIndex; // Current Texture Index.. Animation 시킬때 필요한 인덱스이다.. float 로 해서 텍스처 에니메이션 제어한다.
 
 public:
-	virtual bool Load(HANDLE hFile);
+	bool Load(File& file) override;
 #ifdef _N3TOOL
-	virtual bool Save(HANDLE hFile);
+	bool Save(File& file) override;
 #endif // end of _N3TOOL
 	
 	int TexCount() const
@@ -137,10 +137,10 @@ public:
 	bool			MakeCollisionMeshByParts();  // 충돌 메시를 박스 형태로 다시 만든다...
 	bool			MakeCollisionMeshByPartsDetail();  // 현재 모습 그대로... 충돌 메시를 만든다...
 
-	void			FindMinMax();
-	virtual void	ReCalcMatrix();
+	void			FindMinMax() override;
+	void			ReCalcMatrix() override;
 	void			ReCalcPartMatrix();
-	virtual void	Tick(float fFrm = FRAME_SELFPLAY);
+	void			Tick(float fFrm = FRAME_SELFPLAY) override;
 	virtual void	Render();
 
 	int PartCount() const
@@ -160,17 +160,17 @@ public:
 	CN3SPart*		PartAdd() { CN3SPart* pPart = new CN3SPart(); m_Parts.push_back(pPart); return pPart; }
 	void			PartDelete(int iIndex);
 	
-	bool			Load(HANDLE hFile);
+	bool			Load(File& file) override;
 #ifdef _N3TOOL
-	bool			Save(HANDLE hFile);
+	bool			Save(File& file) override;
 	void			RenderSelected(bool bWireFrame);
 	void			RenderSelected(int iPart, bool bWireFrame);
 	bool			IsPMeshProcessed();
 #endif // end of _N3TOOL
 
-	virtual void	Release();
+	void			Release() override;
 	CN3Shape();
-	virtual ~CN3Shape();
+	~CN3Shape() override;
 
 //	By : Ecli666 ( On 2002-08-06 오후 4:33:04 )
 //
@@ -185,7 +185,7 @@ __Vector3			GetVertexByIndex(int iPartIndex, int iIndex);
 __Vector3			GetColVertexByIndex(int iIndex); 
 	void			PartialColRender(int iCount, int* piIndices);
 	void			PartialGetCollision(int iIndex, __Vector3& vec);
-	bool			LoadTransformOnly(HANDLE hFile);
+	bool			LoadTransformOnly(File& file);
 //	~(By Ecli666 On 2002-08-06 오후 4:33:04 )
 };
 

@@ -58,7 +58,7 @@ public:
 
 	//this_ui_add_start
 	bool				OnKeyPress(int iKey) override;
-	bool				Load(HANDLE hFile) override;
+	bool				Load(File& file) override;
 	void				SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false) override;
 	void				SetVisible(bool bVisible) override;
 	//this_ui_add_end
@@ -75,7 +75,7 @@ public:
 
 	__IconItemSkill*	GetHighlightIconItem(CN3UIIcon* pUIIcon) override;
 
-	void				IconRestore();	
+	void				IconRestore() override;
 
 	bool				ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur) override;
 

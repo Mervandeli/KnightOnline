@@ -4,15 +4,18 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
-#include "n3me.h"
+#include "N3ME.h"
 #include "LyTerrainDef.h"
-
 #include "DTex.h"
-#include <N3Base/N3Texture.h>
 #include "DlgDTexGroupView.h"
 #include "DTexMng.h"
 #include "DTexGroupMng.h"
 #include "ProgressBar.h"
+
+#include <N3Base/N3Texture.h>
+
+#include <FileIO/FileReader.h>
+#include <FileIO/FileWriter.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -147,8 +150,9 @@ void CDTexMng::LoadFromFile(CString RealFileName)
 
 		int i;
 		char szDTexFileName[_MAX_PATH];
-		DWORD dwRWC;
-		for(i=0; i<iCount; i++)
+		FileReader dtexInfoFile;
+
+		for (i = 0; i < iCount; i++)
 		{
 			result = fscanf(stream, "%s\n", szDTexFileName);
 			__ASSERT(result != EOF, "Invalid DTex Info File...");
@@ -160,20 +164,19 @@ void CDTexMng::LoadFromFile(CString RealFileName)
 			pDTex->Init();
 			pDTex->m_ID = i;
 			pDTex->m_pTex->LoadFromFile(szDTexFileName);
-			
+
 			//	그에 관한 타일 정보들을 읽고..
 			char szDir[_MAX_DIR], szFName[_MAX_FNAME];
 			_splitpath(szDTexFileName, nullptr, szDir, szFName, nullptr);
 			wsprintf(szDTexInfoFileName, "%s%s%s.dif", s_szPath.c_str(), szDir, szFName); // Texture Information file
 
-			HANDLE hFile = CreateFile(szDTexInfoFileName, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-			if(hFile != INVALID_HANDLE_VALUE)
+			if (dtexInfoFile.OpenExisting(szDTexInfoFileName))
 			{
-				for(int x=0; x<NUM_DTEXTILE; x++)
+				for (int x = 0; x < NUM_DTEXTILE; x++)
 				{
-					for(int y=0; y<NUM_DTEXTILE; y++)
+					for (int y = 0; y < NUM_DTEXTILE; y++)
 					{
-						ReadFile(hFile, &(pDTex->m_Attr[x][y]), sizeof(DTEXATTR), &dwRWC, nullptr);
+						dtexInfoFile.Read(&pDTex->m_Attr[x][y], sizeof(DTEXATTR));
 						DTEXTILEATTR tile;
 						tile.TexID = i;
 						tile.TileX = x;
@@ -181,10 +184,9 @@ void CDTexMng::LoadFromFile(CString RealFileName)
 						pDTexGroupMng->SetTile(pDTex->m_Attr[x][y].Group, pDTex->m_Attr[x][y].Attr, tile);
 					}
 				}
-			}
-			CloseHandle(hFile);
-			
 
+				dtexInfoFile.Close();
+			}
 
 			m_pDTex.push_back(pDTex);
 		}	// end of for(i=0; i<iCount; i++)
@@ -203,19 +205,19 @@ void CDTexMng::LoadFromFile(CString RealFileName)
 		CDTexGroupMng* pDTexGroupMng = m_pMainFrm->GetDTexGroupMng();
 		int i;
 		char szDTexFileName[_MAX_PATH];
-		DWORD dwRWC;
+		FileReader dtexInfoFile;
 
 		CProgressBar ProgressBar;
-		ProgressBar.Create("Load TileTex Info..", 50,  iCount);
+		ProgressBar.Create("Load TileTex Info..", 50, iCount);
 
-		for(i=0;i<iCount;i++)
+		for (i = 0; i < iCount; i++)
 		{
 			ProgressBar.StepIt();
 
 			result = fscanf(stream, "%s %d\n", szDTexFileName, &id);
 			__ASSERT(result != EOF, "Invalid DTex Info File...");
 
-			if(m_NextID <= id) m_NextID = id + 1;
+			if (m_NextID <= id) m_NextID = id + 1;
 
 			//	실제 텍스쳐 소스를 읽고..
 			CDTex* pDTex = new CDTex;
@@ -223,13 +225,13 @@ void CDTexMng::LoadFromFile(CString RealFileName)
 			pDTex->m_ID = id;
 			pDTex->m_pTex->LoadFromFile(szDTexFileName);
 
-			if(version==2)
+			if (version == 2)
 			{
-				for(int y=0; y<NUM_DTEXTILE; y++)
+				for (int y = 0; y < NUM_DTEXTILE; y++)
 				{
 					int Group;
 					fscanf(stream, "%d\n", &Group);
-					for(int x=0; x<NUM_DTEXTILE; x++)
+					for (int x = 0; x < NUM_DTEXTILE; x++)
 					{
 						pDTex->m_Attr[x][y].Group = Group;
 						pDTex->m_Attr[x][y].Attr = x;
@@ -238,27 +240,27 @@ void CDTexMng::LoadFromFile(CString RealFileName)
 						tile.TexID = id;
 						tile.TileX = x;
 						tile.TileY = y;
-						
+
 						pDTexGroupMng->SetTile(pDTex->m_Attr[x][y].Group, pDTex->m_Attr[x][y].Attr, tile);
 					}
 				}
 			}
 
-			if(version==1)
+			if (version == 1)
 			{
 				//	그에 관한 타일 정보들을 읽고..
 				char szDir[_MAX_DIR], szFName[_MAX_FNAME];
 				_splitpath(szDTexFileName, nullptr, szDir, szFName, nullptr);
 				wsprintf(szDTexInfoFileName, "%s%s%s.dif", s_szPath.c_str(), szDir, szFName); // Texture Information file
 
-				HANDLE hFile = CreateFile(szDTexInfoFileName, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-				if(hFile != INVALID_HANDLE_VALUE)
+				if (dtexInfoFile.OpenExisting(szDTexInfoFileName))
 				{
-					for(int x=0; x<NUM_DTEXTILE; x++)
+					for (int x = 0; x < NUM_DTEXTILE; x++)
 					{
-						for(int y=0; y<NUM_DTEXTILE; y++)
+						for (int y = 0; y < NUM_DTEXTILE; y++)
 						{
-							ReadFile(hFile, &(pDTex->m_Attr[x][y]), sizeof(DTEXATTR), &dwRWC, nullptr);
+							dtexInfoFile.Read(&pDTex->m_Attr[x][y], sizeof(DTEXATTR));
+
 							DTEXTILEATTR tile;
 							tile.TexID = id;
 							tile.TileX = x;
@@ -266,8 +268,9 @@ void CDTexMng::LoadFromFile(CString RealFileName)
 							pDTexGroupMng->SetTile(pDTex->m_Attr[x][y].Group, pDTex->m_Attr[x][y].Attr, tile);
 						}
 					}
+
+					dtexInfoFile.Close();
 				}
-				CloseHandle(hFile);
 			}
 			m_pDTex.push_back(pDTex);
 		}
@@ -302,7 +305,6 @@ void CDTexMng::SaveToFile(CString RealFileName)
 	int id;
 	it_DTex it;
 	char szDTexFileName[_MAX_PATH];
-	//DWORD dwRWC;
 	CDTex* pDTex;
 	for(it=m_pDTex.begin(); it!=m_pDTex.end(); it++)
 	{
@@ -336,7 +338,7 @@ void CDTexMng::SaveToFile(CString RealFileName)
 			{
 				for(int y=0; y<NUM_DTEXTILE; y++)
 				{
-					WriteFile(hFile, &(pDTex->m_Attr[x][y]), sizeof(DTEXATTR), &dwRWC, nullptr);
+					file.Write(&(pDTex->m_Attr[x][y]), sizeof(DTEXATTR));
 				}
 			}
 		}
@@ -355,8 +357,7 @@ void CDTexMng::SaveGameTile()
 	D3DFORMAT	Format;
 	int			Size = DTEX_SIZE / NUM_DTEXTILE;		//단위텍스쳐의 길이..
 	D3DLOCKED_RECT d3dlr;
-
-	HANDLE hFile;
+	
 	int ix, iz;
 	int j;
 	char* pSourceImg;
@@ -371,59 +372,59 @@ void CDTexMng::SaveGameTile()
 	char szDTexGameFileName[_MAX_PATH];
 	char szNewFName[_MAX_PATH];
 
-	it_DTex it;
 	//for(int i=0;i<MAX_TILETEXTURE;i++)
-	for(it = m_pDTex.begin(); it != m_pDTex.end(); it++)
+	for (CDTex* pDTex : m_pDTex)
 	{
-		CDTex* pDTex = (*it);
-		if(pDTex)
+		if (pDTex == nullptr)
+			continue;
+
+		pTex = pDTex->m_pTex;
+		if (nullptr == pTex || nullptr == pTex->Get())
 		{
-			pTex = pDTex->m_pTex;
-			if(nullptr == pTex || nullptr == pTex->Get())
+			MessageBox(::GetActiveWindow(), "Tile texture pointer is NULL!!!", "Save GameTile Data Error", MB_OK);
+			continue;
+		}
+
+		//Source Info...
+		Format = pTex->PixelFormat();
+		pTex->Get()->LockRect(0, &d3dlr, 0, 0);
+		int Bits = d3dlr.Pitch / DTEX_SIZE;
+
+		CN3Texture TileTex;
+		D3DLOCKED_RECT d3dlrTarget;
+		for (iz = 0; iz < NUM_DTEXTILE; iz++)
+		{
+			//file setting..
+			_splitpath(pTex->FileName().c_str(), nullptr, nullptr, szFName, nullptr);
+			sprintf(szNewFName, "%s_%d", szFName, iz);
+
+			_makepath(szDTexGameFileName, szDrive, szDir, szNewFName, ".gtt");
+
+			FileWriter file;
+			if (!file.Create(szDTexGameFileName))
+				break;
+
+			for (ix = 0; ix < NUM_DTEXTILE; ix++)
 			{
-				MessageBox(::GetActiveWindow(), "Tile texture pointer is NULL!!!", "Save GameTile Data Error", MB_OK);
-				continue;
-			}
+				//텍스쳐 서페이스 만들고, 텍스쳐 채우고, 형식 변환하고, 저장.
+				TileTex.Create(Size, Size, Format, TRUE);
+				TileTex.Get()->LockRect(0, &d3dlrTarget, 0, 0);
+				pSourceImg = (char*) ((char*) d3dlr.pBits + (ix * Size * Bits) + (iz * Size * d3dlr.Pitch));
+				pTargetImg = (char*) d3dlrTarget.pBits;
 
-			//Source Info...
-			Format = pTex->PixelFormat();
-			pTex->Get()->LockRect( 0, &d3dlr, 0, 0 );
-			int Bits = d3dlr.Pitch / DTEX_SIZE;
-
-			CN3Texture TileTex;
-			D3DLOCKED_RECT d3dlrTarget;
-			for(iz=0; iz<NUM_DTEXTILE; iz++)
-			{
-				//file setting..
-				_splitpath(pTex->FileName().c_str(), nullptr, nullptr, szFName, nullptr);
-				sprintf(szNewFName, "%s_%d",szFName, iz);
-
-				_makepath(szDTexGameFileName, szDrive, szDir, szNewFName, ".gtt");
-				hFile = CreateFile(szDTexGameFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-
-				for(ix=0; ix<NUM_DTEXTILE; ix++)
+				for (j = 0; j < Size; j++)
 				{
-					//텍스쳐 서페이스 만들고, 텍스쳐 채우고, 형식 변환하고, 저장.
-					TileTex.Create(Size, Size, Format, TRUE);
-					TileTex.Get()->LockRect( 0, &d3dlrTarget, 0, 0 );
-					pSourceImg = (char*)((char*)d3dlr.pBits + (ix*Size*Bits) + (iz*Size*d3dlr.Pitch));
-					pTargetImg = (char*) d3dlrTarget.pBits;
+					memcpy(&(pTargetImg[j * Bits * Size]), &(pSourceImg[j * d3dlr.Pitch]), Bits * Size);
+				}
 
-					for(j=0;j<Size;j++)
-					{
-						memcpy( &(pTargetImg[j*Bits*Size]), &(pSourceImg[j* d3dlr.Pitch]), Bits*Size);
-					}
+				TileTex.Get()->UnlockRect(0);
 
-					TileTex.Get()->UnlockRect(0);
-
-					TileTex.Convert(D3DFMT_DXT1);
-					TileTex.GenerateMipMap();
-					TileTex.Save(hFile);
-				}				
-				CloseHandle(hFile);
-			}			
-			pTex->Get()->UnlockRect(0);
-		}//endof if(pDTex)
+				TileTex.Convert(D3DFMT_DXT1);
+				TileTex.GenerateMipMap();
+				TileTex.Save(file);
+			}
+		}
+		pTex->Get()->UnlockRect(0);
 	}
 }
 

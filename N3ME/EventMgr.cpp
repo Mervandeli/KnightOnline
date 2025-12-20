@@ -3,13 +3,16 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "n3me.h"
+#include "N3ME.h"
 #include "EventMgr.h"
 #include "MapMng.h"
 #include "EventCell.h"
 #include "LyTerrain.h"
 #include "DlgEditEvent.h"
 #include "DlgEditEventAttr.h"
+
+#include <FileIO/FileReader.h>
+#include <FileIO/FileWriter.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -291,10 +294,11 @@ void CEventMgr::LoadFromFile(const char* RealFileName)
 	char szNPCPathFileName[_MAX_PATH];
 	wsprintf(szNPCPathFileName, "%sevent\\%s.evt", s_szPath.c_str(), (LPCTSTR)RealFileName);
 	
-	//DWORD dwRWC;
-	HANDLE hFile = CreateFile(szNPCPathFileName, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-	Load(hFile);
-	CloseHandle(hFile);
+	FileReader file;
+	if (!file.OpenExisting(szNPCPathFileName))
+		return;
+
+	Load(file);
 }
 
 void CEventMgr::SaveToFile(const char* RealFileName)
@@ -307,14 +311,17 @@ void CEventMgr::SaveToFile(const char* RealFileName)
 	char szNPCPathFileName[_MAX_PATH];
 	wsprintf(szNPCPathFileName, "%sevent\\%s.evt", s_szPath.c_str(), (LPCTSTR)RealFileName);
 
-	//DWORD dwRWC;
-	HANDLE hFile = CreateFile(szNPCPathFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-	Save(hFile);	
-	CloseHandle(hFile);
+	FileWriter file;
+	if (file.Create(szNPCPathFileName))
+	{
+		Save(file);	
+		file.Close();
+	}
+
 	SetCurrentDirectory(szOldPath);
 }
 
-bool CEventMgr::Load(HANDLE hFile)
+bool CEventMgr::Load(File& file)
 {
 	if(m_pCurrEvent)
 	{
@@ -331,15 +338,14 @@ bool CEventMgr::Load(HANDLE hFile)
 		delete (*itEvent);
 	}
 	
-	DWORD dwRWC;
 	int NumEvent;
-	ReadFile(hFile, &NumEvent, sizeof(int), &dwRWC, nullptr);
+	file.Read(&NumEvent, sizeof(int));
 
 	m_pEvents.clear();
 	for(int i=0;i<NumEvent;i++)
 	{
 		CEventCell* pEvent = new CEventCell(pRefTerrain);
-		pEvent->Load(hFile);
+		pEvent->Load(file);
 		m_pEvents.push_back(pEvent);
 	}
 
@@ -348,15 +354,13 @@ bool CEventMgr::Load(HANDLE hFile)
 	return true;
 }
 
-bool CEventMgr::Save(HANDLE hFile)
+bool CEventMgr::Save(File& file)
 {
-	DWORD dwRWC;
-
 	int NumEvent = static_cast<int>(m_pEvents.size());
-	WriteFile(hFile, &NumEvent, sizeof(int), &dwRWC, nullptr);
+	file.Write(&NumEvent, sizeof(int));
 
 	for (CEventCell* pEvent : m_pEvents)
-		pEvent->Save(hFile);
+		pEvent->Save(file);
 
 	return true;
 }
@@ -500,49 +504,40 @@ void CEventMgr::SaveInfoTextFile(char* szEvent)
 }
 */
 
-bool CEventMgr::MakeGameFile(char *szEventName, int iSize)
+bool CEventMgr::MakeGameFile(char* szEventName, int iSize)
 {
-	HANDLE hGevFile = CreateFile(szEventName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-	if(INVALID_HANDLE_VALUE == hGevFile)
-	{
+	FileWriter gevFile;
+	if (!gevFile.Create(szEventName))
 		return false;
-	}
 
 	MakeEventArray();
-	if(!MakeGameFile(hGevFile, iSize))
-	{
-		CloseHandle(hGevFile);
-		return false;
-	}
-	CloseHandle(hGevFile);
-	return true;
+	return MakeGameFile(gevFile, iSize);
 }
 
-bool CEventMgr::MakeGameFile(HANDLE hFile, int iSize)
+bool CEventMgr::MakeGameFile(File& file, int iSize)
 {
-	DWORD dwNum = 0;
-//	WriteFile(hFile, &iSize, sizeof(int), &dwNum, nullptr);
+//	file.Write(&iSize, sizeof(int));
 //	for(int x=0;x<iSize;x++)
-//		WriteFile(hFile, m_ppEvent[x], sizeof(short)*iSize, &dwNum, nullptr);
+//		file.Write(m_ppEvent[x], sizeof(short)*iSize);
 
 	int nEventCellCount = static_cast<int>(m_pEvents.size());
-	WriteFile(hFile, &nEventCellCount, sizeof(int), &dwNum, nullptr);
+	file.Write(&nEventCellCount, sizeof(int));
 
 	for (CEventCell* pEvent : m_pEvents)
 	{
 		if (pEvent != nullptr)
 		{
 			RECT rt = pEvent->m_Rect;
-			WriteFile(hFile, &rt, sizeof(RECT), &dwNum, nullptr);
-			WriteFile(hFile, &pEvent->m_EventType, sizeof(short), &dwNum, nullptr);
+			file.Write(&rt, sizeof(RECT));
+			file.Write(&pEvent->m_EventType, sizeof(short));
 		}
 		else
 		{
 			short sEventType = -1;
 			RECT rt;
 			memset(&rt, 0, sizeof(rt));
-			WriteFile(hFile, &rt, sizeof(RECT), &dwNum, nullptr);
-			WriteFile(hFile, &sEventType, sizeof(short), &dwNum, nullptr);
+			file.Write(&rt, sizeof(RECT));
+			file.Write(&sEventType, sizeof(short));
 		}
 	}
 

@@ -224,16 +224,15 @@ void CN3FXSPart::Render()
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, mtx.toD3D());
 }
 
-bool CN3FXSPart::Load(HANDLE hFile)
+bool CN3FXSPart::Load(File& file)
 {
-	DWORD dwRWC;
 	int nL = 0;
 	char szFN[256];
 
-	ReadFile(hFile, &m_vPivot, sizeof(__Vector3), &dwRWC, nullptr);
+	file.Read(&m_vPivot, sizeof(__Vector3));
 
-	ReadFile(hFile, &nL, 4, &dwRWC, nullptr); // Mesh FileName
-	ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 메시 파일 이름..
+	file.Read(&nL, 4); // Mesh FileName
+	file.Read(szFN, nL); szFN[nL] = '\0'; // 메시 파일 이름..
 
 	//m_pRefShape의 경로와 읽어들인 파일명을 합쳐라...
 	char szPath[_MAX_PATH];
@@ -245,19 +244,19 @@ bool CN3FXSPart::Load(HANDLE hFile)
 
 	if(!this->MeshSet(szPath)) return false;
 
-	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질
+	file.Read(&m_Mtl, sizeof(__Material)); // 재질
 
 	int iTC = 0;
-	ReadFile(hFile, &iTC, 4, &dwRWC, nullptr);
-	ReadFile(hFile, &m_fTexFPS, 4, &dwRWC, nullptr);
+	file.Read(&iTC, 4);
+	file.Read(&m_fTexFPS, 4);
 	m_TexRefs.clear();
 	this->TexAlloc(iTC); // Texture Pointer Pointer 할당..
 	for(int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기..
 	{
-		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
+		file.Read(&nL, 4);
 		if(nL > 0)
 		{
-			ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0'; // 텍스처 파일 이름..
+			file.Read(szFN, nL); szFN[nL] = '\0'; // 텍스처 파일 이름..
 			
 			_splitpath(szFN, nullptr, nullptr, szFName, szExt);
 			_makepath(szPath, nullptr, szDir, szFName, szExt);
@@ -289,7 +288,7 @@ void CN3FXSPart::Duplicate(CN3FXSPart* pSrc)
 	return;
 }
 
-bool CN3FXSPart::Save(HANDLE hFile)
+bool CN3FXSPart::Save(File& file)
 {	
 	return true;
 }
@@ -361,18 +360,16 @@ void CN3FXShape::Render()
 		pPart->Render();
 }
 
-bool CN3FXShape::Load(HANDLE hFile)
+bool CN3FXShape::Load(File& file)
 {
-	CN3TransformCollision::Load(hFile); // 기본정보 읽기...
+	CN3TransformCollision::Load(file); // 기본정보 읽기...
 
-	DWORD dwRWC = 0;
-	
 	for (CN3FXSPart* pPart : m_Parts)
 		delete pPart;
 	m_Parts.clear();
 
 	int iPC = 0;
-	ReadFile(hFile, &iPC, 4, &dwRWC, nullptr); // Part Count
+	file.Read(&iPC, 4); // Part Count
 	if (iPC > 0)
 	{
 		m_Parts.assign(iPC, nullptr);
@@ -380,45 +377,45 @@ bool CN3FXShape::Load(HANDLE hFile)
 		{
 			m_Parts[i] = new CN3FXSPart();
 			m_Parts[i]->m_pRefShape = this;
-			if (!m_Parts[i]->Load(hFile)) return false;
+			if (!m_Parts[i]->Load(file))
+				return false;
+
 			//m_Parts[i]->ReCalcMatrix(m_Matrix); // Part Matrix 계산
 		}
 	}
 
 	uint32_t dwTmp;		
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 소속
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 0
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 1
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 2
-	ReadFile(hFile, &dwTmp, 4, &dwRWC, nullptr); // 속성 3
+	file.Read(&dwTmp, 4); // 소속
+	file.Read(&dwTmp, 4); // 속성 0
+	file.Read(&dwTmp, 4); // 속성 1
+	file.Read(&dwTmp, 4); // 속성 2
+	file.Read(&dwTmp, 4); // 속성 3
 
 	this->FindMinMax();
 
 	return true;
 }
 
-bool CN3FXShape::Save(HANDLE hFile)
+bool CN3FXShape::Save(File& file)
 {
 	/*
-	CN3TransformCollision::Save(hFile); // 기본정보 읽기...
-	
-	DWORD dwRWC = 0;
+	CN3TransformCollision::Save(file); // 기본정보 읽기...
 	
 	int nL = 0;
 	
 	CN3SPart* pPD = nullptr;
 	int iPC = m_Parts.size();
-	WriteFile(hFile, &iPC, 4, &dwRWC, nullptr); // Mesh FileName
+	file.Write(&iPC, 4); // Mesh FileName
 	for(int i = 0; i < iPC; i++)
 	{
-		m_Parts[i]->Save(hFile);
+		m_Parts[i]->Save(file);
 	}
 
-	WriteFile(hFile, &m_iBelong, 4, &dwRWC, nullptr); // 소속
-	WriteFile(hFile, &m_iAttr0, 4, &dwRWC, nullptr); // 속성 0
-	WriteFile(hFile, &m_iAttr1, 4, &dwRWC, nullptr); // 속성 1
-	WriteFile(hFile, &m_iAttr2, 4, &dwRWC, nullptr); // 속성 2
-	WriteFile(hFile, &m_iAttr3, 4, &dwRWC, nullptr); // 속성 3
+	file.Write(&m_iBelong, 4); // 소속
+	file.Write(&m_iAttr0, 4); // 속성 0
+	file.Write(&m_iAttr1, 4); // 속성 1
+	file.Write(&m_iAttr2, 4); // 속성 2
+	file.Write(&m_iAttr3, 4); // 속성 3
 	*/
 	return true;
 }
@@ -486,7 +483,7 @@ void CN3FXShape::Duplicate(CN3FXShape* pSrc)
 	m_dwLight = pSrc->m_dwLight;
 	m_dwDoubleSide = pSrc->m_dwDoubleSide;
 		
-	//CN3TransformCollision::Load(hFile); // 기본정보 읽기...
+	//CN3TransformCollision::Load(file); // 기본정보 읽기...
 	//transform collision...
 	SetRadius(pSrc->Radius());
 	SetMin(pSrc->Min());

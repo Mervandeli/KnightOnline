@@ -9,8 +9,6 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#pragma warning(disable : 4786)
-
 #include "N3BaseFileAccess.h"
 #include <string>
 #include <vector>
@@ -70,71 +68,66 @@ public:
 		szName = other.szName;
 	}
 
-	void Load(HANDLE hFile)
+	void Load(File& file)
 	{
-		if(nullptr == hFile || INVALID_HANDLE_VALUE == hFile) return;
-
-		DWORD dwRWC = 0;
-
 		int nL = 0;
-		ReadFile(hFile, &nL, 4, &dwRWC, nullptr); // 원래는 문자열 포인터가 있던자리이다.. 호환성을 위헤서.. 걍...
+		file.Read(&nL, 4); // 원래는 문자열 포인터가 있던자리이다.. 호환성을 위헤서.. 걍...
 
-		ReadFile(hFile, &fFrmStart, 4, &dwRWC, nullptr); // 상체 시작
-		ReadFile(hFile, &fFrmEnd, 4, &dwRWC, nullptr); // 상체 끝
-		ReadFile(hFile, &fFrmPerSec, 4, &dwRWC, nullptr); // 초당 30프레임이 표준이다..
+		file.Read(&fFrmStart, 4); // 상체 시작
+		file.Read(&fFrmEnd, 4); // 상체 끝
+		file.Read(&fFrmPerSec, 4); // 초당 30프레임이 표준이다..
 
-		ReadFile(hFile, &fFrmPlugTraceStart, 4, &dwRWC, nullptr);
-		ReadFile(hFile, &fFrmPlugTraceEnd, 4, &dwRWC, nullptr);
+		file.Read(&fFrmPlugTraceStart, 4);
+		file.Read(&fFrmPlugTraceEnd, 4);
 		
-		ReadFile(hFile, &fFrmSound0, 4, &dwRWC, nullptr);
-		ReadFile(hFile, &fFrmSound1, 4, &dwRWC, nullptr);
+		file.Read(&fFrmSound0, 4);
+		file.Read(&fFrmSound1, 4);
 
-		ReadFile(hFile, &fTimeBlend, 4, &dwRWC, nullptr);
-		ReadFile(hFile, &iBlendFlags, 4, &dwRWC, nullptr); // 블렌딩 플래그 0 이면 걍 블렌딩.. 1이면 루핑시 블렌딩 타임만큼 시간 지연
+		file.Read(&fTimeBlend, 4);
+		file.Read(&iBlendFlags, 4); // 블렌딩 플래그 0 이면 걍 블렌딩.. 1이면 루핑시 블렌딩 타임만큼 시간 지연
 		
-		ReadFile(hFile, &fFrmStrike0, 4, &dwRWC, nullptr);
-		ReadFile(hFile, &fFrmStrike1, 4, &dwRWC, nullptr);
+		file.Read(&fFrmStrike0, 4);
+		file.Read(&fFrmStrike1, 4);
 
 		// 이름 읽기..
-		szName = "";
-		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
-		if(nL > 0)
+		file.Read(&nL, 4);
+		if (nL > 0)
 		{
-			std::vector<char> buffer(nL+1, '\0');
-			ReadFile(hFile, &buffer[0], nL, &dwRWC, nullptr);
-			szName = &buffer[0];
+			szName.assign(nL, '\0');
+			file.Read(&szName[0], nL);
+		}
+		else
+		{
+			szName.clear();
 		}
 	}
-	void Save(HANDLE hFile)
+
+	void Save(File& file)
 	{
-		if(nullptr == hFile || INVALID_HANDLE_VALUE == hFile) return;
-
-		DWORD dwRWC = 0;
-
 		int nL = 0;
-		WriteFile(hFile, &nL, 4, &dwRWC, nullptr); // 원래는 문자열 포인터가 있던자리이다.. 호환성을 위헤서.. 걍...
+		file.Write(&nL, 4); // 원래는 문자열 포인터가 있던자리이다.. 호환성을 위헤서.. 걍...
 
-		WriteFile(hFile, &fFrmStart, 4, &dwRWC, nullptr); // 상체 시작
-		WriteFile(hFile, &fFrmEnd, 4, &dwRWC, nullptr); // 상체 끝
-		WriteFile(hFile, &fFrmPerSec, 4, &dwRWC, nullptr); // 초당 30프레임이 표준이다..
+		file.Write(&fFrmStart, 4); // 상체 시작
+		file.Write(&fFrmEnd, 4); // 상체 끝
+		file.Write(&fFrmPerSec, 4); // 초당 30프레임이 표준이다..
 
-		WriteFile(hFile, &fFrmPlugTraceStart, 4, &dwRWC, nullptr);
-		WriteFile(hFile, &fFrmPlugTraceEnd, 4, &dwRWC, nullptr);
+		file.Write(&fFrmPlugTraceStart, 4);
+		file.Write(&fFrmPlugTraceEnd, 4);
 		
-		WriteFile(hFile, &fFrmSound0, 4, &dwRWC, nullptr);
-		WriteFile(hFile, &fFrmSound1, 4, &dwRWC, nullptr);
+		file.Write(&fFrmSound0, 4);
+		file.Write(&fFrmSound1, 4);
 
-		WriteFile(hFile, &fTimeBlend, 4, &dwRWC, nullptr);
-		WriteFile(hFile, &iBlendFlags, 4, &dwRWC, nullptr); // 블렌딩 플래그 0 이면 걍 블렌딩.. 1이면 루핑시 블렌딩 타임만큼 시간 지연
+		file.Write(&fTimeBlend, 4);
+		file.Write(&iBlendFlags, 4); // 블렌딩 플래그 0 이면 걍 블렌딩.. 1이면 루핑시 블렌딩 타임만큼 시간 지연
 		
-		WriteFile(hFile, &fFrmStrike0, 4, &dwRWC, nullptr);
-		WriteFile(hFile, &fFrmStrike1, 4, &dwRWC, nullptr);
+		file.Write(&fFrmStrike0, 4);
+		file.Write(&fFrmStrike1, 4);
 
 		// 이름 읽기..
 		nL = static_cast<int>(szName.size());
-		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+		file.Write(&nL, 4);
 		if (nL > 0)
-			WriteFile(hFile, szName.c_str(), nL, &dwRWC, nullptr);
+			file.Write(szName.c_str(), nL);
 	}
 
 #ifdef _N3TOOL
@@ -173,7 +166,7 @@ public:
 		return &m_Datas[index];
 	}
 
-	bool Load(HANDLE hFile);
+	bool Load(File& file) override;
 
 	int Count() const
 	{
@@ -194,12 +187,12 @@ public:
 	void			Delete(int nIndex);
 	__AnimData*		Add();
 	__AnimData*		Insert(int nIndex);
-	bool			Save(HANDLE hFile);
+	bool			Save(File& file) override;
 #endif
-	void Release();
+	void Release() override;
 	
 	CN3AnimControl();
-	virtual ~CN3AnimControl();
+	~CN3AnimControl() override;
 
 };
 

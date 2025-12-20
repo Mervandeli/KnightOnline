@@ -58,9 +58,9 @@ public:
 	void SetActive(bool active);
 	void ClearList();
 
-	bool Load(HANDLE hFile);
-	bool Save(HANDLE hFile);
-	void SaveServerData(HANDLE hFile);
+	bool Load(File& file) override;
+	bool Save(File& file) override;
+	void SaveServerData(File& file);
 	
 	CWarpMgr();
 	virtual ~CWarpMgr();

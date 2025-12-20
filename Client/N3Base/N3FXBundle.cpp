@@ -311,11 +311,9 @@ int CN3FXBundle::GetPartCountForVersion() const
 //
 //
 //
-bool CN3FXBundle::Load(HANDLE hFile)
+bool CN3FXBundle::Load(File& file)
 {
-	DWORD dwRWC = 0;
-
-	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
+	file.Read(&m_iVersion, sizeof(int));
 
 	// NOTE: This should ideally just be an assertion, but we'll continue to allow it to run
 	// and otherwise be broken for now.
@@ -327,18 +325,18 @@ bool CN3FXBundle::Load(HANDLE hFile)
 	}
 #endif
 
-	ReadFile(hFile, &m_fLife0, sizeof(float), &dwRWC, nullptr);
+	file.Read(&m_fLife0, sizeof(float));
 	if (m_fLife0 > 10.0f)
 		m_fLife0 = 10.0f;
 
-	ReadFile(hFile, &m_fVelocity, sizeof(float), &dwRWC, nullptr);
-	ReadFile(hFile, &m_bDependScale, sizeof(bool), &dwRWC, nullptr);
+	file.Read(&m_fVelocity, sizeof(float));
+	file.Read(&m_bDependScale, sizeof(bool));
 
 	const int iPartCount = GetPartCountForVersion();
 	for (int i = 0; i < MAX_FX_PART; i++)
 	{
 		int iType = FX_PART_TYPE_NONE;
-		ReadFile(hFile, &iType, sizeof(int), &dwRWC, nullptr);
+		file.Read(&iType, sizeof(int));
 
 		if (iType == FX_PART_TYPE_NONE)
 			continue;
@@ -352,7 +350,7 @@ bool CN3FXBundle::Load(HANDLE hFile)
 		}
 
 		float fStartTime = 0.0f;
-		ReadFile(hFile, &fStartTime, sizeof(float), &dwRWC, nullptr);
+		file.Read(&fStartTime, sizeof(float));
 
 		m_pPart[i] = new FXPARTWITHSTARTTIME;
 		m_pPart[i]->fStartTime = fStartTime;
@@ -360,11 +358,11 @@ bool CN3FXBundle::Load(HANDLE hFile)
 		m_pPart[i]->pPart->m_pRefBundle = this;
 		m_pPart[i]->pPart->m_pRefPrevPart = nullptr;
 		m_pPart[i]->pPart->m_iType = iType;
-		m_pPart[i]->pPart->Load(hFile);
+		m_pPart[i]->pPart->Load(file);
 	}
 
 	if (m_iVersion >= 2)
-		ReadFile(hFile, &m_bStatic, sizeof(bool), &dwRWC, nullptr);
+		file.Read(&m_bStatic, sizeof(bool));
 
 	return true;
 }
@@ -393,32 +391,31 @@ CN3FXPartBase* CN3FXBundle::AllocatePart(int iPartType) const
 //
 //
 //
-bool CN3FXBundle::Save(HANDLE hFile)
+bool CN3FXBundle::Save(File& file)
 {
-	DWORD dwRWC = 0;
-	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
-	WriteFile(hFile, &m_fLife0, sizeof(float), &dwRWC, nullptr);
-	WriteFile(hFile, &m_fVelocity, sizeof(float), &dwRWC, nullptr);
+	file.Write(&m_iVersion, sizeof(int));
+	file.Write(&m_fLife0, sizeof(float));
+	file.Write(&m_fVelocity, sizeof(float));
 
-	WriteFile(hFile, &m_bDependScale, sizeof(bool), &dwRWC, nullptr);
+	file.Write(&m_bDependScale, sizeof(bool));
 
 	for (int i = 0; i < MAX_FX_PART; i++)
 	{
 		if (m_pPart[i] != nullptr
 			&& m_pPart[i]->pPart != nullptr)
 		{
-			WriteFile(hFile, &m_pPart[i]->pPart->m_iType, sizeof(int), &dwRWC, nullptr);
-			WriteFile(hFile, &m_pPart[i]->fStartTime, sizeof(float), &dwRWC, nullptr);
-			m_pPart[i]->pPart->Save(hFile);
+			file.Write(&m_pPart[i]->pPart->m_iType, sizeof(int));
+			file.Write(&m_pPart[i]->fStartTime, sizeof(float));
+			m_pPart[i]->pPart->Save(file);
 		}
 		else
 		{
 			int Type = FX_PART_TYPE_NONE;
-			WriteFile(hFile, &Type, sizeof(int), &dwRWC, nullptr);
+			file.Write(&Type, sizeof(int));
 		}
 	}
 
-	WriteFile(hFile, &m_bStatic, sizeof(bool), &dwRWC, nullptr);
+	file.Write(&m_bStatic, sizeof(bool));
 
 	return true;
 }

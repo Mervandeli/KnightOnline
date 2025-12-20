@@ -10,17 +10,15 @@
 #include "LyTerrain.h"
 #include "MapMng.h"
 #include "MainFrm.h"
+
 #include <N3Base/N3Scene.h>
+#include <FileIO/FileWriter.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CLightObjMgr::CLightObjMgr()
 {
@@ -80,7 +78,7 @@ void CLightObjMgr::ClearList()
 	m_ListObj.clear();
 }
 
-bool CLightObjMgr::Load(HANDLE hFile)
+bool CLightObjMgr::Load(File& file)
 {
 	m_pDlg->Reset();
 	ClearList();
@@ -96,13 +94,12 @@ bool CLightObjMgr::Load(HANDLE hFile)
 		}
 	}
 	
-	DWORD dwRWC;
-	ReadFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
+	file.Read(&m_iVersion, sizeof(int));
 
 	if(m_iVersion<=1)
 	{
 		int cnt = 0;
-		ReadFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
+		file.Read(&cnt, sizeof(int));
 
 		for(int i=0;i<cnt;i++)
 		{
@@ -112,8 +109,8 @@ bool CLightObjMgr::Load(HANDLE hFile)
 			pLO->pRefLight = pLight;
 			pOutPutScene->LightAdd(pLight);
 			
-			ReadFile(hFile, &(pLO->szName[0]), 80, &dwRWC, nullptr);
-			pLight->Load(hFile);
+			file.Read(&pLO->szName[0], 80);
+			pLight->Load(file);
 			pLight->m_Data.bOn = false;
 			pLight->m_Data.nNumber = IDX_STANDBY_LIGHT;
 
@@ -125,19 +122,17 @@ bool CLightObjMgr::Load(HANDLE hFile)
 	return true;
 }
 
-bool CLightObjMgr::Save(HANDLE hFile)
+bool CLightObjMgr::Save(File& file)
 {
-	DWORD dwRWC;
-
-	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
+	file.Write(&m_iVersion, sizeof(int));
 
 	int cnt = static_cast<int>(m_ListObj.size());
-	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
+	file.Write(&cnt, sizeof(int));
 
 	for (LIGHTOBJ* pLO : m_ListObj)
 	{
-		WriteFile(hFile, &pLO->szName[0], 80, &dwRWC, nullptr);
-		pLO->pRefLight->Save(hFile);
+		file.Write(&pLO->szName[0], 80);
+		pLO->pRefLight->Save(file);
 	}
 
 	return true;
@@ -472,15 +467,15 @@ bool CLightObjMgr::MakeGameFile(char* szFN)
 	if (cnt <= 0)
 		return true;
 
-	HANDLE hFile = CreateFile(szFN, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	FileWriter file;
+	if (!file.Create(szFN))
+		return false;
 
-	DWORD dwRWC;
-	WriteFile(hFile, &m_iVersion, sizeof(int), &dwRWC, nullptr);
-	WriteFile(hFile, &cnt, sizeof(int), &dwRWC, nullptr);
+	file.Write(&m_iVersion, sizeof(int));
+	file.Write(&cnt, sizeof(int));
 
 	for (LIGHTOBJ* pLO : m_ListObj)
-		pLO->pRefLight->Save(hFile);
+		pLO->pRefLight->Save(file);
 
-	CloseHandle(hFile);
 	return true;
 }

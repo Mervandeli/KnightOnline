@@ -281,67 +281,51 @@ bool CN3UIList::SetScrollPos(int iScrollPos)
 	return true;
 }
 
-bool CN3UIList::Load(HANDLE hFile)
+bool CN3UIList::Load(File& file)
 {
-	bool bSuccess = CN3UIBase::Load(hFile);
+	bool bSuccess = CN3UIBase::Load(file);
 
 	// font 정보
-	DWORD dwNum;
 	int iStrLen = 0;
-	ReadFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이 
-	__ASSERT(iStrLen>0, "No font name");
-	if (iStrLen>0)
+	file.Read(&iStrLen, sizeof(iStrLen));			// font 이름 길이 
+	__ASSERT(iStrLen > 0, "No font name");
+	if (iStrLen > 0)
 	{
 		m_szFontName.assign(iStrLen, ' ');
-		ReadFile(hFile, &(m_szFontName[0]), iStrLen, &dwNum, nullptr);				// string
-		ReadFile(hFile, &m_dwFontHeight, 4, &dwNum, nullptr);	// font height
-		ReadFile(hFile, &m_crFont, 4, &dwNum, nullptr);	// font color
-		ReadFile(hFile, &m_bFontBold, 4, &dwNum, nullptr);	// font flag (bold, italic)
-		ReadFile(hFile, &m_bFontItalic, 4, &dwNum, nullptr);	// font flag (bold, italic)
+		file.Read(&m_szFontName[0], iStrLen);				// string
+		file.Read(&m_dwFontHeight, 4);	// font height
+		file.Read(&m_crFont, 4);	// font color
+		file.Read(&m_bFontBold, 4);	// font flag (bold, italic)
+		file.Read(&m_bFontItalic, 4);	// font flag (bold, italic)
 	}
 
 	// Child 중에 Scroll Bar 가 있는지 찾아본다.
-	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
+	for (CN3UIBase* pUI : m_Children)
 	{
-		CN3UIBase* pUI = *itor;
-		if(pUI->UIType() == UI_TYPE_SCROLLBAR)
-		{
-			m_pScrollBarRef = (CN3UIScrollBar*)pUI;
-		}
-//		else if(pUI->Type() == UI_TYPE_STRING)
-//		{
-//			CN3UIString* pString = *itor;
-//			if(	pString->GetFontName != m_szFontName ||
-//				pString->GetFontHeight() != m_dwFontHeight ||
-//				m_bFontBold != (pString->GetFontFlags() & D3DFONT_BOLD) ||
-//				m_bFontItalic != (pString->GetFontFlags() & D3DFONT_ITALIC) ) // 폰트가 다르면.. 적용
-//			{
-//				pString->SetFont(m_szFontName, m_dwFontHeight, m_bFontBold, m_bFontItalic);
-//			}
-//		}
+		if (pUI->UIType() == UI_TYPE_SCROLLBAR)
+			m_pScrollBarRef = (CN3UIScrollBar*) pUI;
 	}
 
 	return bSuccess;
 }
 
 #ifdef _N3TOOL
-bool CN3UIList::Save(HANDLE hFile)
+bool CN3UIList::Save(File& file)
 {
-	if (false == CN3UIBase::Save(hFile)) return false;
-	
-	DWORD dwNum;
+	if (!CN3UIBase::Save(file))
+		return false;
 	
 	// font 정보
 	int iStrLen = static_cast<int>(m_szFontName.size());
 	__ASSERT(iStrLen > 0, "No font name");
-	WriteFile(hFile, &iStrLen, sizeof(iStrLen), &dwNum, nullptr);			// font 이름 길이 
+	file.Write(&iStrLen, sizeof(iStrLen));			// font 이름 길이 
 	if (iStrLen > 0)
 	{
-		WriteFile(hFile, m_szFontName.c_str(), iStrLen, &dwNum, nullptr);				// string
-		WriteFile(hFile, &m_dwFontHeight, 4, &dwNum, nullptr);	// font height
-		WriteFile(hFile, &m_crFont, 4, &dwNum, nullptr);	// font color
-		WriteFile(hFile, &m_bFontBold, 4, &dwNum, nullptr);	// font flag (bold, italic)
-		WriteFile(hFile, &m_bFontItalic, 4, &dwNum, nullptr);	// font flag (bold, italic)
+		file.Write(m_szFontName.c_str(), iStrLen);				// string
+		file.Write(&m_dwFontHeight, 4);	// font height
+		file.Write(&m_crFont, 4);	// font color
+		file.Write(&m_bFontBold, 4);	// font flag (bold, italic)
+		file.Write(&m_bFontItalic, 4);	// font flag (bold, italic)
 	}
 
 	return true;

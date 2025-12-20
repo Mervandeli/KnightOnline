@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 
-#include <N3Base/N3TableBase.h>
+#include <N3Base/N3TableBaseImpl.h>
 
 using DATA_TYPE = TBL_DATA_TYPE;
 
@@ -34,7 +34,7 @@ public:
 	DATA_TYPE GetColumnType(int iColNo) const;
 
 protected:
-	bool LoadRowData(HANDLE hFile);
+	bool LoadRowData(File& file);
 
 protected:
 	std::map<int, std::vector<CStringA>> m_Rows;

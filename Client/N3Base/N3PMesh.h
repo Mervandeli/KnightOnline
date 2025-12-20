@@ -84,13 +84,13 @@ public:
 	__Vector3 Min() { return m_vMin; } // 월드 행렬을 적용하지 않은상태의 최소값이다.
 	__Vector3 Max() { return m_vMax; } // 월드 행렬을 적용하지 않은상태의 최대값이다.
 
-	void Release();
+	void Release() override;
 	HRESULT Create(int iNumVertices, int iNumIndices);
 	HRESULT GenerateSecondUV();
 	
-	bool Load(HANDLE hFile);
+	bool Load(File& file) override;
 #ifdef _N3TOOL
-	bool Save(HANDLE hFile);
+	bool Save(File& file) override;
 #endif // end of _N3TOOL
 	
 	void FindMinMax();
@@ -103,7 +103,7 @@ public:
 
 	__VertexT1*		GetVertices() const { return m_pVertices; };
 	__VertexT2*		GetVertices2() const { return m_pVertices2; };
-	uint16_t*			GetIndices() const { return m_pIndices;};		// 제대로된 Index가 아님 
+	uint16_t*		GetIndices() const { return m_pIndices;};		// 제대로된 Index가 아님 
 	// (제대로 된 인덱스를 얻으려면 N3PMeshInstance로 만든후 LOD조정후 인덱스값을 얻으면 된다.)
 
 #ifdef _N3TOOL
@@ -111,7 +111,7 @@ public:
 #endif // end of _N3TOOL
 
 	CN3PMesh();
-	virtual ~CN3PMesh();
+	~CN3PMesh() override;
 };
 
 #endif // !defined(AFX_N3PMesh_h__INCLUDED_)

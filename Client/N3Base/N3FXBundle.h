@@ -71,10 +71,10 @@ public:
 
 	int		GetPartCountForVersion() const;
 
-	bool	Load(HANDLE hFile) override; // 핸들에서 읽어오기..
+	bool	Load(File& file) override; // 핸들에서 읽어오기..
 	virtual CN3FXPartBase* AllocatePart(int iPartType) const;
 
-	bool	Save(HANDLE hFile) override;	// 저장하기..
+	bool	Save(File& file) override;	// 저장하기..
 
 //	int				GetPartCount() { return m_pPartList.size(); }
 	CN3FXPartBase*	GetPart(int i);

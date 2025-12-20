@@ -46,25 +46,25 @@ void CN3CPartSkins::Release()
 	}
 }
 
-bool CN3CPartSkins::Load(HANDLE hFile)
+bool CN3CPartSkins::Load(File& file)
 {
-	CN3BaseFileAccess::Load(hFile);
+	CN3BaseFileAccess::Load(file);
 	for(int i = 0; i < MAX_CHR_LOD; i++)
 	{
 		m_Skins[i].m_iFileFormatVersion = m_iFileFormatVersion;
-		m_Skins[i].Load(hFile);
+		m_Skins[i].Load(file);
 	}
 
 	return true;
 }
 
 #ifdef _N3TOOL
-bool CN3CPartSkins::Save(HANDLE hFile)
+bool CN3CPartSkins::Save(File& file)
 {
-	CN3BaseFileAccess::Save(hFile);
+	CN3BaseFileAccess::Save(file);
 	for(int i = 0; i < MAX_CHR_LOD; i++)
 	{
-		m_Skins[i].Save(hFile);
+		m_Skins[i].Save(file);
 	}
 
 	return true;
@@ -117,29 +117,30 @@ CN3CPartSkins* CN3CPart::SkinsSet(const std::string& szFN)
 	return m_pSkinsRef;
 }
 
-bool CN3CPart::Load(HANDLE hFile)
+bool CN3CPart::Load(File& file)
 {
-	CN3BaseFileAccess::Load(hFile);
+	CN3BaseFileAccess::Load(file);
 
-	DWORD dwRWC = 0;
 	int nL = 0;
 	char szFN[256] = "";
 
-	ReadFile(hFile, &m_dwReserved, 4, &dwRWC, nullptr);
-	ReadFile(hFile, &m_MtlOrg, sizeof(__Material), &dwRWC, nullptr);
+	file.Read(&m_dwReserved, 4);
+	file.Read(&m_MtlOrg, sizeof(__Material));
 	m_Mtl = m_MtlOrg;
 
-	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
-	if(nL > 0) 
+	file.Read(&nL, 4);
+	if (nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
-		this->TexSet(szFN);
+		file.Read(szFN, nL);
+		szFN[nL] = '\0';
+		TexSet(szFN);
 	}
 
-	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
-	if(nL > 0) 
+	file.Read(&nL, 4);
+	if (nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
+		file.Read(szFN, nL);
+		szFN[nL] = '\0';
 		s_MngSkins.Delete(&m_pSkinsRef);
 		m_pSkinsRef = s_MngSkins.Get(szFN);
 	}
@@ -148,31 +149,30 @@ bool CN3CPart::Load(HANDLE hFile)
 }
 
 #ifdef _N3TOOL
-bool CN3CPart::Save(HANDLE hFile)
+bool CN3CPart::Save(File& file)
 {
-	CN3BaseFileAccess::Save(hFile);
+	CN3BaseFileAccess::Save(file);
 
-	DWORD dwRWC = 0;
 	int nL = 0;
 
-	WriteFile(hFile, &m_dwReserved, 4, &dwRWC, nullptr);
-	WriteFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr);
+	file.Write(&m_dwReserved, 4);
+	file.Write(&m_Mtl, sizeof(__Material));
 
 	if (m_pTexRef != nullptr)
 		nL = static_cast<int>(m_pTexRef->FileName().size());
 	else
 		nL = 0;
-	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+	file.Write(&nL, 4);
 	if (nL > 0)
-		WriteFile(hFile, m_pTexRef->FileName().c_str(), nL, &dwRWC, nullptr);
+		file.Write(m_pTexRef->FileName().c_str(), nL);
 
 	if (m_pSkinsRef != nullptr)
 		nL = static_cast<int>(m_pSkinsRef->FileName().size());
 	else
 		nL = 0;
-	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+	file.Write(&nL, 4);
 	if (nL > 0)
-		WriteFile(hFile, m_pSkinsRef->FileName().c_str(), nL, &dwRWC, nullptr);
+		file.Write(m_pSkinsRef->FileName().c_str(), nL);
 
 	return true;
 }
@@ -440,79 +440,77 @@ void CN3CPlugBase::TexOverlapSet(CN3Texture* pTex)
 	m_pTexOverlapRef = pTex;
 }
 
-bool CN3CPlugBase::Load(HANDLE hFile)
+bool CN3CPlugBase::Load(File& file)
 {
-	CN3BaseFileAccess::Load(hFile);
+	CN3BaseFileAccess::Load(file);
 
-	DWORD dwRWC = 0;
 	int nL = 0;
 	char szFN[512] = "";
 
-	ReadFile(hFile, &m_ePlugType, 4, &dwRWC, nullptr); // Plug Type
+	file.Read(&m_ePlugType, 4); // Plug Type
 //#ifdef _N3TOOL
 	if (m_ePlugType > PLUGTYPE_MAX)
 	{
 		m_ePlugType = PLUGTYPE_NORMAL;
 	}
 //#endif
-	ReadFile(hFile, &m_nJointIndex, 4, &dwRWC, nullptr); // Plug Joint Index
+	file.Read(&m_nJointIndex, 4); // Plug Joint Index
 
-	ReadFile(hFile, &m_vPosition, sizeof(m_vPosition), &dwRWC, nullptr);
-	ReadFile(hFile, &m_MtxRot, sizeof(m_MtxRot), &dwRWC, nullptr);
-	ReadFile(hFile, &m_vScale, sizeof(m_vScale), &dwRWC, nullptr);
+	file.Read(&m_vPosition, sizeof(m_vPosition));
+	file.Read(&m_MtxRot, sizeof(m_MtxRot));
+	file.Read(&m_vScale, sizeof(m_vScale));
 
-	ReadFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질
+	file.Read(&m_Mtl, sizeof(__Material)); // 재질
 
-	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
-	if(nL > 0)
+	file.Read(&nL, 4);
+	if (nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
-		this->PMeshSet(szFN);
+		file.Read(szFN, nL); szFN[nL] = '\0';
+		PMeshSet(szFN);
 	}
 
-	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
-	if(nL > 0)
+	file.Read(&nL, 4);
+	if (nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
-		this->TexSet(szFN);
-	}	
+		file.Read(szFN, nL); szFN[nL] = '\0';
+		TexSet(szFN);
+	}
 
-	this->ReCalcMatrix(); // 행렬 계산...
+	ReCalcMatrix(); // 행렬 계산...
 
-	return 0;
+	return true;
 }
 
 #ifdef _N3TOOL
-bool CN3CPlugBase::Save(HANDLE hFile)
+bool CN3CPlugBase::Save(File& file)
 {
-	CN3BaseFileAccess::Save(hFile);
+	CN3BaseFileAccess::Save(file);
 
-	DWORD dwRWC = 0;
 	int nL = 0;
 
-	WriteFile(hFile, &m_ePlugType, 4, &dwRWC, nullptr); // Plug Type
-	WriteFile(hFile, &m_nJointIndex, 4, &dwRWC, nullptr); // Plug Joint Index
+	file.Write(&m_ePlugType, 4); // Plug Type
+	file.Write(&m_nJointIndex, 4); // Plug Joint Index
 
-	WriteFile(hFile, &m_vPosition, sizeof(m_vPosition), &dwRWC, nullptr);
-	WriteFile(hFile, &m_MtxRot, sizeof(m_MtxRot), &dwRWC, nullptr);
-	WriteFile(hFile, &m_vScale, sizeof(m_vScale), &dwRWC, nullptr);
+	file.Write(&m_vPosition, sizeof(m_vPosition));
+	file.Write(&m_MtxRot, sizeof(m_MtxRot));
+	file.Write(&m_vScale, sizeof(m_vScale));
 
-	WriteFile(hFile, &m_Mtl, sizeof(__Material), &dwRWC, nullptr); // 재질
+	file.Write(&m_Mtl, sizeof(__Material)); // 재질
 
 	nL = 0;
 	CN3PMesh* pPMesh = m_PMeshInst.GetMesh();
 	if (pPMesh != nullptr)
 		nL = static_cast<int>(pPMesh->FileName().size());
-	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+	file.Write(&nL, 4);
 	if (nL > 0)
-		WriteFile(hFile, pPMesh->FileName().c_str(), nL, &dwRWC, nullptr);
+		file.Write(pPMesh->FileName().c_str(), nL);
 
 	nL = 0;
 	if (m_pTexRef != nullptr)
 		nL = static_cast<int>(m_pTexRef->FileName().size());
-	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+	file.Write(&nL, 4);
 	if (nL > 0)
-		WriteFile(hFile, m_pTexRef->FileName().c_str(), nL, &dwRWC, nullptr);
+		file.Write(m_pTexRef->FileName().c_str(), nL);
 
 	return 0;
 }
@@ -592,28 +590,31 @@ void CN3CPlug::Release()
 	}
 }
 
-bool CN3CPlug::Load(HANDLE hFile)
+bool CN3CPlug::Load(File& file)
 {
-	CN3CPlugBase::Load(hFile);
-	DWORD dwRWC = 0;
+	CN3CPlugBase::Load(file);
 
-	ReadFile(hFile, &m_nTraceStep, 4, &dwRWC, nullptr); // 궤적 갯수..
-	if(m_nTraceStep > 0)
+	file.Read(&m_nTraceStep, 4); // 궤적 갯수..
+
+	if (m_nTraceStep > 0)
 	{
-		ReadFile(hFile, &m_crTrace, 4, &dwRWC, nullptr); // 궤적 색깔.. 검은색이면 없다..
-		ReadFile(hFile, &m_fTrace0, 4, &dwRWC, nullptr); // 궤적 위치..
-		ReadFile(hFile, &m_fTrace1, 4, &dwRWC, nullptr); // 궤적 위치..
+		file.Read(&m_crTrace, 4); // 궤적 색깔.. 검은색이면 없다..
+		file.Read(&m_fTrace0, 4); // 궤적 위치..
+		file.Read(&m_fTrace1, 4); // 궤적 위치..
 	}
-	else m_nTraceStep = 0;
+	else
+	{
+		m_nTraceStep = 0;
+	}
 
 	int iUseVMesh = 0;
-	ReadFile(hFile, &iUseVMesh, 4, &dwRWC, nullptr); // 메시를 쓰는가??
-	if(iUseVMesh)
+	file.Read(&iUseVMesh, 4); // 메시를 쓰는가??
+
+	if (iUseVMesh != 0)
 	{
 		CN3PMesh* pPMesh = new CN3PMesh();
 		pPMesh->m_iFileFormatVersion = m_iFileFormatVersion; // NOTE: Setting the version for further components
-
-		pPMesh->Load(hFile);
+		pPMesh->Load(file);
 
 		static int iSN = 0;
 		std::string szFNTmp = fmt::format("Temp_Plug_{}.N3PMesh", iSN++);
@@ -623,10 +624,10 @@ bool CN3CPlug::Load(HANDLE hFile)
 		m_PMeshInstFX.Create(pPMesh); // FX 에 쓸 PMesh Instance
 	}
 
-	m_strFXMainName = "";
-	m_strFXTailName = "";
+	m_strFXMainName.clear();
+	m_strFXTailName.clear();
 	InitFX(m_strFXMainName, m_strFXTailName, 0xffffffff);
-	
+
 	return true;
 }
 
@@ -701,23 +702,22 @@ void CN3CPlug::InitFX(std::string& szFXMain, std::string& szFXTail, D3DCOLOR Tra
 }
 
 #ifdef _N3TOOL
-bool CN3CPlug::Save(HANDLE hFile)
+bool CN3CPlug::Save(File& file)
 {
-	CN3CPlugBase::Save(hFile);
-	DWORD dwRWC = 0;
+	CN3CPlugBase::Save(file);
 
-	WriteFile(hFile, &m_nTraceStep, 4, &dwRWC, nullptr); // 궤적 갯수..
+	file.Write(&m_nTraceStep, 4); // 궤적 갯수..
 	if(m_nTraceStep > 0 && m_nTraceStep <= MAX_PLUG_TRACE_VERTEX/2 - 1)
 	{
-		WriteFile(hFile, &m_crTrace, 4, &dwRWC, nullptr); // 궤적 색깔.. 검은색이면 없다..
-		WriteFile(hFile, &m_fTrace0, 4, &dwRWC, nullptr); // 궤적 위치..
-		WriteFile(hFile, &m_fTrace1, 4, &dwRWC, nullptr); // 궤적 위치..
+		file.Write(&m_crTrace, 4); // 궤적 색깔.. 검은색이면 없다..
+		file.Write(&m_fTrace0, 4); // 궤적 위치..
+		file.Write(&m_fTrace1, 4); // 궤적 위치..
 	}
 	else m_nTraceStep = 0;
 	
 	int iUseVMesh = (m_PMeshInstFX.GetMesh()) ? true : false; // 메쉬.. FX에 쓴다..
-	WriteFile(hFile, &iUseVMesh, 4, &dwRWC, nullptr); // 위치 정보 메시를 쓰는가??
-	if(iUseVMesh) m_PMeshInstFX.GetMesh()->Save(hFile);
+	file.Write(&iUseVMesh, 4); // 위치 정보 메시를 쓰는가??
+	if(iUseVMesh) m_PMeshInstFX.GetMesh()->Save(file);
 
 	return 0;
 }
@@ -1003,9 +1003,9 @@ void CN3CPlug_Cloak::Release()
 	CN3CPlugBase::Release();
 }
 
-bool CN3CPlug_Cloak::Load(HANDLE hFile)
+bool CN3CPlug_Cloak::Load(File& file)
 {
-	CN3CPlugBase::Load(hFile);
+	CN3CPlugBase::Load(file);
 #ifdef _N3GAME
 	m_Cloak.Init(this);
 #endif
@@ -1013,9 +1013,9 @@ bool CN3CPlug_Cloak::Load(HANDLE hFile)
 }
 
 #ifdef _N3TOOL
-bool CN3CPlug_Cloak::Save(HANDLE hFile)
+bool CN3CPlug_Cloak::Save(File& file)
 {
-	CN3CPlugBase::Save(hFile);
+	CN3CPlugBase::Save(file);
 	return 0;
 }
 #endif
@@ -1136,47 +1136,46 @@ void CN3Chr::Release()
 	CN3TransformCollision::Release();
 }
 
-bool CN3Chr::Load(HANDLE hFile)
+bool CN3Chr::Load(File& file)
 {
-	if(m_pRootJointRef != nullptr) CN3Chr::Release();
+	if (m_pRootJointRef != nullptr)
+		Release();
 
-	CN3TransformCollision::Load(hFile);
-
-	DWORD dwRWC = 0;
+	CN3TransformCollision::Load(file);
 	
 	int nL = 0;
 	char szFN[512] = "";
 
-	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
-	ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
+	file.Read(&nL, 4);
+	file.Read(szFN, nL); szFN[nL] = '\0';
 	this->JointSet(szFN); // 뼈대 세팅..
 
 	// Part Allocation, Loading .. 
 	int iPC = 0;
-	ReadFile(hFile, &iPC, 4, &dwRWC, nullptr);
+	file.Read(&iPC, 4);
 	this->PartAlloc(iPC);
 	for(int i = 0; i < iPC; i++)
 	{
 		nL = 0;
-		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
+		file.Read(&nL, 4);
 		if(nL > 0)
 		{
-			ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
+			file.Read(szFN, nL); szFN[nL] = '\0';
 			m_Parts[i]->LoadFromFile(szFN);
 		}
 	}
 	
 	// Plug Allocation, Loading .. 
 	m_Plugs.clear();
-	ReadFile(hFile, &iPC, 4, &dwRWC, nullptr);
+	file.Read(&iPC, 4);
 	this->PlugAlloc(iPC);
 	for(int i = 0; i < iPC; i++)
 	{
 		nL = 0;
-		ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
+		file.Read(&nL, 4);
 		if(nL > 0)
 		{
-			ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
+			file.Read(szFN, nL); szFN[nL] = '\0';
 			m_Plugs[i]->LoadFromFile(szFN);
 
 //			CN3CPlugBase* pPlug = nullptr;
@@ -1209,27 +1208,27 @@ bool CN3Chr::Load(HANDLE hFile)
 
 	// Animation Control..
 	nL = 0;
-	ReadFile(hFile, &nL, 4, &dwRWC, nullptr);
+	file.Read(&nL, 4);
 	if(nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
+		file.Read(szFN, nL); szFN[nL] = '\0';
 		this->AniCtrlSet(szFN);
 	}
 
 	for (int i = 0; i < 2; i++)
-		ReadFile(hFile, &m_nJointPartStarts[i], sizeof(int), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
+		file.Read(&m_nJointPartStarts[i], sizeof(int)); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
 
 	for (int i = 0; i < 2; i++)
-		ReadFile(hFile, &m_nJointPartEnds[i], sizeof(int), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
+		file.Read(&m_nJointPartEnds[i], sizeof(int)); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
 
 //////////////////////////////////////////////////
 //	Coded (By Dino On 2002-10-10 오후 2:33:07 )
 //	FXPlug
 	nL = 0;
-	ReadFile(hFile, &nL, sizeof(nL), &dwRWC, nullptr);
+	file.Read(&nL, sizeof(nL));
 	if (nL > 0)
 	{
-		ReadFile(hFile, szFN, nL, &dwRWC, nullptr); szFN[nL] = '\0';
+		file.Read(szFN, nL); szFN[nL] = '\0';
 		FXPlugSet(szFN);
 	}
 //	End Of Code (By Dino On 2002-10-10 오후 2:33:07 )
@@ -1254,19 +1253,18 @@ __AnimData* CN3Chr::AniDataUpper()
 	return m_pAniCtrlRef->DataGet(m_FrmCtrlUpper.iAni);
 }
 
-bool CN3Chr::Save(HANDLE hFile)
+bool CN3Chr::Save(File& file)
 {
-	CN3TransformCollision::Save(hFile);
+	CN3TransformCollision::Save(file);
 
-	DWORD dwRWC = 0;
 	int nL = 0;
 
 	// 관절 파일 이름 써주기..
 	if (m_pRootJointRef != nullptr)
 		nL = static_cast<int>(m_pRootJointRef->FileName().size());
-	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+	file.Write(&nL, 4);
 	if (nL > 0)
-		WriteFile(hFile, m_pRootJointRef->FileName().c_str(), nL, &dwRWC, nullptr);
+		file.Write(m_pRootJointRef->FileName().c_str(), nL);
 
 	// 내용이 없는 Part Data는 걸러낸다..
 	std::vector<CN3CPart*> PartsTmp = m_Parts;
@@ -1305,7 +1303,7 @@ bool CN3Chr::Save(HANDLE hFile)
 
 	// 실제 저장..
 	int iPC = static_cast<int>(m_Parts.size());
-	WriteFile(hFile, &iPC, 4, &dwRWC, nullptr);
+	file.Write(&iPC, 4);
 
 	for (int i = 0; i < iPC; i++)
 	{
@@ -1317,13 +1315,13 @@ bool CN3Chr::Save(HANDLE hFile)
 		}
 
 		nL = static_cast<int>(m_Parts[i]->FileName().size());
-		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
-		WriteFile(hFile, m_Parts[i]->FileName().c_str(), nL, &dwRWC, nullptr);
+		file.Write(&nL, 4);
+		file.Write(m_Parts[i]->FileName().c_str(), nL);
 		m_Parts[i]->SaveToFile();
 	}
 
 	iPC = static_cast<int>(m_Plugs.size());
-	WriteFile(hFile, &iPC, 4, &dwRWC, nullptr);
+	file.Write(&iPC, 4);
 	for (int i = 0; i < iPC; i++)
 	{
 		nL = static_cast<int>(m_Plugs[i]->FileName().size());
@@ -1335,29 +1333,29 @@ bool CN3Chr::Save(HANDLE hFile)
 		}
 
 		nL = static_cast<int>(m_Plugs[i]->FileName().size());
-		WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
-		WriteFile(hFile, m_Plugs[i]->FileName().c_str(), nL, &dwRWC, nullptr);
+		file.Write(&nL, 4);
+		file.Write(m_Plugs[i]->FileName().c_str(), nL);
 		m_Plugs[i]->SaveToFile();
 	}
 
 //	nL = 0;
 //	if(m_pSkinCollision) nL = m_pSkinCollision->m_szName.size();
-//	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
-//	if(nL > 0) WriteFile(hFile, m_pSkinCollision->m_szName.c_str(), nL, &dwRWC, nullptr);
+//	file.Write(&nL, 4);
+//	if(nL > 0) file.Write(m_pSkinCollision->m_szName.c_str(), nL);
 
 	// Animation Control..
 	nL = 0;
 	if (m_pAniCtrlRef != nullptr)
 		nL = static_cast<int>(m_pAniCtrlRef->FileName().size());
-	WriteFile(hFile, &nL, 4, &dwRWC, nullptr);
+	file.Write(&nL, 4);
 	if (nL > 0)
-		WriteFile(hFile, m_pAniCtrlRef->FileName().c_str(), nL, &dwRWC, nullptr);
+		file.Write(m_pAniCtrlRef->FileName().c_str(), nL);
 
 	for (int i = 0; i < 2; i++)
-		WriteFile(hFile, &m_nJointPartStarts[i], sizeof(int), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
+		file.Write(&m_nJointPartStarts[i], sizeof(int)); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 시작 번호
 
 	for (int i = 0; i < 2; i++)
-		WriteFile(hFile, &m_nJointPartEnds[i], sizeof(int), &dwRWC, nullptr); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
+		file.Write(&m_nJointPartEnds[i], sizeof(int)); // 조인트의 일부분이 따로 에니메이션 되야 한다면.. 조인트 인덱스 끝 번호
 
 //////////////////////////////////////////////////
 //	Coded (By Dino On 2002-10-11 오후 2:19:11 )
@@ -1365,10 +1363,10 @@ bool CN3Chr::Save(HANDLE hFile)
 	nL = 0;
 	if (m_pFXPlug != nullptr)
 		nL = static_cast<int>(m_pFXPlug->FileName().size());
-	WriteFile(hFile, &nL, sizeof(nL), &dwRWC, nullptr);
+	file.Write(&nL, sizeof(nL));
 	if (nL > 0)
 	{
-		WriteFile(hFile, m_pFXPlug->FileName().c_str(), nL, &dwRWC, nullptr);
+		file.Write(m_pFXPlug->FileName().c_str(), nL);
 		m_pFXPlug->SaveToFile();
 	}
 //	End Of Code (By Dino On 2002-10-11 오후 2:19:11 )

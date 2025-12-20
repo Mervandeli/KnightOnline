@@ -80,11 +80,11 @@ public:
 	void Render();
 	void ClearList();
 	
-	bool Load(HANDLE hFile);
-	bool Save(HANDLE hFile);
+	bool Load(File& file) override;
+	bool Save(File& file) override;
 		
 	CLightObjMgr();
-	virtual ~CLightObjMgr();
+	~CLightObjMgr() override;
 };
 
 #endif // __LIGHTOBJMGR_H__

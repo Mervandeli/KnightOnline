@@ -54,41 +54,35 @@ void CN3UIStatic::Release()
 void CN3UIStatic::SetRegion(const RECT& Rect)
 {
 	CN3UIBase::SetRegion(Rect);
-	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
-	{
-		(*itor)->SetRegion(Rect);
-	}
+
+	for (CN3UIBase* pChild : m_Children)
+		pChild->SetRegion(Rect);
 }
 
-bool CN3UIStatic::Load(HANDLE hFile)
+bool CN3UIStatic::Load(File& file)
 {
-	if (false == CN3UIBase::Load(hFile)) return false;
+	if (!CN3UIBase::Load(file))
+		return false;
 
 	// m_pImageBkGnd,  m_pBuffOutRef 설정하기
-	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
+	for (CN3UIBase* pChild : m_Children)
 	{
-		CN3UIBase* pChild = (*itor);
 		if (UI_TYPE_IMAGE == pChild->UIType())
-		{
 			m_pImageBkGnd = (CN3UIImage*)pChild;
-		}
 		else if (UI_TYPE_STRING == pChild->UIType())
-		{
 			m_pBuffOutRef = (CN3UIString*)pChild;
-		}
 	}
 	
 	// 이전 uif파일을 컨버팅 하려면 사운드 로드 하는 부분 막기
 	int iSndFNLen = 0;
-	DWORD dwNum;
-	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
-	if (iSndFNLen>0)
+	file.Read(&iSndFNLen, sizeof(iSndFNLen));		//	사운드 파일 문자열 길이
+	if (iSndFNLen > 0)
 	{
-		std::vector<char> buffer(iSndFNLen+1, '\0');
-		ReadFile(hFile, &buffer[0], iSndFNLen, &dwNum, nullptr);
+		std::string filename(iSndFNLen, '\0');
+		file.Read(&filename[0], iSndFNLen);
 
 		__ASSERT(nullptr == m_pSnd_Click, "memory leak");
-		m_pSnd_Click = s_SndMgr.CreateObj(&buffer[0], SNDTYPE_2D);
+		m_pSnd_Click = s_SndMgr.CreateObj(filename, SNDTYPE_2D);
 	}
 
 	return true;
@@ -146,18 +140,17 @@ void CN3UIStatic::operator = (const CN3UIStatic& other)
 	}
 }
 
-bool CN3UIStatic::Save(HANDLE hFile)
+bool CN3UIStatic::Save(File& file)
 {
-	if (!CN3UIBase::Save(hFile))
+	if (!CN3UIBase::Save(file))
 		return false;
 
-	DWORD dwNum;
 	int iSndFNLen = 0;
 	if (m_pSnd_Click != nullptr)
 		iSndFNLen = static_cast<int>(m_pSnd_Click->m_szFileName.size());
-	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
+	file.Write(&iSndFNLen, sizeof(iSndFNLen));		//	사운드 파일 문자열 길이
 	if (iSndFNLen > 0)
-		WriteFile(hFile, m_pSnd_Click->m_szFileName.c_str(), iSndFNLen, &dwNum, nullptr);
+		file.Write(m_pSnd_Click->m_szFileName.c_str(), iSndFNLen);
 	return true;
 }
 

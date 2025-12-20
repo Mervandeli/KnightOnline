@@ -57,9 +57,9 @@ public:
 	void Tick(CN3Terrain* pTerrain);
 	void Render(CN3Texture** ppTex);
 
-	void ReCalcMatrix();
+	void ReCalcMatrix() override;
 
-	bool Load(HANDLE hFile);
+	bool Load(File& file) override;
 	void LoadFromFile(int iTexIndex,uint8_t ucTexOrgIndex,__Vector3 vPos);
 
 	void SetBrightInit(float min,float max) {m_fBrightmin = min,m_fBrightmax = max - min;};
@@ -71,17 +71,16 @@ public:
 	__Vector3	GetPo() {return m_vCenterPo;}
 
 #ifdef _N3TOOL
-	bool Save(HANDLE hFile);
+	bool Save(File& file) override;
 #endif // end of #ifdef _N3TOOL
 
-	void Release();
+	void Release() override;
 
 	CGrassBoard();
-	virtual ~CGrassBoard();
+	~CGrassBoard() override;
 
 protected:
-	void FindGrassIndex(const uint8_t uCGrassMngOrder,int* pnInputGrass,int& nGrassTotNum);
-
+	void FindGrassIndex(const uint8_t uCGrassMngOrder, int* pnInputGrass, int& nGrassTotNum);
 };
 
 #endif // !defined(AFX_GRASSBOARD_H__D53F0EC4_B777_49CD_BEE8_071AD4A1680E__INCLUDED_)

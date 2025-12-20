@@ -163,9 +163,9 @@ void CN3UIProgress::SetFrGndUVFromFrGndImage()
 	UpdateFrGndImage();
 }
 
-bool CN3UIProgress::Load(HANDLE hFile)
+bool CN3UIProgress::Load(File& file)
 {
-	if (false == CN3UIBase::Load(hFile)) return false;
+	if (false == CN3UIBase::Load(file)) return false;
 
 	// m_ImageRef 설정하기
 	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
@@ -218,11 +218,11 @@ void CN3UIProgress::operator = (const CN3UIProgress& other)
 	SetFrGndUVFromFrGndImage();
 }
 
-bool CN3UIProgress::Save(HANDLE hFile)
+bool CN3UIProgress::Save(File& file)
 {
 	int iCur = (int)m_fCurValue;	// 이전 상태 기억해 놓기
 	SetCurValue(m_iMaxValue);	// foreground가 꽉 채운 이미지 만들기
-	bool bRet = CN3UIBase::Save(hFile);	// 저장하기
+	bool bRet = CN3UIBase::Save(file);	// 저장하기
 
 	SetCurValue((int)m_fCurValue);	// 이전 상태로 되돌리기
 

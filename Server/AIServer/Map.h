@@ -5,6 +5,7 @@
 
 #include <shared-server/N3ShapeMgr.h>
 #include <shared-server/STLMap.h>
+
 #include <MathUtils/GeometricStructs.h>
 
 #include <iosfwd>
@@ -14,6 +15,7 @@ class CNpc;
 class CUser;
 class AIServerApp;
 class CRoomEvent;
+class File;
 
 typedef CSTLMap <_OBJECT_EVENT>		ObjectEventArray;
 typedef CSTLMap <CRoomEvent>		RoomEventArray;
@@ -51,10 +53,10 @@ public:
 	MAP();
 	virtual ~MAP();
 
-	bool LoadMap(std::istream& fs);
-	void LoadTerrain(std::istream& fs);
-	void LoadMapTile(std::istream& fs);
-	void LoadObjectEvent(std::istream& fs);
+	bool LoadMap(File& fs);
+	void LoadTerrain(File& fs);
+	void LoadMapTile(File& fs);
+	void LoadObjectEvent(File& fs);
 	bool LoadRoomEvent(int zone_number);
 	bool ObjectIntersect(float x1, float z1, float y1, float x2, float z2, float y2);
 	float GetHeight(float x, float z);

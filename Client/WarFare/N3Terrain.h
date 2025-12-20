@@ -94,7 +94,7 @@ protected:
 	void	SetNormals();
 	void	SetLightMap(int dir);
 	void	ReplaceLightMapPatch(int x, int z, stlMap_N3Tex& LightMapPatch);
-	void	SetLightMapPatch(int x, int z, HANDLE hFile, int* pAddr);
+	void	SetLightMapPatch(int x, int z, File& file, int* pAddr);
 
 	
 	void	TestAvailableTile();
@@ -105,7 +105,7 @@ protected:
 	int Tile2Patch(int x) { return (x / PATCH_TILE_SIZE); } // 타일좌표 -> 패치좌표...(절대좌표계)
 	int Real2Patch(float fX) { return ( ((int)fX / (int)TILE_SIZE) / PATCH_TILE_SIZE ); } // 실좌표 -> 패치좌표..(절대좌표계)
 		
-	void	LoadTileInfo(HANDLE hFile);
+	void	LoadTileInfo(File& file);
 	bool	CheckRenderablePatch();
 	bool	CheckMovePatch();
 	bool	CheckBound();
@@ -119,22 +119,22 @@ public:
 	int		GetLODLevel() { return m_iLodLevel; }
 	bool	SetLODLevel(int level);
 	float	GetHeight(float x, float z);
-	void	Release();
+	void	Release() override;
 	void	Init();
-	bool	Load(HANDLE hFile);
+	bool	Load(File& file) override;
 	void	Tick();
 	void	Render();
 	void	SetFillMode(D3DFILLMODE FillMode) { m_FillMode = FillMode; }
 	void	SetShadeMode(D3DSHADEMODE ShadeMode) {m_ShadeMode = ShadeMode; }
 		
 	CN3Terrain();
-	virtual ~CN3Terrain();
+	~CN3Terrain() override;
 
 public:	//additional........
 	bool			GetTileTexInfo(float x, float z, TERRAINTILETEXINFO& TexInfo1, TERRAINTILETEXINFO& TexInfo2);
 	CN3Texture*		GetTileTex(int x, int z);
 	MAPDATA			GetMapData(int x, int z);
-	uint16_t	GetGrassAttr(int x, int z);
+	uint16_t		GetGrassAttr(int x, int z);
 	bool			LoadColorMap(const std::string& szFN);
 	void			GetNormal(float x, float z, __Vector3& vNormal);
 	bool			IsInTerrain(float x, float z);

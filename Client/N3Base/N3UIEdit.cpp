@@ -686,22 +686,22 @@ BOOL CN3UIEdit::MoveOffset(int iOffsetX, int iOffsetY)		// 위치 지정(chilren
 	return TRUE;
 }
 
-bool CN3UIEdit::Load(HANDLE hFile)
+bool CN3UIEdit::Load(File& file)
 {
-	if (false == CN3UIStatic::Load(hFile)) return false;
+	if (!CN3UIStatic::Load(file))
+		return false;
 
 	// 이전 uif파일을 컨버팅 하려면 사운드 로드 하는 부분 막기
 	int iSndFNLen = 0;
-	DWORD dwNum;
 
-	ReadFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
-	if (iSndFNLen>0)
+	file.Read(&iSndFNLen, sizeof(iSndFNLen));		//	사운드 파일 문자열 길이
+	if (iSndFNLen > 0)
 	{
-		std::vector<char> buffer(iSndFNLen+1, '\0');
-		ReadFile(hFile, &buffer[0], iSndFNLen, &dwNum, nullptr);
+		std::string filename(iSndFNLen, '\0');
+		file.Read(&filename[0], iSndFNLen);
 
 		__ASSERT(nullptr == m_pSnd_Typing, "memory leak");
-		m_pSnd_Typing = s_SndMgr.CreateObj(&buffer[0], SNDTYPE_2D);
+		m_pSnd_Typing = s_SndMgr.CreateObj(filename, SNDTYPE_2D);
 	}
 
 	return true;
@@ -714,19 +714,17 @@ void CN3UIEdit::operator = (const CN3UIEdit& other)
 	SetSndTyping(other.GetSndFName_Typing());
 }
 
-bool CN3UIEdit::Save(HANDLE hFile)
+bool CN3UIEdit::Save(File& file)
 {
-	if (!CN3UIStatic::Save(hFile))
+	if (!CN3UIStatic::Save(file))
 		return false;
-
-	DWORD dwNum;
 
 	int iSndFNLen = 0;
 	if (m_pSnd_Typing != nullptr)
 		iSndFNLen = static_cast<int>(m_pSnd_Typing->m_szFileName.size());
-	WriteFile(hFile, &iSndFNLen, sizeof(iSndFNLen), &dwNum, nullptr);		//	사운드 파일 문자열 길이
+	file.Write(&iSndFNLen, sizeof(iSndFNLen));		//	사운드 파일 문자열 길이
 	if (iSndFNLen > 0)
-		WriteFile(hFile, m_pSnd_Typing->m_szFileName.c_str(), iSndFNLen, &dwNum, nullptr);
+		file.Write(m_pSnd_Typing->m_szFileName.c_str(), iSndFNLen);
 
 	return true;
 }
