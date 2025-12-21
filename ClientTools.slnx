@@ -26,5 +26,5 @@
   <Project Path="Client/Launcher/Launcher.vcxproj" Id="03af3bcf-b1a8-49f3-840e-10642257873a">
     <BuildDependency Project="deps/ZipArchive/ZipArchive.vcxproj" />
   </Project>
-  <Project Path="Client/Option/Option.vcxproj" Id="3fefbf4a-b12c-4e32-be93-4ea51fd09f63" />
+  <Project DefaultStartup="true" Path="Client/Option/Option.vcxproj" Id="3fefbf4a-b12c-4e32-be93-4ea51fd09f63" />
 </Solution>

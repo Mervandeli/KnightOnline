@@ -72,7 +72,7 @@
     </Project>
     <Project Path="deps/fetch-and-build-wrappers/sync-submodules.vcxproj" Id="1f14357d-e06a-48a1-b39a-74082f381fc0" />
   </Folder>
-  <Project Path="Server/AIServer/AIServer.vcxproj" Id="023cd26d-5809-4716-a245-b1e146c6e7fe">
+  <Project DefaultStartup="true" Path="Server/AIServer/AIServer.vcxproj" Id="023cd26d-5809-4716-a245-b1e146c6e7fe">
     <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-db-library.vcxproj" />
     <BuildDependency Project="FileIO/FileIO.vcxproj" />
     <BuildDependency Project="Server/shared-server/shared-server.vcxproj" />

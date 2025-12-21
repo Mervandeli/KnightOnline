@@ -43,7 +43,7 @@
     <Project Path="FileIO/FileIO.vcxproj" Id="10195386-62c0-4bda-a8e3-b88f1c9f81af">
       <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-llfio.vcxproj" />
     </Project>
-    <Project Path="MathUtils/MathUtils.vcxproj" Id="07cd39fe-8cb1-46a2-81ab-485f2cae215f" />
+    <Project DefaultStartup="true" Path="MathUtils/MathUtils.vcxproj" Id="07cd39fe-8cb1-46a2-81ab-485f2cae215f" />
     <Project Path="Server/shared-server/shared-server.vcxproj" Id="c630cf44-84a8-4586-a710-c420bf54dc13">
       <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-argparse.vcxproj" />
       <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-asio.vcxproj" />

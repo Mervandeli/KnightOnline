@@ -13,7 +13,7 @@
     <Project Path="Client/Option/Option.vcxproj" Id="3fefbf4a-b12c-4e32-be93-4ea51fd09f63" />
   </Folder>
   <Folder Name="/client/">
-    <Project Path="Client/WarFare/WarFare.vcxproj" Id="02a7c2de-6db6-477a-977a-adf0bf2204a6">
+    <Project DefaultStartup="true" Path="Client/WarFare/WarFare.vcxproj" Id="02a7c2de-6db6-477a-977a-adf0bf2204a6">
       <BuildDependency Project="Client/JpegFile/JpegFile.vcxproj" />
       <BuildDependency Project="Client/N3Base/N3Base_client.vcxproj" />
       <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-ko-client-assets.vcxproj" />
