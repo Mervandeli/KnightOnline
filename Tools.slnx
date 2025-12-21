@@ -66,7 +66,7 @@
     <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-dx9sdk.vcxproj" />
     <BuildDependency Project="shared/shared.vcxproj" />
   </Project>
-  <Project Path="UIE/UIE.vcxproj" Id="a3b3d543-e737-4888-83f6-6c696f4e6194">
+  <Project DefaultStartup="true" Path="UIE/UIE.vcxproj" Id="a3b3d543-e737-4888-83f6-6c696f4e6194">
     <BuildDependency Project="Client/N3Base/N3Base_tool.vcxproj" />
   </Project>
 </Solution>
