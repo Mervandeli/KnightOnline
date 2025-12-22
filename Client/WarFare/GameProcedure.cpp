@@ -352,24 +352,24 @@ void CGameProcedure::Tick()
 	POINT ptCur = s_pLocalInput->MouseGetPos();
 
 	e_Nation eNation = s_pPlayer->m_InfoBase.eNation;
-	if(dwMouseFlags & MOUSE_LBCLICK) SetGameCursor(((NATION_ELMORAD == eNation) ? s_hCursorClick1 : s_hCursorClick));
-	else if(dwMouseFlags & MOUSE_LBCLICKED) SetGameCursor(((NATION_ELMORAD == eNation) ? s_hCursorNormal1 : s_hCursorNormal));
-	if(dwMouseFlags & MOUSE_RBCLICKED)
+	if (dwMouseFlags & MOUSE_LBCLICK)
+		SetGameCursor(((NATION_ELMORAD == eNation) ? s_hCursorClick1 : s_hCursorClick));
+	else if (dwMouseFlags & MOUSE_LBCLICKED)
+		SetGameCursor(((NATION_ELMORAD == eNation) ? s_hCursorNormal1 : s_hCursorNormal));
+	if (dwMouseFlags & MOUSE_RBCLICKED)
 	{
-		if(s_pPlayer->m_bAttackContinous && s_pProcActive == s_pProcMain) // 메인 프로시져 이면..
+		// 메인 프로시져 이면..
+		if (s_pPlayer->m_bAttackContinous && s_pProcActive == s_pProcMain)
 			SetGameCursor(s_hCursorAttack);
 		else
 			SetGameCursor(((NATION_ELMORAD == eNation) ? s_hCursorNormal1 : s_hCursorNormal));
 	}
 
-	uint32_t dwRet = 0;
-	dwRet = s_pMsgBoxMgr->MouseProcAndTick(dwMouseFlags, s_pLocalInput->MouseGetPos(), s_pLocalInput->MouseGetPosOld());
-
-	if(0 == dwRet)
-	{
+	uint32_t dwRet = s_pMsgBoxMgr->MouseProcAndTick(dwMouseFlags, ptCur, ptPrev);
+	if (dwRet == 0)
 		dwRet = s_pUIMgr->MouseProc(dwMouseFlags, ptCur, ptPrev);
-		s_pUIMgr->Tick();
-	}
+
+	s_pUIMgr->Tick();
 
 	// 몬가 하면... 
 //	if((dwRet & UI_MOUSEPROC_CHILDDONESOMETHING) || (dwRet & UI_MOUSEPROC_DONESOMETHING))
