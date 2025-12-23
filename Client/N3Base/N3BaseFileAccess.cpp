@@ -48,8 +48,6 @@ void CN3BaseFileAccess::FileNameSet(const std::string& szFileName)
 
 bool CN3BaseFileAccess::Load(File& file)
 {
-	_ASSERT(m_iFileFormatVersion != N3FORMAT_VER_UNKN);
-
 	int nL = 0;
 	file.Read(&nL, 4);
 	if (nL > 0)
