@@ -35,7 +35,7 @@
 #include "text_resources.h"
 
 #include <N3Base/N3UIEdit.h>
-#include <N3Base/N3SndObjStream.h>
+#include <N3Base/N3SndObj.h>
 #include <N3Base/N3FXBundle.h>
 
 #include <N3Base/BitmapFile.h>
@@ -49,10 +49,7 @@
 static char THIS_FILE[]=__FILE__;
 #endif
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-CN3SndObjStream*	CGameProcedure::s_pSnd_BGM = nullptr;			// 메인 배경음악 포인터..
+CN3SndObj*			CGameProcedure::s_pSnd_BGM = nullptr;			// 메인 배경음악 포인터..
 CLocalInput*		CGameProcedure::s_pLocalInput = nullptr;		// 마우스와 키보드 입력 객체 .. Direct Input 을 썼다.
 CAPISocket*			CGameProcedure::s_pSocket = nullptr;			// 메인 소켓 객체
 CAPISocket*			CGameProcedure::s_pSocketSub = nullptr;		// 서브 소켓 객체
@@ -203,12 +200,10 @@ void CGameProcedure::StaticMemberInit(HINSTANCE hInstance, HWND hWndMain)
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// Sound 초기화..
-	if(CN3Base::s_Options.bSndEnable)
-	{
-		CN3Base::s_SndMgr.Init(s_hWndBase);//pWindow);
-		CN3Base::s_SndMgr.SetDuplicated(CN3Base::s_Options.bSndDuplicated);
-	}
-	CN3FXBundle::SetEffectSndDistance(float(CN3Base::s_Options.iEffectSndDist));
+	if (s_Options.bSndEnable)
+		s_SndMgr.Init();
+
+	CN3FXBundle::SetEffectSndDistance(static_cast<float>(s_Options.iEffectSndDist));
 
 	s_pFX = new CN3FXMgr();
 
@@ -324,18 +319,26 @@ void CGameProcedure::StaticMemberRelease()
 	delete s_pProcMain; s_pProcMain = nullptr; 						// 메인 게임 프로시져
 	delete s_pProcOption; s_pProcOption = nullptr; 					// 게임 옵션 프로시져
 
-	// UI 들 날리기..
-	if(s_pUILoading) delete s_pUILoading; s_pUILoading = nullptr;		// Loading Bar
-	delete s_pMsgBoxMgr;
-	delete s_pUIMgr; s_pUIMgr = nullptr;				// UI Manager
-
-//	delete s_pIME; s_pIME = nullptr;
-	delete s_pLocalInput; s_pLocalInput = nullptr;
-	delete s_pEng; s_pEng = nullptr; // 젤 마지막에 엔진 날리기.!!!!!
-
-	if(s_pGameCursor) delete s_pGameCursor; s_pGameCursor = nullptr;
-
 	CGameBase::StaticMemberRelease();
+
+	// UI 들 날리기..
+	delete s_pUILoading;
+	s_pUILoading = nullptr;
+
+	delete s_pMsgBoxMgr;
+	s_pMsgBoxMgr = nullptr;
+
+	delete s_pUIMgr;
+	s_pUIMgr = nullptr;
+
+	delete s_pLocalInput;
+	s_pLocalInput = nullptr;
+
+	delete s_pGameCursor;
+	s_pGameCursor = nullptr;
+
+	delete s_pEng;
+	s_pEng = nullptr; // 젤 마지막에 엔진 날리기.!!!!!
 }
 
 void CGameProcedure::Tick()

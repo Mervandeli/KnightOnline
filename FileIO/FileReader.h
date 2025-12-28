@@ -21,6 +21,13 @@ public:
 		return _mappedFileHandle;
 	}
 
+	/// \brief Gets the pointer to the mapped memory for the loaded file.
+	/// \returns the pointer to the mapped memory for the loaded file.
+	const void* Memory() const
+	{
+		return _address;
+	}
+
 	/// \brief Constructs a new FileReader object.
 	FileReader();
 

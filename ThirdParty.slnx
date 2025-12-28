@@ -38,6 +38,9 @@
     <Project Path="deps/fetch-and-build-wrappers/fetch-nanodbc.vcxproj" Id="3f38fd98-5c7e-97c7-70a9-fda7e34a0cfc">
       <BuildDependency Project="deps/fetch-and-build-wrappers/sync-submodules.vcxproj" />
     </Project>
+    <Project Path="deps/fetch-and-build-wrappers/fetch-openal-soft.vcxproj" Id="fe6338e2-792a-4c48-a2b9-95411e36d336">
+      <BuildDependency Project="deps/fetch-and-build-wrappers/sync-submodules.vcxproj" />
+    </Project>
     <Project Path="deps/fetch-and-build-wrappers/fetch-spdlog.vcxproj" Id="10898c84-af45-f0b0-5144-ea801df15503">
       <BuildDependency Project="deps/fetch-and-build-wrappers/sync-submodules.vcxproj" />
     </Project>

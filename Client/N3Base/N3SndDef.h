@@ -10,47 +10,80 @@
 #ifndef __N3SNDDEF_H__
 #define __N3SNDDEF_H__
 
-#include "WaveFile.h"
-#include <DSound.h>
-#include <string>
+#pragma once
 
-class CN3SndObj;
+#include <string> // std::string
 
-typedef struct __SoundSource
+struct __TABLE_SOUND // Sound 리소스 레코드...
 {
-	int						iID;
-	std::string				szFN;
-	LPDIRECTSOUNDBUFFER		pDSBuff;
-	int						Size;
-	int						Type; // 0:2d 1:3d 2: streammin..
-	int						Count;
-	int						iMaxCount;
-	CN3SndObj**				ppObjs;
-
-	__SoundSource()
-	{
-		iID = 0;
-		ppObjs = nullptr;
-		szFN = "";
-		pDSBuff = nullptr;
-		Size = 0;
-		Type = 0;
-		Count = 0;
-		iMaxCount = 0;
-	}	
-} SOUNDSOURCE, *LPSOUNDSOURCE;
-
-typedef struct __TABLE_SOUND // Sound 리소스 레코드...
-{
-	uint32_t		dwID;		// 고유 ID
+	uint32_t	dwID;		// 고유 ID
 	std::string	szFN;		// wave file name
 	int			iType;		// 사운드 타입...
 	int			iNumInst;	// 최대 사용할 수 있는 인스턴스의 갯수..
-} TABLE_SOUND;
+};
 
+/// \struct SoundSettings
+/// \brief Represents per-sound playback settings, such as volume.
+///
+/// It is shared between the sound instance and the audio handle, allowing,
+/// for example, persistent volume settings across subsequent plays from the
+/// same sound instance across different handles.
+struct SoundSettings
+{
+	/// Indicates whether playback should loop.
+	bool IsLooping		= false;
 
-// 사운드 오브젝트 타입 정의..
-enum e_SndType { SNDTYPE_2D=0, SNDTYPE_3D, SNDTYPE_STREAM };
-enum e_SndState { SNDSTATE_STOP=0, SNDSTATE_DELAY, SNDSTATE_FADEIN, SNDSTATE_PLAY, SNDSTATE_FADEOUT };
+	/// Current gain applied to the sound, in the range [0.0, 1.0].
+	float CurrentGain	= 0.0f;
+
+	/// Maximum gain that can be applied to the sound, in the range [0.0, 1.0].
+	/// Used as the target gain for fades and playback.
+	float MaxGain		= 1.0f;
+};
+
+/// \enum e_SndType
+/// \brief Type of sound, used to determine playback behavior.
+enum e_SndType
+{
+	/// Standard 2D sound, unaffected by 3D spatialization.
+	SNDTYPE_2D = 0,
+
+	/// 3D sound that is spatialized based on position and listener.
+	SNDTYPE_3D,
+
+	/// Streamed sound, decoded on the fly.
+	SNDTYPE_STREAM,
+
+	/// Unknown or uninitialized sound type.
+	SNDTYPE_UNKNOWN
+};
+
+/// \enum e_SndState
+/// \brief Current playback state of a sound.
+///
+/// These states are used by the audio system to manage the lifecycle
+/// of a sound handle, including fades, delays, and stopping.
+enum e_SndState
+{
+	/// Initial state, before playback starts.
+	SNDSTATE_INITIAL = 0,
+
+	/// Playback has stopped. Once in this state, the handle is no longer
+	/// considered active and will be removed from the \ref AudioThread.
+	SNDSTATE_STOP,
+
+	/// Playback is delayed, waiting for the start time to elapse.
+	SNDSTATE_DELAY,
+
+	/// Sound is fading in.
+	SNDSTATE_FADEIN,
+
+	/// Sound is actively playing at full volume.
+	SNDSTATE_PLAY,
+
+	/// Sound is fading out. Once the fade-out completes, playback
+	/// will automatically stop and the handle state will transition to SNDSTATE_STOP.
+	SNDSTATE_FADEOUT
+};
 
 #endif	//end of #ifndef __N3SNDDEF_H__

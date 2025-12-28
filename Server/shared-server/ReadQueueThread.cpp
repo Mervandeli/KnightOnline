@@ -2,6 +2,8 @@
 #include "ReadQueueThread.h"
 #include "SharedMemoryQueue.h"
 
+using namespace std::chrono_literals;
+
 ReadQueueThread::ReadQueueThread(SharedMemoryQueue& sharedMemoryQueue)
 	: _sharedMemoryQueue(sharedMemoryQueue)
 {
@@ -18,7 +20,7 @@ void ReadQueueThread::thread_loop()
 		if (len >= SMQ_ERROR_RANGE)
 		{
 			std::unique_lock<std::mutex> lock(_mutex);
-			_cv.wait_for(lock, std::chrono::milliseconds(100));
+			_cv.wait_for(lock, 100ms);
 
 			if (!_canTick)
 				break;

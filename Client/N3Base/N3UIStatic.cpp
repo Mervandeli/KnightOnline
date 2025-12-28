@@ -147,10 +147,10 @@ bool CN3UIStatic::Save(File& file)
 
 	int iSndFNLen = 0;
 	if (m_pSnd_Click != nullptr)
-		iSndFNLen = static_cast<int>(m_pSnd_Click->m_szFileName.size());
+		iSndFNLen = static_cast<int>(m_pSnd_Click->FileName().size());
 	file.Write(&iSndFNLen, sizeof(iSndFNLen));		//	사운드 파일 문자열 길이
 	if (iSndFNLen > 0)
-		file.Write(m_pSnd_Click->m_szFileName.c_str(), iSndFNLen);
+		file.Write(m_pSnd_Click->FileName().c_str(), iSndFNLen);
 	return true;
 }
 
@@ -184,7 +184,9 @@ void CN3UIStatic::SetSndClick(const std::string& strFileName)
 
 std::string CN3UIStatic::GetSndFName_Click() const
 {
-	if (m_pSnd_Click) return m_pSnd_Click->m_szFileName;
-	else return std::string("");
+	if (m_pSnd_Click == nullptr)
+		return {};
+
+	return m_pSnd_Click->FileName();
 }
 #endif

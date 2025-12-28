@@ -6,6 +6,8 @@
 
 #include <spdlog/spdlog.h>
 
+using namespace std::chrono_literals;
+
 SendWorkerThread::SendWorkerThread(EbenezerSocketManager* socketManager)
 	: _socketManager(socketManager)
 {
@@ -17,7 +19,7 @@ void SendWorkerThread::thread_loop()
 	{
 		{
 			std::unique_lock<std::mutex> lock(_mutex);
-			std::cv_status status = _cv.wait_for(lock, std::chrono::milliseconds(200));
+			std::cv_status status = _cv.wait_for(lock, 200ms);
 
 			if (!_canTick)
 				break;

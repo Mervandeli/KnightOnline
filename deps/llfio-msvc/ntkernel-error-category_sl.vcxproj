@@ -44,6 +44,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <LanguageStandard>stdcpp23</LanguageStandard>
       <MinimalRebuild>false</MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>

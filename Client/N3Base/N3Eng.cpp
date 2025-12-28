@@ -3,6 +3,8 @@
 #include "N3Light.h"
 #include "LogWriter.h"
 
+#include <DxErr.h>
+
 CN3Eng::CN3Eng()
 {
 	m_lpDD          = nullptr;
@@ -46,6 +48,8 @@ CN3Eng::CN3Eng()
 
 CN3Eng::~CN3Eng()
 {
+	s_SndMgr.Release();
+
 	CN3Base::ReleaseResrc();
 	delete [] m_DeviceInfo.pModes;
 

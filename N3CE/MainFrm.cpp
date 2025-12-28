@@ -82,7 +82,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 //	m_Eng.InitEnv();
 	if(m_Eng.Init(TRUE, m_hWnd, 64, 64, 0, TRUE) == false) return -1;
 	m_Eng.GridCreate(20, 20); // 그리드 만들기..
-	m_SndMgr.Init(m_hWnd);
+	m_SndMgr.Init();
 
 	return 0;
 }

@@ -77,6 +77,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;OPT_GENERIC;REAL_IS_FLOAT;_CRT_SECURE_NO_WARNINGS;NOXFERMEM</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(DependencyDir)mpg123-msvc\libmpg123;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <PreBuildEvent>
       <Command>

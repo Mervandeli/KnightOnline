@@ -46,6 +46,7 @@
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <LanguageStandard>stdcpp23</LanguageStandard>
       <MinimalRebuild>false</MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level4</WarningLevel>

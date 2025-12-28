@@ -73,7 +73,7 @@ CN3Base::~CN3Base()
 
 void CN3Base::Release()
 {
-	m_szName = "";
+	m_szName.clear();
 }
 
 void CN3Base::ReleaseResrc()

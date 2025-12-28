@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Audio">
+      <UniqueIdentifier>{8b400076-1600-4d39-bedb-d2d8893e5b17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="N3Eng.h">
@@ -177,21 +180,6 @@
     <ClInclude Include="N3SkyMng.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="N3SndDef.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="N3SndEng.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="N3SndMgr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="N3SndObj.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="N3SndObjStream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="N3Star.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -246,12 +234,6 @@
     <ClInclude Include="Pick.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StreamSoundObj.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WaveFile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="N3Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -269,6 +251,36 @@
     </ClInclude>
     <ClInclude Include="N3TableBaseImpl.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="al_wrapper.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioAsset.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioDecoderThread.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioThread.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="N3SndDef.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="N3SndMgr.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="N3SndObj.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="WaveFormat.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioHandle.h">
+      <Filter>Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="mpg123_reader_io.h">
+      <Filter>Audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -410,15 +422,6 @@
     <ClCompile Include="N3SkyMng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="N3SndMgr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="N3SndObj.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="N3SndObjStream.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="N3Star.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -470,9 +473,6 @@
     <ClCompile Include="Pick.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WaveFile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="StdAfxBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -493,6 +493,30 @@
     </ClCompile>
     <ClCompile Include="N3TableBaseImpl.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioAsset.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioDecoderThread.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioThread.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="N3SndMgr.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="N3SndObj.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioHandle.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="mpg123_reader_io.cpp">
+      <Filter>Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="WaveFormat.cpp">
+      <Filter>Audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

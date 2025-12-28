@@ -52,6 +52,7 @@
       <LanguageStandard>stdcpp23</LanguageStandard>
       <PreprocessorDefinitions>ASIO_SEPARATE_COMPILATION;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir)..\asio\asio\include;</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

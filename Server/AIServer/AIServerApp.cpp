@@ -1564,8 +1564,8 @@ void AIServerApp::SendSystemMsg(const std::string_view msg, int zone, int type, 
 	SetByte(buff, type, send_index);				// 채팅형식
 	SetShort(buff, who, send_index);				// 누구에게
 	SetString2(buff, msg, send_index);
-
 	Send(buff, send_index, zone);
+
 	spdlog::info("AIServerApp::SendSystemMsg: zoneId={} type={} who={} msg={}",
 		zone, type, who, msg);
 }
@@ -1613,6 +1613,7 @@ MAP* AIServerApp::GetMapByID(int iZoneID) const
 			&& pMap->m_nZoneNumber == iZoneID)
 			return pMap;
 	}
+
 	spdlog::error("AIServerApp::GetMapByID: no map found for zoneId={}", iZoneID);
 	return nullptr;
 }

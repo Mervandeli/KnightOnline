@@ -19,10 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="al_wrapper.h" />
+    <ClInclude Include="AudioAsset.h" />
+    <ClInclude Include="AudioDecoderThread.h" />
+    <ClInclude Include="AudioHandle.h" />
+    <ClInclude Include="AudioThread.h" />
     <ClInclude Include="BitMapFile.h" />
     <ClInclude Include="DebugUtils.h" />
     <ClInclude Include="DFont.h" />
     <ClInclude Include="LogWriter.h" />
+    <ClInclude Include="mpg123_reader_io.h" />
     <ClInclude Include="My_3DStruct.h" />
     <ClInclude Include="N3AlphaPrimitiveManager.h" />
     <ClInclude Include="N3AnimControl.h" />
@@ -68,10 +74,8 @@
     <ClInclude Include="N3Sky.h" />
     <ClInclude Include="N3SkyMng.h" />
     <ClInclude Include="N3SndDef.h" />
-    <ClInclude Include="N3SndEng.h" />
     <ClInclude Include="N3SndMgr.h" />
     <ClInclude Include="N3SndObj.h" />
-    <ClInclude Include="N3SndObjStream.h" />
     <ClInclude Include="N3Star.h" />
     <ClInclude Include="N3Sun.h" />
     <ClInclude Include="N3TableBase.h" />
@@ -95,15 +99,19 @@
     <ClInclude Include="N3UITrackBar.h" />
     <ClInclude Include="N3VMesh.h" />
     <ClInclude Include="StdAfxBase.h" />
-    <ClInclude Include="StreamSoundObj.h" />
-    <ClInclude Include="WaveFile.h" />
+    <ClInclude Include="WaveFormat.h" />
     <ClInclude Include="WinCrypt.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AudioAsset.cpp" />
+    <ClCompile Include="AudioDecoderThread.cpp" />
+    <ClCompile Include="AudioHandle.cpp" />
+    <ClCompile Include="AudioThread.cpp" />
     <ClCompile Include="BitMapFile.cpp" />
     <ClCompile Include="DebugUtils.cpp" />
     <ClCompile Include="DFont.cpp" />
     <ClCompile Include="LogWriter.cpp" />
+    <ClCompile Include="mpg123_reader_io.cpp" />
     <ClCompile Include="My_3DStruct.cpp" />
     <ClCompile Include="N3AlphaPrimitiveManager.cpp" />
     <ClCompile Include="N3AnimControl.cpp" />
@@ -146,7 +154,6 @@
     <ClCompile Include="N3SkyMng.cpp" />
     <ClCompile Include="N3SndMgr.cpp" />
     <ClCompile Include="N3SndObj.cpp" />
-    <ClCompile Include="N3SndObjStream.cpp" />
     <ClCompile Include="N3Star.cpp" />
     <ClCompile Include="N3Sun.cpp" />
     <ClCompile Include="N3TableBaseImpl.cpp" />
@@ -169,7 +176,7 @@
     <ClCompile Include="StdAfxBase.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="WaveFile.cpp" />
+    <ClCompile Include="WaveFormat.cpp" />
     <ClCompile Include="WinCrypt.cpp" />
   </ItemGroup>
   <ItemGroup>

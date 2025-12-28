@@ -21,7 +21,6 @@
 #include "text_resources.h"
 
 #include <N3Base/N3SndObj.h>
-#include <N3Base/N3SndObjStream.h>
 #include <N3Base/N3ShapeExtra.h>
 
 #ifdef _DEBUG

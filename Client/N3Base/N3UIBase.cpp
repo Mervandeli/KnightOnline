@@ -726,16 +726,16 @@ void CN3UIBase::operator = (const CN3UIBase& other)
 	m_eState = other.m_eState;
 	m_eType = other.m_eType;
 
-	if(other.m_pSnd_OpenUI)
+	if (other.m_pSnd_OpenUI != nullptr)
 	{
-		CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_OpenUI);
-		m_pSnd_OpenUI = s_SndMgr.CreateObj(other.m_pSnd_OpenUI->m_szFileName, SNDTYPE_2D);
+		s_SndMgr.ReleaseObj(&m_pSnd_OpenUI);
+		m_pSnd_OpenUI = s_SndMgr.CreateObj(other.m_pSnd_OpenUI->FileName(), SNDTYPE_2D);
 	}
 
-	if(other.m_pSnd_CloseUI)
+	if (other.m_pSnd_CloseUI != nullptr)
 	{
-		CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_CloseUI);
-		m_pSnd_CloseUI = s_SndMgr.CreateObj(other.m_pSnd_CloseUI->m_szFileName, SNDTYPE_2D);
+		s_SndMgr.ReleaseObj(&m_pSnd_CloseUI);
+		m_pSnd_CloseUI = s_SndMgr.CreateObj(other.m_pSnd_CloseUI->FileName(), SNDTYPE_2D);
 	}
 
 	m_rcMovable = other.m_rcMovable;
@@ -795,16 +795,16 @@ bool CN3UIBase::Save(File& file)
 
 	int iSndFNLen = 0;
 	if (m_pSnd_OpenUI != nullptr)
-		iSndFNLen = static_cast<int>(m_pSnd_OpenUI->m_szFileName.size());
+		iSndFNLen = static_cast<int>(m_pSnd_OpenUI->FileName().size());
 	file.Write(&iSndFNLen, sizeof(iSndFNLen));			//	사운드 파일 문자열 길이
-	if (iSndFNLen>0) file.Write(m_pSnd_OpenUI->m_szFileName.c_str(), iSndFNLen);
+	if (iSndFNLen>0) file.Write(m_pSnd_OpenUI->FileName().c_str(), iSndFNLen);
 
 	iSndFNLen = 0;
 	if (m_pSnd_CloseUI != nullptr)
-		iSndFNLen = static_cast<int>(m_pSnd_CloseUI->m_szFileName.size());
+		iSndFNLen = static_cast<int>(m_pSnd_CloseUI->FileName().size());
 	file.Write(&iSndFNLen, sizeof(iSndFNLen));			//	사운드 파일 문자열 길이
 	if (iSndFNLen > 0)
-		file.Write(m_pSnd_CloseUI->m_szFileName.c_str(), iSndFNLen);
+		file.Write(m_pSnd_CloseUI->FileName().c_str(), iSndFNLen);
 	
 	return true;
 }
@@ -1153,23 +1153,31 @@ void CN3UIBase::SetSndClose(const std::string& strFileName)
 
 std::string CN3UIBase::GetSndFName_OpenUI() const
 {
-	if (m_pSnd_OpenUI) return m_pSnd_OpenUI->m_szFileName;
-	else return std::string("");
+	if (m_pSnd_OpenUI == nullptr)
+		return {};
+	
+	return m_pSnd_OpenUI->FileName();
 }
 
 std::string CN3UIBase::GetSndFName_CloseUI() const
 {
-	if (m_pSnd_CloseUI) return m_pSnd_CloseUI->m_szFileName;
-	else return std::string("");
+	if (m_pSnd_CloseUI == nullptr)
+		return {};
+	
+	return m_pSnd_CloseUI->FileName();
 }
 
 bool CN3UIBase::ReplaceAllTextures(const std::string& strFind, const std::string& strReplace)
 {
-	if (strFind.size() <= 0 || strReplace.size() <= 0) return false;
-	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
+	if (strFind.empty() || strReplace.empty())
+		return false;
+
+	for (CN3UIBase* pChild : m_Children)
 	{
-		if (false == (*itor)->ReplaceAllTextures(strFind, strReplace)) return false;
+		if (!pChild->ReplaceAllTextures(strFind, strReplace))
+			return false;
 	}
+
 	return true;
 }
 

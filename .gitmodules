@@ -75,3 +75,7 @@
 	path = deps/llfio-msvc-dep-headers
 	url = https://github.com/Open-KO/llfio-msvc-dep-headers
 	shallow = true
+[submodule "deps/openal-soft"]
+	path = deps/openal-soft
+	url = https://github.com/kcat/openal-soft
+	shallow = true

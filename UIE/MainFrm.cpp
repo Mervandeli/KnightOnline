@@ -104,7 +104,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//m_Eng.InitEnv();
 
 	if(!m_Eng.Init(TRUE, GetRightPane()->m_hWnd, 64, 64, 0, TRUE)) return -1;
-	m_Eng.s_SndMgr.Init(m_hWnd);
+	m_Eng.s_SndMgr.Init();
 
 
 	char szPath[_MAX_PATH];

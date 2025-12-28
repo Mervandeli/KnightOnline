@@ -15,13 +15,13 @@
 //
 void CNpcThread::thread_loop()
 {
-	uint32_t			dwTickTime	= 0;
+	uint32_t dwTickTime	= 0;
 
 	srand((unsigned int) time(nullptr));
 	myrand(1, 10000);
 	myrand(1, 10000);
 
-	double	fTime2 = 0.0, fTime3 = 0.0;
+	double fTime2 = 0.0, fTime3 = 0.0;
 
 	while (_canTick)
 	{

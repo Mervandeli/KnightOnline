@@ -5,36 +5,41 @@
 #include "StdAfxBase.h"
 #include "N3SndObj.h"
 #include "N3Base.h"
-#include <math.h>
+#include "AudioAsset.h"
+#include "AudioHandle.h"
+#include "WaveFormat.h"
+#include "al_wrapper.h"
+
+#include <AL/alc.h>
+#include <cassert>		// assert()
+
+#ifdef _N3GAME
+#include "LogWriter.h"
+#endif
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-LPDIRECTSOUND				CN3SndObj::s_lpDS = nullptr;
-LPDIRECTSOUND3DLISTENER		CN3SndObj::s_lpDSListener = nullptr;		// 3D listener object
-DS3DLISTENER				CN3SndObj::s_dsListenerParams;			// Listener properties
-bool						CN3SndObj::s_bNeedDeferredTick = false;	// 3D Listener CommitDeferredSetting
+bool al_check_error_impl(const char* file, int line)
+{
+	ALenum error = alGetError();
+	if (error == AL_NO_ERROR)
+		return false;
+	
+#ifdef _N3GAME
+	CLogWriter::Write("{}({}) - OpenAL error occurred: {:X}", file, line, error);
+#endif
+	return true;
+}
 
 CN3SndObj::CN3SndObj()
 {
-	m_lpDSBuff = nullptr;
-	m_lpDS3DBuff = nullptr;
-	m_bIsLoop = false;
-	m_iVol = -1;
-	m_szFileName = "";
+	_type = SNDTYPE_UNKNOWN;
+	_isStarted = false;
 
-	m_fFadeInTime = 0;
-	m_fFadeOutTime = 0;
-	m_fStartDelayTime = 0;
-	m_fTmpSecPerFrm = 0;
-	m_ePlayState = SNDSTATE_STOP;
-
-	m_iMaxVolume = 100;
+	_soundSettings = std::make_shared<SoundSettings>();
 }
 
 CN3SndObj::~CN3SndObj()
@@ -42,562 +47,414 @@ CN3SndObj::~CN3SndObj()
 	Release();
 }
 
-
-//
-//	Initialize....
-//
 void CN3SndObj::Init()
 {
 	Release();
 
-	m_bIsLoop = false;
-	m_iVol = -1;
-	m_szFileName = "";
-
-	m_fStartDelayTime = 0;
-	m_fTmpSecPerFrm = 0;
-	m_ePlayState = SNDSTATE_STOP;
-	m_fFadeInTime = 0;
-	m_fFadeOutTime = 0;
-
-	m_iMaxVolume = 100;
+	_isStarted = false;
+	_soundSettings->IsLooping = false;
 }
 
-
-//
-//	Release...
-//
 void CN3SndObj::Release()
 {
-	if(m_lpDS3DBuff)
-	{
-		m_lpDS3DBuff->Release();
-		m_lpDS3DBuff = nullptr;
-	}	
+	ReleaseHandle();
 
-	if(m_lpDSBuff)
+	if (_audioAsset != nullptr)
 	{
-		m_lpDSBuff->Stop();
-		m_lpDSBuff->Release();
-		m_lpDSBuff = nullptr;
+		CN3Base::s_SndMgr.RemoveAudioAsset(_audioAsset.get());
+		_audioAsset.reset();
 	}
-}
-
-bool CN3SndObj::StaticInit( HWND  hWnd, DWORD dwCoopLevel, DWORD dwPrimaryChannels, DWORD dwPrimaryFreq, DWORD dwPrimaryBitRate )
-{
-    HRESULT hr;
-    LPDIRECTSOUNDBUFFER lpDSBPrimary = nullptr;
-
-	if(s_lpDS)
-	{
-		s_lpDS->Release();
-		s_lpDS = nullptr;
-	}
-
-    // Create IDirectSound using the primary sound device
-    if( FAILED( hr = DirectSoundCreate( nullptr, &s_lpDS, nullptr ) ) )
-        return false;
-
-    // Set DirectSound coop level 
-    if( FAILED( hr = s_lpDS->SetCooperativeLevel( hWnd, dwCoopLevel ) ) )
-        return false;
-    
-    // Set primary buffer format
-    // Get the primary buffer 
-    DSBUFFERDESC dsbd;
-    ZeroMemory( &dsbd, sizeof(DSBUFFERDESC) );
-    dsbd.dwSize        = sizeof(DSBUFFERDESC);
-    dsbd.dwFlags       = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRL3D | DSBCAPS_MUTE3DATMAXDISTANCE;
-    dsbd.dwBufferBytes = 0;
-    dsbd.lpwfxFormat   = nullptr;
-    if( FAILED( hr = s_lpDS->CreateSoundBuffer( &dsbd, &lpDSBPrimary, nullptr ) ) ) return false;
-
-    WAVEFORMATEX wfx;
-    ZeroMemory( &wfx, sizeof(WAVEFORMATEX) ); 
-    wfx.wFormatTag      = WAVE_FORMAT_PCM; 
-    wfx.nChannels       = (uint16_t) dwPrimaryChannels; 
-    wfx.nSamplesPerSec  = dwPrimaryFreq; 
-    wfx.wBitsPerSample  = (uint16_t) dwPrimaryBitRate; 
-    wfx.nBlockAlign     = wfx.wBitsPerSample / 8 * wfx.nChannels;
-    wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
-    if( FAILED( hr = lpDSBPrimary->SetFormat(&wfx) ) ) return false;
-
-	if(lpDSBPrimary)
-	{
-		lpDSBPrimary->Release();
-		lpDSBPrimary = nullptr;
-	}
-
-
-	// Create listener
-    // Obtain primary buffer, asking it for 3D control
-    ZeroMemory( &dsbd, sizeof(dsbd) );
-    dsbd.dwSize = sizeof(DSBUFFERDESC);
-    dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_MUTE3DATMAXDISTANCE | DSBCAPS_CTRL3D;
-    if( FAILED( hr = s_lpDS->CreateSoundBuffer( &dsbd, &lpDSBPrimary, nullptr ) ) )
-        return false;
-
-    if( FAILED( hr = lpDSBPrimary->QueryInterface( IID_IDirectSound3DListener, (VOID**)(&s_lpDSListener) ) ) )
-    {
-       if(lpDSBPrimary)
-	   {
-		   lpDSBPrimary->Release();
-		   lpDSBPrimary = nullptr;
-	   }		   
-	   return false;
-    }
-
-    if(lpDSBPrimary)
-	{
-		lpDSBPrimary->Release();
-		lpDSBPrimary = nullptr;
-	}
-
-	// Set listener 
-	s_dsListenerParams.dwSize = sizeof(DS3DLISTENER);
-	s_lpDSListener->GetAllParameters( &s_dsListenerParams );
-	s_lpDSListener->SetRolloffFactor( DS3D_DEFAULTROLLOFFFACTOR/2, DS3D_IMMEDIATE);
-	s_lpDSListener->SetDopplerFactor(0, DS3D_DEFERRED);
-	
-	s_bNeedDeferredTick = true;	// 3D Listener CommitDeferredSetting
-    return true;
-}
-
-void CN3SndObj::StaticRelease()
-{
-	if(s_lpDSListener)
-	{
-		s_lpDSListener->Release();
-		s_lpDSListener = nullptr;
-	}
-	if(s_lpDS)
-	{
-		s_lpDS->Release();
-		s_lpDS = nullptr;
-	}
-
-	s_bNeedDeferredTick = false;	// 3D Listener CommitDeferredSetting
-}
-
-void CN3SndObj::StaticTick()
-{
-	if(false == s_bNeedDeferredTick) return;
-	// 3D Listener CommitDeferredSetting
-
-	s_lpDSListener->CommitDeferredSettings();
-	s_bNeedDeferredTick = false;
 }
 
 bool CN3SndObj::Create(const std::string& szFN, e_SndType eType)
 {
-	if(nullptr == s_lpDS) return false;
-	if(SNDTYPE_2D != eType && SNDTYPE_3D != eType) return false;
-	if(m_lpDSBuff) this->Init();
+	Init();
 
-	CWaveFile	WaveFile;
-	HRESULT hr = WaveFile.Open(szFN.c_str(), nullptr, 1);	//#define WAVEFILE_READ   1
-	if(FAILED(hr))
+	if (eType == SNDTYPE_2D
+		|| eType == SNDTYPE_3D)
 	{
-#ifdef _N3GAME
-		if (!szFN.empty())
-			CLogWriter::Write("CN3SndObj::Create - WaveFile Open Failed.. ({})", szFN);
-#endif
+		_audioAsset = CN3Base::s_SndMgr.LoadBufferedAudioAsset(szFN);
+
+		// Fallback to streaming if unsupported
+		// Buffering is only supported for small WAV (PCM) files.
+		// Streaming supports MP3.
+		if (_audioAsset == nullptr)
+			_audioAsset = CN3Base::s_SndMgr.LoadStreamedAudioAsset(szFN);
+	}
+	else if (eType == SNDTYPE_STREAM)
+	{
+		_audioAsset = CN3Base::s_SndMgr.LoadStreamedAudioAsset(szFN);
+	}
+	else
+	{
 		return false;
 	}
 
-	DSBUFFERDESC dsbd;
-    ZeroMemory( &dsbd, sizeof(DSBUFFERDESC) );
-    dsbd.dwSize          = sizeof(DSBUFFERDESC);
-	dsbd.dwBufferBytes   = WaveFile.GetSize();
-	dsbd.lpwfxFormat     = WaveFile.m_pwfx;
-
-	if(SNDTYPE_2D == eType) // 2D 음원
-	{
-		dsbd.dwFlags		 = DSBCAPS_CTRLVOLUME; // | DSBCAPS_STATIC;
-	}
-	else if(SNDTYPE_3D == eType)	//3D 음원..
-	{
-		dsbd.dwFlags         = DSBCAPS_CTRL3D | DSBCAPS_MUTE3DATMAXDISTANCE; // | DSBCAPS_STATIC;
-		dsbd.guid3DAlgorithm = DS3DALG_HRTF_LIGHT;
-	}
-
-	hr = s_lpDS->CreateSoundBuffer( &dsbd, &m_lpDSBuff, nullptr );
-	if(FAILED(hr))
-	{
-#ifdef _N3GAME
-		CLogWriter::Write("CN3SndObj::Create - CreateSoundBuffer Failed.. ({})", szFN);
-#endif
+	if (_audioAsset == nullptr)
 		return false;
-	}
 
-    if(!FillBufferWithSound(&WaveFile))
-	{
-#ifdef _N3GAME
-		CLogWriter::Write("CN3SndObj::Create - FillBufferWithSound Failed.. ({})", szFN);
-#endif
-		return false;
-	}
-
-	m_lpDSBuff->SetCurrentPosition(0);
-	if(SNDTYPE_3D == eType)	//3D 음원..
-		if(S_OK != m_lpDSBuff->QueryInterface(IID_IDirectSound3DBuffer, (VOID**)(&m_lpDS3DBuff)))
-			return false;
-
-	m_szFileName = szFN; // 파일 이름을 기록한다..
-
-	s_bNeedDeferredTick = true;	// 3D Listener CommitDeferredSetting
+	_type = eType;
 	return true;
 }
 
-bool CN3SndObj::Duplicate(CN3SndObj* pSrc, e_SndType eType, __Vector3* pPos)
+//	SetVolume
+//	range : [0.0f, 1.0f]
+void CN3SndObj::SetVolume(float currentVolume)
 {
-	if(nullptr == s_lpDS || nullptr == pSrc || nullptr == pSrc->m_lpDSBuff)
-		return false;
-	if(m_lpDSBuff) this->Init();
+	currentVolume = std::clamp(currentVolume, 0.0f, 1.0f);
 
-	HRESULT hr = 0;
-	if(DS_OK != s_lpDS->DuplicateSoundBuffer(pSrc->m_lpDSBuff, &(m_lpDSBuff)))
-		return false;
-	
-	m_lpDSBuff->SetCurrentPosition(0);
-	if(SNDTYPE_3D == eType)
+	if (_handle != nullptr)
 	{
-		if(S_OK != m_lpDSBuff->QueryInterface( IID_IDirectSound3DBuffer, (VOID**)(&m_lpDS3DBuff)))
-			return false;
-		
-		/*
-		if(pSrc->m_lpDS3DBuff)
+		CN3Base::s_SndMgr.QueueCallback(_handle, [=] (AudioHandle* handle)
 		{
-			DS3DBUFFER BuffParam;
-			BuffParam.dwSize = sizeof(DS3DBUFFER);
-			hr = pSrc->m_lpDS3DBuff->GetAllParameters(&BuffParam);
-		  	hr = m_lpDS3DBuff->SetAllParameters(&BuffParam, DS3D_DEFERRED);			
-		}
-		*/
+			handle->Settings->CurrentGain = currentVolume;
 
-		if (pPos != nullptr)
-			SetPos(pPos);
-		SetMaxDistance(100);
-		
-		__Vector3 vDir = { 0.0f, 1.0f, 0.0f };
-		SetConeOrientation(&vDir);
+			alSourcef(handle->SourceId, AL_GAIN, handle->Settings->CurrentGain);
+			AL_CHECK_ERROR();
+		});
 	}
-
-	s_bNeedDeferredTick = true;	// 3D Listener CommitDeferredSetting
-	m_szFileName = pSrc->m_szFileName;
-	return true;
-}
-
-bool CN3SndObj::FillBufferWithSound(CWaveFile* pWaveFile)
-{
-    if( nullptr == m_lpDSBuff || nullptr == pWaveFile )
-		return false; // 포인터들 점검..
-	
-    HRESULT hr; 
-    VOID*   pDSLockedBuffer      = nullptr; // Pointer to locked buffer memory
-    DWORD   dwDSLockedBufferSize = 0;    // Size of the locked DirectSound buffer
-    DWORD   dwWavDataRead        = 0;    // Amount of data read from the wav file 
-
-	DSBCAPS dsbc; dsbc.dwSize = sizeof(dsbc);
-	m_lpDSBuff->GetCaps(&dsbc);
-	if(dsbc.dwBufferBytes != pWaveFile->GetSize())
-		return false; // 사이즈 점검..
-
-	if (!RestoreBuffer())
-		return false;
-
-    // Lock the buffer down
-	if( FAILED( hr = m_lpDSBuff->Lock( 0, dsbc.dwBufferBytes, &pDSLockedBuffer, &dwDSLockedBufferSize, nullptr, nullptr, 0L ) ) )
-        return false;
-
-	pWaveFile->ResetFile();
-
-    if( FAILED( hr = pWaveFile->Read( (uint8_t*) pDSLockedBuffer, dwDSLockedBufferSize, &dwWavDataRead ) ) )
-		return false;
-
-    if( dwWavDataRead == 0 )
-    {
-        // Wav is blank, so just fill with silence
-        FillMemory( (uint8_t*) pDSLockedBuffer, dwDSLockedBufferSize, (uint8_t)(pWaveFile->m_pwfx->wBitsPerSample == 8 ? 128 : 0 ) );
-    }
-    else if( dwWavDataRead < dwDSLockedBufferSize )
-    {
-       // just fill in silence 
-        FillMemory( (uint8_t*) pDSLockedBuffer + dwWavDataRead, 
-                    dwDSLockedBufferSize - dwWavDataRead, 
-                    (uint8_t)(pWaveFile->m_pwfx->wBitsPerSample == 8 ? 128 : 0 ) );
-    }
-
-    // Unlock the buffer, we don't need it anymore.
-    m_lpDSBuff->Unlock( pDSLockedBuffer, dwDSLockedBufferSize, nullptr, 0 );
-
-    return true;
-}
-
-bool CN3SndObj::RestoreBuffer()
-{
-    if( nullptr == m_lpDSBuff ) return false;
-
-    HRESULT hr;
-    DWORD dwStatus;
-    if( FAILED( hr = m_lpDSBuff->GetStatus( &dwStatus ) ) )
-        return false;
-
-    if( dwStatus & DSBSTATUS_BUFFERLOST )
-    {
-        // Since the app could have just been activated, then
-        // DirectSound may not be giving us control yet, so 
-        // the restoring the buffer may fail.  
-        // If it does, sleep until DirectSound gives us control.
-		hr = m_lpDSBuff->Restore();
-		while (FAILED(hr))
-        {
-			if (hr == DSERR_BUFFERLOST)
-				Sleep(10);
-
-			hr = m_lpDSBuff->Restore();
-        }
-    }
-
-	return true;
-}
-
-//
-//	SetVolume...
-//	range : [0,100]
-//
-void CN3SndObj::SetVolume(int Vol)
-{
-	if(nullptr == m_lpDSBuff) return;
-	if(m_lpDS3DBuff) return; // 3D Sound 일때는 소리 조절이 안된다..!!!
-
-	m_iVol = Vol;
-	if(Vol==0)
+	else
 	{
-		m_lpDSBuff->SetVolume(-10000);
-		return;
+		_soundSettings->CurrentGain = currentVolume;
 	}
-
-	float fVol = (float)(Vol) / 100.0f;
-	long dwVol = (long)(log10(fVol) * 3000);	//데시벨 관련 소리조절식..
-	m_lpDSBuff->SetVolume(dwVol);
 }
 
-
-//
-//
-//
-bool CN3SndObj::IsPlaying()
+void CN3SndObj::SetMaxVolume(float maxVolume)
 {
-	if(nullptr == m_lpDSBuff) return false;
-	
-	DWORD dwStatus = 0;
-	m_lpDSBuff->GetStatus( &dwStatus );
-	if(dwStatus & DSBSTATUS_PLAYING) return true;
+	maxVolume = std::clamp(maxVolume, 0.0f, 1.0f);
 
-	if(m_ePlayState != SNDSTATE_STOP) return true;
-	return false;
+	_soundSettings->MaxGain = maxVolume;
+
+	if (_handle != nullptr)
+	{
+		CN3Base::s_SndMgr.QueueCallback(_handle, [=] (AudioHandle* handle)
+		{
+			if (handle->Settings->CurrentGain <= maxVolume)
+				return;
+
+			handle->Settings->CurrentGain = maxVolume;
+
+			alSourcef(handle->SourceId, AL_GAIN, handle->Settings->CurrentGain);
+			AL_CHECK_ERROR();
+		});
+	}
 }
 
+const std::string& CN3SndObj::FileName() const
+{
+	if (_audioAsset != nullptr)
+		return _audioAsset->Filename;
 
-//
-//
-//
+	static std::string empty;
+	return empty;
+}
+
+bool CN3SndObj::IsFinished() const
+{
+	if (_handle == nullptr)
+		return false;
+
+	return _handle->FinishedPlaying;
+}
+
 void CN3SndObj::Tick()
 {
-	if(nullptr == m_lpDSBuff || m_ePlayState == SNDSTATE_STOP) return;
-
-	m_fTmpSecPerFrm += CN3Base::s_fSecPerFrm;
-	
-	if(m_ePlayState==SNDSTATE_DELAY && m_fTmpSecPerFrm >= m_fStartDelayTime)
+	if (_handle == nullptr)
 	{
-		m_fTmpSecPerFrm = 0;
-		m_ePlayState = SNDSTATE_FADEIN;
-		RealPlay();
-	}
-
-	if(m_ePlayState==SNDSTATE_FADEIN) 
-	{
-		if(m_fTmpSecPerFrm >= m_fFadeInTime)
-		{
-			m_fTmpSecPerFrm = 0;
-			m_ePlayState = SNDSTATE_PLAY;
-			this->SetVolume(m_iMaxVolume);
-		}
-		else
-		{
-			int vol = 0;
-			if(m_fFadeInTime>0.0f) vol = (int)((m_fTmpSecPerFrm/m_fFadeInTime)*(float)m_iMaxVolume);
-			SetVolume(vol);
-		}
-	}
-
-	if(m_ePlayState==SNDSTATE_PLAY)
-	{
-		if(!m_bIsLoop) m_ePlayState = SNDSTATE_STOP;		
-	}
-	if(m_ePlayState==SNDSTATE_FADEOUT)
-	{
-		if(m_fTmpSecPerFrm >= m_fFadeOutTime)
-		{
-			m_fTmpSecPerFrm = 0;
-			m_ePlayState = SNDSTATE_STOP;
-			this->SetVolume(0);
-			HRESULT hr = m_lpDSBuff->Stop();
-		}
-		else
-		{
-			//볼륨 점점 작게....
-			int vol = 0;
-			if(m_fFadeOutTime>0.0f)  vol = (int)(((m_fFadeOutTime - m_fTmpSecPerFrm)/m_fFadeOutTime)*(float)m_iMaxVolume);
-			SetVolume(vol);
-		}
-	}
-}
-
-
-//
-//
-//
-void CN3SndObj::Play(const __Vector3* pvPos, float delay, float fFadeInTime, bool bImmediately)
-{
-	SetPos(pvPos);
-	if(bImmediately) this->Stop();
-
-	m_fFadeInTime = fFadeInTime;
-	m_fFadeOutTime = 0;
-	m_fStartDelayTime = delay;
-	m_fTmpSecPerFrm = 0;
-	m_ePlayState = SNDSTATE_DELAY;
-
-	if(m_lpDS3DBuff) // 3D 사운드일때에는 FadeIn 등이 필요 없구.. 볼륨이 먹지 않기 때문에 리턴..
-	{
-		m_ePlayState = SNDSTATE_PLAY;
-		if(m_lpDSBuff)
-		{
-			if(m_bIsLoop) m_lpDSBuff->Play(0,0,DSBPLAY_LOOPING);
-			else m_lpDSBuff->Play( 0, 0, 0 );
-		}
-	}
-}
-
-
-//
-//
-//
-void CN3SndObj::RealPlay()
-{
-    if(nullptr == m_lpDSBuff) return;
-
-	DWORD dwStatus = 0;
-	m_lpDSBuff->GetStatus( &dwStatus );
-	if((dwStatus & DSBSTATUS_PLAYING)==DSBSTATUS_PLAYING) return;
-
-	HRESULT hr;
-	hr = m_lpDSBuff->SetCurrentPosition(0);
-
-	if(m_bIsLoop) m_lpDSBuff->Play(0,0,DSBPLAY_LOOPING);
-	else hr |= m_lpDSBuff->Play( 0, 0, 0 );
-
-	return; 
-}
-
-
-//
-//
-//
-void CN3SndObj::Stop(float fFadeOutTime)
-{
-	if( nullptr == m_lpDSBuff ) return;
-	if( m_ePlayState == SNDSTATE_FADEOUT || m_ePlayState == SNDSTATE_STOP) return; 
-
-	if(fFadeOutTime==0.0f)
-	{
-		m_fTmpSecPerFrm = 0;
-		m_fFadeOutTime = fFadeOutTime;
-		m_ePlayState = SNDSTATE_STOP;
-		HRESULT hr = m_lpDSBuff->Stop();
+		_isStarted = false;
 		return;
 	}
 
-	m_fTmpSecPerFrm = 0;
-	m_fFadeOutTime = fFadeOutTime;
-	m_ePlayState = SNDSTATE_FADEOUT;
-	return;
+	// Handle is no longer managed by the audio thread.
+	// We should consider it stopped and release our handle for future requests.
+	if (!_handle->IsManaged.load())
+	{
+		_isStarted = false;
+		_handle.reset();
+	}
 }
 
-
-void CN3SndObj::SetPos(const __Vector3* pvPos)
+void CN3SndObj::Play(const __Vector3* pvPos, float delay, float fFadeInTime)
 {
-    if( m_lpDS3DBuff && pvPos ) 
-		HRESULT hr = m_lpDS3DBuff->SetPosition(pvPos->x, pvPos->y, pvPos->z, DS3D_IMMEDIATE );
+	if (_audioAsset == nullptr)
+		return;
+
+	if (_handle == nullptr)
+	{
+		if (_audioAsset->Type == AUDIO_ASSET_BUFFERED)
+			_handle = BufferedAudioHandle::Create(_audioAsset);
+		else if (_audioAsset->Type == AUDIO_ASSET_STREAMED)
+			_handle = StreamedAudioHandle::Create(_audioAsset);
+
+		if (_handle == nullptr)
+			return;
+	}
+
+	CN3Base::s_SndMgr.Add(_handle);
+
+	_handle->Settings		= _soundSettings;
+
+	// OpenAL-side looping needs to be disabled on streamed handles.
+	// They implement their own looping.
+	ALint isLooping;
+	if (_handle->HandleType == AUDIO_HANDLE_STREAMED)
+		isLooping = 0;
+	else
+		isLooping = static_cast<ALint>(_soundSettings->IsLooping);
+
+	bool playImmediately = false;
+	if (delay == 0.0f
+		&& fFadeInTime == 0.0f)
+		playImmediately = true;
+
+	// Perform setup -- this is triggered after insertion, so the handle is added to the thread at this point
+	// and otherwise setup, ready to play.
+	if (GetType() == SNDTYPE_2D)
+	{
+		assert(_audioAsset->Type == AUDIO_ASSET_BUFFERED);
+
+		if (_audioAsset->Type != AUDIO_ASSET_BUFFERED)
+			return;
+
+		auto audioAsset = static_pointer_cast<BufferedAudioAsset>(_audioAsset);
+		if (audioAsset == nullptr)
+			return;
+
+		CN3Base::s_SndMgr.QueueCallback(_handle, [=] (AudioHandle* handle)
+		{
+			handle->FadeInTime		= fFadeInTime;
+			handle->FadeOutTime		= 0.0f;
+			handle->StartDelayTime	= delay;
+			handle->Timer			= 0.0f;
+			handle->State			= SNDSTATE_DELAY;
+
+			if (playImmediately)
+				_soundSettings->CurrentGain = _soundSettings->MaxGain;
+
+			if (handle->Asset->Type == AUDIO_ASSET_BUFFERED)
+			{
+				alSourcei(handle->SourceId, AL_BUFFER, audioAsset->BufferId);
+				if (AL_CHECK_ERROR())
+					return;
+			}
+
+			alSourcei(handle->SourceId, AL_SOURCE_RELATIVE, AL_TRUE);
+			AL_CHECK_ERROR();
+
+			alSource3f(handle->SourceId, AL_POSITION, 0.0f, 0.0f, 0.0f);
+			AL_CHECK_ERROR();
+
+			alSourcef(handle->SourceId, AL_ROLLOFF_FACTOR, 0.0f);
+			AL_CHECK_ERROR();
+
+			alSourcei(handle->SourceId, AL_LOOPING, isLooping);
+			AL_CHECK_ERROR();
+
+			if (playImmediately)
+			{
+				handle->State = SNDSTATE_PLAY;
+
+				alSourcef(handle->SourceId, AL_GAIN, handle->Settings->CurrentGain);
+				AL_CHECK_ERROR();
+
+				alSourcePlay(handle->SourceId);
+				AL_CHECK_ERROR();
+			}
+		});
+	}
+	else if (GetType() == SNDTYPE_3D)
+	{
+		assert(_audioAsset->Type == AUDIO_ASSET_BUFFERED);
+
+		if (_audioAsset->Type != AUDIO_ASSET_BUFFERED)
+			return;
+
+		auto audioAsset = static_pointer_cast<BufferedAudioAsset>(_audioAsset);
+		if (audioAsset == nullptr)
+			return;
+
+		bool hasPosition = false;
+
+		__Vector3 position;
+		if (pvPos != nullptr)
+		{
+			position = *pvPos;
+			hasPosition = true;
+		}
+
+		CN3Base::s_SndMgr.QueueCallback(_handle, [=] (AudioHandle* handle)
+		{
+			handle->FadeInTime		= fFadeInTime;
+			handle->FadeOutTime		= 0.0f;
+			handle->StartDelayTime	= delay;
+			handle->Timer			= 0.0f;
+			handle->State			= SNDSTATE_DELAY;
+
+			if (playImmediately)
+				_soundSettings->CurrentGain = _soundSettings->MaxGain;
+
+			if (handle->Asset->Type == AUDIO_ASSET_BUFFERED)
+			{
+				alSourcei(handle->SourceId, AL_BUFFER, audioAsset->BufferId);
+				if (AL_CHECK_ERROR())
+					return;
+			}
+
+			alSourcei(handle->SourceId, AL_SOURCE_RELATIVE, AL_FALSE);
+			AL_CHECK_ERROR();
+
+			if (hasPosition)
+				alSource3f(handle->SourceId, AL_POSITION, position.x, position.y, position.z);
+			else
+				alSource3f(handle->SourceId, AL_POSITION, 0.0f, 0.0f, 0.0f);
+			AL_CHECK_ERROR();
+
+			alSourcef(handle->SourceId, AL_ROLLOFF_FACTOR, 0.5f);
+			AL_CHECK_ERROR();
+
+			alSourcei(handle->SourceId, AL_LOOPING, isLooping);
+			AL_CHECK_ERROR();
+
+			if (playImmediately)
+			{
+				handle->State = SNDSTATE_PLAY;
+
+				alSourcef(handle->SourceId, AL_GAIN, handle->Settings->CurrentGain);
+				AL_CHECK_ERROR();
+
+				alSourcePlay(handle->SourceId);
+				AL_CHECK_ERROR();
+			}
+		});
+	}
+	else if (GetType() == SNDTYPE_STREAM)
+	{
+		CN3Base::s_SndMgr.QueueCallback(_handle, [=] (AudioHandle* handle)
+		{
+			handle->FadeInTime		= fFadeInTime;
+			handle->FadeOutTime		= 0.0f;
+			handle->StartDelayTime	= delay;
+			handle->Timer			= 0.0f;
+			handle->State			= SNDSTATE_DELAY;
+
+			alSourcei(handle->SourceId, AL_SOURCE_RELATIVE, AL_TRUE);
+			AL_CHECK_ERROR();
+
+			alSource3f(handle->SourceId, AL_POSITION, 0.0f, 0.0f, 0.0f);
+			AL_CHECK_ERROR();
+
+			alSourcef(handle->SourceId, AL_ROLLOFF_FACTOR, 0.0f);
+			AL_CHECK_ERROR();
+
+			alSourcei(handle->SourceId, AL_LOOPING, isLooping);
+			AL_CHECK_ERROR();
+
+			if (playImmediately)
+			{
+				handle->State = SNDSTATE_PLAY;
+
+				_soundSettings->CurrentGain = _soundSettings->MaxGain;
+
+				alSourcef(handle->SourceId, AL_GAIN, handle->Settings->CurrentGain);
+				AL_CHECK_ERROR();
+
+				alSourcePlay(handle->SourceId);
+				AL_CHECK_ERROR();
+			}
+		});
+	}
+	else
+	{
+		return;
+	}
+
+	_isStarted = true;
 }
 
-
-//
-//
-//
-void CN3SndObj::SetMaxDistance(D3DVALUE max)
+void CN3SndObj::Stop(float fFadeOutTime)
 {
-	if( m_lpDS3DBuff )	m_lpDS3DBuff->SetMaxDistance(max, DS3D_IMMEDIATE);
+	_isStarted = false;
+
+	if (_handle == nullptr)
+		return;
+
+	// If we intend on stopping it immediately, we can just remove the handle directly,
+	// removing it from the audio thread.
+	if (fFadeOutTime == 0.0f)
+	{
+		ReleaseHandle();
+		return;
+	}
+
+	// It won't be stopped immediately, so queue the stop request so it can process with the delay.
+	CN3Base::s_SndMgr.QueueCallback(_handle, [=] (AudioHandle* handle)
+	{
+		if (handle->State == SNDSTATE_FADEOUT
+			|| handle->State == SNDSTATE_STOP)
+			return;
+
+		handle->Timer		= 0.0f;
+		handle->FadeOutTime	= fFadeOutTime;
+		handle->State		= SNDSTATE_FADEOUT;
+	});
 }
 
-
-//
-//
-//
-void CN3SndObj::SetMinDistance(D3DVALUE min)
+void CN3SndObj::ReleaseHandle()
 {
-	if( m_lpDS3DBuff )	m_lpDS3DBuff->SetMinDistance(min, DS3D_IMMEDIATE);
+	_isStarted = false;
+
+	if (_handle == nullptr)
+		return;
+
+	CN3Base::s_SndMgr.Remove(_handle);
+	_handle.reset();
 }
 
-
-//
-//
-//
-void CN3SndObj::SetConeOutSizeVolume(int32_t vol)
+void CN3SndObj::SetPos(const __Vector3 vPos)
 {
-	if( m_lpDS3DBuff )	m_lpDS3DBuff->SetConeOutsideVolume(vol, DS3D_IMMEDIATE);
+	if (_handle == nullptr
+		|| GetType() != SNDTYPE_3D)
+		return;
+
+	CN3Base::s_SndMgr.QueueCallback(_handle, [=] (AudioHandle* handle)
+	{
+		alSource3f(handle->SourceId, AL_POSITION, vPos.x, vPos.y, vPos.z);
+		AL_CLEAR_ERROR_STATE();
+	});
 }
 
-
-//
-//
-//
-void CN3SndObj::SetConeOrientation(__Vector3* pDir)
+void CN3SndObj::Looping(bool loop)
 {
-	if( m_lpDS3DBuff )	m_lpDS3DBuff->SetConeOrientation(pDir->x, pDir->y, pDir->z, DS3D_IMMEDIATE);
+	_soundSettings->IsLooping = loop;
+
+	if (_handle == nullptr)
+		return;
+
+	// Streams need to manually handle their looping.
+	if (_handle->HandleType == AUDIO_HANDLE_STREAMED)
+		return;
+
+	CN3Base::s_SndMgr.QueueCallback(_handle, [=] (AudioHandle* handle)
+	{
+		alSourcei(handle->SourceId, AL_LOOPING, static_cast<ALint>(handle->Settings->IsLooping));
+		AL_CLEAR_ERROR_STATE();
+	});
 }
 
-
-
-//
-// static functions ....
-//
-
-void CN3SndObj::SetDopplerFactor(D3DVALUE factor)
+void CN3SndObj::SetListenerPos(const __Vector3& vPos)
 {
-	if(nullptr == s_lpDSListener) return;
-	s_lpDSListener->SetDopplerFactor(factor, DS3D_DEFERRED);
-	s_bNeedDeferredTick = true;	// 3D Listener CommitDeferredSetting
+	alListener3f(AL_POSITION, vPos.x, vPos.y, vPos.z);
+	AL_CHECK_ERROR();
 }
 
-void CN3SndObj::SetListenerPos(const __Vector3* pVPos, bool IsDeferred)
+void CN3SndObj::SetListenerOrientation(const __Vector3& vAt, const __Vector3& vUp)
 {
-	if(nullptr == s_lpDSListener || nullptr == pVPos) return;
-	DWORD dwParam = (IsDeferred) ? DS3D_DEFERRED : DS3D_IMMEDIATE;
-	s_lpDSListener->SetPosition(pVPos->x, pVPos->y, pVPos->z, dwParam);
-	s_bNeedDeferredTick = true;	// 3D Listener CommitDeferredSetting
-}
+	ALfloat fv[6] =
+	{
+		vAt.x, vAt.y, vAt.z,
+		vUp.x, vUp.y, vUp.z
+	};
 
-
-//
-//
-//
-void CN3SndObj::SetListenerOrientation(const __Vector3* pVAt, const __Vector3* pVUp, bool IsDeferred)
-{
-	if(nullptr == s_lpDSListener || nullptr == pVAt || nullptr == pVUp) return;
-	DWORD dwParam = (IsDeferred) ? DS3D_DEFERRED : DS3D_IMMEDIATE;
-	s_lpDSListener->SetOrientation(pVAt->x, pVAt->y, pVAt->z, pVUp->x, pVUp->y, pVUp->z, dwParam);
-	s_bNeedDeferredTick = true;	// 3D Listener CommitDeferredSetting
+	alListenerfv(AL_ORIENTATION, fv);
+	AL_CHECK_ERROR();
 }

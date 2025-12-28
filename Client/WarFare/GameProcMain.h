@@ -62,7 +62,7 @@ public:
 
 	class CN3Shape*				m_pTargetSymbol;				// 플레이어가 타겟으로 잡은 캐릭터의 위치위에 그리면 된다..
 
-	class CN3SndObjStream*		m_pSnd_Town, *m_pSnd_Battle;	//마을음악, 전투음악 포인터..
+	class CN3SndObj*			m_pSnd_Town, *m_pSnd_Battle;	//마을음악, 전투음악 포인터..
 	class CMagicSkillMng*		m_pMagicSkillMng;
 
 	class CUINPCChangeEvent*	m_pUINpcChange;

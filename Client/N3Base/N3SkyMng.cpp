@@ -1087,8 +1087,8 @@ void CN3SkyMng::SetWeather(eSKY_WEATHER eWeather, int iPercentage)
 			m_pSnd_Weather_Rain = CN3Base::s_SndMgr.CreateObj(201);	// 비오는 소리..
 			if(m_pSnd_Weather_Rain)
 			{
-				int iMaxVol = (int)(70 * fPercent);
-				m_pSnd_Weather_Rain->SetMaxVolume(iMaxVol);
+				float maxVolume = fPercent * 0.7f;
+				m_pSnd_Weather_Rain->SetMaxVolume(maxVolume);
 				m_pSnd_Weather_Rain->Looping(true);
 				m_pSnd_Weather_Rain->Play(nullptr, 0.0f, 2.0f);
 			}
@@ -1113,8 +1113,8 @@ void CN3SkyMng::SetWeather(eSKY_WEATHER eWeather, int iPercentage)
 			m_pSnd_Weather_Snow = CN3Base::s_SndMgr.CreateObj(200);	// 바람소리..
 			if(m_pSnd_Weather_Snow)
 			{
-				int iMaxVol = (int)(70 * fPercent);
-				m_pSnd_Weather_Snow->SetMaxVolume(iMaxVol);
+				float maxVolume = fPercent * 0.7f;
+				m_pSnd_Weather_Snow->SetMaxVolume(maxVolume);
 				m_pSnd_Weather_Snow->Looping(true);
 				m_pSnd_Weather_Snow->Play(nullptr, 0.0f, 2.0f);
 			}

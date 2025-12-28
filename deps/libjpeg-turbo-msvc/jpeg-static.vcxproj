@@ -44,6 +44,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir);$(DependencyDir)libjpeg-turbo\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(ProjectDir);$(DependencyDir)libjpeg-turbo\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

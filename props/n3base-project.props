@@ -4,6 +4,7 @@
     <Import Project="directx9.props" />
     <Import Project="FileIO.props" />
     <Import Project="MathUtils.props" />
+    <Import Project="OpenAL-soft.props" />
     <Import Project="spdlog.props" />
   </ImportGroup>
   <ItemDefinitionGroup>

@@ -100,9 +100,6 @@ int APIENTRY WinMain(
 	CN3Base::s_Options.bSndEffectEnable = ini.GetBool("Sound", "Effect", true);
 	CN3Base::s_Options.bSndEnable = (CN3Base::s_Options.bSndBgmEnable || CN3Base::s_Options.bSndEffectEnable);
 
-	// NOTE: is sound duplicated?
-	CN3Base::s_Options.bSndDuplicated = ini.GetBool("Sound", "Duplicate", false);
-
 	// NOTE: should we use the Windows cursor? If false, will use the software cursor (CGameCursor) instead.
 	CN3Base::s_Options.bWindowCursor = ini.GetBool("Cursor", "WindowCursor", true);
 																	   

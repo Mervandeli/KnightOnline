@@ -721,10 +721,10 @@ bool CN3UIEdit::Save(File& file)
 
 	int iSndFNLen = 0;
 	if (m_pSnd_Typing != nullptr)
-		iSndFNLen = static_cast<int>(m_pSnd_Typing->m_szFileName.size());
+		iSndFNLen = static_cast<int>(m_pSnd_Typing->FileName().size());
 	file.Write(&iSndFNLen, sizeof(iSndFNLen));		//	사운드 파일 문자열 길이
 	if (iSndFNLen > 0)
-		file.Write(m_pSnd_Typing->m_szFileName.c_str(), iSndFNLen);
+		file.Write(m_pSnd_Typing->FileName().c_str(), iSndFNLen);
 
 	return true;
 }
@@ -743,8 +743,10 @@ void CN3UIEdit::SetSndTyping(const std::string& strFileName)
 
 std::string CN3UIEdit::GetSndFName_Typing() const
 {
-	if (m_pSnd_Typing) return m_pSnd_Typing->m_szFileName;
-	else return std::string("");
+	if (m_pSnd_Typing == nullptr)
+		return {};
+	
+	return m_pSnd_Typing->FileName();
 }
 #endif
 
