@@ -11,11 +11,13 @@ protected: // create from serialization only
 public:
 	static constexpr LPARAM HINT_DOCUMENT_LOADED = 0x100000;
 
-	inline bool IsLoaded() const {
+	inline bool IsLoaded() const
+	{
 		return !GetPathName().IsEmpty();
 	}
 
-	inline CTblEditorBase& GetTbl() {
+	inline CTblEditorBase& GetTbl()
+	{
 		return m_Tbl;
 	}
 
@@ -25,5 +27,5 @@ public:
 	BOOL DoSave(LPCTSTR lpszPathName, BOOL bReplace = TRUE) override;
 
 protected:
-	CTblEditorBase	m_Tbl;
+	CTblEditorBase m_Tbl;
 };

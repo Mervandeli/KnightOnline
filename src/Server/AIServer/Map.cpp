@@ -24,27 +24,27 @@ extern std::mutex g_region_mutex;
 
 MAP::MAP()
 {
-	m_pMain = AIServerApp::instance();
-	m_nMapSize = 0;
-	m_fUnitDist = 0.0f;
-	m_fHeight = nullptr;
+	m_pMain           = AIServerApp::instance();
+	m_nMapSize        = 0;
+	m_fUnitDist       = 0.0f;
+	m_fHeight         = nullptr;
 
-	m_sizeRegion.cx = 0;
-	m_sizeRegion.cy = 0;
-	m_sizeMap.cx = 0;
-	m_sizeMap.cy = 0;
+	m_sizeRegion.cx   = 0;
+	m_sizeRegion.cy   = 0;
+	m_sizeMap.cx      = 0;
+	m_sizeMap.cy      = 0;
 
-	m_ppRegion = nullptr;
+	m_ppRegion        = nullptr;
 	//m_pRoomEvent = nullptr;
-	m_nZoneNumber = 0;
-	m_byRoomType = 0;
-	m_byRoomEvent = 0;
-	m_byRoomStatus = 1;
+	m_nZoneNumber     = 0;
+	m_byRoomType      = 0;
+	m_byRoomEvent     = 0;
+	m_byRoomStatus    = 1;
 	m_byInitRoomCount = 0;
-	m_sKarusRoom = 0;
-	m_sElmoradRoom = 0;
-//	for(int i=0; i<MAX_DUNGEON_BOSS_MONSTER; i++)
-//		m_arDungeonBossMonster[i] = 1;
+	m_sKarusRoom      = 0;
+	m_sElmoradRoom    = 0;
+	//	for(int i=0; i<MAX_DUNGEON_BOSS_MONSTER; i++)
+	//		m_arDungeonBossMonster[i] = 1;
 }
 
 MAP::~MAP()
@@ -55,7 +55,7 @@ MAP::~MAP()
 
 void MAP::RemoveMapData()
 {
-//	int i, j, k;
+	//	int i, j, k;
 
 	if (m_ppRegion != nullptr)
 	{
@@ -101,15 +101,13 @@ void MAP::RemoveMapData()
 
 bool MAP::IsMovable(int dest_x, int dest_y) const
 {
-	if (dest_x < 0
-		|| dest_y < 0)
+	if (dest_x < 0 || dest_y < 0)
 		return false;
 
 	if (m_pMap == nullptr)
 		return false;
 
-	if (dest_x >= m_sizeMap.cx
-		|| dest_y >= m_sizeMap.cy)
+	if (dest_x >= m_sizeMap.cx || dest_y >= m_sizeMap.cy)
 		return false;
 
 	return m_pMap[dest_x][dest_y].m_sEvent == 0;
@@ -123,9 +121,7 @@ bool MAP::LoadMap(File& fs)
 {
 	LoadTerrain(fs);
 
-	m_N3ShapeMgr.Create(
-		(m_nMapSize - 1) * m_fUnitDist,
-		(m_nMapSize - 1) * m_fUnitDist);
+	m_N3ShapeMgr.Create((m_nMapSize - 1) * m_fUnitDist, (m_nMapSize - 1) * m_fUnitDist);
 
 	if (!m_N3ShapeMgr.LoadCollisionData(fs))
 		return false;
@@ -134,18 +130,18 @@ bool MAP::LoadMap(File& fs)
 		|| (m_nMapSize - 1) * m_fUnitDist != m_N3ShapeMgr.Height())
 		return false;
 
-	int mapwidth = (int) m_N3ShapeMgr.Width();
+	int mapwidth    = (int) m_N3ShapeMgr.Width();
 
 	m_sizeRegion.cx = (int) (mapwidth / VIEW_DIST) + 1;
 	m_sizeRegion.cy = (int) (mapwidth / VIEW_DIST) + 1;
 
-	m_sizeMap.cx = m_nMapSize;
-	m_sizeMap.cy = m_nMapSize;
+	m_sizeMap.cx    = m_nMapSize;
+	m_sizeMap.cy    = m_nMapSize;
 
-	m_ppRegion = new CRegion* [m_sizeRegion.cx];
+	m_ppRegion      = new CRegion*[m_sizeRegion.cx];
 	for (int i = 0; i < m_sizeRegion.cx; i++)
 	{
-		m_ppRegion[i] = new CRegion[m_sizeRegion.cy];
+		m_ppRegion[i]             = new CRegion[m_sizeRegion.cy];
 		m_ppRegion[i]->m_byMoving = 0;
 	}
 
@@ -157,17 +153,17 @@ bool MAP::LoadMap(File& fs)
 
 void MAP::LoadTerrain(File& fs)
 {
-	fs.Read(&m_nMapSize, sizeof(int));	// 가로세로 정보가 몇개씩인가?
+	fs.Read(&m_nMapSize, sizeof(int)); // 가로세로 정보가 몇개씩인가?
 	fs.Read(&m_fUnitDist, sizeof(float));
 
-	m_fHeight = new float* [m_nMapSize];
+	m_fHeight = new float*[m_nMapSize];
 	for (int i = 0; i < m_nMapSize; i++)
 		m_fHeight[i] = new float[m_nMapSize];
 
 	for (int z = 0; z < m_nMapSize; z++)
 	{
 		for (int x = 0; x < m_nMapSize; x++)
-			fs.Read(&m_fHeight[x][z], sizeof(float));	// 높이값 읽어오기
+			fs.Read(&m_fHeight[x][z], sizeof(float)); // 높이값 읽어오기
 	}
 }
 
@@ -184,26 +180,23 @@ float MAP::GetHeight(float x, float z)
 	dX = (x - iX * m_fUnitDist) / m_fUnitDist;
 	dZ = (z - iZ * m_fUnitDist) / m_fUnitDist;
 
-//	assert(dX>=0.0f && dZ>=0.0f && dX<1.0f && dZ<1.0f);
-	if (!(dX >= 0.0f
-		&& dZ >= 0.0f
-		&& dX < 1.0f
-		&& dZ < 1.0f))
+	//	assert(dX>=0.0f && dZ>=0.0f && dX<1.0f && dZ<1.0f);
+	if (!(dX >= 0.0f && dZ >= 0.0f && dX < 1.0f && dZ < 1.0f))
 		return FLT_MIN;
 
 	if ((iX + iZ) % 2 == 1)
 	{
 		if ((dX + dZ) < 1.0f)
 		{
-			h1 = m_fHeight[iX][iZ + 1];
-			h2 = m_fHeight[iX + 1][iZ];
-			h3 = m_fHeight[iX][iZ];
+			h1        = m_fHeight[iX][iZ + 1];
+			h2        = m_fHeight[iX + 1][iZ];
+			h3        = m_fHeight[iX][iZ];
 
 			//if (dX == 1.0f) return h2;
 
-			float h12 = h1 + (h2 - h1) * dX;	// h1과 h2사이의 높이값
-			float h32 = h3 + (h2 - h3) * dX;	// h3과 h2사이의 높이값
-			y = h32 + (h12 - h32) * ((dZ) / (1.0f - dX));	// 찾고자 하는 높이값
+			float h12 = h1 + (h2 - h1) * dX;                      // h1과 h2사이의 높이값
+			float h32 = h3 + (h2 - h3) * dX;                      // h3과 h2사이의 높이값
+			y         = h32 + (h12 - h32) * ((dZ) / (1.0f - dX)); // 찾고자 하는 높이값
 		}
 		else
 		{
@@ -214,24 +207,24 @@ float MAP::GetHeight(float x, float z)
 			if (dX == 0.0f)
 				return h1;
 
-			float h12 = h1 + (h2 - h1) * dX;	// h1과 h2사이의 높이값
-			float h13 = h1 + (h3 - h1) * dX;	// h1과 h3사이의 높이값
-			y = h13 + (h12 - h13) * ((1.0f - dZ) / (dX));	// 찾고자 하는 높이값
+			float h12 = h1 + (h2 - h1) * dX;                      // h1과 h2사이의 높이값
+			float h13 = h1 + (h3 - h1) * dX;                      // h1과 h3사이의 높이값
+			y         = h13 + (h12 - h13) * ((1.0f - dZ) / (dX)); // 찾고자 하는 높이값
 		}
 	}
 	else
 	{
 		if (dZ > dX)
 		{
-			h1 = m_fHeight[iX][iZ + 1];
-			h2 = m_fHeight[iX + 1][iZ + 1];
-			h3 = m_fHeight[iX][iZ];
+			h1        = m_fHeight[iX][iZ + 1];
+			h2        = m_fHeight[iX + 1][iZ + 1];
+			h3        = m_fHeight[iX][iZ];
 
 			//if (dX == 1.0f) return h2;
 
-			float h12 = h1 + (h2 - h1) * dX;	// h1과 h2사이의 높이값
-			float h32 = h3 + (h2 - h3) * dX;	// h3과 h2사이의 높이값
-			y = h12 + (h32 - h12) * ((1.0f - dZ) / (1.0f - dX));	// 찾고자 하는 높이값
+			float h12 = h1 + (h2 - h1) * dX;                             // h1과 h2사이의 높이값
+			float h32 = h3 + (h2 - h3) * dX;                             // h3과 h2사이의 높이값
+			y         = h12 + (h32 - h12) * ((1.0f - dZ) / (1.0f - dX)); // 찾고자 하는 높이값
 		}
 		else
 		{
@@ -242,9 +235,9 @@ float MAP::GetHeight(float x, float z)
 			if (dX == 0.0f)
 				return h1;
 
-			float h12 = h1 + (h2 - h1) * dX;	// h1과 h2사이의 높이값
-			float h13 = h1 + (h3 - h1) * dX;	// h1과 h3사이의 높이값
-			y = h12 + (h13 - h12) * ((dZ) / (dX));	// 찾고자 하는 높이값
+			float h12 = h1 + (h2 - h1) * dX;               // h1과 h2사이의 높이값
+			float h13 = h1 + (h3 - h1) * dX;               // h1과 h3사이의 높이값
+			y         = h12 + (h13 - h12) * ((dZ) / (dX)); // 찾고자 하는 높이값
 		}
 	}
 
@@ -255,7 +248,7 @@ bool MAP::ObjectIntersect(float x1, float z1, float y1, float x2, float z2, floa
 {
 	__Vector3 vec1(x1, y1, z1), vec2(x2, y2, z2);
 	__Vector3 vDir = vec2 - vec1;
-	float fSpeed = vDir.Magnitude();
+	float fSpeed   = vDir.Magnitude();
 	vDir.Normalize();
 
 	return m_N3ShapeMgr.CheckCollision(vec1, vDir, fSpeed);
@@ -263,14 +256,11 @@ bool MAP::ObjectIntersect(float x1, float z1, float y1, float x2, float z2, floa
 
 void MAP::RegionUserAdd(int rx, int rz, int uid)
 {
-	if (rx < 0
-		|| rz < 0
-		|| rx >= m_sizeRegion.cx
-		|| rz >= m_sizeRegion.cy)
+	if (rx < 0 || rz < 0 || rx >= m_sizeRegion.cx || rz >= m_sizeRegion.cy)
 		return;
 
-	int* pInt = new int;
-	*pInt = uid;
+	int* pInt       = new int;
+	*pInt           = uid;
 
 	CRegion* region = &m_ppRegion[rx][rz];
 
@@ -282,10 +272,7 @@ void MAP::RegionUserAdd(int rx, int rz, int uid)
 
 void MAP::RegionUserRemove(int rx, int rz, int uid)
 {
-	if (rx < 0
-		|| rz < 0
-		|| rx > m_sizeRegion.cx
-		|| rz > m_sizeRegion.cy)
+	if (rx < 0 || rz < 0 || rx > m_sizeRegion.cx || rz > m_sizeRegion.cy)
 		return;
 
 	CRegion* region = &m_ppRegion[rx][rz];
@@ -296,14 +283,11 @@ void MAP::RegionUserRemove(int rx, int rz, int uid)
 
 void MAP::RegionNpcAdd(int rx, int rz, int nid)
 {
-	if (rx < 0
-		|| rz < 0
-		|| rx >= m_sizeRegion.cx
-		|| rz >= m_sizeRegion.cy)
+	if (rx < 0 || rz < 0 || rx >= m_sizeRegion.cx || rz >= m_sizeRegion.cy)
 		return;
 
-	int* pInt = new int;
-	*pInt = nid;
+	int* pInt       = new int;
+	*pInt           = nid;
 
 	CRegion* region = &m_ppRegion[rx][rz];
 
@@ -312,7 +296,8 @@ void MAP::RegionNpcAdd(int rx, int rz, int nid)
 	if (!region->m_RegionNpcArray.PutData(nid, pInt))
 	{
 		delete pInt;
-		spdlog::error("Map::RegionNpcAdd: RegionNpcArray put failed [x={} z={} npcId={}]", rx, rz, nid);
+		spdlog::error(
+			"Map::RegionNpcAdd: RegionNpcArray put failed [x={} z={} npcId={}]", rx, rz, nid);
 	}
 
 	//TRACE(_T("+++ Map - RegionNpcAdd : x=%d,z=%d, nid=%d, total=%d \n"), rx,rz,nid, region->m_RegionNpcArray.GetSize());
@@ -320,10 +305,7 @@ void MAP::RegionNpcAdd(int rx, int rz, int nid)
 
 void MAP::RegionNpcRemove(int rx, int rz, int nid)
 {
-	if (rx < 0
-		|| rz < 0
-		|| rx > m_sizeRegion.cx
-		|| rz > m_sizeRegion.cy)
+	if (rx < 0 || rz < 0 || rx > m_sizeRegion.cx || rz > m_sizeRegion.cy)
 		return;
 
 	CRegion* region = &m_ppRegion[rx][rz];
@@ -339,7 +321,7 @@ void MAP::LoadMapTile(File& fs)
 	//	1이면 그냥 가는 곳...
 	//	그외는 이벤트 ID.
 	//
-	int16_t** pEvent = new int16_t* [m_sizeMap.cx];
+	int16_t** pEvent = new int16_t*[m_sizeMap.cx];
 
 	// 잠시 막아놓고..
 	for (int x = 0; x < m_sizeMap.cx; x++)
@@ -348,7 +330,7 @@ void MAP::LoadMapTile(File& fs)
 		fs.Read(pEvent[x], sizeof(int16_t) * m_sizeMap.cy);
 	}
 
-	m_pMap = new CMapInfo* [m_sizeMap.cx];
+	m_pMap = new CMapInfo*[m_sizeMap.cx];
 
 	for (int i = 0; i < m_sizeMap.cx; i++)
 		m_pMap[i] = new CMapInfo[m_sizeMap.cy];
@@ -367,13 +349,13 @@ void MAP::LoadMapTile(File& fs)
 
 			if (m_pMap[j][i].m_sEvent >= 1)
 				count++;
-		//	m_pMap[j][i].m_lUser	= 0;
-		//	m_pMap[j][i].m_dwType = 0;
+			//	m_pMap[j][i].m_lUser	= 0;
+			//	m_pMap[j][i].m_dwType = 0;
 		}
 	}
 	spdlog::trace("Map::LoadMapTile: move count={}", count);
 
-/*	FILE* stream = fopen("c:\\move1.txt", "w");
+	/*	FILE* stream = fopen("c:\\move1.txt", "w");
 
 	for(int z=m_sizeMap.cy-1; z>=0; z--)
 	{
@@ -385,7 +367,6 @@ void MAP::LoadMapTile(File& fs)
 		fprintf(stream, "\n");
 	}
 	fclose(stream);	*/
-
 
 	if (pEvent != nullptr)
 	{
@@ -402,10 +383,7 @@ void MAP::LoadMapTile(File& fs)
 
 int MAP::GetRegionUserSize(int rx, int rz)
 {
-	if (rx < 0
-		|| rz < 0
-		|| rx >= m_sizeRegion.cx
-		|| rz >= m_sizeRegion.cy)
+	if (rx < 0 || rz < 0 || rx >= m_sizeRegion.cx || rz >= m_sizeRegion.cy)
 		return 0;
 
 	CRegion* region = &m_ppRegion[rx][rz];
@@ -414,12 +392,9 @@ int MAP::GetRegionUserSize(int rx, int rz)
 	return region->m_RegionUserArray.GetSize();
 }
 
-int  MAP::GetRegionNpcSize(int rx, int rz)
+int MAP::GetRegionNpcSize(int rx, int rz)
 {
-	if (rx < 0
-		|| rz < 0
-		|| rx >= m_sizeRegion.cx
-		|| rz >= m_sizeRegion.cy)
+	if (rx < 0 || rz < 0 || rx >= m_sizeRegion.cx || rz >= m_sizeRegion.cy)
 		return 0;
 
 	CRegion* region = &m_ppRegion[rx][rz];
@@ -438,8 +413,8 @@ void MAP::LoadObjectEvent(File& fs)
 	for (int i = 0; i < iEventObjectCount; i++)
 	{
 		pEvent = new _OBJECT_EVENT;
-		fs.Read(&pEvent->sBelong, 4);				// 소속 
-		fs.Read(&pEvent->sIndex, 2);				// Event Index
+		fs.Read(&pEvent->sBelong, 4); // 소속
+		fs.Read(&pEvent->sIndex, 2);  // Event Index
 		fs.Read(&pEvent->sType, 2);
 		fs.Read(&pEvent->sControlNpcID, 2);
 		fs.Read(&pEvent->sStatus, 2);
@@ -450,12 +425,9 @@ void MAP::LoadObjectEvent(File& fs)
 		//TRACE(_T("Object - belong=%d, index=%d, type=%d, con=%d, sta=%d\n"), pEvent->sBelong, pEvent->sIndex, pEvent->sType, pEvent->sControlNpcID, pEvent->sStatus);
 
 		// 작업할것 : 맵데이터가 바뀌면 Param1이 2이면 성문인것을 판단..  3이면 레버..
-		if (pEvent->sType == OBJECT_TYPE_GATE
-			|| pEvent->sType == OBJECT_TYPE_DOOR_TOPDOWN
-			|| pEvent->sType == OBJECT_TYPE_GATE_LEVER
-			|| pEvent->sType == OBJECT_TYPE_BARRICADE
-			|| pEvent->sType == OBJECT_TYPE_REMOVE_BIND
-			|| pEvent->sType == OBJECT_TYPE_ANVIL
+		if (pEvent->sType == OBJECT_TYPE_GATE || pEvent->sType == OBJECT_TYPE_DOOR_TOPDOWN
+			|| pEvent->sType == OBJECT_TYPE_GATE_LEVER || pEvent->sType == OBJECT_TYPE_BARRICADE
+			|| pEvent->sType == OBJECT_TYPE_REMOVE_BIND || pEvent->sType == OBJECT_TYPE_ANVIL
 			|| pEvent->sType == OBJECT_TYPE_ARTIFACT)
 			m_pMain->AddObjectEventNpc(pEvent, m_nZoneNumber);
 
@@ -464,7 +436,8 @@ void MAP::LoadObjectEvent(File& fs)
 
 		if (!m_ObjectEventArray.PutData(pEvent->sIndex, pEvent))
 		{
-			spdlog::error("Map::LoadObjectEvent: ObjectEventArray put failed [eventId={} zoneId={}]",
+			spdlog::error(
+				"Map::LoadObjectEvent: ObjectEventArray put failed [eventId={} zoneId={}]",
 				pEvent->sIndex, m_nZoneNumber);
 			delete pEvent;
 			pEvent = nullptr;
@@ -474,18 +447,18 @@ void MAP::LoadObjectEvent(File& fs)
 
 bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 {
-	uint8_t		byte;
-	char		buf[4096];
-	char		first[1024];
-	char		temp[1024];
-	int			index = 0;
-	int			t_index = 0, logic = 0, exec = 0;
-	int			event_num = 0, nation = 0;
+	uint8_t byte;
+	char buf[4096];
+	char first[1024];
+	char temp[1024];
+	int index   = 0;
+	int t_index = 0, logic = 0, exec = 0;
+	int event_num = 0, nation = 0;
 
-	CRoomEvent* pEvent = nullptr;
+	CRoomEvent* pEvent               = nullptr;
 
-	std::filesystem::path eventPath = eventDir;
-	eventPath /= std::to_string(zone_number) + ".evt";
+	std::filesystem::path eventPath  = eventDir;
+	eventPath                       /= std::to_string(zone_number) + ".evt";
 
 	if (!std::filesystem::exists(eventPath))
 		return true;
@@ -509,7 +482,7 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 	// This just ensures the path is always explicitly UTF-8 in a cross-platform way.
 	std::string filename(filenameUtf8.begin(), filenameUtf8.end());
 
-	int lineNumber = 0;
+	int lineNumber  = 0;
 	uintmax_t count = 0;
 
 	while (count < length)
@@ -517,12 +490,10 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 		file.read(reinterpret_cast<char*>(&byte), 1);
 		++count;
 
-		if ((char) byte != '\r'
-			&& (char) byte != '\n')
+		if ((char) byte != '\r' && (char) byte != '\n')
 			buf[index++] = byte;
 
-		if ((char) byte == '\n'
-			|| count == length)
+		if ((char) byte == '\n' || count == length)
 		{
 			++lineNumber;
 
@@ -530,11 +501,10 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 				continue;
 
 			buf[index] = (uint8_t) 0;
-			t_index = 0;
+			t_index    = 0;
 
 			// 주석에 대한 처리
-			if (buf[t_index] == ';'
-				|| buf[t_index] == '/')
+			if (buf[t_index] == ';' || buf[t_index] == '/')
 			{
 				index = 0;
 				continue;
@@ -544,15 +514,16 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 
 			if (0 == strcmp(first, "ROOM"))
 			{
-				logic = 0;
-				exec = 0;
+				logic      = 0;
+				exec       = 0;
 
-				t_index += ParseSpace(temp, buf + t_index);
-				event_num = atoi(temp);
+				t_index   += ParseSpace(temp, buf + t_index);
+				event_num  = atoi(temp);
 
 				if (m_arRoomEventArray.GetData(event_num) != nullptr)
 				{
-					spdlog::error("Map::LoadRoomEvent: Duplicate event definition [eventId={} zoneId={}]",
+					spdlog::error(
+						"Map::LoadRoomEvent: Duplicate event definition [eventId={} zoneId={}]",
 						event_num, m_nZoneNumber);
 					goto cancel_event_load;
 				}
@@ -561,8 +532,8 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 			}
 			else if (0 == strcmp(first, "TYPE"))
 			{
-				t_index += ParseSpace(temp, buf + t_index);
-				m_byRoomType = atoi(temp);
+				t_index      += ParseSpace(temp, buf + t_index);
+				m_byRoomType  = atoi(temp);
 			}
 			else if (0 == strcmp(first, "L"))
 			{
@@ -574,14 +545,14 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 				if (pEvent == nullptr)
 					goto cancel_event_load;
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_Exec[exec].sNumber = atoi(temp);
+				t_index                        += ParseSpace(temp, buf + t_index);
+				pEvent->m_Exec[exec].sNumber    = atoi(temp);
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_Exec[exec].sOption_1 = atoi(temp);
+				t_index                        += ParseSpace(temp, buf + t_index);
+				pEvent->m_Exec[exec].sOption_1  = atoi(temp);
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_Exec[exec].sOption_2 = atoi(temp);
+				t_index                        += ParseSpace(temp, buf + t_index);
+				pEvent->m_Exec[exec].sOption_2  = atoi(temp);
 
 				exec++;
 			}
@@ -590,14 +561,14 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 				if (pEvent == nullptr)
 					goto cancel_event_load;
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_Logic[logic].sNumber = atoi(temp);
+				t_index                          += ParseSpace(temp, buf + t_index);
+				pEvent->m_Logic[logic].sNumber    = atoi(temp);
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_Logic[logic].sOption_1 = atoi(temp);
+				t_index                          += ParseSpace(temp, buf + t_index);
+				pEvent->m_Logic[logic].sOption_1  = atoi(temp);
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_Logic[logic].sOption_2 = atoi(temp);
+				t_index                          += ParseSpace(temp, buf + t_index);
+				pEvent->m_Logic[logic].sOption_2  = atoi(temp);
 
 				logic++;
 				pEvent->m_byCheck = logic;
@@ -613,7 +584,7 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 					goto cancel_event_load;
 
 				t_index += ParseSpace(temp, buf + t_index);
-				nation = atoi(temp);
+				nation   = atoi(temp);
 
 				if (nation == KARUS_ZONE)
 					++m_sKarusRoom;
@@ -625,34 +596,34 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 				if (pEvent == nullptr)
 					goto cancel_event_load;
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_iInitMinX = atoi(temp);
+				t_index             += ParseSpace(temp, buf + t_index);
+				pEvent->m_iInitMinX  = atoi(temp);
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_iInitMinZ = atoi(temp);
+				t_index             += ParseSpace(temp, buf + t_index);
+				pEvent->m_iInitMinZ  = atoi(temp);
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_iInitMaxX = atoi(temp);
+				t_index             += ParseSpace(temp, buf + t_index);
+				pEvent->m_iInitMaxX  = atoi(temp);
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_iInitMaxZ = atoi(temp);
+				t_index             += ParseSpace(temp, buf + t_index);
+				pEvent->m_iInitMaxZ  = atoi(temp);
 			}
 			else if (0 == strcmp(first, "POSEND"))
 			{
 				if (pEvent == nullptr)
 					goto cancel_event_load;
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_iEndMinX = atoi(temp);
+				t_index            += ParseSpace(temp, buf + t_index);
+				pEvent->m_iEndMinX  = atoi(temp);
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_iEndMinZ = atoi(temp);
+				t_index            += ParseSpace(temp, buf + t_index);
+				pEvent->m_iEndMinZ  = atoi(temp);
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_iEndMaxX = atoi(temp);
+				t_index            += ParseSpace(temp, buf + t_index);
+				pEvent->m_iEndMaxX  = atoi(temp);
 
-				t_index += ParseSpace(temp, buf + t_index);
-				pEvent->m_iEndMaxZ = atoi(temp);
+				t_index            += ParseSpace(temp, buf + t_index);
+				pEvent->m_iEndMaxZ  = atoi(temp);
 			}
 			else if (0 == strcmp(first, "END"))
 			{
@@ -661,8 +632,8 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 			}
 			else if (isalnum(first[0]))
 			{
-				spdlog::warn("MAP::LoadRoomEvent({}): unhandled opcode '{}' ({}:{})",
-					zone_number, first, filename, lineNumber);
+				spdlog::warn("MAP::LoadRoomEvent({}): unhandled opcode '{}' ({}:{})", zone_number,
+					first, filename, lineNumber);
 			}
 
 			index = 0;
@@ -674,7 +645,7 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 
 cancel_event_load:
 	spdlog::error("LoadRoomEvent Failed [zoneId={} eventId={}]", zone_number, event_num);
-//	DeleteAll();
+	//	DeleteAll();
 	return false;
 }
 
@@ -686,9 +657,9 @@ int MAP::IsRoomCheck(float fx, float fz)
 	CRoomEvent* pRoom = nullptr;
 	// char notify[100] = {};
 
-	int nSize = m_arRoomEventArray.GetSize();
-	int nX = (int) fx;
-	int nZ = (int) fz;
+	int nSize         = m_arRoomEventArray.GetSize();
+	int nX            = (int) fx;
+	int nZ            = (int) fz;
 	int minX = 0, minZ = 0, maxX = 0, maxZ = 0;
 	int room_number = 0;
 
@@ -748,24 +719,23 @@ int MAP::IsRoomCheck(float fx, float fz)
 				bFlag_2 = true;
 		}
 
-		if (bFlag_1
-			&& bFlag_2)
+		if (bFlag_1 && bFlag_2)
 		{
 			// 방이 초기화 상태
 			if (pRoom->m_byStatus == 1)
 			{
-				pRoom->m_byStatus = 2;	// 진행중 상태로 방상태 변환
+				pRoom->m_byStatus   = 2; // 진행중 상태로 방상태 변환
 				pRoom->m_fDelayTime = TimeGet();
-				room_number = i;
-				spdlog::trace("Map::IsRoomCheck: [roomEventId={} zoneId={} x={} z={}]",
-					i, m_nZoneNumber, nX, nZ);
+				room_number         = i;
+				spdlog::trace("Map::IsRoomCheck: [roomEventId={} zoneId={} x={} z={}]", i,
+					m_nZoneNumber, nX, nZ);
 				//wsprintf(notify, "** 알림 : [%d Zone][%d] 방에 들어오신것을 환영합니다 **", m_nZoneNumber, pRoom->m_sRoomNumber);
 				//m_pMain->SendSystemMsg( notify, m_nZoneNumber, PUBLIC_CHAT, SEND_ALL);
 			}
 			// 진행중인 상태
 			else if (pRoom->m_byStatus == 2)
 			{
-				pRoom->m_byStatus = 3;					// 클리어 상태로
+				pRoom->m_byStatus = 3; // 클리어 상태로
 				//wsprintf(notify, "** 알림 : [%d Zone][%d] 목표지점까지 도착해서 클리어 됩니다ㅇ **", m_nZoneNumber, pRoom->m_sRoomNumber);
 				//m_pMain->SendSystemMsg( notify, m_nZoneNumber, PUBLIC_CHAT, SEND_ALL);
 			}
@@ -782,12 +752,13 @@ CRoomEvent* MAP::SetRoomEvent(int number)
 	CRoomEvent* pEvent = m_arRoomEventArray.GetData(number);
 	if (pEvent != nullptr)
 	{
-		spdlog::error("Map::SetRoomEvent: RoomEvent duplicate definition [roomEventId={} zoneId={}]",
-			number, m_nZoneNumber);
+		spdlog::error(
+			"Map::SetRoomEvent: RoomEvent duplicate definition [roomEventId={} zoneId={}]", number,
+			m_nZoneNumber);
 		return nullptr;
 	}
 
-	pEvent = new CRoomEvent();
+	pEvent                = new CRoomEvent();
 	pEvent->m_iZoneNumber = m_nZoneNumber;
 	pEvent->m_sRoomNumber = number;
 	if (!m_arRoomEventArray.PutData(pEvent->m_sRoomNumber, pEvent))
@@ -803,8 +774,8 @@ CRoomEvent* MAP::SetRoomEvent(int number)
 bool MAP::IsRoomStatusCheck()
 {
 	CRoomEvent* pRoom = nullptr;
-	int nTotalRoom = m_arRoomEventArray.GetSize() + 1;
-	int nClearRoom = 1;
+	int nTotalRoom    = m_arRoomEventArray.GetSize() + 1;
+	int nClearRoom    = 1;
 
 	// 방을 초기화중
 	if (m_byRoomStatus == 2)
@@ -815,8 +786,8 @@ bool MAP::IsRoomStatusCheck()
 		pRoom = m_arRoomEventArray.GetData(i);
 		if (pRoom == nullptr)
 		{
-			spdlog::warn("Map::IsRoomStatusCheck: RoomEvent null [roomEventId={} zoneId={}",
-				i, m_nZoneNumber);
+			spdlog::warn("Map::IsRoomStatusCheck: RoomEvent null [roomEventId={} zoneId={}", i,
+				m_nZoneNumber);
 			continue;
 			//return nullptr;
 		}
@@ -833,7 +804,8 @@ bool MAP::IsRoomStatusCheck()
 				if (nTotalRoom == nClearRoom)
 				{
 					m_byRoomStatus = 2;
-					spdlog::trace("Map::IsRoomStatusCheck: all rooms cleared [zoneId={} roomType={} roomStatus={}]",
+					spdlog::trace("Map::IsRoomStatusCheck: all rooms cleared [zoneId={} "
+								  "roomType={} roomStatus={}]",
 						m_nZoneNumber, m_byRoomType, m_byRoomStatus);
 					return true;
 				}
@@ -844,14 +816,15 @@ bool MAP::IsRoomStatusCheck()
 		{
 			if (m_byInitRoomCount >= 10)
 			{
-				pRoom->InitializeRoom();		// 실제 방을 초기화
+				pRoom->InitializeRoom(); // 실제 방을 초기화
 				nClearRoom += 1;
 
-				// 방이 초기화 되었어여.. 
+				// 방이 초기화 되었어여..
 				if (nTotalRoom == nClearRoom)
 				{
 					m_byRoomStatus = 3;
-					spdlog::trace("Map::IsRoomStatusCheck: room initialized [zoneId={} roomType={} roomStatus={}]",
+					spdlog::trace("Map::IsRoomStatusCheck: room initialized [zoneId={} roomType={} "
+								  "roomStatus={}]",
 						m_nZoneNumber, m_byRoomType, m_byRoomStatus);
 					return true;
 				}
@@ -860,10 +833,11 @@ bool MAP::IsRoomStatusCheck()
 		// 방 초기화 완료
 		else if (m_byRoomStatus == 3)
 		{
-			m_byRoomStatus = 1;
+			m_byRoomStatus    = 1;
 			m_byInitRoomCount = 0;
-			spdlog::trace("Map::IsRoomStatusCheck: room restarted [zoneId={} roomType={} roomStatus={}]",
-						m_nZoneNumber, m_byRoomType, m_byRoomStatus);
+			spdlog::trace(
+				"Map::IsRoomStatusCheck: room restarted [zoneId={} roomType={} roomStatus={}]",
+				m_nZoneNumber, m_byRoomType, m_byRoomStatus);
 			return true;
 		}
 	}
@@ -874,20 +848,20 @@ bool MAP::IsRoomStatusCheck()
 void MAP::InitializeRoom()
 {
 	CRoomEvent* pRoom = nullptr;
-	int nTotalRoom = m_arRoomEventArray.GetSize() + 1;
+	int nTotalRoom    = m_arRoomEventArray.GetSize() + 1;
 
 	for (int i = 1; i < nTotalRoom; i++)
 	{
 		pRoom = m_arRoomEventArray.GetData(i);
 		if (pRoom == nullptr)
 		{
-			spdlog::error("Map::InitializeRoom: RoomEvent null [roomEventId={} zoneId={}]",
-				i, m_nZoneNumber);
+			spdlog::error(
+				"Map::InitializeRoom: RoomEvent null [roomEventId={} zoneId={}]", i, m_nZoneNumber);
 			continue;
 		}
 
-		pRoom->InitializeRoom();		// 실제 방을 초기화
-		m_byRoomStatus = 1;
+		pRoom->InitializeRoom(); // 실제 방을 초기화
+		m_byRoomStatus    = 1;
 		m_byInitRoomCount = 0;
 	}
 }

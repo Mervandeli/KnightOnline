@@ -11,18 +11,21 @@ using DATA_TYPE = TBL_DATA_TYPE;
 class CTblEditorBase
 {
 public:
-	inline std::map<int, std::vector<CStringA>>& GetRows() {
+	inline std::map<int, std::vector<CStringA>>& GetRows()
+	{
 		return m_Rows;
 	}
 
-	inline const std::map<int, std::vector<CStringA>>& GetRows() const {
+	inline const std::map<int, std::vector<CStringA>>& GetRows() const
+	{
 		return m_Rows;
 	}
 
-	inline const std::vector<DATA_TYPE>& GetColumnTypes() const {
+	inline const std::vector<DATA_TYPE>& GetColumnTypes() const
+	{
 		return m_DataTypes;
 	}
-	
+
 	CTblEditorBase();
 	virtual ~CTblEditorBase();
 	void Release();

@@ -12,34 +12,34 @@
 class CN3Transform;
 class CToolDlg : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CToolDlg(CWnd* pParent = NULL);   // standard constructor
+	CToolDlg(CWnd* pParent = NULL); // standard constructor
 	void SetObj(CN3Transform* pObj);
 
 protected:
 	CN3Transform* m_pSelectedObj;
 
 public:
-
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CToolDlg)
-	enum { IDD = IDR_MAINFRAME };
-	CSliderCtrl	m_RatateSlider;
-	float	m_fRotY;
+	enum
+	{
+		IDD = IDR_MAINFRAME
+	};
+	CSliderCtrl m_RatateSlider;
+	float m_fRotY;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CToolDlg)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CToolDlg)
 	virtual BOOL OnInitDialog();

@@ -7,21 +7,20 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgTerrainSize dialog
 
-CDlgTerrainSize::CDlgTerrainSize(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgTerrainSize::IDD, pParent)
+CDlgTerrainSize::CDlgTerrainSize(CWnd* pParent /*=nullptr*/) :
+	CDialog(CDlgTerrainSize::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgTerrainSize)
 	m_fSize = 0.0f;
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgTerrainSize::DoDataExchange(CDataExchange* pDX)
 {
@@ -32,11 +31,10 @@ void CDlgTerrainSize::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgTerrainSize, CDialog)
-	//{{AFX_MSG_MAP(CDlgTerrainSize)
-		// NOTE: the ClassWizard will add message map macros here
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgTerrainSize)
+// NOTE: the ClassWizard will add message map macros here
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////

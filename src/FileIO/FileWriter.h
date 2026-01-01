@@ -8,8 +8,8 @@
 #include <llfio/llfio.hpp>
 
 /// \brief FileWriter implements a write-capable file interface.
-/// 
-/// Supports writing to a file, seeking, and flushing data to disk. 
+///
+/// Supports writing to a file, seeking, and flushing data to disk.
 /// Reading operations are not supported. Files may be extended by seeking past the current size.
 class FileWriter : public File
 {
@@ -73,8 +73,8 @@ public:
 	~FileWriter() override;
 
 protected:
-	LLFIO_V2_NAMESPACE::file_handle _fileHandle;	///< File handle used for writing.
-	uint64_t _sizeOnDisk;							///< Current size of the file on disk.
+	LLFIO_V2_NAMESPACE::file_handle _fileHandle; ///< File handle used for writing.
+	uint64_t _sizeOnDisk;                        ///< Current size of the file on disk.
 };
 
-#endif // FILEIO_FILEWRITER_H
+#endif                                           // FILEIO_FILEWRITER_H

@@ -11,30 +11,29 @@
 
 #include <N3Base/N3UIBase.h>
 
-
 class Packet;
-class CUIQuestMenu   : public CN3UIBase
+class CUIQuestMenu : public CN3UIBase
 {
 protected:
 	static constexpr int MAX_STRING_MENU = 10;
 
-	CN3UIString*	m_pTextTitle;
-	CN3UIString*	m_pTextSample;
-	CN3UIString*	m_pTextMenu[MAX_STRING_MENU];
+	CN3UIString* m_pTextTitle;
+	CN3UIString* m_pTextSample;
+	CN3UIString* m_pTextMenu[MAX_STRING_MENU];
 
-	int				m_iMenuCnt;
+	int m_iMenuCnt;
 
-	CN3UIImage*		m_pTextMenuImg[MAX_STRING_MENU];
-	CN3UIImage*		m_pTextMenuImgBk[MAX_STRING_MENU];
-	CN3UIButton*	m_pTextMenuBtn[MAX_STRING_MENU];
+	CN3UIImage* m_pTextMenuImg[MAX_STRING_MENU];
+	CN3UIImage* m_pTextMenuImgBk[MAX_STRING_MENU];
+	CN3UIButton* m_pTextMenuBtn[MAX_STRING_MENU];
 
-	CN3UIButton*	m_pBtnClose;
-	CN3UIString*	m_pStrNpcName;
-	CN3UIScrollBar*	m_pScrollBar;
-	CN3UIButton*	m_pBtnMenu;
-	CN3UIImage*		m_pImageBtn;
-	CN3UIImage*		m_pImageBottom;
-	CN3UIImage*		m_pImageMenu;
+	CN3UIButton* m_pBtnClose;
+	CN3UIString* m_pStrNpcName;
+	CN3UIScrollBar* m_pScrollBar;
+	CN3UIButton* m_pBtnMenu;
+	CN3UIImage* m_pImageBtn;
+	CN3UIImage* m_pImageBottom;
+	CN3UIImage* m_pImageMenu;
 
 public:
 	CUIQuestMenu();

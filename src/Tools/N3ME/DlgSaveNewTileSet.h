@@ -12,28 +12,29 @@
 
 class CDlgSaveNewTileSet : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgSaveNewTileSet(CWnd* pParent = nullptr);   // standard constructor
+	CDlgSaveNewTileSet(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+												 // Dialog Data
 	//{{AFX_DATA(CDlgSaveNewTileSet)
-	enum { IDD = IDD_SAVE_NEW_TILESET };
-	CListBox	m_ListTileSet;
-	CString	m_NewTileSetName;
+	enum
+	{
+		IDD = IDD_SAVE_NEW_TILESET
+	};
+	CListBox m_ListTileSet;
+	CString m_NewTileSetName;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgSaveNewTileSet)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgSaveNewTileSet)
 	virtual BOOL OnInitDialog();

@@ -5,62 +5,53 @@
 
 #include <map>
 
-template <
-	class ValueType_,
-	class KeyType_ = int>
+template <class ValueType_, class KeyType_ = int>
 class CSTLMap
 {
 public:
-	using KeyType = KeyType_;
+	using KeyType   = KeyType_;
 	using ValueType = ValueType_;
-	using SelfType = CSTLMap<ValueType, KeyType>;
-	using MapType = std::map<KeyType, ValueType*>;
+	using SelfType  = CSTLMap<ValueType, KeyType>;
+	using MapType   = std::map<KeyType, ValueType*>;
 
 	MapType m_UserTypeMap;
 
-	int GetSize() const {
-		return (int) m_UserTypeMap.size(); 
-	}
-
-	bool IsExist(
-		const KeyType& key)
-		const
+	int GetSize() const
 	{
-		return m_UserTypeMap.find(key) != m_UserTypeMap.end(); 
+		return (int) m_UserTypeMap.size();
 	}
 
-	bool IsEmpty() const { 
-		return m_UserTypeMap.empty(); 
-	}
-
-	bool PutData(
-		const KeyType& key_value,
-		ValueType* pData) 
+	bool IsExist(const KeyType& key) const
 	{
-		return m_UserTypeMap.insert(
-			std::make_pair(key_value, pData)).second; 
+		return m_UserTypeMap.find(key) != m_UserTypeMap.end();
 	}
 
-	ValueType* GetData(
-		const KeyType& key_value)
+	bool IsEmpty() const
+	{
+		return m_UserTypeMap.empty();
+	}
+
+	bool PutData(const KeyType& key_value, ValueType* pData)
+	{
+		return m_UserTypeMap.insert(std::make_pair(key_value, pData)).second;
+	}
+
+	ValueType* GetData(const KeyType& key_value)
 	{
 		auto itr = m_UserTypeMap.find(key_value);
 		return (itr != m_UserTypeMap.end() ? itr->second : nullptr);
 	}
 
-	const ValueType* GetData(
-		const KeyType& key_value)
-		const
+	const ValueType* GetData(const KeyType& key_value) const
 	{
 		auto itr = m_UserTypeMap.find(key_value);
 		return (itr != m_UserTypeMap.end() ? itr->second : nullptr);
 	}
 
-	void DeleteData(
-		const KeyType& key_value)
+	void DeleteData(const KeyType& key_value)
 	{
 		auto itr = m_UserTypeMap.find(key_value);
-		if (itr!= m_UserTypeMap.end())
+		if (itr != m_UserTypeMap.end())
 		{
 			delete itr->second;
 			m_UserTypeMap.erase(itr);
@@ -78,8 +69,7 @@ public:
 		m_UserTypeMap.clear();
 	}
 
-	void Swap(
-		SelfType& rhs)
+	void Swap(SelfType& rhs)
 	{
 		m_UserTypeMap.swap(rhs.m_UserTypeMap);
 	}
@@ -89,35 +79,43 @@ public:
 		DeleteAllData();
 	}
 
-	typename MapType::const_iterator begin() const {
+	typename MapType::const_iterator begin() const
+	{
 		return m_UserTypeMap.begin();
 	}
 
-	typename MapType::const_iterator end() const {
+	typename MapType::const_iterator end() const
+	{
 		return m_UserTypeMap.end();
 	}
 
-	typename MapType::iterator begin() {
+	typename MapType::iterator begin()
+	{
 		return m_UserTypeMap.begin();
 	}
 
-	typename MapType::iterator end() {
+	typename MapType::iterator end()
+	{
 		return m_UserTypeMap.end();
 	}
 
-	typename MapType::const_reverse_iterator rbegin() const {
+	typename MapType::const_reverse_iterator rbegin() const
+	{
 		return m_UserTypeMap.rbegin();
 	}
 
-	typename MapType::const_reverse_iterator rend() const {
+	typename MapType::const_reverse_iterator rend() const
+	{
 		return m_UserTypeMap.rend();
 	}
 
-	typename MapType::reverse_iterator rbegin() {
+	typename MapType::reverse_iterator rbegin()
+	{
 		return m_UserTypeMap.rbegin();
 	}
 
-	typename MapType::reverse_iterator rend() {
+	typename MapType::reverse_iterator rend()
+	{
 		return m_UserTypeMap.rend();
 	}
 };

@@ -5,16 +5,15 @@
 * \author Tadeusz Dracz
 */
 // Part of the ZipArchive library
-// 
+//
 // Copyright (C) 2000 - 2001 Tadeusz Dracz.
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // For the licensing details see the file License.txt
 ////////////////////////////////////////////////////////////////////////////////
-
 
 #if !defined(AFX_ZIPAUTOBUFFER_H__DEC28C20_83FE_11D3_B7C3_EDEC47A8A86C__INCLUDED_)
 #define AFX_ZIPAUTOBUFFER_H__DEC28C20_83FE_11D3_B7C3_EDEC47A8A86C__INCLUDED_
@@ -26,7 +25,7 @@
 /**
 	A smart buffer freeing its contents on destruction.
 */
-class CZipAutoBuffer  
+class CZipAutoBuffer
 {
 public:
 	operator char*()
@@ -35,14 +34,17 @@ public:
 	}
 
 	// may produce ambiguity on some compilers
-//  	operator const char*() const
-//   	{
-//    		return m_pBuffer;
-//     }
-	const char* GetBuffer() const {return m_pBuffer;}
+	//  	operator const char*() const
+	//   	{
+	//    		return m_pBuffer;
+	//     }
+	const char* GetBuffer() const
+	{
+		return m_pBuffer;
+	}
 	char* Allocate(DWORD iSize, bool bZeroMemory = false);
 	void Release();
-	DWORD GetSize() const 
+	DWORD GetSize() const
 	{
 		return m_iSize;
 	}
@@ -55,6 +57,7 @@ public:
 	CZipAutoBuffer(const CZipAutoBuffer& buffer);
 	virtual ~CZipAutoBuffer();
 	CZipAutoBuffer& operator=(const CZipAutoBuffer& buffer);
+
 protected:
 	char* m_pBuffer;
 	DWORD m_iSize;

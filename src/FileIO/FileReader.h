@@ -8,7 +8,7 @@
 #include <llfio/llfio.hpp>
 
 /// \brief FileReader implements a read-only file interface.
-/// 
+///
 /// Provides memory-mapped reading of a file and tracks the current read offset.
 /// Writing operations are not supported.
 class FileReader : public File
@@ -74,8 +74,9 @@ public:
 	~FileReader() override;
 
 protected:
-	LLFIO_V2_NAMESPACE::mapped_file_handle _mappedFileHandle;	///< Memory-mapped file handle for read access.
-	void* _address;												///< Pointer to the memory-mapped data.
+	LLFIO_V2_NAMESPACE::mapped_file_handle
+		_mappedFileHandle; ///< Memory-mapped file handle for read access.
+	void* _address;        ///< Pointer to the memory-mapped data.
 };
 
-#endif // FILEIO_FILEREADER_H
+#endif                     // FILEIO_FILEREADER_H

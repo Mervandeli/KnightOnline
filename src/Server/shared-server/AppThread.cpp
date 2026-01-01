@@ -19,15 +19,15 @@
 #include <vector>
 
 AppThread* AppThread::s_instance = nullptr;
-bool AppThread::s_shutdown = false;
+bool AppThread::s_shutdown       = false;
 
-AppThread::AppThread(logger::Logger& logger)
-	: _logger(logger), _exitCode(EXIT_SUCCESS), _headless(false)
+AppThread::AppThread(logger::Logger& logger) :
+	_logger(logger), _exitCode(EXIT_SUCCESS), _headless(false)
 {
 	assert(s_instance == nullptr);
 	s_instance = this;
 
-	_iniFile = new CIni();
+	_iniFile   = new CIni();
 }
 
 AppThread::~AppThread()
@@ -77,7 +77,7 @@ bool AppThread::ProcessCommandLineArgs(const argparse::ArgumentParser& /*parser*
 
 void AppThread::thread_loop()
 {
-	CIni& iniFile = IniFile();
+	CIni& iniFile         = IniFile();
 	bool configFileLoaded = iniFile.Load(ConfigPath());
 
 	// Setup the logger
@@ -88,8 +88,8 @@ void AppThread::thread_loop()
 		std::u8string filenameUtf8 = iniFile.GetPath().u8string();
 		std::string filename(filenameUtf8.begin(), filenameUtf8.end());
 
-		spdlog::warn("AppThread::thread_loop: {} does not exist, will use configured defaults.",
-			filename);
+		spdlog::warn(
+			"AppThread::thread_loop: {} does not exist, will use configured defaults.", filename);
 	}
 
 	auto color = ftxui::Terminal::ColorSupport();
@@ -103,7 +103,8 @@ void AppThread::thread_loop()
 	// This isn't a very robust test, but if we're on a terminal with this little support, we shouldn't use ftxui.
 	else if (color == ftxui::Terminal::Color::Palette16)
 	{
-		spdlog::warn("AppThread::thread_loop: No terminal support detected for ftxui. Proceeding with regular console logger.");
+		spdlog::warn("AppThread::thread_loop: No terminal support detected for ftxui. Proceeding "
+					 "with regular console logger.");
 		_exitCode = thread_loop_fallback(iniFile);
 	}
 	// We can assume ftxui should be used in all other cases.
@@ -117,12 +118,12 @@ int AppThread::thread_loop_ftxui(CIni& iniFile)
 {
 	using namespace ftxui;
 
-	int exitCode = EXIT_SUCCESS;
+	int exitCode        = EXIT_SUCCESS;
 
 	bool isServerLoaded = false;
-	auto screen = ScreenInteractive::Fullscreen();
+	auto screen         = ScreenInteractive::Fullscreen();
 
-	auto fxtuiSink = _logger.FxtuiSink();
+	auto fxtuiSink      = _logger.FxtuiSink();
 	if (fxtuiSink != nullptr)
 		fxtuiSink->set_screen(nullptr);
 
@@ -130,148 +131,146 @@ int AppThread::thread_loop_ftxui(CIni& iniFile)
 	Elements logElements;
 
 	int focusedLineNumber = 0;
-	bool autoScroll = true;
+	bool autoScroll       = true;
 	int elementCount = 0, lastElementIndex = 0;
 
-	auto input = Input(&inputText, "Enter command...");
+	auto input  = Input(&inputText, "Enter command...");
 
-	input |= CatchEvent([&](Event event)
-	{
-		if (event == Event::Return
-			&& isServerLoaded)
+	input      |= CatchEvent(
+        [&](Event event)
+        {
+            if (event == Event::Return && isServerLoaded)
+            {
+                ParseCommand(inputText);
+                inputText.clear();
+                return true;
+            }
+
+            return false;
+        });
+
+	auto renderer            = Renderer(input,
+				   [&]
+				   {
+            {
+                std::lock_guard<std::mutex> lock(fxtuiSink->lock());
+                logElements =
+                    fxtuiSink
+                        ->log_buffer(); // this is intentionally a copy, but it's a container of shared pointers
+            }
+
+            // clamping
+            int oldElementCount  = elementCount;
+            elementCount         = static_cast<int>(logElements.size());
+            lastElementIndex     = std::max(0, elementCount - 1);
+            focusedLineNumber    = std::clamp(focusedLineNumber, 0, lastElementIndex);
+
+            float scrollPosition = 0.0f;
+            if (elementCount > 0)
+                scrollPosition = std::clamp(
+                    static_cast<float>(focusedLineNumber) / static_cast<float>(elementCount), 0.0f,
+                    1.0f);
+
+            // Auto-scroll to bottom when new lines are added
+            if (autoScroll && oldElementCount != elementCount)
+            {
+                focusedLineNumber = lastElementIndex;
+                scrollPosition    = 1.0f;
+            }
+
+            // render
+            auto logDisplay = vbox(logElements) | focusPositionRelative(0, scrollPosition)
+                              | vscroll_indicator | yframe | flex;
+
+            auto inputBox = hbox({ text(" Command: ") | bold, input->Render() | flex }) | border;
+
+            if (!isServerLoaded)
+                return logDisplay;
+
+            return vbox({ logDisplay, inputBox });
+        });
+
+	constexpr int PageSize   = 10;
+	constexpr int WheelSize  = 3;
+
+	renderer                |= CatchEvent(
+        [&](Event event)
+        {
+            // Keyboard events
+            if (event == Event::ArrowUp)
+            {
+                --focusedLineNumber;
+                return true;
+            }
+
+            if (event == Event::ArrowDown)
+            {
+                ++focusedLineNumber;
+
+                if (focusedLineNumber >= lastElementIndex)
+                    autoScroll = true;
+                return true;
+            }
+
+            if (event == Event::PageUp)
+            {
+                focusedLineNumber -= PageSize;
+                return true;
+            }
+
+            if (event == Event::PageDown)
+            {
+                focusedLineNumber += PageSize;
+
+                if (focusedLineNumber >= lastElementIndex)
+                    autoScroll = true;
+                return true;
+            }
+
+            if (event == Event::Home)
+            {
+                focusedLineNumber = 0;
+                return true;
+            }
+
+            if (event == Event::End)
+            {
+                focusedLineNumber = std::max(0, elementCount - 1);
+                autoScroll        = true;
+                return true;
+            }
+
+            // Mouse events
+            if (event.is_mouse())
+            {
+                if (event.mouse().button == Mouse::WheelUp)
+                {
+                    focusedLineNumber -= WheelSize;
+                    return true;
+                }
+
+                if (event.mouse().button == Mouse::WheelDown)
+                {
+                    focusedLineNumber += WheelSize;
+
+                    if (focusedLineNumber >= lastElementIndex)
+                        autoScroll = true;
+                    return true;
+                }
+            }
+
+            return HandleInputEvent(event);
+        });
+
+	std::thread uiThread(
+		[&]
 		{
-			ParseCommand(inputText);
-			inputText.clear();
-			return true;
-		}
+			fxtuiSink->set_screen(&screen);
+			screen.Loop(renderer);
+			fxtuiSink->set_screen(nullptr);
 
-		return false;
-	});
-
-	auto renderer = Renderer(input, [&]
-	{
-		{
-			std::lock_guard<std::mutex> lock(fxtuiSink->lock());
-			logElements = fxtuiSink->log_buffer(); // this is intentionally a copy, but it's a container of shared pointers
-		}
-
-		// clamping
-		int oldElementCount = elementCount;
-		elementCount = static_cast<int>(logElements.size());
-		lastElementIndex = std::max(0, elementCount - 1);
-		focusedLineNumber = std::clamp(focusedLineNumber, 0, lastElementIndex);
-
-		float scrollPosition = 0.0f;
-		if (elementCount > 0)
-			scrollPosition = std::clamp(static_cast<float>(focusedLineNumber) / static_cast<float>(elementCount), 0.0f, 1.0f);
-
-		// Auto-scroll to bottom when new lines are added
-		if (autoScroll && oldElementCount != elementCount)
-		{
-			focusedLineNumber = lastElementIndex;
-			scrollPosition = 1.0f;
-	 	}
-
-		// render
-		auto logDisplay = vbox(logElements)
-			| focusPositionRelative(0, scrollPosition)
-			| vscroll_indicator
-			| yframe
-			| flex;
-
-		auto inputBox = hbox({
-			text(" Command: ") | bold,
-			input->Render() | flex
-		}) | border;
-
-		if (!isServerLoaded)
-			return logDisplay;
-
-		return vbox({
-			logDisplay,
-			inputBox
+			shutdown(false);
 		});
-	});
-
-	constexpr int PageSize	= 10;
-	constexpr int WheelSize	= 3;
-
-	renderer |= CatchEvent([&](Event event)
-	{
-		// Keyboard events
-		if (event == Event::ArrowUp)
-		{
-			--focusedLineNumber;
-			return true;
-		}
-
-		if (event == Event::ArrowDown)
-		{
-			++focusedLineNumber;
-
-			if (focusedLineNumber >= lastElementIndex)
-				autoScroll = true;
-			return true;
-		}
-
-		if (event == Event::PageUp)
-		{
-			focusedLineNumber -= PageSize;
-			return true;
-		}
-
-		if (event == Event::PageDown)
-		{
-			focusedLineNumber += PageSize;
-
-			if (focusedLineNumber >= lastElementIndex)
-				autoScroll = true;
-			return true;
-		}
-
-		if (event == Event::Home)
-		{
-			focusedLineNumber = 0;
-			return true;
-		}
-
-		if (event == Event::End)
-		{
-			focusedLineNumber = std::max(0, elementCount - 1);
-			autoScroll = true;
-			return true;
-		}
-
-		// Mouse events
-		if (event.is_mouse())
-		{
-			if (event.mouse().button == Mouse::WheelUp)
-			{
-				focusedLineNumber -= WheelSize;
-				return true;
-			}
-
-			if (event.mouse().button == Mouse::WheelDown)
-			{
-				focusedLineNumber += WheelSize;
-
-				if (focusedLineNumber >= lastElementIndex)
-					autoScroll = true;
-				return true;
-			}
-		}
-
-		return HandleInputEvent(event);
-	});
-
-	std::thread uiThread([&]
-	{
-		fxtuiSink->set_screen(&screen);
-		screen.Loop(renderer);
-		fxtuiSink->set_screen(nullptr);
-
-		shutdown(false);
-	});
 
 	if (StartupImpl(iniFile))
 	{
@@ -384,7 +383,7 @@ bool AppThread::HandleCommand(const std::string& command)
 		spdlog::info("Logs cleared");
 		return true;
 	}
-	
+
 	if (command == "/exit")
 	{
 		shutdown(false);
@@ -411,8 +410,7 @@ void AppThread::signalHandler(int signalNumber)
 		case SIGABRT:
 		case SIGTERM:
 			// Shutdown the application thread
-			if (!s_shutdown
-				&& s_instance != nullptr)
+			if (!s_shutdown && s_instance != nullptr)
 			{
 				s_instance->shutdown(false);
 				s_shutdown = true;

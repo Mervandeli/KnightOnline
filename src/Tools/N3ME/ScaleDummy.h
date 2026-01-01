@@ -11,7 +11,7 @@
 
 #include "TransDummy.h"
 
-class CScaleDummy : public CTransDummy  
+class CScaleDummy : public CTransDummy
 {
 public:
 	CScaleDummy();
@@ -19,9 +19,9 @@ public:
 
 public:
 protected:
-
 public:
 	virtual BOOL MouseMsgFilter(LPMSG pMsg);
+
 protected:
 };
 

@@ -33,7 +33,8 @@ public:
 
 	/// \brief attempts to create a new Version table record
 	/// \returns true on success, false on failure
-	bool InsertVersion(int version, const char* fileName, const char* compressName, int historyVersion);
+	bool InsertVersion(
+		int version, const char* fileName, const char* compressName, int historyVersion);
 
 	/// \brief attempts a connection with db::ConnectionManager to the ACCOUNT dbType
 	/// \throws nanodbc::database_error

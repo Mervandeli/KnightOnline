@@ -24,15 +24,15 @@ typedef struct __GRASS
 
 	__GRASS()
 	{
-		Tile_x = -1;
-		Tile_z = -1;
-		Pos = __Vector3(0.0f,0.0f,0.0f);
-		Sub_Grass = nullptr;
+		Tile_x          = -1;
+		Tile_z          = -1;
+		Pos             = __Vector3(0.0f, 0.0f, 0.0f);
+		Sub_Grass       = nullptr;
 		Sub_Grass_Count = 0;
-		roll =0;
+		roll            = 0;
 	};
 
-}GRASS,*LPGRASS;
+} GRASS, *LPGRASS;
 
 typedef struct __GRASS_GROUP
 {
@@ -42,44 +42,42 @@ typedef struct __GRASS_GROUP
 	char FileName[256];
 	__Vector3 Pos;
 
-	std::list<LPGRASS>	grass;
+	std::list<LPGRASS> grass;
 	__GRASS_GROUP()
 	{
-		Pos = __Vector3(0.0f,0.0f,0.0f);
-		memset(FileName,0,256);
+		Pos = __Vector3(0.0f, 0.0f, 0.0f);
+		memset(FileName, 0, 256);
 		Group_id = -1;
 		grass.clear();
 	};
 
-}GRASS_GROUP,*LPGRASS_GROUP;
+} GRASS_GROUP, *LPGRASS_GROUP;
 
 typedef struct __OBJ_NAME
 {
 	int Id;
 	char FileName[256];
-}OBJ_NAME,*LPOBJ_NAME;
-
-
+} OBJ_NAME, *LPOBJ_NAME;
 
 typedef std::list<LPGRASS>::iterator it_Grass;
 typedef std::list<LPGRASS_GROUP>::iterator it_Grass_Group;
 typedef std::list<LPOBJ_NAME>::iterator it_Obj_Name;
 
-class CSowSeedMng  
+class CSowSeedMng
 {
 public:
-	std::list<LPGRASS_GROUP>			Grass_Group;
-	std::list<LPOBJ_NAME>				Obj_Name;
-	LPGRASS		Grass;
+	std::list<LPGRASS_GROUP> Grass_Group;
+	std::list<LPOBJ_NAME> Obj_Name;
+	LPGRASS Grass;
 	int Grass_Count;
 
 	int Add_List_Count;
 
-	__VertexColor*	m_pVertices; // 점 버퍼
-	int			m_nVC; // 점 갯수
+	__VertexColor* m_pVertices; // 점 버퍼
+	int m_nVC;                  // 점 갯수
 
 	bool bActive;
-	BOOL Render_Grass ;
+	BOOL Render_Grass;
 	POINT ptSelHeightMapPos;
 	int Select_Group_Id;
 
@@ -89,15 +87,15 @@ public:
 
 	void Render(LPDIRECT3DDEVICE9 lpD3DDevice);
 	// Mouse 메세지 처리
-	BOOL MouseMessage(LPMSG pMsg);	
+	BOOL MouseMessage(LPMSG pMsg);
 	void Release();
 	void Create_Grass(int NUm);
 	void Random_Grass(void);
 	void Add_Grass(void);
-	int  SelectSeed(POINT point);
+	int SelectSeed(POINT point);
 	void SetListPos(void);
-	void CreateBox(__Vector3 Max,__Vector3 Min);
-	void Render_Box(LPDIRECT3DDEVICE9 lpD3DDevice,__Vector3 Pos);
+	void CreateBox(__Vector3 Max, __Vector3 Min);
+	void Render_Box(LPDIRECT3DDEVICE9 lpD3DDevice, __Vector3 Pos);
 	void SaveData(void);
 	void LoadData(void);
 	void SaveDataGame(void);

@@ -11,17 +11,22 @@
 
 #include <N3Base/N3UIBase.h>
 
-enum e_NpcEvent	{ NPC_EVENT_ITEM_TRADE = 0, NPC_EVENT_TRADE_REPAIR = 1, NPC_EVENT_KNIGHTS = 2 };
+enum e_NpcEvent
+{
+	NPC_EVENT_ITEM_TRADE   = 0,
+	NPC_EVENT_TRADE_REPAIR = 1,
+	NPC_EVENT_KNIGHTS      = 2
+};
 
 //////////////////////////////////////////////////////////////////////
 
 class CUINPCEvent : public CN3UIBase
 {
-	int					m_iTradeID;
-	int					m_iIDTarget;
-	CN3UIButton*		m_pBtn_Repair;
-	CN3UIString*		m_pText_Repair;
-	CN3UIString*		m_pText_Title;
+	int m_iTradeID;
+	int m_iIDTarget;
+	CN3UIButton* m_pBtn_Repair;
+	CN3UIString* m_pText_Repair;
+	CN3UIString* m_pText_Title;
 
 public:
 	void SetVisible(bool bVisible) override;

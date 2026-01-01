@@ -26,73 +26,75 @@ public:
 	__ColorValue(D3DCOLOR cr);
 	__ColorValue(float r2, float g2, float b2, float a2);
 
-	void operator = (const D3DCOLORVALUE& cv);
-	void operator = (D3DCOLOR cr);
+	void operator=(const D3DCOLORVALUE& cv);
+	void operator=(D3DCOLOR cr);
 	void Set(float r2, float g2, float b2, float a2);
 
 	D3DCOLOR ToD3DCOLOR() const;
 
-	void operator += (float fDelta);
-	void operator -= (float fDelta);
-	void operator *= (float fDelta);
-	void operator /= (float fDelta);
-	
-	D3DCOLORVALUE operator + (float fDelta) const;
-	D3DCOLORVALUE operator - (float fDelta) const;
-	D3DCOLORVALUE operator * (float fDelta) const;
-	D3DCOLORVALUE operator / (float fDelta) const;
+	void operator+=(float fDelta);
+	void operator-=(float fDelta);
+	void operator*=(float fDelta);
+	void operator/=(float fDelta);
 
-	void operator += (const D3DCOLORVALUE& cv);
-	void operator -= (const D3DCOLORVALUE& cv);
-	void operator *= (const D3DCOLORVALUE& cv);
-	void operator /= (const D3DCOLORVALUE& cv);
-	
-	D3DCOLORVALUE operator + (const D3DCOLORVALUE& cv) const;
-	D3DCOLORVALUE operator - (const D3DCOLORVALUE& cv) const;
-	D3DCOLORVALUE operator * (const D3DCOLORVALUE& cv) const;
-	D3DCOLORVALUE operator / (const D3DCOLORVALUE& cv) const;
+	D3DCOLORVALUE operator+(float fDelta) const;
+	D3DCOLORVALUE operator-(float fDelta) const;
+	D3DCOLORVALUE operator*(float fDelta) const;
+	D3DCOLORVALUE operator/(float fDelta) const;
+
+	void operator+=(const D3DCOLORVALUE& cv);
+	void operator-=(const D3DCOLORVALUE& cv);
+	void operator*=(const D3DCOLORVALUE& cv);
+	void operator/=(const D3DCOLORVALUE& cv);
+
+	D3DCOLORVALUE operator+(const D3DCOLORVALUE& cv) const;
+	D3DCOLORVALUE operator-(const D3DCOLORVALUE& cv) const;
+	D3DCOLORVALUE operator*(const D3DCOLORVALUE& cv) const;
+	D3DCOLORVALUE operator/(const D3DCOLORVALUE& cv) const;
 };
 
-constexpr uint32_t FVF_VNT1 = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
-constexpr uint32_t FVF_VNT2 = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX2;
-constexpr uint32_t FVF_CV = D3DFVF_XYZ | D3DFVF_DIFFUSE;
-constexpr uint32_t FVF_CSV = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_SPECULAR;
-constexpr uint32_t FVF_TRANSFORMED = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1;
-constexpr uint32_t FVF_TRANSFORMEDT2 = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX2;
-constexpr uint32_t FVF_TRANSFORMEDCOLOR = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
-constexpr uint32_t FVF_PARTICLE = D3DFVF_XYZ | D3DFVF_PSIZE | D3DFVF_DIFFUSE;
+constexpr uint32_t FVF_VNT1               = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
+constexpr uint32_t FVF_VNT2               = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX2;
+constexpr uint32_t FVF_CV                 = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+constexpr uint32_t FVF_CSV                = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_SPECULAR;
+constexpr uint32_t FVF_TRANSFORMED        = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1;
+constexpr uint32_t FVF_TRANSFORMEDT2      = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX2;
+constexpr uint32_t FVF_TRANSFORMEDCOLOR   = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
+constexpr uint32_t FVF_PARTICLE           = D3DFVF_XYZ | D3DFVF_PSIZE | D3DFVF_DIFFUSE;
 
 //..
-constexpr uint32_t FVF_XYZT1				= D3DFVF_XYZ | D3DFVF_TEX1;
-constexpr uint32_t FVF_XYZT2				= D3DFVF_XYZ | D3DFVF_TEX2;
-constexpr uint32_t FVF_XYZNORMAL			= D3DFVF_XYZ | D3DFVF_NORMAL;
-constexpr uint32_t FVF_XYZCOLORT1			= D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
-constexpr uint32_t FVF_XYZCOLORT2			= D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX2;
-constexpr uint32_t FVF_XYZCOLORSPECULART1	= D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX1;
-constexpr uint32_t FVF_XYZCOLOR				= D3DFVF_XYZ | D3DFVF_DIFFUSE;
-constexpr uint32_t FVF_XYZNORMALCOLOR		= D3DFVF_XYZ | D3DFVF_NORMAL  | D3DFVF_DIFFUSE;
-constexpr uint32_t FVF_XYZNORMALCOLORT1		= D3DFVF_XYZ | D3DFVF_NORMAL  | D3DFVF_DIFFUSE | D3DFVF_TEX1;
+constexpr uint32_t FVF_XYZT1              = D3DFVF_XYZ | D3DFVF_TEX1;
+constexpr uint32_t FVF_XYZT2              = D3DFVF_XYZ | D3DFVF_TEX2;
+constexpr uint32_t FVF_XYZNORMAL          = D3DFVF_XYZ | D3DFVF_NORMAL;
+constexpr uint32_t FVF_XYZCOLORT1         = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
+constexpr uint32_t FVF_XYZCOLORT2         = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX2;
+constexpr uint32_t FVF_XYZCOLORSPECULART1 = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_SPECULAR
+											| D3DFVF_TEX1;
+constexpr uint32_t FVF_XYZCOLOR         = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+constexpr uint32_t FVF_XYZNORMALCOLOR   = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE;
+constexpr uint32_t FVF_XYZNORMALCOLORT1 = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1;
 
-constexpr uint32_t RF_NOTHING			= 0x0;
-constexpr uint32_t RF_ALPHABLENDING		= 0x1;		// Alpha blending
-constexpr uint32_t RF_NOTUSEFOG			= 0x2;		// 안개 무시
-constexpr uint32_t RF_DOUBLESIDED		= 0x4;		// 양면 - D3DCULL_NONE
-constexpr uint32_t RF_BOARD_Y			= 0x8;		// Y 축으로 해서.. 카메라를 본다.
-constexpr uint32_t RF_POINTSAMPLING		= 0x10;		// MipMap 에서.. PointSampling 으로 한다..
-constexpr uint32_t RF_WINDY				= 0x20;		// 바람에 날린다.. 바람의 값은 CN3Base::s_vWindFactor 를 참조 한다..
-constexpr uint32_t RF_NOTUSELIGHT		= 0x40;		// Light Off
-constexpr uint32_t RF_DIFFUSEALPHA		= 0x80;		// Diffuse 값을 갖고 투명하게 Alpha blending
-constexpr uint32_t RF_NOTZWRITE			= 0x100;	// ZBuffer 에 안쓴다.
-constexpr uint32_t RF_UV_CLAMP			= 0x200;	// texture UV적용을 Clamp로 한다..default는 wrap이다..
-constexpr uint32_t RF_NOTZBUFFER		= 0x400;	// ZBuffer 무시.
+constexpr uint32_t RF_NOTHING           = 0x0;
+constexpr uint32_t RF_ALPHABLENDING     = 0x1;  // Alpha blending
+constexpr uint32_t RF_NOTUSEFOG         = 0x2;  // 안개 무시
+constexpr uint32_t RF_DOUBLESIDED       = 0x4;  // 양면 - D3DCULL_NONE
+constexpr uint32_t RF_BOARD_Y           = 0x8;  // Y 축으로 해서.. 카메라를 본다.
+constexpr uint32_t RF_POINTSAMPLING     = 0x10; // MipMap 에서.. PointSampling 으로 한다..
+constexpr uint32_t
+	RF_WINDY = 0x20; // 바람에 날린다.. 바람의 값은 CN3Base::s_vWindFactor 를 참조 한다..
+constexpr uint32_t RF_NOTUSELIGHT  = 0x40;  // Light Off
+constexpr uint32_t RF_DIFFUSEALPHA = 0x80;  // Diffuse 값을 갖고 투명하게 Alpha blending
+constexpr uint32_t RF_NOTZWRITE    = 0x100; // ZBuffer 에 안쓴다.
+constexpr uint32_t RF_UV_CLAMP     = 0x200; // texture UV적용을 Clamp로 한다..default는 wrap이다..
+constexpr uint32_t RF_NOTZBUFFER   = 0x400; // ZBuffer 무시.
 
 struct __Material : public _D3DMATERIAL9
 {
 public:
-	uint32_t	dwColorOp, dwColorArg1, dwColorArg2;
-	uint32_t	nRenderFlags; // 1-AlphaBlending | 2-안개랑 관계없음 | 4-Double Side | 8- ??
-	uint32_t	dwSrcBlend; // 소스 블렌딩 방법
-	uint32_t	dwDestBlend; // 데스트 블렌딩 방법
+	uint32_t dwColorOp, dwColorArg1, dwColorArg2;
+	uint32_t nRenderFlags; // 1-AlphaBlending | 2-안개랑 관계없음 | 4-Double Side | 8- ??
+	uint32_t dwSrcBlend;   // 소스 블렌딩 방법
+	uint32_t dwDestBlend;  // 데스트 블렌딩 방법
 
 public:
 	void Init(const _D3DCOLORVALUE& diffuseColor);
@@ -113,19 +115,19 @@ struct __D3DLight9
 		return reinterpret_cast<const _D3DLIGHT9*>(this);
 	}
 
-	D3DLIGHTTYPE	Type;            /* Type of light source */
-	__ColorValue	Diffuse;         /* Diffuse color of light */
-	__ColorValue	Specular;        /* Specular color of light */
-	__ColorValue	Ambient;         /* Ambient color of light */
-	__Vector3		Position;         /* Position in world space */
-	__Vector3		Direction;        /* Direction in world space */
-	float			Range;            /* Cutoff range */
-	float			Falloff;          /* Falloff */
-	float			Attenuation0;     /* Constant attenuation */
-	float			Attenuation1;     /* Linear attenuation */
-	float			Attenuation2;     /* Quadratic attenuation */
-	float			Theta;            /* Inner angle of spotlight cone */
-	float			Phi;              /* Outer angle of spotlight cone */
+	D3DLIGHTTYPE Type;     /* Type of light source */
+	__ColorValue Diffuse;  /* Diffuse color of light */
+	__ColorValue Specular; /* Specular color of light */
+	__ColorValue Ambient;  /* Ambient color of light */
+	__Vector3 Position;    /* Position in world space */
+	__Vector3 Direction;   /* Direction in world space */
+	float Range;           /* Cutoff range */
+	float Falloff;         /* Falloff */
+	float Attenuation0;    /* Constant attenuation */
+	float Attenuation1;    /* Linear attenuation */
+	float Attenuation2;    /* Quadratic attenuation */
+	float Theta;           /* Inner angle of spotlight cone */
+	float Phi;             /* Outer angle of spotlight cone */
 };
 
 struct __VertexColor : public __Vector3
@@ -136,21 +138,21 @@ public:
 public:
 	void Set(const __Vector3& p, D3DCOLOR sColor)
 	{
-		x = p.x;
-		y = p.y;
-		z = p.z;
+		x     = p.x;
+		y     = p.y;
+		z     = p.z;
 		color = sColor;
 	}
 
 	void Set(float sx, float sy, float sz, D3DCOLOR sColor)
 	{
-		x = sx;
-		y = sy;
-		z = sz;
+		x     = sx;
+		y     = sy;
+		z     = sz;
 		color = sColor;
 	}
 
-	const __VertexColor& operator = (const __Vector3& vec)
+	const __VertexColor& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -180,26 +182,26 @@ public:
 public:
 	void Set(const __Vector3& p, float fPointSize, D3DCOLOR sColor)
 	{
-		x = p.x;
-		y = p.y;
-		z = p.z;
-		color = sColor;
+		x         = p.x;
+		y         = p.y;
+		z         = p.z;
+		color     = sColor;
 		PointSize = fPointSize;
 	}
 
 	void Set(float sx, float sy, float sz, float fPointSize, D3DCOLOR sColor)
 	{
-		x = sx;
-		y = sy;
-		z = sz;
-		color = sColor;
+		x         = sx;
+		y         = sy;
+		z         = sz;
+		color     = sColor;
 		PointSize = fPointSize;
 	}
 
 	__VertexParticle()
 	{
 		PointSize = 1.0f;
-		color = 0xffffffff;
+		color     = 0xffffffff;
 	}
 
 	__VertexParticle(const __Vector3& p, float fPointSize, D3DCOLOR sColor)
@@ -222,10 +224,10 @@ public:
 public:
 	void Set(float sx, float sy, float sz, float srhw, D3DCOLOR sColor)
 	{
-		x = sx;
-		y = sy;
-		z = sz;
-		rhw = srhw;
+		x     = sx;
+		y     = sy;
+		z     = sz;
+		rhw   = srhw;
 		color = sColor;
 	}
 
@@ -246,24 +248,24 @@ public:
 public:
 	void Set(const __Vector3& p, const __Vector3& sn, float u, float v)
 	{
-		x = p.x;
-		y = p.y;
-		z = p.z;
-		n = sn;
+		x  = p.x;
+		y  = p.y;
+		z  = p.z;
+		n  = sn;
 		tu = u;
 		tv = v;
 	}
 
 	void Set(float sx, float sy, float sz, float snx, float sny, float snz, float stu, float stv)
 	{
-		x = sx;
-		y = sy;
-		z = sz;
+		x   = sx;
+		y   = sy;
+		z   = sz;
 		n.x = snx;
 		n.y = sny;
 		n.z = snz;
-		tu = stu;
-		tv = stv;
+		tu  = stu;
+		tv  = stv;
 	}
 
 	__VertexT1() = default;
@@ -287,26 +289,27 @@ public:
 public:
 	void Set(const __Vector3& p, const __Vector3& sn, float u, float v, float u2, float v2)
 	{
-		x = p.x;
-		y = p.y;
-		z = p.z;
-		n = sn;
-		tu = u;
-		tv = v;
+		x   = p.x;
+		y   = p.y;
+		z   = p.z;
+		n   = sn;
+		tu  = u;
+		tv  = v;
 		tu2 = u2;
 		tv2 = v2;
 	}
 
-	void Set(float sx, float sy, float sz, float snx, float sny, float snz, float stu, float stv, float stu2, float stv2)
+	void Set(float sx, float sy, float sz, float snx, float sny, float snz, float stu, float stv,
+		float stu2, float stv2)
 	{
-		x = sx;
-		y = sy;
-		z = sz;
+		x   = sx;
+		y   = sy;
+		z   = sz;
 		n.x = snx;
 		n.y = sny;
 		n.z = snz;
-		tu = stu;
-		tv = stv;
+		tu  = stu;
+		tv  = stv;
 		tu2 = stu2;
 		tv2 = stv2;
 	}
@@ -318,7 +321,8 @@ public:
 		Set(p, n, u, v, u2, v2);
 	}
 
-	__VertexT2(float sx, float sy, float sz, float snx, float sny, float snz, float stu, float stv, float stu2, float stv2)
+	__VertexT2(float sx, float sy, float sz, float snx, float sny, float snz, float stu, float stv,
+		float stu2, float stv2)
 	{
 		Set(sx, sy, sz, snx, sny, snz, stu, stv, stu2, stv2);
 	}
@@ -334,18 +338,19 @@ public:
 public:
 	void Set(float sx, float sy, float sz, float srhw, D3DCOLOR sColor, float stu, float stv)
 	{
-		x = sx;
-		y = sy;
-		z = sz;
-		rhw = srhw;
+		x     = sx;
+		y     = sy;
+		z     = sz;
+		rhw   = srhw;
 		color = sColor;
-		tu = stu;
-		tv = stv;
+		tu    = stu;
+		tv    = stv;
 	}
 
 	__VertexTransformed() = default;
 
-	__VertexTransformed(float sx, float sy, float sz, float srhw, D3DCOLOR sColor, float stu, float stv)
+	__VertexTransformed(
+		float sx, float sy, float sz, float srhw, D3DCOLOR sColor, float stu, float stv)
 	{
 		Set(sx, sy, sz, srhw, sColor, stu, stv);
 	}
@@ -357,22 +362,24 @@ public:
 	float tu2, tv2;
 
 public:
-	void Set(float sx, float sy, float sz, float srhw, D3DCOLOR sColor, float stu, float stv, float stu2, float stv2)
+	void Set(float sx, float sy, float sz, float srhw, D3DCOLOR sColor, float stu, float stv,
+		float stu2, float stv2)
 	{
-		x = sx;
-		y = sy;
-		z = sz;
-		rhw = srhw;
+		x     = sx;
+		y     = sy;
+		z     = sz;
+		rhw   = srhw;
 		color = sColor;
-		tu = stu;
-		tv = stv;
-		tu2 = stu2;
-		tv2 = stv2;
+		tu    = stu;
+		tv    = stv;
+		tu2   = stu2;
+		tv2   = stv2;
 	}
 
 	__VertexTransformedT2() = default;
 
-	__VertexTransformedT2(float sx, float sy, float sz, float srhw, D3DCOLOR sColor, float stu, float stv, float stu2, float stv2)
+	__VertexTransformedT2(float sx, float sy, float sz, float srhw, D3DCOLOR sColor, float stu,
+		float stv, float stu2, float stv2)
 	{
 		Set(sx, sy, sz, srhw, sColor, stu, stv, stu2, stv2);
 	}
@@ -381,27 +388,28 @@ public:
 struct __VertexXyzT1 : public __Vector3
 {
 public:
-	float tu, tv;	
+	float tu, tv;
 
 public:
 	void Set(const __Vector3& p, float u, float v)
 	{
-		x = p.x;
-		y = p.y;
-		z = p.z;
-		tu = u; tv = v;
-	}
-
-	void Set(float sx, float sy, float sz, float u, float v)
-	{
-		x = sx;
-		y = sy;
-		z = sz;
+		x  = p.x;
+		y  = p.y;
+		z  = p.z;
 		tu = u;
 		tv = v;
 	}
 
-	const __VertexXyzT1& operator = (const __Vector3& vec)
+	void Set(float sx, float sy, float sz, float u, float v)
+	{
+		x  = sx;
+		y  = sy;
+		z  = sz;
+		tu = u;
+		tv = v;
+	}
+
+	const __VertexXyzT1& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -430,27 +438,27 @@ public:
 public:
 	void Set(const __Vector3& p, float u, float v, float u2, float v2)
 	{
-		x = p.x;
-		y = p.y;
-		z = p.z;
-		tu = u;
-		tv = v;
+		x   = p.x;
+		y   = p.y;
+		z   = p.z;
+		tu  = u;
+		tv  = v;
 		tu2 = u2;
 		tv2 = v2;
 	}
 
 	void Set(float sx, float sy, float sz, float u, float v, float u2, float v2)
 	{
-		x = sx;
-		y = sy;
-		z = sz;
-		tu = u;
-		tv = v;
+		x   = sx;
+		y   = sy;
+		z   = sz;
+		tu  = u;
+		tv  = v;
 		tu2 = u2;
 		tv2 = v2;
 	}
 
-	const __VertexXyzT2& operator = (const __Vector3& vec)
+	const __VertexXyzT2& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -487,15 +495,15 @@ public:
 
 	void Set(float xx, float yy, float zz, float nxx, float nyy, float nzz)
 	{
-		x = xx;
-		y = yy;
-		z = zz;
+		x   = xx;
+		y   = yy;
+		z   = zz;
 		n.x = nxx;
 		n.y = nyy;
 		n.z = nzz;
 	}
 
-	const __VertexXyzNormal& operator = (const __Vector3& vec)
+	const __VertexXyzNormal& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -526,34 +534,36 @@ public:
 public:
 	void Set(const __Vector3& p, D3DCOLOR sColor, D3DCOLOR sSpecular, float u, float v)
 	{
-		x = p.x;
-		y = p.y;
-		z = p.z;
-		color = sColor;
+		x        = p.x;
+		y        = p.y;
+		z        = p.z;
+		color    = sColor;
 		specular = sSpecular;
-		tu = u;
-		tv = v;
+		tu       = u;
+		tv       = v;
 	}
 
 	void Set(float sx, float sy, float sz, D3DCOLOR sColor, D3DCOLOR sSpecular, float u, float v)
 	{
-		x = sx;
-		y = sy;
-		z = sz;
-		color = sColor;
+		x        = sx;
+		y        = sy;
+		z        = sz;
+		color    = sColor;
 		specular = sSpecular;
-		tu = u;
-		tv = v;
+		tu       = u;
+		tv       = v;
 	}
 
 	__VertexXyzColorSpecularT1() = default;
 
-	__VertexXyzColorSpecularT1(const __Vector3& p, D3DCOLOR sColor, D3DCOLOR sSpecular, float u, float v)
+	__VertexXyzColorSpecularT1(
+		const __Vector3& p, D3DCOLOR sColor, D3DCOLOR sSpecular, float u, float v)
 	{
 		Set(p, sColor, sSpecular, u, v);
 	}
 
-	__VertexXyzColorSpecularT1(float sx, float sy, float sz, D3DCOLOR sColor, D3DCOLOR sSpecular, float u, float v)
+	__VertexXyzColorSpecularT1(
+		float sx, float sy, float sz, D3DCOLOR sColor, D3DCOLOR sSpecular, float u, float v)
 	{
 		Set(sx, sy, sz, sColor, sSpecular, u, v);
 	}
@@ -568,25 +578,25 @@ public:
 public:
 	void Set(const __Vector3& p, D3DCOLOR sColor, float u, float v)
 	{
-		x = p.x;
-		y = p.y;
-		z = p.z;
+		x     = p.x;
+		y     = p.y;
+		z     = p.z;
 		color = sColor;
-		tu = u;
-		tv = v;
+		tu    = u;
+		tv    = v;
 	}
 
 	void Set(float sx, float sy, float sz, D3DCOLOR sColor, float u, float v)
 	{
-		x = sx;
-		y = sy;
-		z = sz;
+		x     = sx;
+		y     = sy;
+		z     = sz;
 		color = sColor;
-		tu = u;
-		tv = v;
+		tu    = u;
+		tv    = v;
 	}
 
-	const __VertexXyzColorT1& operator = (const __Vector3& vec)
+	const __VertexXyzColorT1& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -611,32 +621,33 @@ struct __VertexXyzColorT2 : public __VertexXyzColorT1
 {
 public:
 	float tu2, tv2;
+
 public:
 	void Set(const __Vector3& p, D3DCOLOR sColor, float u, float v, float u2, float v2)
 	{
-		x = p.x;
-		y = p.y;
-		z = p.z;
+		x     = p.x;
+		y     = p.y;
+		z     = p.z;
 		color = sColor;
-		tu = u;
-		tv = v;
-		tu2 = u2;
-		tv2 = v2;
+		tu    = u;
+		tv    = v;
+		tu2   = u2;
+		tv2   = v2;
 	}
 
 	void Set(float sx, float sy, float sz, D3DCOLOR sColor, float u, float v, float u2, float v2)
 	{
-		x = sx;
-		y = sy;
-		z = sz;
+		x     = sx;
+		y     = sy;
+		z     = sz;
 		color = sColor;
-		tu = u;
-		tv = v;
-		tu2 = u2;
-		tv2 = v2;
+		tu    = u;
+		tv    = v;
+		tu2   = u2;
+		tv2   = v2;
 	}
 
-	const __VertexXyzColorT2& operator = (const __Vector3& vec)
+	const __VertexXyzColorT2& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -651,7 +662,8 @@ public:
 		Set(p, sColor, u, v, u2, v2);
 	}
 
-	__VertexXyzColorT2(float sx, float sy, float sz, D3DCOLOR sColor, float u, float v, float u2, float v2)
+	__VertexXyzColorT2(
+		float sx, float sy, float sz, D3DCOLOR sColor, float u, float v, float u2, float v2)
 	{
 		Set(sx, sy, sz, sColor, u, v, u2, v2);
 	}
@@ -665,21 +677,21 @@ public:
 public:
 	void Set(const __Vector3& p, D3DCOLOR sColor)
 	{
-		x = p.x;
-		y = p.y;
-		z = p.z;
+		x     = p.x;
+		y     = p.y;
+		z     = p.z;
 		color = sColor;
 	}
 
 	void Set(float sx, float sy, float sz, D3DCOLOR sColor)
 	{
-		x = sx;
-		y = sy;
-		z = sz;
+		x     = sx;
+		y     = sy;
+		z     = sz;
 		color = sColor;
 	}
 
-	const __VertexXyzColor& operator = (const __Vector3& vec)
+	const __VertexXyzColor& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -708,25 +720,25 @@ public:
 public:
 	void Set(const __Vector3& p, const __Vector3& sn, D3DCOLOR sColor)
 	{
-		x = p.x;
-		y = p.y;
-		z = p.z;
-		n = sn;
+		x     = p.x;
+		y     = p.y;
+		z     = p.z;
+		n     = sn;
 		color = sColor;
 	}
 
 	void Set(float sx, float sy, float sz, float nxx, float nyy, float nzz, D3DCOLOR sColor)
 	{
-		x = sx;
-		y = sy;
-		z = sz;
-		n.x = nxx;
-		n.y = nyy;
-		n.z = nzz;
+		x     = sx;
+		y     = sy;
+		z     = sz;
+		n.x   = nxx;
+		n.y   = nyy;
+		n.z   = nzz;
 		color = sColor;
 	}
 
-	const __VertexXyzNormalColor& operator = (const __Vector3& vec)
+	const __VertexXyzNormalColor& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -741,69 +753,70 @@ public:
 		Set(p, n, sColor);
 	}
 
-	__VertexXyzNormalColor(float sx, float sy, float sz, float xx, float yy, float zz, D3DCOLOR sColor)
+	__VertexXyzNormalColor(
+		float sx, float sy, float sz, float xx, float yy, float zz, D3DCOLOR sColor)
 	{
 		Set(sx, sy, sz, xx, yy, zz, sColor);
 	}
 };
 
-constexpr int MAX_MIPMAP_COUNT = 10; // 1024 * 1024 단계까지 생성
+constexpr int MAX_MIPMAP_COUNT              = 10; // 1024 * 1024 단계까지 생성
 
-constexpr uint32_t OBJ_UNKNOWN					= 0;
-constexpr uint32_t OBJ_BASE						= 0x1;
-constexpr uint32_t OBJ_BASE_FILEACCESS			= 0x2;
-constexpr uint32_t OBJ_TEXTURE					= 0x4;
-constexpr uint32_t OBJ_TRANSFORM 				= 0x8;
-constexpr uint32_t OBJ_TRANSFORM_COLLISION		= 0x10;
-constexpr uint32_t OBJ_SCENE					= 0x20;
+constexpr uint32_t OBJ_UNKNOWN              = 0;
+constexpr uint32_t OBJ_BASE                 = 0x1;
+constexpr uint32_t OBJ_BASE_FILEACCESS      = 0x2;
+constexpr uint32_t OBJ_TEXTURE              = 0x4;
+constexpr uint32_t OBJ_TRANSFORM            = 0x8;
+constexpr uint32_t OBJ_TRANSFORM_COLLISION  = 0x10;
+constexpr uint32_t OBJ_SCENE                = 0x20;
 
-constexpr uint32_t OBJ_CAMERA					= 0x100;
-constexpr uint32_t OBJ_LIGHT					= 0x200;
-constexpr uint32_t OBJ_SHAPE					= 0x400;
-constexpr uint32_t OBJ_SHAPE_PART				= 0x800;
-constexpr uint32_t OBJ_SHAPE_EXTRA				= 0x1000;
-constexpr uint32_t OBJ_CHARACTER				= 0x2000;
-constexpr uint32_t OBJ_CHARACTER_PART			= 0x4000;
-constexpr uint32_t OBJ_CHARACTER_PLUG			= 0x8000;
-constexpr uint32_t OBJ_BOARD					= 0x1000;
-constexpr uint32_t OBJ_FX_PLUG					= 0x20000;
-constexpr uint32_t OBJ_FX_PLUG_PART				= 0x40000;
+constexpr uint32_t OBJ_CAMERA               = 0x100;
+constexpr uint32_t OBJ_LIGHT                = 0x200;
+constexpr uint32_t OBJ_SHAPE                = 0x400;
+constexpr uint32_t OBJ_SHAPE_PART           = 0x800;
+constexpr uint32_t OBJ_SHAPE_EXTRA          = 0x1000;
+constexpr uint32_t OBJ_CHARACTER            = 0x2000;
+constexpr uint32_t OBJ_CHARACTER_PART       = 0x4000;
+constexpr uint32_t OBJ_CHARACTER_PLUG       = 0x8000;
+constexpr uint32_t OBJ_BOARD                = 0x1000;
+constexpr uint32_t OBJ_FX_PLUG              = 0x20000;
+constexpr uint32_t OBJ_FX_PLUG_PART         = 0x40000;
 
-constexpr uint32_t OBJ_MESH						= 0x100000;
-constexpr uint32_t OBJ_MESH_PROGRESSIVE			= 0x200000;
-constexpr uint32_t OBJ_MESH_INDEXED				= 0x400000;
-constexpr uint32_t OBJ_MESH_VECTOR3				= 0x800000;
-constexpr uint32_t OBJ_JOINT					= 0x1000000;
-constexpr uint32_t OBJ_SKIN						= 0x2000000;
-constexpr uint32_t OBJ_CHARACTER_PART_SKINS		= 0x4000000;
+constexpr uint32_t OBJ_MESH                 = 0x100000;
+constexpr uint32_t OBJ_MESH_PROGRESSIVE     = 0x200000;
+constexpr uint32_t OBJ_MESH_INDEXED         = 0x400000;
+constexpr uint32_t OBJ_MESH_VECTOR3         = 0x800000;
+constexpr uint32_t OBJ_JOINT                = 0x1000000;
+constexpr uint32_t OBJ_SKIN                 = 0x2000000;
+constexpr uint32_t OBJ_CHARACTER_PART_SKINS = 0x4000000;
 
-constexpr uint32_t OBJ_DUMMY					= 0x10000000;
-constexpr uint32_t OBJ_EFFECT					= 0x20000000;
-constexpr uint32_t OBJ_ANIM_CONTROL				= 0x40000000;
+constexpr uint32_t OBJ_DUMMY                = 0x10000000;
+constexpr uint32_t OBJ_EFFECT               = 0x20000000;
+constexpr uint32_t OBJ_ANIM_CONTROL         = 0x40000000;
 
 #ifndef _DEBUG
 #define __ASSERT(expr, expMessage)
 #else
 #include "CrtDbg.h"
 
-#define __ASSERT(expr, expMessage) \
-if (!(expr)) \
-{ \
-	_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, "N3 Custom Assert Function", expMessage); \
-	char __szErr[512] = {}; \
-	snprintf(__szErr, sizeof(__szErr), "%s(%d): %s\n", __FILE__, __LINE__, expMessage); \
-	OutputDebugStringA(__szErr); \
-	_CrtDbgBreak(); \
-}
+#define __ASSERT(expr, expMessage)                                                               \
+	if (!(expr))                                                                                 \
+	{                                                                                            \
+		_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, "N3 Custom Assert Function", expMessage); \
+		char __szErr[512] = {};                                                                  \
+		snprintf(__szErr, sizeof(__szErr), "%s(%d): %s\n", __FILE__, __LINE__, expMessage);      \
+		OutputDebugStringA(__szErr);                                                             \
+		_CrtDbgBreak();                                                                          \
+	}
 #endif
 
-D3DCOLOR		_RGB_To_D3DCOLOR(COLORREF cr, uint32_t dwAlpha);
-COLORREF		_D3DCOLOR_To_RGB(D3DCOLOR cr);
-COLORREF		_D3DCOLORVALUE_To_RGB(const D3DCOLORVALUE& cr);
-D3DCOLOR		_D3DCOLORVALUE_To_D3DCOLOR(const D3DCOLORVALUE& cr);
-D3DCOLORVALUE	_RGB_To_D3DCOLORVALUE(COLORREF cr, float fAlpha);
-D3DCOLORVALUE	_D3DCOLOR_To_D3DCOLORVALUE(D3DCOLOR cr);
-int16_t			_IsKeyDown(int iVirtualKey);
-int16_t			_IsKeyDowned(int iVirtualKey);
+D3DCOLOR _RGB_To_D3DCOLOR(COLORREF cr, uint32_t dwAlpha);
+COLORREF _D3DCOLOR_To_RGB(D3DCOLOR cr);
+COLORREF _D3DCOLORVALUE_To_RGB(const D3DCOLORVALUE& cr);
+D3DCOLOR _D3DCOLORVALUE_To_D3DCOLOR(const D3DCOLORVALUE& cr);
+D3DCOLORVALUE _RGB_To_D3DCOLORVALUE(COLORREF cr, float fAlpha);
+D3DCOLORVALUE _D3DCOLOR_To_D3DCOLORVALUE(D3DCOLOR cr);
+int16_t _IsKeyDown(int iVirtualKey);
+int16_t _IsKeyDowned(int iVirtualKey);
 
 #endif // __MY_3DSTRUCT_H_

@@ -60,8 +60,8 @@ void CLogWriter::Open(const std::string& szFN)
 	buff = "---------------------------------------------------------------------------\r\n";
 	file.Write(buff.data(), buff.length());
 
-	buff = fmt::format("// Begin writing log... [{:02}/{:02} {:02}:{:02}]\r\n",
-		time.wMonth, time.wDay, time.wHour, time.wMinute);
+	buff = fmt::format("// Begin writing log... [{:02}/{:02} {:02}:{:02}]\r\n", time.wMonth,
+		time.wDay, time.wHour, time.wMinute);
 	file.Write(buff.data(), buff.length());
 }
 
@@ -80,8 +80,8 @@ void CLogWriter::Close()
 	SYSTEMTIME time;
 	GetLocalTime(&time);
 
-	buff = fmt::format("// End writing log... [{:02}/{:02} {:02}:{:02}]\r\n",
-		time.wMonth, time.wDay, time.wHour, time.wMinute);
+	buff = fmt::format("// End writing log... [{:02}/{:02} {:02}:{:02}]\r\n", time.wMonth,
+		time.wDay, time.wHour, time.wMinute);
 	file.Write(buff.data(), buff.length());
 
 	buff = "---------------------------------------------------------------------------\r\n";
@@ -90,8 +90,7 @@ void CLogWriter::Close()
 
 void CLogWriter::Write(const std::string_view message)
 {
-	if (s_szFileName.empty()
-		|| message.empty())
+	if (s_szFileName.empty() || message.empty())
 		return;
 
 	FileWriter file;
@@ -104,8 +103,8 @@ void CLogWriter::Write(const std::string_view message)
 	SYSTEMTIME time;
 	GetLocalTime(&time);
 
-	std::string outputMessage = fmt::format("    [{:02}:{:02}:{:02}] {}\r\n",
-		time.wHour, time.wMinute, time.wSecond, message);
+	std::string outputMessage = fmt::format(
+		"    [{:02}:{:02}:{:02}] {}\r\n", time.wHour, time.wMinute, time.wSecond, message);
 
 	file.Seek(0, SEEK_END); // 추가 하기 위해서 파일의 끝으로 옮기고..
 	file.Write(outputMessage.data(), outputMessage.length());

@@ -5,7 +5,8 @@
 class CUIUpgradeSelect : public CN3UIBase
 {
 public:
-	inline void SetNpcID(int iNpcID) {
+	inline void SetNpcID(int iNpcID)
+	{
 		m_iNpcID = iNpcID;
 	}
 
@@ -16,8 +17,8 @@ public:
 	void SetVisible(bool bVisible) override;
 
 protected:
-	CN3UIButton*	m_pBtn_Upgrade_1;
-	CN3UIButton*	m_pBtn_Upgrade_2;
-	CN3UIButton*	m_pBtn_Close;
-	int				m_iNpcID;
+	CN3UIButton* m_pBtn_Upgrade_1;
+	CN3UIButton* m_pBtn_Upgrade_2;
+	CN3UIButton* m_pBtn_Close;
+	int m_iNpcID;
 };

@@ -22,7 +22,7 @@ public:
 		append(&opcode, 1);
 	}
 
-	Packet(const Packet &packet) : ByteBuffer(packet)
+	Packet(const Packet& packet) : ByteBuffer(packet)
 	{
 	}
 

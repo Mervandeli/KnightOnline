@@ -11,9 +11,9 @@ static char THIS_FILE[] = __FILE__;
 
 // CTblEditorApp
 BEGIN_MESSAGE_MAP(CTblEditorApp, CWinApp)
-	ON_COMMAND(ID_FILE_NEW, CWinApp::OnFileNew)
-	ON_COMMAND(ID_FILE_OPEN, CWinApp::OnFileOpen)
-	ON_COMMAND(ID_APP_ABOUT, OnAppAbout)
+ON_COMMAND(ID_FILE_NEW, CWinApp::OnFileNew)
+ON_COMMAND(ID_FILE_OPEN, CWinApp::OnFileOpen)
+ON_COMMAND(ID_APP_ABOUT, OnAppAbout)
 END_MESSAGE_MAP()
 
 // CAboutDlg dialog used for App About
@@ -24,13 +24,16 @@ public:
 
 	// Dialog Data
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_ABOUTBOX };
+	enum
+	{
+		IDD = IDD_ABOUTBOX
+	};
 #endif
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 
-	// Implementation
+													 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -55,11 +58,11 @@ CTblEditorApp::CTblEditorApp()
 
 	// TODO: add construction code here,
 	// Place all significant initialization in InitInstance
-	m_hAccelTable = nullptr;
+	m_hAccelTable                  = nullptr;
 
 	// Create the shell manager, in case the dialog contains
 	// any shell tree view or shell list view controls.
-	m_pShellManager = new CShellManager();
+	m_pShellManager                = new CShellManager();
 }
 
 CTblEditorApp::~CTblEditorApp()
@@ -74,16 +77,17 @@ CTblEditorApp::~CTblEditorApp()
 // The one and only CTblEditorApp object
 CTblEditorApp theApp;
 
-static BOOL NEAR PASCAL SetRegKey(LPCTSTR lpszKey, LPCTSTR lpszValue) 
-{ 
-	if (::RegSetValue(HKEY_CLASSES_ROOT, lpszKey, REG_SZ, lpszValue, lstrlen(lpszValue)) != ERROR_SUCCESS)
+static BOOL NEAR PASCAL SetRegKey(LPCTSTR lpszKey, LPCTSTR lpszValue)
+{
+	if (::RegSetValue(HKEY_CLASSES_ROOT, lpszKey, REG_SZ, lpszValue, lstrlen(lpszValue))
+		!= ERROR_SUCCESS)
 	{
 		TRACE1("Warning: registration database update failed for key '%Fs'\n", lpszKey);
 		return FALSE;
 	}
 
 	return TRUE;
-} 
+}
 
 // CTblEditorApp initialization
 BOOL CTblEditorApp::InitInstance()
@@ -95,7 +99,7 @@ BOOL CTblEditorApp::InitInstance()
 	InitCtrls.dwSize = sizeof(InitCtrls);
 	// Set this to include all the common control classes you want to use
 	// in your application.
-	InitCtrls.dwICC = ICC_WIN95_CLASSES;
+	InitCtrls.dwICC  = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
 	CWinApp::InitInstance();
@@ -114,20 +118,16 @@ BOOL CTblEditorApp::InitInstance()
 	// such as the name of your company or organization
 	SetRegistryKey(_T("OpenKO TBL Editor"));
 
-	LoadStdProfileSettings();  // Load standard INI file options (including MRU)
+	LoadStdProfileSettings(); // Load standard INI file options (including MRU)
 
-	m_hAccelTable = LoadAccelerators(
-		AfxGetInstanceHandle(),
-		MAKEINTRESOURCE(IDR_ACCELERATOR));
+	m_hAccelTable = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_ACCELERATOR));
 
 	// Register the application's document templates.  Document templates
 	//  serve as the connection between documents, frame windows and views.
 
 	CSingleDocTemplate* pDocTemplate;
-	pDocTemplate = new CSingleDocTemplate(
-		IDR_MAINFRAME,
-		RUNTIME_CLASS(CTblEditorDoc),
-		RUNTIME_CLASS(CFrameWnd),       // main SDI frame window
+	pDocTemplate = new CSingleDocTemplate(IDR_MAINFRAME, RUNTIME_CLASS(CTblEditorDoc),
+		RUNTIME_CLASS(CFrameWnd), // main SDI frame window
 		RUNTIME_CLASS(CTblEditorView));
 	AddDocTemplate(pDocTemplate);
 
@@ -161,16 +161,12 @@ void CTblEditorApp::OnAppAbout()
 	aboutDlg.DoModal();
 }
 
-BOOL CTblEditorApp::ProcessMessageFilter(
-	int code,
-	LPMSG lpMsg) 
+BOOL CTblEditorApp::ProcessMessageFilter(int code, LPMSG lpMsg)
 {
-	if (code >= 0
-		&& m_pMainWnd != nullptr
-		&& m_hAccelTable != nullptr)
+	if (code >= 0 && m_pMainWnd != nullptr && m_hAccelTable != nullptr)
 	{
-		if (TranslateAccelerator(m_pMainWnd->m_hWnd, m_hAccelTable, lpMsg)) 
-			return(TRUE);
+		if (TranslateAccelerator(m_pMainWnd->m_hWnd, m_hAccelTable, lpMsg))
+			return (TRUE);
 	}
 
 	return CWinApp::ProcessMessageFilter(code, lpMsg);

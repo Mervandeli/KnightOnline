@@ -13,17 +13,17 @@
 #endif // _MSC_VER > 1000
 typedef unsigned short uShort;
 // errors number definitions
-#define ZIP_BADZIPFILE		(-101)
-#define ZIP_BADCRC			(-102)
-#define ZIP_NOCALLBACK		(-103)
-#define ZIP_ABORTED			(-104)
-#define ZIP_NONREMOVABLE	(-105)
-#define ZIP_TOOMANYVOLUMES	(-106)
+#define ZIP_BADZIPFILE      (-101)
+#define ZIP_BADCRC          (-102)
+#define ZIP_NOCALLBACK      (-103)
+#define ZIP_ABORTED         (-104)
+#define ZIP_NONREMOVABLE    (-105)
+#define ZIP_TOOMANYVOLUMES  (-106)
 #define ZIP_TOOLONGFILENAME (-107)
-#define ZIP_BADPASSWORD		(-108)
-#define ZIP_CDIR_NOTFOUND	(-109)
+#define ZIP_BADPASSWORD     (-108)
+#define ZIP_CDIR_NOTFOUND   (-109)
 
-class CZipException : public CException  
+class CZipException : public CException
 {
 public:
 	DECLARE_DYNAMIC(CZipException)
@@ -34,32 +34,31 @@ public:
 
 	enum
 	{
-		noError,		// no error
-		generic,		// unknown error
-		streamEnd,			// zlib library errors
-		needDict,			//
-		errNo,				//
-		streamError,		//
-		dataError,			//
-		memError,			//	
-		bufError,			//
-		versionError,		// 
-		badZipFile,		// damaged or not a zip file
-		badCrc,			// crc mismatched
-		noCallback,		// no callback function set
-		aborted,		// disk change callback function returned false
-		nonRemovable,	// the disk selected for pkSpan archive is non removable
-		tooManyVolumes,	// limit of the maximum volumes reached (999)
-		tooLongFileName,	// the file name of the file added to the archive is too long
-		badPassword,	// incorrect password set for the file being decrypted
-		cdirNotFound,		///< the central directory was not found in the archive
-		dirWithSize		// during testing: found the directory with the size greater than 0
+		noError,         // no error
+		generic,         // unknown error
+		streamEnd,       // zlib library errors
+		needDict,        //
+		errNo,           //
+		streamError,     //
+		dataError,       //
+		memError,        //
+		bufError,        //
+		versionError,    //
+		badZipFile,      // damaged or not a zip file
+		badCrc,          // crc mismatched
+		noCallback,      // no callback function set
+		aborted,         // disk change callback function returned false
+		nonRemovable,    // the disk selected for pkSpan archive is non removable
+		tooManyVolumes,  // limit of the maximum volumes reached (999)
+		tooLongFileName, // the file name of the file added to the archive is too long
+		badPassword,     // incorrect password set for the file being decrypted
+		cdirNotFound,    ///< the central directory was not found in the archive
+		dirWithSize      // during testing: found the directory with the size greater than 0
 	};
 	// cause - takes one of the codes above
 	int m_iCause;
 	CZipException(int iCause = generic, LPCTSTR lpszZipName = nullptr);
 	virtual ~CZipException();
-
 };
 
 // throw zip exception

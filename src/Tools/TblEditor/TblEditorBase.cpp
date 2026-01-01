@@ -14,9 +14,9 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-static constexpr int MAX_COLUMN_COUNT	= 10'000;
-static constexpr int MAX_ROW_COUNT		= 100'000;
-static constexpr int MAX_STRING_LENGTH	= 50'000;
+static constexpr int MAX_COLUMN_COUNT  = 10'000;
+static constexpr int MAX_ROW_COUNT     = 100'000;
+static constexpr int MAX_STRING_LENGTH = 50'000;
 
 struct WriteBuffer : std::vector<uint8_t>
 {
@@ -28,9 +28,7 @@ struct WriteBuffer : std::vector<uint8_t>
 
 	void append(const void* value, size_t length)
 	{
-		insert(
-			end(),
-			reinterpret_cast<const uint8_t*>(value),
+		insert(end(), reinterpret_cast<const uint8_t*>(value),
 			reinterpret_cast<const uint8_t*>(value) + length);
 	}
 };
@@ -88,8 +86,8 @@ bool CTblEditorBase::LoadFile(const CString& path, CString& errorMsg)
 	encryptedFile.Read(pDatas, encryptedFileSize);
 	encryptedFile.Close(); // close original file
 
-	// same key with the one used in table creator 
-	uint16_t key_r = 0x0816;
+	// same key with the one used in table creator
+	uint16_t key_r  = 0x0816;
 	uint16_t key_c1 = 0x6081;
 	uint16_t key_c2 = 0x1608;
 
@@ -97,8 +95,8 @@ bool CTblEditorBase::LoadFile(const CString& path, CString& errorMsg)
 	for (uint32_t i = 0; i < encryptedFileSize; i++)
 	{
 		uint8_t byData = (pDatas[i] ^ (key_r >> 8));
-		key_r = (pDatas[i] + key_r) * key_c1 + key_c2;
-		pDatas[i] = byData;
+		key_r          = (pDatas[i] + key_r) * key_c1 + key_c2;
+		pDatas[i]      = byData;
 	}
 
 	// Open temporary file for writing the decrypted data to.
@@ -112,7 +110,7 @@ bool CTblEditorBase::LoadFile(const CString& path, CString& errorMsg)
 		}
 
 		tmpFileWriter.Write(pDatas, encryptedFileSize); // write encrypted data into temporary file
-		tmpFileWriter.Close(); // 임시 파일 닫기
+		tmpFileWriter.Close();                          // 임시 파일 닫기
 
 		delete[] pDatas;
 		pDatas = nullptr;
@@ -140,14 +138,13 @@ bool CTblEditorBase::LoadFile(const CString& path, CString& errorMsg)
 
 bool CTblEditorBase::LoadRowData(File& file)
 {
-	size_t bytesRead = 0;
+	size_t bytesRead   = 0;
 
 	// Reading how the structure of the data (column) is organized.
 	int iDataTypeCount = 0;
 
 	// Read first 4 bytes = number of columns in the table (datatype count)
-	if (!file.Read(&iDataTypeCount, sizeof(int), &bytesRead)
-		|| bytesRead != sizeof(int))
+	if (!file.Read(&iDataTypeCount, sizeof(int), &bytesRead) || bytesRead != sizeof(int))
 	{
 		TRACE("Failed to read datatype count.\n");
 		return false;
@@ -155,8 +152,7 @@ bool CTblEditorBase::LoadRowData(File& file)
 
 	TRACE("Columns: %d\n", iDataTypeCount);
 
-	if (iDataTypeCount <= 0
-		|| iDataTypeCount > MAX_COLUMN_COUNT)
+	if (iDataTypeCount <= 0 || iDataTypeCount > MAX_COLUMN_COUNT)
 	{
 		TRACE("Invalid column count.\n");
 		return false;
@@ -169,8 +165,7 @@ bool CTblEditorBase::LoadRowData(File& file)
 	for (int i = 0; i < iDataTypeCount; i++)
 	{
 		int iDataType = 0;
-		if (!file.Read(&iDataType, sizeof(int), &bytesRead)
-			|| bytesRead != sizeof(int))
+		if (!file.Read(&iDataType, sizeof(int), &bytesRead) || bytesRead != sizeof(int))
 		{
 			TRACE("Failed to read data types.\n");
 			return false;
@@ -184,8 +179,7 @@ bool CTblEditorBase::LoadRowData(File& file)
 
 	// Now read the row count (4 bytes after the dataTypes array)
 	int iRowCount = 0;
-	if (!file.Read(&iRowCount, sizeof(int), &bytesRead)
-		|| bytesRead != sizeof(int))
+	if (!file.Read(&iRowCount, sizeof(int), &bytesRead) || bytesRead != sizeof(int))
 	{
 		TRACE("Failed to read row count.\n");
 		return false;
@@ -193,8 +187,7 @@ bool CTblEditorBase::LoadRowData(File& file)
 
 	TRACE("Row count: %d\n", iRowCount);
 
-	if (iRowCount < 0
-		|| iRowCount > MAX_ROW_COUNT)
+	if (iRowCount < 0 || iRowCount > MAX_ROW_COUNT)
 	{
 		TRACE("Invalid row count.\n");
 		return false;
@@ -220,8 +213,7 @@ bool CTblEditorBase::LoadRowData(File& file)
 				case DT_CHAR:
 				{
 					char val = '\0';
-					if (!file.Read(&val, sizeof(char), &bytesRead)
-						|| bytesRead != sizeof(char))
+					if (!file.Read(&val, sizeof(char), &bytesRead) || bytesRead != sizeof(char))
 					{
 						TRACE("Failed to read DT_CHAR data at row %d, column %d\n", iRowNo, iColNo);
 						return false;
@@ -257,7 +249,8 @@ bool CTblEditorBase::LoadRowData(File& file)
 					if (!file.Read(&val, sizeof(int16_t), &bytesRead)
 						|| bytesRead != sizeof(int16_t))
 					{
-						TRACE("Failed to read DT_SHORT data at row %d, column %d\n", iRowNo, iColNo);
+						TRACE(
+							"Failed to read DT_SHORT data at row %d, column %d\n", iRowNo, iColNo);
 						return false;
 					}
 
@@ -308,7 +301,8 @@ bool CTblEditorBase::LoadRowData(File& file)
 					if (!file.Read(&val, sizeof(uint32_t), &bytesRead)
 						|| bytesRead != sizeof(uint32_t))
 					{
-						TRACE("Failed to read DT_DWORD data at row %d, column %d\n", iRowNo, iColNo);
+						TRACE(
+							"Failed to read DT_DWORD data at row %d, column %d\n", iRowNo, iColNo);
 						return false;
 					}
 
@@ -326,15 +320,15 @@ bool CTblEditorBase::LoadRowData(File& file)
 					if (!file.Read(&iStrLen, sizeof(int32_t), &bytesRead)
 						|| bytesRead != sizeof(int32_t))
 					{
-						TRACE("Failed to read string length at row %d, column %d\n", iRowNo, iColNo);
+						TRACE(
+							"Failed to read string length at row %d, column %d\n", iRowNo, iColNo);
 						return false;
 					}
 
 					TRACE("Row %d, Column %d: String length = %d\n", iRowNo, iColNo, iStrLen);
 
 					// Invalid string length
-					if (iStrLen < 0
-						|| iStrLen > MAX_STRING_LENGTH)
+					if (iStrLen < 0 || iStrLen > MAX_STRING_LENGTH)
 					{
 						TRACE("Row %d, Column %d: DT_STRING = (invalid string)\n", iRowNo, iColNo);
 						return false;
@@ -351,7 +345,8 @@ bool CTblEditorBase::LoadRowData(File& file)
 							|| bytesRead != iStrLen)
 						{
 							szValue.ReleaseBuffer();
-							TRACE("Failed to read string data at row %d, column %d\n", iRowNo, iColNo);
+							TRACE("Failed to read string data at row %d, column %d\n", iRowNo,
+								iColNo);
 							return false;
 						}
 
@@ -367,10 +362,10 @@ bool CTblEditorBase::LoadRowData(File& file)
 				case DT_FLOAT:
 				{
 					float val = 0.0f;
-					if (!file.Read(&val, sizeof(float), &bytesRead)
-						|| bytesRead != sizeof(float))
+					if (!file.Read(&val, sizeof(float), &bytesRead) || bytesRead != sizeof(float))
 					{
-						TRACE("Failed to read DT_FLOAT data at row %d, column %d\n", iRowNo, iColNo);
+						TRACE(
+							"Failed to read DT_FLOAT data at row %d, column %d\n", iRowNo, iColNo);
 						return false;
 					}
 
@@ -384,10 +379,10 @@ bool CTblEditorBase::LoadRowData(File& file)
 				case DT_DOUBLE:
 				{
 					double val = 0.0;
-					if (!file.Read(&val, sizeof(double), &bytesRead)
-						|| bytesRead != sizeof(double))
+					if (!file.Read(&val, sizeof(double), &bytesRead) || bytesRead != sizeof(double))
 					{
-						TRACE("Failed to read DT_DOUBLE data at row %d, column %d\n", iRowNo, iColNo);
+						TRACE(
+							"Failed to read DT_DOUBLE data at row %d, column %d\n", iRowNo, iColNo);
 						return false;
 					}
 
@@ -410,7 +405,8 @@ bool CTblEditorBase::LoadRowData(File& file)
 	return true;
 }
 
-bool CTblEditorBase::SaveFile(const CString& path, const std::map<int, std::vector<CStringA>>& newData)
+bool CTblEditorBase::SaveFile(
+	const CString& path, const std::map<int, std::vector<CStringA>>& newData)
 {
 	WriteBuffer writeBuffer;
 
@@ -435,7 +431,7 @@ bool CTblEditorBase::SaveFile(const CString& path, const std::map<int, std::vect
 
 		for (int iColNo = 0; iColNo < iDataTypeCount; iColNo++)
 		{
-			DATA_TYPE dataType = m_DataTypes[iColNo];
+			DATA_TYPE dataType    = m_DataTypes[iColNo];
 			const CStringA& value = row[iColNo];
 
 			switch (dataType)
@@ -516,18 +512,18 @@ bool CTblEditorBase::SaveFile(const CString& path, const std::map<int, std::vect
 		return false;
 
 	// Encryption key as defined earlier
-	uint16_t key_r = 0x0816;
-	uint16_t key_c1 = 0x6081;
-	uint16_t key_c2 = 0x1608;
+	uint16_t key_r         = 0x0816;
+	uint16_t key_c1        = 0x6081;
+	uint16_t key_c2        = 0x1608;
 
 	// Encrypt the data before writing it to the file
-	size_t dataSize = writeBuffer.size();
+	size_t dataSize        = writeBuffer.size();
 	uint8_t* encryptedData = new uint8_t[dataSize];
 
 	for (size_t i = 0; i < dataSize; i++)
 	{
-		uint8_t cipher = (writeBuffer[i] ^ (key_r >> 8));
-		key_r = (cipher + key_r) * key_c1 + key_c2;
+		uint8_t cipher   = (writeBuffer[i] ^ (key_r >> 8));
+		key_r            = (cipher + key_r) * key_c1 + key_c2;
 		encryptedData[i] = cipher;
 	}
 
@@ -536,7 +532,7 @@ bool CTblEditorBase::SaveFile(const CString& path, const std::map<int, std::vect
 
 	// Write encrypted data to the file
 	size_t bytesWritten = 0;
-	bool bResult = file.Write(encryptedData, dataSize, &bytesWritten);
+	bool bResult        = file.Write(encryptedData, dataSize, &bytesWritten);
 	file.Close();
 
 	TRACE("Actual number of bytes written: %zu\n", bytesWritten);
@@ -619,10 +615,7 @@ CString CTblEditorBase::GetColumnName(int iColNo) const
 CString CTblEditorBase::GetFullColumnName(int iColNo) const
 {
 	CString szName;
-	szName.Format(
-		_T("%d (%s)"),
-		iColNo + 1,
-		GetColumnName(iColNo));
+	szName.Format(_T("%d (%s)"), iColNo + 1, GetColumnName(iColNo));
 	return szName;
 }
 

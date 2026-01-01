@@ -9,7 +9,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -18,16 +18,16 @@ static char THIS_FILE[]=__FILE__;
 
 CN3UIList::CN3UIList()
 {
-	m_eType = UI_TYPE_LIST;
+	m_eType         = UI_TYPE_LIST;
 
-	m_iCurSel = 0;		// 현재 선택..
+	m_iCurSel       = 0; // 현재 선택..
 	m_pScrollBarRef = nullptr;
 
-	m_szFontName = "굴림체";
-	m_dwFontHeight = 10;
-	m_bFontBold = FALSE;
-	m_bFontItalic = FALSE;
-	m_crFont = 0xffffffff;
+	m_szFontName    = "굴림체";
+	m_dwFontHeight  = 10;
+	m_bFontBold     = FALSE;
+	m_bFontItalic   = FALSE;
+	m_crFont        = 0xffffffff;
 }
 
 CN3UIList::~CN3UIList()
@@ -38,29 +38,29 @@ void CN3UIList::Release()
 {
 	CN3UIBase::Release();
 
-//	it_pString it = m_ListString.begin(), itEnd = m_ListString.end();
-//	for(; it != itEnd; it++)
-//	{
-//		delete (*it);
-//	}
+	//	it_pString it = m_ListString.begin(), itEnd = m_ListString.end();
+	//	for(; it != itEnd; it++)
+	//	{
+	//		delete (*it);
+	//	}
 
 	m_ListString.clear(); // 어차피 자식은 다지우니까... 리스트의 포인터를 Delete 할 필요 없다..
-	m_iCurSel = 0;
+	m_iCurSel       = 0;
 	m_pScrollBarRef = nullptr;
 
-	m_szFontName = "굴림체";
-	m_dwFontHeight = 10;
-	m_bFontBold = FALSE;
-	m_bFontItalic = FALSE;
-	m_crFont = 0xffffffff;
+	m_szFontName    = "굴림체";
+	m_dwFontHeight  = 10;
+	m_bFontBold     = FALSE;
+	m_bFontItalic   = FALSE;
+	m_crFont        = 0xffffffff;
 }
 
 void CN3UIList::SetFont(const std::string& szFontName, uint32_t dwHeight, BOOL bBold, BOOL bItalic)
 {
-	m_szFontName = szFontName;
+	m_szFontName   = szFontName;
 	m_dwFontHeight = dwHeight;
-	m_bFontBold = bBold;
-	m_bFontItalic = bItalic;
+	m_bFontBold    = bBold;
+	m_bFontItalic  = bItalic;
 
 	for (CN3UIString* pUIString : m_ListString)
 		pUIString->SetFont(m_szFontName, m_dwFontHeight, m_bFontBold, m_bFontItalic);
@@ -70,8 +70,7 @@ void CN3UIList::SetFont(const std::string& szFontName, uint32_t dwHeight, BOOL b
 
 void CN3UIList::SetFontColor(int iIndex, D3DCOLOR color)
 {
-	if (iIndex < 0
-		|| iIndex >= static_cast<int>(m_ListString.size()))
+	if (iIndex < 0 || iIndex >= static_cast<int>(m_ListString.size()))
 		return;
 
 	auto it = m_ListString.begin();
@@ -99,13 +98,13 @@ int CN3UIList::AddStrings(const std::string* pszStrings, int iStringCount)
 
 		m_ListString.push_back(pString);
 	}
-		
+
 	UpdateChildRegions();
 
 	return static_cast<int>(m_ListString.size()) - 1;
 }
 
-int	CN3UIList::AddString(const std::string& szString)
+int CN3UIList::AddString(const std::string& szString)
 {
 	CN3UIString* pString = new CN3UIString();
 	pString->Init(this);
@@ -121,8 +120,7 @@ int	CN3UIList::AddString(const std::string& szString)
 
 bool CN3UIList::InsertString(int iIndex, const std::string& szString)
 {
-	if (iIndex < 0
-		|| iIndex >= static_cast<int>(m_ListString.size()))
+	if (iIndex < 0 || iIndex >= static_cast<int>(m_ListString.size()))
 		return false;
 
 	CN3UIString* pString = new CN3UIString();
@@ -141,8 +139,7 @@ bool CN3UIList::InsertString(int iIndex, const std::string& szString)
 
 bool CN3UIList::DeleteString(int iIndex)
 {
-	if (iIndex < 0
-		|| iIndex >= static_cast<int>(m_ListString.size()))
+	if (iIndex < 0 || iIndex >= static_cast<int>(m_ListString.size()))
 		return false;
 
 	auto it = m_ListString.begin();
@@ -170,28 +167,26 @@ bool CN3UIList::GetString(int iIndex, std::string& szString)
 {
 	szString.clear();
 
-	if (iIndex < 0
-		|| iIndex >= static_cast<int>(m_ListString.size()))
+	if (iIndex < 0 || iIndex >= static_cast<int>(m_ListString.size()))
 		return false;
 
 	auto it = m_ListString.begin();
 	std::advance(it, iIndex);
 
 	CN3UIString* pUIString = (*it);
-	szString = pUIString->GetString();
+	szString               = pUIString->GetString();
 
 	return true;
 }
 
 bool CN3UIList::SetString(int iIndex, const std::string& szString)
 {
-	if (iIndex < 0
-		|| iIndex >= static_cast<int>(m_ListString.size()))
+	if (iIndex < 0 || iIndex >= static_cast<int>(m_ListString.size()))
 		return false;
 
 	auto it = m_ListString.begin();
 	std::advance(it, iIndex);
-	
+
 	CN3UIString* pUIString = (*it);
 	pUIString->SetString(szString);
 
@@ -211,7 +206,7 @@ CN3UIString* CN3UIList::GetChildStrFromList(const std::string& str)
 
 void CN3UIList::UpdateChildRegions()
 {
-	RECT rc = GetRegion();
+	RECT rc     = GetRegion();
 	RECT rcThis = rc;
 	POINT pt;
 	SIZE size;
@@ -220,7 +215,7 @@ void CN3UIList::UpdateChildRegions()
 	{
 		iScrollPos = m_pScrollBarRef->GetCurrentPos();
 		RECT rcTmp = m_pScrollBarRef->GetRegion();
-		rc.right = rcTmp.left;
+		rc.right   = rcTmp.left;
 	}
 
 	it_pString it = m_ListString.begin(), itEnd = m_ListString.end();
@@ -233,7 +228,7 @@ void CN3UIList::UpdateChildRegions()
 			continue;
 		}
 
-		pt = pStr->GetPos();
+		pt                     = pStr->GetPos();
 
 		const std::string& str = pStr->GetString();
 
@@ -243,8 +238,10 @@ void CN3UIList::UpdateChildRegions()
 		pStr->SetRegion(rcTmp);
 		rc.top += size.cy;
 
-		if (rc.top >= rcThis.bottom) pStr->SetVisibleWithNoSound(false);
-		else pStr->SetVisibleWithNoSound(true);
+		if (rc.top >= rcThis.bottom)
+			pStr->SetVisibleWithNoSound(false);
+		else
+			pStr->SetVisibleWithNoSound(true);
 	}
 
 	if (m_pScrollBarRef)
@@ -275,7 +272,7 @@ bool CN3UIList::SetScrollPos(int iScrollPos)
 {
 	if (m_pScrollBarRef == nullptr)
 		return false;
-	
+
 	m_pScrollBarRef->SetCurrentPos(iScrollPos);
 	UpdateChildRegions();
 	return true;
@@ -286,17 +283,17 @@ bool CN3UIList::Load(File& file)
 	bool bSuccess = CN3UIBase::Load(file);
 
 	// font 정보
-	int iStrLen = 0;
-	file.Read(&iStrLen, sizeof(iStrLen));			// font 이름 길이 
+	int iStrLen   = 0;
+	file.Read(&iStrLen, sizeof(iStrLen)); // font 이름 길이
 	__ASSERT(iStrLen > 0, "No font name");
 	if (iStrLen > 0)
 	{
 		m_szFontName.assign(iStrLen, ' ');
-		file.Read(&m_szFontName[0], iStrLen);				// string
-		file.Read(&m_dwFontHeight, 4);	// font height
-		file.Read(&m_crFont, 4);	// font color
-		file.Read(&m_bFontBold, 4);	// font flag (bold, italic)
-		file.Read(&m_bFontItalic, 4);	// font flag (bold, italic)
+		file.Read(&m_szFontName[0], iStrLen); // string
+		file.Read(&m_dwFontHeight, 4);        // font height
+		file.Read(&m_crFont, 4);              // font color
+		file.Read(&m_bFontBold, 4);           // font flag (bold, italic)
+		file.Read(&m_bFontItalic, 4);         // font flag (bold, italic)
 	}
 
 	// Child 중에 Scroll Bar 가 있는지 찾아본다.
@@ -314,18 +311,18 @@ bool CN3UIList::Save(File& file)
 {
 	if (!CN3UIBase::Save(file))
 		return false;
-	
+
 	// font 정보
 	int iStrLen = static_cast<int>(m_szFontName.size());
 	__ASSERT(iStrLen > 0, "No font name");
-	file.Write(&iStrLen, sizeof(iStrLen));			// font 이름 길이 
+	file.Write(&iStrLen, sizeof(iStrLen));         // font 이름 길이
 	if (iStrLen > 0)
 	{
-		file.Write(m_szFontName.c_str(), iStrLen);				// string
-		file.Write(&m_dwFontHeight, 4);	// font height
-		file.Write(&m_crFont, 4);	// font color
-		file.Write(&m_bFontBold, 4);	// font flag (bold, italic)
-		file.Write(&m_bFontItalic, 4);	// font flag (bold, italic)
+		file.Write(m_szFontName.c_str(), iStrLen); // string
+		file.Write(&m_dwFontHeight, 4);            // font height
+		file.Write(&m_crFont, 4);                  // font color
+		file.Write(&m_bFontBold, 4);               // font flag (bold, italic)
+		file.Write(&m_bFontItalic, 4);             // font flag (bold, italic)
 	}
 
 	return true;
@@ -333,52 +330,58 @@ bool CN3UIList::Save(File& file)
 #endif // #ifdef _N3TOOL
 
 #ifdef _N3TOOL
-void CN3UIList::operator = (const CN3UIList& other)
+void CN3UIList::operator=(const CN3UIList& other)
 {
-	CN3UIBase::operator = (other);
+	CN3UIBase::operator=(other);
 
-	m_szFontName = other.m_szFontName;
+	m_szFontName   = other.m_szFontName;
 	m_dwFontHeight = other.m_dwFontHeight;
-	m_bFontBold = other.m_bFontBold;
-	m_bFontItalic = other.m_bFontItalic;
-	m_crFont = other.m_crFont;
+	m_bFontBold    = other.m_bFontBold;
+	m_bFontItalic  = other.m_bFontItalic;
+	m_crFont       = other.m_crFont;
 }
 #endif // #ifdef _N3TOOL
 
 uint32_t CN3UIList::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld)
 {
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
-	if (!m_bVisible || UI_STATE_LIST_DISABLE == m_eState) return dwRet;
+	if (!m_bVisible || UI_STATE_LIST_DISABLE == m_eState)
+		return dwRet;
 
 	// 특정 이벤트에 대해 메시지 전송..
-	if(IsIn(ptCur.x, ptCur.y) && ((dwFlags & UI_MOUSE_LBCLICK) || (dwFlags & UI_MOUSE_LBDBLCLK)) )	
+	if (IsIn(ptCur.x, ptCur.y) && ((dwFlags & UI_MOUSE_LBCLICK) || (dwFlags & UI_MOUSE_LBDBLCLK)))
 	{
 		RECT rc = this->GetRegion(), rcStr;
 		SIZE size;
 
 		it_pString it = m_ListString.begin(), itEnd = m_ListString.end();
-		for(int i = 0; it != itEnd; it++, i++)
+		for (int i = 0; it != itEnd; it++, i++)
 		{
 			CN3UIString* pStr = (*it);
-			if(false == pStr->IsVisible()) continue;
+			if (false == pStr->IsVisible())
+				continue;
 
 			pStr->GetTextExtent("1", 1, &size);
-			rcStr = pStr->GetRegion();
+			rcStr      = pStr->GetRegion();
 
-			rc.top += size.cy;
+			rc.top    += size.cy;
 			rc.bottom += size.cy;
 
-			if(::PtInRect(&rcStr, ptCur))
+			if (::PtInRect(&rcStr, ptCur))
 			{
 				m_iCurSel = i;
-				if(dwFlags & UI_MOUSE_LBCLICK)
+				if (dwFlags & UI_MOUSE_LBCLICK)
 				{
-					if(m_pParent) m_pParent->ReceiveMessage(this, UIMSG_LIST_SELCHANGE); // 부모에게 버튼 클릭 통지..
+					if (m_pParent)
+						m_pParent->ReceiveMessage(
+							this, UIMSG_LIST_SELCHANGE); // 부모에게 버튼 클릭 통지..
 					dwRet |= UIMSG_LIST_SELCHANGE;
 				}
 				else
 				{
-					if(m_pParent) m_pParent->ReceiveMessage(this, UIMSG_LIST_DBLCLK); // 부모에게 버튼 클릭 통지..
+					if (m_pParent)
+						m_pParent->ReceiveMessage(
+							this, UIMSG_LIST_DBLCLK); // 부모에게 버튼 클릭 통지..
 					dwRet |= UIMSG_LIST_DBLCLK;
 				}
 				dwRet |= UI_MOUSEPROC_DONESOMETHING;
@@ -395,24 +398,28 @@ void CN3UIList::Render()
 {
 	CN3UIBase::Render();
 
-	if (m_iCurSel >= 0
-		&& m_iCurSel < static_cast<int>(m_ListString.size()))
+	if (m_iCurSel >= 0 && m_iCurSel < static_cast<int>(m_ListString.size()))
 	{
 		auto it = m_ListString.begin();
 		std::advance(it, m_iCurSel);
 		CN3UIString* pStr = *it;
-		if(pStr)
+		if (pStr)
 		{
 			RECT rc = pStr->GetRegion(); // 선택 표시
-		
+
 			__VertexTransformedColor vLines[5];
-			vLines[0].Set((float)rc.left, (float)rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
-			vLines[1].Set((float)rc.right, (float)rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
-			vLines[2].Set((float)rc.right, (float)rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
-			vLines[3].Set((float)rc.left, (float)rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+			vLines[0].Set(
+				(float) rc.left, (float) rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+			vLines[1].Set(
+				(float) rc.right, (float) rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+			vLines[2].Set(
+				(float) rc.right, (float) rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+			vLines[3].Set(
+				(float) rc.left, (float) rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
 			vLines[4] = vLines[0];
-	
-			DWORD dwZ, dwFog, dwAlpha, dwCOP, dwCA1, dwSrcBlend, dwDestBlend, dwVertexShader, dwAOP, dwAA1;
+
+			DWORD dwZ, dwFog, dwAlpha, dwCOP, dwCA1, dwSrcBlend, dwDestBlend, dwVertexShader, dwAOP,
+				dwAA1;
 			CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &dwZ);
 			CN3Base::s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
 			CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
@@ -435,8 +442,9 @@ void CN3UIList::Render()
 			CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
 
 			CN3Base::s_lpD3DDev->SetFVF(FVF_TRANSFORMEDCOLOR);
-			CN3Base::s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINESTRIP, 4, vLines, sizeof(__VertexTransformedColor));
-			
+			CN3Base::s_lpD3DDev->DrawPrimitiveUP(
+				D3DPT_LINESTRIP, 4, vLines, sizeof(__VertexTransformedColor));
+
 			CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, dwZ);
 			CN3Base::s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, dwFog);
 			CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlpha);
@@ -458,7 +466,7 @@ bool CN3UIList::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		if (pSender == m_pScrollBarRef)
 		{
 			this->SetScrollPos(m_pScrollBarRef->GetCurrentPos());
-//			return m_pParent->ReceiveMessage(this, UIMSG_SCROLLBAR_POS);
+			//			return m_pParent->ReceiveMessage(this, UIMSG_SCROLLBAR_POS);
 		}
 	}
 
@@ -468,15 +476,14 @@ bool CN3UIList::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 void CN3UIList::ResetContent()
 {
 	it_pString it = m_ListString.begin(), itEnd = m_ListString.end();
-	for(; it != itEnd; it++)
+	for (; it != itEnd; it++)
 	{
-		
 		CN3UIString* pString = *it;
-		delete pString;		
+		delete pString;
 	}
 	m_ListString.clear();
 	m_iCurSel = 0;
-	if(m_pScrollBarRef)
+	if (m_pScrollBarRef)
 	{
 		m_pScrollBarRef->SetRange(0, 0);
 		m_pScrollBarRef->SetCurrentPos(0);

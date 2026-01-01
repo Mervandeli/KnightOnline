@@ -8,10 +8,10 @@
 
 struct CircularBufferSpan
 {
-	char*	Buffer1 = nullptr;
-	int		Length1 = 0;
-	char*	Buffer2 = nullptr;
-	int		Length2 = 0;
+	char* Buffer1 = nullptr;
+	int Length1   = 0;
+	char* Buffer2 = nullptr;
+	int Length2   = 0;
 };
 
 class CCircularBuffer
@@ -21,7 +21,7 @@ public:
 	{
 		assert(size > 0);
 		m_iBufSize = size;
-		m_pBuffer = new char[m_iBufSize];
+		m_pBuffer  = new char[m_iBufSize];
 
 		m_iHeadPos = 0;
 		m_iTailPos = 0;
@@ -35,30 +35,35 @@ public:
 	}
 
 	CircularBufferSpan PutData(char* pData, int len, bool resize = true);
-	void	GetData(char* pData, int len);
-	int		GetOutData(char* pData); //HeadPos, 변화
+	void GetData(char* pData, int len);
+	int GetOutData(char* pData); //HeadPos, 변화
 
-	char& GetHeadData() {
+	char& GetHeadData()
+	{
 		return m_pBuffer[m_iHeadPos];
 	}
 
 	// 1 Byte Operation;
 	// false : 모든데이터 다빠짐, TRUE: 정상적으로 진행중
-	bool	HeadIncrease(int increasement = 1);
+	bool HeadIncrease(int increasement = 1);
 
-	void SetEmpty() {
+	void SetEmpty()
+	{
 		m_iHeadPos = m_iTailPos = 0;
 	}
 
-	int& GetBufferSize() {
+	int& GetBufferSize()
+	{
 		return m_iBufSize;
 	}
 
-	int& GetHeadPos() {
+	int& GetHeadPos()
+	{
 		return m_iHeadPos;
 	}
 
-	int& GetTailPos() {
+	int& GetTailPos()
+	{
 		return m_iTailPos;
 	}
 
@@ -66,22 +71,24 @@ public:
 
 protected:
 	// over flow 먼저 점검한 후 IndexOverFlow 점검
-	inline bool IsOverFlowCondition(int len) const {
+	inline bool IsOverFlowCondition(int len) const
+	{
 		return (len >= m_iBufSize - GetValidCount());
 	}
 
-	inline bool IsIndexOverFlow(int len) const {
+	inline bool IsIndexOverFlow(int len) const
+	{
 		return (len + m_iTailPos >= m_iBufSize);
 	}
 
-	void	BufferResize(); //overflow condition 일때 size를 현재의 두배로 늘림
+	void BufferResize(); //overflow condition 일때 size를 현재의 두배로 늘림
 
 protected:
-	int		m_iBufSize;
-	char*	m_pBuffer;
+	int m_iBufSize;
+	char* m_pBuffer;
 
-	int		m_iHeadPos;
-	int		m_iTailPos;
+	int m_iHeadPos;
+	int m_iTailPos;
 };
 
 inline int CCircularBuffer::GetValidCount() const
@@ -94,9 +101,9 @@ inline int CCircularBuffer::GetValidCount() const
 
 inline void CCircularBuffer::BufferResize()
 {
-	int prevBufSize = m_iBufSize;
-	m_iBufSize <<= 1;
-	char* pNewData = new char[m_iBufSize];
+	int prevBufSize   = m_iBufSize;
+	m_iBufSize      <<= 1;
+	char* pNewData    = new char[m_iBufSize];
 	memcpy(pNewData, m_pBuffer, prevBufSize);
 
 	if (m_iTailPos < m_iHeadPos)
@@ -132,7 +139,7 @@ inline CircularBufferSpan CCircularBuffer::PutData(char* pData, int len, bool re
 
 	if (IsIndexOverFlow(len))
 	{
-		int FirstCopyLen = m_iBufSize - m_iTailPos;
+		int FirstCopyLen  = m_iBufSize - m_iTailPos;
 		int SecondCopyLen = len - FirstCopyLen;
 		assert(FirstCopyLen);
 
@@ -169,7 +176,7 @@ inline CircularBufferSpan CCircularBuffer::PutData(char* pData, int len, bool re
 inline int CCircularBuffer::GetOutData(char* pData)
 {
 	int len = GetValidCount();
-	int fc = m_iBufSize - m_iHeadPos;
+	int fc  = m_iBufSize - m_iHeadPos;
 	if (len > fc)
 	{
 		int sc = len - fc;

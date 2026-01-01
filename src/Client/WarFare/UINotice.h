@@ -18,11 +18,11 @@ typedef std::list<std::string>::iterator it_String;
 class CUINotice : public CN3UIBase
 {
 public:
-	class CN3UIString*		m_pText_Notice;
-	class CN3UIScrollBar*	m_pScrollBar;
-	class CN3UIButton*		m_pBtn_OK;
+	class CN3UIString* m_pText_Notice;
+	class CN3UIScrollBar* m_pScrollBar;
+	class CN3UIButton* m_pBtn_OK;
 
-	std::list<std::string>	m_Texts;
+	std::list<std::string> m_Texts;
 
 public:
 	void RemoveNotice();

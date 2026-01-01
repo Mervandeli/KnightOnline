@@ -14,19 +14,19 @@
 
 #include <AL/alc.h>
 
-#include <cassert>			// assert()
+#include <cassert> // assert()
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 CN3SndMgr::CN3SndMgr()
 {
 	m_bSndEnable = false;
 
-	_alcDevice = nullptr;
-	_alcContext = nullptr;
+	_alcDevice   = nullptr;
+	_alcContext  = nullptr;
 }
 
 CN3SndMgr::~CN3SndMgr()
@@ -85,14 +85,14 @@ bool CN3SndMgr::InitOpenAL()
 		alcCloseDevice(_alcDevice);
 
 		_alcContext = nullptr;
-		_alcDevice = nullptr;
+		_alcDevice  = nullptr;
 
 		MessageBoxW(nullptr, L"Unable to generate sound sources.", L"Error", MB_OK);
 		return false;
 	}
 
 	int maxRegularSourceCount = generatedSourceIdCount;
-	int maxStreamCount = MAX_AUDIO_STREAM_SOURCES;
+	int maxStreamCount        = MAX_AUDIO_STREAM_SOURCES;
 
 	// Not enough sources to allow for MAX_AUDIO_STREAM_SOURCES.
 	if (generatedSourceIdCount < maxStreamCount)
@@ -251,7 +251,7 @@ void CN3SndMgr::ReleaseObj(CN3SndObj** ppObj)
 		}
 	}
 
-	it = m_SndObjs_PlayOnceAndRelease.begin();
+	it    = m_SndObjs_PlayOnceAndRelease.begin();
 	itEnd = m_SndObjs_PlayOnceAndRelease.end();
 	for (; it != itEnd; ++it)
 	{
@@ -525,7 +525,8 @@ void CN3SndMgr::Add(std::shared_ptr<AudioHandle> handle)
 		_thread->Add(std::move(handle));
 }
 
-void CN3SndMgr::QueueCallback(std::shared_ptr<AudioHandle> handle, AudioThread::AudioCallback callback)
+void CN3SndMgr::QueueCallback(
+	std::shared_ptr<AudioHandle> handle, AudioThread::AudioCallback callback)
 {
 	if (_thread != nullptr)
 		_thread->QueueCallback(std::move(handle), std::move(callback));

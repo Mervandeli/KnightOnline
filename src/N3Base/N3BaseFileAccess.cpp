@@ -10,15 +10,15 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 CN3BaseFileAccess::CN3BaseFileAccess()
 {
-	m_iFileFormatVersion = N3FORMAT_VER_UNKN;
+	m_iFileFormatVersion  = N3FORMAT_VER_UNKN;
 
-	m_dwType |= OBJ_BASE_FILEACCESS;
-	m_iLOD = 0; // 로딩할때 쓸 LOD
+	m_dwType             |= OBJ_BASE_FILEACCESS;
+	m_iLOD                = 0; // 로딩할때 쓸 LOD
 }
 
 CN3BaseFileAccess::~CN3BaseFileAccess()
@@ -37,7 +37,7 @@ void CN3BaseFileAccess::FileNameSet(const std::string& szFileName)
 	std::string szTmpFN = szFileName;
 
 	if (!szTmpFN.empty())
-		CharLower(&szTmpFN[0]); // 모두 소문자로 만든다..
+		CharLower(&szTmpFN[0]);          // 모두 소문자로 만든다..
 
 	size_t pos = szTmpFN.find(s_szPath); // 문자열에 Base Path 와 일치하는 이름이 있는지 본다.
 	if (pos != std::string::npos)
@@ -97,7 +97,7 @@ bool CN3BaseFileAccess::LoadFromFile()
 #ifdef _N3TOOL
 		MessageBox(s_hWndBase, szErr.c_str(), "File Handle error", MB_OK);
 #endif
-#ifdef _N3GAME 
+#ifdef _N3GAME
 		CLogWriter::Write(szErr);
 #endif
 		return false;

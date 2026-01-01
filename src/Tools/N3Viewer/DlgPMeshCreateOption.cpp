@@ -13,18 +13,16 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgPMeshCreateOption dialog
 
-
-CDlgPMeshCreateOption::CDlgPMeshCreateOption(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgPMeshCreateOption::IDD, pParent)
+CDlgPMeshCreateOption::CDlgPMeshCreateOption(CWnd* pParent /*=nullptr*/) :
+	CDialog(CDlgPMeshCreateOption::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgPMeshCreateOption)
 	m_bTriangleLoss = TRUE;
-	m_fWeight = 4.0f;
-	m_iLoss = 1;
-	m_iTriangle = 0;
+	m_fWeight       = 4.0f;
+	m_iLoss         = 1;
+	m_iTriangle     = 0;
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgPMeshCreateOption::DoDataExchange(CDataExchange* pDX)
 {
@@ -37,32 +35,30 @@ void CDlgPMeshCreateOption::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgPMeshCreateOption, CDialog)
-	//{{AFX_MSG_MAP(CDlgPMeshCreateOption)
-	ON_BN_CLICKED(IDC_CHECK_TRIANGLE_LOSS, OnCheckTriangleLoss)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgPMeshCreateOption)
+ON_BN_CLICKED(IDC_CHECK_TRIANGLE_LOSS, OnCheckTriangleLoss)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgPMeshCreateOption message handlers
 
-BOOL CDlgPMeshCreateOption::OnInitDialog() 
+BOOL CDlgPMeshCreateOption::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
 	OnCheckTriangleLoss();
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE; // return TRUE unless you set the focus to a control
+				 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-
-void CDlgPMeshCreateOption::OnCheckTriangleLoss() 
+void CDlgPMeshCreateOption::OnCheckTriangleLoss()
 {
 	UpdateData(TRUE);
 
 	GetDlgItem(IDC_RADIO_AREA)->EnableWindow(m_bTriangleLoss);
 	GetDlgItem(IDC_RADIO_SIDE)->EnableWindow(m_bTriangleLoss);
 	GetDlgItem(IDC_EDIT_WEIGHT)->EnableWindow(m_bTriangleLoss);
-	GetDlgItem(IDC_RADIO_AREA)->EnableWindow(m_bTriangleLoss);	
+	GetDlgItem(IDC_RADIO_AREA)->EnableWindow(m_bTriangleLoss);
 }

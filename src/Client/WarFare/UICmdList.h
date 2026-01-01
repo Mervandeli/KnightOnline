@@ -16,36 +16,94 @@
 enum e_ChatCmd
 {
 	// Private
-	CMD_WHISPER, CMD_TOWN, CMD_EXIT, CMD_GREETING, CMD_GREETING2, CMD_GREETING3,
-	CMD_PROVOKE, CMD_PROVOKE2, CMD_PROVOKE3, CMD_GAME_SAVE, CMD_RECOMMEND, CMD_INDIVIDUAL_BATTLE,
+	CMD_WHISPER,
+	CMD_TOWN,
+	CMD_EXIT,
+	CMD_GREETING,
+	CMD_GREETING2,
+	CMD_GREETING3,
+	CMD_PROVOKE,
+	CMD_PROVOKE2,
+	CMD_PROVOKE3,
+	CMD_GAME_SAVE,
+	CMD_RECOMMEND,
+	CMD_INDIVIDUAL_BATTLE,
 #if 0 // unused officially -- they exist, but aren't loaded (& they're Korean in our data)
 	CMDSIT_STAND, CMD_WALK_RUN, CMD_LOCATION,
 #endif
-	
+
 	// Trade
-	CMD_TRADE, CMD_FORBIDTRADE, CMD_PERMITTRADE, CMD_MERCHANT,
+	CMD_TRADE,
+	CMD_FORBIDTRADE,
+	CMD_PERMITTRADE,
+	CMD_MERCHANT,
 
 	// Party
-	CMD_PARTY, CMD_LEAVEPARTY, CMD_RECRUITPARTY, CMD_FORBIDPARTY, CMD_PERMITPARTY,
+	CMD_PARTY,
+	CMD_LEAVEPARTY,
+	CMD_RECRUITPARTY,
+	CMD_FORBIDPARTY,
+	CMD_PERMITPARTY,
 
 	// Clan
-	CMD_JOINCLAN, CMD_WITHDRAWCLAN, CMD_FIRECLAN, CMD_COMMAND, CMD_CLAN_WAR,
-	CMD_SURRENDER, CMD_APPOINTVICECHIEF, CMD_CLAN_CHAT, CMD_CLAN_BATTLE,
+	CMD_JOINCLAN,
+	CMD_WITHDRAWCLAN,
+	CMD_FIRECLAN,
+	CMD_COMMAND,
+	CMD_CLAN_WAR,
+	CMD_SURRENDER,
+	CMD_APPOINTVICECHIEF,
+	CMD_CLAN_CHAT,
+	CMD_CLAN_BATTLE,
 
 	// Knights
-	CMD_CONFEDERACY, CMD_BAN_KNIGHTS, CMD_QUIT_KNIGHTS, CMD_BASE, CMD_DECLARATION,
+	CMD_CONFEDERACY,
+	CMD_BAN_KNIGHTS,
+	CMD_QUIT_KNIGHTS,
+	CMD_BASE,
+	CMD_DECLARATION,
 
 	// GM
-	CMD_VISIBLE, CMD_INVISIBLE, CMD_CLEAN, CMD_RAINING, CMD_SNOWING, CMD_TIME, CMD_CU_COUNT,
-	CMD_NOTICE, CMD_ARREST, CMD_FORBIDCONNECT, CMD_FORBIDCHAT, CMD_PERMITCHAT, CMD_NOTICEALL,
-	CMD_CUTOFF, CMD_VIEW, CMD_UNVIEW, CMD_FORBIDUSER, CMD_SUMMONUSER,
-	CMD_ATTACKDISABLE, CMD_ATTACKENABLE, CMD_PLC,
+	CMD_VISIBLE,
+	CMD_INVISIBLE,
+	CMD_CLEAN,
+	CMD_RAINING,
+	CMD_SNOWING,
+	CMD_TIME,
+	CMD_CU_COUNT,
+	CMD_NOTICE,
+	CMD_ARREST,
+	CMD_FORBIDCONNECT,
+	CMD_FORBIDCHAT,
+	CMD_PERMITCHAT,
+	CMD_NOTICEALL,
+	CMD_CUTOFF,
+	CMD_VIEW,
+	CMD_UNVIEW,
+	CMD_FORBIDUSER,
+	CMD_SUMMONUSER,
+	CMD_ATTACKDISABLE,
+	CMD_ATTACKENABLE,
+	CMD_PLC,
 
 	// Guardian Monster
-	CMD_HIDE, CMD_GUARD, CMD_DEFEND, CMD_LOOK_OUT, CMD_STRATEGIC_FORMATION, CMD_REST, CMD_DESTROY,
+	CMD_HIDE,
+	CMD_GUARD,
+	CMD_DEFEND,
+	CMD_LOOK_OUT,
+	CMD_STRATEGIC_FORMATION,
+	CMD_REST,
+	CMD_DESTROY,
 
 	// King
-	CMD_ROYALORDER, CMD_PRIZE, CMD_EXPERIENCEPOINT, CMD_DROPRATE, CMD_RAIN, CMD_SNOW, CMD_CLEAR, CMD_REWARD,
+	CMD_ROYALORDER,
+	CMD_PRIZE,
+	CMD_EXPERIENCEPOINT,
+	CMD_DROPRATE,
+	CMD_RAIN,
+	CMD_SNOW,
+	CMD_CLEAR,
+	CMD_REWARD,
 
 	CMD_COUNT,
 	CMD_UNKNOWN = 0xffffffff
@@ -57,8 +115,8 @@ class CUICmdList : public CN3UIBase
 protected:
 	enum e_CmdListSelection : uint8_t
 	{
-		CMD_LIST_SEL_CATEGORY = 0,	// Category list
-		CMD_LIST_SEL_COMMAND		// Command list
+		CMD_LIST_SEL_CATEGORY = 0, // Category list
+		CMD_LIST_SEL_COMMAND       // Command list
 	};
 
 	enum e_CmdListCategory : uint8_t
@@ -74,25 +132,25 @@ protected:
 		CMD_LIST_CAT_COUNT
 	};
 
-	CUICmdEdit*			m_pUICmdEdit;
+	CUICmdEdit* m_pUICmdEdit;
 
-	CN3UIButton*		m_pBtn_Cancel;
-	CN3UIList*			m_pList_CmdCat;
-	CN3UIList*			m_pList_Cmds;
+	CN3UIButton* m_pBtn_Cancel;
+	CN3UIList* m_pList_CmdCat;
+	CN3UIList* m_pList_Cmds;
 
-	bool				m_bOpenningNow;		// 열리고 있다..
-	bool				m_bClosingNow;		// 닫히고 있다..
-	float				m_fMoveDelta;		// 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
-	int					m_iSelectedCategory;
-	e_CmdListSelection	m_eSelectedList;
+	bool m_bOpenningNow; // 열리고 있다..
+	bool m_bClosingNow;  // 닫히고 있다..
+	float m_fMoveDelta;  // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
+	int m_iSelectedCategory;
+	e_CmdListSelection m_eSelectedList;
 
 	struct CommandInfo
 	{
-		uint32_t			ResourceID;
-		e_ChatCmd			Command;
+		uint32_t ResourceID;
+		e_ChatCmd Command;
 	};
 
-	std::multimap<e_CmdListCategory, CommandInfo>		m_categoryToCommandInfoMap;
+	std::multimap<e_CmdListCategory, CommandInfo> m_categoryToCommandInfoMap;
 
 public:
 	CUICmdList();
@@ -115,6 +173,4 @@ public:
 };
 
 #endif // !defined(AFX_UICmdList)
-
-
 

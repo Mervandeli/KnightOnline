@@ -12,14 +12,14 @@
 
 #pragma once
 
-#include <string> // std::string
+#include <string>     // std::string
 
-struct __TABLE_SOUND // Sound 리소스 레코드...
+struct __TABLE_SOUND  // Sound 리소스 레코드...
 {
-	uint32_t	dwID;		// 고유 ID
-	std::string	szFN;		// wave file name
-	int			iType;		// 사운드 타입...
-	int			iNumInst;	// 최대 사용할 수 있는 인스턴스의 갯수..
+	uint32_t dwID;    // 고유 ID
+	std::string szFN; // wave file name
+	int iType;        // 사운드 타입...
+	int iNumInst;     // 최대 사용할 수 있는 인스턴스의 갯수..
 };
 
 /// \struct SoundSettings
@@ -31,14 +31,14 @@ struct __TABLE_SOUND // Sound 리소스 레코드...
 struct SoundSettings
 {
 	/// Indicates whether playback should loop.
-	bool IsLooping		= false;
+	bool IsLooping    = false;
 
 	/// Current gain applied to the sound, in the range [0.0, 1.0].
-	float CurrentGain	= 0.0f;
+	float CurrentGain = 0.0f;
 
 	/// Maximum gain that can be applied to the sound, in the range [0.0, 1.0].
 	/// Used as the target gain for fades and playback.
-	float MaxGain		= 1.0f;
+	float MaxGain     = 1.0f;
 };
 
 /// \enum e_SndType
@@ -86,4 +86,4 @@ enum e_SndState
 	SNDSTATE_FADEOUT
 };
 
-#endif	//end of #ifndef __N3SNDDEF_H__
+#endif //end of #ifndef __N3SNDDEF_H__

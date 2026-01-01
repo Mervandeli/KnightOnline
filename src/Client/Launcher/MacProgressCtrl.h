@@ -13,35 +13,33 @@
 // Feel free to modifiy and/or distribute this file, but
 // do not remove this header.
 //
-// I would appreciate a notification of any bugs discovered or 
+// I would appreciate a notification of any bugs discovered or
 // improvements that could be made.
 //
 // This file is provided "as is" with no expressed or implied warranty.
 //
 //	History:
-//		PMM	12/21/1999		Initial implementation.		
+//		PMM	12/21/1999		Initial implementation.
 
 /////////////////////////////////////////////////////////////////////////////
 // CMacProgressCtrl window
 
 class CMacProgressCtrl : public CProgressCtrl
 {
-// Construction
+	// Construction
 public:
 	CMacProgressCtrl();
 
-// Attributes
+	// Attributes
 public:
-
-// Operations
+	// Operations
 public:
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CMacProgressCtrl)
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	BOOL GetIndeterminate();
 	void SetIndeterminate(BOOL bIndeterminate = TRUE);
@@ -61,8 +59,8 @@ protected:
 private:
 	int m_nIndOffset;
 	BOOL m_bIndeterminate;
-	void DrawVerticalBar(CDC *pDC, const CRect rect);
-	void DrawHorizontalBar(CDC *pDC, const CRect rect);
+	void DrawVerticalBar(CDC* pDC, const CRect rect);
+	void DrawHorizontalBar(CDC* pDC, const CRect rect);
 	void DeletePens();
 	void CreatePens();
 	CPen m_penColor;

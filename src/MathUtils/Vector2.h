@@ -12,15 +12,15 @@ public:
 	void Zero();
 	void Set(float fx, float fy);
 
-	__Vector2& operator += (const __Vector2&);
-	__Vector2& operator -= (const __Vector2&);
-	__Vector2& operator *= (float);
-	__Vector2& operator /= (float);
+	__Vector2& operator+=(const __Vector2&);
+	__Vector2& operator-=(const __Vector2&);
+	__Vector2& operator*=(float);
+	__Vector2& operator/=(float);
 
-	__Vector2 operator + (const __Vector2&) const;
-	__Vector2 operator - (const __Vector2&) const;
-	__Vector2 operator * (float) const;
-	__Vector2 operator / (float) const;
+	__Vector2 operator+(const __Vector2&) const;
+	__Vector2 operator-(const __Vector2&) const;
+	__Vector2 operator*(float) const;
+	__Vector2 operator/(float) const;
 
 public:
 	float x, y;

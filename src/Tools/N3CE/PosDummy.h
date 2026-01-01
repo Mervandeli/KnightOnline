@@ -11,7 +11,7 @@
 
 #include "TransDummy.h"
 
-class CPosDummy : public CTransDummy  
+class CPosDummy : public CTransDummy
 {
 public:
 	CPosDummy();
@@ -19,13 +19,12 @@ public:
 
 public:
 protected:
-
 public:
 	virtual void SetVertex(__Vector3* pVertex);
 	virtual void SetSelObj(CN3Transform* pObj);
 	virtual BOOL MouseMsgFilter(LPMSG pMsg);
-protected:
 
+protected:
 };
 
 #endif // !defined(AFX_POSDUMMY_H__61F97647_F058_413E_A1C2_1F153B020C9D__INCLUDED_)

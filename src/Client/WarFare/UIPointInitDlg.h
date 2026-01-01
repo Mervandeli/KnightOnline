@@ -15,11 +15,11 @@
 
 class CUIPointInitDlg : public CN3UIBase
 {
-	CN3UIButton*		m_pBtn_Ok;
-	CN3UIButton*		m_pBtn_Cancel;
+	CN3UIButton* m_pBtn_Ok;
+	CN3UIButton* m_pBtn_Cancel;
 
-	CN3UIString*		m_pText_NeedGold;
-	bool				m_bAllpoint;
+	CN3UIString* m_pText_NeedGold;
+	bool m_bAllpoint;
 
 public:
 	CUIPointInitDlg();

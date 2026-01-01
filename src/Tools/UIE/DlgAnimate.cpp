@@ -14,15 +14,12 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgAnimate dialog
 
-
-CDlgAnimate::CDlgAnimate(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgAnimate::IDD, pParent)
+CDlgAnimate::CDlgAnimate(CWnd* pParent /*=nullptr*/) : CDialog(CDlgAnimate::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgAnimate)
 	m_iCount = 0;
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgAnimate::DoDataExchange(CDataExchange* pDX)
 {
@@ -33,11 +30,10 @@ void CDlgAnimate::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgAnimate, CDialog)
-	//{{AFX_MSG_MAP(CDlgAnimate)
-		// NOTE: the ClassWizard will add message map macros here
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgAnimate)
+// NOTE: the ClassWizard will add message map macros here
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////

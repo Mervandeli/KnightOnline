@@ -6,45 +6,46 @@
 
 CNpcMagicProcess::CNpcMagicProcess()
 {
-	m_pMain = AIServerApp::instance();
-	m_pSrcNpc = nullptr;
+	m_pMain       = AIServerApp::instance();
+	m_pSrcNpc     = nullptr;
 	m_bMagicState = NONE;
 }
 
 CNpcMagicProcess::~CNpcMagicProcess()
 {
-
 }
 
 void CNpcMagicProcess::MagicPacket(char* pBuf, int len)
 {
-	int index = 0, send_index = 0, magicid = 0, sid = -1, tid = -1, data1 = 0, data2 = 0, data3 = 0, data4 = 0, data5 = 0, data6 = 0;
-	char send_buff[128] = {};
+	int index = 0, send_index = 0, magicid = 0, sid = -1, tid = -1, data1 = 0, data2 = 0, data3 = 0,
+		data4 = 0, data5 = 0, data6 = 0;
+	char send_buff[128]  = {};
 	model::Magic* pTable = nullptr;
 
-	// Get the magic status. 
-	uint8_t command = GetByte(pBuf, index);
+	// Get the magic status.
+	uint8_t command      = GetByte(pBuf, index);
 
 	// Client indicates that magic failed. Just send back packet.
 	if (command == MAGIC_FAIL)
 	{
 		SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
-		SetString(send_buff, pBuf, len - 1, send_index);	// len ==> include WIZ_MAGIC_PROCESS command byte. 
+		SetString(send_buff, pBuf, len - 1,
+			send_index); // len ==> include WIZ_MAGIC_PROCESS command byte.
 		//m_pMain->Send_Region( send_buff, send_index, m_pSrcUser->m_pUserData->m_bZone, m_pSrcUser->m_RegionX, m_pSrcUser->m_RegionZ );
 		m_bMagicState = NONE;
 		return;
 	}
 
-	magicid = GetDWORD(pBuf, index);	// Get ID of magic.
-	sid = GetShort(pBuf, index);		// Get ID of source.
-	tid = GetShort(pBuf, index);		// Get ID of target.
+	magicid = GetDWORD(pBuf, index); // Get ID of magic.
+	sid     = GetShort(pBuf, index); // Get ID of source.
+	tid     = GetShort(pBuf, index); // Get ID of target.
 
-	data1 = GetShort(pBuf, index);		// ( Remember, you don't definately need this. )
-	data2 = GetShort(pBuf, index);		// ( Only use it when you really feel it's needed. )
-	data3 = GetShort(pBuf, index);
-	data4 = GetShort(pBuf, index);
-	data5 = GetShort(pBuf, index);
-	data6 = GetShort(pBuf, index);		// Get data1 ~ data6 (No, I don't know what the hell 'data' is.) 
+	data1   = GetShort(pBuf, index); // ( Remember, you don't definately need this. )
+	data2   = GetShort(pBuf, index); // ( Only use it when you really feel it's needed. )
+	data3   = GetShort(pBuf, index);
+	data4   = GetShort(pBuf, index);
+	data5   = GetShort(pBuf, index);
+	data6  = GetShort(pBuf, index); // Get data1 ~ data6 (No, I don't know what the hell 'data' is.)
 
 	// If magic was successful.......
 	pTable = IsAvailable(magicid, tid, command);
@@ -53,8 +54,8 @@ void CNpcMagicProcess::MagicPacket(char* pBuf, int len)
 
 	if (command == MAGIC_EFFECTING)
 	{
-		// Is target another player? 
-		//if (tid < -1 || tid >= MAX_USER) return;	
+		// Is target another player?
+		//if (tid < -1 || tid >= MAX_USER) return;
 
 		switch (pTable->Type1)
 		{
@@ -145,15 +146,16 @@ void CNpcMagicProcess::MagicPacket(char* pBuf, int len)
 	else if (command == MAGIC_CASTING)
 	{
 		SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
-		SetString(send_buff, pBuf, len - 1, send_index);	// len ==> include WIZ_MAGIC_PROCESS command byte. 
+		SetString(send_buff, pBuf, len - 1,
+			send_index); // len ==> include WIZ_MAGIC_PROCESS command byte.
 		m_pSrcNpc->SendAll(send_buff, send_index);
 	}
 }
 
 model::Magic* CNpcMagicProcess::IsAvailable(int magicid, int tid, uint8_t type)
 {
-	CUser* pUser = nullptr;
-	CNpc* pNpc = nullptr;
+	CUser* pUser         = nullptr;
+	CNpc* pNpc           = nullptr;
 	model::Magic* pTable = nullptr;
 
 	int send_index = 0, moral = 0;
@@ -168,22 +170,19 @@ model::Magic* CNpcMagicProcess::IsAvailable(int magicid, int tid, uint8_t type)
 		goto fail_return;
 
 	// Compare morals between source and target character.
-	if (tid >= 0
-		&& tid < MAX_USER)
+	if (tid >= 0 && tid < MAX_USER)
 	{
 		pUser = m_pMain->GetUserPtr(tid);
-		if (!pUser
-			|| pUser->m_bLive == USER_DEAD)
+		if (!pUser || pUser->m_bLive == USER_DEAD)
 			goto fail_return;
 
 		moral = pUser->m_bNation;
 	}
-	// Compare morals between source and target NPC.            
+	// Compare morals between source and target NPC.
 	else if (tid >= NPC_BAND)
 	{
 		pNpc = m_pMain->_npcMap.GetData(tid - NPC_BAND);
-		if (!pNpc
-			|| pNpc->m_NpcState == NPC_DEAD)
+		if (!pNpc || pNpc->m_NpcState == NPC_DEAD)
 			goto fail_return;
 
 		moral = pNpc->m_byGroup;
@@ -257,9 +256,9 @@ model::Magic* CNpcMagicProcess::IsAvailable(int magicid, int tid, uint8_t type)
 		//m_bMagicState = NONE;
 	}
 
-	return pTable;      // Magic was successful! 
+	return pTable; // Magic was successful!
 
-fail_return:    // In case the magic failed.
+fail_return:       // In case the magic failed.
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 	SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
@@ -277,7 +276,7 @@ fail_return:    // In case the magic failed.
 	SetShort(send_buff, 0, send_index);
 	SetShort(send_buff, 0, send_index);
 
-/*	if( m_bMagicState == CASTING )
+	/*	if( m_bMagicState == CASTING )
 		m_pMain->Send_Region( send_buff, send_index, m_pSrcUser->m_pUserData->m_bZone, m_pSrcUser->m_RegionX, m_pSrcUser->m_RegionZ );
 	else m_pSrcUser->Send( send_buff, send_index );	*/
 
@@ -285,30 +284,33 @@ fail_return:    // In case the magic failed.
 
 	m_bMagicState = NONE;
 
-	return nullptr;     // Magic was a failure!
+	return nullptr; // Magic was a failure!
 }
 
 // Applied to an attack skill using a weapon.
-void CNpcMagicProcess::ExecuteType1(int /*magicid*/, int /*tid*/, int /*data1*/, int /*data2*/, int /*data3*/)
+void CNpcMagicProcess::ExecuteType1(
+	int /*magicid*/, int /*tid*/, int /*data1*/, int /*data2*/, int /*data3*/)
 {
 }
 
-void CNpcMagicProcess::ExecuteType2(int /*magicid*/, int /*tid*/, int /*data1*/, int /*data2*/, int /*data3*/)
+void CNpcMagicProcess::ExecuteType2(
+	int /*magicid*/, int /*tid*/, int /*data1*/, int /*data2*/, int /*data3*/)
 {
 }
 
-void CNpcMagicProcess::ExecuteType3(int magicid, int tid, int data1, int /*data2*/, int data3, int moral)  // Applied when a magical attack, healing, and mana restoration is done.
+void CNpcMagicProcess::ExecuteType3(int magicid, int tid, int data1, int /*data2*/, int data3,
+	int moral) // Applied when a magical attack, healing, and mana restoration is done.
 {
 	int damage = 0, result = 1, send_index = 0;
-	char send_buff[256] = {};
+	char send_buff[256]      = {};
 	model::MagicType3* pType = nullptr;
-	CNpc* pNpc = nullptr;      // Pointer initialization!
-	int dexpoint = 0;
+	CNpc* pNpc               = nullptr; // Pointer initialization!
+	int dexpoint             = 0;
 
-	model::Magic* pMagic = nullptr;
+	model::Magic* pMagic     = nullptr;
 
 	// Get main magic table.
-	pMagic = m_pMain->_magicTableMap.GetData(magicid);
+	pMagic                   = m_pMain->_magicTableMap.GetData(magicid);
 	if (!pMagic)
 		return;
 
@@ -317,9 +319,7 @@ void CNpcMagicProcess::ExecuteType3(int magicid, int tid, int data1, int /*data2
 		goto packet_send;
 
 	pNpc = m_pMain->_npcMap.GetData(tid - NPC_BAND);
-	if (pNpc == nullptr
-		|| pNpc->m_NpcState == NPC_DEAD
-		|| pNpc->m_iHP == 0)
+	if (pNpc == nullptr || pNpc->m_NpcState == NPC_DEAD || pNpc->m_iHP == 0)
 	{
 		result = 0;
 		goto packet_send;
@@ -331,7 +331,7 @@ void CNpcMagicProcess::ExecuteType3(int magicid, int tid, int data1, int /*data2
 		return;
 
 	damage = GetMagicDamage(tid, pType->FirstDamage, pType->Attribute, dexpoint);
-//	if(damage == 0)	damage = -1;
+	//	if(damage == 0)	damage = -1;
 
 	//TRACE(_T("magictype3 ,, magicid=%d, damage=%d\n"), magicid, damage);
 
@@ -348,7 +348,7 @@ void CNpcMagicProcess::ExecuteType3(int magicid, int tid, int data1, int /*data2
 			else
 			{
 				damage = abs(damage);
-/*				if(pType->bAttribute == 3)   attack_type = 3; // 기절시키는 마법이라면.....
+				/*				if(pType->bAttribute == 3)   attack_type = 3; // 기절시키는 마법이라면.....
 				else attack_type = magicid;
 
 				if (!pNpc->SetDamage(attack_type, damage, m_pSrcUser->m_strUserID, m_pSrcUser->m_iUserId + USER_BAND, m_pSrcUser->m_pIocport))	{
@@ -370,7 +370,7 @@ void CNpcMagicProcess::ExecuteType3(int magicid, int tid, int data1, int /*data2
 	}
 
 packet_send:
-	//if ( pMagic->bType2 == 0 || pMagic->bType2 == 3 ) 
+	//if ( pMagic->bType2 == 0 || pMagic->bType2 == 3 )
 	{
 		SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
 		SetByte(send_buff, MAGIC_EFFECTING, send_index);
@@ -386,7 +386,7 @@ packet_send:
 		m_pSrcNpc->SendAll(send_buff, send_index);
 	}
 
-/*	int send_index = 0, result = 1;
+	/*	int send_index = 0, result = 1;
 	char send_buff[256] = {};
 	SetByte( send_buff, AG_MAGIC_ATTACK_RESULT, send_index );
 	SetByte( send_buff, MAGIC_EFFECTING, send_index );
@@ -419,7 +419,8 @@ void CNpcMagicProcess::ExecuteType7(int /*magicid*/)
 }
 
 // Warp, resurrection, and summon spells.
-void CNpcMagicProcess::ExecuteType8(int /*magicid*/, int /*tid*/, int /*sid*/, int /*data1*/, int /*data2*/, int /*data3*/)
+void CNpcMagicProcess::ExecuteType8(
+	int /*magicid*/, int /*tid*/, int /*sid*/, int /*data1*/, int /*data2*/, int /*data3*/)
 {
 }
 
@@ -436,30 +437,25 @@ int16_t CNpcMagicProcess::GetMagicDamage(int tid, int total_hit, int attribute, 
 	int16_t damage = 0;
 	int random = 0, total_r = 0;
 	uint8_t result;
-	bool bSign = true;			// false이면 -, true이면 +
+	bool bSign = true; // false이면 -, true이면 +
 
 	// Check if target id is valid.
-	if (tid < NPC_BAND
-		|| tid > INVALID_BAND)
+	if (tid < NPC_BAND || tid > INVALID_BAND)
 		return 0;
 
 	CNpc* pNpc = nullptr;
-	pNpc = m_pMain->_npcMap.GetData(tid - NPC_BAND);
-	if (pNpc == nullptr
-		|| pNpc->m_NpcState == NPC_DEAD
-		|| pNpc->m_iHP == 0)
+	pNpc       = m_pMain->_npcMap.GetData(tid - NPC_BAND);
+	if (pNpc == nullptr || pNpc->m_NpcState == NPC_DEAD || pNpc->m_iHP == 0)
 		return 0;
 
-	if (pNpc->m_tNpcType == NPC_ARTIFACT
-		|| pNpc->m_tNpcType == NPC_PHOENIX_GATE
-		|| pNpc->m_tNpcType == NPC_GATE_LEVER
-		|| pNpc->m_tNpcType == NPC_SPECIAL_GATE)
+	if (pNpc->m_tNpcType == NPC_ARTIFACT || pNpc->m_tNpcType == NPC_PHOENIX_GATE
+		|| pNpc->m_tNpcType == NPC_GATE_LEVER || pNpc->m_tNpcType == NPC_SPECIAL_GATE)
 		return 0;
 
-	//result = m_pSrcUser->GetHitRate(m_pSrcUser->m_fHitrate / pNpc->m_sEvadeRate ); 
+	//result = m_pSrcUser->GetHitRate(m_pSrcUser->m_fHitrate / pNpc->m_sEvadeRate );
 	result = SUCCESS;
 
-	// In case of SUCCESS (and SUCCESS only!) .... 
+	// In case of SUCCESS (and SUCCESS only!) ....
 	if (result != FAIL)
 	{
 		switch (attribute)
@@ -506,20 +502,20 @@ int16_t CNpcMagicProcess::GetMagicDamage(int tid, int total_hit, int attribute, 
 		if (total_hit < 0)
 		{
 			total_hit = abs(total_hit);
-			bSign = false;
+			bSign     = false;
 		}
 
 		damage = static_cast<int16_t>(total_hit - (0.7f * total_hit * total_r / 200));
 		random = myrand(0, damage);
-		damage = static_cast<int16_t>((0.7f * (total_hit - (0.9f * total_hit * total_r / 200))) + 0.2f * random);
+		damage = static_cast<int16_t>(
+			(0.7f * (total_hit - (0.9f * total_hit * total_r / 200))) + 0.2f * random);
 	}
 	else
 	{
 		damage = 0;
 	}
 
-	if (!bSign
-		&& damage != 0)
+	if (!bSign && damage != 0)
 		damage = -damage;
 
 	return damage;

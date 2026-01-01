@@ -14,7 +14,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -34,18 +34,18 @@ bool CUICreateClanName::Load(File& file)
 {
 	if (!CN3UIBase::Load(file))
 		return false;
-	
-	N3_VERIFY_UI_COMPONENT(m_pText_Title,		GetChildByID<CN3UIString>("Text_Message"));
-	N3_VERIFY_UI_COMPONENT(m_pEdit_ClanName,	GetChildByID<CN3UIEdit>("Edit_Clan"));
+
+	N3_VERIFY_UI_COMPONENT(m_pText_Title, GetChildByID<CN3UIString>("Text_Message"));
+	N3_VERIFY_UI_COMPONENT(m_pEdit_ClanName, GetChildByID<CN3UIEdit>("Edit_Clan"));
 
 	return true;
 }
 
 bool CUICreateClanName::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if (dwMsg == UIMSG_BUTTON_CLICK)					
+	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
-		if(pSender->m_szID == "btn_yes")	
+		if (pSender->m_szID == "btn_yes")
 		{
 			m_szClanName = m_pEdit_ClanName->GetString();
 			if (!MakeClan())
@@ -55,7 +55,7 @@ bool CUICreateClanName::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			return true;
 		}
 
-		if(pSender->m_szID == "btn_no")	
+		if (pSender->m_szID == "btn_no")
 		{
 			SetVisible(false);
 			return true;
@@ -80,8 +80,8 @@ bool CUICreateClanName::MakeClan()
 void CUICreateClanName::MsgSend_MakeClan() const
 {
 	int iLn = static_cast<int>(m_szClanName.size());
-	uint8_t byBuff[40];	// 패킷 버퍼..									
-	int iOffset = 0;	// 패킷 오프셋..									
+	uint8_t byBuff[40]; // 패킷 버퍼..
+	int iOffset = 0;    // 패킷 오프셋..
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_KNIGHTS_PROCESS);
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_KNIGHTS_CREATE);
 	CAPISocket::MP_AddShort(byBuff, iOffset, static_cast<int16_t>(iLn));

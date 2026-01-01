@@ -19,36 +19,36 @@ class CMapMng;
 
 typedef struct __LightObj
 {
-	char		szName[80];
-	CN3Light*	pRefLight;
+	char szName[80];
+	CN3Light* pRefLight;
 
 	__LightObj()
 	{
-		ZeroMemory(szName, 80);		
-	}	
+		ZeroMemory(szName, 80);
+	}
 } LIGHTOBJ, *LPLIGHTOBJ;
 
-const int IDX_CURR_LIGHT = 3;
-const int IDX_SEL_LIGHT = 4;
+const int IDX_CURR_LIGHT    = 3;
+const int IDX_SEL_LIGHT     = 4;
 const int IDX_STANDBY_LIGHT = 5;
 
 class CLightObjMgr : public CN3BaseFileAccess
 {
 public:
-	__Vector3				m_BaseCube[8];
-	__VertexXyzColor		m_CubeVB[36];
-	CDlgLight*				m_pDlg;
+	__Vector3 m_BaseCube[8];
+	__VertexXyzColor m_CubeVB[36];
+	CDlgLight* m_pDlg;
 
-	CMapMng*				m_pRefMapMng;		// 지형 참조 포인터..
-	bool					m_bActive;
+	CMapMng* m_pRefMapMng; // 지형 참조 포인터..
+	bool m_bActive;
 
-	std::list<LIGHTOBJ*>	m_ListObj;
-	LIGHTOBJ*				m_pCurrLO;
+	std::list<LIGHTOBJ*> m_ListObj;
+	LIGHTOBJ* m_pCurrLO;
 
-	int						m_iVersion;
-	
-	CVtxPosDummy			m_VtxPosDummy;
-	__VertexXyzT1			m_vCurrLOPos;
+	int m_iVersion;
+
+	CVtxPosDummy m_VtxPosDummy;
+	__VertexXyzT1 m_vCurrLOPos;
 
 protected:
 	void MakeCube(__Vector3 cv, D3DCOLOR color);
@@ -73,16 +73,19 @@ public:
 	void DeleteLO(LPLIGHTOBJ pLO);
 	void DownLoad();
 	void UpLoad(const char* pName, float fRange, float fAtten, __ColorValue crLgt);
-	
-	bool IsActive() { return m_bActive; }
+
+	bool IsActive()
+	{
+		return m_bActive;
+	}
 	void SetActive(bool active);
 	BOOL MouseMsgFilter(LPMSG pMsg);
 	void Render();
 	void ClearList();
-	
+
 	bool Load(File& file) override;
 	bool Save(File& file) override;
-		
+
 	CLightObjMgr();
 	~CLightObjMgr() override;
 };

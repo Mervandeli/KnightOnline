@@ -13,7 +13,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -22,12 +22,12 @@ static char THIS_FILE[]=__FILE__;
 
 CGameCursor::CGameCursor()
 {
-	m_bCursorLocked		= false;
-	m_eCurGameCursor	= CURSOR_EL_NORMAL;
-	m_ePrevGameCursor	= CURSOR_EL_NORMAL;
-	m_hCursor			= nullptr;
+	m_bCursorLocked   = false;
+	m_eCurGameCursor  = CURSOR_EL_NORMAL;
+	m_ePrevGameCursor = CURSOR_EL_NORMAL;
+	m_hCursor         = nullptr;
 
-	for(int i = 0 ; i < CURSOR_COUNT; i++)
+	for (int i = 0; i < CURSOR_COUNT; i++)
 	{
 		m_pImageCursor[i] = nullptr;
 	}
@@ -35,7 +35,8 @@ CGameCursor::CGameCursor()
 
 CGameCursor::~CGameCursor()
 {
-	if(m_hCursor) ::SetCursor(m_hCursor);
+	if (m_hCursor)
+		::SetCursor(m_hCursor);
 }
 
 bool CGameCursor::Load(File& file)
@@ -58,8 +59,9 @@ bool CGameCursor::Load(File& file)
 
 void CGameCursor::SetGameCursor(e_Cursor eCursor, bool bLocked)
 {
-	if ((m_bCursorLocked) && (!bLocked) ) return;
-	else if ( ((m_bCursorLocked) && bLocked) || ((!m_bCursorLocked) && !bLocked) )
+	if ((m_bCursorLocked) && (!bLocked))
+		return;
+	else if (((m_bCursorLocked) && bLocked) || ((!m_bCursorLocked) && !bLocked))
 	{
 		m_eCurGameCursor = eCursor;
 		return;
@@ -67,14 +69,14 @@ void CGameCursor::SetGameCursor(e_Cursor eCursor, bool bLocked)
 	else if ((!m_bCursorLocked) && bLocked)
 	{
 		m_ePrevGameCursor = m_eCurGameCursor;
-		m_bCursorLocked = true;
-		m_eCurGameCursor = eCursor;
+		m_bCursorLocked   = true;
+		m_eCurGameCursor  = eCursor;
 	}
 }
 
 void CGameCursor::RestoreGameCursor()
 {
-	if (m_bCursorLocked) 
+	if (m_bCursorLocked)
 		m_bCursorLocked = false;
 
 	m_eCurGameCursor = m_ePrevGameCursor;
@@ -82,9 +84,10 @@ void CGameCursor::RestoreGameCursor()
 
 void CGameCursor::Render()
 {
-	if(m_eCurGameCursor >= CURSOR_COUNT) return;
+	if (m_eCurGameCursor >= CURSOR_COUNT)
+		return;
 
-	if(m_pImageCursor[m_eCurGameCursor])
+	if (m_pImageCursor[m_eCurGameCursor])
 	{
 		CGameProcedure::s_pUIMgr->RenderStateSet();
 		DWORD dwZ;
@@ -94,18 +97,19 @@ void CGameCursor::Render()
 		m_pImageCursor[m_eCurGameCursor]->Render();
 		CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, dwZ);
 		CGameProcedure::s_pUIMgr->RenderStateRestore();
-
 	}
 }
 
 void CGameCursor::Tick()
 {
 	HCURSOR hCursor = ::GetCursor();
-	if(hCursor)	::SetCursor(nullptr);
+	if (hCursor)
+		::SetCursor(nullptr);
 
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
-	for(int i = 0 ; i < CURSOR_COUNT; i++)
+	for (int i = 0; i < CURSOR_COUNT; i++)
 	{
-		if(m_pImageCursor[i]) m_pImageCursor[i]->SetPos(ptCur.x, ptCur.y);
+		if (m_pImageCursor[i])
+			m_pImageCursor[i]->SetPos(ptCur.x, ptCur.y);
 	}
 }

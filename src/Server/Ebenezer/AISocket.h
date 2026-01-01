@@ -11,9 +11,9 @@ class EbenezerApp;
 class CAISocket : public TcpClientSocket
 {
 private:
-	EbenezerApp*	_main;
-	CMagicProcess	_magicProcess;
-	int				_zoneNum;
+	EbenezerApp* _main;
+	CMagicProcess _magicProcess;
+	int _zoneNum;
 
 public:
 	int GetZoneNumber() const

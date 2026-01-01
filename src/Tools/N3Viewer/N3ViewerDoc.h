@@ -21,16 +21,14 @@ protected: // create from serialization only
 	CN3ViewerDoc();
 	DECLARE_DYNCREATE(CN3ViewerDoc)
 
-// Attributes
+	// Attributes
 public:
-
-// Operations
+	// Operations
 public:
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CN3ViewerDoc)
-	public:
+public:
 	virtual BOOL OnNewDocument();
 	virtual void Serialize(CArchive& ar);
 	virtual BOOL OnOpenDocument(LPCTSTR lpszPathName);
@@ -38,7 +36,7 @@ public:
 	virtual void OnCloseDocument();
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CN3ViewerDoc();
 #ifdef _DEBUG
@@ -47,8 +45,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CN3ViewerDoc)
 	afx_msg void OnEditInsertCamera();

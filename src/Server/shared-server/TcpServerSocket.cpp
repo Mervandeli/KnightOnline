@@ -2,8 +2,7 @@
 #include "TcpServerSocket.h"
 #include "SocketManager.h"
 
-TcpServerSocket::TcpServerSocket(SocketManager* socketManager)
-	: TcpSocket(socketManager)
+TcpServerSocket::TcpServerSocket(SocketManager* socketManager) : TcpSocket(socketManager)
 {
 }
 
@@ -22,8 +21,7 @@ void TcpServerSocket::Close()
 
 		// Wait until the send chain is complete.
 		// The send chain will trigger this again.
-		if (_sendInProgress
-			|| !_sendQueue.empty())
+		if (_sendInProgress || !_sendQueue.empty())
 			return;
 	}
 
@@ -34,12 +32,13 @@ void TcpServerSocket::Close()
 		if (threadPool == nullptr)
 			return;
 
-		asio::post(*threadPool, std::bind(&SocketManager::OnPostServerSocketClose, _socketManager, this));
+		asio::post(
+			*threadPool, std::bind(&SocketManager::OnPostServerSocketClose, _socketManager, this));
 	}
 	catch (const asio::system_error& ex)
 	{
-		spdlog::error("TcpServerSocket::Close: failed to post close for socketId={}: {}",
-			_socketId, ex.what());
+		spdlog::error("TcpServerSocket::Close: failed to post close for socketId={}: {}", _socketId,
+			ex.what());
 	}
 }
 

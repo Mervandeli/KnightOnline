@@ -17,22 +17,21 @@ protected: // create from serialization only
 	CN3TexViewerDoc();
 	DECLARE_DYNCREATE(CN3TexViewerDoc)
 
-// Attributes
+	// Attributes
 public:
 	CN3Texture* m_pTex;
 	CN3Texture* m_pTexAlpha;
 
-	int				m_nCurFile;
-	CString			m_szPath;
-	CStringArray	m_szFiles;
+	int m_nCurFile;
+	CString m_szPath;
+	CStringArray m_szFiles;
 
-// Operations
+	// Operations
 public:
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CN3TexViewerDoc)
-	public:
+public:
 	virtual BOOL OnNewDocument();
 	virtual BOOL OnOpenDocument(LPCTSTR lpszPathName);
 	virtual BOOL OnSaveDocument(LPCTSTR lpszPathName);
@@ -40,7 +39,7 @@ public:
 	virtual void SetTitle(LPCTSTR lpszTitle);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	void OpenLastFile();
 	void OpenFirstFile();
@@ -54,8 +53,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CN3TexViewerDoc)
 	afx_msg void OnFileSaveAsBitmap();

@@ -16,22 +16,22 @@
 
 #include <list>
 
-struct __InfoTradeSellBBS // 파티 지원 게시판 구조체..
+struct __InfoTradeSellBBS      // 파티 지원 게시판 구조체..
 {
-	std::string szID;			// 파티 이름 문자열
-	std::string szTitle;		// 제목
-	std::string szExplanation;	// 설명
-	int			iPrice;			// 가격
-	int16_t		sIndex;			// 등록 인덱스
-	int16_t		sID;			// 캐릭터 아이디
+	std::string szID;          // 파티 이름 문자열
+	std::string szTitle;       // 제목
+	std::string szExplanation; // 설명
+	int iPrice;                // 가격
+	int16_t sIndex;            // 등록 인덱스
+	int16_t sID;               // 캐릭터 아이디
 
 	void Init()
 	{
-		szID			= "";
-		szTitle			= "";
-		szExplanation	= "";
-		iPrice			= 0;
-		sIndex			= -1;
+		szID          = "";
+		szTitle       = "";
+		szExplanation = "";
+		iPrice        = 0;
+		sIndex        = -1;
 	};
 
 	__InfoTradeSellBBS()
@@ -43,40 +43,40 @@ struct __InfoTradeSellBBS // 파티 지원 게시판 구조체..
 typedef std::list<__InfoTradeSellBBS>::iterator it_TradeSellBBS;
 
 class Packet;
-class CUITradeSellBBS : public CN3UIBase  
+class CUITradeSellBBS : public CN3UIBase
 {
 protected:
-//	class CN3UIList*		m_pList_Infos;
+	//	class CN3UIList*		m_pList_Infos;
 
-	class CN3UIButton*		m_pBtn_PageUp;
-	class CN3UIButton*		m_pBtn_PageDown;
-	class CN3UIButton*		m_pBtn_Refresh;
-	class CN3UIButton*		m_pBtn_Close;
-	class CN3UIButton*		m_pBtn_Register;
-	class CN3UIButton*		m_pBtn_RegisterCancel;
-	class CN3UIButton*		m_pBtn_Whisper;
-	class CN3UIButton*		m_pBtn_Trade;
+	class CN3UIButton* m_pBtn_PageUp;
+	class CN3UIButton* m_pBtn_PageDown;
+	class CN3UIButton* m_pBtn_Refresh;
+	class CN3UIButton* m_pBtn_Close;
+	class CN3UIButton* m_pBtn_Register;
+	class CN3UIButton* m_pBtn_RegisterCancel;
+	class CN3UIButton* m_pBtn_Whisper;
+	class CN3UIButton* m_pBtn_Trade;
 
-	class CN3UIImage*		m_pImage_Sell;
-	class CN3UIImage*		m_pImage_Buy;
-	class CN3UIImage*		m_pImage_Sell_Title;
-	class CN3UIImage*		m_pImage_Buy_Title;
+	class CN3UIImage* m_pImage_Sell;
+	class CN3UIImage* m_pImage_Buy;
+	class CN3UIImage* m_pImage_Sell_Title;
+	class CN3UIImage* m_pImage_Buy_Title;
 
-	class CN3UIString*		m_pString_Page;
-	class CN3UIString*		m_pText[69];
+	class CN3UIString* m_pString_Page;
+	class CN3UIString* m_pText[69];
 
-	CUIMessageBox			m_MsgBox;
-	CUITradeExplanation		m_UIExplanation;
+	CUIMessageBox m_MsgBox;
+	CUITradeExplanation m_UIExplanation;
 
-	std::list<__InfoTradeSellBBS>	m_Datas;
-	__InfoTradeSellBBS				m_ITSB;
+	std::list<__InfoTradeSellBBS> m_Datas;
+	__InfoTradeSellBBS m_ITSB;
 
-	int			m_iCurPage; // 현재 페이지..
-	int			m_iMaxPage;	// 총 페이지..
-	bool		m_bProcessing;
-	uint8_t		m_byBBSKind;
-	int			m_iCurIndex;
-	float		m_fTime;
+	int m_iCurPage; // 현재 페이지..
+	int m_iMaxPage; // 총 페이지..
+	bool m_bProcessing;
+	uint8_t m_byBBSKind;
+	int m_iCurIndex;
+	float m_fTime;
 
 public:
 	void SetContentString();
@@ -101,7 +101,10 @@ public:
 	void MsgRecv_TradeBBS(Packet& pkt);
 	void SetContentString(int iIndex, std::string szID, int iPrice, std::string szTitle);
 
-	void SetBBSKind(uint8_t byKind){ m_byBBSKind = byKind; }
+	void SetBBSKind(uint8_t byKind)
+	{
+		m_byBBSKind = byKind;
+	}
 	bool Load(File& file) override;
 	bool ReceiveMessage(class CN3UIBase* pSender, uint32_t dwMsg) override;
 	void SetVisible(bool bVisible) override;

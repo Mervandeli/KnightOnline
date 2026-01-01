@@ -14,7 +14,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -24,44 +24,44 @@ static char THIS_FILE[]=__FILE__;
 
 CWallMgr::CWallMgr()
 {
-	m_BaseCube[0].Set(0, 1, 0);	// 앞쪽 LT
-	m_BaseCube[1].Set(1, 1, 0);	// 앞쪽 RT
+	m_BaseCube[0].Set(0, 1, 0); // 앞쪽 LT
+	m_BaseCube[1].Set(1, 1, 0); // 앞쪽 RT
 	m_BaseCube[2].Set(0, 0, 0); // 앞쪽 LB
 	m_BaseCube[3].Set(1, 0, 0); // 앞쪽 RB
 	m_BaseCube[4].Set(0, 1, 1); // 뒤쪽 LT
 	m_BaseCube[5].Set(1, 1, 1); // 뒤쪽 RT
 	m_BaseCube[6].Set(0, 0, 1); // 뒤쪽 LB
-	m_BaseCube[7].Set(1, 0, 1);	// 뒤쪽 RB
-	
-	m_pRefMapMng = nullptr;	// 지형 참조 포인터..
-	m_pWalls.clear();		// 벽들...
+	m_BaseCube[7].Set(1, 0, 1); // 뒤쪽 RB
+
+	m_pRefMapMng = nullptr;     // 지형 참조 포인터..
+	m_pWalls.clear();           // 벽들...
 
 	m_pDlg = new CDlgMakeWall;
 	m_pDlg->Create(IDD_MAKE_WALL);
 	m_pDlg->ShowWindow(FALSE);
 	m_pDlg->m_pRefWallMgr = this;
 
-	m_bActive = false; // 이기능이 활성화 되어 있는지...1:활성화, 0:비활성화..
-	m_pCurrWall = nullptr;
+	m_bActive             = false; // 이기능이 활성화 되어 있는지...1:활성화, 0:비활성화..
+	m_pCurrWall           = nullptr;
 }
 
 CWallMgr::~CWallMgr()
 {
 	std::list<CWall*>::iterator it;
-	for(it = m_pWalls.begin(); it != m_pWalls.end(); it++)
+	for (it = m_pWalls.begin(); it != m_pWalls.end(); it++)
 	{
 		delete (*it);
 		(*it) = nullptr;
 	}
 	m_pWalls.clear();
 
-	if(m_pCurrWall)
+	if (m_pCurrWall)
 	{
 		delete m_pCurrWall;
 		m_pCurrWall = nullptr;
 	}
 
-	if(m_pDlg) 
+	if (m_pDlg)
 	{
 		m_pDlg->DestroyWindow();
 		delete m_pDlg;
@@ -93,47 +93,47 @@ void CWallMgr::MakeCube(__Vector3 cv, D3DCOLOR color)
 	cv.z -= 0.5f;
 
 	//front lt...
-	tmp = cv + m_BaseCube[0];
-	m_CubeVB[0].Set(tmp.x, tmp.y, tmp.z, color);			
+	tmp   = cv + m_BaseCube[0];
+	m_CubeVB[0].Set(tmp.x, tmp.y, tmp.z, color);
 	tmp = cv + m_BaseCube[1];
-	m_CubeVB[1].Set(tmp.x, tmp.y, tmp.z, color);			
+	m_CubeVB[1].Set(tmp.x, tmp.y, tmp.z, color);
 	tmp = cv + m_BaseCube[2];
 	m_CubeVB[2].Set(tmp.x, tmp.y, tmp.z, color);
-	
+
 	//front rb...
 	m_CubeVB[3] = m_CubeVB[2];
 	m_CubeVB[4] = m_CubeVB[1];
-	tmp = cv + m_BaseCube[3];
+	tmp         = cv + m_BaseCube[3];
 	m_CubeVB[5].Set(tmp.x, tmp.y, tmp.z, color);
 
 	//right lt..
 	m_CubeVB[6] = m_CubeVB[1];
-	tmp = cv + m_BaseCube[5];
+	tmp         = cv + m_BaseCube[5];
 	m_CubeVB[7].Set(tmp.x, tmp.y, tmp.z, color);
-	m_CubeVB[8] = m_CubeVB[5];
+	m_CubeVB[8]  = m_CubeVB[5];
 
 	//right rb..
-	m_CubeVB[9] = m_CubeVB[8]; 
+	m_CubeVB[9]  = m_CubeVB[8];
 	m_CubeVB[10] = m_CubeVB[7];
-	tmp = cv + m_BaseCube[7];
+	tmp          = cv + m_BaseCube[7];
 	m_CubeVB[11].Set(tmp.x, tmp.y, tmp.z, color);
 
 	//back lt..
 	m_CubeVB[12] = m_CubeVB[7];
-	tmp = cv + m_BaseCube[4];
+	tmp          = cv + m_BaseCube[4];
 	m_CubeVB[13].Set(tmp.x, tmp.y, tmp.z, color);
 	m_CubeVB[14] = m_CubeVB[11];
 
 	//back rb..
 	m_CubeVB[15] = m_CubeVB[14];
 	m_CubeVB[16] = m_CubeVB[13];
-	tmp = cv + m_BaseCube[6];
+	tmp          = cv + m_BaseCube[6];
 	m_CubeVB[17].Set(tmp.x, tmp.y, tmp.z, color);
 
 	//left lt..
 	m_CubeVB[18] = m_CubeVB[13];
 	m_CubeVB[19] = m_CubeVB[0];
-	m_CubeVB[20] = m_CubeVB[17];			
+	m_CubeVB[20] = m_CubeVB[17];
 
 	//left rb..
 	m_CubeVB[21] = m_CubeVB[20];
@@ -143,7 +143,7 @@ void CWallMgr::MakeCube(__Vector3 cv, D3DCOLOR color)
 	//top lt..
 	m_CubeVB[24] = m_CubeVB[13];
 	m_CubeVB[25] = m_CubeVB[12];
-	m_CubeVB[26] = m_CubeVB[0];			
+	m_CubeVB[26] = m_CubeVB[0];
 
 	//top rb..
 	m_CubeVB[27] = m_CubeVB[26];
@@ -153,7 +153,7 @@ void CWallMgr::MakeCube(__Vector3 cv, D3DCOLOR color)
 	//bottom lt..
 	m_CubeVB[30] = m_CubeVB[2];
 	m_CubeVB[31] = m_CubeVB[5];
-	m_CubeVB[32] = m_CubeVB[17];			
+	m_CubeVB[32] = m_CubeVB[17];
 
 	//botom rb..
 	m_CubeVB[33] = m_CubeVB[32];
@@ -165,15 +165,16 @@ void CWallMgr::MakeCube(__Vector3 cv, D3DCOLOR color)
 
 void CWallMgr::SetActive(bool active)
 {
-	if(m_bActive==active) return;
+	if (m_bActive == active)
+		return;
 	m_bActive = active;
 
-	if(active)
+	if (active)
 	{
 		m_pDlg->ShowWindow(TRUE);
 
 		CWall* pWall = new CWall;
-		if(m_pCurrWall)
+		if (m_pCurrWall)
 		{
 			delete m_pCurrWall;
 			m_pCurrWall = nullptr;
@@ -184,7 +185,7 @@ void CWallMgr::SetActive(bool active)
 	{
 		m_pDlg->ShowWindow(FALSE);
 
-		if(m_pCurrWall)
+		if (m_pCurrWall)
 		{
 			delete m_pCurrWall;
 			m_pCurrWall = nullptr;
@@ -194,28 +195,31 @@ void CWallMgr::SetActive(bool active)
 
 BOOL CWallMgr::MouseMsgFilter(LPMSG pMsg)
 {
-	if(!m_pRefMapMng) return FALSE;
+	if (!m_pRefMapMng)
+		return FALSE;
 	CLyTerrain* pRefTerrain = m_pRefMapMng->GetTerrain();
-	if(!m_bActive || !pRefTerrain) return FALSE;
+	if (!m_bActive || !pRefTerrain)
+		return FALSE;
 
-	switch(pMsg->message)
+	switch (pMsg->message)
 	{
-	case WM_LBUTTONUP:
+		case WM_LBUTTONUP:
 		{
-			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
+			POINT point = { short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam)) };
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
+			if (!pRefTerrain->Pick(point.x, point.y, &vec, nullptr))
+				break;
 
-			m_pCurrWall->AddVertex(vec);			
+			m_pCurrWall->AddVertex(vec);
 		}
-		return TRUE;
+			return TRUE;
 
-	case WM_RBUTTONUP:
+		case WM_RBUTTONUP:
 		{
 			m_pCurrWall->DelPrevVertex();
 		}
-		return TRUE;
+			return TRUE;
 	}
 	return TRUE;
 }
@@ -227,9 +231,9 @@ void CWallMgr::Render()
 
 	__Matrix44 mtx;
 	mtx.Identity();
-		
+
 	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, mtx.toD3D()); // 월드 행렬 적용..
-	
+
 	// set texture
 	hr = s_lpD3DDev->SetTexture(0, nullptr);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
@@ -246,7 +250,6 @@ void CWallMgr::Render()
 	hr = s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, FALSE);
 	hr = s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
-
 	hr = s_lpD3DDev->SetFVF(FVF_XYZCOLOR);
 
 	//이미 만들어진 길 그리기...
@@ -256,71 +259,82 @@ void CWallMgr::Render()
 	CWall* pWall;
 	__Vector3 PrevVertex, Vertex;
 
-	for(itWall = m_pWalls.begin(); itWall != m_pWalls.end(); itWall++)
+	for (itWall = m_pWalls.begin(); itWall != m_pWalls.end(); itWall++)
 	{
 		pWall = (*itWall);
-		if(!pWall) continue;
-		
-		for(itVertex = pWall->m_Wall.begin(); itVertex != pWall->m_Wall.end(); itVertex++)
+		if (!pWall)
+			continue;
+
+		for (itVertex = pWall->m_Wall.begin(); itVertex != pWall->m_Wall.end(); itVertex++)
 		{
-			Vertex = (*itVertex);
+			Vertex    = (*itVertex);
 			Vertex.y += .5f;
-									
-			if(itVertex==pWall->m_Wall.begin()) PrevVertex = Vertex;
-			
+
+			if (itVertex == pWall->m_Wall.begin())
+				PrevVertex = Vertex;
+
 			MakeLine(PrevVertex, Vertex, 0xff0000ff);
 			MakeCube(Vertex, 0xff0000ff);
 			MakeBoard(PrevVertex, Vertex, 0xff0000ff);
-						
+
 			hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 1, m_LineVB, sizeof(__VertexXyzColor));
-			hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 12, m_CubeVB, sizeof(__VertexXyzColor));
-			hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, m_BoardVB, sizeof(__VertexXyzColor));
-			
+			hr = s_lpD3DDev->DrawPrimitiveUP(
+				D3DPT_TRIANGLELIST, 12, m_CubeVB, sizeof(__VertexXyzColor));
+			hr = s_lpD3DDev->DrawPrimitiveUP(
+				D3DPT_TRIANGLEFAN, 2, m_BoardVB, sizeof(__VertexXyzColor));
+
 			PrevVertex = Vertex;
 		}
 	}
 
 	//다이얼로그 창에서 선택된 길 그리기..
 	CWall* pSelWall = m_pDlg->m_pSelWall;
-	if(pSelWall)
+	if (pSelWall)
 	{
-		for(itVertex = pSelWall->m_Wall.begin(); itVertex != pSelWall->m_Wall.end(); itVertex++)
+		for (itVertex = pSelWall->m_Wall.begin(); itVertex != pSelWall->m_Wall.end(); itVertex++)
 		{
-			Vertex = (*itVertex);
+			Vertex    = (*itVertex);
 			Vertex.y += .5f;
 
-			if(itVertex==pSelWall->m_Wall.begin()) PrevVertex = Vertex;
+			if (itVertex == pSelWall->m_Wall.begin())
+				PrevVertex = Vertex;
 
 			MakeLine(PrevVertex, Vertex, 0xff00ff00);
 			MakeCube(Vertex, 0xff00ff00);
 			MakeBoard(PrevVertex, Vertex, 0xff00ff00);
-			
+
 			hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 1, m_LineVB, sizeof(__VertexXyzColor));
-			hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 12, m_CubeVB, sizeof(__VertexXyzColor));
-			hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, m_BoardVB, sizeof(__VertexXyzColor));
-			
+			hr = s_lpD3DDev->DrawPrimitiveUP(
+				D3DPT_TRIANGLELIST, 12, m_CubeVB, sizeof(__VertexXyzColor));
+			hr = s_lpD3DDev->DrawPrimitiveUP(
+				D3DPT_TRIANGLEFAN, 2, m_BoardVB, sizeof(__VertexXyzColor));
+
 			PrevVertex = Vertex;
 		}
 	}
 
 	//만들고 있는 길 & 영역 그리기..
-	if(m_pCurrWall)
+	if (m_pCurrWall)
 	{
-		for(itVertex = m_pCurrWall->m_Wall.begin(); itVertex != m_pCurrWall->m_Wall.end(); itVertex++)
+		for (itVertex = m_pCurrWall->m_Wall.begin(); itVertex != m_pCurrWall->m_Wall.end();
+			itVertex++)
 		{
-			Vertex = (*itVertex);
+			Vertex    = (*itVertex);
 			Vertex.y += .5f;
 
-			if(itVertex==m_pCurrWall->m_Wall.begin()) PrevVertex = Vertex;
+			if (itVertex == m_pCurrWall->m_Wall.begin())
+				PrevVertex = Vertex;
 
 			MakeLine(PrevVertex, Vertex, 0xffff0000);
 			MakeCube(Vertex, 0xffff0000);
 			MakeBoard(PrevVertex, Vertex, 0xffff0000);
-			
+
 			hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 1, m_LineVB, sizeof(__VertexXyzColor));
-			hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 12, m_CubeVB, sizeof(__VertexXyzColor));
-			hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, m_BoardVB, sizeof(__VertexXyzColor));
-			
+			hr = s_lpD3DDev->DrawPrimitiveUP(
+				D3DPT_TRIANGLELIST, 12, m_CubeVB, sizeof(__VertexXyzColor));
+			hr = s_lpD3DDev->DrawPrimitiveUP(
+				D3DPT_TRIANGLEFAN, 2, m_BoardVB, sizeof(__VertexXyzColor));
+
 			PrevVertex = Vertex;
 		}
 	}
@@ -333,19 +347,19 @@ void CWallMgr::Render()
 
 void CWallMgr::SetCurrWall(CWall* pWall)
 {
-	if(m_pCurrWall)
+	if (m_pCurrWall)
 	{
 		delete m_pCurrWall;
 		m_pCurrWall = nullptr;
 	}
 
 	std::list<CWall*>::iterator itWall;
-	
+
 	m_pCurrWall = pWall;
-	
-	for(itWall = m_pWalls.begin(); itWall != m_pWalls.end(); itWall++)
+
+	for (itWall = m_pWalls.begin(); itWall != m_pWalls.end(); itWall++)
 	{
-		if(pWall == (*itWall))
+		if (pWall == (*itWall))
 		{
 			m_pWalls.erase(itWall);
 			return;
@@ -355,13 +369,12 @@ void CWallMgr::SetCurrWall(CWall* pWall)
 
 CWall* CWallMgr::GetpWall(int idx)
 {
-	if (idx < 0
-		|| idx >= static_cast<int>(m_pWalls.size()))
+	if (idx < 0 || idx >= static_cast<int>(m_pWalls.size()))
 		return nullptr;
 
 	std::list<CWall*>::iterator itWall;
 	itWall = m_pWalls.begin();
-	for(int i=0;i<idx;i++)
+	for (int i = 0; i < idx; i++)
 	{
 		itWall++;
 	}
@@ -374,16 +387,16 @@ void CWallMgr::UpdateWall()
 	m_pWalls.push_back(m_pCurrWall);
 
 	CWall* pWall = new CWall;
-	m_pCurrWall = pWall;	
+	m_pCurrWall  = pWall;
 }
 
 void CWallMgr::DelWall(CWall* pWall)
 {
 	std::list<CWall*>::iterator itWall;
-	
-	for(itWall = m_pWalls.begin(); itWall != m_pWalls.end(); itWall++)
+
+	for (itWall = m_pWalls.begin(); itWall != m_pWalls.end(); itWall++)
 	{
-		if(pWall == (*itWall))
+		if (pWall == (*itWall))
 		{
 			delete pWall;
 			m_pWalls.erase(itWall);
@@ -392,13 +405,13 @@ void CWallMgr::DelWall(CWall* pWall)
 	}
 }
 
-
 void CWallMgr::SetFocus(CWall* pWall)
 {
-	if(!m_pRefMapMng || !pWall) return;
+	if (!m_pRefMapMng || !pWall)
+		return;
 
 	__Vector3 vec;
-	if(pWall->GetVertex(0, &vec))
+	if (pWall->GetVertex(0, &vec))
 	{
 		m_pRefMapMng->FocusAt(vec);
 	}
@@ -445,28 +458,28 @@ void CWallMgr::AddWall2Coll(CN3ShapeMgr* pShapeMgr)
 	std::list<__Vector3>::iterator itVertex;
 
 	CWall* pWall;
-	__Vector3 PrevVertex(0,0,0), Vertex(0,0,0);
+	__Vector3 PrevVertex(0, 0, 0), Vertex(0, 0, 0);
 	__Vector3 v1, v2, v3;
 
 	// Let's embed it as a text file...
 	FILE* stream = fopen("c:\\Wall_info.txt", "w");
 
 	fprintf(stream, "Walls = %zu\n", m_pWalls.size());
-	for(itWall = m_pWalls.begin(); itWall != m_pWalls.end(); itWall++)
+	for (itWall = m_pWalls.begin(); itWall != m_pWalls.end(); itWall++)
 	{
 		pWall = (*itWall);
-		if(!pWall)
+		if (!pWall)
 		{
 			fprintf(stream, "I do not have a wall ... but I try\n");
 			continue;
 		}
 
 		fprintf(stream, "wall = %zu\n", pWall->m_Wall.size());
-		for(itVertex = pWall->m_Wall.begin(); itVertex != pWall->m_Wall.end(); itVertex++)
+		for (itVertex = pWall->m_Wall.begin(); itVertex != pWall->m_Wall.end(); itVertex++)
 		{
 			Vertex = (*itVertex);
-												
-			if(itVertex==pWall->m_Wall.begin())
+
+			if (itVertex == pWall->m_Wall.begin())
 			{
 				PrevVertex = Vertex;
 				continue;
@@ -476,20 +489,24 @@ void CWallMgr::AddWall2Coll(CN3ShapeMgr* pShapeMgr)
 			//v2.Set( Vertex.x, Vertex.y + 1000.0f, Vertex.z);
 			//v3.Set( Vertex.x, Vertex.y - 1000.0f, Vertex.z);
 
-			v1.Set( PrevVertex.x, 5000.0f, PrevVertex.z);
-			v2.Set( Vertex.x, 5000.0f, Vertex.z);
-			v3.Set( Vertex.x, -5000.0f, Vertex.z);
+			v1.Set(PrevVertex.x, 5000.0f, PrevVertex.z);
+			v2.Set(Vertex.x, 5000.0f, Vertex.z);
+			v3.Set(Vertex.x, -5000.0f, Vertex.z);
 
-			if(!pShapeMgr->AddCollisionTriangle(v1, v2, v3)) fprintf(stream, "I did not put in the wall\n");
-			if(!pShapeMgr->AddCollisionTriangle(v1, v3, v2)) fprintf(stream, "I did not put in the wall\n");
-			
-			v1.Set( PrevVertex.x, 5000.0f, PrevVertex.z);
-			v2.Set( Vertex.x, -5000.0f, Vertex.z);
-			v3.Set( PrevVertex.x, -5000.0f, PrevVertex.z);
+			if (!pShapeMgr->AddCollisionTriangle(v1, v2, v3))
+				fprintf(stream, "I did not put in the wall\n");
+			if (!pShapeMgr->AddCollisionTriangle(v1, v3, v2))
+				fprintf(stream, "I did not put in the wall\n");
 
-			if(!pShapeMgr->AddCollisionTriangle(v1, v2, v3)) fprintf(stream, "I did not put in the wall\n");
-			if(!pShapeMgr->AddCollisionTriangle(v1, v3, v2)) fprintf(stream, "I did not put in the wall\n");
-						
+			v1.Set(PrevVertex.x, 5000.0f, PrevVertex.z);
+			v2.Set(Vertex.x, -5000.0f, Vertex.z);
+			v3.Set(PrevVertex.x, -5000.0f, PrevVertex.z);
+
+			if (!pShapeMgr->AddCollisionTriangle(v1, v2, v3))
+				fprintf(stream, "I did not put in the wall\n");
+			if (!pShapeMgr->AddCollisionTriangle(v1, v3, v2))
+				fprintf(stream, "I did not put in the wall\n");
+
 			PrevVertex = Vertex;
 		}
 	}

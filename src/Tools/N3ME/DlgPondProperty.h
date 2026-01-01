@@ -14,19 +14,19 @@
 class CPondMng;
 class CPondMesh;
 
-
 class CDlgPondProperty : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgPondProperty(CPondMng* pPondMng, CWnd* pParent = nullptr);   // standard constructor
+	CDlgPondProperty(CPondMng* pPondMng, CWnd* pParent = nullptr); // standard constructor
 
-// Attributes
+	// Attributes
 public:
 	BOOL m_IsModalDialog;
+
 protected:
-	CPondMng*	m_pPondMng;
-// Operations
+	CPondMng* m_pPondMng;
+	// Operations
 public:
 	void UpdateInfo();
 	void UpdateWaterLength(CPondMesh* pSelPond);
@@ -34,27 +34,28 @@ public:
 	void PondComboSetting();
 
 public:
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgPondProperty)
-	enum { IDD = IDD_POND_PROPERTY };
-	CPropertyList	m_LPPond;
-	CComboBox		m_ComGoPond;
-	float			m_fWidthLength;
-	float			m_fHeightLength;
+	enum
+	{
+		IDD = IDD_POND_PROPERTY
+	};
+	CPropertyList m_LPPond;
+	CComboBox m_ComGoPond;
+	float m_fWidthLength;
+	float m_fHeightLength;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgPondProperty)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 protected:
-
 	// Generated message map functions
 	//{{AFX_MSG(CDlgPondProperty)
 	virtual BOOL OnInitDialog();

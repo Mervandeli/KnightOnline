@@ -7,7 +7,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -17,14 +17,14 @@ static char THIS_FILE[]=__FILE__;
 CN3Joint::CN3Joint()
 {
 	m_dwType |= OBJ_JOINT;
-	
-	m_qOrient.Identity();		// Joint Orient Quaternion
+
+	m_qOrient.Identity(); // Joint Orient Quaternion
 	m_pParent = nullptr;
 }
 
 CN3Joint::~CN3Joint()
 {
-	for(it_Joint it = m_Children.begin(), itEnd = m_Children.end(); it != itEnd; it++)
+	for (it_Joint it = m_Children.begin(), itEnd = m_Children.end(); it != itEnd; it++)
 	{
 		delete *it;
 	}
@@ -33,10 +33,10 @@ CN3Joint::~CN3Joint()
 
 void CN3Joint::Release()
 {
-	m_qOrient.Identity();		// Joint Orient Quaternion
-	m_KeyOrient.Release();		// Joint Orient 키값... nullptr 이면 없는거다..
-	
-	for(it_Joint it = m_Children.begin(), itEnd = m_Children.end(); it != itEnd; it++)
+	m_qOrient.Identity();  // Joint Orient Quaternion
+	m_KeyOrient.Release(); // Joint Orient 키값... nullptr 이면 없는거다..
+
+	for (it_Joint it = m_Children.begin(), itEnd = m_Children.end(); it != itEnd; it++)
 	{
 		delete *it;
 	}
@@ -68,8 +68,8 @@ bool CN3Joint::Load(File& file)
 bool CN3Joint::Save(File& file)
 {
 	CN3Transform::Save(file);
-	
-	m_KeyOrient.Save(file); // 
+
+	m_KeyOrient.Save(file); //
 
 	int iSize = static_cast<int>(m_Children.size());
 	file.Write(&iSize, 4);
@@ -84,7 +84,6 @@ bool CN3Joint::Save(File& file)
 }
 #endif // end of _N3TOOL
 
-
 #ifdef _N3TOOL
 void CN3Joint::Render(const __Matrix44* pMtxParent, float fUnitSize)
 {
@@ -93,16 +92,20 @@ void CN3Joint::Render(const __Matrix44* pMtxParent, float fUnitSize)
 	s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
 	s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
 	s_lpD3DDev->GetRenderState(D3DRS_LIGHTING, &dwLight);
-	
-	if(dwZ) s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, FALSE);
-	if(dwFog) s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, FALSE);
-	if(dwAlpha) s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-	if(dwLight) s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, FALSE);
+
+	if (dwZ)
+		s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, FALSE);
+	if (dwFog)
+		s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, FALSE);
+	if (dwAlpha)
+		s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	if (dwLight)
+		s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, FALSE);
 
 	static __Matrix44 stm;
 	static __Material smtl;
 	static bool bInit = false;
-	if(false == bInit)
+	if (false == bInit)
 	{
 		stm.Identity();
 		smtl.Init();
@@ -113,14 +116,14 @@ void CN3Joint::Render(const __Matrix44* pMtxParent, float fUnitSize)
 	s_lpD3DDev->SetMaterial(&smtl);
 	s_lpD3DDev->SetTexture(0, nullptr);
 
-	if(m_pParent) // 부모 관절과 이어주는 선..
+	if (m_pParent) // 부모 관절과 이어주는 선..
 	{
 		static __Vector3 v[2];
 		static __VertexColor vBone[2];
-	
+
 		v[0] = m_pParent->m_Matrix.Pos();
 		v[1] = m_Matrix.Pos();
-		if(pMtxParent)
+		if (pMtxParent)
 		{
 			v[0] *= *pMtxParent;
 			v[1] *= *pMtxParent;
@@ -136,12 +139,12 @@ void CN3Joint::Render(const __Matrix44* pMtxParent, float fUnitSize)
 	static __VertexColor vBoxes[36];
 	static __VertexColor vAxis[6];
 	static bool bBoxCreated = false;
-	if(false == bBoxCreated)
+	if (false == bBoxCreated)
 	{
 		CN3Mesh mesh;
 		mesh.Create_Cube(__Vector3(-0.5f, -0.5f, -0.5f), __Vector3(0.5f, 0.5f, 0.5f));
 		__VertexT1* pVSrc = mesh.Vertices();
-		for(int i = 0; i < 36; i++)
+		for (int i = 0; i < 36; i++)
 		{
 			vBoxes[i].Set(pVSrc[i].x, pVSrc[i].y, pVSrc[i].z, 0xff00ff00);
 		}
@@ -159,22 +162,29 @@ void CN3Joint::Render(const __Matrix44* pMtxParent, float fUnitSize)
 
 	__Matrix44 mtxAxis, mtxBox;
 	mtxBox.Scale(fUnitSize, fUnitSize, fUnitSize);
-	if(m_Children.size() > 0) mtxAxis.Scale(fUnitSize*2, fUnitSize*2, fUnitSize*2);
-	else mtxAxis.Scale(fUnitSize*12, fUnitSize*12, fUnitSize*12);
+	if (m_Children.size() > 0)
+		mtxAxis.Scale(fUnitSize * 2, fUnitSize * 2, fUnitSize * 2);
+	else
+		mtxAxis.Scale(fUnitSize * 12, fUnitSize * 12, fUnitSize * 12);
 
-	mtxBox *= m_Matrix;
+	mtxBox  *= m_Matrix;
 	mtxAxis *= m_Matrix;
 
 	s_lpD3DDev->SetFVF(FVF_CV);
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, mtxBox.toD3D());
-	s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 12, vBoxes, sizeof(__VertexColor)); // 박스 그리기..
+	s_lpD3DDev->DrawPrimitiveUP(
+		D3DPT_TRIANGLELIST, 12, vBoxes, sizeof(__VertexColor));                   // 박스 그리기..
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, mtxAxis.toD3D());
 	s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 3, vAxis, sizeof(__VertexColor)); // 축 그리기..
 
-	if(dwZ) s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, dwZ);
-	if(dwFog) s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, dwFog);
-	if(dwAlpha) s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlpha);
-	if(dwLight) s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, dwLight);
+	if (dwZ)
+		s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, dwZ);
+	if (dwFog)
+		s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, dwFog);
+	if (dwAlpha)
+		s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlpha);
+	if (dwLight)
+		s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, dwLight);
 
 	for (CN3Joint* pChild : m_Children)
 	{
@@ -184,7 +194,7 @@ void CN3Joint::Render(const __Matrix44* pMtxParent, float fUnitSize)
 }
 #endif // end of _N3TOOL
 
-void CN3Joint::ChildAdd(CN3Joint *pChild)
+void CN3Joint::ChildAdd(CN3Joint* pChild)
 {
 	__ASSERT(pChild, "Child joint pointer is NULL!");
 
@@ -204,7 +214,7 @@ void CN3Joint::ChildDelete(CN3Joint* pChild)
 		return;
 
 	auto it = m_Children.begin(), itEnd = m_Children.end();
-	for (; it != itEnd; )
+	for (; it != itEnd;)
 	{
 		if (*it == pChild)
 		{
@@ -244,24 +254,26 @@ void CN3Joint::NodeCount(int& nCount)
 }
 
 #ifdef _N3TOOL
-BOOL CN3Joint::FindPointerByName(const std::string& szName, CN3Joint *&pJoint) // 이름을 넣으면 해당 노드의 포인터를 돌려준다..
+BOOL CN3Joint::FindPointerByName(
+	const std::string& szName, CN3Joint*& pJoint) // 이름을 넣으면 해당 노드의 포인터를 돌려준다..
 {
-	if(szName.empty())
+	if (szName.empty())
 	{
 		pJoint = nullptr;
 		return FALSE;
 	}
 
-	if(m_szName == szName) return TRUE;
+	if (m_szName == szName)
+		return TRUE;
 	pJoint = this;
-		
+
 	for (CN3Joint* pChild : m_Children)
 	{
 		__ASSERT(pChild, "Child joint pointer is NULL!");
 		if (pChild->FindPointerByName(szName, pJoint))
 			return TRUE;
 	}
-	
+
 	return FALSE;
 }
 #endif // end of _N3TOOL
@@ -289,24 +301,25 @@ BOOL CN3Joint::FindPointerByID(int nID, CN3Joint*& pJoint)
 }
 
 #ifdef _N3TOOL
-BOOL CN3Joint::FindIndex(const std::string& szName, int &nIndex)
+BOOL CN3Joint::FindIndex(const std::string& szName, int& nIndex)
 {
-	if(szName.empty())
+	if (szName.empty())
 	{
 		nIndex = -1;
 		return FALSE;
 	}
 
-	if(m_szName == szName) return TRUE;
+	if (m_szName == szName)
+		return TRUE;
 	nIndex++;
-		
+
 	for (CN3Joint* pChild : m_Children)
 	{
 		__ASSERT(pChild, "Child joint pointer is NULL!");
 		if (pChild->FindIndex(szName, nIndex))
 			return TRUE;
 	}
-	
+
 	return FALSE;
 }
 #endif // end of _N3TOOL
@@ -330,7 +343,8 @@ void CN3Joint::Tick(float fFrm)
 bool CN3Joint::TickAnimationKey(float fFrm)
 {
 	bool bNeedReCalcMatrix = CN3Transform::TickAnimationKey(fFrm);
-	if(m_KeyOrient.DataGet(fFrm, m_qOrient)) bNeedReCalcMatrix = true;
+	if (m_KeyOrient.DataGet(fFrm, m_qOrient))
+		bNeedReCalcMatrix = true;
 
 	return bNeedReCalcMatrix;
 }
@@ -338,38 +352,39 @@ bool CN3Joint::TickAnimationKey(float fFrm)
 void CN3Joint::ReCalcMatrix()
 {
 	__Matrix44 mtx;
-//	원래 행렬 계산 코드...
-//	m_Matrix.Identity();
-//	mtx.Rotation(m_vRot.x, m_vRot.y, m_vRot.z); m_Matrix *= mtx; // 부모 축 만큼 회전.
-//	mtx.Scale(m_vScale); m_Matrix *= mtx; // 부모 축 만큼 회전.
-//	mtx.Rotation(m_vOrigin.x, m_vOrigin.y, m_vOrigin.z); m_Matrix *= mtx; // 부모 로컬 축 만큼 회전.
-//	mtx.Identity(); mtx.PosSet(m_vPos); m_Matrix *= mtx; // 이동
+	//	원래 행렬 계산 코드...
+	//	m_Matrix.Identity();
+	//	mtx.Rotation(m_vRot.x, m_vRot.y, m_vRot.z); m_Matrix *= mtx; // 부모 축 만큼 회전.
+	//	mtx.Scale(m_vScale); m_Matrix *= mtx; // 부모 축 만큼 회전.
+	//	mtx.Rotation(m_vOrigin.x, m_vOrigin.y, m_vOrigin.z); m_Matrix *= mtx; // 부모 로컬 축 만큼 회전.
+	//	mtx.Identity(); mtx.PosSet(m_vPos); m_Matrix *= mtx; // 이동
 
-//	if(m_RotSeq == ROT_SEQ_XYZ)
-//	{
-//		m_Matrix.Rotation(m_vRot.x, m_vRot.y, m_vRot.z); // 부모 축 만큼 회전. // XYZ 회전일때..
-//	}
-//	else if(ROT_SEQ_YXZ)
-//	{
-//		m_Matrix.Identity();
-//		mtx.RotationY(m_vRot.y); m_Matrix *= mtx; // YXZ 회전일때
-//		mtx.RotationX(m_vRot.x); m_Matrix *= mtx;
-//		mtx.RotationZ(m_vRot.z); m_Matrix *= mtx;
-//	}
+	//	if(m_RotSeq == ROT_SEQ_XYZ)
+	//	{
+	//		m_Matrix.Rotation(m_vRot.x, m_vRot.y, m_vRot.z); // 부모 축 만큼 회전. // XYZ 회전일때..
+	//	}
+	//	else if(ROT_SEQ_YXZ)
+	//	{
+	//		m_Matrix.Identity();
+	//		mtx.RotationY(m_vRot.y); m_Matrix *= mtx; // YXZ 회전일때
+	//		mtx.RotationX(m_vRot.x); m_Matrix *= mtx;
+	//		mtx.RotationZ(m_vRot.z); m_Matrix *= mtx;
+	//	}
 
-	if (m_KeyOrient.Count() > 0) // Orient 키값이 있으면..
-		m_Matrix = m_qRot * m_qOrient; // 회전.. 쿼터니언 계산..
+	if (m_KeyOrient.Count() > 0)                                        // Orient 키값이 있으면..
+		m_Matrix = m_qRot * m_qOrient;                                  // 회전.. 쿼터니언 계산..
 	else
-		m_Matrix = m_qRot; // 회전.. 쿼터니언 계산..
+		m_Matrix = m_qRot;                                              // 회전.. 쿼터니언 계산..
 
-	if(1.0f != m_vScale.x || 1.0f != m_vScale.y || 1.0f != m_vScale.z) // 스케일 값이 있으면..
+	if (1.0f != m_vScale.x || 1.0f != m_vScale.y || 1.0f != m_vScale.z) // 스케일 값이 있으면..
 	{
-		mtx.Scale(m_vScale); // 스케일
+		mtx.Scale(m_vScale);                                            // 스케일
 		m_Matrix *= mtx;
 	}
 	m_Matrix.PosSet(m_vPos);
 
-	if(m_pParent) m_Matrix *= m_pParent->m_Matrix; // 부모 행렬
+	if (m_pParent)
+		m_Matrix *= m_pParent->m_Matrix; // 부모 행렬
 }
 
 void CN3Joint::MatricesGet(__Matrix44* pMtxs, int& nJointIndex)
@@ -383,94 +398,97 @@ void CN3Joint::MatricesGet(__Matrix44* pMtxs, int& nJointIndex)
 
 void CN3Joint::ReCalcMatrixBlended(float fFrm0, float fFrm1, float fWeight0)
 {
-//	__ASSERT(1.0f == (fWeight0 + fWeight1));
+	//	__ASSERT(1.0f == (fWeight0 + fWeight1));
 
 	static __Vector3 v1, v2;
 	static __Quaternion qt1, qt2;
-	int nKC = 0, nFrm0 = (int)fFrm0, nFrm1 = (int)fFrm1;
+	int nKC = 0, nFrm0 = (int) fFrm0, nFrm1 = (int) fFrm1;
 	float fWeight1 = 1.0f - fWeight0;
 
 	bool bHaveKey1 = m_KeyPos.DataGet(fFrm0, v1);
 	bool bHaveKey2 = m_KeyPos.DataGet(fFrm1, v2);
-	if(bHaveKey1 && bHaveKey2) 
+	if (bHaveKey1 && bHaveKey2)
 		m_vPos = (v1 * fWeight0) + (v2 * fWeight1);
 
 	bHaveKey1 = m_KeyRot.DataGet(fFrm0, qt1);
 	bHaveKey2 = m_KeyRot.DataGet(fFrm1, qt2);
-	if(bHaveKey1 && bHaveKey2) 
+	if (bHaveKey1 && bHaveKey2)
 		m_qRot.Slerp(qt1, qt2, fWeight1);
 
 	bHaveKey1 = m_KeyScale.DataGet(fFrm0, v1);
 	bHaveKey2 = m_KeyScale.DataGet(fFrm1, v2);
-	if(bHaveKey1 && bHaveKey2) 
+	if (bHaveKey1 && bHaveKey2)
 		m_vScale = (v1 * fWeight0) + (v2 * fWeight1);
 
 	bHaveKey1 = m_KeyOrient.DataGet(fFrm0, qt1);
 	bHaveKey2 = m_KeyOrient.DataGet(fFrm1, qt2);
-	if(bHaveKey1 && bHaveKey2) 
+	if (bHaveKey1 && bHaveKey2)
 		m_qOrient.Slerp(qt1, qt2, fWeight1);
 
 	this->ReCalcMatrix(); // Matrix 계산...
 }
 
 #ifdef _N3TOOL
-void CN3Joint::KeyDelete(CN3Joint *pJoint, int nKS, int nKE)
+void CN3Joint::KeyDelete(CN3Joint* pJoint, int nKS, int nKE)
 {
 	CN3AnimKey* pAKs[3] = { &(pJoint->m_KeyPos), &(pJoint->m_KeyRot), &(pJoint->m_KeyScale) };
 
 	int i;
-	for(i = 0; i < 3; i++)
+	for (i = 0; i < 3; i++)
 	{
 		int nKC = pAKs[i]->Count();
-		if(nKC > 0 && nKS > 0 && nKS < nKC && nKE > nKS && nKE < nKC)
+		if (nKC > 0 && nKS > 0 && nKS < nKC && nKE > nKS && nKE < nKC)
 		{
-			int nKE2 = nKC - nKE - 1;
+			int nKE2        = nKC - nKE - 1;
 
 			__Vector3* pVs1 = new __Vector3[nKS];
 			__Vector3* pVs2 = new __Vector3[nKE2];
 
-			if(pAKs[i]->Type() == KEY_VECTOR3) 
+			if (pAKs[i]->Type() == KEY_VECTOR3)
 			{
-				memcpy(pVs1, &(((__Vector3*)pAKs[i]->m_pDatas)[0]), sizeof(__Vector3) * nKS);
-				memcpy(pVs2, &(((__Vector3*)pAKs[i]->m_pDatas)[nKE+1]), sizeof(__Vector3) * nKE2);
+				memcpy(pVs1, &(((__Vector3*) pAKs[i]->m_pDatas)[0]), sizeof(__Vector3) * nKS);
+				memcpy(
+					pVs2, &(((__Vector3*) pAKs[i]->m_pDatas)[nKE + 1]), sizeof(__Vector3) * nKE2);
 			}
-			else if(pAKs[i]->Type() == KEY_QUATERNION)
+			else if (pAKs[i]->Type() == KEY_QUATERNION)
 			{
-				memcpy(pVs1, &(((__Quaternion*)pAKs[i]->m_pDatas)[0]), sizeof(__Quaternion) * nKS);
-				memcpy(pVs2, &(((__Quaternion*)pAKs[i]->m_pDatas)[nKE+1]), sizeof(__Quaternion) * nKE2);
+				memcpy(pVs1, &(((__Quaternion*) pAKs[i]->m_pDatas)[0]), sizeof(__Quaternion) * nKS);
+				memcpy(pVs2, &(((__Quaternion*) pAKs[i]->m_pDatas)[nKE + 1]),
+					sizeof(__Quaternion) * nKE2);
 			}
 
-			delete [] pAKs[i]->m_pDatas;
+			delete[] pAKs[i]->m_pDatas;
 			pAKs[i]->m_nCount = 0;
 			pAKs[i]->m_pDatas = nullptr;
 
 			pAKs[i]->Alloc(nKS + nKE2, pAKs[i]->SamplingRate(), pAKs[i]->Type());
 
-			if(pAKs[i]->Type() == KEY_VECTOR3) 
+			if (pAKs[i]->Type() == KEY_VECTOR3)
 			{
-				memcpy(&(((__Vector3*)pAKs[i]->m_pDatas)[0]), pVs1, sizeof(__Vector3) * nKS);
-				memcpy(&(((__Vector3*)pAKs[i]->m_pDatas)[nKS]), pVs2, sizeof(__Vector3) * nKE2);
+				memcpy(&(((__Vector3*) pAKs[i]->m_pDatas)[0]), pVs1, sizeof(__Vector3) * nKS);
+				memcpy(&(((__Vector3*) pAKs[i]->m_pDatas)[nKS]), pVs2, sizeof(__Vector3) * nKE2);
 			}
-			else if(pAKs[i]->Type() == KEY_QUATERNION)
+			else if (pAKs[i]->Type() == KEY_QUATERNION)
 			{
-				memcpy(&(((__Quaternion*)pAKs[i]->m_pDatas)[0]), pVs1, sizeof(__Quaternion) * nKS);
-				memcpy(&(((__Quaternion*)pAKs[i]->m_pDatas)[nKS]), pVs2, sizeof(__Quaternion) * nKE2);
+				memcpy(&(((__Quaternion*) pAKs[i]->m_pDatas)[0]), pVs1, sizeof(__Quaternion) * nKS);
+				memcpy(
+					&(((__Quaternion*) pAKs[i]->m_pDatas)[nKS]), pVs2, sizeof(__Quaternion) * nKE2);
 			}
 
-			delete [] pVs1;
-			delete [] pVs2;
+			delete[] pVs1;
+			delete[] pVs2;
 		}
 	}
 
 	// Child 를 다시 만들어 준다.
 	int nCC = pJoint->ChildCount();
-	for(i = 0; i < nCC; i++)
+	for (i = 0; i < nCC; i++)
 	{
 		CN3Joint* pChild = pJoint->Child(i);
 		pChild->KeyDelete(pChild, nKS, nKE); // 하위 조인트를 복사..
 	}
 }
-#endif // end of _N3TOOL
+#endif                                       // end of _N3TOOL
 
 #ifdef _N3TOOL
 void CN3Joint::AddKey(CN3Joint* pJSrc, int nIndexS, int nIndexE)
@@ -479,45 +497,49 @@ void CN3Joint::AddKey(CN3Joint* pJSrc, int nIndexS, int nIndexE)
 	m_KeyRot.Add(pJSrc->m_KeyRot, nIndexS, nIndexE);
 	m_KeyScale.Add(pJSrc->m_KeyScale, nIndexS, nIndexE);
 
-	auto it = pJSrc->m_Children.begin();
-	auto it2 = m_Children.begin();
-	size_t srcSize = pJSrc->m_Children.size();
+	auto it         = pJSrc->m_Children.begin();
+	auto it2        = m_Children.begin();
+	size_t srcSize  = pJSrc->m_Children.size();
 	size_t destSize = m_Children.size();
-	__ASSERT(srcSize == destSize, "can't copy animation key - because child count is different from each other.");
+	__ASSERT(srcSize == destSize,
+		"can't copy animation key - because child count is different from each other.");
 	for (size_t i = 0; i < srcSize; i++, it++, it2++)
 	{
-		CN3Joint* pChildSrc = *it;
+		CN3Joint* pChildSrc  = *it;
 		CN3Joint* pChildDest = *it2;
 
 		pChildDest->AddKey(pChildSrc, nIndexS, nIndexE); // 재귀호출
 	}
 }
-#endif // end of _N3TOOL
+#endif                                                   // end of _N3TOOL
 
 // 회전값등을
 #ifdef _N3TOOL
-void CN3Joint::CopyExceptAnimationKey(CN3Joint *pJSrc)
+void CN3Joint::CopyExceptAnimationKey(CN3Joint* pJSrc)
 {
 	this->Release();
 
-	m_szName = pJSrc->m_szName;
+	m_szName     = pJSrc->m_szName;
 	m_szFileName = pJSrc->m_szFileName;
 
-	m_vPos = pJSrc->m_vPos;
-	m_qRot = pJSrc->m_qRot;
-	m_vScale = pJSrc->m_vScale;
+	m_vPos       = pJSrc->m_vPos;
+	m_qRot       = pJSrc->m_qRot;
+	m_vScale     = pJSrc->m_vScale;
 
-	m_Matrix = pJSrc->m_Matrix;
-	m_fFrmCur = pJSrc->m_fFrmCur;
-	m_fFrmWhole = pJSrc->m_fFrmWhole;
+	m_Matrix     = pJSrc->m_Matrix;
+	m_fFrmCur    = pJSrc->m_fFrmCur;
+	m_fFrmWhole  = pJSrc->m_fFrmWhole;
 
-	if(m_KeyPos.Count() <= 0) m_KeyPos.m_eType = pJSrc->m_KeyPos.m_eType;
-	if(m_KeyRot.Count() <= 0) m_KeyRot.m_eType = pJSrc->m_KeyRot.m_eType;
-	if(m_KeyScale.Count() <= 0) m_KeyScale.m_eType = pJSrc->m_KeyScale.m_eType;
+	if (m_KeyPos.Count() <= 0)
+		m_KeyPos.m_eType = pJSrc->m_KeyPos.m_eType;
+	if (m_KeyRot.Count() <= 0)
+		m_KeyRot.m_eType = pJSrc->m_KeyRot.m_eType;
+	if (m_KeyScale.Count() <= 0)
+		m_KeyScale.m_eType = pJSrc->m_KeyScale.m_eType;
 
 	CN3Joint* pChild = nullptr;
 	it_Joint it = m_Children.begin(), itEnd = m_Children.end();
-	for(; it != itEnd; )
+	for (; it != itEnd;)
 	{
 		pChild = *it;
 		delete pChild;
@@ -525,15 +547,15 @@ void CN3Joint::CopyExceptAnimationKey(CN3Joint *pJSrc)
 	}
 	m_Children.clear();
 
-	it = pJSrc->m_Children.begin();
+	it    = pJSrc->m_Children.begin();
 	itEnd = pJSrc->m_Children.end();
-	for(; it != itEnd; it++)
+	for (; it != itEnd; it++)
 	{
 		CN3Joint* pChildDest = new CN3Joint();
-		this->ChildAdd(pChildDest); // 자식 추가..
+		this->ChildAdd(pChildDest);                    // 자식 추가..
 
 		CN3Joint* pChildSrc = *it;
 		pChildDest->CopyExceptAnimationKey(pChildSrc); // 재귀호출
 	}
 }
-#endif // end of _N3TOOL
+#endif                                                 // end of _N3TOOL

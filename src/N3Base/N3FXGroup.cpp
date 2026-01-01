@@ -21,9 +21,9 @@ CN3FXGroup::~CN3FXGroup()
 {
 	std::list<__FXBInfo*>::iterator it, ite;
 	ite = FXBList.end();
-	it = FXBList.begin();
+	it  = FXBList.begin();
 
-	while(it!=ite)
+	while (it != ite)
 	{
 		__FXBInfo* pFXB = (*it);
 		delete pFXB;
@@ -72,7 +72,8 @@ bool CN3FXGroup::Save(File& file)
 bool CN3FXGroup::DecodeScriptFile(const char* lpPathName)
 {
 	FILE* stream = fopen(lpPathName, "r");
-	if(!stream) return false;
+	if (!stream)
+		return false;
 
 	char szGamePathName[_MAX_PATH];
 	char szDrive[_MAX_DRIVE], szDir[_MAX_DIR], szFName[_MAX_FNAME], szExt[_MAX_EXT];
@@ -81,39 +82,41 @@ bool CN3FXGroup::DecodeScriptFile(const char* lpPathName)
 
 	CN3BaseFileAccess::FileNameSet(szGamePathName);
 
-	char szLine[512] = "", szCommand[80] = "", szBuf[4][80] = { "", "", "", ""};
+	char szLine[512] = "", szCommand[80] = "", szBuf[4][80] = { "", "", "", "" };
 	char* pResult = fgets(szLine, 512, stream);
 	sscanf(szLine, "%s %s %s %s %s", szCommand, szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
 
-	if(lstrcmpi(szCommand, "<n3fxgroup>"))
+	if (lstrcmpi(szCommand, "<n3fxgroup>"))
 	{
 		fclose(stream);
 		return false;
 	}
 
-	while(!feof(stream))
+	while (!feof(stream))
 	{
 		char* pResult = fgets(szLine, 512, stream);
-		if(pResult == nullptr) continue;
+		if (pResult == nullptr)
+			continue;
 
-		ZeroMemory(szCommand,80);
-		ZeroMemory(szBuf[0],80);
-		ZeroMemory(szBuf[1],80);
-		ZeroMemory(szBuf[2],80);
-		ZeroMemory(szBuf[3],80);
+		ZeroMemory(szCommand, 80);
+		ZeroMemory(szBuf[0], 80);
+		ZeroMemory(szBuf[1], 80);
+		ZeroMemory(szBuf[2], 80);
+		ZeroMemory(szBuf[3], 80);
 
 		sscanf(szLine, "%s %s %s %s %s", szCommand, szBuf[0], szBuf[1], szBuf[2], szBuf[3]);
 
-		if(lstrcmpi(szCommand, "<fxb>")==0)
+		if (lstrcmpi(szCommand, "<fxb>") == 0)
 		{
 			__FXBInfo* pFXB = new __FXBInfo;
 			strcpy(pFXB->FXBName, szBuf[0]);
 			pFXB->joint = atoi(szBuf[1]);
-			if(lstrcmpi(szBuf[2], "TRUE")==0) pFXB->IsLooping = TRUE;
+			if (lstrcmpi(szBuf[2], "TRUE") == 0)
+				pFXB->IsLooping = TRUE;
 
 			FXBList.push_back(pFXB);
 			continue;
-		}		
+		}
 	}
 	fclose(stream);
 
@@ -123,13 +126,13 @@ bool CN3FXGroup::DecodeScriptFile(const char* lpPathName)
 
 __FXBInfo* CN3FXGroup::GetFXBInfo(int idx)
 {
-	if (idx < 0
-		|| idx >= static_cast<int>(FXBList.size()))
+	if (idx < 0 || idx >= static_cast<int>(FXBList.size()))
 		return nullptr;
 
 	std::list<__FXBInfo*>::iterator it;
 	it = FXBList.begin();
 
-	for(int i=0;i<idx;i++) it++;
+	for (int i = 0; i < idx; i++)
+		it++;
 	return (*it);
 }

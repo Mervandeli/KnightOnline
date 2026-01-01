@@ -3,37 +3,37 @@
 
 #include <cassert>
 
-#define IMPL_BYTEBUFFER_POD_TEMPLATE(type) \
-	template <> \
-	void ByteBuffer::append<type>(type value) \
-	{ \
-		append(&value, sizeof(value)); \
-	} \
-	template <> \
-	void ByteBuffer::put<type>(size_t pos, type value) \
-	{ \
-		put(pos, &value, sizeof(value)); \
-	} \
-	template <> \
+#define IMPL_BYTEBUFFER_POD_TEMPLATE(type)                \
+	template <>                                           \
+	void ByteBuffer::append<type>(type value)             \
+	{                                                     \
+		append(&value, sizeof(value));                    \
+	}                                                     \
+	template <>                                           \
+	void ByteBuffer::put<type>(size_t pos, type value)    \
+	{                                                     \
+		put(pos, &value, sizeof(value));                  \
+	}                                                     \
+	template <>                                           \
 	ByteBuffer& ByteBuffer::operator<< <type>(type value) \
-	{ \
-		append<type>(value); \
-		return *this; \
-	} \
-	template <> \
-	type ByteBuffer::read<type>(size_t pos) const \
-	{ \
-		/*assert(pos + sizeof(type) <= size());*/ \
-		if (pos + sizeof(type) > size()) \
-			return {}; \
-		return *((type*) &_storage[pos]); \
-	} \
-	template <> \
-	type ByteBuffer::read<type>() \
-	{ \
-		type r = read<type>(_rpos); \
-		_rpos += sizeof(type); \
-		return r; \
+	{                                                     \
+		append<type>(value);                              \
+		return *this;                                     \
+	}                                                     \
+	template <>                                           \
+	type ByteBuffer::read<type>(size_t pos) const         \
+	{                                                     \
+		/*assert(pos + sizeof(type) <= size());*/         \
+		if (pos + sizeof(type) > size())                  \
+			return {};                                    \
+		return *((type*) &_storage[pos]);                 \
+	}                                                     \
+	template <>                                           \
+	type ByteBuffer::read<type>()                         \
+	{                                                     \
+		type r  = read<type>(_rpos);                      \
+		_rpos  += sizeof(type);                           \
+		return r;                                         \
 	}
 
 IMPL_BYTEBUFFER_POD_TEMPLATE(float)
@@ -66,21 +66,18 @@ std::string ByteBuffer::read<std::string>()
 	return r;
 }
 
-
-ByteBuffer::ByteBuffer()
-	: _doubleByte(true), _rpos(0), _wpos(0)
+ByteBuffer::ByteBuffer() : _doubleByte(true), _rpos(0), _wpos(0)
 {
 	_storage.reserve(DEFAULT_SIZE);
 }
 
-ByteBuffer::ByteBuffer(size_t res)
-	: _doubleByte(true), _rpos(0), _wpos(0)
+ByteBuffer::ByteBuffer(size_t res) : _doubleByte(true), _rpos(0), _wpos(0)
 {
 	_storage.reserve(res <= 0 ? DEFAULT_SIZE : res);
 }
 
-ByteBuffer::ByteBuffer(const ByteBuffer& buf)
-	: _doubleByte(true), _rpos(buf._rpos), _wpos(buf._wpos), _storage(buf._storage)
+ByteBuffer::ByteBuffer(const ByteBuffer& buf) :
+	_doubleByte(true), _rpos(buf._rpos), _wpos(buf._wpos), _storage(buf._storage)
 {
 }
 
@@ -102,7 +99,7 @@ ByteBuffer& ByteBuffer::operator<<(ByteBuffer& value)
 }
 
 // Hacky KO string flag - either it's a single byte length, or a double byte.
-void ByteBuffer:: SByte()
+void ByteBuffer::SByte()
 {
 	_doubleByte = false;
 }

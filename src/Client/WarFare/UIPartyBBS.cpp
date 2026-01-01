@@ -17,40 +17,39 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
-#define PARTY_BBS_MAXSTRING	69
-#define PARTY_BBS_MAXLINE	23
+#define PARTY_BBS_MAXSTRING 69
+#define PARTY_BBS_MAXLINE   23
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
 CUIPartyBBS::CUIPartyBBS()
 {
-//	m_pList_Infos			= nullptr;		
-	m_pBtn_PageUp			= nullptr;
-	m_pBtn_PageDown			= nullptr;
-	m_pBtn_Refresh			= nullptr;
-	
-	m_pBtn_Close			= nullptr;
-	m_pBtn_Register			= nullptr;
-	m_pBtn_RegisterCancel	= nullptr;
-	m_pBtn_Whisper			= nullptr;
-	m_pBtn_Party			= nullptr;
-	m_pText_Page			= nullptr;
+	//	m_pList_Infos			= nullptr;
+	m_pBtn_PageUp         = nullptr;
+	m_pBtn_PageDown       = nullptr;
+	m_pBtn_Refresh        = nullptr;
 
-	m_iCurPage				= 0;
-	m_bProcessing			= false;
-	m_fTime					= 0.0f;
-	m_iCurIndex				= -1;
+	m_pBtn_Close          = nullptr;
+	m_pBtn_Register       = nullptr;
+	m_pBtn_RegisterCancel = nullptr;
+	m_pBtn_Whisper        = nullptr;
+	m_pBtn_Party          = nullptr;
+	m_pText_Page          = nullptr;
 
-	for(int i = 0 ; i < PARTY_BBS_MAXSTRING ; i++)
+	m_iCurPage            = 0;
+	m_bProcessing         = false;
+	m_fTime               = 0.0f;
+	m_iCurIndex           = -1;
+
+	for (int i = 0; i < PARTY_BBS_MAXSTRING; i++)
 	{
 		m_pText[i] = nullptr;
 	}
-
 }
 
 CUIPartyBBS::~CUIPartyBBS()
@@ -92,16 +91,16 @@ bool CUIPartyBBS::Load(File& file)
 bool CUIPartyBBS::SelectedString(CN3UIBase* pSender, int& iID)
 {
 	int iIndex = -1;
-	for(int i = 0; i < PARTY_BBS_MAXSTRING ; i++)
+	for (int i = 0; i < PARTY_BBS_MAXSTRING; i++)
 	{
-		if(pSender == m_pText[i])
+		if (pSender == m_pText[i])
 		{
 			iIndex = i % PARTY_BBS_MAXLINE;
 			if (iIndex >= static_cast<int>(m_Datas.size()))
 				return false;
 
 			iID = iIndex;
-//			SetStringColor( iID, 0xffff0000);
+			//			SetStringColor( iID, 0xffff0000);
 			return true;
 		}
 	}
@@ -112,58 +111,58 @@ bool CUIPartyBBS::SelectedString(CN3UIBase* pSender, int& iID)
 bool CUIPartyBBS::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
 	int iID = -1;
-	if( dwMsg == UIMSG_BUTTON_CLICK )
+	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
-		if(pSender == m_pBtn_Refresh)
+		if (pSender == m_pBtn_Refresh)
 		{
 			this->MsgSend_RefreshData(m_iCurPage);
 		}
-		else if(pSender == m_pBtn_PageUp)
+		else if (pSender == m_pBtn_PageUp)
 		{
 			int iCurPage = m_iCurPage;
 			iCurPage--;
-			if(iCurPage >= 0)
+			if (iCurPage >= 0)
 			{
 				this->MsgSend_RefreshData(iCurPage);
 			}
 		}
-		else if(pSender == m_pBtn_PageDown)
+		else if (pSender == m_pBtn_PageDown)
 		{
 			int iCurPage = m_iCurPage;
 			iCurPage++;
-			if(iCurPage < m_iMaxPage)
+			if (iCurPage < m_iMaxPage)
 			{
 				this->MsgSend_RefreshData(iCurPage);
 			}
 		}
-		else if(pSender == m_pBtn_Close)
+		else if (pSender == m_pBtn_Close)
 		{
 			m_iCurPage = 0;
-			m_fTime = 0.0f;
+			m_fTime    = 0.0f;
 			this->SetVisible(false);
 		}
-		else if(pSender == m_pBtn_Register)
+		else if (pSender == m_pBtn_Register)
 		{
 			std::string szMsg = fmt::format_text_resource(IDS_PARTY_BBS_REGISTER);
 			CGameProcedure::MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_PARTY_BBS_REGISTER); // 기사단 해체 물어보기..
 		}
-		else if(pSender == m_pBtn_RegisterCancel)
+		else if (pSender == m_pBtn_RegisterCancel)
 		{
 			std::string szMsg = fmt::format_text_resource(IDS_PARTY_BBS_REGISTER_CANCEL);
 			CGameProcedure::MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_PARTY_BBS_REGISTER_CANCEL); // 기사단 해체 물어보기..
 		}
-		else if(pSender == m_pBtn_Whisper)
+		else if (pSender == m_pBtn_Whisper)
 		{
 			RequestWhisper();
 		}
-		else if(pSender == m_pBtn_Party) // 파티 신청
+		else if (pSender == m_pBtn_Party) // 파티 신청
 		{
 			RequestParty();
 		}
 	}
-	else if( dwMsg == UIMSG_STRING_LCLICK )
+	else if (dwMsg == UIMSG_STRING_LCLICK)
 	{
-		if(SelectedString(pSender, iID))
+		if (SelectedString(pSender, iID))
 		{
 			m_iCurIndex = iID;
 		}
@@ -174,15 +173,16 @@ bool CUIPartyBBS::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 void CUIPartyBBS::MsgSend_RefreshData(int iCurPage)
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if (m_bProcessing)
+		return; //전에 보낸 패킷 응답이 없으면
 
 	float fTime = CN3Base::TimeGet();
-	if( fTime - m_fTime < 3.0f )
+	if (fTime - m_fTime < 3.0f)
 		return;
 	m_fTime = fTime;
 
 	uint8_t byBuff[4];
-	int iOffset=0;
+	int iOffset   = 0;
 
 	int16_t sPage = m_iCurPage;
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_PARTY_BBS);
@@ -195,28 +195,30 @@ void CUIPartyBBS::MsgSend_RefreshData(int iCurPage)
 
 void CUIPartyBBS::MsgRecv_RefreshData(Packet& pkt)
 {
-	m_bProcessing = false;
+	m_bProcessing    = false;
 
-	uint8_t byType = pkt.read<uint8_t>();
+	uint8_t byType   = pkt.read<uint8_t>();
 	uint8_t byResult = pkt.read<uint8_t>();
-	if(byResult != 0x01) return; //실패했다면
+	if (byResult != 0x01)
+		return; //실패했다면
 
-	switch( byType )
+	switch (byType)
 	{
-	case N3_SP_PARTY_REGISTER:
+		case N3_SP_PARTY_REGISTER:
 		{
-			if(!IsVisible())
+			if (!IsVisible())
 				SetVisible(true);
 		}
-	case N3_SP_PARTY_REGISTER_CANCEL:
+		case N3_SP_PARTY_REGISTER_CANCEL:
 		{
 			PartyStringSet(byType);
-			if(!IsVisible()) return;
+			if (!IsVisible())
+				return;
 		}
 		break;
-	case N3_SP_PARTY_BBS_DATA:
+		case N3_SP_PARTY_BBS_DATA:
 		{
-			if(!IsVisible())
+			if (!IsVisible())
 				SetVisible(true);
 		}
 		break;
@@ -224,38 +226,38 @@ void CUIPartyBBS::MsgRecv_RefreshData(Packet& pkt)
 
 	m_Datas.clear();
 
-	for( int i = 0 ; i < PARTY_BBS_MAXLINE ; i++ )
+	for (int i = 0; i < PARTY_BBS_MAXLINE; i++)
 	{
 		__InfoPartyBBS Info;
-		int iNameLen	= pkt.read<int16_t>();
+		int iNameLen = pkt.read<int16_t>();
 		pkt.readString(Info.szID, iNameLen);
-		Info.iLevel		= pkt.read<uint8_t>();
-		Info.eClass		= (e_Class)pkt.read<int16_t>();
+		Info.iLevel = pkt.read<uint8_t>();
+		Info.eClass = (e_Class) pkt.read<int16_t>();
 
-		if( iNameLen > 0 )
+		if (iNameLen > 0)
 			m_Datas.push_back(Info);
 	}
 
-	int16_t sPage = pkt.read<int16_t>();
+	int16_t sPage  = pkt.read<int16_t>();
 	int16_t sTotal = pkt.read<int16_t>();
 
-	m_iCurPage = sPage;
-	m_iMaxPage = sTotal / PARTY_BBS_MAXLINE;
-	if( (sTotal % PARTY_BBS_MAXLINE) > 0 )
+	m_iCurPage     = sPage;
+	m_iMaxPage     = sTotal / PARTY_BBS_MAXLINE;
+	if ((sTotal % PARTY_BBS_MAXLINE) > 0)
 		m_iMaxPage++;
 
 	RefreshPage();
 }
 
-
 void CUIPartyBBS::MsgSend_Register()
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if (m_bProcessing)
+		return; //전에 보낸 패킷 응답이 없으면
 
 	uint8_t byBuff[4];
-	int iOffset=0;
+	int iOffset = 0;
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_PARTY_BBS);	
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_PARTY_BBS);
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PARTY_REGISTER);
 	CGameProcedure::s_pSocket->Send(byBuff, iOffset);
 
@@ -264,31 +266,33 @@ void CUIPartyBBS::MsgSend_Register()
 
 void CUIPartyBBS::MsgSend_RegisterCancel()
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if (m_bProcessing)
+		return; //전에 보낸 패킷 응답이 없으면
 
 	uint8_t byBuff[4];
-	int iOffset=0;
+	int iOffset = 0;
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_PARTY_BBS);	
-	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PARTY_REGISTER_CANCEL);	
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_PARTY_BBS);
+	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PARTY_REGISTER_CANCEL);
 	CGameProcedure::s_pSocket->Send(byBuff, iOffset);
 
 	m_bProcessing = true;
 }
 
-
 void CUIPartyBBS::RefreshPage()
 {
-	if(m_pText_Page) m_pText_Page->SetStringAsInt(m_iCurPage+1); // 페이지 표시..
+	if (m_pText_Page)
+		m_pText_Page->SetStringAsInt(m_iCurPage + 1); // 페이지 표시..
 
 	ResetContent();
 
 	it_PartyBBS it = m_Datas.begin();
 
 	std::string szDuty, szClass;
-	for( int i = 0 ; i < PARTY_BBS_MAXLINE ; i++ )
+	for (int i = 0; i < PARTY_BBS_MAXLINE; i++)
 	{
-		if(it==m_Datas.end()) return;
+		if (it == m_Datas.end())
+			return;
 
 		__InfoPartyBBS IPB = (*it);
 		CGameBase::GetTextByClass(IPB.eClass, szClass);
@@ -299,23 +303,25 @@ void CUIPartyBBS::RefreshPage()
 
 void CUIPartyBBS::PartyStringSet(uint8_t byType)
 {
-	switch(byType)
+	switch (byType)
 	{
-	case N3_SP_PARTY_REGISTER:
-		CGameBase::s_pPlayer->m_bRecruitParty = true;
-		break;
-	case N3_SP_PARTY_REGISTER_CANCEL:
-		CGameBase::s_pPlayer->m_bRecruitParty = false;
-		break;
+		case N3_SP_PARTY_REGISTER:
+			CGameBase::s_pPlayer->m_bRecruitParty = true;
+			break;
+		case N3_SP_PARTY_REGISTER_CANCEL:
+			CGameBase::s_pPlayer->m_bRecruitParty = false;
+			break;
 	}
 
 	if (CGameBase::s_pPlayer->m_bRecruitParty)
 	{
 		int iLevel = CGameBase::s_pPlayer->m_InfoBase.iLevel;
-		int iLMin = iLevel - 8;
-		if(iLMin < 0) iLMin = 0;
+		int iLMin  = iLevel - 8;
+		if (iLMin < 0)
+			iLMin = 0;
 		int iLMax = iLevel + 8;
-		if(iLMax > MAX_LEVEL) iLMax = MAX_LEVEL;
+		if (iLMax > MAX_LEVEL)
+			iLMax = MAX_LEVEL;
 
 		std::string szMsg = fmt::format_text_resource(IDS_WANT_PARTY_MEMBER, iLMin, iLMax);
 		CGameBase::s_pPlayer->InfoStringSet(szMsg, 0xff00ff00);
@@ -330,14 +336,14 @@ void CUIPartyBBS::PartyStringSet(uint8_t byType)
 
 void CUIPartyBBS::ResetContent()
 {
-	if(m_Datas.size()>0)
+	if (m_Datas.size() > 0)
 		m_iCurIndex = 0;
 	else
 		m_iCurIndex = -1;
 
-	for(int i = 0 ; i < PARTY_BBS_MAXSTRING ; i++)
+	for (int i = 0; i < PARTY_BBS_MAXSTRING; i++)
 	{
-		if(m_pText[i])
+		if (m_pText[i])
 		{
 			m_pText[i]->SetString("");
 			m_pText[i]->SetColor(0xffffffff);
@@ -359,7 +365,8 @@ void CUIPartyBBS::SetContentString(int iIndex, std::string szID, int iLevel, std
 
 void CUIPartyBBS::Render()
 {
-	if(!IsVisible()) return;
+	if (!IsVisible())
+		return;
 
 	CN3UIBase::Render();
 	RenderSelectContent();
@@ -367,17 +374,20 @@ void CUIPartyBBS::Render()
 
 void CUIPartyBBS::RenderSelectContent()
 {
-	if(!IsVisible())	return;
-	if(m_iCurIndex < 0)	return;
-	if(m_iCurIndex >= PARTY_BBS_MAXLINE) return;
+	if (!IsVisible())
+		return;
+	if (m_iCurIndex < 0)
+		return;
+	if (m_iCurIndex >= PARTY_BBS_MAXLINE)
+		return;
 
 	RECT rc, rc1;
-	if(m_pText[m_iCurIndex])
+	if (m_pText[m_iCurIndex])
 	{
 		rc = m_pText[m_iCurIndex]->GetRegion();
-		if(m_pText[m_iCurIndex + PARTY_BBS_MAXLINE*2])
+		if (m_pText[m_iCurIndex + PARTY_BBS_MAXLINE * 2])
 		{
-			rc1 = m_pText[m_iCurIndex + PARTY_BBS_MAXLINE*2]->GetRegion();
+			rc1      = m_pText[m_iCurIndex + PARTY_BBS_MAXLINE * 2]->GetRegion();
 			rc.right = rc1.right;
 		}
 	}
@@ -385,10 +395,10 @@ void CUIPartyBBS::RenderSelectContent()
 		return;
 
 	__VertexTransformedColor vLines[5];
-	vLines[0].Set((float)rc.left, (float)rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
-	vLines[1].Set((float)rc.right, (float)rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
-	vLines[2].Set((float)rc.right, (float)rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
-	vLines[3].Set((float)rc.left, (float)rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+	vLines[0].Set((float) rc.left, (float) rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+	vLines[1].Set((float) rc.right, (float) rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+	vLines[2].Set((float) rc.right, (float) rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+	vLines[3].Set((float) rc.left, (float) rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
 	vLines[4] = vLines[0];
 
 	DWORD dwZ, dwFog, dwAlpha, dwCOP, dwCA1, dwSrcBlend, dwDestBlend, dwVertexShader, dwAOP, dwAA1;
@@ -415,7 +425,7 @@ void CUIPartyBBS::RenderSelectContent()
 
 	CN3Base::s_lpD3DDev->SetFVF(FVF_TRANSFORMEDCOLOR);
 	CN3Base::s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINESTRIP, 4, vLines, sizeof(__VertexTransformedColor));
-	
+
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, dwZ);
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, dwFog);
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlpha);
@@ -430,27 +440,28 @@ void CUIPartyBBS::RenderSelectContent()
 
 void CUIPartyBBS::SetStringColor(int iIndex, uint32_t dwColor)
 {
-	if(m_pText[iIndex])
+	if (m_pText[iIndex])
 		m_pText[iIndex]->SetColor(dwColor);
 
-	if(m_pText[iIndex + PARTY_BBS_MAXLINE])
+	if (m_pText[iIndex + PARTY_BBS_MAXLINE])
 		m_pText[iIndex + PARTY_BBS_MAXLINE]->SetColor(dwColor);
 
-	if(m_pText[iIndex + PARTY_BBS_MAXLINE*2])
-		m_pText[iIndex + PARTY_BBS_MAXLINE*2]->SetColor(dwColor);
+	if (m_pText[iIndex + PARTY_BBS_MAXLINE * 2])
+		m_pText[iIndex + PARTY_BBS_MAXLINE * 2]->SetColor(dwColor);
 }
 
 void CUIPartyBBS::RequestWhisper()
 {
-	if(m_iCurIndex <= -1)
+	if (m_iCurIndex <= -1)
 		return;
 
 	it_PartyBBS it = m_Datas.begin();
 
-	for( int i = 0 ; i < PARTY_BBS_MAXLINE ; i++, it++ )
+	for (int i = 0; i < PARTY_BBS_MAXLINE; i++, it++)
 	{
-		if( it == m_Datas.end() ) break;
-		if( i == m_iCurIndex )
+		if (it == m_Datas.end())
+			break;
+		if (i == m_iCurIndex)
 		{
 			__InfoPartyBBS IPB = (*it);
 			//나 자신에게는 귓속말을 못하게 한다...
@@ -463,15 +474,16 @@ void CUIPartyBBS::RequestWhisper()
 
 void CUIPartyBBS::RequestParty()
 {
-	if(m_iCurIndex <= -1)
+	if (m_iCurIndex <= -1)
 		return;
 
 	it_PartyBBS it = m_Datas.begin();
 
-	for( int i = 0 ; i < PARTY_BBS_MAXLINE ; i++, it++ )
+	for (int i = 0; i < PARTY_BBS_MAXLINE; i++, it++)
 	{
-		if( it == m_Datas.end() ) break;
-		if( i == m_iCurIndex )
+		if (it == m_Datas.end())
+			break;
+		if (i == m_iCurIndex)
 		{
 			__InfoPartyBBS IPB = (*it);
 
@@ -480,7 +492,7 @@ void CUIPartyBBS::RequestParty()
 			{
 				std::string szMsg;
 				if (CGameProcedure::s_pProcMain->MsgSend_PartyOrForceCreate(0, IPB.szID))
-					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE); // 파티
+					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE);        // 파티
 				else
 					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE_FAILED); // 파티 초대 실패
 				CGameProcedure::s_pProcMain->MsgOutput(IPB.szID + szMsg, 0xffffff00);
@@ -493,19 +505,19 @@ void CUIPartyBBS::RequestParty()
 void CUIPartyBBS::SetVisible(bool bVisible)
 {
 	CN3UIBase::SetVisible(bVisible);
-	if(bVisible)
+	if (bVisible)
 		CGameProcedure::s_pUIMgr->SetVisibleFocusedUI(this);
 	else
-		CGameProcedure::s_pUIMgr->ReFocusUI();//this_ui
+		CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
 }
 
 bool CUIPartyBBS::OnKeyPress(int iKey)
 {
-	switch(iKey)
+	switch (iKey)
 	{
-	case DIK_ESCAPE:
-		SetVisible(false);
-		return true;
+		case DIK_ESCAPE:
+			SetVisible(false);
+			return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

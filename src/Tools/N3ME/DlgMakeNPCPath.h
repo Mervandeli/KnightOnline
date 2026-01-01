@@ -15,53 +15,54 @@ class CNPCPath;
 
 class CDlgMakeNPCPath : public CDialog
 {
-// Construction
+	// Construction
 public:
 	void SetNumPoint(int NumPoint);
-	CNPCPath*		m_pSelPath;
-	CNPCPathMgr*	m_pRefNPCPathMgr;
-	char			m_strSelNPCName[80];
-	int				m_iSelNPCID;
-	int				m_iSelActType;
+	CNPCPath* m_pSelPath;
+	CNPCPathMgr* m_pRefNPCPathMgr;
+	char m_strSelNPCName[80];
+	int m_iSelNPCID;
+	int m_iSelActType;
 
-	unsigned char	m_cSelAttrRegen;
-	unsigned char	m_cSelAttrGroup;
-	unsigned char	m_cSelAttrCreate;
-	unsigned char	m_cSelOption;
+	unsigned char m_cSelAttrRegen;
+	unsigned char m_cSelAttrGroup;
+	unsigned char m_cSelAttrCreate;
+	unsigned char m_cSelOption;
 
-	CDlgMakeNPCPath(CWnd* pParent = nullptr);   // standard constructor
+	CDlgMakeNPCPath(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+											  // Dialog Data
 	//{{AFX_DATA(CDlgMakeNPCPath)
-	enum { IDD = IDD_MAKE_NPCPATH };
-	CComboBox	m_OptionList;
-	CComboBox	m_AttrRegenList;
-	CComboBox	m_AttrGroupList;
-	CComboBox	m_AttrCreateList;
-	CComboBox	m_ActTypeList;
-	CListBox	m_ListPathGroup;
-	CComboBox	m_NPCList;
-	int		m_NumNPC;
-	int		m_iRegenTime;
-	CString	m_PathSetFileName;
-	int		m_State;
-	CString	m_strNPCPathName;
-	int		m_ViewNonMove;
-	float	m_fTransX;
-	float	m_fTransZ;
+	enum
+	{
+		IDD = IDD_MAKE_NPCPATH
+	};
+	CComboBox m_OptionList;
+	CComboBox m_AttrRegenList;
+	CComboBox m_AttrGroupList;
+	CComboBox m_AttrCreateList;
+	CComboBox m_ActTypeList;
+	CListBox m_ListPathGroup;
+	CComboBox m_NPCList;
+	int m_NumNPC;
+	int m_iRegenTime;
+	CString m_PathSetFileName;
+	int m_State;
+	CString m_strNPCPathName;
+	int m_ViewNonMove;
+	float m_fTransX;
+	float m_fTransZ;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgMakeNPCPath)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgMakeNPCPath)
 	virtual BOOL OnInitDialog();

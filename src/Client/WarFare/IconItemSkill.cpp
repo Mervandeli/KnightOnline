@@ -4,8 +4,7 @@
 
 int __IconItemSkill::GetBuyPrice() const
 {
-	if (pItemBasic == nullptr
-		|| pItemExt == nullptr)
+	if (pItemBasic == nullptr || pItemExt == nullptr)
 		return 0;
 
 	return pItemBasic->iPrice * pItemExt->siPriceMultiply;
@@ -13,14 +12,13 @@ int __IconItemSkill::GetBuyPrice() const
 
 int __IconItemSkill::GetSellPrice(bool bHasPremium /*= false*/) const
 {
-	if (pItemBasic == nullptr
-		|| pItemExt == nullptr)
+	if (pItemBasic == nullptr || pItemExt == nullptr)
 		return 0;
 
 	constexpr int PREMIUM_RATIO = 4;
-	constexpr int NORMAL_RATIO = 6;
+	constexpr int NORMAL_RATIO  = 6;
 
-	int iSellPrice = pItemBasic->iPrice * pItemExt->siPriceMultiply;
+	int iSellPrice              = pItemBasic->iPrice * pItemExt->siPriceMultiply;
 
 	if (pItemBasic->iSaleType != SALE_TYPE_FULL)
 	{

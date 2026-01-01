@@ -20,14 +20,14 @@ typedef std::list<CDTex*>::iterator it_DTex;
 class CDTexMng : public CN3Base
 {
 protected:
-	int					m_NextID;
+	int m_NextID;
 
 public:
-	std::list<CDTex*>	m_pDTex;
-	CMainFrame*			m_pMainFrm;	
+	std::list<CDTex*> m_pDTex;
+	CMainFrame* m_pMainFrm;
 	//int					m_NumDTex;	//dtex를 담고 있는 마지막 배열 + 1...^^
 	//CDTex*			m_pDTex[MAX_TILETEXTURE];
-				
+
 public:
 	int GetMaxID() const
 	{
@@ -39,17 +39,17 @@ public:
 		return static_cast<int>(m_pDTex.size());
 	}
 
-	bool	IsInDTex(CString FileName);
-	CDTex*	GetDTexByID(int id);
-	CDTex*	GetDTexByName(CString FileName);
-	bool	AddDTex(CString FileName);
-	void	DelDTexByID(int id);
-	void	Init(CMainFrame* pFrm = nullptr);
-	void	Release();
+	bool IsInDTex(CString FileName);
+	CDTex* GetDTexByID(int id);
+	CDTex* GetDTexByName(CString FileName);
+	bool AddDTex(CString FileName);
+	void DelDTexByID(int id);
+	void Init(CMainFrame* pFrm = nullptr);
+	void Release();
 
-	void	SaveToFile(CString RealFileName);
-	void	LoadFromFile(CString RealFileName);
-	void	SaveGameTile();
+	void SaveToFile(CString RealFileName);
+	void LoadFromFile(CString RealFileName);
+	void SaveGameTile();
 
 	CDTexMng();
 	virtual ~CDTexMng();

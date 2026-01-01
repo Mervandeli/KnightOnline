@@ -19,7 +19,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -30,13 +30,12 @@ static char THIS_FILE[]=__FILE__;
 CUITradeEditDlg::CUITradeEditDlg()
 {
 	m_pSubProcPerTrade = nullptr;
-	m_pArea = nullptr;
-	m_pImageOfIcon = nullptr;
+	m_pArea            = nullptr;
+	m_pImageOfIcon     = nullptr;
 }
 
 CUITradeEditDlg::~CUITradeEditDlg()
 {
-
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -46,7 +45,7 @@ void CUITradeEditDlg::Release()
 	CN3UIBase::Release();
 }
 
-int	CUITradeEditDlg::GetQuantity() // "edit_trade" Edit Control 에서 정수값을 얻오온다..
+int CUITradeEditDlg::GetQuantity() // "edit_trade" Edit Control 에서 정수값을 얻오온다..
 {
 	CN3UIEdit* pEdit = nullptr;
 	N3_VERIFY_UI_COMPONENT(pEdit, GetChildByID<CN3UIEdit>("edit_trade"));
@@ -65,14 +64,15 @@ void CUITradeEditDlg::SetQuantity(int iQuantity) // "edit_trade" Edit Control �
 
 bool CUITradeEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(nullptr == pSender) return false;
+	if (nullptr == pSender)
+		return false;
 
-	if (dwMsg == UIMSG_BUTTON_CLICK)					
+	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
-		if(pSender->m_szID == "btn_ok")
+		if (pSender->m_szID == "btn_ok")
 			m_pSubProcPerTrade->ItemCountEditOK();
 
-		if(pSender->m_szID == "btn_cancel")
+		if (pSender->m_szID == "btn_cancel")
 			m_pSubProcPerTrade->ItemCountEditCancel();
 	}
 
@@ -97,18 +97,19 @@ void CUITradeEditDlg::Open(bool bCountGold)
 
 	CN3UIEdit* pEdit = nullptr;
 	N3_VERIFY_UI_COMPONENT(pEdit, GetChildByID<CN3UIEdit>("edit_trade"));
-	if(pEdit) pEdit->SetFocus();
+	if (pEdit)
+		pEdit->SetFocus();
 
 	RECT rc, rcThis;
 	int iCX, iCY;
 
 	this->SetQuantity(0);
 
-	rc = CGameProcedure::s_pProcMain->m_pSubProcPerTrade->m_pUIPerTradeDlg->GetRegion();
-	iCX = (rc.right+rc.left)/2;
-	iCY = (rc.bottom+rc.top)/2;
+	rc     = CGameProcedure::s_pProcMain->m_pSubProcPerTrade->m_pUIPerTradeDlg->GetRegion();
+	iCX    = (rc.right + rc.left) / 2;
+	iCY    = (rc.bottom + rc.top) / 2;
 	rcThis = GetRegion();
-	SetPos(iCX-(rcThis.right-rcThis.left)/2, iCY-(rcThis.bottom-rcThis.top)/2);
+	SetPos(iCX - (rcThis.right - rcThis.left) / 2, iCY - (rcThis.bottom - rcThis.top) / 2);
 }
 
 void CUITradeEditDlg::Close()
@@ -116,6 +117,7 @@ void CUITradeEditDlg::Close()
 	SetVisible(false);
 
 	CN3UIEdit* pEdit = GetFocusedEdit();
-	if (pEdit) pEdit->KillFocus();
+	if (pEdit)
+		pEdit->KillFocus();
 }
 

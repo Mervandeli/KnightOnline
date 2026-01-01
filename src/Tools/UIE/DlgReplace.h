@@ -12,31 +12,32 @@
 
 class CDlgReplace : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgReplace(CWnd* pParent = nullptr);   // standard constructor
+	CDlgReplace(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+										  // Dialog Data
 	//{{AFX_DATA(CDlgReplace)
-	enum { IDD = IDD_REPLACE };
-	CString	m_strFind;
-	CString	m_strReplace;
+	enum
+	{
+		IDD = IDD_REPLACE
+	};
+	CString m_strFind;
+	CString m_strReplace;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgReplace)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgReplace)
-		// NOTE: the ClassWizard will add member functions here
+	// NOTE: the ClassWizard will add member functions here
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

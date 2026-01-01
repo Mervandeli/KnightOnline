@@ -17,7 +17,7 @@
 
 CUIQuestMenu::CUIQuestMenu()
 {
-	m_iMenuCnt = 0;
+	m_iMenuCnt     = 0;
 
 	m_pTextTitle   = nullptr;
 	m_pTextSample  = nullptr;
@@ -42,7 +42,7 @@ CUIQuestMenu::CUIQuestMenu()
 CUIQuestMenu::~CUIQuestMenu()
 {
 	InitBase();
-	
+
 	delete m_pTextSample;
 	delete m_pBtnMenu;
 	delete m_pImageBtn;
@@ -76,22 +76,22 @@ bool CUIQuestMenu::Load(File& file)
 	if (!CN3UIBase::Load(file))
 		return false;
 
-	N3_VERIFY_UI_COMPONENT(m_pTextSample,	GetChildByID<CN3UIString>("Text_Menu"));
-	N3_VERIFY_UI_COMPONENT(m_pTextTitle,	GetChildByID<CN3UIString>("Text_Title"));
+	N3_VERIFY_UI_COMPONENT(m_pTextSample, GetChildByID<CN3UIString>("Text_Menu"));
+	N3_VERIFY_UI_COMPONENT(m_pTextTitle, GetChildByID<CN3UIString>("Text_Title"));
 
-	N3_VERIFY_UI_COMPONENT(m_pBtnClose,		GetChildByID<CN3UIButton>("btn_close"));
-	N3_VERIFY_UI_COMPONENT(m_pStrNpcName,	GetChildByID<CN3UIString>("Text_Npcname"));
-	N3_VERIFY_UI_COMPONENT(m_pScrollBar,	GetChildByID<CN3UIScrollBar>("scroll"));
-	N3_VERIFY_UI_COMPONENT(m_pBtnMenu,		GetChildByID<CN3UIButton>("btn_menu"));
+	N3_VERIFY_UI_COMPONENT(m_pBtnClose, GetChildByID<CN3UIButton>("btn_close"));
+	N3_VERIFY_UI_COMPONENT(m_pStrNpcName, GetChildByID<CN3UIString>("Text_Npcname"));
+	N3_VERIFY_UI_COMPONENT(m_pScrollBar, GetChildByID<CN3UIScrollBar>("scroll"));
+	N3_VERIFY_UI_COMPONENT(m_pBtnMenu, GetChildByID<CN3UIButton>("btn_menu"));
 
 	// the background image for the button
-	N3_VERIFY_UI_COMPONENT(m_pImageBtn,		GetChildByID<CN3UIImage>("img_button_menu"));
+	N3_VERIFY_UI_COMPONENT(m_pImageBtn, GetChildByID<CN3UIImage>("img_button_menu"));
 
 	// this is the bottom of the quest menu UI
-	N3_VERIFY_UI_COMPONENT(m_pImageBottom,	GetChildByID<CN3UIImage>("img_Bottom"));
+	N3_VERIFY_UI_COMPONENT(m_pImageBottom, GetChildByID<CN3UIImage>("img_Bottom"));
 
 	// this is the background image for the background image for the button
-	N3_VERIFY_UI_COMPONENT(m_pImageMenu,	GetChildByID<CN3UIImage>("img_menu"));
+	N3_VERIFY_UI_COMPONENT(m_pImageMenu, GetChildByID<CN3UIImage>("img_menu"));
 
 	// NOTE: some of these components are meant only to be copied
 	RemoveChild(m_pTextSample);
@@ -150,17 +150,14 @@ void CUIQuestMenu::Open(Packet& pkt)
 {
 	InitBase();
 
-	if (m_pTextSample == nullptr
-		|| m_pImageBtn == nullptr
-		|| m_pImageMenu == nullptr
-		|| m_pBtnMenu == nullptr)
+	if (m_pTextSample == nullptr || m_pImageBtn == nullptr || m_pImageMenu == nullptr || m_pBtnMenu == nullptr)
 		return;
 
 	std::string szTitle;
 	std::string szMenu[MAX_STRING_MENU];
 
 	// NOTE: set the NPC name
-	int iNpcID = pkt.read<int16_t>();
+	int iNpcID       = pkt.read<int16_t>();
 
 	CPlayerNPC* pNPC = CGameProcedure::s_pOPMgr->NPCGetByID(iNpcID, false);
 	if (pNPC == nullptr)
@@ -169,7 +166,7 @@ void CUIQuestMenu::Open(Packet& pkt)
 	m_pStrNpcName->SetString(pNPC->IDString());
 
 	// NOTE: get the quest's main text
-	int index = pkt.read<uint32_t>();
+	int index                           = pkt.read<uint32_t>();
 
 	__TABLE_QUEST_TALK* pTbl_Quest_Talk = CGameBase::s_pTbl_QuestTalk.Find(index);
 	if (pTbl_Quest_Talk == nullptr)
@@ -207,7 +204,7 @@ void CUIQuestMenu::Open(Packet& pkt)
 	RECT rcImage, rcText;
 
 	rcImage = m_pImageMenu->GetRegion();
-	iIH = rcImage.bottom - rcImage.top;
+	iIH     = rcImage.bottom - rcImage.top;
 
 	for (int i = 0; i < m_iMenuCnt; i++)
 	{
@@ -222,13 +219,13 @@ void CUIQuestMenu::Open(Packet& pkt)
 			m_pTextMenu[i]->MoveOffset(0, i * iIH);
 		}
 
-		m_pTextMenuImg[i] = new CN3UIImage();
-		m_pTextMenuImgBk[i] = new CN3UIImage();
-		m_pTextMenuBtn[i] = new CN3UIButton();
+		m_pTextMenuImg[i]      = new CN3UIImage();
+		m_pTextMenuImgBk[i]    = new CN3UIImage();
+		m_pTextMenuBtn[i]      = new CN3UIButton();
 
-		*(m_pTextMenuImg[i]) = *m_pImageBtn;
+		*(m_pTextMenuImg[i])   = *m_pImageBtn;
 		*(m_pTextMenuImgBk[i]) = *m_pImageMenu;
-		*(m_pTextMenuBtn[i]) = *m_pBtnMenu;
+		*(m_pTextMenuBtn[i])   = *m_pBtnMenu;
 
 		m_pTextMenuImg[i]->MoveOffset(0, i * iIH);
 		m_pTextMenuImgBk[i]->MoveOffset(0, i * iIH);
@@ -243,11 +240,11 @@ void CUIQuestMenu::Open(Packet& pkt)
 	rcText = m_pTextMenuImgBk[m_iMenuCnt - 1]->GetRegion();
 	m_pImageBottom->SetPos(0, rcText.bottom);
 
-	const int iWidth = CN3Base::s_CameraData.vp.Width;
+	const int iWidth  = CN3Base::s_CameraData.vp.Width;
 	const int iHeight = CN3Base::s_CameraData.vp.Height;
 	int iX = 0, iY = 0;
 
-	rcText = GetRegion();
+	rcText        = GetRegion();
 	rcText.bottom = m_pImageBottom->GetRegion().bottom;
 	SetRegion(rcText);
 
@@ -280,18 +277,17 @@ void CUIQuestMenu::SetVisible(bool bVisible)
 
 void CUIQuestMenu::UpdateTextForScroll()
 {
-	if (m_pTextTitle == nullptr
-		|| m_pScrollBar == nullptr)
+	if (m_pTextTitle == nullptr || m_pScrollBar == nullptr)
 		return;
 
 	// scrollbar's current position
-	const int iScrollPosition = m_pScrollBar->GetCurrentPos();
+	const int iScrollPosition     = m_pScrollBar->GetCurrentPos();
 
 	// total number of lines of text
-	const int iTotalLineCount = m_pTextTitle->GetLineCount();
+	const int iTotalLineCount     = m_pTextTitle->GetLineCount();
 
 	// max number of lines visible in text area
-	const int iVisibleLineCount = 8;
+	const int iVisibleLineCount   = 8;
 
 	const int iMaxScrollableLines = iTotalLineCount - iVisibleLineCount;
 	m_pScrollBar->SetRangeMax(iMaxScrollableLines);
@@ -301,10 +297,7 @@ void CUIQuestMenu::UpdateTextForScroll()
 		return;
 
 	// limit check for the line which displayed first, topline
-	int iTopLine = std::clamp(
-		iScrollPosition,
-		0,
-		iTotalLineCount - iVisibleLineCount);
+	int iTopLine = std::clamp(iScrollPosition, 0, iTotalLineCount - iVisibleLineCount);
 
 	m_pTextTitle->SetStartLine(iTopLine);
 }

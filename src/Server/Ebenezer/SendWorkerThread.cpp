@@ -8,8 +8,8 @@
 
 using namespace std::chrono_literals;
 
-SendWorkerThread::SendWorkerThread(EbenezerSocketManager* socketManager)
-	: _socketManager(socketManager)
+SendWorkerThread::SendWorkerThread(EbenezerSocketManager* socketManager) :
+	_socketManager(socketManager)
 {
 }
 
@@ -45,7 +45,7 @@ void SendWorkerThread::tick()
 			continue;
 
 		char regionBuffer[REGION_BUFF_SIZE] = {};
-		int len = userSocket->RegionPacketClear(regionBuffer);
+		int len                             = userSocket->RegionPacketClear(regionBuffer);
 		if (len <= 0)
 			continue;
 

@@ -3,6 +3,6 @@
 
 CKnightsSiegeWar::CKnightsSiegeWar()
 {
-	_castleIndex	= 0;
-	_masterKnights	= 0;
+	_castleIndex   = 0;
+	_masterKnights = 0;
 }

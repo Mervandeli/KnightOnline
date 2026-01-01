@@ -18,73 +18,73 @@ class CDlgEditPart;
 class CDlgEditScript : public CDialog
 {
 public:
-	CMainFrame*					m_pRefFrm;
-	CN3FXBundle*				m_pFXBundle;
-	CComboBox*					m_pPartName[MAX_FX_PART_TOOL];
-	float*						m_pPartStartTime[MAX_FX_PART_TOOL];
-				
-// Construction
+	CMainFrame* m_pRefFrm;
+	CN3FXBundle* m_pFXBundle;
+	CComboBox* m_pPartName[MAX_FX_PART_TOOL];
+	float* m_pPartStartTime[MAX_FX_PART_TOOL];
+
+	// Construction
 public:
 	bool NewBundle();
 	bool LoadBundle(CString& strPathName);
 	void SaveGameDataPartnBundle();
-	CDlgEditScript(CWnd* pParent = nullptr);   // standard constructor
+	CDlgEditScript(CWnd* pParent = nullptr); // standard constructor
 	void RefreshParts();
 	void ReloadCombo();
-	
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgEditScript)
-	enum { IDD = IDD_DLG_SCRIPTEDITOR };
-	CComboBox	m_CBPartName15;
-	CComboBox	m_CBPartName14;
-	CComboBox	m_CBPartName13;
-	CComboBox	m_CBPartName12;
-	CComboBox	m_CBPartName11;
-	CComboBox	m_CBPartName10;
-	CComboBox	m_CBPartName9;
-	CComboBox	m_CBPartName8;
-	float		m_fStartTime0;
-	float		m_fStartTime1;
-	float		m_fStartTime2;
-	float		m_fStartTime3;
-	float		m_fStartTime4;
-	float		m_fStartTime5;
-	float		m_fStartTime6;
-	float		m_fStartTime7;
-	CComboBox	m_CBPartName0;
-	CComboBox	m_CBPartName1;
-	CComboBox	m_CBPartName2;
-	CComboBox	m_CBPartName3;
-	CComboBox	m_CBPartName4;
-	CComboBox	m_CBPartName5;
-	CComboBox	m_CBPartName6;
-	CComboBox	m_CBPartName7;
-	float	m_fVelocity;
-	BOOL	m_bDependScale;
-	CString	m_strPathName;
-	float	m_fStartTime8;
-	float	m_fStartTime9;
-	float	m_fStartTime10;
-	float	m_fStartTime11;
-	float	m_fStartTime12;
-	float	m_fStartTime13;
-	float	m_fStartTime14;
-	float	m_fStartTime15;
-	BOOL	m_bStaticPos;
+	enum
+	{
+		IDD = IDD_DLG_SCRIPTEDITOR
+	};
+	CComboBox m_CBPartName15;
+	CComboBox m_CBPartName14;
+	CComboBox m_CBPartName13;
+	CComboBox m_CBPartName12;
+	CComboBox m_CBPartName11;
+	CComboBox m_CBPartName10;
+	CComboBox m_CBPartName9;
+	CComboBox m_CBPartName8;
+	float m_fStartTime0;
+	float m_fStartTime1;
+	float m_fStartTime2;
+	float m_fStartTime3;
+	float m_fStartTime4;
+	float m_fStartTime5;
+	float m_fStartTime6;
+	float m_fStartTime7;
+	CComboBox m_CBPartName0;
+	CComboBox m_CBPartName1;
+	CComboBox m_CBPartName2;
+	CComboBox m_CBPartName3;
+	CComboBox m_CBPartName4;
+	CComboBox m_CBPartName5;
+	CComboBox m_CBPartName6;
+	CComboBox m_CBPartName7;
+	float m_fVelocity;
+	BOOL m_bDependScale;
+	CString m_strPathName;
+	float m_fStartTime8;
+	float m_fStartTime9;
+	float m_fStartTime10;
+	float m_fStartTime11;
+	float m_fStartTime12;
+	float m_fStartTime13;
+	float m_fStartTime14;
+	float m_fStartTime15;
+	BOOL m_bStaticPos;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgEditScript)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgEditScript)
 	afx_msg void OnBtnPlay();

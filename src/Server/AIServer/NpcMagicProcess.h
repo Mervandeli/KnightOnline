@@ -10,9 +10,9 @@ class CNpc;
 class CNpcMagicProcess
 {
 public:
-	AIServerApp*	m_pMain;
-	CNpc*			m_pSrcNpc;
-	uint8_t			m_bMagicState;
+	AIServerApp* m_pMain;
+	CNpc* m_pSrcNpc;
+	uint8_t m_bMagicState;
 
 public:
 	CNpcMagicProcess();
@@ -28,7 +28,8 @@ public:
 	void ExecuteType4(int magicid, int tid);
 	void ExecuteType3(int magicid, int tid, int data1, int data2, int data3, int moral);
 	void ExecuteType2(int magicid, int tid, int data1, int data2, int data3);
-	void ExecuteType1(int magicid, int tid, int data1, int data2, int data3);	// sequence => type1 or type2
+	void ExecuteType1(
+		int magicid, int tid, int data1, int data2, int data3); // sequence => type1 or type2
 
 	model::Magic* IsAvailable(int magicid, int tid, uint8_t type);
 	void MagicPacket(char* pBuf, int len);

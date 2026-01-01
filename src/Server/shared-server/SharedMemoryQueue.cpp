@@ -28,7 +28,9 @@ bool SharedMemoryQueue::Create(const char* name)
 	}
 	catch (const interprocess_exception& ex)
 	{
-		spdlog::error("SharedMemoryQueue::Create: failed to create shared memory. name='{}' ex='{}'", name, ex.what());
+		spdlog::error(
+			"SharedMemoryQueue::Create: failed to create shared memory. name='{}' ex='{}'", name,
+			ex.what());
 		_queue.reset();
 	}
 
@@ -39,7 +41,8 @@ bool SharedMemoryQueue::OpenOrCreate(const char* name)
 {
 	try
 	{
-		_queue = std::make_unique<message_queue_impl>(open_or_create, name, MAX_NUM_MSG, MAX_MSG_SIZE);
+		_queue = std::make_unique<message_queue_impl>(
+			open_or_create, name, MAX_NUM_MSG, MAX_MSG_SIZE);
 
 		// As with previous behaviour, as the expected 'creator' of the queue, flush it, even if we just reopened it.
 		FlushQueue();
@@ -47,7 +50,9 @@ bool SharedMemoryQueue::OpenOrCreate(const char* name)
 	}
 	catch (const interprocess_exception& ex)
 	{
-		spdlog::error("SharedMemoryQueue::OpenOrCreate: failed to open or create shared memory. name='{}' ex='{}'", name, ex.what());
+		spdlog::error("SharedMemoryQueue::OpenOrCreate: failed to open or create shared memory. "
+					  "name='{}' ex='{}'",
+			name, ex.what());
 		_queue.reset();
 	}
 
@@ -64,7 +69,9 @@ bool SharedMemoryQueue::Open(const char* name)
 	catch (const interprocess_exception& ex)
 	{
 		if (ex.get_error_code() != not_found_error)
-			spdlog::error("SharedMemoryQueue::Open: failed to open existing shared memory. name='{}' ex='{}'", name, ex.what());
+			spdlog::error(
+				"SharedMemoryQueue::Open: failed to open existing shared memory. name='{}' ex='{}'",
+				name, ex.what());
 
 		_queue.reset();
 	}
@@ -82,9 +89,9 @@ int SharedMemoryQueue::PutData(const char* pBuf, int size)
 		spdlog::error("SharedMemoryQueue::PutData: data size overflow: {} bytes", size);
 		return SMQ_PKTSIZEOVER;
 	}
-	
+
 	const uint32_t priority = 0;
-	int attemptCount = _sendRetryCount + 1;
+	int attemptCount        = _sendRetryCount + 1;
 
 	for (int i = 0; i < attemptCount; i++)
 	{
@@ -108,7 +115,7 @@ int SharedMemoryQueue::PutData(const char* pBuf, int size)
 int SharedMemoryQueue::GetData(char* pBuf)
 {
 	size_t receivedSize = 0;
-	uint32_t priority = 0;
+	uint32_t priority   = 0;
 
 	try
 	{

@@ -42,12 +42,12 @@ public:
 	~VersionManagerApp();
 	bool LoadVersionList();
 
-	SocketManager	_socketManager;
+	SocketManager _socketManager;
 
-	VersionInfoList	VersionList;
-	ServerInfoList	ServerList;
-	_NEWS			News;
-	CDBProcess		DbProcess;
+	VersionInfoList VersionList;
+	ServerInfoList ServerList;
+	_NEWS News;
+	CDBProcess DbProcess;
 
 protected:
 	/// \returns The application's ini config path.
@@ -63,12 +63,12 @@ protected:
 	bool OnStart() override;
 
 protected:
-	char			_ftpUrl[256];
-	char			_ftpPath[256];
+	char _ftpUrl[256];
+	char _ftpPath[256];
 
-	int				_lastVersion;
+	int _lastVersion;
 
-	std::unique_ptr<TimerThread>	_dbPoolCheckThread;
+	std::unique_ptr<TimerThread> _dbPoolCheckThread;
 };
 
 #endif // SERVER_VERSIONMANAGER_VERSIONMANAGERAPP_H

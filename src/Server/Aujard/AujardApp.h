@@ -36,10 +36,10 @@ public:
 	/// \todo related stored procedures are not implemented
 	/// \see DB_COUPON_EVENT
 	void CouponEvent(const char* data);
-	
+
 	/// \brief handles WIZ_BATTLE_EVENT requests
-    /// \details contains which nation won the war and which charId killed the commander
-    /// \see WIZ_BATTLE_EVENT
+	/// \details contains which nation won the war and which charId killed the commander
+	/// \see WIZ_BATTLE_EVENT
 	void BattleEventResult(const char* data);
 
 	/// \brief writes a packet summary line to the log file
@@ -96,7 +96,7 @@ public:
 	/// \param[out] userId UserData index of the user, if found
 	/// \return pointer to UserData[userId] object if found, nullptr otherwise
 	_USER_DATA* GetUserPtr(const char* charId, int& userId);
-	
+
 	/// \brief handles a WIZ_ALLCHAR_INFO_REQ request
 	/// \details Loads all character information and sends it to the client
 	/// \see WIZ_ALLCHAR_INFO_REQ
@@ -121,17 +121,17 @@ public:
 
 	/// \brief loads information needed from the ITEM table to a cache map
 	bool LoadItemTable();
-	
+
 	/// \brief handles a WIZ_DATASAVE request
 	/// \see WIZ_DATASAVE
 	/// \see HandleUserUpdate()
 	void UserDataSave(const char* buffer);
-	
+
 	/// \brief Handles a WIZ_LOGOUT request when logging out of the game
 	/// \details Updates USERDATA and WAREHOUSE as part of logging out, then resets the UserData entry for re-use
 	/// \see WIZ_LOGOUT, HandleUserLogout()
 	void UserLogOut(const char* buffer);
-	
+
 	/// \brief handling for when OnTimer fails a PROCESS_CHECK with ebenezer
 	/// \details Logs ebenezer outage, attempts to save all UserData, and resets all UserData[userId] objects
 	/// \see OnTimer(), HandleUserLogout()
@@ -143,21 +143,21 @@ public:
 	/// \brief loads and sends data after a character is selected
 	void SelectCharacter(const char* buffer);
 
-	SharedMemoryQueue	LoggerSendQueue;
-	SharedMemoryQueue	LoggerRecvQueue;
+	SharedMemoryQueue LoggerSendQueue;
+	SharedMemoryQueue LoggerRecvQueue;
 
-	ItemtableArray		ItemArray;
+	ItemtableArray ItemArray;
 
 protected:
-	CDBAgent			_dbAgent;
-	SharedMemoryBlock	_userDataBlock;
+	CDBAgent _dbAgent;
+	SharedMemoryBlock _userDataBlock;
 
-	int					_serverId;
-	int					_zoneId;
+	int _serverId;
+	int _zoneId;
 
-	int					_packetCount;		// packet의 수를 체크
-	int					_sendPacketCount;	// packet의 수를 체크
-	int					_recvPacketCount;	// packet의 수를 체크
+	int _packetCount;     // packet의 수를 체크
+	int _sendPacketCount; // packet의 수를 체크
+	int _recvPacketCount; // packet의 수를 체크
 
 protected:
 	/// \brief handles user logout functions
@@ -197,12 +197,12 @@ protected:
 	void OnSharedMemoryOpened();
 
 private:
-	time_t								_heartbeatReceivedTime;
-	std::unique_ptr<TimerThread>		_dbPoolCheckThread;
-	std::unique_ptr<TimerThread>		_heartbeatCheckThread;
-	std::unique_ptr<TimerThread>		_concurrentCheckThread;
-	std::unique_ptr<TimerThread>		_packetCheckThread;
-	std::unique_ptr<TimerThread>		_smqOpenThread;
+	time_t _heartbeatReceivedTime;
+	std::unique_ptr<TimerThread> _dbPoolCheckThread;
+	std::unique_ptr<TimerThread> _heartbeatCheckThread;
+	std::unique_ptr<TimerThread> _concurrentCheckThread;
+	std::unique_ptr<TimerThread> _packetCheckThread;
+	std::unique_ptr<TimerThread> _smqOpenThread;
 
-	std::unique_ptr<ReadQueueThread>	_readQueueThread;
+	std::unique_ptr<ReadQueueThread> _readQueueThread;
 };

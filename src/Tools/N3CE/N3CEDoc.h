@@ -14,23 +14,21 @@
 class CN3CEDoc : public CDocument
 {
 public:
-	CN3Scene	m_Scene;
-	BOOL		m_bLoadingNow;
+	CN3Scene m_Scene;
+	BOOL m_bLoadingNow;
 
 protected: // create from serialization only
 	CN3CEDoc();
 	DECLARE_DYNCREATE(CN3CEDoc)
 
-// Attributes
+	// Attributes
 public:
-
-// Operations
+	// Operations
 public:
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CN3CEDoc)
-	public:
+public:
 	virtual BOOL OnNewDocument();
 	virtual void Serialize(CArchive& ar);
 	virtual BOOL OnOpenDocument(LPCTSTR lpszPathName);
@@ -38,7 +36,7 @@ public:
 	virtual void OnCloseDocument();
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CN3CEDoc();
 #ifdef _DEBUG
@@ -47,8 +45,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CN3CEDoc)
 	afx_msg void OnFileSaveAsOneFolder();

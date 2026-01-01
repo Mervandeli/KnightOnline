@@ -18,26 +18,27 @@ public:
 
 public:
 	void UpdateAll();
-	CDlgUnusedFiles(CWnd* pParent = nullptr);   // standard constructor
+	CDlgUnusedFiles(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+											  // Dialog Data
 	//{{AFX_DATA(CDlgUnusedFiles)
-	enum { IDD = IDD_UNUSED_FILES };
-	CListBox	m_ListInvalidObjects;
-	CListBox	m_ListFiles;
+	enum
+	{
+		IDD = IDD_UNUSED_FILES
+	};
+	CListBox m_ListInvalidObjects;
+	CListBox m_ListFiles;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgUnusedFiles)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgUnusedFiles)
 	afx_msg void OnDelete();

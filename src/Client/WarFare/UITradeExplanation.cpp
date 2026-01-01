@@ -11,7 +11,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -21,49 +21,48 @@ static char THIS_FILE[]=__FILE__;
 
 CUITradeExplanation::CUITradeExplanation()
 {
-	m_pBtn_PageUp		= nullptr;
-	m_pBtn_PageDown		= nullptr;	
-	m_pBtn_Close		= nullptr;
+	m_pBtn_PageUp       = nullptr;
+	m_pBtn_PageDown     = nullptr;
+	m_pBtn_Close        = nullptr;
 	m_pText_Explanation = nullptr;
-	
-	m_szExplanation		= "";
-	m_iCurSel			= 0;
+
+	m_szExplanation     = "";
+	m_iCurSel           = 0;
 }
 
 CUITradeExplanation::~CUITradeExplanation()
 {
-
 }
 
 void CUITradeExplanation::SetExplanation(int iCurSel, std::string szExplanation)
 {
 	m_szExplanation = szExplanation;
-	m_iCurSel		= iCurSel;
-	if(m_pText_Explanation)
+	m_iCurSel       = iCurSel;
+	if (m_pText_Explanation)
 	{
 		m_pText_Explanation->SetString(m_szExplanation);
 	}
 }
 
-bool CUITradeExplanation::ReceiveMessage(CN3UIBase *pSender, uint32_t dwMsg)
+bool CUITradeExplanation::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if( dwMsg == UIMSG_BUTTON_CLICK )
+	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
-		if(pSender == m_pBtn_PageUp)
+		if (pSender == m_pBtn_PageUp)
 		{
-			if(m_pParentUI)
+			if (m_pParentUI)
 			{
-				m_pParentUI->CallBackProc(m_iChildID,1);
+				m_pParentUI->CallBackProc(m_iChildID, 1);
 			}
 		}
-		else if(pSender == m_pBtn_PageDown)
+		else if (pSender == m_pBtn_PageDown)
 		{
-			if(m_pParentUI)
+			if (m_pParentUI)
 			{
-				m_pParentUI->CallBackProc(m_iChildID,2);
+				m_pParentUI->CallBackProc(m_iChildID, 2);
 			}
 		}
-		else if(pSender == m_pBtn_Close)
+		else if (pSender == m_pBtn_Close)
 		{
 			SetVisible(false);
 		}
@@ -74,7 +73,8 @@ bool CUITradeExplanation::ReceiveMessage(CN3UIBase *pSender, uint32_t dwMsg)
 
 bool CUITradeExplanation::Load(File& file)
 {
-	if(CN3UIBase::Load(file)==false) return false;
+	if (CN3UIBase::Load(file) == false)
+		return false;
 
 	N3_VERIFY_UI_COMPONENT(m_pBtn_PageUp, GetChildByID<CN3UIButton>("btn_pageup"));
 	N3_VERIFY_UI_COMPONENT(m_pBtn_PageDown, GetChildByID<CN3UIButton>("btn_pagedown"));
@@ -86,17 +86,17 @@ bool CUITradeExplanation::Load(File& file)
 
 bool CUITradeExplanation::OnKeyPress(int iKey)
 {
-	switch(iKey)
+	switch (iKey)
 	{
-	case DIK_PRIOR:
-		ReceiveMessage(m_pBtn_PageUp, UIMSG_BUTTON_CLICK);
-		return true;
-	case DIK_NEXT:
-		ReceiveMessage(m_pBtn_PageDown, UIMSG_BUTTON_CLICK);
-		return true;
-	case DIK_ESCAPE:
-		ReceiveMessage(m_pBtn_Close, UIMSG_BUTTON_CLICK);
-		return true;
+		case DIK_PRIOR:
+			ReceiveMessage(m_pBtn_PageUp, UIMSG_BUTTON_CLICK);
+			return true;
+		case DIK_NEXT:
+			ReceiveMessage(m_pBtn_PageDown, UIMSG_BUTTON_CLICK);
+			return true;
+		case DIK_ESCAPE:
+			ReceiveMessage(m_pBtn_Close, UIMSG_BUTTON_CLICK);
+			return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

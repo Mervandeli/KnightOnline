@@ -15,78 +15,83 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 const float CARET_FLICKERING_TIME = 0.4f;
 
 //HWND CN3UIEdit::s_hWndParent = nullptr;
-HWND CN3UIEdit::s_hWndEdit = nullptr;
-HWND CN3UIEdit::s_hWndParent = nullptr;
-WNDPROC	CN3UIEdit::s_lpfnEditProc = nullptr;
-char CN3UIEdit::s_szBuffTmp[512] = "";
+HWND CN3UIEdit::s_hWndEdit        = nullptr;
+HWND CN3UIEdit::s_hWndParent      = nullptr;
+WNDPROC CN3UIEdit::s_lpfnEditProc = nullptr;
+char CN3UIEdit::s_szBuffTmp[512]  = "";
 
 //////////////////////////////////////////////////////////////////////
 // CN3UIEdit::CN3Caret
 //////////////////////////////////////////////////////////////////////
 CN3UIEdit::CN3Caret::CN3Caret()
 {
-	m_pVB[0].Set(0,0,UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xffff0000);
-	m_pVB[1].Set(0,10,UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xffff0000);
-	m_bVisible = FALSE;
-	m_fFlickerTimePrev = CN3Base::TimeGet();	// 깜박이기 위한 시간..
-	m_bFlickerStatus = true;
-
+	m_pVB[0].Set(0, 0, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xffff0000);
+	m_pVB[1].Set(0, 10, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xffff0000);
+	m_bVisible         = FALSE;
+	m_fFlickerTimePrev = CN3Base::TimeGet(); // 깜박이기 위한 시간..
+	m_bFlickerStatus   = true;
 }
 CN3UIEdit::CN3Caret::~CN3Caret()
 {
 }
 void CN3UIEdit::CN3Caret::SetPos(int x, int y)
 {
-	m_pVB[0].x = (float)x; m_pVB[0].y = (float)y;
-	m_pVB[1].x = (float)x; m_pVB[1].y = (float)y+m_iSize;
+	m_pVB[0].x = (float) x;
+	m_pVB[0].y = (float) y;
+	m_pVB[1].x = (float) x;
+	m_pVB[1].y = (float) y + m_iSize;
 	this->InitFlckering();
 }
 void CN3UIEdit::CN3Caret::MoveOffset(int iOffsetX, int iOffsetY)
 {
-	m_pVB[0].x += iOffsetX; m_pVB[0].y += iOffsetY; 
-	m_pVB[1].x = m_pVB[0].x; m_pVB[1].y = m_pVB[0].y+m_iSize;
+	m_pVB[0].x += iOffsetX;
+	m_pVB[0].y += iOffsetY;
+	m_pVB[1].x  = m_pVB[0].x;
+	m_pVB[1].y  = m_pVB[0].y + m_iSize;
 	this->InitFlckering();
 }
 void CN3UIEdit::CN3Caret::SetSize(int iSize)
 {
-	m_iSize = iSize;
-	m_pVB[1].y = m_pVB[0].y+m_iSize;
+	m_iSize    = iSize;
+	m_pVB[1].y = m_pVB[0].y + m_iSize;
 }
 void CN3UIEdit::CN3Caret::SetColor(D3DCOLOR color)
 {
 	m_pVB[0].color = color;
 	m_pVB[1].color = color;
 }
-void CN3UIEdit::CN3Caret::Render(LPDIRECT3DDEVICE9	lpD3DDev)
+void CN3UIEdit::CN3Caret::Render(LPDIRECT3DDEVICE9 lpD3DDev)
 {
-	if (FALSE == m_bVisible) return;
+	if (FALSE == m_bVisible)
+		return;
 
 	// 깜박임 처리..
 	float fTime = CN3Base::TimeGet();
-	if(fTime - m_fFlickerTimePrev > CARET_FLICKERING_TIME)
+	if (fTime - m_fFlickerTimePrev > CARET_FLICKERING_TIME)
 	{
-		m_bFlickerStatus = !m_bFlickerStatus;
+		m_bFlickerStatus   = !m_bFlickerStatus;
 		m_fFlickerTimePrev = fTime;
 	}
-	if(!m_bFlickerStatus) return;
+	if (!m_bFlickerStatus)
+		return;
 
 	__ASSERT(lpD3DDev, "DIRECT3DDEVICE8 is null");
 	lpD3DDev->SetTexture(0, nullptr);
-//	lpD3DDev->SetTextureStageState( 0, D3DTSS_COLOROP,    D3DTOP_SELECTARG1 );
-//	lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG1,  D3DTA_DIFFUSE );
+	//	lpD3DDev->SetTextureStageState( 0, D3DTSS_COLOROP,    D3DTOP_SELECTARG1 );
+	//	lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG1,  D3DTA_DIFFUSE );
 	lpD3DDev->SetFVF(FVF_TRANSFORMEDCOLOR);
 	lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 1, m_pVB, sizeof(m_pVB[0]));
 }
 void CN3UIEdit::CN3Caret::InitFlckering()
 {
-	m_fFlickerTimePrev = CN3Base::TimeGet();	// 깜박이기 위한 시간..
-	m_bFlickerStatus = true;
+	m_fFlickerTimePrev = CN3Base::TimeGet(); // 깜박이기 위한 시간..
+	m_bFlickerStatus   = true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -95,20 +100,25 @@ void CN3UIEdit::CN3Caret::InitFlckering()
 
 BOOL CN3UIEdit::CreateEditWindow(HWND hParent, RECT rect)
 {
-	if(nullptr == hParent) return FALSE;
-	if(s_hWndEdit) return FALSE;
+	if (nullptr == hParent)
+		return FALSE;
+	if (s_hWndEdit)
+		return FALSE;
 
 	s_hWndParent = hParent;
-	s_hWndEdit = CreateWindow("EDIT", "EditWindow", WS_CHILD|WS_TABSTOP|ES_LEFT|ES_WANTRETURN, rect.left, rect.top, rect.right-rect.left, rect.bottom-rect.top, hParent, nullptr, nullptr, nullptr);
-	s_lpfnEditProc = (WNDPROC) SetWindowLongPtr(s_hWndEdit, GWLP_WNDPROC, (LONG_PTR) CN3UIEdit::EditWndProc);
+	s_hWndEdit = CreateWindow("EDIT", "EditWindow", WS_CHILD | WS_TABSTOP | ES_LEFT | ES_WANTRETURN,
+		rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, hParent, nullptr,
+		nullptr, nullptr);
+	s_lpfnEditProc = (WNDPROC) SetWindowLongPtr(
+		s_hWndEdit, GWLP_WNDPROC, (LONG_PTR) CN3UIEdit::EditWndProc);
 
 	// Set the edit control's text size to the maximum.
 	::SendMessage(s_hWndEdit, EM_LIMITTEXT, 0, 0);
 
 	// Set the edit control's font
-	HFONT hFont = (HFONT)GetStockObject(ANSI_FIXED_FONT);
-	::SendMessage(s_hWndEdit, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
-	::SendMessage(s_hWndEdit, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
+	HFONT hFont = (HFONT) GetStockObject(ANSI_FIXED_FONT);
+	::SendMessage(s_hWndEdit, WM_SETFONT, (WPARAM) hFont, MAKELPARAM(TRUE, 0));
+	::SendMessage(s_hWndEdit, WM_SETFONT, (WPARAM) hFont, MAKELPARAM(TRUE, 0));
 
 	// 배경 지우기...??
 	HDC hDC = GetDC(s_hWndEdit);
@@ -121,67 +131,63 @@ BOOL CN3UIEdit::CreateEditWindow(HWND hParent, RECT rect)
 
 LRESULT APIENTRY CN3UIEdit::EditWndProc(HWND hWnd, uint16_t Message, WPARAM wParam, LPARAM lParam)
 {
-   //
-   // When the focus is in an edit control inside a dialog box, the
-   //  default ENTER key action will not occur.
-   //
-    switch (Message)
+	//
+	// When the focus is in an edit control inside a dialog box, the
+	//  default ENTER key action will not occur.
+	//
+	switch (Message)
 	{
-	case WM_KEYDOWN:
-		if (wParam == VK_RETURN)
-		{
-			if(s_pFocusedEdit && s_pFocusedEdit->GetParent())
+		case WM_KEYDOWN:
+			if (wParam == VK_RETURN)
 			{
-				s_pFocusedEdit->GetParent()->ReceiveMessage(s_pFocusedEdit, UIMSG_EDIT_RETURN);
+				if (s_pFocusedEdit && s_pFocusedEdit->GetParent())
+				{
+					s_pFocusedEdit->GetParent()->ReceiveMessage(s_pFocusedEdit, UIMSG_EDIT_RETURN);
+				}
+				return 0;
 			}
+
+			(CallWindowProc(s_lpfnEditProc, hWnd, Message, wParam, lParam));
+			if (s_pFocusedEdit)
+				CN3UIEdit::UpdateCaretPosFromEditCtrl();
 			return 0;
-		}
+			//break;
 
-		(CallWindowProc(s_lpfnEditProc, hWnd, Message, wParam, lParam));
-		if(s_pFocusedEdit) CN3UIEdit::UpdateCaretPosFromEditCtrl();
-		return 0;
-		//break;
-
-    case WM_CHAR:
-		if(s_pFocusedEdit) CN3UIEdit::UpdateCaretPosFromEditCtrl();
-		if(wParam==VK_RETURN) return 0;
-		if(wParam==VK_TAB) return 0;
-		break;
-	case WM_INPUTLANGCHANGE:
+		case WM_CHAR:
+			if (s_pFocusedEdit)
+				CN3UIEdit::UpdateCaretPosFromEditCtrl();
+			if (wParam == VK_RETURN)
+				return 0;
+			if (wParam == VK_TAB)
+				return 0;
+			break;
+		case WM_INPUTLANGCHANGE:
 		{
 			POINT ptPos;
 			ptPos.x = 0;
 			ptPos.y = 0;
-			SetImeStatus(ptPos,true);
+			SetImeStatus(ptPos, true);
 		}
 		break;
-	case WM_IME_ENDCOMPOSITION:
+		case WM_IME_ENDCOMPOSITION:
 		{
 			POINT ptPos;
 			ptPos.x = -1000;
 			ptPos.y = -1000;
-			SetImeStatus(ptPos,false);
+			SetImeStatus(ptPos, false);
 		}
 		break;
-	case WM_IME_STARTCOMPOSITION:
+		case WM_IME_STARTCOMPOSITION:
 		{
 			POINT ptPos;
 			ptPos.x = 0;
 			ptPos.y = 0;
-			SetImeStatus(ptPos,true);
+			SetImeStatus(ptPos, true);
 		}
 		break;
-    } // switch
+	} // switch
 
-
-
-
-
-
-
-
-
-/*
+	/*
 	switch(Message)
 	{
 	case WM_IME_CHAR:
@@ -395,21 +401,6 @@ LRESULT APIENTRY CN3UIEdit::EditWndProc(HWND hWnd, uint16_t Message, WPARAM wPar
 	}
 */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	return (CallWindowProc(s_lpfnEditProc, hWnd, Message, wParam, lParam));
 }
 
@@ -417,10 +408,10 @@ CN3UIEdit::CN3Caret CN3UIEdit::s_Caret;
 
 CN3UIEdit::CN3UIEdit()
 {
-	m_eType = UI_TYPE_EDIT;
-	m_nCaretPos = 0;
+	m_eType       = UI_TYPE_EDIT;
+	m_nCaretPos   = 0;
 	m_iCompLength = 0;
-	m_iMaxStrLen = 0x7fffffff;
+	m_iMaxStrLen  = 0x7fffffff;
 	KillFocus();
 	m_pSnd_Typing = nullptr;
 }
@@ -434,9 +425,9 @@ CN3UIEdit::~CN3UIEdit()
 void CN3UIEdit::Release()
 {
 	CN3UIBase::Release();
-	m_nCaretPos = 0;
+	m_nCaretPos   = 0;
 	m_iCompLength = 0;
-	m_iMaxStrLen = 0x7fffffff;
+	m_iMaxStrLen  = 0x7fffffff;
 	KillFocus();
 	m_szPassword = "";
 	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Typing);
@@ -444,12 +435,13 @@ void CN3UIEdit::Release()
 
 void CN3UIEdit::Render()
 {
-	if (!m_bVisible) return;
+	if (!m_bVisible)
+		return;
 
 	CN3UIStatic::Render();
 	if (HaveFocus())
 	{
-		s_Caret.Render(s_lpD3DDev);	// 포커스가 있으면 캐럿 그리기
+		s_Caret.Render(s_lpD3DDev); // 포커스가 있으면 캐럿 그리기
 	}
 }
 
@@ -457,7 +449,7 @@ void CN3UIEdit::SetVisible(bool bVisible)
 {
 	CN3UIBase::SetVisible(bVisible);
 
-	if (false == bVisible && true == m_bVisible)	// 보이지 않게 할때
+	if (false == bVisible && true == m_bVisible) // 보이지 않게 할때
 	{
 		KillFocus();
 	}
@@ -467,10 +459,10 @@ void CN3UIEdit::KillFocus()
 {
 	if (HaveFocus())
 	{
-		s_pFocusedEdit = nullptr;
+		s_pFocusedEdit     = nullptr;
 		s_Caret.m_bVisible = FALSE;
 
-		if(s_hWndEdit)
+		if (s_hWndEdit)
 		{
 			::SetWindowText(s_hWndEdit, "");
 			::SetFocus(s_hWndParent);
@@ -480,9 +472,10 @@ void CN3UIEdit::KillFocus()
 
 bool CN3UIEdit::SetFocus()
 {
-//	if (HaveFocus()) return true;		// 이미 내가 포커스를 가지고 있으면 return true;
-	if (nullptr != s_pFocusedEdit) s_pFocusedEdit->KillFocus();	// 다른 edit 가 가지고 있으면 killfocus호출
-	s_pFocusedEdit = this;				// 포커스를 가지고 있는 edit를 나로 설정
+	//	if (HaveFocus()) return true;		// 이미 내가 포커스를 가지고 있으면 return true;
+	if (nullptr != s_pFocusedEdit)
+		s_pFocusedEdit->KillFocus(); // 다른 edit 가 가지고 있으면 killfocus호출
+	s_pFocusedEdit = this;           // 포커스를 가지고 있는 edit를 나로 설정
 
 	SIZE size;
 	if (m_pBuffOutRef && m_pBuffOutRef->GetTextExtent("가", lstrlen("가"), &size))
@@ -495,25 +488,27 @@ bool CN3UIEdit::SetFocus()
 	s_Caret.InitFlckering();
 	CN3UIEdit::UpdateCaretPosFromEditCtrl(); // 캐럿 포지션 설정
 
-	if(s_hWndEdit)
+	if (s_hWndEdit)
 	{
 		::SetFocus(s_hWndEdit);
 
 		RECT rcEdit = GetRegion();
-		int iX		= rcEdit.left;
-		int iY		= rcEdit.top;
-		int iH		= rcEdit.bottom - rcEdit.top;
-		int iW		= rcEdit.right - rcEdit.left;
+		int iX      = rcEdit.left;
+		int iY      = rcEdit.top;
+		int iH      = rcEdit.bottom - rcEdit.top;
+		int iW      = rcEdit.right - rcEdit.left;
 		::MoveWindow(s_hWndEdit, iX, iY, iW, iH, false);
-		
-		if(UISTYLE_EDIT_PASSWORD & m_dwStyle)
+
+		if (UISTYLE_EDIT_PASSWORD & m_dwStyle)
 		{
 			::SetWindowText(s_hWndEdit, m_szPassword.c_str());
 		}
 		else
 		{
-			if(m_pBuffOutRef) ::SetWindowText(s_hWndEdit, m_pBuffOutRef->GetString().c_str());
-			else ::SetWindowText(s_hWndEdit, "");
+			if (m_pBuffOutRef)
+				::SetWindowText(s_hWndEdit, m_pBuffOutRef->GetString().c_str());
+			else
+				::SetWindowText(s_hWndEdit, "");
 		}
 	}
 
@@ -523,11 +518,12 @@ bool CN3UIEdit::SetFocus()
 uint32_t CN3UIEdit::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld)
 {
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
-	if (!m_bVisible) return dwRet;
-	if(dwFlags & UI_MOUSE_LBCLICK &&IsIn(ptCur.x, ptCur.y))	// 영역 안에서 왼쪽 버튼이 눌렸으면
+	if (!m_bVisible)
+		return dwRet;
+	if (dwFlags & UI_MOUSE_LBCLICK && IsIn(ptCur.x, ptCur.y)) // 영역 안에서 왼쪽 버튼이 눌렸으면
 	{
-		SetFocus();	// 나에게 포커스를 준다.
-		dwRet |= (UI_MOUSEPROC_DONESOMETHING|UI_MOUSEPROC_INREGION);
+		SetFocus();                                           // 나에게 포커스를 준다.
+		dwRet |= (UI_MOUSEPROC_DONESOMETHING | UI_MOUSEPROC_INREGION);
 		return dwRet;
 	}
 	dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);
@@ -537,12 +533,13 @@ uint32_t CN3UIEdit::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 void CN3UIEdit::SetCaretPos(size_t nPos)
 {
 	if (nPos > m_iMaxStrLen)
-		nPos = m_iMaxStrLen;	// 최대 길이보다 길경우 작게 세팅
-	m_nCaretPos = nPos;
+		nPos = m_iMaxStrLen; // 최대 길이보다 길경우 작게 세팅
+	m_nCaretPos               = nPos;
 
 	const std::string& szBuff = m_pBuffOutRef->GetString();
-	__ASSERT(szBuff.empty() || -1 == szBuff.find('\n'), "multiline edit");	// 지금은 multiline은 지원하지 않는다.
-	SIZE size = { 0,0 };
+	__ASSERT(szBuff.empty() || -1 == szBuff.find('\n'),
+		"multiline edit"); // 지금은 multiline은 지원하지 않는다.
+	SIZE size = { 0, 0 };
 	if (!szBuff.empty() && m_pBuffOutRef != nullptr)
 		m_pBuffOutRef->GetTextExtent(szBuff, static_cast<int>(m_nCaretPos), &size);
 
@@ -553,7 +550,7 @@ void CN3UIEdit::SetCaretPos(size_t nPos)
 	s_Caret.SetPos(m_pBuffOutRef->m_ptDrawPos.x + size.cx, m_pBuffOutRef->m_ptDrawPos.y);
 }
 
-void CN3UIEdit::SetMaxString(size_t nMax)		// 최대 글씨 수를 정해준다
+void CN3UIEdit::SetMaxString(size_t nMax) // 최대 글씨 수를 정해준다
 {
 	if (nMax == 0)
 	{
@@ -585,14 +582,17 @@ void CN3UIEdit::SetMaxString(size_t nMax)		// 최대 글씨 수를 정해준다
 // 별 다른 문제 없이 사용할 수 있다고 생각한다.
 //
 /////////////////////////////////////////////////////////////////////
-BOOL CN3UIEdit::IsHangulMiddleByte( const char* lpszStr, int iPos )
+BOOL CN3UIEdit::IsHangulMiddleByte(const char* lpszStr, int iPos)
 {
-    if( !lpszStr ) return FALSE;
-    if (iPos <= 0) return FALSE;
-    int nLength = lstrlen(lpszStr);
-    if (iPos >= nLength) return FALSE;
-    if (!(lpszStr[iPos] & 0x80))
-        return FALSE;
+	if (!lpszStr)
+		return FALSE;
+	if (iPos <= 0)
+		return FALSE;
+	int nLength = lstrlen(lpszStr);
+	if (iPos >= nLength)
+		return FALSE;
+	if (!(lpszStr[iPos] & 0x80))
+		return FALSE;
 
 	BOOL bMiddle = FALSE;
 	for (int i = 0; i < iPos && i < nLength; i++)
@@ -605,7 +605,8 @@ BOOL CN3UIEdit::IsHangulMiddleByte( const char* lpszStr, int iPos )
 
 const std::string& CN3UIEdit::GetString()
 {
-	if (UISTYLE_EDIT_PASSWORD & m_dwStyle) return m_szPassword;
+	if (UISTYLE_EDIT_PASSWORD & m_dwStyle)
+		return m_szPassword;
 	return CN3UIStatic::GetString();
 }
 
@@ -620,7 +621,9 @@ void CN3UIEdit::SetString(const std::string& szString)
 
 		if (IsHangulMiddleByte(szString.c_str(), static_cast<int>(m_iMaxStrLen)))
 		{
-			szNewBuff = szString.substr(0, m_iMaxStrLen - 1);	// -1은 한글이므로 하나 덜 카피하기 위해 +1은 맨 마지막에 nullptr 넣기 위해
+			szNewBuff = szString.substr(0,
+				m_iMaxStrLen
+					- 1); // -1은 한글이므로 하나 덜 카피하기 위해 +1은 맨 마지막에 nullptr 넣기 위해
 			if (UISTYLE_EDIT_PASSWORD & m_dwStyle)
 			{
 				m_szPassword = szNewBuff;
@@ -632,7 +635,7 @@ void CN3UIEdit::SetString(const std::string& szString)
 		}
 		else
 		{
-			szNewBuff = szString.substr(0, m_iMaxStrLen);	// +1은 맨 마지막에 nullptr 넣기 위해
+			szNewBuff = szString.substr(0, m_iMaxStrLen); // +1은 맨 마지막에 nullptr 넣기 위해
 			if (UISTYLE_EDIT_PASSWORD & m_dwStyle)
 			{
 				m_szPassword = szNewBuff;
@@ -665,15 +668,17 @@ void CN3UIEdit::SetString(const std::string& szString)
 	}
 
 	const std::string& szTempStr = m_pBuffOutRef->GetString();
-	uint32_t nStrLen = static_cast<uint32_t>(szTempStr.size());
+	uint32_t nStrLen             = static_cast<uint32_t>(szTempStr.size());
 	if (m_nCaretPos > nStrLen)
 		SetCaretPos(nStrLen);
 }
 
-BOOL CN3UIEdit::MoveOffset(int iOffsetX, int iOffsetY)		// 위치 지정(chilren의 위치도 같이 바꾸어준다. caret위치도 같이 바꾸어줌.)
+BOOL CN3UIEdit::MoveOffset(int iOffsetX,
+	int iOffsetY) // 위치 지정(chilren의 위치도 같이 바꾸어준다. caret위치도 같이 바꾸어줌.)
 {
-	if (FALSE == CN3UIBase::MoveOffset(iOffsetX, iOffsetY)) return FALSE;
-/*
+	if (FALSE == CN3UIBase::MoveOffset(iOffsetX, iOffsetY))
+		return FALSE;
+	/*
 	RECT rcEdit = GetRegion();
 	int iX		= rcEdit.left;
 	int iY		= rcEdit.top;
@@ -682,7 +687,8 @@ BOOL CN3UIEdit::MoveOffset(int iOffsetX, int iOffsetY)		// 위치 지정(chilren
 
 	::MoveWindow(s_hWndEdit, iX, iY, iW, iH, false);
 */
-	if (HaveFocus()) s_Caret.MoveOffset(iOffsetX, iOffsetY);
+	if (HaveFocus())
+		s_Caret.MoveOffset(iOffsetX, iOffsetY);
 	return TRUE;
 }
 
@@ -694,7 +700,7 @@ bool CN3UIEdit::Load(File& file)
 	// 이전 uif파일을 컨버팅 하려면 사운드 로드 하는 부분 막기
 	int iSndFNLen = 0;
 
-	file.Read(&iSndFNLen, sizeof(iSndFNLen));		//	사운드 파일 문자열 길이
+	file.Read(&iSndFNLen, sizeof(iSndFNLen)); //	사운드 파일 문자열 길이
 	if (iSndFNLen > 0)
 	{
 		std::string filename(iSndFNLen, '\0');
@@ -708,9 +714,9 @@ bool CN3UIEdit::Load(File& file)
 }
 
 #ifdef _N3TOOL
-void CN3UIEdit::operator = (const CN3UIEdit& other)
+void CN3UIEdit::operator=(const CN3UIEdit& other)
 {
-	CN3UIStatic::operator = (other);
+	CN3UIStatic::operator=(other);
 	SetSndTyping(other.GetSndFName_Typing());
 }
 
@@ -722,7 +728,7 @@ bool CN3UIEdit::Save(File& file)
 	int iSndFNLen = 0;
 	if (m_pSnd_Typing != nullptr)
 		iSndFNLen = static_cast<int>(m_pSnd_Typing->FileName().size());
-	file.Write(&iSndFNLen, sizeof(iSndFNLen));		//	사운드 파일 문자열 길이
+	file.Write(&iSndFNLen, sizeof(iSndFNLen)); //	사운드 파일 문자열 길이
 	if (iSndFNLen > 0)
 		file.Write(m_pSnd_Typing->FileName().c_str(), iSndFNLen);
 
@@ -732,10 +738,11 @@ bool CN3UIEdit::Save(File& file)
 void CN3UIEdit::SetSndTyping(const std::string& strFileName)
 {
 	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Typing);
-	if (0 == strFileName.size()) return;
+	if (0 == strFileName.size())
+		return;
 
 	CN3BaseFileAccess tmpBase;
-	tmpBase.FileNameSet(strFileName);	// Base경로에 대해서 상대적 경로를 넘겨준다.
+	tmpBase.FileNameSet(strFileName); // Base경로에 대해서 상대적 경로를 넘겨준다.
 
 	SetCurrentDirectory(tmpBase.PathGet().c_str());
 	m_pSnd_Typing = s_SndMgr.CreateObj(tmpBase.FileName(), SNDTYPE_2D);
@@ -745,14 +752,15 @@ std::string CN3UIEdit::GetSndFName_Typing() const
 {
 	if (m_pSnd_Typing == nullptr)
 		return {};
-	
+
 	return m_pSnd_Typing->FileName();
 }
 #endif
 
 void CN3UIEdit::UpdateTextFromEditCtrl()
 {
-	if(nullptr == s_pFocusedEdit || nullptr == s_hWndEdit) return;
+	if (nullptr == s_pFocusedEdit || nullptr == s_hWndEdit)
+		return;
 
 	::GetWindowText(s_hWndEdit, s_szBuffTmp, 512);
 	s_pFocusedEdit->SetString(s_szBuffTmp);
@@ -760,9 +768,10 @@ void CN3UIEdit::UpdateTextFromEditCtrl()
 
 void CN3UIEdit::UpdateCaretPosFromEditCtrl()
 {
-	if(nullptr == s_pFocusedEdit || nullptr == s_hWndEdit) return;
+	if (nullptr == s_pFocusedEdit || nullptr == s_hWndEdit)
+		return;
 
-/*	int iCaret = 0;
+	/*	int iCaret = 0;
 	int iLen = GetWindowTextLength(s_hWndEdit);
 	POINT ptCaret;
 	GetCaretPos(&ptCaret);
@@ -776,8 +785,8 @@ void CN3UIEdit::UpdateCaretPosFromEditCtrl()
 	}
 */
 	LRESULT lResult = ::SendMessage(s_hWndEdit, EM_GETSEL, 0, 0);
-	int iCaret = LOWORD(lResult);
-	int iCTmp2 = HIWORD(lResult);
+	int iCaret      = LOWORD(lResult);
+	int iCTmp2      = HIWORD(lResult);
 	s_pFocusedEdit->SetCaretPos(iCaret);
 }
 
@@ -785,19 +794,19 @@ void CN3UIEdit::SetImeStatus(POINT ptPos, bool bOpen)
 {
 #ifndef _N3TOOL
 	HKL hHKL = GetKeyboardLayout(0);
-	if(ImmIsIME(hHKL))
+	if (ImmIsIME(hHKL))
 	{
 		HIMC hImc = ImmGetContext(s_hWndEdit);
-		if(bOpen)
+		if (bOpen)
 		{
 			SendMessage(s_hWndEdit, WM_IME_NOTIFY, IMN_OPENSTATUSWINDOW, 0);
-			ImmSetStatusWindowPos(hImc,&ptPos);
+			ImmSetStatusWindowPos(hImc, &ptPos);
 		}
 		else
 		{
 			SendMessage(s_hWndEdit, WM_IME_NOTIFY, IMN_CLOSESTATUSWINDOW, 0);
 		}
-		ImmReleaseContext( s_hWndEdit, hImc );
+		ImmReleaseContext(s_hWndEdit, hImc);
 	}
 #endif
 }

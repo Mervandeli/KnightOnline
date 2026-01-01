@@ -21,20 +21,16 @@ bool FileWriter::OpenExisting(const std::filesystem::path& path)
 	// NOTE: As we have no 'append' flag, we will leave the offset set to 0.
 	// If the user wishes to append, they must seek to the end of the file themselves.
 	// This matches WinAPI & general C file I/O API behaviour (where the "a" mode isn't used).
-	auto handleResult = llfio::file(
-		{},
-		path.native(),
-		llfio::handle::mode::write,
-		llfio::handle::creation::open_existing,
-		llfio::handle::caching::all,
+	auto handleResult = llfio::file({}, path.native(), llfio::handle::mode::write,
+		llfio::handle::creation::open_existing, llfio::handle::caching::all,
 		llfio::handle::flag::none);
 	if (!handleResult)
 		return false;
 
 	_fileHandle = std::move(std::move(handleResult).value());
-	_path = path;
-	_open = true;
-	_size = 0;
+	_path       = path;
+	_open       = true;
+	_size       = 0;
 
 	llfio::stat_t stat;
 
@@ -54,20 +50,16 @@ bool FileWriter::Create(const std::filesystem::path& path)
 	// Open the given file for writing.
 	// If it doesn't exist, create it.
 	// If it already exists, truncate it.
-	auto handleResult = llfio::file(
-		{},
-		path.native(),
-		llfio::handle::mode::write,
-		llfio::handle::creation::always_new,
-		llfio::handle::caching::all,
+	auto handleResult = llfio::file({}, path.native(), llfio::handle::mode::write,
+		llfio::handle::creation::always_new, llfio::handle::caching::all,
 		llfio::handle::flag::none);
 	if (!handleResult)
 		return false;
 
 	_fileHandle = std::move(std::move(handleResult).value());
-	_path = path;
-	_open = true;
-	_size = 0;
+	_path       = path;
+	_open       = true;
+	_size       = 0;
 	_sizeOnDisk = 0;
 	return true;
 }
@@ -95,14 +87,14 @@ bool FileWriter::Write(const void* buffer, size_t bytesToWrite, size_t* bytesWri
 	assert(_fileHandle.is_valid());
 
 	// Write the given bytes out to file.
-	auto writeResult = _fileHandle.write(_offset,
-		{ { static_cast<const std::byte*>(buffer), bytesToWrite } });
+	auto writeResult = _fileHandle.write(
+		_offset, { { static_cast<const std::byte*>(buffer), bytesToWrite } });
 	if (!writeResult)
 		return false;
 
 	// Advance the current file's offset by the number of bytes actually written.
-	size_t effectiveBytesWritten = writeResult.value();
-	_offset += effectiveBytesWritten;
+	size_t effectiveBytesWritten  = writeResult.value();
+	_offset                      += effectiveBytesWritten;
 
 	// Update the caller with the number of bytes actually written.
 	if (bytesWritten != nullptr)
@@ -111,7 +103,7 @@ bool FileWriter::Write(const void* buffer, size_t bytesToWrite, size_t* bytesWri
 	// Expand the size of the file if we've written past the end of it.
 	if (_offset > _size)
 	{
-		_size = _offset;
+		_size       = _offset;
 		_sizeOnDisk = _size;
 	}
 
@@ -177,10 +169,9 @@ void FileWriter::Flush()
 	// the operating system will fill in the blanks.
 	if (_size > _sizeOnDisk)
 	{
-		std::byte dummy = {};
+		std::byte dummy  = {};
 
-		auto writeResult = _fileHandle.write(_size - 1,
-			{ { &dummy, 1 } });
+		auto writeResult = _fileHandle.write(_size - 1, { { &dummy, 1 } });
 		if (writeResult)
 			_sizeOnDisk = _size;
 	}
@@ -197,7 +188,7 @@ bool FileWriter::Close()
 	(void) _fileHandle.close();
 
 	_offset = 0;
-	_open = false;
+	_open   = false;
 
 	return true;
 }

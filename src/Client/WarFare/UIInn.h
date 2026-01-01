@@ -14,7 +14,7 @@
 //////////////////////////////////////////////////////////////////////
 
 class CUIInn : public CN3UIBase
-{	
+{
 public:
 	bool OnKeyPress(int iChar);
 	void SetVisible(bool bVisible);

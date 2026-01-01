@@ -4,9 +4,9 @@
 #include <fstream>
 #include "StringUtils.h"
 
-constexpr char INI_SECTION_START	= '[';
-constexpr char INI_SECTION_END		= ']';
-constexpr char INI_KEY_SEPARATOR	= '=';
+constexpr char INI_SECTION_START = '[';
+constexpr char INI_SECTION_END   = ']';
+constexpr char INI_KEY_SEPARATOR = '=';
 
 CIni::CIni(const std::filesystem::path& path)
 {
@@ -51,7 +51,7 @@ bool CIni::Load(const std::filesystem::path& path)
 			if (skipNextSection)
 				continue;
 
-			std::string key = line.substr(0, keySeparatorPos);
+			std::string key   = line.substr(0, keySeparatorPos);
 			std::string value = line.substr(keySeparatorPos + 1);
 
 			// Clean up key/value to allow for 'key = value'
@@ -61,8 +61,7 @@ bool CIni::Load(const std::filesystem::path& path)
 			auto itr = _configMap.find(currentSection);
 			if (itr == _configMap.end())
 			{
-				_configMap.insert(
-					std::make_pair(currentSection, ConfigEntryMap()));
+				_configMap.insert(std::make_pair(currentSection, ConfigEntryMap()));
 				itr = _configMap.find(currentSection);
 			}
 
@@ -72,10 +71,9 @@ bool CIni::Load(const std::filesystem::path& path)
 
 		// Not a value, so assume it's a section
 		size_t sectionStart = line.find_first_of(INI_SECTION_START);
-		size_t sectionEnd = line.find_last_of(INI_SECTION_END);
+		size_t sectionEnd   = line.find_last_of(INI_SECTION_END);
 
-		if (sectionStart == std::string::npos
-			|| sectionEnd == std::string::npos
+		if (sectionStart == std::string::npos || sectionEnd == std::string::npos
 			|| sectionStart > sectionEnd)
 		{
 			/* invalid section */
@@ -83,7 +81,7 @@ bool CIni::Load(const std::filesystem::path& path)
 			continue;
 		}
 
-		currentSection = line.substr(sectionStart + 1, sectionEnd - 1);
+		currentSection  = line.substr(sectionStart + 1, sectionEnd - 1);
 		skipNextSection = false;
 	}
 
@@ -99,7 +97,7 @@ void CIni::Save()
 void CIni::Save(const std::filesystem::path& path)
 {
 	FILE* fp = nullptr;
-	
+
 #ifdef _MSC_VER
 	_wfopen_s(&fp, path.c_str(), L"w");
 #else
@@ -144,7 +142,8 @@ bool CIni::GetBool(std::string_view svAppName, std::string_view svKeyName, const
 	return GetInt(svAppName, svKeyName, bDefault) == 1;
 }
 
-std::string CIni::GetString(std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault)
+std::string CIni::GetString(
+	std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault)
 {
 	auto sectionItr = _configMap.find(svAppName);
 	if (sectionItr != _configMap.end())
@@ -159,7 +158,8 @@ std::string CIni::GetString(std::string_view svAppName, std::string_view svKeyNa
 	return szResult;
 }
 
-void CIni::GetString(std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault, char* szOutBuffer, size_t nBufferLength)
+void CIni::GetString(std::string_view svAppName, std::string_view svKeyName,
+	std::string_view svDefault, char* szOutBuffer, size_t nBufferLength)
 {
 	auto sectionItr = _configMap.find(svAppName);
 	if (sectionItr != _configMap.end())
@@ -175,11 +175,7 @@ void CIni::GetString(std::string_view svAppName, std::string_view svKeyName, std
 	SetString(svAppName, svKeyName, svDefault);
 
 	snprintf(
-		szOutBuffer,
-		nBufferLength,
-		"%.*s",
-		static_cast<int>(svDefault.length()),
-		svDefault.data());
+		szOutBuffer, nBufferLength, "%.*s", static_cast<int>(svDefault.length()), svDefault.data());
 }
 
 int CIni::SetInt(std::string_view svAppName, std::string_view svKeyName, const int iDefault)
@@ -188,13 +184,13 @@ int CIni::SetInt(std::string_view svAppName, std::string_view svKeyName, const i
 	return SetString(svAppName, svKeyName, szDefault);
 }
 
-int CIni::SetString(std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault)
+int CIni::SetString(
+	std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault)
 {
 	auto itr = _configMap.find(svAppName);
 	if (itr == _configMap.end())
 	{
-		auto ret = _configMap.insert(
-			std::make_pair(svAppName, ConfigEntryMap()));
+		auto ret = _configMap.insert(std::make_pair(svAppName, ConfigEntryMap()));
 		if (!ret.second)
 			return 0;
 

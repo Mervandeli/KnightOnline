@@ -15,9 +15,9 @@
 	3. GetDamage() 수정
 */
 
-#define MORAL_GOOD		0x01
-#define MORAL_BAD		0x02
-#define MORAL_NEUTRAL	0x03
+#define MORAL_GOOD    0x01
+#define MORAL_BAD     0x02
+#define MORAL_NEUTRAL 0x03
 
 // 운영자 아이디 넣기..
 /*const char* g_pszOPID[] =
@@ -30,8 +30,8 @@
 //	"민순"
 };*/
 
-float surround_fx[8] = { 0.0f, -0.7071f, -1.0f, -0.7083f,  0.0f,  0.7059f,  1.0000f, 0.7083f };
-float surround_fz[8] = { 1.0f,  0.7071f,  0.0f, -0.7059f, -1.0f, -0.7083f, -0.0017f, 0.7059f };
+float surround_fx[8] = { 0.0f, -0.7071f, -1.0f, -0.7083f, 0.0f, 0.7059f, 1.0000f, 0.7083f };
+float surround_fz[8] = { 1.0f, 0.7071f, 0.0f, -0.7059f, -1.0f, -0.7083f, -0.0017f, 0.7059f };
 
 extern std::mutex g_region_mutex;
 
@@ -48,50 +48,50 @@ void CUser::Initialize()
 {
 	m_MagicProcess.m_pSrcUser = this;
 
-	memset(m_strUserID, 0, sizeof(m_strUserID));// 캐릭터의 이름
-	m_iUserId = -1;								// User의 번호
-	m_bLive = USER_DEAD;						// 죽었니? 살았니?
-	m_curx = 0.0f;								// 현재 X 좌표
-	m_cury = 0.0f;								// 현재 Y 좌표
-	m_curz = 0.0f;								// 현재 Z 좌표
-	m_fWill_x = 0.0f;
-	m_fWill_y = 0.0f;
-	m_fWill_z = 0.0f;
-	m_curZone = -1;								// 현재 존
-	m_sZoneIndex = -1;
-	m_bNation = 0;								// 소속국가
-	m_byLevel = 0;								// 레벨
-	m_sHP = 0;									// HP
-	m_sMP = 0;									// MP
-	m_sSP = 0;									// SP
-	m_sMaxHP = 0;								// MaxHP
-	m_sMaxMP = 0;								// MaxMP
-	m_sMaxSP = 0;								// MaxSP
-	m_state = 0;								// User의 상태
-	m_sRegionX = 0;								// 현재 영역 X 좌표
-	m_sRegionZ = 0;								// 현재 영역 Z 좌표
-	m_sOldRegionX = 0;
-	m_sOldRegionZ = 0;
-	m_bResHp = 0;								// 회복량
-	m_bResMp = 0;
-	m_bResSta = 0;
-	m_sHitDamage = 0;							// Hit
-	m_sAC = 0;
-	m_sItemAC = 0;
-	m_fHitrate = 0.0f;							// 타격 성공률
-	m_fAvoidrate = 0;							// 회피 성공률
-	m_bLogOut = false;							// Logout 중인가?
-	m_byNowParty = 0;
+	memset(m_strUserID, 0, sizeof(m_strUserID)); // 캐릭터의 이름
+	m_iUserId          = -1;                     // User의 번호
+	m_bLive            = USER_DEAD;              // 죽었니? 살았니?
+	m_curx             = 0.0f;                   // 현재 X 좌표
+	m_cury             = 0.0f;                   // 현재 Y 좌표
+	m_curz             = 0.0f;                   // 현재 Z 좌표
+	m_fWill_x          = 0.0f;
+	m_fWill_y          = 0.0f;
+	m_fWill_z          = 0.0f;
+	m_curZone          = -1;    // 현재 존
+	m_sZoneIndex       = -1;
+	m_bNation          = 0;     // 소속국가
+	m_byLevel          = 0;     // 레벨
+	m_sHP              = 0;     // HP
+	m_sMP              = 0;     // MP
+	m_sSP              = 0;     // SP
+	m_sMaxHP           = 0;     // MaxHP
+	m_sMaxMP           = 0;     // MaxMP
+	m_sMaxSP           = 0;     // MaxSP
+	m_state            = 0;     // User의 상태
+	m_sRegionX         = 0;     // 현재 영역 X 좌표
+	m_sRegionZ         = 0;     // 현재 영역 Z 좌표
+	m_sOldRegionX      = 0;
+	m_sOldRegionZ      = 0;
+	m_bResHp           = 0;     // 회복량
+	m_bResMp           = 0;
+	m_bResSta          = 0;
+	m_sHitDamage       = 0;     // Hit
+	m_sAC              = 0;
+	m_sItemAC          = 0;
+	m_fHitrate         = 0.0f;  // 타격 성공률
+	m_fAvoidrate       = 0;     // 회피 성공률
+	m_bLogOut          = false; // Logout 중인가?
+	m_byNowParty       = 0;
 	m_sPartyTotalLevel = 0;
-	m_byPartyTotalMan = 0;
-	m_sPartyNumber = -1;
-	m_byIsOP = 0;
-	m_lUsed = 0;
+	m_byPartyTotalMan  = 0;
+	m_sPartyNumber     = -1;
+	m_byIsOP           = 0;
+	m_lUsed            = 0;
 	InitNpcAttack();
 
-	m_bMagicTypeLeftHand = 0;
-	m_bMagicTypeRightHand = 0;
-	m_sMagicAmountLeftHand = 0;
+	m_bMagicTypeLeftHand    = 0;
+	m_bMagicTypeRightHand   = 0;
+	m_sMagicAmountLeftHand  = 0;
 	m_sMagicAmountRightHand = 0;
 }
 
@@ -108,7 +108,7 @@ void CUser::Attack(int /*sid*/, int tid)
 		return;
 
 	// 경비병이면 타겟을 해당 유저로
-/*	if (pNpc->m_tNpcType == NPCTYPE_GUARD)
+	/*	if (pNpc->m_tNpcType == NPCTYPE_GUARD)
 	{
 		pNpc->m_Target.id = m_iUserId + USER_BAND;
 		pNpc->m_Target.x = m_curx;
@@ -126,7 +126,7 @@ void CUser::Attack(int /*sid*/, int tid)
 	else if (m_byIsOP == AUTHORITY_LIMITED_MANAGER)
 		nFinalDamage = USER_DAMAGE_OVERRIDE_LIMITED_GM;
 	else if (m_pMain->_testMode)
-		nFinalDamage = USER_DAMAGE_OVERRIDE_TEST_MODE;	// sungyong test
+		nFinalDamage = USER_DAMAGE_OVERRIDE_TEST_MODE; // sungyong test
 
 	// Npc가 죽은 경우,,
 	if (!pNpc->SetDamage(0, nFinalDamage, m_strUserID, m_iUserId + USER_BAND))
@@ -135,8 +135,8 @@ void CUser::Attack(int /*sid*/, int tid)
 		pNpc->SendDead();
 		SendAttackSuccess(tid, ATTACK_TARGET_DEAD, nFinalDamage, pNpc->m_iHP);
 
-	//	CheckMaxValue(m_dwXP, 1);		// 몹이 죽을때만 1 증가!	
-	//	SendXP();
+		//	CheckMaxValue(m_dwXP, 1);		// 몹이 죽을때만 1 증가!
+		//	SendXP();
 	}
 	// 공격 결과 전송
 	else
@@ -145,17 +145,18 @@ void CUser::Attack(int /*sid*/, int tid)
 	}
 }
 
-void CUser::SendAttackSuccess(int tuid, uint8_t result, int16_t sDamage, int nHP, uint8_t byAttackType)
+void CUser::SendAttackSuccess(
+	int tuid, uint8_t result, int16_t sDamage, int nHP, uint8_t byAttackType)
 {
 	int send_index = 0;
 	int sid = -1, tid = -1;
 	uint8_t type, bResult;
 	char buff[256] = {};
 
-	type = 0x01;
-	bResult = result;
-	sid = m_iUserId + USER_BAND;
-	tid = tuid;
+	type           = 0x01;
+	bResult        = result;
+	sid            = m_iUserId + USER_BAND;
+	tid            = tuid;
 
 	SetByte(buff, AG_ATTACK_RESULT, send_index);
 	SetByte(buff, type, send_index);
@@ -168,7 +169,7 @@ void CUser::SendAttackSuccess(int tuid, uint8_t result, int16_t sDamage, int nHP
 
 	//TRACE(_T("User - SendAttackSuccess() : [sid=%d, tid=%d, result=%d], damage=%d, hp = %d\n"), sid, tid, bResult, sDamage, sHP);
 
-	SendAll(buff, send_index);   // thread 에서 send
+	SendAll(buff, send_index); // thread 에서 send
 }
 
 void CUser::SendMagicAttackResult(int tuid, uint8_t result, int16_t sDamage, int16_t sHP)
@@ -178,10 +179,10 @@ void CUser::SendMagicAttackResult(int tuid, uint8_t result, int16_t sDamage, int
 	uint8_t type, bResult;
 	char buff[256] = {};
 
-	type = 0x01;
-	bResult = result;
-	sid = m_iUserId + USER_BAND;
-	tid = tuid;
+	type           = 0x01;
+	bResult        = result;
+	sid            = m_iUserId + USER_BAND;
+	tid            = tuid;
 
 	SetByte(buff, AG_MAGIC_ATTACK_RESULT, send_index);
 	SetByte(buff, type, send_index);
@@ -193,17 +194,16 @@ void CUser::SendMagicAttackResult(int tuid, uint8_t result, int16_t sDamage, int
 
 	//TRACE(_T("User - SendAttackSuccess() : [sid=%d, tid=%d, result=%d], damage=%d, hp = %d\n"), sid, tid, bResult, sDamage, sHP);
 
-	SendAll(buff, send_index);   // thread 에서 send
+	SendAll(buff, send_index); // thread 에서 send
 }
 
 // sungyong 2002.05.22
 void CUser::SendAll(const char* pBuf, int nLength)
 {
-	if (m_iUserId < 0
-		|| m_iUserId >= MAX_USER)
+	if (m_iUserId < 0 || m_iUserId >= MAX_USER)
 	{
-		spdlog::error("User::SendAll: userId out of bounds [userId={} charId={}]",
-			m_iUserId, m_strUserID);
+		spdlog::error(
+			"User::SendAll: userId out of bounds [userId={} charId={}]", m_iUserId, m_strUserID);
 		return;
 	}
 
@@ -246,7 +246,7 @@ void CUser::Dead(int tid, int nDamage)
 		return;
 
 	// 이 부분에서 update를 해야 함,,  게임서버에서,, 처리하도록,,,
-	m_sHP = 0;
+	m_sHP   = 0;
 	m_bLive = USER_DEAD;
 
 	InitNpcAttack();
@@ -255,19 +255,17 @@ void CUser::Dead(int tid, int nDamage)
 	MAP* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 	{
-		spdlog::error("User::Dead: map not found [userId={} charId={} zoneId={}]",
-			m_iUserId, m_strUserID, m_sZoneIndex);
+		spdlog::error("User::Dead: map not found [userId={} charId={} zoneId={}]", m_iUserId,
+			m_strUserID, m_sZoneIndex);
 		return;
 	}
 
 	// map에 region에서 나의 정보 삭제..
-	if (m_sRegionX < 0
-		|| m_sRegionZ < 0
-		|| m_sRegionX > pMap->GetXRegionMax()
+	if (m_sRegionX < 0 || m_sRegionZ < 0 || m_sRegionX > pMap->GetXRegionMax()
 		|| m_sRegionZ > pMap->GetZRegionMax())
 	{
-		spdlog::error("User::Dead: out of region bounds [userId={} charId={} x={} z={}]",
-			m_iUserId, m_strUserID, m_sRegionX, m_sRegionZ);
+		spdlog::error("User::Dead: out of region bounds [userId={} charId={} x={} z={}]", m_iUserId,
+			m_strUserID, m_sRegionX, m_sRegionZ);
 		return;
 	}
 
@@ -275,8 +273,8 @@ void CUser::Dead(int tid, int nDamage)
 	pMap->RegionUserRemove(m_sRegionX, m_sRegionZ, m_iUserId);
 	//TRACE(_T("*** User Dead()-> User(%hs, %d)를 Region에 삭제,, region_x=%d, y=%d\n"), m_strUserID, m_iUserId, m_sRegionX, m_sRegionZ);
 
-	m_sRegionX = -1;
-	m_sRegionZ = -1;
+	m_sRegionX     = -1;
+	m_sRegionZ     = -1;
 
 	int send_index = 0;
 	int sid = -1, targid = -1;
@@ -285,9 +283,9 @@ void CUser::Dead(int tid, int nDamage)
 	memset(buff, 0, sizeof(buff));
 	spdlog::debug("User::Dead: userId={} charId={}", m_iUserId, m_strUserID);
 
-	type = 0x02;
+	type   = 0x02;
 	result = ATTACK_TARGET_DEAD;
-	sid = tid;
+	sid    = tid;
 	targid = m_iUserId + USER_BAND;
 
 	SetByte(buff, AG_ATTACK_RESULT, send_index);
@@ -302,9 +300,9 @@ void CUser::Dead(int tid, int nDamage)
 	//TRACE(_T("Npc - SendAttackSuccess()-User Dead : [sid=%d, tid=%d, result=%d], damage=%d, hp = %d\n"), sid, targid, result, nDamage, m_sHP);
 
 	if (tid > 0)
-		SendAll(buff, send_index);   // thread 에서 send
+		SendAll(buff, send_index); // thread 에서 send
 
-/*	SetByte(buff, AG_DEAD, send_index );
+	/*	SetByte(buff, AG_DEAD, send_index );
 	SetShort(buff, m_iUserId, send_index );
 	SetFloat(buff, m_curx, send_index);
 	SetFloat(buff, m_curz, send_index);
@@ -330,55 +328,53 @@ void CUser::SendHP()
 
 void CUser::SetExp(int iNpcExp, int iLoyalty, int iLevel)
 {
-	int nExp = 0;
-	int nLoyalty = 0;
-	int nLevel = 0;
+	int nExp         = 0;
+	int nLoyalty     = 0;
+	int nLevel       = 0;
 	double TempValue = 0;
-	nLevel = iLevel - m_byLevel;
+	nLevel           = iLevel - m_byLevel;
 
 	if (nLevel <= -14)
 	{
 		//TRACE(_T("$$ User - SetExp Level Fail : %hs, exp=%d, loyalty=%d, mylevel=%d, level=%d $$\n"), m_strUserID, iNpcExp, iLoyalty, m_sLevel, iLevel);
 		//return;
 		TempValue = iNpcExp * 0.2;
-		nExp = (int) TempValue;
+		nExp      = (int) TempValue;
 		if (TempValue > nExp)
 			++nExp;
 
 		TempValue = iLoyalty * 0.2;
-		nLoyalty = (int) TempValue;
+		nLoyalty  = (int) TempValue;
 		if (TempValue > nLoyalty)
 			++nLoyalty;
 	}
-	else if (nLevel <= -8
-		&& nLevel >= -13)
+	else if (nLevel <= -8 && nLevel >= -13)
 	{
 		TempValue = iNpcExp * 0.5;
-		nExp = (int) TempValue;
+		nExp      = (int) TempValue;
 		if (TempValue > nExp)
 			++nExp;
 
 		TempValue = iLoyalty * 0.5;
-		nLoyalty = (int) TempValue;
+		nLoyalty  = (int) TempValue;
 		if (TempValue > nLoyalty)
 			++nLoyalty;
 	}
-	else if (nLevel <= -2
-		&& nLevel >= -7)
+	else if (nLevel <= -2 && nLevel >= -7)
 	{
 		TempValue = iNpcExp * 0.8;
-		nExp = (int) TempValue;
+		nExp      = (int) TempValue;
 		if (TempValue > nExp)
 			++nExp;
 
 		TempValue = iLoyalty * 0.8;
-		nLoyalty = (int) TempValue;
+		nLoyalty  = (int) TempValue;
 		if (TempValue > nLoyalty)
 			++nLoyalty;
 	}
 	else if (nLevel >= -1) // && nLevel < 2)
 	{
-		nExp = iNpcExp;
+		nExp     = iNpcExp;
 		nLoyalty = iLoyalty;
 	}
 	/* else if (nLevel >= 2
@@ -449,34 +445,31 @@ int16_t CUser::GetDamage(int tid, int magicid)
 	int16_t damage = 0;
 	float Attack = 0, Avoid = 0;
 	int16_t Hit = 0, HitB = 0;
-	int16_t Ac = 0;
-	int random = 0;
-	uint8_t result = FAIL;
+	int16_t Ac                = 0;
+	int random                = 0;
+	uint8_t result            = FAIL;
 
-	model::Magic* pTable = nullptr;
+	model::Magic* pTable      = nullptr;
 	model::MagicType1* pType1 = nullptr;
 	model::MagicType2* pType2 = nullptr;
 
-	if (tid < NPC_BAND
-		|| tid > INVALID_BAND)
+	if (tid < NPC_BAND || tid > INVALID_BAND)
 		return damage;
 
 	CNpc* pNpc = m_pMain->_npcMap.GetData(tid - NPC_BAND);
 	if (pNpc == nullptr)
 		return damage;
 
-	if (pNpc->m_tNpcType == NPC_ARTIFACT
-		|| pNpc->m_tNpcType == NPC_PHOENIX_GATE
-		|| pNpc->m_tNpcType == NPC_GATE_LEVER
-		|| pNpc->m_tNpcType == NPC_SPECIAL_GATE)
+	if (pNpc->m_tNpcType == NPC_ARTIFACT || pNpc->m_tNpcType == NPC_PHOENIX_GATE
+		|| pNpc->m_tNpcType == NPC_GATE_LEVER || pNpc->m_tNpcType == NPC_SPECIAL_GATE)
 		return damage;
 
-	Attack = (float) m_fHitrate;						// 공격민첩
-	Avoid = (float) pNpc->m_sEvadeRate;					// 방어민첩	
-	Hit = m_sHitDamage;									// 공격자 Hit 
-//	Ac = (int16_t) (pNpc->m_sDefense) + pNpc->m_sLevel;	// 방어자 Ac 2002.07.06
-	Ac = (int16_t) (pNpc->m_sDefense);					// 방어자 Ac 
-	HitB = (int) ((Hit * 200) / (Ac + 240));			// 새로운 공격식의 B
+	Attack = (float) m_fHitrate;         // 공격민첩
+	Avoid  = (float) pNpc->m_sEvadeRate; // 방어민첩
+	Hit    = m_sHitDamage;               // 공격자 Hit
+	//	Ac = (int16_t) (pNpc->m_sDefense) + pNpc->m_sLevel;	// 방어자 Ac 2002.07.06
+	Ac     = (int16_t) (pNpc->m_sDefense);     // 방어자 Ac
+	HitB   = (int) ((Hit * 200) / (Ac + 240)); // 새로운 공격식의 B
 
 	// Skill Hit.
 	if (magicid > 0)
@@ -508,7 +501,7 @@ int16_t CUser::GetDamage(int tid, int magicid)
 			{
 				result = GetHitRate((Attack / Avoid) * (pType1->HitRateMod / 100.0f));
 			}
-/*
+			/*
 			// Non-relative hit.
 			if (pType1->Type)
 			{
@@ -531,8 +524,7 @@ int16_t CUser::GetDamage(int tid, int magicid)
 				return -1;
 
 			// Non-relative/Penetration hit.
-			if (pType2->HitType == 1
-				|| pType2->HitType == 2)
+			if (pType2->HitType == 1 || pType2->HitType == 2)
 			{
 				random = myrand(0, 100);
 				if (pType2->HitRateMod <= random)
@@ -555,7 +547,7 @@ int16_t CUser::GetDamage(int tid, int magicid)
 			}
 			else
 			{
-//				Hit = (m_sHitDamage - pNpc->m_sDefense) * (pType2->DamageMod / 100.0f);
+				//				Hit = (m_sHitDamage - pNpc->m_sDefense) * (pType2->DamageMod / 100.0f);
 				Hit = static_cast<int16_t>(HitB * (pType2->DamageMod / 100.0f));
 			}
 		}
@@ -563,7 +555,7 @@ int16_t CUser::GetDamage(int tid, int magicid)
 	// Normal Hit.
 	else
 	{
-		result = GetHitRate(Attack / Avoid);		// 타격비 구하기
+		result = GetHitRate(Attack / Avoid); // 타격비 구하기
 	}
 
 	switch (result)
@@ -576,7 +568,7 @@ int16_t CUser::GetDamage(int tid, int magicid)
 			{
 				damage = (int16_t) Hit;
 				random = myrand(0, damage);
-//				damage = (int16_t) ((0.85f * (float) Hit) + 0.3f * (float) random);
+				//				damage = (int16_t) ((0.85f * (float) Hit) + 0.3f * (float) random);
 				if (pTable->Type1 == 1)
 				{
 					damage = (int16_t) ((float) Hit + 0.3f * (float) random + 0.99);
@@ -586,7 +578,7 @@ int16_t CUser::GetDamage(int tid, int magicid)
 					damage = (int16_t) ((float) (Hit * 0.6f) + 1.0f * (float) random + 0.99);
 				}
 			}
-			//일반 공격	
+			//일반 공격
 			else
 			{
 				damage = (int16_t) (HitB);
@@ -595,12 +587,12 @@ int16_t CUser::GetDamage(int tid, int magicid)
 			}
 			break;
 
-		case FAIL:  // 사장님 요구 
+		case FAIL: // 사장님 요구
 			damage = 0;
 			break;
 	}
 
-	damage = GetMagicDamage(damage, tid);	// 2. Magical item damage....
+	damage = GetMagicDamage(damage, tid); // 2. Magical item damage....
 
 	//return 3000;
 	return damage;
@@ -615,94 +607,90 @@ int16_t CUser::GetMagicDamage(int damage, int16_t tid)
 		return damage;
 
 	// RIGHT HAND!!! by Yookozuna
-	if (m_bMagicTypeRightHand > 4
-		&& m_bMagicTypeRightHand < 8)
+	if (m_bMagicTypeRightHand > 4 && m_bMagicTypeRightHand < 8)
 		temp_damage = damage * m_sMagicAmountRightHand / 100;
 
 	// RIGHT HAND!!!
 	switch (m_bMagicTypeRightHand)
 	{
-		case 1:	// Fire Damage
+		case 1: // Fire Damage
 			total_r = pNpc->m_sFireR;
 			break;
 
-		case 2:	// Ice Damage
+		case 2: // Ice Damage
 			total_r = pNpc->m_sColdR;
 			break;
 
-		case 3:	// Lightning Damage
+		case 3: // Lightning Damage
 			total_r = pNpc->m_sLightningR;
 			break;
 
-		case 4:	// Poison Damage
+		case 4: // Poison Damage
 			total_r = pNpc->m_sPoisonR;
 			break;
 
-		case 5:	// HP Drain						
+		case 5: // HP Drain
 			break;
 
-		case 6:	// MP Damage		
+		case 6: // MP Damage
 			pNpc->MSpChange(2, -temp_damage);
 			break;
 
-		case 7:	// MP Drain				
+		case 7: // MP Drain
 			break;
 	}
 
-	if (m_bMagicTypeRightHand > 0
-		&& m_bMagicTypeRightHand < 5)
+	if (m_bMagicTypeRightHand > 0 && m_bMagicTypeRightHand < 5)
 	{
-		temp_damage = m_sMagicAmountRightHand - m_sMagicAmountRightHand * total_r / 200;
-		damage += temp_damage;
+		temp_damage  = m_sMagicAmountRightHand - m_sMagicAmountRightHand * total_r / 200;
+		damage      += temp_damage;
 	}
 
 	// Reset all temporary data.
-	total_r = 0;
+	total_r     = 0;
 	temp_damage = 0;
 
 	// LEFT HAND!!! by Yookozuna
-	if (m_bMagicTypeLeftHand > 4
-		&& m_bMagicTypeLeftHand < 8)
+	if (m_bMagicTypeLeftHand > 4 && m_bMagicTypeLeftHand < 8)
 		temp_damage = damage * m_sMagicAmountLeftHand / 100;
 
 	// LEFT HAND!!!
 	switch (m_bMagicTypeLeftHand)
 	{
-		case 1:	// Fire Damage
+		case 1: // Fire Damage
 			total_r = pNpc->m_sFireR;
 			break;
 
-		case 2:	// Ice Damage
+		case 2: // Ice Damage
 			total_r = pNpc->m_sColdR;
 			break;
 
-		case 3:	// Lightning Damage
+		case 3: // Lightning Damage
 			total_r = pNpc->m_sLightningR;
 			break;
 
-		case 4:	// Poison Damage
+		case 4: // Poison Damage
 			total_r = pNpc->m_sPoisonR;
 			break;
 
-		case 5:	// HP Drain					
+		case 5: // HP Drain
 			break;
 
-		case 6:	// MP Damage		
+		case 6: // MP Damage
 			pNpc->MSpChange(2, -temp_damage);
 			break;
 
-		case 7:	// MP Drain		
+		case 7: // MP Drain
 			break;
 	}
 
-	if (m_bMagicTypeLeftHand > 0
-		&& m_bMagicTypeLeftHand < 5)
+	if (m_bMagicTypeLeftHand > 0 && m_bMagicTypeLeftHand < 5)
 	{
 		if (total_r > 200)
 			total_r = 200;
 
-		temp_damage = m_sMagicAmountLeftHand - m_sMagicAmountLeftHand * total_r / 200;
-		damage += temp_damage;
+		temp_damage  = m_sMagicAmountLeftHand - m_sMagicAmountLeftHand * total_r / 200;
+		damage      += temp_damage;
 	}
 
 	return damage;
@@ -711,129 +699,101 @@ int16_t CUser::GetMagicDamage(int damage, int16_t tid)
 uint8_t CUser::GetHitRate(float rate)
 {
 	uint8_t result = FAIL;
-	int random = myrand(1, 10000);
+	int random     = myrand(1, 10000);
 
 	if (rate >= 5.0f)
 	{
-		if (random >= 1
-			&& random <= 3500)
+		if (random >= 1 && random <= 3500)
 			result = GREAT_SUCCESS;
-		else if (random >= 3501
-			&& random <= 7500)
+		else if (random >= 3501 && random <= 7500)
 			result = SUCCESS;
-		else if (random >= 7501
-			&& random <= 9800)
+		else if (random >= 7501 && random <= 9800)
 			result = NORMAL;
 	}
 	else if (rate >= 3.0f)
 	{
-		if (random >= 1
-			&& random <= 2500)
+		if (random >= 1 && random <= 2500)
 			result = GREAT_SUCCESS;
-		else if (random >= 2501
-			&& random <= 6000)
+		else if (random >= 2501 && random <= 6000)
 			result = SUCCESS;
-		else if (random >= 6001
-			&& random <= 9600)
+		else if (random >= 6001 && random <= 9600)
 			result = NORMAL;
 	}
 	else if (rate >= 2.0f)
 	{
-		if (random >= 1
-			&& random <= 2000)
+		if (random >= 1 && random <= 2000)
 			result = GREAT_SUCCESS;
-		else if (random >= 2001
-			&& random <= 5000)
+		else if (random >= 2001 && random <= 5000)
 			result = SUCCESS;
-		else if (random >= 5001
-			&& random <= 9400)
+		else if (random >= 5001 && random <= 9400)
 			result = NORMAL;
 	}
 	else if (rate >= 1.25f)
 	{
-		if (random >= 1
-			&& random <= 1500)
+		if (random >= 1 && random <= 1500)
 			result = GREAT_SUCCESS;
-		else if (random >= 1501
-			&& random <= 4000)
+		else if (random >= 1501 && random <= 4000)
 			result = SUCCESS;
-		else if (random >= 4001
-			&& random <= 9200)
+		else if (random >= 4001 && random <= 9200)
 			result = NORMAL;
 	}
 	else if (rate >= 0.8f)
 	{
-		if (random >= 1
-			&& random <= 1000)
+		if (random >= 1 && random <= 1000)
 			result = GREAT_SUCCESS;
-		else if (random >= 1001
-			&& random <= 3000)
+		else if (random >= 1001 && random <= 3000)
 			result = SUCCESS;
-		else if (random >= 3001
-			&& random <= 9000)
+		else if (random >= 3001 && random <= 9000)
 			result = NORMAL;
 	}
 	else if (rate >= 0.5f)
 	{
-		if (random >= 1
-			&& random <= 800)
+		if (random >= 1 && random <= 800)
 			result = GREAT_SUCCESS;
-		else if (random >= 801
-			&& random <= 2500)
+		else if (random >= 801 && random <= 2500)
 			result = SUCCESS;
-		else if (random >= 2501
-			&& random <= 8000)
+		else if (random >= 2501 && random <= 8000)
 			result = NORMAL;
 	}
 	else if (rate >= 0.33f)
 	{
-		if (random >= 1
-			&& random <= 600)
+		if (random >= 1 && random <= 600)
 			result = GREAT_SUCCESS;
-		else if (random >= 601
-			&& random <= 2000)
+		else if (random >= 601 && random <= 2000)
 			result = SUCCESS;
-		else if (random >= 2001
-			&& random <= 7000)
+		else if (random >= 2001 && random <= 7000)
 			result = NORMAL;
 	}
 	else if (rate >= 0.2f)
 	{
-		if (random >= 1
-			&& random <= 400)
+		if (random >= 1 && random <= 400)
 			result = GREAT_SUCCESS;
-		else if (random >= 401
-			&& random <= 1500)
+		else if (random >= 401 && random <= 1500)
 			result = SUCCESS;
-		else if (random >= 1501
-			&& random <= 6000)
+		else if (random >= 1501 && random <= 6000)
 			result = NORMAL;
 	}
 	else
 	{
-		if (random >= 1
-			&& random <= 200)
+		if (random >= 1 && random <= 200)
 			result = GREAT_SUCCESS;
-		else if (random >= 201
-			&& random <= 1000)
+		else if (random >= 201 && random <= 1000)
 			result = SUCCESS;
-		else if (random >= 1001
-			&& random <= 5000)
+		else if (random >= 1001 && random <= 5000)
 			result = NORMAL;
 	}
 
 	return result;
 }
 
-
 void CUser::SendSystemMsg(const std::string_view msg, uint8_t type, int nWho)
 {
-	int send_index = 0;
+	int send_index  = 0;
 	char buff[1024] = {};
 
 	SetByte(buff, AG_SYSTEM_MSG, send_index);
-	SetByte(buff, type, send_index);				// 채팅형식
-	SetShort(buff, nWho, send_index);				// 누구에게
+	SetByte(buff, type, send_index);  // 채팅형식
+	SetShort(buff, nWho, send_index); // 누구에게
 	SetShort(buff, m_iUserId, send_index);
 	SetString2(buff, msg, send_index);
 
@@ -866,14 +826,13 @@ int CUser::IsSurroundCheck(float fX, float fY, float fZ, int NpcID)
 			else
 			{
 				m_sSurroundNpcNumber[i] = NpcID;
-				nDir = i + 1;
-				bFlag = true;
+				nDir                    = i + 1;
+				bFlag                   = true;
 			}
 			//return nDir;
 		}
 
-		if (m_sSurroundNpcNumber[i] == -1
-			&& !bFlag)
+		if (m_sSurroundNpcNumber[i] == -1 && !bFlag)
 		{
 			fDX = m_curx + surround_fx[i];
 			fDZ = m_curz + surround_fz[i];
@@ -883,14 +842,13 @@ int CUser::IsSurroundCheck(float fX, float fY, float fZ, int NpcID)
 
 			if (fDis < fCurDis)
 			{
-				nDir = i + 1;
+				nDir    = i + 1;
 				fCurDis = fDis;
 			}
 		}
 	}
 
-
-/*	TRACE(_T("User-Sur : [0=%d,1=%d,2=%d,3=%d,4=%d,5=%d,6=%d,7=%d]\n"), m_sSurroundNpcNumber[0],
+	/*	TRACE(_T("User-Sur : [0=%d,1=%d,2=%d,3=%d,4=%d,5=%d,6=%d,7=%d]\n"), m_sSurroundNpcNumber[0],
 		m_sSurroundNpcNumber[1], m_sSurroundNpcNumber[2], m_sSurroundNpcNumber[3], m_sSurroundNpcNumber[4],
 		m_sSurroundNpcNumber[5],m_sSurroundNpcNumber[6], m_sSurroundNpcNumber[7]);
 	*/
@@ -902,7 +860,7 @@ int CUser::IsSurroundCheck(float fX, float fY, float fZ, int NpcID)
 
 bool CUser::IsOpIDCheck(const char* /*szName*/)
 {
-/*	int nSize = sizeof(g_pszOPID)/sizeof(char*);
+	/*	int nSize = sizeof(g_pszOPID)/sizeof(char*);
 	CString szCheck = szName;
 	CString szCheck2;
 
@@ -924,18 +882,18 @@ void CUser::HealMagic()
 	int region_x = static_cast<int>(m_curx / VIEW_DIST);
 	int region_z = static_cast<int>(m_curz / VIEW_DIST);
 
-	MAP* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
+	MAP* pMap    = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 	{
-		spdlog::error("User::HealMagic: map not found [userId={} charId={} zoneId={}]",
-			m_iUserId, m_strUserID, m_sZoneIndex);
+		spdlog::error("User::HealMagic: map not found [userId={} charId={} zoneId={}]", m_iUserId,
+			m_strUserID, m_sZoneIndex);
 		return;
 	}
 
 	int max_xx = pMap->m_sizeRegion.cx;
 	int max_zz = pMap->m_sizeRegion.cy;
 
-	int min_x = region_x - 1;
+	int min_x  = region_x - 1;
 	if (min_x < 0)
 		min_x = 0;
 
@@ -972,16 +930,13 @@ void CUser::HealAreaCheck(int rx, int rz)
 	}
 
 	// 자신의 region에 있는 NpcMap을 먼저 검색하여,, 가까운 거리에 Monster가 있는지를 판단..
-	if (rx < 0
-		|| rz < 0
-		|| rx > pMap->GetXRegionMax()
-		|| rz > pMap->GetZRegionMax())
+	if (rx < 0 || rz < 0 || rx > pMap->GetXRegionMax() || rz > pMap->GetZRegionMax())
 	{
 		spdlog::error("User::HealAreaCheck: out of region bounds [userId={} charId={} x={} z={}]",
 			m_iUserId, m_strUserID, m_sRegionX, m_sRegionZ);
 		return;
 	}
-	
+
 	// 30m
 	float fRadius = 10.0f;
 
@@ -998,12 +953,12 @@ void CUser::HealAreaCheck(int rx, int rz)
 		auto Iter1 = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.begin();
 		auto Iter2 = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.end();
 
-		total_mon = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.GetSize();
+		total_mon  = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.GetSize();
 
 		pNpcIDList = new int[total_mon];
 		for (; Iter1 != Iter2; Iter1++)
 		{
-			nid = *((*Iter1).second);
+			nid               = *((*Iter1).second);
 			pNpcIDList[count] = nid;
 			count++;
 		}
@@ -1017,8 +972,7 @@ void CUser::HealAreaCheck(int rx, int rz)
 
 		pNpc = m_pMain->_npcMap.GetData(nid - NPC_BAND);
 
-		if (pNpc != nullptr
-			&& pNpc->m_NpcState != NPC_DEAD)
+		if (pNpc != nullptr && pNpc->m_NpcState != NPC_DEAD)
 		{
 			if (m_bNation == pNpc->m_byGroup)
 				continue;

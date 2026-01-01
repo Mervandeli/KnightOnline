@@ -17,7 +17,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -27,15 +27,14 @@ static char THIS_FILE[]=__FILE__;
 
 CUIPointInitDlg::CUIPointInitDlg()
 {
-	m_pBtn_Ok			= nullptr;
-	m_pBtn_Cancel		= nullptr;
+	m_pBtn_Ok        = nullptr;
+	m_pBtn_Cancel    = nullptr;
 
-	m_pText_NeedGold	= nullptr;
+	m_pText_NeedGold = nullptr;
 }
 
 CUIPointInitDlg::~CUIPointInitDlg()
 {
-
 }
 
 void CUIPointInitDlg::Release()
@@ -45,7 +44,8 @@ void CUIPointInitDlg::Release()
 
 bool CUIPointInitDlg::Load(File& file)
 {
-	if(CN3UIBase::Load(file)==false) return false;
+	if (CN3UIBase::Load(file) == false)
+		return false;
 
 	N3_VERIFY_UI_COMPONENT(m_pBtn_Ok, GetChildByID<CN3UIButton>("btn_ok"));
 	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel, GetChildByID<CN3UIButton>("btn_cancel"));
@@ -57,14 +57,14 @@ bool CUIPointInitDlg::Load(File& file)
 
 bool CUIPointInitDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if (dwMsg == UIMSG_BUTTON_CLICK)					
+	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
-		if(pSender == m_pBtn_Ok)
+		if (pSender == m_pBtn_Ok)
 		{
 			Close();
 			PushOkButton();
 		}
-		else if(pSender == m_pBtn_Cancel)
+		else if (pSender == m_pBtn_Cancel)
 			Close();
 	}
 
@@ -100,14 +100,14 @@ void CUIPointInitDlg::PushOkButton()
 //this_ui_add_start
 bool CUIPointInitDlg::OnKeyPress(int iKey)
 {
-	switch(iKey)
+	switch (iKey)
 	{
-	case DIK_RETURN:
-		ReceiveMessage(m_pBtn_Ok, UIMSG_BUTTON_CLICK);
-		return true;
-	case DIK_ESCAPE:
-		ReceiveMessage(m_pBtn_Cancel, UIMSG_BUTTON_CLICK);
-		return true;
+		case DIK_RETURN:
+			ReceiveMessage(m_pBtn_Ok, UIMSG_BUTTON_CLICK);
+			return true;
+		case DIK_ESCAPE:
+			ReceiveMessage(m_pBtn_Cancel, UIMSG_BUTTON_CLICK);
+			return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);
@@ -116,14 +116,14 @@ bool CUIPointInitDlg::OnKeyPress(int iKey)
 void CUIPointInitDlg::InitDlg(bool bAllpoint, int iGold)
 {
 	m_bAllpoint = bAllpoint;
-	if (m_pText_NeedGold) 
+	if (m_pText_NeedGold)
 	{
 		switch (bAllpoint)
 		{
-			case true: 
+			case true:
 				m_pText_NeedGold->SetStringAsInt(iGold);
 				break;
-			case false: 
+			case false:
 				m_pText_NeedGold->SetStringAsInt(iGold);
 				break;
 		}

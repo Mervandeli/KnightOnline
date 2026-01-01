@@ -56,8 +56,8 @@ TEST(Vector2Test, Set_Floats_MatchesReference)
 TEST(Vector2Test, AddAssign_Vector2_MatchesReference)
 {
 	const __Vector2 expectedVec = { 80.0f, 160.0f };
-	const __Vector2 lhsVec = { 64.0f, 128.0f };
-	const __Vector2 rhsVec = { 16.0f, 32.0f };
+	const __Vector2 lhsVec      = { 64.0f, 128.0f };
+	const __Vector2 rhsVec      = { 16.0f, 32.0f };
 
 	SCOPED_TRACE("__Vector2::operator+=(const __Vector2&)");
 
@@ -69,8 +69,8 @@ TEST(Vector2Test, AddAssign_Vector2_MatchesReference)
 TEST(Vector2Test, SubtractAssign_Vector2_MatchesReference)
 {
 	const __Vector2 expectedVec = { 48.0f, 96.0f };
-	const __Vector2 lhsVec = { 64.0f, 128.0f };
-	const __Vector2 rhsVec = { 16.0f, 32.0f };
+	const __Vector2 lhsVec      = { 64.0f, 128.0f };
+	const __Vector2 rhsVec      = { 16.0f, 32.0f };
 
 	SCOPED_TRACE("__Vector2::operator-=(const __Vector2&)");
 
@@ -82,7 +82,7 @@ TEST(Vector2Test, SubtractAssign_Vector2_MatchesReference)
 TEST(Vector2Test, MultiplyAssign_Delta_MatchesReference)
 {
 	const __Vector2 expectedVec = { 8192.0f, 16384.0f };
-	const __Vector2 lhsVec = { 64.0f, 128.0f };
+	const __Vector2 lhsVec      = { 64.0f, 128.0f };
 
 	SCOPED_TRACE("__Vector2::operator*(float)");
 
@@ -93,10 +93,10 @@ TEST(Vector2Test, MultiplyAssign_Delta_MatchesReference)
 
 TEST(Vector2Test, DivideAssign_Float_MatchesReference)
 {
-	constexpr float Delta = 128.0f;
+	constexpr float Delta       = 128.0f;
 
 	const __Vector2 expectedVec = { 64.0f, 256.0f };
-	const __Vector2 lhsVec = { 8192.0f, 32768.0f };
+	const __Vector2 lhsVec      = { 8192.0f, 32768.0f };
 
 	SCOPED_TRACE("__Vector2::operator/=(float)");
 
@@ -108,8 +108,8 @@ TEST(Vector2Test, DivideAssign_Float_MatchesReference)
 TEST(Vector2Test, Add_Vector2_MatchesReference)
 {
 	const __Vector2 expectedVec = { 80.0f, 160.0f };
-	const __Vector2 lhsVec = { 64.0f, 128.0f };
-	const __Vector2 rhsVec = { 16.0f, 32.0f };
+	const __Vector2 lhsVec      = { 64.0f, 128.0f };
+	const __Vector2 rhsVec      = { 16.0f, 32.0f };
 
 	SCOPED_TRACE("__Vector2::operator+(const __Vector2&)");
 
@@ -120,8 +120,8 @@ TEST(Vector2Test, Add_Vector2_MatchesReference)
 TEST(Vector2Test, Subtract_Vector2_MatchesReference)
 {
 	const __Vector2 expectedVec = { 48.0f, 96.0f };
-	const __Vector2 lhsVec = { 64.0f, 128.0f };
-	const __Vector2 rhsVec = { 16.0f, 32.0f };
+	const __Vector2 lhsVec      = { 64.0f, 128.0f };
+	const __Vector2 rhsVec      = { 16.0f, 32.0f };
 
 	SCOPED_TRACE("__Vector2::operator-(const __Vector2&)");
 
@@ -131,10 +131,10 @@ TEST(Vector2Test, Subtract_Vector2_MatchesReference)
 
 TEST(Vector2Test, Multiply_Float_MatchesReference)
 {
-	constexpr float Delta = 128.0f;
+	constexpr float Delta       = 128.0f;
 
 	const __Vector2 expectedVec = { 8192.0f, 32768.0f };
-	const __Vector2 lhsVec = { 64.0f, 256.0f };
+	const __Vector2 lhsVec      = { 64.0f, 256.0f };
 
 	SCOPED_TRACE("__Vector2::operator*(float)");
 

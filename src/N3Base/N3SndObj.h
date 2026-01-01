@@ -13,27 +13,27 @@ class AudioHandle;
 
 /// \brief Represents a single sound object, either buffered or streamed.
 ///
-/// CN3SndObj manages a single sound instance, including playback, looping, 
+/// CN3SndObj manages a single sound instance, including playback, looping,
 /// volume, 3D position, and lifetime of the underlying audio asset. It interacts
 /// with the sound manager to queue OpenAL operations on a dedicated audio thread.
 class CN3SndObj
 {
 protected:
 	/// Type of sound (2D, 3D, Stream, Unknown)
-	e_SndType						_type;
+	e_SndType _type;
 
 	/// Indicates whether the sound has been started
-	bool							_isStarted;
+	bool _isStarted;
 
 	/// Settings associated with this sound object, including current and maximum volume.
 	/// These settings persist with the CN3SndObj instance and are shared with any AudioHandle created for playback.
-	std::shared_ptr<SoundSettings>	_soundSettings;
+	std::shared_ptr<SoundSettings> _soundSettings;
 
 	/// Cached audio asset used by this sound
-	std::shared_ptr<AudioAsset>		_audioAsset;
+	std::shared_ptr<AudioAsset> _audioAsset;
 
 	/// Handle managed by the audio thread for playback
-	std::shared_ptr<AudioHandle>	_handle;
+	std::shared_ptr<AudioHandle> _handle;
 
 public:
 	/// \brief Returns the type of this sound object.
@@ -120,7 +120,7 @@ public:
 
 	/// \brief Stops playback of the sound.
 	///
-	/// \param fFadeOutTime Time in seconds to fade out before stopping. 
+	/// \param fFadeOutTime Time in seconds to fade out before stopping.
 	/// If zero, the sound stops immediately.
 	void Stop(float fFadeOutTime = 0.0f);
 

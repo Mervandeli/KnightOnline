@@ -25,10 +25,12 @@ struct CZipFindFast
 {
 	CZipFindFast()
 	{
-		m_uIndex = 0;
-		m_pHeader= nullptr;
+		m_uIndex  = 0;
+		m_pHeader = nullptr;
 	}
-	CZipFindFast(CZipFileHeader* pHeader, WORD uIndex):m_pHeader(pHeader), m_uIndex(uIndex){}
+	CZipFindFast(CZipFileHeader* pHeader, WORD uIndex) : m_pHeader(pHeader), m_uIndex(uIndex)
+	{
+	}
 	/**
 		We extract a name from it.
 	*/
@@ -40,34 +42,31 @@ struct CZipFindFast
 	WORD m_uIndex;
 };
 
-
-class CZipCentralDir  
+class CZipCentralDir
 {
-
 public:
-	
-//		end of central dir signature    4 bytes  (0x06054b50)
+	//		end of central dir signature    4 bytes  (0x06054b50)
 	char m_szSignature[4];
-//		number of this disk             2 bytes
+	//		number of this disk             2 bytes
 	WORD m_uThisDisk;
-//		number of the disk with the
-//		start of the central directory  2 bytes
+	//		number of the disk with the
+	//		start of the central directory  2 bytes
 	WORD m_uDiskWithCD;
-//		total number of entries in
-//		the central dir on this disk    2 bytes
+	//		total number of entries in
+	//		the central dir on this disk    2 bytes
 	WORD m_uDiskEntriesNo;
-//		total number of entries in
-//		the central dir                 2 bytes
+	//		total number of entries in
+	//		the central dir                 2 bytes
 	WORD m_uEntriesNumber;
-//		size of the central directory   4 bytes
+	//		size of the central directory   4 bytes
 	DWORD m_uSize;
-//		offset of start of central
-//		directory with respect to
-//		the starting disk number        4 bytes
+	//		offset of start of central
+	//		directory with respect to
+	//		the starting disk number        4 bytes
 	DWORD m_uOffset;
-//		zipfile comment length          2 bytes
-// 	WORD m_uCommentSize;
-//		zipfile comment (variable size)
+	//		zipfile comment length          2 bytes
+	// 	WORD m_uCommentSize;
+	//		zipfile comment (variable size)
 	CZipAutoBuffer m_pszComment;
 	bool m_bFindFastEnabled;
 	CZipFileHeader* m_pOpenedFile;
@@ -90,7 +89,7 @@ public:
 	static char m_gszSignature[];
 	CTypedPtrArray<CPtrArray, CZipFileHeader*> m_headers;
 	CZipAutoBuffer m_pLocalExtraField;
-	void AddNewFile(CZipFileHeader & header);
+	void AddNewFile(CZipFileHeader& header);
 	void RemoveFromDisk();
 	DWORD GetSize(bool bWhole = false);
 	CArray<CZipFindFast, CZipFindFast> m_findarray;
@@ -112,7 +111,7 @@ public:
 	*/
 	bool m_bConvertAfterOpen;
 
-/**
+	/**
 	Convert the filename of the CZipFileHeader.
 	\param	bFromZip
 		if \c true, convert from archive format
@@ -136,6 +135,7 @@ public:
 		pHeader->SlashChange(bFromZip);
 	}
 	void ConvertAll();
+
 protected:
 	void InsertFindFastElement(CZipFileHeader* pHeader, WORD uIndex);
 	void RemoveHeaders();
@@ -144,13 +144,13 @@ protected:
 	void WriteHeaders();
 	void ReadHeaders();
 	void ThrowError(int err);
-	DWORD Locate();	
+	DWORD Locate();
 	int CompareElement(LPCTSTR lpszFileName, WORD uIndex, bool bCaseSensitive)
 	{
-		return bCaseSensitive ? m_findarray[uIndex].m_pHeader->GetFileName().Collate(lpszFileName)
-			: m_findarray[uIndex].m_pHeader->GetFileName().CollateNoCase(lpszFileName);
+		return bCaseSensitive
+				   ? m_findarray[uIndex].m_pHeader->GetFileName().Collate(lpszFileName)
+				   : m_findarray[uIndex].m_pHeader->GetFileName().CollateNoCase(lpszFileName);
 	}
-
 };
 
 #endif // !defined(AFX_ZipCentralDir_H__859029E8_8927_4717_9D4B_E26E5DA12BAE__INCLUDED_)

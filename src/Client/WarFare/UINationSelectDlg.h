@@ -11,7 +11,7 @@
 
 #include <N3Base/N3UIBase.h>
 
-class CUINationSelectDlg : public CN3UIBase  
+class CUINationSelectDlg : public CN3UIBase
 {
 public:
 	CN3UIBase* m_pBtnKarus;

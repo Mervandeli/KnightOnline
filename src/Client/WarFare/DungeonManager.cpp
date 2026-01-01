@@ -9,7 +9,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -18,12 +18,10 @@ static char THIS_FILE[]=__FILE__;
 
 CDungeonManager::CDungeonManager()
 {
-
 }
 
 CDungeonManager::~CDungeonManager()
 {
-
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -31,8 +29,12 @@ CDungeonManager::~CDungeonManager()
 void CDungeonManager::InitWorld(int iZoneID, const __Vector3& vPosPlayer)
 {
 	__TABLE_ZONE* pZone = s_pTbl_Zones.Find(s_pPlayer->m_InfoExt.iZoneCur);
-	if(nullptr == pZone) { CLogWriter::Write("Null Zone data : {}", iZoneID); return; }
-		
+	if (nullptr == pZone)
+	{
+		CLogWriter::Write("Null Zone data : {}", iZoneID);
+		return;
+	}
+
 	m_pvsmgr.LoadFromFile(pZone->szTerrainFN);
 }
 
@@ -63,24 +65,24 @@ CN3SkyMng* CDungeonManager::GetSkyRef()
 //////////////////////////////////////////////////////////////////////
 
 // Terrain..
-bool CDungeonManager::CheckCollisionCameraWithTerrain(__Vector3& vEyeResult, const __Vector3& vAt, float fNP)	// Done..
+bool CDungeonManager::CheckCollisionCameraWithTerrain(__Vector3& vEyeResult, const __Vector3& vAt, float fNP) // Done..
 {
-	return m_pvsmgr.CheckCollisionCameraWithTerrain(vEyeResult, vAt, fNP);						
+	return m_pvsmgr.CheckCollisionCameraWithTerrain(vEyeResult, vAt, fNP);
 }
 
-float CDungeonManager::GetHeightWithTerrain(float x, float z, bool bWarp)																	// Done..
+float CDungeonManager::GetHeightWithTerrain(float x, float z, bool bWarp) // Done..
 {
-	return m_pvsmgr.GetHeightWithTerrain(x, z, bWarp);																		
+	return m_pvsmgr.GetHeightWithTerrain(x, z, bWarp);
 }
 
-BOOL CDungeonManager::PickWideWithTerrain(int x, int y, __Vector3& vPick)																// Done..
+BOOL CDungeonManager::PickWideWithTerrain(int x, int y, __Vector3& vPick) // Done..
 {
 	return m_pvsmgr.PickWideWithTerrain(x, y, vPick);
 }
 
 bool CDungeonManager::CheckCollisionWithTerrain(__Vector3& vPos, __Vector3& vDir, float fVelocity, __Vector3* vCol)
 {
-	return false;	
+	return false;
 }
 
 void CDungeonManager::GetNormalWithTerrain(float x, float z, __Vector3& vNormal)
@@ -92,7 +94,7 @@ float CDungeonManager::GetWidthByMeterWithTerrain()
 	return 100.0f;
 }
 
-bool CDungeonManager::IsInTerrainWithTerrain(float x, float z, __Vector3 vPosBefore)												// Done..
+bool CDungeonManager::IsInTerrainWithTerrain(float x, float z, __Vector3 vPosBefore) // Done..
 {
 	return m_pvsmgr.IsInTerrainWithTerrain(x, z, vPosBefore);
 }
@@ -103,33 +105,31 @@ bool CDungeonManager::CheckInclineWithTerrain(const __Vector3& vPos, const __Vec
 }
 
 // Shapes..
-bool CDungeonManager::CheckCollisionCameraWithShape(__Vector3& vEyeResult, const __Vector3& vAt, float fNP)	  // Done..
+bool CDungeonManager::CheckCollisionCameraWithShape(__Vector3& vEyeResult, const __Vector3& vAt, float fNP) // Done..
 {
-	return m_pvsmgr.CheckCollisionCameraWithShape(vEyeResult, vAt, fNP);						
+	return m_pvsmgr.CheckCollisionCameraWithShape(vEyeResult, vAt, fNP);
 }
 
-float CDungeonManager::GetHeightNearstPosWithShape(const __Vector3 &vPos, float fDist, __Vector3* pvNormal)		// Done..
+float CDungeonManager::GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal) // Done..
 {
-	return m_pvsmgr.GetHeightNearstPosWithShape(vPos, fDist, pvNormal);							
+	return m_pvsmgr.GetHeightNearstPosWithShape(vPos, fDist, pvNormal);
 }
 
-
-void CDungeonManager::RenderCollisionWithShape(const __Vector3& vPos)																			// No need..
+void CDungeonManager::RenderCollisionWithShape(const __Vector3& vPos) // No need..
 {
 }
-
 
 float CDungeonManager::GetHeightWithShape(float fX, float fZ, __Vector3* pvNormal)
 {
 	return m_pvsmgr.GetHeightWithShape(fX, fZ, pvNormal);
 }
 
-bool CDungeonManager::CheckCollisionWithShape(	const __Vector3& vPos,				 // 충돌 위치
-														const __Vector3& vDir,				   // 방향 벡터
-														float fSpeedPerSec,					    // 초당 움직이는 속도
-														__Vector3* pvCol,						 // 충돌 지점
-														__Vector3* pvNormal,				  // 충돌한면의 법선벡터
-														__Vector3* pVec)						// 충돌한 면 의 폴리곤 __Vector3[3]
+bool CDungeonManager::CheckCollisionWithShape(const __Vector3& vPos, // 충돌 위치
+	const __Vector3& vDir,                                           // 방향 벡터
+	float fSpeedPerSec,                                              // 초당 움직이는 속도
+	__Vector3* pvCol,                                                // 충돌 지점
+	__Vector3* pvNormal,                                             // 충돌한면의 법선벡터
+	__Vector3* pVec)                                                 // 충돌한 면 의 폴리곤 __Vector3[3]
 {
 	return m_pvsmgr.CheckCollisionWithShape(vPos, vDir, fSpeedPerSec, pvCol, pvNormal, pVec);
 }
@@ -143,6 +143,4 @@ CN3Shape* CDungeonManager::PickWithShape(int iXScreen, int iYScreen, bool bMustH
 {
 	return m_pvsmgr.PickWithShape(iXScreen, iYScreen, bMustHaveEvent, pvPick);
 }
-
-
 

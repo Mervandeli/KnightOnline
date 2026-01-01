@@ -11,16 +11,16 @@
 
 #include <N3Base/N3UIBase.h>
 
-#define TRADE_BBS_SELL		1
-#define TRADE_BBS_BUY		2
-#define TRADE_BBS_CANCEL	3
+#define TRADE_BBS_SELL   1
+#define TRADE_BBS_BUY    2
+#define TRADE_BBS_CANCEL 3
 
 class CUITradeBBSSelector : public CN3UIBase
 {
 protected:
-	CN3UIButton*	m_pBtn_BBSSell;
-	CN3UIButton*	m_pBtn_BBSBuy;
-	CN3UIButton*	m_pBtn_BBSCancel;
+	CN3UIButton* m_pBtn_BBSSell;
+	CN3UIButton* m_pBtn_BBSBuy;
+	CN3UIButton* m_pBtn_BBSCancel;
 
 public:
 	void SetVisible(bool bVisible) override;

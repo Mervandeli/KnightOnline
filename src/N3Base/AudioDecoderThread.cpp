@@ -4,8 +4,8 @@
 #include "AudioAsset.h"
 #include "al_wrapper.h"
 
-#include <cassert>			// assert()
-#include <unordered_map>	// std::unordered_map<>
+#include <cassert>       // assert()
+#include <unordered_map> // std::unordered_map<>
 
 #include <FileIO/FileReader.h>
 #include <mpg123.h>
@@ -114,7 +114,7 @@ void AudioDecoderThread::decode_impl_mp3(StreamedAudioHandle* handle)
 	if (handle->Mp3Handle == nullptr)
 		return;
 
-	StreamedAudioAsset* asset = static_cast<StreamedAudioAsset*>(handle->Asset.get());
+	StreamedAudioAsset* asset   = static_cast<StreamedAudioAsset*>(handle->Asset.get());
 	const size_t ChunksToDecode = MAX_AUDIO_STREAM_BUFFER_COUNT - handle->DecodedChunks.size();
 
 	for (size_t i = 0; i < ChunksToDecode; i++)
@@ -123,13 +123,15 @@ void AudioDecoderThread::decode_impl_mp3(StreamedAudioHandle* handle)
 		decodedChunk.Data.resize(asset->PcmChunkSize);
 
 		size_t done = 0;
-		int error = mpg123_read(handle->Mp3Handle, &decodedChunk.Data[0], asset->PcmChunkSize, &done);
+		int error   = mpg123_read(
+            handle->Mp3Handle, &decodedChunk.Data[0], asset->PcmChunkSize, &done);
 
 		// The first read will invoke MPG123_NEW_FORMAT.
 		// This is where we'd fetch the format data, but we don't really care about it.
 		// Retry the read so we can decode the chunk.
 		while (error == MPG123_NEW_FORMAT)
-			error = mpg123_read(handle->Mp3Handle, &decodedChunk.Data[0], asset->PcmChunkSize, &done);
+			error = mpg123_read(
+				handle->Mp3Handle, &decodedChunk.Data[0], asset->PcmChunkSize, &done);
 
 		// Decoded a chunk
 		if (error == MPG123_OK)
@@ -173,24 +175,23 @@ void AudioDecoderThread::decode_impl_pcm(StreamedAudioHandle* handle)
 	assert(asset->PcmDataBuffer != nullptr);
 	assert(asset->PcmDataSize != 0);
 
-	if (asset->PcmDataBuffer == nullptr
-		|| asset->PcmDataSize == 0)
+	if (asset->PcmDataBuffer == nullptr || asset->PcmDataSize == 0)
 		return;
 
 	const size_t ChunksToDecode = MAX_AUDIO_STREAM_BUFFER_COUNT - handle->DecodedChunks.size();
 	FileReaderHandle& fileReaderHandle = handle->FileReaderHandle;
-	FileReader* file = asset->File.get();
-	const size_t fileSize = static_cast<size_t>(file->Size());
+	FileReader* file                   = asset->File.get();
+	const size_t fileSize              = static_cast<size_t>(file->Size());
 
 	for (size_t i = 0; i < ChunksToDecode; i++)
 	{
 		AudioDecodedChunk decodedChunk = {};
 
-		const size_t bytesRemaining = fileSize > fileReaderHandle.Offset
-			? fileSize - fileReaderHandle.Offset
-			: 0;
+		const size_t bytesRemaining    = fileSize > fileReaderHandle.Offset
+											 ? fileSize - fileReaderHandle.Offset
+											 : 0;
 
-		size_t bytesToRead = asset->PcmChunkSize;
+		size_t bytesToRead             = asset->PcmChunkSize;
 		if (bytesRemaining < bytesToRead)
 			bytesToRead = bytesRemaining;
 
@@ -219,14 +220,12 @@ void AudioDecoderThread::decode_impl_pcm(StreamedAudioHandle* handle)
 		// Read a chunk.
 		decodedChunk.Data.resize(bytesToRead);
 
-		std::memcpy(
-			&decodedChunk.Data[0],
-			static_cast<const uint8_t*>(file->Memory()) + fileReaderHandle.Offset,
-			bytesToRead);
+		std::memcpy(&decodedChunk.Data[0],
+			static_cast<const uint8_t*>(file->Memory()) + fileReaderHandle.Offset, bytesToRead);
 
-		handle->FileReaderHandle.Offset	+= bytesToRead;
+		handle->FileReaderHandle.Offset += bytesToRead;
 
-		decodedChunk.BytesDecoded = static_cast<int32_t>(bytesToRead);
+		decodedChunk.BytesDecoded        = static_cast<int32_t>(bytesToRead);
 
 		handle->DecodedChunks.push(std::move(decodedChunk));
 		handle->FinishedDecoding = false;

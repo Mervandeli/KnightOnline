@@ -12,42 +12,42 @@
 
 class CDlgSetLightMap : public CDialog
 {
-// Construction
+	// Construction
 public:
-	COLORREF	m_SelDCColor;
-	DWORD		m_SelDXColor;
-	int			m_ColorWidth, m_ColorHeight;
-
+	COLORREF m_SelDCColor;
+	DWORD m_SelDXColor;
+	int m_ColorWidth, m_ColorHeight;
 
 public:
 	bool MoreLight();
 	int GetHardness();
 	DWORD GetColor();
 	int GetPenSize();
-	float	GetAlpha();
-	CDlgSetLightMap(CWnd* pParent = nullptr);   // standard constructor
+	float GetAlpha();
+	CDlgSetLightMap(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+											  // Dialog Data
 	//{{AFX_DATA(CDlgSetLightMap)
-	enum { IDD = IDD_SET_LIGHTMAP };
-	CSliderCtrl	m_sld_Opacity;
-	CStatic	m_ColorView;
-	CSliderCtrl	m_sld_PenSize;
-	CSliderCtrl	m_sld_Hard;
-	int		m_rdo_MoreLight;
+	enum
+	{
+		IDD = IDD_SET_LIGHTMAP
+	};
+	CSliderCtrl m_sld_Opacity;
+	CStatic m_ColorView;
+	CSliderCtrl m_sld_PenSize;
+	CSliderCtrl m_sld_Hard;
+	int m_rdo_MoreLight;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgSetLightMap)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgSetLightMap)
 	virtual BOOL OnInitDialog();

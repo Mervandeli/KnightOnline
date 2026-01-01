@@ -22,24 +22,23 @@ static char THIS_FILE[] = __FILE__;
 IMPLEMENT_DYNCREATE(CMainFrame, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
-	//{{AFX_MSG_MAP(CMainFrame)
-	ON_WM_CREATE()
-	ON_COMMAND(ID_ADJUST_WINDOW_SIZE, OnAdjustWindowSize)
-	ON_COMMAND(ID_FILE_CONVERT, OnFileConvert)
-	ON_COMMAND(ID_TOOL_CONVERT_FILES_AUTOMATICALY, OnToolConvertFilesAutomaticaly)
-	ON_COMMAND(ID_TOOL_CONVERT_FILES_MANUALLY, OnToolConvertFilesManually)
-	ON_COMMAND(ID_TOOL_CUT_BMP, OnToolCutBmp)
-	ON_COMMAND(ID_FILE_OPEN_NEXT, OnFileOpenNext)
-	ON_COMMAND(ID_FILE_OPEN_PREV, OnFileOpenPrev)
-	ON_COMMAND(ID_FILE_OPEN_FIRST, OnFileOpenFirst)
-	ON_COMMAND(ID_FILE_OPEN_LAST, OnFileOpenLast)
-	ON_COMMAND(ID_TOOL_SAVE_REPEAT, OnToolSaveRepeat)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CMainFrame)
+ON_WM_CREATE()
+ON_COMMAND(ID_ADJUST_WINDOW_SIZE, OnAdjustWindowSize)
+ON_COMMAND(ID_FILE_CONVERT, OnFileConvert)
+ON_COMMAND(ID_TOOL_CONVERT_FILES_AUTOMATICALY, OnToolConvertFilesAutomaticaly)
+ON_COMMAND(ID_TOOL_CONVERT_FILES_MANUALLY, OnToolConvertFilesManually)
+ON_COMMAND(ID_TOOL_CUT_BMP, OnToolCutBmp)
+ON_COMMAND(ID_FILE_OPEN_NEXT, OnFileOpenNext)
+ON_COMMAND(ID_FILE_OPEN_PREV, OnFileOpenPrev)
+ON_COMMAND(ID_FILE_OPEN_FIRST, OnFileOpenFirst)
+ON_COMMAND(ID_FILE_OPEN_LAST, OnFileOpenLast)
+ON_COMMAND(ID_TOOL_SAVE_REPEAT, OnToolSaveRepeat)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
-static UINT indicators[] =
-{
-	ID_SEPARATOR,           // status line indicator
+static UINT indicators[] = {
+	ID_SEPARATOR, // status line indicator
 	ID_INDICATOR_CAPS,
 	ID_INDICATOR_NUM,
 	ID_INDICATOR_SCRL,
@@ -51,7 +50,6 @@ static UINT indicators[] =
 CMainFrame::CMainFrame()
 {
 	// TODO: add member initialization code here
-	
 }
 
 CMainFrame::~CMainFrame()
@@ -62,21 +60,21 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
-	
-	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP
-		| CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
-		!m_wndToolBar.LoadToolBar(IDR_MAINFRAME))
+
+	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT,
+			WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY
+				| CBRS_SIZE_DYNAMIC)
+		|| !m_wndToolBar.LoadToolBar(IDR_MAINFRAME))
 	{
 		TRACE0("Failed to create toolbar\n");
-		return -1;      // fail to create
+		return -1; // fail to create
 	}
 
-	if (!m_wndStatusBar.Create(this) ||
-		!m_wndStatusBar.SetIndicators(indicators,
-		  sizeof(indicators)/sizeof(UINT)))
+	if (!m_wndStatusBar.Create(this)
+		|| !m_wndStatusBar.SetIndicators(indicators, sizeof(indicators) / sizeof(UINT)))
 	{
 		TRACE0("Failed to create status bar\n");
-		return -1;      // fail to create
+		return -1; // fail to create
 	}
 
 	// TODO: Delete these three lines if you don't want the toolbar to
@@ -85,14 +83,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	EnableDocking(CBRS_ALIGN_ANY);
 	DockControlBar(&m_wndToolBar);
 
-	if(m_Eng.Init(TRUE, m_hWnd, 64, 64, 0, TRUE) == false) return -1;
+	if (m_Eng.Init(TRUE, m_hWnd, 64, 64, 0, TRUE) == false)
+		return -1;
 
 	return 0;
 }
 
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
-	if( !CFrameWnd::PreCreateWindow(cs) )
+	if (!CFrameWnd::PreCreateWindow(cs))
 		return FALSE;
 	// TODO: Modify the Window class or styles here by modifying
 	//  the CREATESTRUCT cs
@@ -119,44 +118,47 @@ void CMainFrame::Dump(CDumpContext& dc) const
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame message handlers
 
-
-void CMainFrame::OnAdjustWindowSize() 
+void CMainFrame::OnAdjustWindowSize()
 {
 	this->AdjustWindowSize();
 }
 
-void CMainFrame::AdjustWindowSize() 
-{	
+void CMainFrame::AdjustWindowSize()
+{
 	// 그림크기에 윈도우 사이즈 맞추기..
 	DWORD dwStyle = this->GetStyle();
 	CRect rcFrm, rcView;
 	this->GetWindowRect(rcFrm);
 	GetActiveView()->GetClientRect(rcView);
-	CN3TexViewerDoc* pDoc = (CN3TexViewerDoc*)GetActiveDocument();
+	CN3TexViewerDoc* pDoc = (CN3TexViewerDoc*) GetActiveDocument();
 
-	int nW = rcFrm.Width() - rcView.Width() + pDoc->m_pTex->Width();
-	int nH = rcFrm.Height() - rcView.Height() + pDoc->m_pTex->Height();
+	int nW                = rcFrm.Width() - rcView.Width() + pDoc->m_pTex->Width();
+	int nH                = rcFrm.Height() - rcView.Height() + pDoc->m_pTex->Height();
 
-	if(pDoc->m_pTex->Width() <= 0) nW += 256;
-	if(pDoc->m_pTex->Height() <= 0) nH += 256;
+	if (pDoc->m_pTex->Width() <= 0)
+		nW += 256;
+	if (pDoc->m_pTex->Height() <= 0)
+		nH += 256;
 
-	if(nW < 256) nW = 256;
+	if (nW < 256)
+		nW = 256;
 
 	SetWindowPos(nullptr, 0, 0, nW, nH, SWP_NOMOVE | SWP_NOZORDER);
 }
 
-void CMainFrame::OnFileConvert() 
+void CMainFrame::OnFileConvert()
 {
-	CN3TexViewerDoc* pDoc = (CN3TexViewerDoc*)GetActiveDocument();
-	if(nullptr == pDoc->m_pTex || nullptr == pDoc->m_pTex->Get()) return;
+	CN3TexViewerDoc* pDoc = (CN3TexViewerDoc*) GetActiveDocument();
+	if (nullptr == pDoc->m_pTex || nullptr == pDoc->m_pTex->Get())
+		return;
 
 	CDlgFormat dlg;
-	dlg.m_Fmt = pDoc->m_pTex->PixelFormat();
-	dlg.m_nWidth = pDoc->m_pTex->Width();
+	dlg.m_Fmt     = pDoc->m_pTex->PixelFormat();
+	dlg.m_nWidth  = pDoc->m_pTex->Width();
 	dlg.m_nHeight = pDoc->m_pTex->Height();
 	dlg.m_bMipMap = pDoc->m_pTex->MipMapCount() > 1 ? TRUE : FALSE;
 
-	INT_PTR nOK = dlg.DoModal();
+	INT_PTR nOK   = dlg.DoModal();
 	if (IDOK != nOK)
 		return;
 
@@ -164,45 +166,46 @@ void CMainFrame::OnFileConvert()
 	pDoc->SetTitle(""); // 타이틀 바꾸기..
 }
 
-void CMainFrame::OnToolConvertFilesAutomaticaly() 
+void CMainFrame::OnToolConvertFilesAutomaticaly()
 {
 	char szBuff[102400] = "";
-	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "dxt", nullptr, dwFlags, "Generic Image Files(*.bmp, *.tga, *.jpg)|*.bmp;*.tga;*.jpg||", nullptr);
-	char szCurPath[256]; GetCurrentDirectory(256, szCurPath);
+	DWORD dwFlags       = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
+	CFileDialog dlg(TRUE, "dxt", nullptr, dwFlags,
+		"Generic Image Files(*.bmp, *.tga, *.jpg)|*.bmp;*.tga;*.jpg||", nullptr);
+	char szCurPath[256];
+	GetCurrentDirectory(256, szCurPath);
 	dlg.m_ofn.lpstrInitialDir = szCurPath;
-	dlg.m_ofn.nMaxFile = 102400;
-	dlg.m_ofn.lpstrFile = szBuff;
+	dlg.m_ofn.nMaxFile        = 102400;
+	dlg.m_ofn.lpstrFile       = szBuff;
 
-	if(dlg.DoModal() == IDCANCEL) return;
+	if (dlg.DoModal() == IDCANCEL)
+		return;
 
 	CN3Texture Tex;
 	POSITION pos = dlg.GetStartPosition();
 	CString FileName;
-	while(pos != nullptr)
+	while (pos != nullptr)
 	{
 		FileName = dlg.GetNextPathName(pos);
-		
+
 		CT2A FileNameA(FileName);
 		Tex.LoadFromFile(FileNameA.m_psz);
 
-		if(Tex.Get()) 
+		if (Tex.Get())
 		{
-			char szFN2[_MAX_PATH], szDrv[_MAX_DRIVE], szDir[_MAX_DIR], szFN[_MAX_FNAME], szExt[_MAX_EXT];
+			char szFN2[_MAX_PATH], szDrv[_MAX_DRIVE], szDir[_MAX_DIR], szFN[_MAX_FNAME],
+				szExt[_MAX_EXT];
 			::_splitpath(FileName, szDrv, szDir, szFN, szExt);
 			lstrcpy(szExt, ".DXT");
 			::_makepath(szFN2, szDrv, szDir, szFN, szExt); // 파일 이름의 확장자를 DXT 로 바꿈...
-	
+
 			D3DFORMAT Fmt = Tex.PixelFormat();
-			if(	Fmt == D3DFMT_R8G8B8 ||
-				Fmt == D3DFMT_X8R8G8B8 ||
-				Fmt == D3DFMT_R5G6B5 || 
-				Fmt == D3DFMT_X1R5G5B5 )
+			if (Fmt == D3DFMT_R8G8B8 || Fmt == D3DFMT_X8R8G8B8 || Fmt == D3DFMT_R5G6B5
+				|| Fmt == D3DFMT_X1R5G5B5)
 			{
 				Tex.Convert(D3DFMT_DXT1);
 			}
-			else if(	Fmt == D3DFMT_A8R8G8B8 ||
-						Fmt == D3DFMT_A1R5G5B5 )
+			else if (Fmt == D3DFMT_A8R8G8B8 || Fmt == D3DFMT_A1R5G5B5)
 			{
 				Tex.Convert(D3DFMT_DXT3);
 			}
@@ -214,68 +217,78 @@ void CMainFrame::OnToolConvertFilesAutomaticaly()
 	}
 }
 
-void CMainFrame::OnToolConvertFilesManually() 
+void CMainFrame::OnToolConvertFilesManually()
 {
 	char szBuff[102400] = "";
-	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "dxt", nullptr, dwFlags, "Generic Image Files(*.dxt, *.bmp, *.tga, *.jpg)|*.dxt;*.bmp;*.tga;*.jpg|BitmapFile File(*.bmp)|*.bmp|Targa File(*.tga)|*.bmp|DXT File(*.dxt)|*.dxt||", nullptr);
-	char szCurPath[256]; GetCurrentDirectory(256, szCurPath);
+	DWORD dwFlags       = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
+	CFileDialog dlg(TRUE, "dxt", nullptr, dwFlags,
+		"Generic Image Files(*.dxt, *.bmp, *.tga, *.jpg)|*.dxt;*.bmp;*.tga;*.jpg|BitmapFile "
+		"File(*.bmp)|*.bmp|Targa File(*.tga)|*.bmp|DXT File(*.dxt)|*.dxt||",
+		nullptr);
+	char szCurPath[256];
+	GetCurrentDirectory(256, szCurPath);
 	dlg.m_ofn.lpstrInitialDir = szCurPath;
-	dlg.m_ofn.nMaxFile = 102400;
-	dlg.m_ofn.lpstrFile = szBuff;
+	dlg.m_ofn.nMaxFile        = 102400;
+	dlg.m_ofn.lpstrFile       = szBuff;
 
-	if(dlg.DoModal() == IDCANCEL) return;
+	if (dlg.DoModal() == IDCANCEL)
+		return;
 
 	CN3Texture Tex;
 	std::string szFN;
 	szFN = dlg.GetPathName();
 	Tex.LoadFromFile(szFN); // 첨 하나 읽어보고..
 
-	CDlgFormat dlgFormat; // 포맷 정학...
-	dlgFormat.m_nWidth = Tex.Width();
+	CDlgFormat dlgFormat;   // 포맷 정학...
+	dlgFormat.m_nWidth  = Tex.Width();
 	dlgFormat.m_nHeight = Tex.Height();
 	dlgFormat.m_bMipMap = Tex.MipMapCount() > 1 ? TRUE : FALSE;
-	if(dlgFormat.DoModal() == IDCANCEL) return;
+	if (dlgFormat.DoModal() == IDCANCEL)
+		return;
 
 	POSITION pos = dlg.GetStartPosition();
 	CString FileName;
-	while(pos != nullptr)
+	while (pos != nullptr)
 	{
 		FileName = dlg.GetNextPathName(pos);
-		
-		szFN = FileName;
+
+		szFN     = FileName;
 		Tex.LoadFromFile(szFN);
 
-		if(Tex.Get()) 
+		if (Tex.Get())
 		{
-			char szFN2[_MAX_PATH] = "", szDrv[_MAX_DRIVE], szDir[_MAX_DIR], szFN[_MAX_FNAME], szExt[_MAX_EXT];
+			char szFN2[_MAX_PATH] = "", szDrv[_MAX_DRIVE], szDir[_MAX_DIR], szFN[_MAX_FNAME],
+				 szExt[_MAX_EXT];
 			::_splitpath(FileName, szDrv, szDir, szFN, szExt);
 			lstrcpy(szExt, ".DXT");
 			::_makepath(szFN2, szDrv, szDir, szFN, szExt); // 파일 이름의 확장자를 DXT 로 바꿈...
-			
-			Tex.Convert(dlgFormat.m_Fmt, dlgFormat.m_nWidth, dlgFormat.m_nHeight, dlgFormat.m_bMipMap);
+
+			Tex.Convert(
+				dlgFormat.m_Fmt, dlgFormat.m_nWidth, dlgFormat.m_nHeight, dlgFormat.m_bMipMap);
 			Tex.m_szName = szFN2;
 			Tex.SaveToFile(szFN2);
 		}
 	}
 }
 
-void CMainFrame::OnToolCutBmp() 
+void CMainFrame::OnToolCutBmp()
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
 	CFileDialog dlg(TRUE, "bmp", nullptr, dwFlags, "Bitmap file(*.bmp)|*.bmp||", nullptr);
-	if(dlg.DoModal() == IDCANCEL) return;
+	if (dlg.DoModal() == IDCANCEL)
+		return;
 
 	CDlgFormat dlgFmt; // 크기 및 저장 형식 지정.
-	if(IDCANCEL == dlgFmt.DoModal()) return;
+	if (IDCANCEL == dlgFmt.DoModal())
+		return;
 
-	int nW = dlgFmt.m_nWidth; // 너비 
-	int nH = dlgFmt.m_nHeight; // 높이
-	D3DFORMAT fmtSave = dlgFmt.m_Fmt; // 포맷 - BitMap 일때는 무시..
+	int nW            = dlgFmt.m_nWidth;  // 너비
+	int nH            = dlgFmt.m_nHeight; // 높이
+	D3DFORMAT fmtSave = dlgFmt.m_Fmt;     // 포맷 - BitMap 일때는 무시..
 
-	int nYesNo = MessageBox("DXT File 로 저장하시겠습니까?", "저장 형식", MB_YESNO);
-	bool bSaveToDXT = false;
-	if(IDYES == nYesNo)
+	int nYesNo        = MessageBox("DXT File 로 저장하시겠습니까?", "저장 형식", MB_YESNO);
+	bool bSaveToDXT   = false;
+	if (IDYES == nYesNo)
 	{
 		bSaveToDXT = true;
 	}
@@ -283,17 +296,19 @@ void CMainFrame::OnToolCutBmp()
 	BMPCutter(dlg.GetPathName(), nW, nH, bSaveToDXT, fmtSave);
 }
 
-BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool bSaveToDXT, D3DFORMAT fmtDXT)
+BOOL CMainFrame::BMPCutter(
+	LPCTSTR lpszFileName, int iWidth, int iHeight, bool bSaveToDXT, D3DFORMAT fmtDXT)
 {
 	CBitMapFile BMF;
-	if(false == BMF.LoadFromFile(lpszFileName)) return FALSE;
+	if (false == BMF.LoadFromFile(lpszFileName))
+		return FALSE;
 
 	// 저장할 file 이름
 	char szDrive[_MAX_DRIVE];
 	char szDir[_MAX_DIR];
 	char szFName[_MAX_FNAME];
 	_splitpath(lpszFileName, szDrive, szDir, szFName, nullptr);
-	CreateDirectory(szFName, nullptr);	// 하위 폴더 만들기
+	CreateDirectory(szFName, nullptr); // 하위 폴더 만들기
 
 	int xx = BMF.Width() / iWidth;
 	int yy = BMF.Height() / iHeight;
@@ -303,28 +318,32 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 	ProgressBar.Create("cutting bitmap..", 50, yy * xx);
 	ProgressBar.SetStep(1);
 
-	for(int y = 0; y < yy; y++)
+	for (int y = 0; y < yy; y++)
 	{
-		for(int x = 0; x < xx; x++)
+		for (int x = 0; x < xx; x++)
 		{
-			RECT rcDest = {x*iWidth, y*iHeight, (x+1)*iWidth, (y+1)*iHeight };
+			RECT rcDest = { x * iWidth, y * iHeight, (x + 1) * iWidth, (y + 1) * iHeight };
 			char szDestFN[_MAX_PATH];
-			
-			if(bSaveToDXT)
+
+			if (bSaveToDXT)
 			{
-				if(false == BMF.SaveRectToFile("c:\\TempConvert.BMP", rcDest)) continue;
-				
+				if (false == BMF.SaveRectToFile("c:\\TempConvert.BMP", rcDest))
+					continue;
+
 				CN3Texture Tex;
-				if(false == Tex.LoadFromFile("c:\\TempConvert.BMP")) continue;
+				if (false == Tex.LoadFromFile("c:\\TempConvert.BMP"))
+					continue;
 
 				Tex.Convert(fmtDXT);
-				wsprintf(szDestFN, "%s%s%s\\%s_%02d%02d.DXT", szDrive, szDir, szFName, szFName, x, y);
+				wsprintf(
+					szDestFN, "%s%s%s\\%s_%02d%02d.DXT", szDrive, szDir, szFName, szFName, x, y);
 				Tex.SaveToFile(szDestFN);
 				DeleteFile("c:\\TempConvert.BMP");
 			}
 			else
 			{
-				wsprintf(szDestFN, "%s%s%s\\%s_%02d%02d.bmp", szDrive, szDir, szFName, szFName, x, y);
+				wsprintf(
+					szDestFN, "%s%s%s\\%s_%02d%02d.bmp", szDrive, szDir, szFName, szFName, x, y);
 				BMF.SaveRectToFile(szDestFN, rcDest);
 			}
 
@@ -333,7 +352,7 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 	}
 
 	return TRUE;
-/*
+	/*
 	if (lstrlen(lpszFileName) == 0 || iWidth<=0 || iHeight<=0)
 	{
 		MessageBox("가로 세로가 0이하인 bitmap으로 나눌 수 없습니다.", "error");
@@ -524,43 +543,48 @@ BOOL CMainFrame::BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool b
 	 */
 }
 
-void CMainFrame::OnFileOpenNext() 
+void CMainFrame::OnFileOpenNext()
 {
-	CN3TexViewerDoc* pDoc = (CN3TexViewerDoc*)(this->GetActiveDocument());
-	if(pDoc) pDoc->OpenNextFile();
+	CN3TexViewerDoc* pDoc = (CN3TexViewerDoc*) (this->GetActiveDocument());
+	if (pDoc)
+		pDoc->OpenNextFile();
 	AdjustWindowSize();
 }
 
-void CMainFrame::OnFileOpenPrev() 
+void CMainFrame::OnFileOpenPrev()
 {
-	CN3TexViewerDoc* pDoc = (CN3TexViewerDoc*)(this->GetActiveDocument());
-	if(pDoc) pDoc->OpenPrevFile();
+	CN3TexViewerDoc* pDoc = (CN3TexViewerDoc*) (this->GetActiveDocument());
+	if (pDoc)
+		pDoc->OpenPrevFile();
 	AdjustWindowSize();
 }
 
-void CMainFrame::OnFileOpenFirst() 
+void CMainFrame::OnFileOpenFirst()
 {
-	CN3TexViewerDoc* pDoc = (CN3TexViewerDoc*)(this->GetActiveDocument());
-	if(pDoc) pDoc->OpenFirstFile();
+	CN3TexViewerDoc* pDoc = (CN3TexViewerDoc*) (this->GetActiveDocument());
+	if (pDoc)
+		pDoc->OpenFirstFile();
 	AdjustWindowSize();
 }
 
-void CMainFrame::OnFileOpenLast() 
+void CMainFrame::OnFileOpenLast()
 {
-	CN3TexViewerDoc* pDoc = (CN3TexViewerDoc*)(this->GetActiveDocument());
-	if(pDoc) pDoc->OpenLastFile();
+	CN3TexViewerDoc* pDoc = (CN3TexViewerDoc*) (this->GetActiveDocument());
+	if (pDoc)
+		pDoc->OpenLastFile();
 	AdjustWindowSize();
 }
 
-void CMainFrame::OnToolSaveRepeat() 
+void CMainFrame::OnToolSaveRepeat()
 {
 	char szBuff[102400] = "";
-	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
+	DWORD dwFlags       = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
 	CFileDialog dlg(TRUE, "dxt", nullptr, dwFlags, "Noah Texture Files(*.dxt)|*.dxt||", nullptr);
-	char szCurPath[256]; GetCurrentDirectory(256, szCurPath);
+	char szCurPath[256];
+	GetCurrentDirectory(256, szCurPath);
 	dlg.m_ofn.lpstrInitialDir = szCurPath;
-	dlg.m_ofn.nMaxFile = 102400;
-	dlg.m_ofn.lpstrFile = szBuff;
+	dlg.m_ofn.nMaxFile        = 102400;
+	dlg.m_ofn.lpstrFile       = szBuff;
 
 	if (dlg.DoModal() == IDCANCEL)
 		return;

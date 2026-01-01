@@ -14,44 +14,43 @@ const int TEX_VIEW_SIZE = 512;
 
 class CDlgSaveDivision : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgSaveDivision(CWnd* pParent = nullptr);   // standard constructor
+	CDlgSaveDivision(CWnd* pParent = nullptr); // standard constructor
 
-// Variables...
-	class CLyTerrain*	m_pTerrain;
-	class CMapMng*		m_pMapMng;
-	class CN3Texture*	m_pMiniMap;
-	
-	int					m_iTotalSize;
-	int					m_iDivisionSize;
-	POINT				m_ptMousePos;
-	CRect				m_rtDrawRegion;
+											   // Variables...
+	class CLyTerrain* m_pTerrain;
+	class CMapMng* m_pMapMng;
+	class CN3Texture* m_pMiniMap;
 
+	int m_iTotalSize;
+	int m_iDivisionSize;
+	POINT m_ptMousePos;
+	CRect m_rtDrawRegion;
 
+	// Functions...
+	void SetTexView();
+	void RenderTexnRegion();
 
-// Functions...
-	void	SetTexView();
-	void	RenderTexnRegion();
-
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgSaveDivision)
-	enum { IDD = IDD_SAVE_DIVIDE };
-	CComboBox	m_cbDivision;
-	CString	m_strTotalSize;
+	enum
+	{
+		IDD = IDD_SAVE_DIVIDE
+	};
+	CComboBox m_cbDivision;
+	CString m_strTotalSize;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgSaveDivision)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgSaveDivision)
 	virtual BOOL OnInitDialog();

@@ -14,7 +14,7 @@
 #include "ZipAutoBuffer.h"
 #include <zlib.h>
 
-class CZipInternalInfo  
+class CZipInternalInfo
 {
 public:
 	DWORD m_iBufferSize;
@@ -26,7 +26,6 @@ public:
 	CZipAutoBuffer m_pBuffer;
 	CZipInternalInfo();
 	virtual ~CZipInternalInfo();
-
 };
 
 #endif // !defined(AFX_ZIPINTERNALINFO_H__C6749101_590C_4F74_8121_B82E3BE9FA44__INCLUDED_)

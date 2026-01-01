@@ -8,7 +8,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -34,19 +34,19 @@ void CWall::AddVertex(__Vector3 Vertex)
 
 void CWall::DelPrevVertex()
 {
-	if(m_Wall.size()>0) m_Wall.pop_back();
+	if (m_Wall.size() > 0)
+		m_Wall.pop_back();
 }
 
 bool CWall::GetVertex(int idx, __Vector3* pPos)
 {
-	if (idx < 0
-		|| idx >= static_cast<int>(m_Wall.size()))
+	if (idx < 0 || idx >= static_cast<int>(m_Wall.size()))
 		return false;
 
 	std::list<__Vector3>::iterator it;
 	it = m_Wall.begin();
 
-	for(int i=0; i<idx; i++)
+	for (int i = 0; i < idx; i++)
 	{
 		it++;
 	}

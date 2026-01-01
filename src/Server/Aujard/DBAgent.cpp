@@ -35,7 +35,8 @@ bool CDBAgent::InitDatabase()
 	// exceptions per-connection
 	try
 	{
-		auto gameConn = db::ConnectionManager::CreatePoolConnection(modelUtil::DbType::GAME, DB_PROCESS_TIMEOUT);
+		auto gameConn = db::ConnectionManager::CreatePoolConnection(
+			modelUtil::DbType::GAME, DB_PROCESS_TIMEOUT);
 		if (gameConn == nullptr)
 			return false;
 	}
@@ -47,7 +48,8 @@ bool CDBAgent::InitDatabase()
 
 	try
 	{
-		auto accountConn = db::ConnectionManager::CreatePoolConnection(modelUtil::DbType::ACCOUNT, DB_PROCESS_TIMEOUT);
+		auto accountConn = db::ConnectionManager::CreatePoolConnection(
+			modelUtil::DbType::ACCOUNT, DB_PROCESS_TIMEOUT);
 		if (accountConn == nullptr)
 			return false;
 	}
@@ -73,18 +75,18 @@ void CDBAgent::ResetUserData(int userId)
 bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userId)
 {
 	// verify UserData[userId] is valid for load
-	_USER_DATA* user =  UserData[userId];
+	_USER_DATA* user = UserData[userId];
 	if (user == nullptr)
 	{
-		spdlog::error("DBAgent::LoadUserData: UserData[{}] not found for charId={}",
-			userId, charId);
+		spdlog::error(
+			"DBAgent::LoadUserData: UserData[{}] not found for charId={}", userId, charId);
 		return false;
 	}
 
 	if (user->m_bLogout)
 	{
-		spdlog::error("DBAgent::LoadUserData: logout error: charId={}, logout={}",
-			charId, user->m_bLogout);
+		spdlog::error(
+			"DBAgent::LoadUserData: logout error: charId={}, logout={}", charId, user->m_bLogout);
 		return false;
 	}
 
@@ -93,11 +95,8 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 	uint8_t Face, City, Fame, Authority, Points;
 	int16_t Hp, Mp, Sp, Class, Bind = 0, Knights, QuestCount;
 	uint8_t Str, Sta, Dex, Intel, Cha, Zone;
-	ByteBuffer skills(10),
-		items(400),
-		serials(400),
-		quests(400);
-	
+	ByteBuffer skills(10), items(400), serials(400), quests(400);
+
 	int16_t rowCount = 0;
 	try
 	{
@@ -105,7 +104,7 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 
 		db::StoredProc<storedProc::LoadUserData> proc;
 		auto weak_result = proc.execute(accountId, charId, &rowCount);
-		auto result = weak_result.lock();
+		auto result      = weak_result.lock();
 		if (result == nullptr)
 		{
 			throw db::ApplicationError("DBAgent::LoadUserData: expected result set");
@@ -117,38 +116,38 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 		}
 
 		// THIS IS WHERE THE FUN STARTS
-		Nation = result->get<uint8_t>(0);
-		Race = result->get<uint8_t>(1);
-		Class = result->get<int16_t>(2);
+		Nation    = result->get<uint8_t>(0);
+		Race      = result->get<uint8_t>(1);
+		Class     = result->get<int16_t>(2);
 		HairColor = result->get<uint8_t>(3);
-		Rank = result->get<uint8_t>(4);
-		Title = result->get<uint8_t>(5);
-		Level = result->get<uint8_t>(6);
-		Exp = result->get<uint32_t>(7);
-		Loyalty = result->get<uint32_t>(8);
-		Face = result->get<uint8_t>(9);
-		City = result->get<uint8_t>(10);
-		Knights = result->get<int16_t>(11);
-		Fame = result->get<uint8_t>(12);
-		Hp = result->get<int16_t>(13);
-		Mp = result->get<int16_t>(14);
-		Sp = result->get<int16_t>(15);
-		Str = result->get<uint8_t>(16);
-		Sta = result->get<uint8_t>(17);
-		Dex = result->get<uint8_t>(18);
-		Intel = result->get<uint8_t>(19);
-		Cha = result->get<uint8_t>(20);
+		Rank      = result->get<uint8_t>(4);
+		Title     = result->get<uint8_t>(5);
+		Level     = result->get<uint8_t>(6);
+		Exp       = result->get<uint32_t>(7);
+		Loyalty   = result->get<uint32_t>(8);
+		Face      = result->get<uint8_t>(9);
+		City      = result->get<uint8_t>(10);
+		Knights   = result->get<int16_t>(11);
+		Fame      = result->get<uint8_t>(12);
+		Hp        = result->get<int16_t>(13);
+		Mp        = result->get<int16_t>(14);
+		Sp        = result->get<int16_t>(15);
+		Str       = result->get<uint8_t>(16);
+		Sta       = result->get<uint8_t>(17);
+		Dex       = result->get<uint8_t>(18);
+		Intel     = result->get<uint8_t>(19);
+		Cha       = result->get<uint8_t>(20);
 		Authority = result->get<uint8_t>(21);
-		Points = result->get<uint8_t>(22);
-		Gold = result->get<uint32_t>(23);
-		Zone = result->get<uint8_t>(24);
+		Points    = result->get<uint8_t>(22);
+		Gold      = result->get<uint32_t>(23);
+		Zone      = result->get<uint8_t>(24);
 		if (!result->is_null(25))
 		{
 			Bind = result->get<int16_t>(25);
 		}
-		PX = result->get<uint32_t>(26);
-		PZ = result->get<uint32_t>(27);
-		PY = result->get<uint32_t>(28);
+		PX     = result->get<uint32_t>(26);
+		PZ     = result->get<uint32_t>(27);
+		PY     = result->get<uint32_t>(28);
 		dwTime = result->get<uint32_t>(29);
 
 		if (!result->is_null(30))
@@ -177,7 +176,7 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 			quests.sync_for_read();
 		}
 
-		MannerPoint = result->get<uint32_t>(35);
+		MannerPoint    = result->get<uint32_t>(35);
 		LoyaltyMonthly = result->get<uint32_t>(36);
 	}
 	catch (const nanodbc::database_error& dbErr)
@@ -185,7 +184,7 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 		db::utils::LogDatabaseError(dbErr, "DBAgent::LoadUserData()");
 		return false;
 	}
-	
+
 	std::string newCharId = charId;
 #if defined(DB_COMPAT_PADDED_NAMES)
 	rtrim(newCharId);
@@ -193,43 +192,44 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 
 	if (strcpy_safe(user->m_id, newCharId) != 0)
 	{
-		spdlog::error("DBAgent::LoadUserData(): failed to write newCharId(len: {}, val: {}) to user->m_id",
+		spdlog::error(
+			"DBAgent::LoadUserData(): failed to write newCharId(len: {}, val: {}) to user->m_id",
 			newCharId.length(), newCharId);
 		return false;
 	}
 
-	user->m_bZone = Zone;
-	user->m_curx = static_cast<float>(PX / 100);
-	user->m_curz = static_cast<float>(PZ / 100);
-	user->m_cury = static_cast<float>(PY / 100);
-	user->m_dwTime = dwTime+1;
-	user->m_bNation = Nation;
-	user->m_bRace = Race;
-	user->m_sClass = Class;
-	user->m_bHairColor = HairColor;
-	user->m_bRank = Rank;
-	user->m_bTitle = Title;
-	user->m_bLevel = Level;
-	user->m_iExp = Exp;
-	user->m_iLoyalty = Loyalty;
-	user->m_bFace = Face;
-	user->m_bCity = City;
-	user->m_bKnights = Knights;
-	user->m_bFame = Fame;
-	user->m_sHp = Hp;
-	user->m_sMp = Mp;
-	user->m_sSp = Sp;
-	user->m_bStr = Str;
-	user->m_bSta = Sta;
-	user->m_bDex = Dex;
-	user->m_bIntel = Intel;
-	user->m_bCha = Cha;
-	user->m_bAuthority = Authority;
-	user->m_bPoints = Points;
-	user->m_iGold = Gold;
-	user->m_sBind = Bind;
-	user->m_dwTime = dwTime + 1;
-	user->m_iMannerPoint = MannerPoint;
+	user->m_bZone           = Zone;
+	user->m_curx            = static_cast<float>(PX / 100);
+	user->m_curz            = static_cast<float>(PZ / 100);
+	user->m_cury            = static_cast<float>(PY / 100);
+	user->m_dwTime          = dwTime + 1;
+	user->m_bNation         = Nation;
+	user->m_bRace           = Race;
+	user->m_sClass          = Class;
+	user->m_bHairColor      = HairColor;
+	user->m_bRank           = Rank;
+	user->m_bTitle          = Title;
+	user->m_bLevel          = Level;
+	user->m_iExp            = Exp;
+	user->m_iLoyalty        = Loyalty;
+	user->m_bFace           = Face;
+	user->m_bCity           = City;
+	user->m_bKnights        = Knights;
+	user->m_bFame           = Fame;
+	user->m_sHp             = Hp;
+	user->m_sMp             = Mp;
+	user->m_sSp             = Sp;
+	user->m_bStr            = Str;
+	user->m_bSta            = Sta;
+	user->m_bDex            = Dex;
+	user->m_bIntel          = Intel;
+	user->m_bCha            = Cha;
+	user->m_bAuthority      = Authority;
+	user->m_bPoints         = Points;
+	user->m_iGold           = Gold;
+	user->m_sBind           = Bind;
+	user->m_dwTime          = dwTime + 1;
+	user->m_iMannerPoint    = MannerPoint;
 	user->m_iLoyaltyMonthly = LoyaltyMonthly;
 
 	spdlog::debug("DBAgent::LoadUserData: name={}, nation={}, zone={}, level={}, exp={}, money={}",
@@ -241,20 +241,20 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 	// Equip slots + inventory slots (14+28=42)
 	for (int i = 0; i < HAVE_MAX + SLOT_MAX; i++)
 	{
-		int32_t itemId = items.read<int32_t>();
-		int16_t duration = items.read<int16_t>();
-		int16_t count = items.read<int16_t>();
+		int32_t itemId      = items.read<int32_t>();
+		int16_t duration    = items.read<int16_t>();
+		int16_t count       = items.read<int16_t>();
 
-		int64_t serial = serials.read<int64_t>();		// item serial number
+		int64_t serial      = serials.read<int64_t>(); // item serial number
 
 		model::Item* pTable = _main->ItemArray.GetData(itemId);
 
 		if (pTable != nullptr)
 		{
-			user->m_sItemArray[i].nNum = itemId;
-			user->m_sItemArray[i].sDuration = duration;
-			user->m_sItemArray[i].nSerialNum = serial;
-			user->m_sItemArray[i].byFlag = 0;
+			user->m_sItemArray[i].nNum           = itemId;
+			user->m_sItemArray[i].sDuration      = duration;
+			user->m_sItemArray[i].nSerialNum     = serial;
+			user->m_sItemArray[i].byFlag         = 0;
 			user->m_sItemArray[i].sTimeRemaining = 0;
 
 			if (count > ITEMCOUNT_MAX)
@@ -263,9 +263,9 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 			}
 			else if (pTable->Countable && count <= 0)
 			{
-				user->m_sItemArray[i].nNum = 0;
-				user->m_sItemArray[i].sDuration = 0;
-				user->m_sItemArray[i].sCount = 0;
+				user->m_sItemArray[i].nNum       = 0;
+				user->m_sItemArray[i].sDuration  = 0;
+				user->m_sItemArray[i].sCount     = 0;
 				user->m_sItemArray[i].nSerialNum = 0;
 			}
 			else
@@ -276,21 +276,22 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 				user->m_sItemArray[i].sCount = count;
 			}
 
-			spdlog::debug("DBAgent::LoadUserData: {} : {} slot ({} : {})",
-				user->m_id, i, user->m_sItemArray[i].nNum, user->m_sItemArray[i].nSerialNum);
+			spdlog::debug("DBAgent::LoadUserData: {} : {} slot ({} : {})", user->m_id, i,
+				user->m_sItemArray[i].nNum, user->m_sItemArray[i].nSerialNum);
 		}
 		else
 		{
-			user->m_sItemArray[i].nNum = 0;
-			user->m_sItemArray[i].sDuration = 0;
-			user->m_sItemArray[i].sCount = 0;
-			user->m_sItemArray[i].nSerialNum = 0;
-			user->m_sItemArray[i].byFlag = 0;
+			user->m_sItemArray[i].nNum           = 0;
+			user->m_sItemArray[i].sDuration      = 0;
+			user->m_sItemArray[i].sCount         = 0;
+			user->m_sItemArray[i].nSerialNum     = 0;
+			user->m_sItemArray[i].byFlag         = 0;
 			user->m_sItemArray[i].sTimeRemaining = 0;
 
 			if (itemId > 0)
 			{
-				spdlog::error("DBAgent::LoadUserData: Item Drop [charId={} itemId={}]", charId, itemId);
+				spdlog::error(
+					"DBAgent::LoadUserData: Item Drop [charId={} itemId={}]", charId, itemId);
 			}
 		}
 	}
@@ -299,11 +300,10 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 	for (int i = 0; i < MAX_QUEST; i++)
 	{
 		_USER_QUEST& quest = user->m_quests[i];
-		quest.sQuestID = quests.read<int16_t>();
+		quest.sQuestID     = quests.read<int16_t>();
 		quest.byQuestState = quests.read<uint8_t>();
 
-		if (quest.sQuestID > 100
-			|| quest.byQuestState > 3)
+		if (quest.sQuestID > 100 || quest.byQuestState > 3)
 		{
 			memset(&quest, 0, sizeof(_USER_QUEST));
 			continue;
@@ -316,9 +316,7 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 	if (QuestCount != sQuestTotal)
 		user->m_sQuestCount = sQuestTotal;
 
-	if (user->m_bLevel == 1
-		&& user->m_iExp == 0
-		&& user->m_iGold == 0)
+	if (user->m_bLevel == 1 && user->m_iExp == 0 && user->m_iGold == 0)
 	{
 		int emptySlot = 0;
 		for (int j = SLOT_MAX; j < HAVE_MAX + SLOT_MAX; j++)
@@ -336,46 +334,46 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 		switch (user->m_sClass)
 		{
 			case 101:
-				user->m_sItemArray[emptySlot].nNum = 120010000;
+				user->m_sItemArray[emptySlot].nNum      = 120010000;
 				user->m_sItemArray[emptySlot].sDuration = 5000;
 				break;
 
 			case 102:
-				user->m_sItemArray[emptySlot].nNum = 110010000;
+				user->m_sItemArray[emptySlot].nNum      = 110010000;
 				user->m_sItemArray[emptySlot].sDuration = 4000;
 				break;
 
 			case 103:
-				user->m_sItemArray[emptySlot].nNum = 180010000;
+				user->m_sItemArray[emptySlot].nNum      = 180010000;
 				user->m_sItemArray[emptySlot].sDuration = 5000;
 				break;
 
 			case 104:
-				user->m_sItemArray[emptySlot].nNum = 190010000;
+				user->m_sItemArray[emptySlot].nNum      = 190010000;
 				user->m_sItemArray[emptySlot].sDuration = 10000;
 				break;
 
 			case 201:
-				user->m_sItemArray[emptySlot].nNum = 120050000;
+				user->m_sItemArray[emptySlot].nNum      = 120050000;
 				user->m_sItemArray[emptySlot].sDuration = 5000;
 				break;
 
 			case 202:
-				user->m_sItemArray[emptySlot].nNum = 110050000;
+				user->m_sItemArray[emptySlot].nNum      = 110050000;
 				user->m_sItemArray[emptySlot].sDuration = 4000;
 				break;
 
 			case 203:
-				user->m_sItemArray[emptySlot].nNum = 180050000;
+				user->m_sItemArray[emptySlot].nNum      = 180050000;
 				user->m_sItemArray[emptySlot].sDuration = 5000;
 				break;
 
 			case 204:
-				user->m_sItemArray[emptySlot].nNum = 190050000;
+				user->m_sItemArray[emptySlot].nNum      = 190050000;
 				user->m_sItemArray[emptySlot].sDuration = 10000;
 				break;
 			default:
-				user->m_sItemArray[emptySlot].sCount = 1;
+				user->m_sItemArray[emptySlot].sCount     = 1;
 				user->m_sItemArray[emptySlot].nSerialNum = 0;
 		}
 	}
@@ -394,14 +392,10 @@ bool CDBAgent::UpdateUser(const char* charId, int userId, int updateType)
 
 	if (updateType == UPDATE_PACKET_SAVE)
 		user->m_dwTime++;
-	else if (updateType == UPDATE_LOGOUT
-		|| updateType == UPDATE_ALL_SAVE)
+	else if (updateType == UPDATE_LOGOUT || updateType == UPDATE_ALL_SAVE)
 		user->m_dwTime = 0;
 
-	ByteBuffer skills(10),
-		items(400),
-		serials(400),
-		quests(400);
+	ByteBuffer skills(10), items(400), serials(400), quests(400);
 	int16_t questTotal = 0;
 
 	skills.append(user->m_bstrSkill, sizeof(user->m_bstrSkill));
@@ -410,8 +404,7 @@ bool CDBAgent::UpdateUser(const char* charId, int userId, int updateType)
 	{
 		_USER_QUEST& quest = user->m_quests[i];
 
-		if (quest.sQuestID > 100
-			|| quest.byQuestState > 3)
+		if (quest.sQuestID > 100 || quest.byQuestState > 3)
 		{
 			memset(&quest, 0, sizeof(_USER_QUEST));
 		}
@@ -421,9 +414,7 @@ bool CDBAgent::UpdateUser(const char* charId, int userId, int updateType)
 				++questTotal;
 		}
 
-		quests
-			<< int16_t(quest.sQuestID)
-			<< uint8_t(quest.byQuestState);
+		quests << int16_t(quest.sQuestID) << uint8_t(quest.byQuestState);
 	}
 
 	if (questTotal != user->m_sQuestCount)
@@ -436,39 +427,32 @@ bool CDBAgent::UpdateUser(const char* charId, int userId, int updateType)
 		if (item.nNum > 0)
 		{
 			if (_main->ItemArray.GetData(item.nNum) == nullptr)
-				spdlog::debug("DBAgent::UpdateUser: Item Drop Saved({}) : {} ({})", i, item.nNum, user->m_id);
+				spdlog::debug(
+					"DBAgent::UpdateUser: Item Drop Saved({}) : {} ({})", i, item.nNum, user->m_id);
 		}
 
-		items
-			<< int32_t(item.nNum)
-			<< int16_t(item.sDuration)
-			<< int16_t(item.sCount);
+		items << int32_t(item.nNum) << int16_t(item.sDuration) << int16_t(item.sCount);
 
-		serials
-			<< int64_t(item.nSerialNum);
+		serials << int64_t(item.nSerialNum);
 	}
-	
+
 	try
 	{
 		// _main->DBProcessNumber(3);
 
 		db::StoredProc<storedProc::UpdateUserData> proc;
 
-		auto weak_result = proc.execute(
-			user->m_id, user->m_bNation, user->m_bRace, user->m_sClass,
-			user->m_bHairColor, user->m_bRank, user->m_bTitle, user->m_bLevel,
-			user->m_iExp, user->m_iLoyalty, user->m_bFace, user->m_bCity,
-			user->m_bKnights, user->m_bFame, user->m_sHp, user->m_sMp, user->m_sSp,
-			user->m_bStr, user->m_bSta, user->m_bDex, user->m_bIntel, user->m_bCha,
-			user->m_bAuthority, user->m_bPoints, user->m_iGold, user->m_bZone, user->m_sBind,
-			static_cast<int>(user->m_curx * 100),
-			static_cast<int>(user->m_curz * 100),
-			static_cast<int>(user->m_cury * 100),
-			user->m_dwTime,
-			questTotal, skills.storage(), items.storage(), serials.storage(),
+		auto weak_result = proc.execute(user->m_id, user->m_bNation, user->m_bRace, user->m_sClass,
+			user->m_bHairColor, user->m_bRank, user->m_bTitle, user->m_bLevel, user->m_iExp,
+			user->m_iLoyalty, user->m_bFace, user->m_bCity, user->m_bKnights, user->m_bFame,
+			user->m_sHp, user->m_sMp, user->m_sSp, user->m_bStr, user->m_bSta, user->m_bDex,
+			user->m_bIntel, user->m_bCha, user->m_bAuthority, user->m_bPoints, user->m_iGold,
+			user->m_bZone, user->m_sBind, static_cast<int>(user->m_curx * 100),
+			static_cast<int>(user->m_curz * 100), static_cast<int>(user->m_cury * 100),
+			user->m_dwTime, questTotal, skills.storage(), items.storage(), serials.storage(),
 			quests.storage(), user->m_iMannerPoint, user->m_iLoyaltyMonthly);
 
-		auto result = weak_result.lock();
+		auto result      = weak_result.lock();
 		if (result == nullptr)
 		{
 			throw db::ApplicationError("DBAgent::UpdateUser: expected result set");
@@ -486,7 +470,7 @@ bool CDBAgent::UpdateUser(const char* charId, int userId, int updateType)
 		db::utils::LogDatabaseError(dbErr, "DBAgent::UpdateUser()");
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -505,7 +489,7 @@ int CDBAgent::AccountLogInReq(char* accountId, char* password)
 		db::utils::LogDatabaseError(dbErr, "DBAgent::AccountLogInReq()");
 		return false;
 	}
-	
+
 	return retCode - 1;
 }
 
@@ -534,7 +518,8 @@ bool CDBAgent::NationSelect(char* accountId, int nation)
 	return true;
 }
 
-int CDBAgent::CreateNewChar(char* accountId, int index, char* charId, int race, int Class, int hair, int face, int str, int sta, int dex, int intel, int cha)
+int CDBAgent::CreateNewChar(char* accountId, int index, char* charId, int race, int Class, int hair,
+	int face, int str, int sta, int dex, int intel, int cha)
 {
 	int16_t retCode = 0;
 	try
@@ -543,8 +528,7 @@ int CDBAgent::CreateNewChar(char* accountId, int index, char* charId, int race, 
 
 		db::StoredProc<storedProc::CreateNewChar> proc;
 		proc.execute(
-			&retCode, accountId, index, charId, race, Class, hair,
-			face, str, sta, dex, intel, cha);
+			&retCode, accountId, index, charId, race, Class, hair, face, str, sta, dex, intel, cha);
 	}
 	catch (const nanodbc::database_error& dbErr)
 	{
@@ -580,7 +564,7 @@ bool CDBAgent::LoadCharInfo(char* charId_, char* buff, int& buffIndex)
 			db::StoredProc<storedProc::LoadCharInfo> proc;
 
 			auto weak_result = proc.execute(charId.c_str(), &rowCount);
-			auto result = weak_result.lock();
+			auto result      = weak_result.lock();
 
 			// Officially this requests all 3, but we pre-emptively skip the nullptr/empty character names,
 			// so at this point we're only requesting character names that we expect to exist.
@@ -594,12 +578,12 @@ bool CDBAgent::LoadCharInfo(char* charId_, char* buff, int& buffIndex)
 				throw db::ApplicationError("DBAgent::LoadCharInfo: expected row in result set");
 			}
 
-			Race = result->get<uint8_t>(0);
-			Class = result->get<int16_t>(1);
+			Race      = result->get<uint8_t>(0);
+			Class     = result->get<int16_t>(1);
 			HairColor = result->get<uint8_t>(2);
-			Level = result->get<uint8_t>(3);
-			Face = result->get<uint8_t>(4);
-			Zone = result->get<uint8_t>(5);
+			Level     = result->get<uint8_t>(3);
+			Face      = result->get<uint8_t>(4);
+			Zone      = result->get<uint8_t>(5);
 
 			if (!result->is_null(6))
 			{
@@ -624,18 +608,12 @@ bool CDBAgent::LoadCharInfo(char* charId_, char* buff, int& buffIndex)
 
 	for (int i = 0; i < SLOT_MAX; i++)
 	{
-		int32_t itemId = items.read<int32_t>();
+		int32_t itemId   = items.read<int32_t>();
 		int16_t duration = items.read<int16_t>();
-		/*int16_t count =*/ items.read<int16_t>();
+		/*int16_t count =*/items.read<int16_t>();
 
-		if (i == HEAD
-			|| i == BREAST
-			|| i == SHOULDER
-			|| i == LEG
-			|| i == GLOVE
-			|| i == FOOT
-			|| i == LEFTHAND
-			|| i == RIGHTHAND)
+		if (i == HEAD || i == BREAST || i == SHOULDER || i == LEG || i == GLOVE || i == FOOT
+			|| i == LEFTHAND || i == RIGHTHAND)
 		{
 			SetDWORD(buff, itemId, buffIndex);
 			SetShort(buff, duration, buffIndex);
@@ -648,7 +626,7 @@ bool CDBAgent::LoadCharInfo(char* charId_, char* buff, int& buffIndex)
 bool CDBAgent::GetAllCharID(const char* accountId, char* charId1_, char* charId2_, char* charId3_)
 {
 	std::string charId1, charId2, charId3;
-	
+
 	int32_t rowCount = 0;
 	try
 	{
@@ -657,9 +635,8 @@ bool CDBAgent::GetAllCharID(const char* accountId, char* charId1_, char* charId2
 		db::StoredProc<storedProc::LoadAccountCharid> proc;
 
 		auto weak_result = proc.execute(&rowCount, accountId);
-		auto result = weak_result.lock();
-		if (result == nullptr
-			|| !result->next())
+		auto result      = weak_result.lock();
+		if (result == nullptr || !result->next())
 		{
 			spdlog::error("DBAgent::GetAllCharID: No rows selected for accountId={}", accountId);
 			return false;
@@ -688,21 +665,24 @@ bool CDBAgent::GetAllCharID(const char* accountId, char* charId1_, char* charId2
 
 	if (strcpy_safe(charId1_, charId1, MAX_ID_SIZE) != 0)
 	{
-		spdlog::error("DBAgent::GetAllCharID: failed to write charId1(len: {}, val: {}) to charId1_",
+		spdlog::error(
+			"DBAgent::GetAllCharID: failed to write charId1(len: {}, val: {}) to charId1_",
 			charId1.length(), charId1);
 		return false;
 	}
 
 	if (strcpy_safe(charId2_, charId2, MAX_ID_SIZE) != 0)
 	{
-		spdlog::error("DBAgent::GetAllCharID: failed to write charId2(len: {}, val: {}) to charId2_",
+		spdlog::error(
+			"DBAgent::GetAllCharID: failed to write charId2(len: {}, val: {}) to charId2_",
 			charId2.length(), charId2);
 		return false;
 	}
 
 	if (strcpy_safe(charId3_, charId3, MAX_ID_SIZE) != 0)
 	{
-		spdlog::error("DBAgent::GetAllCharID: failed to write charId3(len: {}, val: {}) to charId3_",
+		spdlog::error(
+			"DBAgent::GetAllCharID: failed to write charId3(len: {}, val: {}) to charId3_",
 			charId3.length(), charId3);
 		return false;
 	}
@@ -728,7 +708,8 @@ int CDBAgent::CreateKnights(int knightsId, int nation, char* name, char* chief, 
 
 	if (retCode == 6)
 	{
-		spdlog::error("DBAgent::CreateKnights: database error creating knights (knightsId={}, nation={}, name={}, chief={}, flag={}",
+		spdlog::error("DBAgent::CreateKnights: database error creating knights (knightsId={}, "
+					  "nation={}, name={}, chief={}, flag={}",
 			knightsId, nation, name, chief, flag);
 	}
 
@@ -771,7 +752,6 @@ int CDBAgent::DeleteKnights(int knightsId)
 	}
 
 	return retCode;
-	
 }
 
 int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int& buffIndex)
@@ -785,7 +765,7 @@ int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int
 
 		db::StoredProc<storedProc::LoadKnightsMembers> proc;
 		auto weak_result = proc.execute(knightsId);
-		auto result = weak_result.lock();
+		auto result      = weak_result.lock();
 		if (result != nullptr)
 		{
 			while (result->next())
@@ -793,7 +773,7 @@ int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int
 				std::string charId;
 				result->get_ref(0, charId);
 
-				uint8_t Fame = result->get<uint8_t>(1);
+				uint8_t Fame  = result->get<uint8_t>(1);
 				uint8_t Level = result->get<uint8_t>(2);
 				int16_t Class = result->get<int16_t>(3);
 
@@ -807,7 +787,7 @@ int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int
 				SetShort(buffOut, Class, tempIndex);
 
 				// check if the user is online
-				userId = -1;
+				userId            = -1;
 				_USER_DATA* pUser = _main->GetUserPtr(charId.c_str(), userId);
 				if (pUser != nullptr)
 					SetByte(buffOut, 1, tempIndex);
@@ -829,7 +809,8 @@ int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int
 
 	if (rowCount == 0)
 	{
-		spdlog::error("DBAgent::LoadKnightsAllMembers: No rows selected for knightsId={}", knightsId);
+		spdlog::error(
+			"DBAgent::LoadKnightsAllMembers: No rows selected for knightsId={}", knightsId);
 	}
 
 	buffIndex = tempIndex;
@@ -840,15 +821,18 @@ int CDBAgent::LoadKnightsAllMembers(int knightsId, int start, char* buffOut, int
 
 bool CDBAgent::UpdateConCurrentUserCount(int serverId, int zoneId, int userCount)
 {
-	std::string updateQuery = fmt::format("UPDATE CONCURRENT SET [zone{}_count] = ? WHERE [serverid] = ?", zoneId);
+	std::string updateQuery = fmt::format(
+		"UPDATE CONCURRENT SET [zone{}_count] = ? WHERE [serverid] = ?", zoneId);
 	try
 	{
 		// _main->DBProcessNumber(14);
 
-		auto conn = db::ConnectionManager::CreatePoolConnection(modelUtil::DbType::ACCOUNT, DB_PROCESS_TIMEOUT);
+		auto conn = db::ConnectionManager::CreatePoolConnection(
+			modelUtil::DbType::ACCOUNT, DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)
 		{
-			throw db::ApplicationError("DBAgent::UpdateConCurrentUserCount: failed to allocate pool connection");
+			throw db::ApplicationError(
+				"DBAgent::UpdateConCurrentUserCount: failed to allocate pool connection");
 		}
 
 		nanodbc::statement stmt = conn->CreateStatement(updateQuery);
@@ -870,16 +854,15 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 	char items[1600] = {}, serials[1600] = {};
 
 	_USER_DATA* user = UserData[userId];
-	if (user == nullptr
-		|| strlen(user->m_id) == 0)
+	if (user == nullptr || strlen(user->m_id) == 0)
 	{
 		spdlog::error("DBAgent::LoadWarehouseData: called for inactive userId={}", userId);
 		return false;
 	}
-	
+
 	db::SqlBuilder<model::Warehouse> sql;
 	// note: dwTime from prior query wasn't used, so not selecting it here.
-	sql.SetSelectColumns({"nMoney", "WarehouseData", "strSerial"});
+	sql.SetSelectColumns({ "nMoney", "WarehouseData", "strSerial" });
 	sql.IsWherePK = true;
 	try
 	{
@@ -890,7 +873,8 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 		auto stmt = recordSet.prepare(sql);
 		if (stmt == nullptr)
 		{
-			throw db::ApplicationError("DBAgent::LoadWarehouseData: statement could not be allocated");
+			throw db::ApplicationError(
+				"DBAgent::LoadWarehouseData: statement could not be allocated");
 		}
 
 		stmt->bind(0, accountId);
@@ -898,12 +882,13 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 
 		if (!recordSet.next())
 		{
-			spdlog::error("DBAgent::LoadWarehouseData: No rows selected for accountId={}", accountId);
+			spdlog::error(
+				"DBAgent::LoadWarehouseData: No rows selected for accountId={}", accountId);
 			return false;
 		}
 
 		model::Warehouse warehouse = recordSet.get();
-		user->m_iBank = warehouse.Money;
+		user->m_iBank              = warehouse.Money;
 
 		if (warehouse.ItemData.has_value())
 			std::ranges::copy(warehouse.ItemData.value(), items);
@@ -920,16 +905,16 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 	int index = 0, serialIndex = 0;
 	for (int i = 0; i < WAREHOUSE_MAX; i++)
 	{
-		int itemId = GetDWORD(items, index);
-		int16_t durability = GetShort(items, index);
-		int16_t count = GetShort(items, index);
+		int itemId            = GetDWORD(items, index);
+		int16_t durability    = GetShort(items, index);
+		int16_t count         = GetShort(items, index);
 
-		int64_t serialNumber = GetInt64(serials, serialIndex);
+		int64_t serialNumber  = GetInt64(serials, serialIndex);
 
 		model::Item* itemData = _main->ItemArray.GetData(itemId);
 		if (itemData != nullptr)
 		{
-			user->m_sWarehouseArray[i].nNum = itemId;
+			user->m_sWarehouseArray[i].nNum      = itemId;
 			user->m_sWarehouseArray[i].sDuration = durability;
 
 			if (count > ITEMCOUNT_MAX)
@@ -937,16 +922,16 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 			else if (count <= 0)
 				count = 1;
 
-			user->m_sWarehouseArray[i].sCount = count;
+			user->m_sWarehouseArray[i].sCount     = count;
 			user->m_sWarehouseArray[i].nSerialNum = serialNumber;
-			spdlog::trace("DBAgent::LoadWarehouseData: {}: {} ware slot ({} : {})",
-				user->m_id, i, user->m_sWarehouseArray[i].nNum, user->m_sWarehouseArray[i].nSerialNum);
+			spdlog::trace("DBAgent::LoadWarehouseData: {}: {} ware slot ({} : {})", user->m_id, i,
+				user->m_sWarehouseArray[i].nNum, user->m_sWarehouseArray[i].nSerialNum);
 		}
 		else
 		{
-			user->m_sWarehouseArray[i].nNum = 0;
+			user->m_sWarehouseArray[i].nNum      = 0;
 			user->m_sWarehouseArray[i].sDuration = 0;
-			user->m_sWarehouseArray[i].sCount = 0;
+			user->m_sWarehouseArray[i].sCount    = 0;
 
 			if (itemId > 0)
 			{
@@ -962,39 +947,33 @@ bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 bool CDBAgent::UpdateWarehouseData(const char* accountId, int userId, int updateType)
 {
 	_USER_DATA* pUser = UserData[userId];
-	if (pUser == nullptr
-		|| strlen(accountId) == 0)
+	if (pUser == nullptr || strlen(accountId) == 0)
 	{
 		spdlog::error("DBAgent::UpdateWarehouseData: called with inactive userId={} accountId={}",
-					userId, accountId);
+			userId, accountId);
 		return false;
 	}
 
 	if (strnicmp(pUser->m_Accountid, accountId, MAX_ID_SIZE) != 0)
 	{
-		spdlog::error("DBAgent::UpdateWarehouseData: accountId mismatch user.accountId={} accountId={}",
-					pUser->m_Accountid, accountId);
+		spdlog::error(
+			"DBAgent::UpdateWarehouseData: accountId mismatch user.accountId={} accountId={}",
+			pUser->m_Accountid, accountId);
 		return false;
 	}
 
-	if (updateType == UPDATE_LOGOUT
-		|| updateType == UPDATE_ALL_SAVE)
+	if (updateType == UPDATE_LOGOUT || updateType == UPDATE_ALL_SAVE)
 		pUser->m_dwTime = 0;
 
-	ByteBuffer items(1600),
-		serials(1600);
+	ByteBuffer items(1600), serials(1600);
 
 	for (int i = 0; i < WAREHOUSE_MAX; i++)
 	{
 		const _WAREHOUSE_ITEM_DATA& item = pUser->m_sWarehouseArray[i];
 
-		items
-			<< int32_t(item.nNum)
-			<< int16_t(item.sDuration)
-			<< int16_t(item.sCount);
+		items << int32_t(item.nNum) << int16_t(item.sDuration) << int16_t(item.sCount);
 
-		serials
-			<< int64_t(item.nSerialNum);
+		serials << int64_t(item.nSerialNum);
 	}
 
 	try
@@ -1004,8 +983,7 @@ bool CDBAgent::UpdateWarehouseData(const char* accountId, int userId, int update
 		db::StoredProc<storedProc::UpdateWarehouse> proc;
 
 		auto weak_result = proc.execute(
-			accountId, pUser->m_iBank, pUser->m_dwTime,
-			items.storage(), serials.storage());
+			accountId, pUser->m_iBank, pUser->m_dwTime, items.storage(), serials.storage());
 
 		auto result = weak_result.lock();
 		if (result == nullptr)
@@ -1016,7 +994,8 @@ bool CDBAgent::UpdateWarehouseData(const char* accountId, int userId, int update
 		// affected_rows will be -1 if unavailable should be 1 if available
 		if (result->affected_rows() == 0)
 		{
-			spdlog::error("DBAgent::UpdateWarehouseData: No rows affected for accountId={}", accountId);
+			spdlog::error(
+				"DBAgent::UpdateWarehouseData: No rows affected for accountId={}", accountId);
 			return false;
 		}
 	}
@@ -1043,7 +1022,8 @@ bool CDBAgent::LoadKnightsInfo(int knightsId, char* buffOut, int& buffIndex)
 		auto stmt = recordSet.prepare(sql);
 		if (stmt == nullptr)
 		{
-			throw db::ApplicationError("DBAgent::LoadKnightsInfo: statement could not be allocated");
+			throw db::ApplicationError(
+				"DBAgent::LoadKnightsInfo: statement could not be allocated");
 		}
 
 		stmt->bind(0, &knightsId);
@@ -1083,25 +1063,29 @@ bool CDBAgent::LoadKnightsInfo(int knightsId, char* buffOut, int& buffIndex)
 	return true;
 }
 
-bool CDBAgent::SetLogInInfo(const char* accountId, const char* charId, const char* serverIp, int serverId, const char* clientIp, uint8_t init)
+bool CDBAgent::SetLogInInfo(const char* accountId, const char* charId, const char* serverIp,
+	int serverId, const char* clientIp, uint8_t init)
 {
 	using ModelType = model::CurrentUser;
 
 	std::string query;
 	if (init == 0x01)
 	{
-		query = fmt::format("INSERT INTO [CURRENTUSER] ([strAccountID], [strCharID], [nServerNo], [strServerIP], [strClientIP]) VALUES (\'{}\',\'{}\',{},\'{}\',\'{}\')",
+		query = fmt::format("INSERT INTO [CURRENTUSER] ([strAccountID], [strCharID], [nServerNo], "
+							"[strServerIP], [strClientIP]) VALUES (\'{}\',\'{}\',{},\'{}\',\'{}\')",
 			accountId, charId, serverId, serverIp, clientIp);
 	}
 	else if (init == 0x02)
 	{
-		query = fmt::format("UPDATE [CURRENTUSER] SET [nServerNo]={}, [strServerIP]=\'{}\' WHERE [strAccountID] = \'{}\'",
+		query = fmt::format("UPDATE [CURRENTUSER] SET [nServerNo]={}, [strServerIP]=\'{}\' WHERE "
+							"[strAccountID] = \'{}\'",
 			serverId, serverIp, accountId);
 	}
 	else
 	{
-		spdlog::error("DBAgent::SetLogInInfo: invalid init code specified (init: {}) for accountId={}",
-			init, accountId);
+		spdlog::error(
+			"DBAgent::SetLogInInfo: invalid init code specified (init: {}) for accountId={}", init,
+			accountId);
 		return false;
 	}
 
@@ -1109,12 +1093,13 @@ bool CDBAgent::SetLogInInfo(const char* accountId, const char* charId, const cha
 	{
 		// _main->DBProcessNumber(18);
 
-		auto conn = db::ConnectionManager::CreatePoolConnection(ModelType::DbType(), DB_PROCESS_TIMEOUT);
+		auto conn = db::ConnectionManager::CreatePoolConnection(
+			ModelType::DbType(), DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)
 			return false;
 
 		nanodbc::statement stmt = conn->CreateStatement(query);
-		nanodbc::result result = stmt.execute();
+		nanodbc::result result  = stmt.execute();
 		// affected_rows will be -1 if unavailable should be 1 if available
 		if (result.affected_rows() == 0)
 		{
@@ -1143,10 +1128,11 @@ bool CDBAgent::AccountLogout(const char* accountId, int logoutCode)
 
 		auto weak_result = proc.execute(accountId, logoutCode, &ret1, &ret2);
 
-		auto result = weak_result.lock();
+		auto result      = weak_result.lock();
 		if (result == nullptr)
 		{
-			throw nanodbc::database_error(nullptr, 0, "DBAgent::AccountLogout: expected result set");
+			throw nanodbc::database_error(
+				nullptr, 0, "DBAgent::AccountLogout: expected result set");
 		}
 
 		// affected_rows will be -1 if unavailable should be 1 if available
@@ -1164,14 +1150,16 @@ bool CDBAgent::AccountLogout(const char* accountId, int logoutCode)
 
 	if (ret1 != 1)
 	{
-		spdlog::debug("DBAgent::AccountLogout: ret1 not updated by proc for accountId={}", accountId);
+		spdlog::debug(
+			"DBAgent::AccountLogout: ret1 not updated by proc for accountId={}", accountId);
 		//return false;
 	}
 
 	return true;
 }
 
-bool CDBAgent::CheckUserData(const char* accountId, const char* charId, int checkType, int userUpdateTime, int compareData)
+bool CDBAgent::CheckUserData(
+	const char* accountId, const char* charId, int checkType, int userUpdateTime, int compareData)
 {
 	uint32_t dbData = 0, dbTime = 0;
 	modelUtil::DbType dbType;
@@ -1179,15 +1167,17 @@ bool CDBAgent::CheckUserData(const char* accountId, const char* charId, int chec
 	std::string query;
 	if (checkType == 1)
 	{
-		query = fmt::format("SELECT [dwTime], [nMoney] FROM [WAREHOUSE] WHERE [strAccountID] = \'{}\'", accountId);
+		query = fmt::format(
+			"SELECT [dwTime], [nMoney] FROM [WAREHOUSE] WHERE [strAccountID] = \'{}\'", accountId);
 		dbType = model::Warehouse::DbType();
 	}
 	else
 	{
-		query = fmt::format("SELECT [dwTime], [Exp] FROM [USERDATA] WHERE [strUserID] = \'{}\'", charId);
+		query = fmt::format(
+			"SELECT [dwTime], [Exp] FROM [USERDATA] WHERE [strUserID] = \'{}\'", charId);
 		dbType = model::UserData::DbType();
 	}
-	
+
 	try
 	{
 		// _main->DBProcessNumber(20);
@@ -1197,11 +1187,12 @@ bool CDBAgent::CheckUserData(const char* accountId, const char* charId, int chec
 			return false;
 
 		nanodbc::statement stmt = conn->CreateStatement(query);
-		nanodbc::result result = stmt.execute();
+		nanodbc::result result  = stmt.execute();
 
 		if (!result.next())
 		{
-			spdlog::error("DBAgent::CheckUserData: No rows affected for accountId={} charId={}", accountId, charId);
+			spdlog::error("DBAgent::CheckUserData: No rows affected for accountId={} charId={}",
+				accountId, charId);
 			return false;
 		}
 
@@ -1214,12 +1205,11 @@ bool CDBAgent::CheckUserData(const char* accountId, const char* charId, int chec
 		return false;
 	}
 
-	if (static_cast<int>(dbTime) != userUpdateTime
-		|| static_cast<int>(dbData) != compareData)
+	if (static_cast<int>(dbTime) != userUpdateTime || static_cast<int>(dbData) != compareData)
 	{
-		spdlog::error("DBAgent::CheckUserData: data mismatch dbTime(expected: {}, actual: {}) dbData(expected: {}, actual: {})",
-			userUpdateTime, dbTime,
-			compareData, dbData);
+		spdlog::error("DBAgent::CheckUserData: data mismatch dbTime(expected: {}, actual: {}) "
+					  "dbData(expected: {}, actual: {})",
+			userUpdateTime, dbTime, compareData, dbData);
 		return false;
 	}
 
@@ -1228,15 +1218,14 @@ bool CDBAgent::CheckUserData(const char* accountId, const char* charId, int chec
 
 void CDBAgent::LoadKnightsAllList(int nation)
 {
-	int32_t count = 0;
+	int32_t count     = 0;
 	int8_t retryCount = 0, maxRetry = 50;
 	int32_t sendIndex = 0, dbIndex = 0, maxBatchSize = 40;
-	char sendBuff[512] = {},
-		dbBuff[512] = {};
-	
+	char sendBuff[512] = {}, dbBuff[512] = {};
+
 	db::SqlBuilder<model::Knights> sql;
 	sql.PostWhereClause = "ORDER BY [Points] DESC";
-	if (nation == 3)	// battle zone
+	if (nation == 3) // battle zone
 	{
 		sql.Where = "[Points] <> 0";
 	}
@@ -1287,7 +1276,7 @@ void CDBAgent::LoadKnightsAllList(int nation)
 				memset(sendBuff, 0, sizeof(sendBuff));
 				memset(dbBuff, 0, sizeof(dbBuff));
 				sendIndex = dbIndex = 0;
-				count = 0;
+				count               = 0;
 			}
 		}
 	}
@@ -1322,14 +1311,15 @@ void CDBAgent::LoadKnightsAllList(int nation)
 
 bool CDBAgent::UpdateBattleEvent(const char* charId, int nation)
 {
-	using ModelType = model::Battle;
+	using ModelType   = model::Battle;
 
 	std::string query = "UPDATE BATTLE SET byNation = ?, strUserName = ? WHERE sIndex = 1";
 	try
 	{
 		// _main->DBProcessNumber(22);
 
-		auto conn = db::ConnectionManager::CreatePoolConnection(ModelType::DbType(), DB_PROCESS_TIMEOUT);
+		auto conn = db::ConnectionManager::CreatePoolConnection(
+			ModelType::DbType(), DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)
 			return false;
 

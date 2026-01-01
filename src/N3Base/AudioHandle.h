@@ -5,10 +5,10 @@
 
 #include "N3SndDef.h"
 
-#include <atomic>	// std::atomic<>
-#include <memory>	// std::shared_ptr<>
-#include <vector>	// std::vector<>
-#include <queue>	// std::queue<>
+#include <atomic> // std::atomic<>
+#include <memory> // std::shared_ptr<>
+#include <vector> // std::vector<>
+#include <queue>  // std::queue<>
 
 /// \enum e_AudioHandleType
 /// \brief Identifies the playback audio handle type.
@@ -39,34 +39,34 @@ class AudioHandle
 {
 public:
 	/// Type of audio handle (buffered or streamed).
-	e_AudioHandleType				HandleType;
+	e_AudioHandleType HandleType;
 
 	/// Indicates whether this handle is currently managed by the audio thread.
 	///
 	/// The flag is set when the handle is queued for decoding/playback in
 	/// the AudioThread (i.e. via AudioThread::Add) and cleared when the
 	/// handle is removed from the AudioThread.
-	/// 
+	///
 	/// \ref CN3SndObj::Tick() checks this flag to detect when the handle is
 	/// no longer active; if false, the object releases its reference to the
 	/// handle, restoring it to its associated pool for reuse.
-	std::atomic<bool>				IsManaged;
+	std::atomic<bool> IsManaged;
 
 	/// Indicates whether playback has started.
-	bool							StartedPlaying;
+	bool StartedPlaying;
 
 	/// Indicates whether playback has finished.
 	///
 	/// This flag can only be true if \ref StartedPlaying was previously true.
 	/// It is set when the audio playback completes or reaches the end of the
 	/// sound/stream.
-	bool							FinishedPlaying;
+	bool FinishedPlaying;
 
 	/// OpenAL source identifier associated with this handle.
-	uint32_t						SourceId;
+	uint32_t SourceId;
 
 	/// Audio asset supplying data for playback.
-	std::shared_ptr<AudioAsset>		Asset;
+	std::shared_ptr<AudioAsset> Asset;
 
 	/// Current sound playback state.
 	///
@@ -74,7 +74,7 @@ public:
 	/// \ref e_SndState. Typical states include initial, playing, paused, or
 	/// stopped. This is used by the audio engine to manage playback
 	/// progression, transitions, and cleanup.
-	e_SndState						State;
+	e_SndState State;
 
 	/// Shared sound settings for this audio handle.
 	///
@@ -84,19 +84,19 @@ public:
 	/// persists in \ref CN3SndObj for subsequent playback of the same sound,
 	/// ensuring consistency across uses. This allows both the audio engine
 	/// and the handle instance to reference the same configuration.
-	std::shared_ptr<SoundSettings>	Settings;
+	std::shared_ptr<SoundSettings> Settings;
 
 	/// Duration of fade-in effect, in seconds.
-	float							FadeInTime;
+	float FadeInTime;
 
 	/// Duration of fade-out effect, in seconds.
-	float							FadeOutTime;
+	float FadeOutTime;
 
 	/// Delay before playback begins, in seconds.
-	float							StartDelayTime;
+	float StartDelayTime;
 
 	/// Internal playback timer used for state tracking, in seconds.
-	float							Timer;
+	float Timer;
 
 	/// Constructs an audio handle with default state.
 	AudioHandle();
@@ -140,10 +140,10 @@ class FileReader;
 struct FileReaderHandle
 {
 	/// Memory-mapped file reader instance used for streaming.
-	FileReader* File	= nullptr;
+	FileReader* File = nullptr;
 
 	/// Current read offset, in bytes.
-	size_t		Offset	= 0;
+	size_t Offset    = 0;
 };
 
 /// \struct AudioDecodedChunk
@@ -154,12 +154,12 @@ struct FileReaderHandle
 struct AudioDecodedChunk
 {
 	/// Buffer containing decoded PCM audio data.
-	std::vector<uint8_t>	Data;
+	std::vector<uint8_t> Data;
 
 	/// Number of valid bytes decoded into the buffer.
 	///
 	/// A value of zero indicates end-of-stream.
-	int32_t					BytesDecoded = -1;
+	int32_t BytesDecoded = -1;
 };
 
 struct mpg123_handle_struct;
@@ -177,25 +177,25 @@ class StreamedAudioHandle : public AudioHandle
 
 protected:
 	/// File reader state used for streamed decoding.
-	FileReaderHandle				FileReaderHandle;
+	FileReaderHandle FileReaderHandle;
 
 	/// mpg123 decoder handle (used for MP3 streams).
-	mpg123_handle_struct*			Mp3Handle;
+	mpg123_handle_struct* Mp3Handle;
 
 	/// Queue of available OpenAL buffer IDs.
-	std::queue<uint32_t>			AvailableBufferIds;
+	std::queue<uint32_t> AvailableBufferIds;
 
 	/// All OpenAL buffer IDs allocated for this handle.
-	std::vector<uint32_t>			BufferIds;
+	std::vector<uint32_t> BufferIds;
 
 	/// Queue of decoded PCM audio chunks awaiting playback.
-	std::queue<AudioDecodedChunk>	DecodedChunks;
+	std::queue<AudioDecodedChunk> DecodedChunks;
 
 	/// Indicates whether OpenAL buffers have been allocated.
-	bool							BuffersAllocated;
+	bool BuffersAllocated;
 
 	/// Indicates whether decoding has reached end-of-stream.
-	bool							FinishedDecoding;
+	bool FinishedDecoding;
 
 public:
 	/// Creates a streamed audio handle for the given asset.

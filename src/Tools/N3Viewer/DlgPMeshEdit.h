@@ -13,38 +13,39 @@
 
 class CDlgPMeshEdit : public CDialog
 {
-// Construction
+	// Construction
 public:
 	void LOD_Delete();
 	void LOD_Add();
 	void SavePMeshes();
 	void UpdateAllInfo();
 	void UpdateInfo();
-	CDlgPMeshEdit(CWnd* pParent = nullptr);   // standard constructor
+	CDlgPMeshEdit(CWnd* pParent = nullptr); // standard constructor
 
 	CN3Shape* m_pShapeRef;
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgPMeshEdit)
-	enum { IDD = IDD_PMESH_EDIT };
-	CListBox	m_LBLOD;
-	CComboBox	m_CBPart;
-	CScrollBar	m_ScrollBar;
-	int		m_iNumVertices;
-	BOOL	m_bPreview;
+	enum
+	{
+		IDD = IDD_PMESH_EDIT
+	};
+	CListBox m_LBLOD;
+	CComboBox m_CBPart;
+	CScrollBar m_ScrollBar;
+	int m_iNumVertices;
+	BOOL m_bPreview;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgPMeshEdit)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgPMeshEdit)
 	virtual void OnCancel();

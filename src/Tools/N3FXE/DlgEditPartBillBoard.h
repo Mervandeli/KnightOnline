@@ -14,66 +14,68 @@ class CMainFrame;
 
 class CDlgEditPartBillBoard : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgEditPartBillBoard(CWnd* pParent = nullptr);   // standard constructor
+	CDlgEditPartBillBoard(CWnd* pParent = nullptr); // standard constructor
 
-	CMainFrame*			m_pRefFrm;
+	CMainFrame* m_pRefFrm;
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgEditPartBillBoard)
-	enum { IDD = IDD_DLG_PART_BILLBOARD };
-	CComboBox	m_CBSrcBlend;
-	CComboBox	m_CBDestBlend;
-	BOOL	m_bAlphaBlend;
-	BOOL	m_bTexLoop;
-	float	m_fAccelX;
-	float	m_fAccelY;
-	float	m_fAccelZ;
-	float	m_fDist4Vol;
-	float	m_fFadeOut;
-	float	m_fLife;
-	float	m_fMoveX;
-	float	m_fMoveY;
-	float	m_fMoveZ;
-	int		m_iNumTex;
-	float	m_fPosX;
-	float	m_fPosY;
-	float	m_fPosZ;
-	CString	m_strPathName;
-	float	m_fScaleX;
-	float	m_fScaleY;
-	float	m_fTexVelocity;
-	CString	m_strTexName;
-	BOOL	m_bRotateY;
-	float	m_fFadeIn;
-	float	m_fScaleAccelX;
-	float	m_fScaleAccelY;
-	float	m_fScaleVelX;
-	float	m_fScaleVelY;
-	BOOL	m_bOnGround;
-	float	m_fRotVelocity;
-	BOOL	m_bDoubleSide;
-	BOOL	m_bLight;
-	BOOL	m_bZBuffer;
-	BOOL	m_bZWrite;
-	float	m_fRotBillBoardX;
-	float	m_fRotBillBoardY;
-	float	m_fRotBillBoardZ;
+	enum
+	{
+		IDD = IDD_DLG_PART_BILLBOARD
+	};
+	CComboBox m_CBSrcBlend;
+	CComboBox m_CBDestBlend;
+	BOOL m_bAlphaBlend;
+	BOOL m_bTexLoop;
+	float m_fAccelX;
+	float m_fAccelY;
+	float m_fAccelZ;
+	float m_fDist4Vol;
+	float m_fFadeOut;
+	float m_fLife;
+	float m_fMoveX;
+	float m_fMoveY;
+	float m_fMoveZ;
+	int m_iNumTex;
+	float m_fPosX;
+	float m_fPosY;
+	float m_fPosZ;
+	CString m_strPathName;
+	float m_fScaleX;
+	float m_fScaleY;
+	float m_fTexVelocity;
+	CString m_strTexName;
+	BOOL m_bRotateY;
+	float m_fFadeIn;
+	float m_fScaleAccelX;
+	float m_fScaleAccelY;
+	float m_fScaleVelX;
+	float m_fScaleVelY;
+	BOOL m_bOnGround;
+	float m_fRotVelocity;
+	BOOL m_bDoubleSide;
+	BOOL m_bLight;
+	BOOL m_bZBuffer;
+	BOOL m_bZWrite;
+	float m_fRotBillBoardX;
+	float m_fRotBillBoardY;
+	float m_fRotBillBoardZ;
 	//}}AFX_DATA
 
-	bool	LoadPartScript(const char* szPath);
+	bool LoadPartScript(const char* szPath);
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgEditPartBillBoard)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgEditPartBillBoard)
 	afx_msg void OnPartBoardBtnLoadTex();

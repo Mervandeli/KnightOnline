@@ -12,32 +12,33 @@
 
 class CDlgFormat : public CDialog
 {
-// Construction
+	// Construction
 public:
-	D3DFORMAT	m_Fmt;
-	int			m_nWidth;
-	int			m_nHeight;
-	BOOL		m_bMipMap;
+	D3DFORMAT m_Fmt;
+	int m_nWidth;
+	int m_nHeight;
+	BOOL m_bMipMap;
 
-	CDlgFormat(CWnd* pParent = nullptr);   // standard constructor
+	CDlgFormat(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+										 // Dialog Data
 	//{{AFX_DATA(CDlgFormat)
-	enum { IDD = IDD_FORMAT };
-	CComboBox	m_CBFormat;
+	enum
+	{
+		IDD = IDD_FORMAT
+	};
+	CComboBox m_CBFormat;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgFormat)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgFormat)
 	virtual BOOL OnInitDialog();

@@ -27,32 +27,32 @@ public:
 
 	struct __Sort
 	{
-		CN3TransformCollision*	pObj;
-		float		fCamDist;
-		__Vector3	vMin, vMax;
+		CN3TransformCollision* pObj;
+		float fCamDist;
+		__Vector3 vMin, vMax;
 	};
-	CN3Base*		m_pSelObjs[MAX_SELECT];
-	D3DCOLOR		m_crBkg; // 안개가 꺼졌을때 배경색
+	CN3Base* m_pSelObjs[MAX_SELECT];
+	D3DCOLOR m_crBkg; // 안개가 꺼졌을때 배경색
 
-protected: // create from serialization only
+protected:            // create from serialization only
 	CN3ViewerView();
 	DECLARE_DYNCREATE(CN3ViewerView)
 
-// Attributes
+	// Attributes
 public:
 	CN3ViewerDoc* GetDocument();
 
-// Operations
+	// Operations
 public:
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CN3ViewerView)
-	public:
-	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
+public:
+	virtual void OnDraw(CDC* pDC); // overridden to draw this view
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual void OnInitialUpdate();
-	protected:
+
+protected:
 	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
 	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
 	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
@@ -60,11 +60,11 @@ public:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	void SetFocusToSelectedObject();
 	CN3Base* Pick(POINT point, int* pnPart);
-	static int SortByCameraDistance(const void *pArg1, const void *pArg2);
+	static int SortByCameraDistance(const void* pArg1, const void* pArg2);
 	virtual ~CN3ViewerView();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
@@ -72,8 +72,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CN3ViewerView)
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
@@ -101,9 +100,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-#ifndef _DEBUG  // debug version in N3ViewerView.cpp
+#ifndef _DEBUG // debug version in N3ViewerView.cpp
 inline CN3ViewerDoc* CN3ViewerView::GetDocument()
-   { return (CN3ViewerDoc*)m_pDocument; }
+{
+	return (CN3ViewerDoc*) m_pDocument;
+}
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

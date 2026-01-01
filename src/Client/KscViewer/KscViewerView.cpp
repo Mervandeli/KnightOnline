@@ -20,10 +20,10 @@ static char THIS_FILE[] = __FILE__;
 IMPLEMENT_DYNCREATE(CKscViewerView, CView)
 
 BEGIN_MESSAGE_MAP(CKscViewerView, CView)
-	//{{AFX_MSG_MAP(CKscViewerView)
-	ON_WM_CREATE()
-	ON_WM_DROPFILES()
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CKscViewerView)
+ON_WM_CREATE()
+ON_WM_DROPFILES()
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,6 @@ END_MESSAGE_MAP()
 CKscViewerView::CKscViewerView()
 {
 	// TODO: add construction code here
-
 }
 
 CKscViewerView::~CKscViewerView()
@@ -75,23 +74,23 @@ void CKscViewerView::Dump(CDumpContext& dc) const
 CKscViewerDoc* CKscViewerView::GetDocument() // non-debug version is inline
 {
 	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CKscViewerDoc)));
-	return (CKscViewerDoc*)m_pDocument;
+	return (CKscViewerDoc*) m_pDocument;
 }
 #endif //_DEBUG
 
 /////////////////////////////////////////////////////////////////////////////
 // CKscViewerView message handlers
 
-int CKscViewerView::OnCreate(LPCREATESTRUCT lpCreateStruct) 
+int CKscViewerView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
-	
+
 	DragAcceptFiles();
 	return 0;
 }
 
-void CKscViewerView::OnDropFiles(HDROP hDropInfo) 
+void CKscViewerView::OnDropFiles(HDROP hDropInfo)
 {
 	CKscViewerDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -100,17 +99,18 @@ void CKscViewerView::OnDropFiles(HDROP hDropInfo)
 	TCHAR* szExt = nullptr;
 	UINT uiFiles;
 
-	uiFiles = DragQueryFile(hDropInfo,0xFFFF,nullptr,0);
+	uiFiles = DragQueryFile(hDropInfo, 0xFFFF, nullptr, 0);
 
 	::DragQueryFile(hDropInfo, 0, szFile, MAX_PATH - 1);
 	::DragFinish(hDropInfo);
 
 	size_t nLen = _tcslen(szFile);
 
-	szExt = szFile + nLen - 3;
+	szExt       = szFile + nLen - 3;
 
-	if(pDoc) pDoc->OnOpenDocument(szFile);
-	
+	if (pDoc)
+		pDoc->OnOpenDocument(szFile);
+
 	CView::OnDropFiles(hDropInfo);
 }
 
@@ -119,13 +119,14 @@ BOOL CKscViewerView::DrawImage()
 	CKscViewerDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	if(pDoc == nullptr) return FALSE;
+	if (pDoc == nullptr)
+		return FALSE;
 	CN3JpegFile* pFile = pDoc->GetJpegFile();
 
-	if(pFile == nullptr) return FALSE;
+	if (pFile == nullptr)
+		return FALSE;
 
-
-	CDC *theDC = GetDC();
+	CDC* theDC = GetDC();
 	pFile->DrawImage(theDC->m_hDC);
 
 	ReleaseDC(theDC);

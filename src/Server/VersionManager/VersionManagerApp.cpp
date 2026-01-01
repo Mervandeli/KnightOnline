@@ -13,20 +13,18 @@
 
 using namespace std::chrono_literals;
 
-VersionManagerApp::VersionManagerApp(logger::Logger& logger)
-	: AppThread(logger),
-	_socketManager(SOCKET_BUFF_SIZE, SOCKET_BUFF_SIZE)
+VersionManagerApp::VersionManagerApp(logger::Logger& logger) :
+	AppThread(logger), _socketManager(SOCKET_BUFF_SIZE, SOCKET_BUFF_SIZE)
 {
 	memset(_ftpUrl, 0, sizeof(_ftpUrl));
 	memset(_ftpPath, 0, sizeof(_ftpPath));
-	_lastVersion = 0;
+	_lastVersion                                    = 0;
 
 	db::ConnectionManager::DefaultConnectionTimeout = DB_PROCESS_TIMEOUT;
 	db::ConnectionManager::Create();
 
 	_dbPoolCheckThread = std::make_unique<TimerThread>(
-		1min,
-		std::bind(&db::ConnectionManager::ExpireUnusedPoolConnections));
+		1min, std::bind(&db::ConnectionManager::ExpireUnusedPoolConnections));
 }
 
 VersionManagerApp::~VersionManagerApp()
@@ -35,7 +33,8 @@ VersionManagerApp::~VersionManagerApp()
 	_socketManager.Shutdown();
 	spdlog::info("VersionManagerApp::~VersionManagerApp: SocketManager stopped.");
 
-	spdlog::info("VersionManagerApp::~VersionManagerApp: Waiting for worker threads to fully shut down.");
+	spdlog::info(
+		"VersionManagerApp::~VersionManagerApp: Waiting for worker threads to fully shut down.");
 
 	if (_dbPoolCheckThread != nullptr)
 	{
@@ -46,7 +45,8 @@ VersionManagerApp::~VersionManagerApp()
 		spdlog::info("VersionManagerApp::~VersionManagerApp: DB pool check thread stopped.");
 	}
 
-	spdlog::info("VersionManagerApp::~VersionManagerApp: All worker threads stopped, freeing caches.");
+	spdlog::info(
+		"VersionManagerApp::~VersionManagerApp: All worker threads stopped, freeing caches.");
 
 	for (_SERVER_INFO* pInfo : ServerList)
 		delete pInfo;
@@ -66,8 +66,7 @@ bool VersionManagerApp::OnStart()
 
 	// print the ODBC connection string
 	// TODO: modelUtil::DbType::ACCOUNT;  Currently all models are assigned to GAME
-	spdlog::debug(
-		db::ConnectionManager::GetOdbcConnectionString(modelUtil::DbType::GAME));
+	spdlog::debug(db::ConnectionManager::GetOdbcConnectionString(modelUtil::DbType::GAME));
 
 	if (!DbProcess.InitDatabase())
 	{
@@ -106,20 +105,18 @@ bool VersionManagerApp::LoadConfig(CIni& iniFile)
 	// ftp config
 	iniFile.GetString(ini::DOWNLOAD, ini::URL, "127.0.0.1", _ftpUrl, sizeof(_ftpUrl));
 	iniFile.GetString(ini::DOWNLOAD, ini::PATH, "/", _ftpPath, sizeof(_ftpPath));
-	
+
 	// TODO: KN_online should be Knight_Account
 	std::string datasourceName = iniFile.GetString(ini::ODBC, ini::DSN, "KN_online");
 	std::string datasourceUser = iniFile.GetString(ini::ODBC, ini::UID, "knight");
 	std::string datasourcePass = iniFile.GetString(ini::ODBC, ini::PWD, "knight");
 
 	db::ConnectionManager::SetDatasourceConfig(
-		modelUtil::DbType::ACCOUNT,
-		datasourceName, datasourceUser, datasourcePass);
+		modelUtil::DbType::ACCOUNT, datasourceName, datasourceUser, datasourcePass);
 
 	// TODO: Remove this - currently all models are assigned to GAME
 	db::ConnectionManager::SetDatasourceConfig(
-		modelUtil::DbType::GAME,
-		datasourceName, datasourceUser, datasourcePass);
+		modelUtil::DbType::GAME, datasourceName, datasourceUser, datasourcePass);
 
 	int serverCount = iniFile.GetInt(ini::SERVER_LIST, ini::COUNT, 1);
 
@@ -137,8 +134,7 @@ bool VersionManagerApp::LoadConfig(CIni& iniFile)
 
 	if (datasourceName.empty()
 		// TODO: Should we not validate UID/Pass length?  Would that allow Windows Auth?
-		|| datasourceUser.empty()
-		|| datasourcePass.empty())
+		|| datasourceUser.empty() || datasourcePass.empty())
 	{
 		spdlog::error("VersionManagerApp::LoadConfig: Datasource config must be set.");
 		return false;
@@ -146,7 +142,8 @@ bool VersionManagerApp::LoadConfig(CIni& iniFile)
 
 	if (serverCount <= 0)
 	{
-		spdlog::error("VersionManagerApp::LoadConfig: At least 1 server must exist in the server list.");
+		spdlog::error(
+			"VersionManagerApp::LoadConfig: At least 1 server must exist in the server list.");
 		return false;
 	}
 
@@ -158,10 +155,12 @@ bool VersionManagerApp::LoadConfig(CIni& iniFile)
 		_SERVER_INFO* pInfo = new _SERVER_INFO;
 
 		snprintf(key, sizeof(key), "SERVER_%02d", i);
-		iniFile.GetString(ini::SERVER_LIST, key, "127.0.0.1", pInfo->strServerIP, sizeof(pInfo->strServerIP));
+		iniFile.GetString(
+			ini::SERVER_LIST, key, "127.0.0.1", pInfo->strServerIP, sizeof(pInfo->strServerIP));
 
 		snprintf(key, sizeof(key), "NAME_%02d", i);
-		iniFile.GetString(ini::SERVER_LIST, key, "TEST|Server 1", pInfo->strServerName, sizeof(pInfo->strServerName));
+		iniFile.GetString(ini::SERVER_LIST, key, "TEST|Server 1", pInfo->strServerName,
+			sizeof(pInfo->strServerName));
 
 		snprintf(key, sizeof(key), "ID_%02d", i);
 		pInfo->sServerID = static_cast<int16_t>(iniFile.GetInt(ini::SERVER_LIST, key, 1));

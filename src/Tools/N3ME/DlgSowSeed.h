@@ -16,63 +16,69 @@ class CMainFrame;
 typedef struct __SeedTex
 {
 	CN3Texture* pTex;
-	int			ID;
+	int ID;
 
 	__SeedTex()
 	{
-		ID = 0;
+		ID   = 0;
 		pTex = nullptr;
 	}
 	~__SeedTex()
 	{
-		if(pTex) delete pTex;
+		if (pTex)
+			delete pTex;
 	}
 } SEEDTEX, *LPSEEDTEX;
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgSowSeed dialog
-enum E_TPYE { CS_NONE = 0 ,CS_SOW = 1, CS_SELECT =2};
+enum E_TPYE
+{
+	CS_NONE   = 0,
+	CS_SOW    = 1,
+	CS_SELECT = 2
+};
 class CDlgSowSeed : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgSowSeed(CWnd* pParent = nullptr);   // standard constructor
-	
+	CDlgSowSeed(CWnd* pParent = nullptr); // standard constructor
+
 public:
-	CMainFrame*	m_pRefFrm;
+	CMainFrame* m_pRefFrm;
 	//std::list<LPSEEDGROUP> m_SeedGroupList;
 	//char	m_FileName[MAX_PATH];
 	int Brush_Size;
 	int SowDetail;
 	int Sow_Array[MAX_BRUSH_SIZE][MAX_BRUSH_SIZE];
 	int Obj_Index;
-	int  Sow_Select_Flage;
+	int Sow_Select_Flage;
 
-// normal functions..
-	void	Release();
-	void	RePaint();
+	// normal functions..
+	void Release();
+	void RePaint();
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgSowSeed)
-	enum { IDD = IDD_SOW_SEED };
-	CSliderCtrl	m_SowDetail;
-	CComboBox	m_CB_TileGroup;
-	CSliderCtrl	m_Brush_Size;
-	CComboBox	m_CB_Seed;
+	enum
+	{
+		IDD = IDD_SOW_SEED
+	};
+	CSliderCtrl m_SowDetail;
+	CComboBox m_CB_TileGroup;
+	CSliderCtrl m_Brush_Size;
+	CComboBox m_CB_Seed;
 	//}}AFX_DATA
 
-
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgSowSeed)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgSowSeed)
 	virtual BOOL OnInitDialog();

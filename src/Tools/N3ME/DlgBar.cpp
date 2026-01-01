@@ -18,21 +18,19 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgBar dialog
 
-
 CDlgBar::CDlgBar()
 {
 	//{{AFX_DATA_INIT(CDlgBar)
 	m_iZoneID = 0;
 	//}}AFX_DATA_INIT
 
-		CSliderCtrl	m_TileRegion_Slider;
-	
-//	m_FP_Slider.SetRange(100,4200);
-//	m_FP_Slider.SetPos(100);
-	
+	CSliderCtrl m_TileRegion_Slider;
+
+	//	m_FP_Slider.SetRange(100,4200);
+	//	m_FP_Slider.SetPos(100);
+
 	m_bUpdateingNow = FALSE;
 }
-
 
 void CDlgBar::DoDataExchange(CDataExchange* pDX)
 {
@@ -46,75 +44,79 @@ void CDlgBar::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgBar, CDialog)
-	//{{AFX_MSG_MAP(CDlgBar)
-	ON_BN_CLICKED(IDC_B_SET_RESOURCE_PATH, OnBSetResourcePath)
-	ON_EN_CHANGE(IDC_E_TRANSFORM_X, OnChangeETransformX)
-	ON_EN_CHANGE(IDC_E_TRANSFORM_Y, OnChangeETransformY)
-	ON_EN_CHANGE(IDC_E_TRANSFORM_Z, OnChangeETransformZ)
-	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_FARPLANE, OnReleasedcaptureSliderFarplane)
-	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_TILEREGION, OnReleasedcaptureSliderTileregion)
-	ON_EN_CHANGE(IDC_E_ZONEID, OnChangeEZoneid)
-	ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_LIGHT, OnReleasedcaptureSliderLight)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgBar)
+ON_BN_CLICKED(IDC_B_SET_RESOURCE_PATH, OnBSetResourcePath)
+ON_EN_CHANGE(IDC_E_TRANSFORM_X, OnChangeETransformX)
+ON_EN_CHANGE(IDC_E_TRANSFORM_Y, OnChangeETransformY)
+ON_EN_CHANGE(IDC_E_TRANSFORM_Z, OnChangeETransformZ)
+ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_FARPLANE, OnReleasedcaptureSliderFarplane)
+ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_TILEREGION, OnReleasedcaptureSliderTileregion)
+ON_EN_CHANGE(IDC_E_ZONEID, OnChangeEZoneid)
+ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_SLIDER_LIGHT, OnReleasedcaptureSliderLight)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgBar message handlers
 
-void CDlgBar::OnBSetResourcePath() 
+void CDlgBar::OnBSetResourcePath()
 {
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
 	pFrm->OnResourcePathSet(); // Project ¼¼ÆÃ..
 }
 
-void CDlgBar::OnChangeETransformX() 
+void CDlgBar::OnChangeETransformX()
 {
 	this->UpdateDataFromControl();
 }
 
-void CDlgBar::OnChangeETransformY() 
+void CDlgBar::OnChangeETransformY()
 {
 	this->UpdateDataFromControl();
 }
 
-void CDlgBar::OnChangeETransformZ() 
+void CDlgBar::OnChangeETransformZ()
 {
 	this->UpdateDataFromControl();
 }
 
 void CDlgBar::UpdateInfo()
 {
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
 
-	if(nullptr == pFrm->GetMapMng()) return;
+	if (nullptr == pFrm->GetMapMng())
+		return;
 
 	int nSelCount = pFrm->GetMapMng()->GetSelOutputObjCount();
-	if (nSelCount <= 0) return;
+	if (nSelCount <= 0)
+		return;
 
-	m_bUpdateingNow = TRUE;
-	CN3TransformCollision* pTrans = (CN3TransformCollision*)pFrm->GetMapMng()->GetSelOutputObj(0);
-	int nCM = pFrm->GetMapMng()->GetCursorMode();
-	if(nSelCount == 1 && nullptr != pTrans && (CM_POS == nCM || CM_SCALE == nCM))
+	m_bUpdateingNow               = TRUE;
+	CN3TransformCollision* pTrans = (CN3TransformCollision*) pFrm->GetMapMng()->GetSelOutputObj(0);
+	int nCM                       = pFrm->GetMapMng()->GetCursorMode();
+	if (nSelCount == 1 && nullptr != pTrans && (CM_POS == nCM || CM_SCALE == nCM))
 	{
 		__Vector3 v;
-		
-		if(nCM == CM_POS)
+
+		if (nCM == CM_POS)
 		{
 			v = pTrans->Pos();
 			SetDlgItemText(IDC_STATIC_TRANSFORM, "Position");
 		}
-		else if(nCM == CM_SCALE)
+		else if (nCM == CM_SCALE)
 		{
 			v = pTrans->Scale();
 			SetDlgItemText(IDC_STATIC_TRANSFORM, "Scale");
 		}
 
 		CString szVal = "";
-		szVal.Format("%f", v.x); SetDlgItemText(IDC_E_TRANSFORM_X, szVal);
-		szVal.Format("%f", v.y); SetDlgItemText(IDC_E_TRANSFORM_Y, szVal);
-		szVal.Format("%f", v.z); SetDlgItemText(IDC_E_TRANSFORM_Z, szVal);
+		szVal.Format("%f", v.x);
+		SetDlgItemText(IDC_E_TRANSFORM_X, szVal);
+		szVal.Format("%f", v.y);
+		SetDlgItemText(IDC_E_TRANSFORM_Y, szVal);
+		szVal.Format("%f", v.z);
+		SetDlgItemText(IDC_E_TRANSFORM_Z, szVal);
 	}
 	else
 	{
@@ -128,15 +130,17 @@ void CDlgBar::UpdateInfo()
 
 void CDlgBar::UpdateDataFromControl()
 {
-	if(TRUE == m_bUpdateingNow) return;
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
+	if (TRUE == m_bUpdateingNow)
+		return;
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
 
-	if(nullptr == pFrm->GetMapMng()) return;
+	if (nullptr == pFrm->GetMapMng())
+		return;
 
-	int nSelCount = pFrm->GetMapMng()->GetSelOutputObjCount();
+	int nSelCount        = pFrm->GetMapMng()->GetSelOutputObjCount();
 	CN3Transform* pTrans = pFrm->GetMapMng()->GetSelOutputObj(0);
-	int nCM = pFrm->GetMapMng()->GetCursorMode();
-	if(nSelCount != 1 || nullptr == pTrans && CM_POS != nCM && CM_SCALE != nCM)
+	int nCM              = pFrm->GetMapMng()->GetCursorMode();
+	if (nSelCount != 1 || nullptr == pTrans && CM_POS != nCM && CM_SCALE != nCM)
 	{
 		return;
 	}
@@ -144,15 +148,18 @@ void CDlgBar::UpdateDataFromControl()
 	{
 		__Vector3 v;
 		CString szVal = "";
-		GetDlgItemText(IDC_E_TRANSFORM_X, szVal); v.x = (float)atof(szVal);
-		GetDlgItemText(IDC_E_TRANSFORM_Y, szVal); v.y = (float)atof(szVal);
-		GetDlgItemText(IDC_E_TRANSFORM_Z, szVal); v.z = (float)atof(szVal);
-		
-		if(nCM == CM_POS)
+		GetDlgItemText(IDC_E_TRANSFORM_X, szVal);
+		v.x = (float) atof(szVal);
+		GetDlgItemText(IDC_E_TRANSFORM_Y, szVal);
+		v.y = (float) atof(szVal);
+		GetDlgItemText(IDC_E_TRANSFORM_Z, szVal);
+		v.z = (float) atof(szVal);
+
+		if (nCM == CM_POS)
 		{
 			pTrans->PosSet(v);
 		}
-		else if(nCM == CM_SCALE)
+		else if (nCM == CM_SCALE)
 		{
 			pTrans->ScaleSet(v);
 		}
@@ -163,69 +170,72 @@ void CDlgBar::UpdateDataFromControl()
 	m_bUpdateingNow = FALSE;
 }
 
-void CDlgBar::OnReleasedcaptureSliderFarplane(NMHDR* pNMHDR, LRESULT* pResult) 
+void CDlgBar::OnReleasedcaptureSliderFarplane(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	if(!pFrm) return;
-	if(pFrm->GetMapMng())
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
+	if (!pFrm)
+		return;
+	if (pFrm->GetMapMng())
 	{
 		pFrm->GetMapMng()->UpDateFP();
 	}
-	
+
 	*pResult = 0;
 }
 
-void CDlgBar::OnReleasedcaptureSliderTileregion(NMHDR* pNMHDR, LRESULT* pResult) 
+void CDlgBar::OnReleasedcaptureSliderTileregion(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	if(!pFrm) return;
-	if(pFrm->GetMapMng())
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
+	if (!pFrm)
+		return;
+	if (pFrm->GetMapMng())
 	{
-		if(pFrm->GetMapMng()->GetTerrain())
+		if (pFrm->GetMapMng()->GetTerrain())
 			pFrm->GetMapMng()->GetTerrain()->UpDateDistLimit();
 	}
-	
+
 	*pResult = 0;
 }
 
-BOOL CDlgBar::OnInitDialog() 
+BOOL CDlgBar::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	m_FP_Slider.SetRange(128,5120);
+	m_FP_Slider.SetRange(128, 5120);
 	m_FP_Slider.SetPos(512);
 
-	m_TileRegion_Slider.SetRange(10,100);
+	m_TileRegion_Slider.SetRange(10, 100);
 	m_TileRegion_Slider.SetPos(30);
 
-	m_sld_Light.SetRange(1,100);
+	m_sld_Light.SetRange(1, 100);
 	m_sld_Light.SetPos(70);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE; // return TRUE unless you set the focus to a control
+				 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void CDlgBar::OnChangeEZoneid() 
+void CDlgBar::OnChangeEZoneid()
 {
 	UpdateData();
 
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	if(pFrm->GetMapMng())
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
+	if (pFrm->GetMapMng())
 	{
 		pFrm->GetMapMng()->SetZoneID(m_iZoneID);
 	}
 }
 
-void CDlgBar::OnReleasedcaptureSliderLight(NMHDR* pNMHDR, LRESULT* pResult) 
+void CDlgBar::OnReleasedcaptureSliderLight(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	if(!pFrm) return;
-	if(pFrm->GetMapMng())
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
+	if (!pFrm)
+		return;
+	if (pFrm->GetMapMng())
 	{
-		int val = m_sld_Light.GetPos();
-		float lgt = (float)val / 100.0f;
+		int val   = m_sld_Light.GetPos();
+		float lgt = (float) val / 100.0f;
 		pFrm->GetMapMng()->SetLight(lgt);
 	}
-	
+
 	*pResult = 0;
 }

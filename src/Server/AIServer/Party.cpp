@@ -44,72 +44,71 @@ void CParty::PartyProcess(char* pBuf)
 
 void CParty::PartyCreate(char* pBuf)
 {
-	int index = 0;
-	int16_t sPartyIndex = 0;
-	int16_t sUid = 0;
+	int index            = 0;
+	int16_t sPartyIndex  = 0;
+	int16_t sUid         = 0;
 	_PARTY_GROUP* pParty = nullptr;
-	CUser* pUser = nullptr;
+	CUser* pUser         = nullptr;
 
-	sPartyIndex = GetShort(pBuf, index);
-	sUid = GetShort(pBuf, index);
+	sPartyIndex          = GetShort(pBuf, index);
+	sUid                 = GetShort(pBuf, index);
 
-	pUser = m_pMain->GetUserPtr(sUid);
+	pUser                = m_pMain->GetUserPtr(sUid);
 	if (pUser != nullptr)
 	{
-		pUser->m_byNowParty = 1;
+		pUser->m_byNowParty   = 1;
 		pUser->m_sPartyNumber = sPartyIndex;
 	}
 
 	std::unique_lock<std::mutex> lock(g_region_mutex);
 
-	pParty = new _PARTY_GROUP;
+	pParty         = new _PARTY_GROUP;
 	pParty->wIndex = sPartyIndex;
 	pParty->uid[0] = sUid;
 
-	bool ret = m_pMain->_partyMap.PutData(pParty->wIndex, pParty);
+	bool ret       = m_pMain->_partyMap.PutData(pParty->wIndex, pParty);
 
 	lock.unlock();
 
 	if (!ret)
 	{
-		spdlog::error("Party::PartyCreate: failed [partyId={} uid0={} uid1={}]",
-			sPartyIndex, pParty->uid[0], pParty->uid[1]);
+		spdlog::error("Party::PartyCreate: failed [partyId={} uid0={} uid1={}]", sPartyIndex,
+			pParty->uid[0], pParty->uid[1]);
 		delete pParty;
 		return;
 	}
 
-	spdlog::debug("Party::PartyCreate: success [partyId={} uid0={} uid1={}]",
-		sPartyIndex, pParty->uid[0], pParty->uid[1]);
+	spdlog::debug("Party::PartyCreate: success [partyId={} uid0={} uid1={}]", sPartyIndex,
+		pParty->uid[0], pParty->uid[1]);
 }
 
 void CParty::PartyInsert(char* pBuf)
 {
-	int index = 0;
-	int16_t sPartyIndex = 0;
-	uint8_t  byIndex = -1;
-	int16_t sUid = 0;
+	int index            = 0;
+	int16_t sPartyIndex  = 0;
+	uint8_t byIndex      = -1;
+	int16_t sUid         = 0;
 	_PARTY_GROUP* pParty = nullptr;
-	CUser* pUser = nullptr;
+	CUser* pUser         = nullptr;
 
-	sPartyIndex = GetShort(pBuf, index);
-	byIndex = GetByte(pBuf, index);
-	sUid = GetShort(pBuf, index);
+	sPartyIndex          = GetShort(pBuf, index);
+	byIndex              = GetByte(pBuf, index);
+	sUid                 = GetShort(pBuf, index);
 
-	pParty = m_pMain->_partyMap.GetData(sPartyIndex);
+	pParty               = m_pMain->_partyMap.GetData(sPartyIndex);
 
 	// 이상한 경우
 	if (!pParty)
 		return;
 
-	if (byIndex >= 0
-		&& byIndex < 8)
+	if (byIndex >= 0 && byIndex < 8)
 	{
 		pParty->uid[byIndex] = sUid;
 
-		pUser = m_pMain->GetUserPtr(sUid);
+		pUser                = m_pMain->GetUserPtr(sUid);
 		if (pUser)
 		{
-			pUser->m_byNowParty = 1;
+			pUser->m_byNowParty   = 1;
 			pUser->m_sPartyNumber = sPartyIndex;
 		}
 	}
@@ -117,17 +116,16 @@ void CParty::PartyInsert(char* pBuf)
 
 void CParty::PartyRemove(char* pBuf)
 {
-	int index = 0;
-	int16_t sPartyIndex = 0;
-	int16_t sUid = 0;
+	int index            = 0;
+	int16_t sPartyIndex  = 0;
+	int16_t sUid         = 0;
 	_PARTY_GROUP* pParty = nullptr;
-	CUser* pUser = nullptr;
+	CUser* pUser         = nullptr;
 
-	sPartyIndex = GetShort(pBuf, index);
-	sUid = GetShort(pBuf, index);
+	sPartyIndex          = GetShort(pBuf, index);
+	sUid                 = GetShort(pBuf, index);
 
-	if (sUid < 0
-		|| sUid > MAX_USER)
+	if (sUid < 0 || sUid > MAX_USER)
 		return;
 
 	if (sPartyIndex <= -1)
@@ -147,10 +145,10 @@ void CParty::PartyRemove(char* pBuf)
 			{
 				pParty->uid[i] = -1;
 
-				pUser = m_pMain->GetUserPtr(sUid);
+				pUser          = m_pMain->GetUserPtr(sUid);
 				if (pUser)
 				{
-					pUser->m_byNowParty = 0;
+					pUser->m_byNowParty   = 0;
 					pUser->m_sPartyNumber = -1;
 				}
 			}
@@ -160,12 +158,12 @@ void CParty::PartyRemove(char* pBuf)
 
 void CParty::PartyDelete(char* pBuf)
 {
-	int index = 0;
-	int16_t sPartyIndex = 0;
+	int index            = 0;
+	int16_t sPartyIndex  = 0;
 	_PARTY_GROUP* pParty = nullptr;
-	CUser* pUser = nullptr;
+	CUser* pUser         = nullptr;
 
-	sPartyIndex = GetShort(pBuf, index);
+	sPartyIndex          = GetShort(pBuf, index);
 
 	if (sPartyIndex <= -1)
 		return;
@@ -183,7 +181,7 @@ void CParty::PartyDelete(char* pBuf)
 			pUser = m_pMain->GetUserPtr(pParty->uid[i]);
 			if (pUser)
 			{
-				pUser->m_byNowParty = 0;
+				pUser->m_byNowParty   = 0;
 				pUser->m_sPartyNumber = -1;
 			}
 		}

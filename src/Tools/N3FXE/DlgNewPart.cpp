@@ -14,15 +14,12 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgNewPart dialog
 
-
-CDlgNewPart::CDlgNewPart(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgNewPart::IDD, pParent)
+CDlgNewPart::CDlgNewPart(CWnd* pParent /*=nullptr*/) : CDialog(CDlgNewPart::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgNewPart)
 	m_iPartType = 0;
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgNewPart::DoDataExchange(CDataExchange* pDX)
 {
@@ -32,17 +29,16 @@ void CDlgNewPart::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgNewPart, CDialog)
-	//{{AFX_MSG_MAP(CDlgNewPart)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgNewPart)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgNewPart message handlers
 
-void CDlgNewPart::OnOK() 
+void CDlgNewPart::OnOK()
 {
-	UpdateData(TRUE);	
+	UpdateData(TRUE);
 	CDialog::OnOK();
 }

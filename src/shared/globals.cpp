@@ -28,8 +28,8 @@ uint64_t RandUInt64()
 
 double TimeGet()
 {
-	using clock = std::chrono::high_resolution_clock;
-	static const auto startTime = clock::now();
+	using clock                           = std::chrono::high_resolution_clock;
+	static const auto startTime           = clock::now();
 
 	std::chrono::duration<double> elapsed = clock::now() - startTime;
 	return elapsed.count(); // seconds as double

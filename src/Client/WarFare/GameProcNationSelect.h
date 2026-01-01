@@ -11,17 +11,17 @@
 
 #include "GameProcedure.h"
 
-class CGameProcNationSelect : public CGameProcedure   
+class CGameProcNationSelect : public CGameProcedure
 {
 public:
-	class CUINationSelectDlg* m_pUINationSelectDlg;	
+	class CUINationSelectDlg* m_pUINationSelectDlg;
 
 protected:
 	virtual bool ProcessPacket(Packet& pkt);
 
 public:
 	void MsgSendNationSelect(e_Nation eNation);
-	
+
 	void Release();
 	void Init();
 	void Tick();

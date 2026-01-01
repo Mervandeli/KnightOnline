@@ -14,32 +14,34 @@
 
 class CDlgPutColor : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgPutColor(CWnd* pParent = nullptr);   // standard constructor
+	CDlgPutColor(CWnd* pParent = nullptr); // standard constructor
 
-	DWORD	m_Color[NUM_KEY_COLOR];
-	DWORD	m_Opacity[NUM_KEY_COLOR];
+	DWORD m_Color[NUM_KEY_COLOR];
+	DWORD m_Opacity[NUM_KEY_COLOR];
 
-	bool	m_bColorKey[NUM_KEY_COLOR];
-	bool	m_bAlphaKey[NUM_KEY_COLOR];
+	bool m_bColorKey[NUM_KEY_COLOR];
+	bool m_bAlphaKey[NUM_KEY_COLOR];
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgPutColor)
-	enum { IDD = IDD_DLG_PUTCOLOR };
-	CStatic	m_stcOpacity;
-	CStatic	m_stcColor;
+	enum
+	{
+		IDD = IDD_DLG_PUTCOLOR
+	};
+	CStatic m_stcOpacity;
+	CStatic m_stcColor;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgPutColor)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 protected:
 	void GradateColor(int start, int end);
 	void GradateAlpha(int start, int end);

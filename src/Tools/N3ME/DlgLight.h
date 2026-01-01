@@ -14,37 +14,39 @@
 
 class CDlgLight : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgLight(CWnd* pParent = nullptr);   // standard constructor
+	CDlgLight(CWnd* pParent = nullptr); // standard constructor
 
-	CLightObjMgr*	m_pRefLightObjMgr;
-	LPLIGHTOBJ		m_pSelLO;
-	COLORREF		m_pLOColor;
+	CLightObjMgr* m_pRefLightObjMgr;
+	LPLIGHTOBJ m_pSelLO;
+	COLORREF m_pLOColor;
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgLight)
-	enum { IDD = IDD_LIGHT };
-	CStatic	m_stcColor;
-	CSliderCtrl	m_sld_Atten;
-	CSliderCtrl	m_sld_Range;
-	CListBox	m_ListLO;
-	CString	m_strPathName;
-	CString	m_strLightObjName;
+	enum
+	{
+		IDD = IDD_LIGHT
+	};
+	CStatic m_stcColor;
+	CSliderCtrl m_sld_Atten;
+	CSliderCtrl m_sld_Range;
+	CListBox m_ListLO;
+	CString m_strPathName;
+	CString m_strLightObjName;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgLight)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
-	void	RefreshCurrLight();
-	
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
+
+	// Implementation
+protected:
+	void RefreshCurrLight();
+
 	// Generated message map functions
 	//{{AFX_MSG(CDlgLight)
 	virtual BOOL OnInitDialog();
@@ -63,8 +65,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	void	InsertLOList(LPLIGHTOBJ pLO);
-	void	Reset();
+	void InsertLOList(LPLIGHTOBJ pLO);
+	void Reset();
 };
 
 //{{AFX_INSERT_LOCATION}}

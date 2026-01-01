@@ -17,30 +17,31 @@ protected: // create from serialization only
 	CHierarchyView();
 	DECLARE_DYNCREATE(CHierarchyView)
 
-// Attributes
+	// Attributes
 public:
 	CUIEDoc* GetDocument();
 
-// Operations
+	// Operations
 public:
 protected:
-	void UpdateAllInfo();										// 모든 tree item 정보 갱신하기
-	void UpdateTreeItem(HTREEITEM hParent, CN3UIBase *pUIBase);	// tree item 정보 갱신하기
-	void SelectObject(HTREEITEM hItem,  CN3UIBase* pUIBase);	// UPBase 포인터로 tree item 선택하기
+	void UpdateAllInfo();                                       // 모든 tree item 정보 갱신하기
+	void UpdateTreeItem(HTREEITEM hParent, CN3UIBase* pUIBase); // tree item 정보 갱신하기
+	void SelectObject(HTREEITEM hItem, CN3UIBase* pUIBase); // UPBase 포인터로 tree item 선택하기
 
 public:
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CHierarchyView)
-	public:
-	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
+public:
+	virtual void OnDraw(CDC* pDC); // overridden to draw this view
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	protected:
+
+protected:
 	virtual void OnInitialUpdate(); // called first time after construct
 	virtual void OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CHierarchyView();
 #ifdef _DEBUG
@@ -49,8 +50,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CHierarchyView)
 	afx_msg void OnRclick(NMHDR* pNMHDR, LRESULT* pResult);
@@ -61,9 +61,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-#ifndef _DEBUG  // debug version in HierarchyView.cpp
+#ifndef _DEBUG // debug version in HierarchyView.cpp
 inline CUIEDoc* CHierarchyView::GetDocument()
-   { return (CUIEDoc*)m_pDocument; }
+{
+	return (CUIEDoc*) m_pDocument;
+}
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

@@ -8,11 +8,11 @@
 #include <string_view>
 
 #if defined(_WIN32)
-#define stricmp _stricmp
+#define stricmp  _stricmp
 #define strnicmp _strnicmp
 #elif __has_include(<strings.h>)
 #include <strings.h>
-#define stricmp strcasecmp
+#define stricmp  strcasecmp
 #define strnicmp strncasecmp
 #else
 #error "No applicable strncasecmp/_strnicmp implementation found"

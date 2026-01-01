@@ -10,7 +10,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -19,22 +19,22 @@ static char THIS_FILE[]=__FILE__;
 
 CN3FXPartMesh::CN3FXPartMesh()
 {
-	m_iVersion = SUPPORTED_PART_VERSION;
+	m_iVersion        = SUPPORTED_PART_VERSION;
 
-	m_pShape = nullptr;
-	m_pRefShape = nullptr;
+	m_pShape          = nullptr;
+	m_pRefShape       = nullptr;
 
-	m_dwCurrColor = 0xffffffff;
+	m_dwCurrColor     = 0xffffffff;
 
 	m_cTextureMoveDir = 0;
-	m_fv = 0.0f;
-	m_fu = 0.0f;
+	m_fv              = 0.0f;
+	m_fu              = 0.0f;
 
-	m_vScaleVel.Set(0,0,0);
-	m_vDir.Set(0,0,1);
-	m_vUnitScale.Set(1,1,1);
-	m_vCurrScaleVel.Set(0,0,0);
-	m_vScaleAccel.Set(0,0,0);
+	m_vScaleVel.Set(0, 0, 0);
+	m_vDir.Set(0, 0, 1);
+	m_vUnitScale.Set(1, 1, 1);
+	m_vCurrScaleVel.Set(0, 0, 0);
+	m_vScaleAccel.Set(0, 0, 0);
 
 	m_bTexLoop = false;
 	m_fMeshFPS = 30.0f;
@@ -43,7 +43,7 @@ CN3FXPartMesh::CN3FXPartMesh()
 CN3FXPartMesh::~CN3FXPartMesh()
 {
 	CN3Base::s_MngFXShape.Delete(&m_pRefShape);
-	if(m_pShape)
+	if (m_pShape)
 	{
 		m_pShape->Release();
 		delete m_pShape;
@@ -55,12 +55,12 @@ CN3FXPartMesh::~CN3FXPartMesh()
 //
 //////////////////////////////////////////////////////////////////////
 
-
 //
 //
 //
 #ifdef _N3TOOL
-bool CN3FXPartMesh::ParseScript(char* szCommand, char* szBuff0, char* szBuff1, char* szBuff2, char* szBuff3)
+bool CN3FXPartMesh::ParseScript(
+	char* szCommand, char* szBuff0, char* szBuff1, char* szBuff2, char* szBuff3)
 {
 	if (CN3FXPartBase::ParseScript(szCommand, szBuff0, szBuff1, szBuff2, szBuff3))
 		return true;
@@ -70,7 +70,7 @@ bool CN3FXPartMesh::ParseScript(char* szCommand, char* szBuff0, char* szBuff1, c
 		char szPath[MAX_PATH] = {};
 		strcpy(szPath, szBuff0);
 
-		m_pShape = new CN3FXShape();
+		m_pShape    = new CN3FXShape();
 		m_pRefShape = s_MngFXShape.Get(szPath);
 		m_pShape->Duplicate(m_pRefShape);
 
@@ -122,9 +122,7 @@ bool CN3FXPartMesh::ParseScript(char* szCommand, char* szBuff0, char* szBuff1, c
 
 	if (lstrcmpi(szCommand, "<scale_velocity>") == 0)
 	{
-		m_vScaleVel.Set(
-			static_cast<float>(atof(szBuff0)),
-			static_cast<float>(atof(szBuff1)),
+		m_vScaleVel.Set(static_cast<float>(atof(szBuff0)), static_cast<float>(atof(szBuff1)),
 			static_cast<float>(atof(szBuff2)));
 		m_vCurrScaleVel = m_vScaleVel;
 		return true;
@@ -132,18 +130,14 @@ bool CN3FXPartMesh::ParseScript(char* szCommand, char* szBuff0, char* szBuff1, c
 
 	if (lstrcmpi(szCommand, "<scale_accelerate>") == 0)
 	{
-		m_vScaleAccel.Set(
-			static_cast<float>(atof(szBuff0)),
-			static_cast<float>(atof(szBuff1)),
+		m_vScaleAccel.Set(static_cast<float>(atof(szBuff0)), static_cast<float>(atof(szBuff1)),
 			static_cast<float>(atof(szBuff2)));
 		return true;
 	}
 
 	if (lstrcmpi(szCommand, "<scale>") == 0)
 	{
-		m_vUnitScale.Set(
-			static_cast<float>(atof(szBuff0)),
-			static_cast<float>(atof(szBuff1)),
+		m_vUnitScale.Set(static_cast<float>(atof(szBuff0)), static_cast<float>(atof(szBuff1)),
 			static_cast<float>(atof(szBuff2)));
 		return true;
 	}
@@ -198,30 +192,32 @@ bool CN3FXPartMesh::ParseScript(char* szCommand, char* szBuff0, char* szBuff1, c
 }
 #endif // end of _N3TOOL
 
-
 //
 //	init...
 //
 void CN3FXPartMesh::Init()
 {
 	CN3FXPartBase::Init();
-	
-	m_dwCurrColor = 0xffffffff;
+
+	m_dwCurrColor   = 0xffffffff;
 	m_vCurrVelocity = m_vVelocity;
-	m_vCurrPos = m_vPos;
+	m_vCurrPos      = m_vPos;
 	m_vCurrScaleVel = m_vScaleVel;
-	
-	m_vDir.Set(0,0,1);
 
-	if(m_pRefBundle)
+	m_vDir.Set(0, 0, 1);
+
+	if (m_pRefBundle)
 	{
-		if(m_pShape) m_pShape->PosSet(m_vPos+m_pRefBundle->m_vPos);		
+		if (m_pShape)
+			m_pShape->PosSet(m_vPos + m_pRefBundle->m_vPos);
 	}
-	else if(m_pShape) m_pShape->PosSet(m_vPos);
+	else if (m_pShape)
+		m_pShape->PosSet(m_vPos);
 
-	if(m_pShape) m_pShape->SetPartsMtl(m_bAlpha, m_dwSrcBlend, m_dwDestBlend, m_dwZEnable, m_dwZWrite, m_dwLight, m_dwDoubleSide);
+	if (m_pShape)
+		m_pShape->SetPartsMtl(m_bAlpha, m_dwSrcBlend, m_dwDestBlend, m_dwZEnable, m_dwZWrite,
+			m_dwLight, m_dwDoubleSide);
 }
-
 
 //
 //
@@ -235,11 +231,12 @@ bool CN3FXPartMesh::Load(File& file)
 	file.Read(szShapeFileName, _MAX_PATH);
 
 	delete m_pShape;
-	m_pShape = new CN3FXShape();
+	m_pShape    = new CN3FXShape();
 
 	m_pRefShape = s_MngFXShape.Get(szShapeFileName);
 	m_pShape->Duplicate(m_pRefShape);
-	m_pShape->SetPartsMtl(m_bAlpha, m_dwSrcBlend, m_dwDestBlend, m_dwZEnable, m_dwZWrite, m_dwLight, m_dwDoubleSide);
+	m_pShape->SetPartsMtl(
+		m_bAlpha, m_dwSrcBlend, m_dwDestBlend, m_dwZEnable, m_dwZWrite, m_dwLight, m_dwDoubleSide);
 	//m_pShape->LoadFromFile(szShapeFileName);
 	__Vector3 vScale;
 	if (m_pShape->m_KeyScale.DataGet(0, vScale))
@@ -285,10 +282,9 @@ bool CN3FXPartMesh::Load(File& file)
 #if defined(_DEBUG)
 	if (m_iVersion > SUPPORTED_PART_VERSION)
 	{
-		TRACE(
-			"!!! WARNING: CN3FXPartMesh::Load(%s) encountered version %d (base version %d). Needs support!",
-			m_pRefBundle != nullptr ? m_pRefBundle->FileName().c_str() : "<unknown>",
-			m_iVersion,
+		TRACE("!!! WARNING: CN3FXPartMesh::Load(%s) encountered version %d (base version %d). "
+			  "Needs support!",
+			m_pRefBundle != nullptr ? m_pRefBundle->FileName().c_str() : "<unknown>", m_iVersion,
 			m_iBaseVersion);
 	}
 #endif
@@ -301,7 +297,7 @@ bool CN3FXPartMesh::Load(File& file)
 			if (part == nullptr)
 				continue;
 
-			part->m_fTexFPS = m_fTexFPS;
+			part->m_fTexFPS  = m_fTexFPS;
 			part->m_bTexLoop = m_bTexLoop;
 		}
 	}
@@ -310,7 +306,6 @@ bool CN3FXPartMesh::Load(File& file)
 
 	return true;
 }
-
 
 //
 //
@@ -346,127 +341,131 @@ bool CN3FXPartMesh::Save(File& file)
 	return true;
 }
 
-
 //
 //
 //
 void CN3FXPartMesh::Start()
 {
 	m_dwCurrColor = 0xffffffff;
-	if(!m_pShape) return;
+	if (!m_pShape)
+		return;
 
 	int PartCount = m_pShape->PartCount();
-	for(int i=0;i<PartCount;i++)
+	for (int i = 0; i < PartCount; i++)
 	{
-		CN3FXSPart* pPart = m_pShape->Part(i);
+		CN3FXSPart* pPart        = m_pShape->Part(i);
 
-		pPart->m_Mtl.dwSrcBlend = m_dwSrcBlend;
+		pPart->m_Mtl.dwSrcBlend  = m_dwSrcBlend;
 		pPart->m_Mtl.dwDestBlend = m_dwDestBlend;
 
-		if((pPart->m_Mtl.nRenderFlags & RF_ALPHABLENDING) && !m_bAlpha)
+		if ((pPart->m_Mtl.nRenderFlags & RF_ALPHABLENDING) && !m_bAlpha)
 		{
 			pPart->m_Mtl.nRenderFlags -= RF_ALPHABLENDING;
 		}
-		else if(!(pPart->m_Mtl.nRenderFlags & RF_ALPHABLENDING) && m_bAlpha)
+		else if (!(pPart->m_Mtl.nRenderFlags & RF_ALPHABLENDING) && m_bAlpha)
 		{
 			pPart->m_Mtl.nRenderFlags += RF_ALPHABLENDING;
 		}
 
 		__VertexXyzColorT1* pVertices;
 		pVertices = pPart->GetColorVertices();
-		if(pVertices)
+		if (pVertices)
 		{
-			for(int j=0;j<pPart->Mesh()->GetMaxNumVertices();j++)
+			for (int j = 0; j < pPart->Mesh()->GetMaxNumVertices(); j++)
 			{
 				pVertices[j].color = m_dwCurrColor;
 			}
 		}
 	}
 
-	CN3FXPartBase::Start();	
+	CN3FXPartBase::Start();
 }
-
 
 //
 //
 //
 void CN3FXPartMesh::Stop()
 {
-	CN3FXPartBase::Stop();	
+	CN3FXPartBase::Stop();
 }
-
 
 //
 //
 //
 bool CN3FXPartMesh::Tick()
 {
-	if(!CN3FXPartBase::Tick()) return false;
+	if (!CN3FXPartBase::Tick())
+		return false;
 
-	if(!m_pShape) return false;
+	if (!m_pShape)
+		return false;
 
-	if(m_fCurrLife<=m_fFadeIn)
+	if (m_fCurrLife <= m_fFadeIn)
 	{
-		uint32_t Alpha = (uint32_t)(255.0f * m_fCurrLife / m_fFadeIn);
-		m_dwCurrColor = (Alpha<<24) + 0x00ffffff;
-		
-		int PartCount = m_pShape->PartCount();
-		for(int i=0;i<PartCount;i++)
+		uint32_t Alpha = (uint32_t) (255.0f * m_fCurrLife / m_fFadeIn);
+		m_dwCurrColor  = (Alpha << 24) + 0x00ffffff;
+
+		int PartCount  = m_pShape->PartCount();
+		for (int i = 0; i < PartCount; i++)
 		{
 			CN3FXSPart* pPart = m_pShape->Part(i);
-			if(pPart) pPart->SetColor(m_dwCurrColor);
+			if (pPart)
+				pPart->SetColor(m_dwCurrColor);
 		}
 	}
-	else if(m_dwCurrColor!=0xffffffff && m_fCurrLife < (m_fFadeIn+m_fLife))
+	else if (m_dwCurrColor != 0xffffffff && m_fCurrLife < (m_fFadeIn + m_fLife))
 	{
 		m_dwCurrColor = 0xffffffff;
 
 		int PartCount = m_pShape->PartCount();
-		for(int i=0;i<PartCount;i++)
+		for (int i = 0; i < PartCount; i++)
 		{
 			CN3FXSPart* pPart = m_pShape->Part(i);
-			if(pPart) pPart->SetColor(m_dwCurrColor);
+			if (pPart)
+				pPart->SetColor(m_dwCurrColor);
 		}
 	}
 
-	if(m_dwState==FX_PART_STATE_DYING)
+	if (m_dwState == FX_PART_STATE_DYING)
 	{
 		float TotalLife = m_fFadeIn + m_fLife + m_fFadeOut;
-		if(m_fCurrLife >= TotalLife)
+		if (m_fCurrLife >= TotalLife)
 		{
 			m_dwCurrColor = 0x00ffffff;
 		}
 		else
 		{
-			uint32_t Alpha = (uint32_t)(255.0f * (TotalLife - m_fCurrLife) / m_fFadeOut);
-			m_dwCurrColor = (Alpha<<24) + 0x00ffffff;
+			uint32_t Alpha = (uint32_t) (255.0f * (TotalLife - m_fCurrLife) / m_fFadeOut);
+			m_dwCurrColor  = (Alpha << 24) + 0x00ffffff;
 		}
 
 		int PartCount = m_pShape->PartCount();
-		for(int i=0;i<PartCount;i++)
+		for (int i = 0; i < PartCount; i++)
 		{
 			CN3FXSPart* pPart = m_pShape->Part(i);
-			if(pPart) pPart->SetColor(m_dwCurrColor);
+			if (pPart)
+				pPart->SetColor(m_dwCurrColor);
 		}
 	}
 
 	float fFrm = m_fCurrLife * m_fMeshFPS;
-	if(fFrm>m_pShape->GetWholeFrm()-1.0f)
-		fFrm = m_pShape->GetWholeFrm()-1.0f;
+	if (fFrm > m_pShape->GetWholeFrm() - 1.0f)
+		fFrm = m_pShape->GetWholeFrm() - 1.0f;
 
 	m_pShape->SetCurrFrm(fFrm);
 
-	if(m_cTextureMoveDir>0) MoveTexUV();
+	if (m_cTextureMoveDir > 0)
+		MoveTexUV();
 
 	Rotate();
 	Scaling();
-	Move();	
+	Move();
 
 	m_pShape->Tick();
 
 	return true;
 
-/*	
+	/*	
 	//회전과 이동..
 	__Matrix44 mtx;
 	mtx.Identity();]
@@ -542,9 +541,8 @@ bool CN3FXPartMesh::Tick()
 	}
 	m_pShape->Tick(fFrm);
 	return true;
-*/	
+*/
 }
-
 
 //
 //
@@ -557,80 +555,84 @@ void CN3FXPartMesh::Rotate()
 	//__Quaternion qtLocalRot(mtx);
 
 	m_pShape->m_mtxParent.Rotation(m_vRotVelocity * m_fCurrLife);
-		
+
 	//mesh방향과 bundle방향을 맞춰라...
 	__Quaternion qtBundle;
 	__Vector3 vDirAxis;
 	float fDirAng;
-	
+
 	vDirAxis.Cross(m_vDir, m_pRefBundle->m_vDir);
 	int tmp;
-	tmp = (int)(vDirAxis.x*10000.0f);
-	vDirAxis.x = (float)(tmp)/10000.0f;
-	tmp = (int)(vDirAxis.y*10000.0f);
-	vDirAxis.y = (float)(tmp)/10000.0f;
-	tmp = (int)(vDirAxis.z*10000.0f);
-	vDirAxis.z = (float)(tmp)/10000.0f;
+	tmp        = (int) (vDirAxis.x * 10000.0f);
+	vDirAxis.x = (float) (tmp) / 10000.0f;
+	tmp        = (int) (vDirAxis.y * 10000.0f);
+	vDirAxis.y = (float) (tmp) / 10000.0f;
+	tmp        = (int) (vDirAxis.z * 10000.0f);
+	vDirAxis.z = (float) (tmp) / 10000.0f;
 
-	if(vDirAxis.x==0.0f && vDirAxis.y==0.0f && vDirAxis.z==0.0f) vDirAxis.Set(0,1,0);
+	if (vDirAxis.x == 0.0f && vDirAxis.y == 0.0f && vDirAxis.z == 0.0f)
+		vDirAxis.Set(0, 1, 0);
 	fDirAng = acos(m_vDir.Dot(m_pRefBundle->m_vDir));
 	qtBundle.RotationAxis(vDirAxis, fDirAng);
-	mtx = qtBundle;
+	mtx                    = qtBundle;
 
 	m_pShape->m_mtxParent *= mtx;
 }
-
 
 //
 //
 //
 void CN3FXPartMesh::Move()
 {
-	m_vCurrVelocity += m_vAcceleration*CN3Base::s_fSecPerFrm;
-	m_vCurrPos += m_vCurrVelocity*CN3Base::s_fSecPerFrm;
+	m_vCurrVelocity += m_vAcceleration * CN3Base::s_fSecPerFrm;
+	m_vCurrPos      += m_vCurrVelocity * CN3Base::s_fSecPerFrm;
 
 	__Quaternion qtBundle;
 	__Vector3 vDirAxis;
 	float fDirAng;
-	
+
 	vDirAxis.Cross(m_vDir, m_pRefBundle->m_vDir);
 	int tmp;
-	tmp = (int)(vDirAxis.x*10000.0f);
-	vDirAxis.x = (float)(tmp)/10000.0f;
-	tmp = (int)(vDirAxis.y*10000.0f);
-	vDirAxis.y = (float)(tmp)/10000.0f;
-	tmp = (int)(vDirAxis.z*10000.0f);
-	vDirAxis.z = (float)(tmp)/10000.0f;
+	tmp        = (int) (vDirAxis.x * 10000.0f);
+	vDirAxis.x = (float) (tmp) / 10000.0f;
+	tmp        = (int) (vDirAxis.y * 10000.0f);
+	vDirAxis.y = (float) (tmp) / 10000.0f;
+	tmp        = (int) (vDirAxis.z * 10000.0f);
+	vDirAxis.z = (float) (tmp) / 10000.0f;
 
-	if(vDirAxis.x==0.0f && vDirAxis.y==0.0f && vDirAxis.z==0.0f) vDirAxis.Set(0,1,0);
+	if (vDirAxis.x == 0.0f && vDirAxis.y == 0.0f && vDirAxis.z == 0.0f)
+		vDirAxis.Set(0, 1, 0);
 
 	fDirAng = acos(m_vDir.Dot(m_pRefBundle->m_vDir));
 	qtBundle.RotationAxis(vDirAxis, fDirAng);
 
-	__Matrix44 mtx = qtBundle;
+	__Matrix44 mtx     = qtBundle;
 	__Vector3 vRealPos = m_vCurrPos * mtx;
 
 	//__Vector3 vPos = m_vCurrPos+m_pRefBundle->m_vPos;
-	__Vector3 vPos = vRealPos + m_pRefBundle->m_vPos;
+	__Vector3 vPos     = vRealPos + m_pRefBundle->m_vPos;
 
 	m_pShape->m_mtxParent.PosSet(vPos);
 }
-
 
 //
 //
 //
 void CN3FXPartMesh::Scaling()
 {
-	m_vCurrScaleVel += m_vScaleAccel*m_fCurrLife;
-	__Vector3 vScale = m_vCurrScaleVel*m_fCurrLife;
-	vScale += m_vUnitScale;
+	m_vCurrScaleVel  += m_vScaleAccel * m_fCurrLife;
+	__Vector3 vScale  = m_vCurrScaleVel * m_fCurrLife;
+	vScale           += m_vUnitScale;
 
-	if(m_pRefBundle->m_bDependScale) vScale *= m_pRefBundle->m_fTargetScale;
+	if (m_pRefBundle->m_bDependScale)
+		vScale *= m_pRefBundle->m_fTargetScale;
 
-	if(vScale.x < 0.0f) vScale.x = 0.0f;
-	if(vScale.y < 0.0f) vScale.y = 0.0f;
-	if(vScale.z < 0.0f) vScale.z = 0.0f;
+	if (vScale.x < 0.0f)
+		vScale.x = 0.0f;
+	if (vScale.y < 0.0f)
+		vScale.y = 0.0f;
+	if (vScale.z < 0.0f)
+		vScale.z = 0.0f;
 
 	__Matrix44 mtx;
 	mtx.Identity();
@@ -639,64 +641,63 @@ void CN3FXPartMesh::Scaling()
 	//m_pShape->m_mtxParent.Scale(vScale);
 }
 
-
 //
 //
 //
 void CN3FXPartMesh::MoveTexUV()
 {
 	int cnt = m_pShape->PartCount();
-	for(int i=0;i<cnt;i++)
+	for (int i = 0; i < cnt; i++)
 	{
 		CN3FXSPart* pPart = m_pShape->Part(i);
-		if(!pPart) continue;
+		if (!pPart)
+			continue;
 
 		__VertexXyzColorT1* pVertices;
 		pVertices = pPart->GetColorVertices();
-		if(pVertices)
+		if (pVertices)
 		{
-			for(int j=0;j<pPart->Mesh()->GetMaxNumVertices();j++)
+			for (int j = 0; j < pPart->Mesh()->GetMaxNumVertices(); j++)
 			{
-				pVertices[j].tu += m_fu*CN3Base::s_fSecPerFrm;
-				pVertices[j].tv += m_fv*CN3Base::s_fSecPerFrm;
+				pVertices[j].tu += m_fu * CN3Base::s_fSecPerFrm;
+				pVertices[j].tv += m_fv * CN3Base::s_fSecPerFrm;
 			}
 		}
 	}
 }
 
-
 //
 //
 //
-int	CN3FXPartMesh::NumPart()
+int CN3FXPartMesh::NumPart()
 {
-	if(!m_pShape) return 0;
-	
+	if (!m_pShape)
+		return 0;
+
 	return m_pShape->PartCount();
 }
-
 
 //
 //
 //
 int CN3FXPartMesh::NumVertices(int Part)
 {
-	if(!m_pShape) return 0;
-//	return m_pShape->Part(Part)->Mesh()->GetNumVertices(); //this_fx
+	if (!m_pShape)
+		return 0;
+	//	return m_pShape->Part(Part)->Mesh()->GetNumVertices(); //this_fx
 	return m_pShape->Part(Part)->Mesh()->GetMaxNumVertices();
 }
-
 
 //
 //
 //
 LPDIRECT3DVERTEXBUFFER9 CN3FXPartMesh::GetVB(int Part)
 {
-	if(!m_pShape) return nullptr;
+	if (!m_pShape)
+		return nullptr;
 	return nullptr;
-//	return m_pShape->Part(Part)->Mesh()->GetVertexBuffer();	//this_fx
+	//	return m_pShape->Part(Part)->Mesh()->GetVertexBuffer();	//this_fx
 }
-
 
 //
 //
@@ -704,10 +705,10 @@ LPDIRECT3DVERTEXBUFFER9 CN3FXPartMesh::GetVB(int Part)
 bool CN3FXPartMesh::IsDead()
 {
 	float TotalLife = m_fFadeIn + m_fLife + m_fFadeOut;
-	if(m_fCurrLife >= TotalLife) return true;
+	if (m_fCurrLife >= TotalLife)
+		return true;
 	return false;
 }
-
 
 //
 //	render...
@@ -717,51 +718,55 @@ bool CN3FXPartMesh::IsDead()
 void CN3FXPartMesh::Render()
 {
 	// render state 세팅
-	if(!m_pShape) return;
+	if (!m_pShape)
+		return;
 
 	DWORD dwAlpha;
-	s_lpD3DDev->GetRenderState( D3DRS_ALPHABLENDENABLE, &dwAlpha);
+	s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
 
-	s_lpD3DDev->SetRenderState( D3DRS_ALPHABLENDENABLE, m_bAlpha );
-	if(m_dwState == FX_PART_STATE_DYING || m_fCurrLife < m_fFadeIn) s_lpD3DDev->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+	s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, m_bAlpha);
+	if (m_dwState == FX_PART_STATE_DYING || m_fCurrLife < m_fFadeIn)
+		s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 
-	s_lpD3DDev->SetRenderState( D3DRS_SRCBLEND, m_dwSrcBlend );
-	s_lpD3DDev->SetRenderState( D3DRS_DESTBLEND, m_dwDestBlend );
+	s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND, m_dwSrcBlend);
+	s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND, m_dwDestBlend);
 
-	s_lpD3DDev->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_DISABLE );
-	s_lpD3DDev->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
+	s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+	s_lpD3DDev->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
 	m_pShape->Render();
 
-	s_lpD3DDev->SetRenderState( D3DRS_ALPHABLENDENABLE, dwAlpha);
+	s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlpha);
 }
 
 void CN3FXPartMesh::Duplicate(CN3FXPartMesh* pSrc)
 {
-	if(!pSrc) return;
+	if (!pSrc)
+		return;
 
 	CN3FXPartBase::Duplicate(pSrc);
-	if(m_pShape) 
+	if (m_pShape)
 	{
 		delete m_pShape;
 		m_pShape = nullptr;
 	}
 
-	m_pShape = new CN3FXShape;
+	m_pShape    = new CN3FXShape;
 
 	m_pRefShape = s_MngFXShape.Get(pSrc->m_pRefShape->FileName());
 	m_pShape->Duplicate(m_pRefShape);
-	m_pShape->SetPartsMtl(m_bAlpha, m_dwSrcBlend, m_dwDestBlend, m_dwZEnable, m_dwZWrite, m_dwLight, m_dwDoubleSide);
-	
+	m_pShape->SetPartsMtl(
+		m_bAlpha, m_dwSrcBlend, m_dwDestBlend, m_dwZEnable, m_dwZWrite, m_dwLight, m_dwDoubleSide);
+
 	m_cTextureMoveDir = pSrc->m_cTextureMoveDir;
-	m_fu = pSrc->m_fu;
-	m_fv = pSrc->m_fv;
-	m_vScaleVel = pSrc->m_vScaleVel;
-	m_vScaleAccel = pSrc->m_vScaleAccel;
-	m_fMeshFPS = pSrc->m_fMeshFPS;
-	m_bTexLoop = pSrc->m_bTexLoop;
-	m_vUnitScale = pSrc->m_vUnitScale;
-		
+	m_fu              = pSrc->m_fu;
+	m_fv              = pSrc->m_fv;
+	m_vScaleVel       = pSrc->m_vScaleVel;
+	m_vScaleAccel     = pSrc->m_vScaleAccel;
+	m_fMeshFPS        = pSrc->m_fMeshFPS;
+	m_bTexLoop        = pSrc->m_bTexLoop;
+	m_vUnitScale      = pSrc->m_vUnitScale;
+
 	if (m_pShape != nullptr)
 	{
 		for (int i = 0; i < m_pShape->PartCount(); i++)
@@ -770,7 +775,7 @@ void CN3FXPartMesh::Duplicate(CN3FXPartMesh* pSrc)
 			if (part == nullptr)
 				continue;
 
-			part->m_fTexFPS = m_fTexFPS;
+			part->m_fTexFPS  = m_fTexFPS;
 			part->m_bTexLoop = m_bTexLoop;
 		}
 	}

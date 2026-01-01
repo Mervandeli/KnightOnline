@@ -15,10 +15,10 @@
 class CN3Shape;
 class CN3Sun;
 
-class CN3WorldManager : public CGameBase  
+class CN3WorldManager : public CGameBase
 {
-	bool									m_bIndoor;
-	CN3WorldBase*				   m_pActiveWorld;
+	bool m_bIndoor;
+	CN3WorldBase* m_pActiveWorld;
 
 public:
 	void InitWorld(int iZoneID, const __Vector3& vPosPlayer);
@@ -28,13 +28,16 @@ public:
 
 	void Tick();
 
-	bool IsIndoor() {	return m_bIndoor;	}
-	
-	//..
-	CN3WorldBase* GetActiveWorld() 
+	bool IsIndoor()
 	{
-//		__ASSERT(0, "No Acitive World!!");
-		return m_pActiveWorld;	
+		return m_bIndoor;
+	}
+
+	//..
+	CN3WorldBase* GetActiveWorld()
+	{
+		//		__ASSERT(0, "No Acitive World!!");
+		return m_pActiveWorld;
 	}
 };
 

@@ -17,7 +17,11 @@
 
 #include "DlgPMeshEdit.h"
 
-enum eToolMode { MODE_NORMAL = 0, MODE_EDIT_PMESH = 1, };
+enum eToolMode
+{
+	MODE_NORMAL     = 0,
+	MODE_EDIT_PMESH = 1,
+};
 
 class CMainFrame : public CFrameWnd
 {
@@ -27,18 +31,19 @@ public:
 
 	CDlgPMeshEdit m_DlgPMeshEdit;
 
-	CN3EngTool	m_Eng;
-	eToolMode	m_eMode;
-	BOOL		m_IsPlaying;
+	CN3EngTool m_Eng;
+	eToolMode m_eMode;
+	BOOL m_IsPlaying;
+
 protected: // create from serialization only
 	CMainFrame();
 	DECLARE_DYNCREATE(CMainFrame)
 
 public:
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CMainFrame)
-	public:
+public:
 	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	//}}AFX_VIRTUAL
@@ -46,7 +51,10 @@ public:
 	CN3ViewerView* GetView();
 	CViewSceneTree* GetViewSceneTree();
 	CViewProperty* GetViewProperty();
-	void SetStatusBarText(LPCTSTR lpszText) {m_wndStatusBar.SetPaneText(0, lpszText);}
+	void SetStatusBarText(LPCTSTR lpszText)
+	{
+		m_wndStatusBar.SetPaneText(0, lpszText);
+	}
 
 	virtual ~CMainFrame();
 #ifdef _DEBUG
@@ -54,11 +62,11 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
-protected:  // control bar embedded members
-	CStatusBar  m_wndStatusBar;
-	CToolBar    m_wndToolBar;
+protected: // control bar embedded members
+	CStatusBar m_wndStatusBar;
+	CToolBar m_wndToolBar;
 
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CMainFrame)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

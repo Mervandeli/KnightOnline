@@ -14,15 +14,12 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgSaveEvt dialog
 
-
-CDlgSaveEvt::CDlgSaveEvt(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgSaveEvt::IDD, pParent)
+CDlgSaveEvt::CDlgSaveEvt(CWnd* pParent /*=nullptr*/) : CDialog(CDlgSaveEvt::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgSaveEvt)
 	m_FileName = _T("");
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgSaveEvt::DoDataExchange(CDataExchange* pDX)
 {
@@ -34,30 +31,29 @@ void CDlgSaveEvt::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgSaveEvt, CDialog)
-	//{{AFX_MSG_MAP(CDlgSaveEvt)
-	ON_LBN_SELCHANGE(IDC_LIST_SAVED_EVT_FILE, OnSelchangeListSavedEvtFile)
-	ON_LBN_DBLCLK(IDC_LIST_SAVED_EVT_FILE, OnDblclkListSavedEvtFile)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgSaveEvt)
+ON_LBN_SELCHANGE(IDC_LIST_SAVED_EVT_FILE, OnSelchangeListSavedEvtFile)
+ON_LBN_DBLCLK(IDC_LIST_SAVED_EVT_FILE, OnDblclkListSavedEvtFile)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgSaveEvt message handlers
 
-void CDlgSaveEvt::OnSelchangeListSavedEvtFile() 
+void CDlgSaveEvt::OnSelchangeListSavedEvtFile()
 {
 	int CurrSel = m_SavedFileList.GetCurSel();
 	m_SavedFileList.GetText(CurrSel, m_FileName);
-	UpdateData(FALSE);	
+	UpdateData(FALSE);
 }
 
-void CDlgSaveEvt::OnDblclkListSavedEvtFile() 
+void CDlgSaveEvt::OnDblclkListSavedEvtFile()
 {
-	OnOK();	
+	OnOK();
 }
 
-BOOL CDlgSaveEvt::OnInitDialog() 
+BOOL CDlgSaveEvt::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
@@ -77,22 +73,22 @@ BOOL CDlgSaveEvt::OnInitDialog()
 	int count = m_SavedFileList.GetCount();
 
 	CString str;
-	for(int i=0;i<count;i++)
+	for (int i = 0; i < count; i++)
 	{
 		m_SavedFileList.GetText(0, str);
 
 		char szFileName[_MAX_PATH];
 		char szExt[_MAX_EXT];
-		_splitpath((LPCTSTR)str, nullptr, nullptr, szFileName, szExt);
+		_splitpath((LPCTSTR) str, nullptr, nullptr, szFileName, szExt);
 
 		//str.Format("%s%s",szFileName,szExt);
-		str.Format("%s",szFileName);
+		str.Format("%s", szFileName);
 		m_SavedFileList.InsertString(count, str);
 		m_SavedFileList.DeleteString(0);
 	}
 
 	SetCurrentDirectory(szOldPath);
-	
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+
+	return TRUE; // return TRUE unless you set the focus to a control
+				 // EXCEPTION: OCX Property Pages should return FALSE
 }

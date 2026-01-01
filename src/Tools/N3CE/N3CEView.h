@@ -17,15 +17,22 @@ class CN3CEDoc;
 #include <deque>
 
 typedef std::deque<int>::iterator it_AniIndex;
-enum e_CursorMode { eCM_Nothing, eCM_PickJoint, eCM_PlugPosition, eCM_PlugScale, eCM_PlugRotation,
-					eCM_PlugFXPosition0,
-					eCM_PlugFXPosition1,
-					eCM_PlugFXPosition2,
-					eCM_PlugFXPosition3,
-					eCM_PlugFXPosition4,
-					eCM_PlugFXPosition5,
-					eCM_PlugFXPosition6,
-					eCM_PlugFXPosition7 };
+enum e_CursorMode
+{
+	eCM_Nothing,
+	eCM_PickJoint,
+	eCM_PlugPosition,
+	eCM_PlugScale,
+	eCM_PlugRotation,
+	eCM_PlugFXPosition0,
+	eCM_PlugFXPosition1,
+	eCM_PlugFXPosition2,
+	eCM_PlugFXPosition3,
+	eCM_PlugFXPosition4,
+	eCM_PlugFXPosition5,
+	eCM_PlugFXPosition6,
+	eCM_PlugFXPosition7
+};
 
 class CN3CEView : public CView
 {
@@ -43,32 +50,33 @@ public:
 
 	e_CursorMode m_eCursorMode;
 
-	CN3Transform*	m_pFXPosTransform;
-	CPosDummy*		m_pPosDummy;
+	CN3Transform* m_pFXPosTransform;
+	CPosDummy* m_pPosDummy;
 
 protected: // create from serialization only
 	CN3CEView();
 	DECLARE_DYNCREATE(CN3CEView)
 
-// Attributes
+	// Attributes
 public:
-	CN3CEDoc*	GetDocument();
+	CN3CEDoc* GetDocument();
 
-// Operations
+	// Operations
 public:
 	void InitFXPos();
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CN3CEView)
-	public:
-	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
+public:
+	virtual void OnDraw(CDC* pDC); // overridden to draw this view
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual DROPEFFECT OnDragEnter(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
 	virtual void OnDragLeave();
 	virtual DROPEFFECT OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
 	virtual BOOL OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point);
-	protected:
+
+protected:
 	virtual void OnInitialUpdate(); // called first time after construct
 	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
 	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
@@ -77,7 +85,7 @@ public:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	void UpdateAllInfo();
 	void SetCameraToDefault();
@@ -88,8 +96,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CN3CEView)
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
@@ -106,9 +113,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-#ifndef _DEBUG  // debug version in N3CEView.cpp
+#ifndef _DEBUG // debug version in N3CEView.cpp
 inline CN3CEDoc* CN3CEView::GetDocument()
-   { return (CN3CEDoc*)m_pDocument; }
+{
+	return (CN3CEDoc*) m_pDocument;
+}
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

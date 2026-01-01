@@ -7,13 +7,11 @@ using test::ExpectVector4Near;
 class Vector4Test : public ::testing::Test
 {
 protected:
-	static constexpr float Projection[4][4] =
-	{
-		{ 1.07111096f,    0.000000000f,  0.000000000f, 0.000000000f },
-		{ 0.000000000f,   1.42814803f,   0.000000000f, 0.000000000f },
-		{ 0.000000000f,   0.000000000f,  1.00108361f,  1.00000000f  },
-		{ 0.000000000f,   0.000000000f, -0.500541806f, 0.000000000f }
-	};
+	static constexpr float Projection[4][4] = { { 1.07111096f, 0.000000000f, 0.000000000f,
+													0.000000000f },
+		{ 0.000000000f, 1.42814803f, 0.000000000f, 0.000000000f },
+		{ 0.000000000f, 0.000000000f, 1.00108361f, 1.00000000f },
+		{ 0.000000000f, 0.000000000f, -0.500541806f, 0.000000000f } };
 
 	__Matrix44 mtxProjection;
 
@@ -82,7 +80,7 @@ TEST_F(Vector4Test, Set_Floats_MatchesReference)
 TEST_F(Vector4Test, Transform_MatchesReferenceWithinTolerance)
 {
 	const __Vector4 expectedVector = { 68.5511017f, 182.802948f, 255.776855f, 256.0f };
-	const __Vector3 inputVec = { 64.0f, 128.0f, 256.0f };
+	const __Vector3 inputVec       = { 64.0f, 128.0f, 256.0f };
 
 	SCOPED_TRACE("__Vector4::Transform(const __Vector3&, const __Matrix44&)");
 
@@ -94,8 +92,8 @@ TEST_F(Vector4Test, Transform_MatchesReferenceWithinTolerance)
 TEST_F(Vector4Test, AddAssign_Vector4_MatchesReference)
 {
 	const __Vector4 expectedVec = { 80.0f, 160.0f, 320.0f, 640.0f };
-	const __Vector4 lhsVec = { 64.0f, 128.0f, 256.0f, 512.0f };
-	const __Vector4 rhsVec = { 16.0f, 32.0f, 64.0f, 128.0f };
+	const __Vector4 lhsVec      = { 64.0f, 128.0f, 256.0f, 512.0f };
+	const __Vector4 rhsVec      = { 16.0f, 32.0f, 64.0f, 128.0f };
 
 	SCOPED_TRACE("__Vector4::operator+=(const __Vector4&)");
 
@@ -107,8 +105,8 @@ TEST_F(Vector4Test, AddAssign_Vector4_MatchesReference)
 TEST_F(Vector4Test, SubtractAssign_Vector4_MatchesReference)
 {
 	const __Vector4 expectedVec = { 48.0f, 96.0f, 192.0f, 384.0f };
-	const __Vector4 lhsVec = { 64.0f, 128.0f, 256.0f, 512.0f };
-	const __Vector4 rhsVec = { 16.0f, 32.0f, 64.0f, 128.0f };
+	const __Vector4 lhsVec      = { 64.0f, 128.0f, 256.0f, 512.0f };
+	const __Vector4 rhsVec      = { 16.0f, 32.0f, 64.0f, 128.0f };
 
 	SCOPED_TRACE("__Vector4::operator-=(const __Vector4&)");
 
@@ -119,10 +117,10 @@ TEST_F(Vector4Test, SubtractAssign_Vector4_MatchesReference)
 
 TEST_F(Vector4Test, MultiplyAssign_Float_MatchesReference)
 {
-	constexpr float Delta = 128.0f;
+	constexpr float Delta       = 128.0f;
 
 	const __Vector4 expectedVec = { 8192.0f, 16384.0f, 32768.0f, 65536.0f };
-	const __Vector4 lhsVec = { 64.0f, 128.0f, 256.0f, 512.0f };
+	const __Vector4 lhsVec      = { 64.0f, 128.0f, 256.0f, 512.0f };
 
 	SCOPED_TRACE("__Vector4::operator*=(float)");
 
@@ -133,10 +131,10 @@ TEST_F(Vector4Test, MultiplyAssign_Float_MatchesReference)
 
 TEST_F(Vector4Test, DivideAssign_Float_MatchesReference)
 {
-	constexpr float Delta = 128.0f;
+	constexpr float Delta       = 128.0f;
 
 	const __Vector4 expectedVec = { 64.0f, 128.0f, 256.0f, 512.0f };
-	const __Vector4 lhsVec = { 8192.0f, 16384.0f, 32768.0f, 65536.0f };
+	const __Vector4 lhsVec      = { 8192.0f, 16384.0f, 32768.0f, 65536.0f };
 
 	SCOPED_TRACE("__Vector4::operator/=(float)");
 
@@ -148,8 +146,8 @@ TEST_F(Vector4Test, DivideAssign_Float_MatchesReference)
 TEST_F(Vector4Test, Add_Vector4_MatchesReference)
 {
 	const __Vector4 expectedVec = { 80.0f, 160.0f, 320.0f, 640.0f };
-	const __Vector4 lhsVec = { 64.0f, 128.0f, 256.0f, 512.0f };
-	const __Vector4 rhsVec = { 16.0f, 32.0f, 64.0f, 128.0f };
+	const __Vector4 lhsVec      = { 64.0f, 128.0f, 256.0f, 512.0f };
+	const __Vector4 rhsVec      = { 16.0f, 32.0f, 64.0f, 128.0f };
 
 	SCOPED_TRACE("__Vector4::operator+(const __Vector4&)");
 
@@ -160,8 +158,8 @@ TEST_F(Vector4Test, Add_Vector4_MatchesReference)
 TEST_F(Vector4Test, Subtract_Vector4_MatchesReference)
 {
 	const __Vector4 expectedVec = { 48.0f, 96.0f, 192.0f, 384.0f };
-	const __Vector4 lhsVec = { 64.0f, 128.0f, 256.0f, 512.0f };
-	const __Vector4 rhsVec = { 16.0f, 32.0f, 64.0f, 128.0f };
+	const __Vector4 lhsVec      = { 64.0f, 128.0f, 256.0f, 512.0f };
+	const __Vector4 rhsVec      = { 16.0f, 32.0f, 64.0f, 128.0f };
 
 	SCOPED_TRACE("__Vector4::operator+(const __Vector4&)");
 
@@ -171,10 +169,10 @@ TEST_F(Vector4Test, Subtract_Vector4_MatchesReference)
 
 TEST_F(Vector4Test, Multiply_Float_MatchesReference)
 {
-	constexpr float Delta = 128.0f;
+	constexpr float Delta       = 128.0f;
 
 	const __Vector4 expectedVec = { 8192.0f, 16384.0f, 32768.0f, 65536.0f };
-	const __Vector4 lhsVec = { 64.0f, 128.0f, 256.0f, 512.0f };
+	const __Vector4 lhsVec      = { 64.0f, 128.0f, 256.0f, 512.0f };
 
 	SCOPED_TRACE("__Vector4::operator*(float)");
 
@@ -184,10 +182,10 @@ TEST_F(Vector4Test, Multiply_Float_MatchesReference)
 
 TEST_F(Vector4Test, Divide_Float_MatchesReference)
 {
-	constexpr float Delta = 128.0f;
+	constexpr float Delta       = 128.0f;
 
 	const __Vector4 expectedVec = { 64.0f, 128.0f, 256.0f, 512.0f };
-	const __Vector4 lhsVec = { 8192.0f, 16384.0f, 32768.0f, 65536.0f };
+	const __Vector4 lhsVec      = { 8192.0f, 16384.0f, 32768.0f, 65536.0f };
 
 	SCOPED_TRACE("__Vector4::operator/(float)");
 

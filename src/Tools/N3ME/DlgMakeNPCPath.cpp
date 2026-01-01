@@ -18,23 +18,21 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgMakeNPCPath dialog
 
-
-CDlgMakeNPCPath::CDlgMakeNPCPath(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgMakeNPCPath::IDD, pParent)
+CDlgMakeNPCPath::CDlgMakeNPCPath(CWnd* pParent /*=nullptr*/) :
+	CDialog(CDlgMakeNPCPath::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgMakeNPCPath)
-	m_NumNPC = 0;
-	m_iRegenTime = 0;
+	m_NumNPC          = 0;
+	m_iRegenTime      = 0;
 	m_PathSetFileName = _T("");
-	m_State = -1;
-	m_strNPCPathName = _T("");
-	m_ViewNonMove = -1;
-	m_fTransX = 0.0f;
-	m_fTransZ = 0.0f;
-	m_pSelPath = nullptr;
+	m_State           = -1;
+	m_strNPCPathName  = _T("");
+	m_ViewNonMove     = -1;
+	m_fTransX         = 0.0f;
+	m_fTransZ         = 0.0f;
+	m_pSelPath        = nullptr;
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgMakeNPCPath::DoDataExchange(CDataExchange* pDX)
 {
@@ -61,64 +59,63 @@ void CDlgMakeNPCPath::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgMakeNPCPath, CDialog)
-	//{{AFX_MSG_MAP(CDlgMakeNPCPath)
-	ON_EN_CHANGE(IDC_EDIT_NUM_NPC, OnChangeEditNumNpc)
-	ON_CBN_SELCHANGE(IDC_COMBO_NPC, OnSelchangeComboNpc)
-	ON_BN_CLICKED(IDC_BTN_RECORD, OnBtnRecord)
-	ON_BN_CLICKED(IDC_RDO_START_RGN, OnRdoStartRgn)
-	ON_BN_CLICKED(IDC_RDO_MAKE_PATH, OnRdoMakePath)
-	ON_EN_CHANGE(IDC_EDIT_REGENTIME, OnChangeEditRegentime)
-	ON_CBN_SELCHANGE(IDC_COMBO_ACTIONTYPE, OnSelchangeComboActiontype)
-	ON_BN_CLICKED(IDC_BTN_LOAD_PATHSET, OnBtnLoadPathset)
-	ON_BN_CLICKED(IDC_BTN_SAVE_PATHSET, OnBtnSavePathset)
-	ON_BN_CLICKED(IDC_BTN_SAVE_SERVER_PATHSET, OnBtnSaveServerPathset)
-	ON_BN_CLICKED(IDC_BTN_PATH_DELETE, OnBtnPathDelete)
-	ON_BN_CLICKED(IDC_BTN_PATH_MODIFY, OnBtnPathModify)
-	ON_LBN_SELCHANGE(IDC_LIST_NPCPATH, OnSelchangeListNpcpath)
-	ON_EN_CHANGE(IDC_EDT_NPCPATHNAME, OnChangeEdtNpcpathname)
-	ON_BN_CLICKED(IDC_RDO_VIEW_NONE, OnRdoViewNone)
-	ON_BN_CLICKED(IDC_RDO_VIEW_NONMOVE, OnRdoViewNonmove)
-	ON_BN_CLICKED(IDC_BTN_SETCOLOR, OnBtnSetcolor)
-	ON_BN_CLICKED(IDC_BTN_LOAD_NPCLIST, OnBtnLoadNpclist)
-	ON_BN_CLICKED(IDC_BTN_TRANS, OnBtnTrans)
-	ON_BN_CLICKED(IDC_RDO_MAKE_ACT_RGN, OnRdoMakeActRgn)
-	ON_BN_CLICKED(IDC_BTN_LOAD_CREATE, OnBtnLoadCreate)
-	ON_BN_CLICKED(IDC_BTN_LOAD_GROUP, OnBtnLoadGroup)
-	ON_BN_CLICKED(IDC_BTN_LOAD_REGEN, OnBtnLoadRegen)
-	ON_CBN_SELCHANGE(IDC_COMBO_NPC_ATTR_CREATE, OnSelchangeComboNpcAttrCreate)
-	ON_CBN_SELCHANGE(IDC_COMBO_NPC_ATTR_GROUP, OnSelchangeComboNpcAttrGroup)
-	ON_CBN_SELCHANGE(IDC_COMBO_NPC_ATTR_REGEN, OnSelchangeComboNpcAttrRegen)
-	ON_BN_CLICKED(IDC_BTN_LOAD_OPTION, OnBtnLoadOption)
-	ON_CBN_SELCHANGE(IDC_COMBO_NPC_OPTION, OnSelchangeComboNpcOption)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgMakeNPCPath)
+ON_EN_CHANGE(IDC_EDIT_NUM_NPC, OnChangeEditNumNpc)
+ON_CBN_SELCHANGE(IDC_COMBO_NPC, OnSelchangeComboNpc)
+ON_BN_CLICKED(IDC_BTN_RECORD, OnBtnRecord)
+ON_BN_CLICKED(IDC_RDO_START_RGN, OnRdoStartRgn)
+ON_BN_CLICKED(IDC_RDO_MAKE_PATH, OnRdoMakePath)
+ON_EN_CHANGE(IDC_EDIT_REGENTIME, OnChangeEditRegentime)
+ON_CBN_SELCHANGE(IDC_COMBO_ACTIONTYPE, OnSelchangeComboActiontype)
+ON_BN_CLICKED(IDC_BTN_LOAD_PATHSET, OnBtnLoadPathset)
+ON_BN_CLICKED(IDC_BTN_SAVE_PATHSET, OnBtnSavePathset)
+ON_BN_CLICKED(IDC_BTN_SAVE_SERVER_PATHSET, OnBtnSaveServerPathset)
+ON_BN_CLICKED(IDC_BTN_PATH_DELETE, OnBtnPathDelete)
+ON_BN_CLICKED(IDC_BTN_PATH_MODIFY, OnBtnPathModify)
+ON_LBN_SELCHANGE(IDC_LIST_NPCPATH, OnSelchangeListNpcpath)
+ON_EN_CHANGE(IDC_EDT_NPCPATHNAME, OnChangeEdtNpcpathname)
+ON_BN_CLICKED(IDC_RDO_VIEW_NONE, OnRdoViewNone)
+ON_BN_CLICKED(IDC_RDO_VIEW_NONMOVE, OnRdoViewNonmove)
+ON_BN_CLICKED(IDC_BTN_SETCOLOR, OnBtnSetcolor)
+ON_BN_CLICKED(IDC_BTN_LOAD_NPCLIST, OnBtnLoadNpclist)
+ON_BN_CLICKED(IDC_BTN_TRANS, OnBtnTrans)
+ON_BN_CLICKED(IDC_RDO_MAKE_ACT_RGN, OnRdoMakeActRgn)
+ON_BN_CLICKED(IDC_BTN_LOAD_CREATE, OnBtnLoadCreate)
+ON_BN_CLICKED(IDC_BTN_LOAD_GROUP, OnBtnLoadGroup)
+ON_BN_CLICKED(IDC_BTN_LOAD_REGEN, OnBtnLoadRegen)
+ON_CBN_SELCHANGE(IDC_COMBO_NPC_ATTR_CREATE, OnSelchangeComboNpcAttrCreate)
+ON_CBN_SELCHANGE(IDC_COMBO_NPC_ATTR_GROUP, OnSelchangeComboNpcAttrGroup)
+ON_CBN_SELCHANGE(IDC_COMBO_NPC_ATTR_REGEN, OnSelchangeComboNpcAttrRegen)
+ON_BN_CLICKED(IDC_BTN_LOAD_OPTION, OnBtnLoadOption)
+ON_CBN_SELCHANGE(IDC_COMBO_NPC_OPTION, OnSelchangeComboNpcOption)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgMakeNPCPath message handlers
 
-void CDlgMakeNPCPath::OnOK() 
+void CDlgMakeNPCPath::OnOK()
 {
 	// TODO: Add extra validation here
 	//CDialog::OnOK();
 }
 
-BOOL CDlgMakeNPCPath::OnInitDialog() 
+BOOL CDlgMakeNPCPath::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	
+
 	// TODO: Add extra initialization here
 
 	m_NPCList.ResetContent();
 	m_ListPathGroup.ResetContent();
 	m_ActTypeList.ResetContent();
-	
+
 	m_AttrRegenList.ResetContent();
 	m_AttrGroupList.ResetContent();
 	m_AttrCreateList.ResetContent();
 	m_OptionList.ResetContent();
-	
+
 	int idx = m_AttrRegenList.AddString("NONE");
 	m_AttrRegenList.SetItemData(idx, 0);
 
@@ -130,39 +127,41 @@ BOOL CDlgMakeNPCPath::OnInitDialog()
 
 	idx = m_OptionList.AddString("NONE");
 	m_OptionList.SetItemData(idx, 0);
-	
-	char szLine[512] = "", szID[80] = "", szBuff[4][80] = {"", "", "", ""};
+
+	char szLine[512] = "", szID[80] = "", szBuff[4][80] = { "", "", "", "" };
 	char szName[512] = "";
-	
+
 	//NPC종류에 관한 정의...
 	char szNpcFileName[MAX_PATH];
 	wsprintf(szNpcFileName, "npclist\\npclist.txt");
 	FILE* stream = fopen(szNpcFileName, "r");
-	if(stream)
+	if (stream)
 	{
 		//int result;
-		while(true)
+		while (true)
 		{
 			int id;
 			char* pResult = fgets(szLine, 512, stream);
-			if(pResult)
+			if (pResult)
 			{
-				sprintf(szID,"");
-				sprintf(szBuff[0],"");
-				sprintf(szBuff[1],"");
-				sprintf(szBuff[2],"");
-				sprintf(szBuff[3],"");
+				sprintf(szID, "");
+				sprintf(szBuff[0], "");
+				sprintf(szBuff[1], "");
+				sprintf(szBuff[2], "");
+				sprintf(szBuff[3], "");
 				sscanf(szLine, "%s %s %s %s %s", szID, szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
-				
+
 				id = atoi(szID);
-				if(id==0) continue;
-				sprintf(szName,"%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
-				
+				if (id == 0)
+					continue;
+				sprintf(szName, "%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
+
 				idx = m_NPCList.AddString(szName);
 				m_NPCList.SetItemData(idx, (DWORD_PTR) id);
 				//m_NPCList.SetCurSel(0);
 			}
-			else break;
+			else
+				break;
 		}
 		fclose(stream);
 	}
@@ -170,137 +169,137 @@ BOOL CDlgMakeNPCPath::OnInitDialog()
 	//NPC움직임에 관한 정의..
 	wsprintf(szNpcFileName, "npclist\\npcacttypelist.txt");
 	stream = fopen(szNpcFileName, "r");
-	if(stream)
+	if (stream)
 	{
 		//int result;
-		while(true)
+		while (true)
 		{
 			int id;
 			char* pResult = fgets(szLine, 512, stream);
-			if(pResult)
+			if (pResult)
 			{
-				sprintf(szID,"");
-				sprintf(szBuff[0],"");
-				sprintf(szBuff[1],"");
-				sprintf(szBuff[2],"");
-				sprintf(szBuff[3],"");
+				sprintf(szID, "");
+				sprintf(szBuff[0], "");
+				sprintf(szBuff[1], "");
+				sprintf(szBuff[2], "");
+				sprintf(szBuff[3], "");
 				sscanf(szLine, "%s %s %s %s %s", szID, szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
 
 				id = atoi(szID);
-				sprintf(szName,"%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
-				
+				sprintf(szName, "%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
+
 				int idx = m_ActTypeList.AddString(szName);
 				m_ActTypeList.SetItemData(idx, (DWORD_PTR) id);
 			}
-			else break;
+			else
+				break;
 		}
 		fclose(stream);
 	}
 
 	m_NPCList.SetCurSel(0);
 	m_NPCList.GetLBText(0, m_strSelNPCName);
-	m_iSelNPCID = (int)m_NPCList.GetItemData(0);
+	m_iSelNPCID = (int) m_NPCList.GetItemData(0);
 
 	//m_ActTypeList.AddString("움직이는");
 	//m_ActTypeList.AddString("안움직이는");
 	m_ActTypeList.SetCurSel(0);
-	m_iSelActType = (int)m_ActTypeList.GetItemData(0);
+	m_iSelActType = (int) m_ActTypeList.GetItemData(0);
 
-	m_NumNPC = 10;
-	m_State = 0;
-	m_iRegenTime = 1;
+	m_NumNPC      = 10;
+	m_State       = 0;
+	m_iRegenTime  = 1;
 	m_PathSetFileName.Empty();
 
 	m_pSelPath = nullptr;
 	m_strNPCPathName.Format("noname0000");
 
 	SetNumPoint(0);
-	
+
 	UpdateData(FALSE);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE; // return TRUE unless you set the focus to a control
+				 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void CDlgMakeNPCPath::OnChangeEditNumNpc() 
+void CDlgMakeNPCPath::OnChangeEditNumNpc()
 {
 	UpdateData(TRUE);
 }
 
-void CDlgMakeNPCPath::OnSelchangeComboNpc() 
+void CDlgMakeNPCPath::OnSelchangeComboNpc()
 {
-	int idx = m_NPCList.GetCurSel();
-	m_iSelNPCID = (int)m_NPCList.GetItemData(idx);
-	m_NPCList.GetLBText(idx, m_strSelNPCName);	
+	int idx     = m_NPCList.GetCurSel();
+	m_iSelNPCID = (int) m_NPCList.GetItemData(idx);
+	m_NPCList.GetLBText(idx, m_strSelNPCName);
 }
 
-void CDlgMakeNPCPath::OnBtnRecord() 
+void CDlgMakeNPCPath::OnBtnRecord()
 {
 	CNPCPath* pPath = m_pRefNPCPathMgr->m_pCurrPath;
-	int idx = 0;
-	if(pPath)
+	int idx         = 0;
+	if (pPath)
 	{
-		strcpy(pPath->m_strPathName, (LPCTSTR)m_strNPCPathName);
+		strcpy(pPath->m_strPathName, (LPCTSTR) m_strNPCPathName);
 		idx = m_ListPathGroup.AddString(m_strNPCPathName);
-		m_ListPathGroup.SetItemDataPtr(idx, m_pRefNPCPathMgr->m_pCurrPath); 
-		m_pRefNPCPathMgr->UpdatePath();		
+		m_ListPathGroup.SetItemDataPtr(idx, m_pRefNPCPathMgr->m_pCurrPath);
+		m_pRefNPCPathMgr->UpdatePath();
 	}
 	m_State = 0;
-	m_strNPCPathName.Format("noname%04d", (idx+1));
+	m_strNPCPathName.Format("noname%04d", (idx + 1));
 	UpdateData(FALSE);
-
 }
 
-void CDlgMakeNPCPath::OnRdoStartRgn() 
+void CDlgMakeNPCPath::OnRdoStartRgn()
 {
-	m_State = 0;		
+	m_State = 0;
 }
 
-void CDlgMakeNPCPath::OnRdoMakePath() 
+void CDlgMakeNPCPath::OnRdoMakePath()
 {
 	m_State = 1;
 }
 
-void CDlgMakeNPCPath::OnRdoMakeActRgn() 
+void CDlgMakeNPCPath::OnRdoMakeActRgn()
 {
-	m_State = 2;	
+	m_State = 2;
 }
 
-void CDlgMakeNPCPath::OnChangeEditRegentime() 
+void CDlgMakeNPCPath::OnChangeEditRegentime()
 {
-	UpdateData(TRUE);	
+	UpdateData(TRUE);
 }
 
-void CDlgMakeNPCPath::OnSelchangeComboActiontype() 
+void CDlgMakeNPCPath::OnSelchangeComboActiontype()
 {
-	int idx = m_ActTypeList.GetCurSel();
+	int idx       = m_ActTypeList.GetCurSel();
 	m_iSelActType = static_cast<int>(m_ActTypeList.GetItemData(idx));
 }
 
-void CDlgMakeNPCPath::OnBtnLoadPathset() 
+void CDlgMakeNPCPath::OnBtnLoadPathset()
 {
 	CDlgLoadNPCPath dlg;
 
 	m_pSelPath = nullptr;
-	
-	if(dlg.DoModal()==IDOK)
+
+	if (dlg.DoModal() == IDOK)
 	{
-		m_pRefNPCPathMgr->LoadFromFile((LPCTSTR)dlg.m_SelFileName);
+		m_pRefNPCPathMgr->LoadFromFile((LPCTSTR) dlg.m_SelFileName);
 		m_PathSetFileName = dlg.m_SelFileName + ".npi";
 
 		m_ListPathGroup.ResetContent();
 
 		int size = m_pRefNPCPathMgr->GetSize();
 		CNPCPath* pPath;
-		for(int i=0;i<size;i++)
+		for (int i = 0; i < size; i++)
 		{
 			pPath = m_pRefNPCPathMgr->GetpPath(i);
-			if(pPath)
+			if (pPath)
 			{
 				__Vector3 vs, ve;
 				pPath->GetPath(0, &vs);
-				pPath->GetPath(pPath->GetSize()-1, &ve);
-								
+				pPath->GetPath(pPath->GetSize() - 1, &ve);
+
 				int idx = m_ListPathGroup.AddString(pPath->m_strPathName);
 				m_ListPathGroup.SetItemDataPtr(idx, pPath);
 			}
@@ -309,51 +308,53 @@ void CDlgMakeNPCPath::OnBtnLoadPathset()
 	}
 }
 
-void CDlgMakeNPCPath::OnBtnSavePathset() 
+void CDlgMakeNPCPath::OnBtnSavePathset()
 {
 	CDlgSaveNPCPath dlg;
 
-	if(dlg.DoModal()==IDOK)
+	if (dlg.DoModal() == IDOK)
 	{
 		m_PathSetFileName = dlg.m_NewFileName + ".npi";
-		m_pRefNPCPathMgr->SaveToFile((LPCTSTR)dlg.m_NewFileName);
+		m_pRefNPCPathMgr->SaveToFile((LPCTSTR) dlg.m_NewFileName);
 		UpdateData(FALSE);
-	}	
-}
-
-void CDlgMakeNPCPath::OnBtnSaveServerPathset() 
-{
-	CFileDialog dlg(FALSE, "snr", "Noname", OFN_EXPLORER | OFN_LONGNAMES | OFN_OVERWRITEPROMPT, "서버 NPC Route파일(*.snr)|*.snr||");
-
-	if(dlg.DoModal()==IDOK)
-	{
-		CString str = dlg.GetPathName();
-		m_pRefNPCPathMgr->MakeServerDataFile((LPCTSTR)str);
 	}
 }
 
-void CDlgMakeNPCPath::OnBtnPathDelete() 
+void CDlgMakeNPCPath::OnBtnSaveServerPathset()
 {
-	int idx = m_ListPathGroup.GetCurSel();
-	CNPCPath* pPath = (CNPCPath*)m_ListPathGroup.GetItemDataPtr(idx);
+	CFileDialog dlg(FALSE, "snr", "Noname", OFN_EXPLORER | OFN_LONGNAMES | OFN_OVERWRITEPROMPT,
+		"서버 NPC Route파일(*.snr)|*.snr||");
+
+	if (dlg.DoModal() == IDOK)
+	{
+		CString str = dlg.GetPathName();
+		m_pRefNPCPathMgr->MakeServerDataFile((LPCTSTR) str);
+	}
+}
+
+void CDlgMakeNPCPath::OnBtnPathDelete()
+{
+	int idx         = m_ListPathGroup.GetCurSel();
+	CNPCPath* pPath = (CNPCPath*) m_ListPathGroup.GetItemDataPtr(idx);
 	m_ListPathGroup.DeleteString(idx);
-	if(pPath)
+	if (pPath)
 	{
 		m_pRefNPCPathMgr->DelPath(pPath);
 	}
 	m_pSelPath = nullptr;
 }
 
-void CDlgMakeNPCPath::OnBtnPathModify() 
+void CDlgMakeNPCPath::OnBtnPathModify()
 {
 	int idx = m_ListPathGroup.GetCurSel();
-	if(idx<0) return;
+	if (idx < 0)
+		return;
 
 	m_ListPathGroup.GetText(idx, m_strNPCPathName);
-	CNPCPath* pPath = (CNPCPath*)m_ListPathGroup.GetItemDataPtr(idx);
+	CNPCPath* pPath = (CNPCPath*) m_ListPathGroup.GetItemDataPtr(idx);
 
 	m_ListPathGroup.DeleteString(idx);
-	if(pPath)
+	if (pPath)
 	{
 		m_pRefNPCPathMgr->SetCurrPath(pPath);
 	}
@@ -361,31 +362,31 @@ void CDlgMakeNPCPath::OnBtnPathModify()
 	//
 	m_iSelActType = pPath->m_iActType;
 	int i;
-	for(i=0;i<m_ActTypeList.GetCount(); i++)
+	for (i = 0; i < m_ActTypeList.GetCount(); i++)
 	{
-		int id = (int)m_ActTypeList.GetItemData(i);
-		if(id==m_iSelActType)
+		int id = (int) m_ActTypeList.GetItemData(i);
+		if (id == m_iSelActType)
 		{
-			m_ActTypeList.SetCurSel(i);			
+			m_ActTypeList.SetCurSel(i);
 			break;
 		}
 	}
-	
+
 	m_iRegenTime = pPath->m_iRegenTime;
 
-	m_iSelNPCID = pPath->m_iNPCID;
-	
-	for(i=0;i<m_NPCList.GetCount(); i++)
+	m_iSelNPCID  = pPath->m_iNPCID;
+
+	for (i = 0; i < m_NPCList.GetCount(); i++)
 	{
-		int id = (int)m_NPCList.GetItemData(i);
-		if(id==m_iSelNPCID)
+		int id = (int) m_NPCList.GetItemData(i);
+		if (id == m_iSelNPCID)
 		{
 			m_NPCList.SetCurSel(i);
 			m_NPCList.GetLBText(i, m_strSelNPCName);
 			break;
 		}
 	}
-	if(i==m_NPCList.GetCount())
+	if (i == m_NPCList.GetCount())
 	{
 		ZeroMemory(m_strSelNPCName, 80);
 		m_NPCList.SetCurSel(-1);
@@ -393,10 +394,10 @@ void CDlgMakeNPCPath::OnBtnPathModify()
 
 	m_cSelAttrRegen = pPath->m_cAttr_Regen;
 
-	for(i=0;i<m_AttrRegenList.GetCount(); i++)
+	for (i = 0; i < m_AttrRegenList.GetCount(); i++)
 	{
-		unsigned char cId = (int)m_AttrRegenList.GetItemData(i);
-		if(cId==m_cSelAttrRegen)
+		unsigned char cId = (int) m_AttrRegenList.GetItemData(i);
+		if (cId == m_cSelAttrRegen)
 		{
 			m_AttrRegenList.SetCurSel(i);
 			break;
@@ -405,10 +406,10 @@ void CDlgMakeNPCPath::OnBtnPathModify()
 
 	m_cSelAttrGroup = pPath->m_cAttr_Group;
 
-	for(i=0;i<m_AttrGroupList.GetCount(); i++)
+	for (i = 0; i < m_AttrGroupList.GetCount(); i++)
 	{
-		unsigned char cId = (int)m_AttrGroupList.GetItemData(i);
-		if(cId==m_cSelAttrGroup)
+		unsigned char cId = (int) m_AttrGroupList.GetItemData(i);
+		if (cId == m_cSelAttrGroup)
 		{
 			m_AttrGroupList.SetCurSel(i);
 			break;
@@ -417,10 +418,10 @@ void CDlgMakeNPCPath::OnBtnPathModify()
 
 	m_cSelAttrCreate = pPath->m_cAttr_Create;
 
-	for(i=0;i<m_AttrCreateList.GetCount(); i++)
+	for (i = 0; i < m_AttrCreateList.GetCount(); i++)
 	{
-		unsigned char cId = (int)m_AttrCreateList.GetItemData(i);
-		if(cId==m_cSelAttrCreate)
+		unsigned char cId = (int) m_AttrCreateList.GetItemData(i);
+		if (cId == m_cSelAttrCreate)
 		{
 			m_AttrCreateList.SetCurSel(i);
 			break;
@@ -429,29 +430,31 @@ void CDlgMakeNPCPath::OnBtnPathModify()
 
 	m_cSelOption = pPath->m_cAttr_Option;
 
-	for(i=0;i<m_OptionList.GetCount(); i++)
+	for (i = 0; i < m_OptionList.GetCount(); i++)
 	{
-		unsigned char cId = (int)m_OptionList.GetItemData(i);
-		if(cId==m_cSelOption)
+		unsigned char cId = (int) m_OptionList.GetItemData(i);
+		if (cId == m_cSelOption)
 		{
 			m_OptionList.SetCurSel(i);
 			break;
 		}
 	}
 
-	m_NumNPC = pPath->m_iNumNPC;	
+	m_NumNPC = pPath->m_iNumNPC;
 
 	UpdateData(FALSE);
 }
 
-void CDlgMakeNPCPath::OnSelchangeListNpcpath() 
+void CDlgMakeNPCPath::OnSelchangeListNpcpath()
 {
 	int idx = m_ListPathGroup.GetCurSel();
-	if(idx<0) m_pSelPath = nullptr;
-	else m_pSelPath = (CNPCPath*)m_ListPathGroup.GetItemDataPtr(idx);
+	if (idx < 0)
+		m_pSelPath = nullptr;
+	else
+		m_pSelPath = (CNPCPath*) m_ListPathGroup.GetItemDataPtr(idx);
 }
 
-void CDlgMakeNPCPath::OnChangeEdtNpcpathname() 
+void CDlgMakeNPCPath::OnChangeEdtNpcpathname()
 {
 	UpdateData(TRUE);
 }
@@ -463,281 +466,290 @@ void CDlgMakeNPCPath::SetNumPoint(int NumPoint)
 	SetDlgItemText(IDC_NUM_POINT, NumP);
 }
 
-void CDlgMakeNPCPath::OnRdoViewNone() 
+void CDlgMakeNPCPath::OnRdoViewNone()
 {
 	m_pRefNPCPathMgr->m_bRenderMovableRegion = false;
 }
 
-void CDlgMakeNPCPath::OnRdoViewNonmove() 
+void CDlgMakeNPCPath::OnRdoViewNonmove()
 {
-	m_pRefNPCPathMgr->m_bRenderMovableRegion = true;	
+	m_pRefNPCPathMgr->m_bRenderMovableRegion = true;
 }
 
-void CDlgMakeNPCPath::OnBtnSetcolor() 
+void CDlgMakeNPCPath::OnBtnSetcolor()
 {
 	CColorDialog dlg;
 	DWORD dwColor = 0xff0000ff;
-	if(dlg.DoModal()==IDOK)
+	if (dlg.DoModal() == IDOK)
 	{
 		COLORREF color = dlg.GetColor();
-		DWORD r,g,b;
-		r = (color<<24)>>8;
-		g = ((color>>8)<<24)>>16;
-		b = ((color>>16)<<24)>>24;
-		dwColor = 0xff000000;
+		DWORD r, g, b;
+		r        = (color << 24) >> 8;
+		g        = ((color >> 8) << 24) >> 16;
+		b        = ((color >> 16) << 24) >> 24;
+		dwColor  = 0xff000000;
 		dwColor += r;
 		dwColor += g;
 		dwColor += b;
 	}
-	if(m_pRefNPCPathMgr->m_pCurrPath)
+	if (m_pRefNPCPathMgr->m_pCurrPath)
 	{
 		m_pRefNPCPathMgr->m_pCurrPath->m_dwColor = dwColor;
 	}
 }
 
-void CDlgMakeNPCPath::OnBtnLoadNpclist() 
+void CDlgMakeNPCPath::OnBtnLoadNpclist()
 {
 	m_NPCList.ResetContent();
 
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
 	CFileDialog dlg(TRUE, "txt", nullptr, dwFlags, "NPCList file(*.txt)|*.txt||", nullptr);
-	if(dlg.DoModal() == IDCANCEL) return;
+	if (dlg.DoModal() == IDCANCEL)
+		return;
 
 	CString szNpcFileName = dlg.GetPathName();
 
-	char szLine[512] = "", szID[80] = "", szBuff[4][80] = {"", "", "", ""};
+	char szLine[512] = "", szID[80] = "", szBuff[4][80] = { "", "", "", "" };
 	char szName[512] = "";
 
-	FILE* stream = fopen((LPCTSTR)szNpcFileName, "r");
-	if(stream)
+	FILE* stream     = fopen((LPCTSTR) szNpcFileName, "r");
+	if (stream)
 	{
 		//int result;
-		while(true)
+		while (true)
 		{
 			int id;
 			char* pResult = fgets(szLine, 512, stream);
-			if(pResult)
+			if (pResult)
 			{
-				sprintf(szID,"");
-				sprintf(szBuff[0],"");
-				sprintf(szBuff[1],"");
-				sprintf(szBuff[2],"");
-				sprintf(szBuff[3],"");
+				sprintf(szID, "");
+				sprintf(szBuff[0], "");
+				sprintf(szBuff[1], "");
+				sprintf(szBuff[2], "");
+				sprintf(szBuff[3], "");
 				sscanf(szLine, "%s %s %s %s %s", szID, szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
-				
+
 				id = atoi(szID);
-				sprintf(szName,"%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
-				if(id==0) continue;
+				sprintf(szName, "%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
+				if (id == 0)
+					continue;
 				int idx = m_NPCList.AddString(szName);
 				m_NPCList.SetItemData(idx, (DWORD_PTR) id);
 				m_NPCList.SetCurSel(0);
 			}
-			else break;
+			else
+				break;
 		}
 		fclose(stream);
-	}	
+	}
 }
 
-void CDlgMakeNPCPath::OnBtnTrans() 
+void CDlgMakeNPCPath::OnBtnTrans()
 {
 	UpdateData(TRUE);
 	m_pRefNPCPathMgr->TransPos(m_fTransX, m_fTransZ);
 }
 
-
-
-void CDlgMakeNPCPath::OnBtnLoadCreate() 
+void CDlgMakeNPCPath::OnBtnLoadCreate()
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
 	CFileDialog dlg(TRUE, "txt", nullptr, dwFlags, "Create Attr List file(*.txt)|*.txt||", nullptr);
 
-	if(dlg.DoModal() == IDCANCEL) return;
+	if (dlg.DoModal() == IDCANCEL)
+		return;
 
 	m_AttrCreateList.ResetContent();
 
 	int idx = m_AttrCreateList.AddString("NONE");
 	m_AttrCreateList.SetItemData(idx, 0);
 
-	char szLine[512] = "", szID[80] = "", szBuff[4][80] = {"", "", "", ""};
+	char szLine[512] = "", szID[80] = "", szBuff[4][80] = { "", "", "", "" };
 	char szName[512] = "";
 
-	FILE* stream = fopen((LPCTSTR)dlg.GetPathName(), "r");
-	if(stream)
+	FILE* stream     = fopen((LPCTSTR) dlg.GetPathName(), "r");
+	if (stream)
 	{
-		while(true)
+		while (true)
 		{
 			int id;
 			char* pResult = fgets(szLine, 512, stream);
-			if(pResult)
+			if (pResult)
 			{
-				sprintf(szID,"");
-				sprintf(szBuff[0],"");
-				sprintf(szBuff[1],"");
-				sprintf(szBuff[2],"");
-				sprintf(szBuff[3],"");
+				sprintf(szID, "");
+				sprintf(szBuff[0], "");
+				sprintf(szBuff[1], "");
+				sprintf(szBuff[2], "");
+				sprintf(szBuff[3], "");
 				sscanf(szLine, "%s %s %s %s %s", szID, szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
 
 				id = atoi(szID);
-				sprintf(szName,"%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
-				
+				sprintf(szName, "%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
+
 				int idx = m_AttrCreateList.AddString(szName);
 				m_AttrCreateList.SetItemData(idx, (DWORD_PTR) id);
 			}
-			else break;
+			else
+				break;
 		}
 		fclose(stream);
 	}
 }
 
-void CDlgMakeNPCPath::OnBtnLoadGroup() 
+void CDlgMakeNPCPath::OnBtnLoadGroup()
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
 	CFileDialog dlg(TRUE, "txt", nullptr, dwFlags, "Group Attr List file(*.txt)|*.txt||", nullptr);
 
-	if(dlg.DoModal() == IDCANCEL) return;
+	if (dlg.DoModal() == IDCANCEL)
+		return;
 
 	m_AttrGroupList.ResetContent();
 
 	int idx = m_AttrGroupList.AddString("NONE");
 	m_AttrGroupList.SetItemData(idx, 0);
 
-	char szLine[512] = "", szID[80] = "", szBuff[4][80] = {"", "", "", ""};
+	char szLine[512] = "", szID[80] = "", szBuff[4][80] = { "", "", "", "" };
 	char szName[512] = "";
 
-	FILE* stream = fopen((LPCTSTR)dlg.GetPathName(), "r");
-	if(stream)
+	FILE* stream     = fopen((LPCTSTR) dlg.GetPathName(), "r");
+	if (stream)
 	{
-		while(true)
+		while (true)
 		{
 			int id;
 			char* pResult = fgets(szLine, 512, stream);
-			if(pResult)
+			if (pResult)
 			{
-				sprintf(szID,"");
-				sprintf(szBuff[0],"");
-				sprintf(szBuff[1],"");
-				sprintf(szBuff[2],"");
-				sprintf(szBuff[3],"");
+				sprintf(szID, "");
+				sprintf(szBuff[0], "");
+				sprintf(szBuff[1], "");
+				sprintf(szBuff[2], "");
+				sprintf(szBuff[3], "");
 				sscanf(szLine, "%s %s %s %s %s", szID, szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
 
 				id = atoi(szID);
-				sprintf(szName,"%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
-				
+				sprintf(szName, "%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
+
 				int idx = m_AttrGroupList.AddString(szName);
 				m_AttrGroupList.SetItemData(idx, (DWORD_PTR) id);
 			}
-			else break;
+			else
+				break;
 		}
 		fclose(stream);
 	}
 }
 
-void CDlgMakeNPCPath::OnBtnLoadRegen() 
+void CDlgMakeNPCPath::OnBtnLoadRegen()
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
 	CFileDialog dlg(TRUE, "txt", nullptr, dwFlags, "Regen Attr List file(*.txt)|*.txt||", nullptr);
 
-	if(dlg.DoModal() == IDCANCEL) return;
-	
+	if (dlg.DoModal() == IDCANCEL)
+		return;
+
 	m_AttrRegenList.ResetContent();
 
 	int idx = m_AttrRegenList.AddString("NONE");
 	m_AttrRegenList.SetItemData(idx, 0);
 
-	char szLine[512] = "", szID[80] = "", szBuff[4][80] = {"", "", "", ""};
+	char szLine[512] = "", szID[80] = "", szBuff[4][80] = { "", "", "", "" };
 	char szName[512] = "";
 
-	FILE* stream = fopen((LPCTSTR)dlg.GetPathName(), "r");
-	if(stream)
+	FILE* stream     = fopen((LPCTSTR) dlg.GetPathName(), "r");
+	if (stream)
 	{
-		while(true)
+		while (true)
 		{
 			int id;
 			char* pResult = fgets(szLine, 512, stream);
-			if(pResult)
+			if (pResult)
 			{
-				sprintf(szID,"");
-				sprintf(szBuff[0],"");
-				sprintf(szBuff[1],"");
-				sprintf(szBuff[2],"");
-				sprintf(szBuff[3],"");
+				sprintf(szID, "");
+				sprintf(szBuff[0], "");
+				sprintf(szBuff[1], "");
+				sprintf(szBuff[2], "");
+				sprintf(szBuff[3], "");
 				sscanf(szLine, "%s %s %s %s %s", szID, szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
 
 				id = atoi(szID);
-				sprintf(szName,"%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
-				
+				sprintf(szName, "%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
+
 				int idx = m_AttrRegenList.AddString(szName);
 				m_AttrRegenList.SetItemData(idx, (DWORD_PTR) id);
 			}
-			else break;
+			else
+				break;
 		}
 		fclose(stream);
 	}
 }
 
-void CDlgMakeNPCPath::OnBtnLoadOption() 
+void CDlgMakeNPCPath::OnBtnLoadOption()
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_PATHMUSTEXIST;
 	CFileDialog dlg(TRUE, "txt", nullptr, dwFlags, "Option Attr List file(*.txt)|*.txt||", nullptr);
 
-	if(dlg.DoModal() == IDCANCEL) return;
+	if (dlg.DoModal() == IDCANCEL)
+		return;
 
 	m_OptionList.ResetContent();
 
 	int idx = m_OptionList.AddString("NONE");
 	m_OptionList.SetItemData(idx, 0);
 
-	char szLine[512] = "", szID[80] = "", szBuff[4][80] = {"", "", "", ""};
+	char szLine[512] = "", szID[80] = "", szBuff[4][80] = { "", "", "", "" };
 	char szName[512] = "";
 
-	FILE* stream = fopen((LPCTSTR)dlg.GetPathName(), "r");
-	if(stream)
+	FILE* stream     = fopen((LPCTSTR) dlg.GetPathName(), "r");
+	if (stream)
 	{
-		while(true)
+		while (true)
 		{
 			int id;
 			char* pResult = fgets(szLine, 512, stream);
-			if(pResult)
+			if (pResult)
 			{
-				sprintf(szID,"");
-				sprintf(szBuff[0],"");
-				sprintf(szBuff[1],"");
-				sprintf(szBuff[2],"");
-				sprintf(szBuff[3],"");
+				sprintf(szID, "");
+				sprintf(szBuff[0], "");
+				sprintf(szBuff[1], "");
+				sprintf(szBuff[2], "");
+				sprintf(szBuff[3], "");
 				sscanf(szLine, "%s %s %s %s %s", szID, szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
 
 				id = atoi(szID);
-				sprintf(szName,"%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
-				
+				sprintf(szName, "%s %s %s %s", szBuff[0], szBuff[1], szBuff[2], szBuff[3]);
+
 				int idx = m_OptionList.AddString(szName);
-				m_OptionList.SetItemData(idx, (DWORD)id);
+				m_OptionList.SetItemData(idx, (DWORD) id);
 			}
-			else break;
+			else
+				break;
 		}
 		fclose(stream);
 	}
 }
 
-void CDlgMakeNPCPath::OnSelchangeComboNpcAttrCreate() 
+void CDlgMakeNPCPath::OnSelchangeComboNpcAttrCreate()
 {
-	int idx = m_AttrCreateList.GetCurSel();
-	m_cSelAttrCreate = (unsigned char)m_AttrCreateList.GetItemData(idx);
+	int idx          = m_AttrCreateList.GetCurSel();
+	m_cSelAttrCreate = (unsigned char) m_AttrCreateList.GetItemData(idx);
 }
 
-void CDlgMakeNPCPath::OnSelchangeComboNpcAttrGroup() 
-{	
-	int idx = m_AttrGroupList.GetCurSel();
-	m_cSelAttrGroup = (unsigned char)m_AttrGroupList.GetItemData(idx);
+void CDlgMakeNPCPath::OnSelchangeComboNpcAttrGroup()
+{
+	int idx         = m_AttrGroupList.GetCurSel();
+	m_cSelAttrGroup = (unsigned char) m_AttrGroupList.GetItemData(idx);
 }
 
-void CDlgMakeNPCPath::OnSelchangeComboNpcAttrRegen() 
+void CDlgMakeNPCPath::OnSelchangeComboNpcAttrRegen()
 {
-	int idx = m_AttrRegenList.GetCurSel();
-	m_cSelAttrRegen = (unsigned char)m_AttrRegenList.GetItemData(idx);	
+	int idx         = m_AttrRegenList.GetCurSel();
+	m_cSelAttrRegen = (unsigned char) m_AttrRegenList.GetItemData(idx);
 }
 
-void CDlgMakeNPCPath::OnSelchangeComboNpcOption() 
+void CDlgMakeNPCPath::OnSelchangeComboNpcOption()
 {
-	int idx = m_OptionList.GetCurSel();
-	m_cSelOption = (unsigned char)m_OptionList.GetItemData(idx);	
+	int idx      = m_OptionList.GetCurSel();
+	m_cSelOption = (unsigned char) m_OptionList.GetItemData(idx);
 }

@@ -53,24 +53,24 @@ public:
 	/// Specifies how the audio asset is stored and consumed.
 	/// This is used for runtime identification of class types,
 	/// in lieu of dynamic_cast() (which would require the use of RTTI).
-	e_AudioAssetType	Type		= AUDIO_ASSET_UNKNOWN;
+	e_AudioAssetType Type          = AUDIO_ASSET_UNKNOWN;
 
 	/// Decoder used to convert encoded audio data into PCM samples.
-	e_AudioDecoderType	DecoderType	= AUDIO_DECODER_UNKNOWN;
+	e_AudioDecoderType DecoderType = AUDIO_DECODER_UNKNOWN;
 
 	/// Source filename of the audio asset.
-	std::string			Filename;
+	std::string Filename;
 
 	/// Reference count used to manage shared ownership of the asset.
 	/// Once this hits 0 (i.e. nothing references it), the asset will be
 	/// immediately removed from its pool and unloaded.
-	uint32_t			RefCount	= 0;
+	uint32_t RefCount  = 0;
 
 	/// OpenAL audio format (e.g. AL_FORMAT_MONO16), or -1 if uninitialized.
-	int32_t				AlFormat	= -1;
+	int32_t AlFormat   = -1;
 
 	/// Sample rate of the decoded audio data, in Hz.
-	int32_t				SampleRate	= 0;
+	int32_t SampleRate = 0;
 
 public:
 	/// Loads the audio asset from a file.
@@ -84,7 +84,9 @@ public:
 	virtual bool LoadFromFile(const std::string& filename) = 0;
 
 	/// Virtual destructor to allow safe deletion via base-class pointers.
-	virtual ~AudioAsset() {}
+	virtual ~AudioAsset()
+	{
+	}
 };
 
 /// \class BufferedAudioAsset
@@ -130,13 +132,13 @@ public:
 	///
 	/// The underlying file remains open and memory-mapped for the entire lifetime
 	/// of the streamed audio asset.
-	std::unique_ptr<FileReader>	File;
+	std::unique_ptr<FileReader> File;
 
 	/// Total size of the decoded PCM data, in bytes.
-	size_t						PcmDataSize;
+	size_t PcmDataSize;
 
 	/// Size of each decoded PCM chunk, in bytes.
-	size_t						PcmChunkSize;
+	size_t PcmChunkSize;
 
 	/// Pointer to the start of the decoded PCM data buffer.
 	///
@@ -144,7 +146,7 @@ public:
 	/// AUDIO_DECODER_PCM. The pointer references the beginning of the PCM data
 	/// within the memory-mapped file and remains valid for the lifetime of the
 	/// asset.
-	const uint8_t*				PcmDataBuffer;
+	const uint8_t* PcmDataBuffer;
 
 public:
 	/// Constructs an empty streamed audio asset.

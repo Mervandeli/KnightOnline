@@ -15,15 +15,15 @@ public:
 	void Set(float fx, float fy, float fz, float fw);
 	void Transform(const __Vector3& v, const __Matrix44& m);
 
-	__Vector4& operator += (const __Vector4&);
-	__Vector4& operator -= (const __Vector4&);
-	__Vector4& operator *= (float);
-	__Vector4& operator /= (float);
+	__Vector4& operator+=(const __Vector4&);
+	__Vector4& operator-=(const __Vector4&);
+	__Vector4& operator*=(float);
+	__Vector4& operator/=(float);
 
-	__Vector4 operator + (const __Vector4&) const;
-	__Vector4 operator - (const __Vector4&) const;
-	__Vector4 operator * (float) const;
-	__Vector4 operator / (float) const;
+	__Vector4 operator+(const __Vector4&) const;
+	__Vector4 operator-(const __Vector4&) const;
+	__Vector4 operator*(float) const;
+	__Vector4 operator/(float) const;
 
 public:
 	float x, y, z, w;

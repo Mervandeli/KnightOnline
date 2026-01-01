@@ -11,7 +11,7 @@
 
 #include "TransDummy.h"
 
-class CRotDummy : public CTransDummy  
+class CRotDummy : public CTransDummy
 {
 public:
 	CRotDummy();
@@ -19,10 +19,10 @@ public:
 
 public:
 protected:
-
 public:
 	void SetSelObj(CN3Transform* pObj);
 	virtual BOOL MouseMsgFilter(LPMSG pMsg);
+
 protected:
 };
 

@@ -22,7 +22,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -31,39 +31,41 @@ static char THIS_FILE[]=__FILE__;
 
 CCountableItemEditDlg::CCountableItemEditDlg()
 {
-	m_eCallerWnd = UIWND_UNKNOWN;
+	m_eCallerWnd         = UIWND_UNKNOWN;
 	m_eCallerWndDistrict = UIWND_DISTRICT_UNKNOWN;
-	m_pArea = nullptr;
-	m_pImageOfIcon = nullptr;
-	m_bLocked = false;
-	m_pEdit	= nullptr;
-	m_bWareGold = false;
+	m_pArea              = nullptr;
+	m_pImageOfIcon       = nullptr;
+	m_bLocked            = false;
+	m_pEdit              = nullptr;
+	m_bWareGold          = false;
 
-	m_pBtnOk	 = nullptr;
-	m_pBtnCancel = nullptr;
+	m_pBtnOk             = nullptr;
+	m_pBtnCancel         = nullptr;
 }
 
 CCountableItemEditDlg::~CCountableItemEditDlg()
 {
-
 }
 
 void CCountableItemEditDlg::Release()
 {
 	CN3UIBase::Release();
-
 }
 
 bool CCountableItemEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if(nullptr == pSender) return false;
-	if(IsVisible() == false) return false;
-	if(m_eCallerWnd == UIWND_UNKNOWN) return false;
-	if(m_eCallerWndDistrict == UIWND_DISTRICT_UNKNOWN) return false;
+	if (nullptr == pSender)
+		return false;
+	if (IsVisible() == false)
+		return false;
+	if (m_eCallerWnd == UIWND_UNKNOWN)
+		return false;
+	if (m_eCallerWndDistrict == UIWND_DISTRICT_UNKNOWN)
+		return false;
 
-	if (dwMsg == UIMSG_BUTTON_CLICK)					
+	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
-		if(pSender == m_pBtnOk)
+		if (pSender == m_pBtnOk)
 		{
 			switch (m_eCallerWnd)
 			{
@@ -105,7 +107,7 @@ bool CCountableItemEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			}
 		}
 
-		if(pSender == m_pBtnCancel)
+		if (pSender == m_pBtnCancel)
 		{
 			switch (m_eCallerWnd)
 			{
@@ -177,9 +179,9 @@ void CCountableItemEditDlg::Open(e_UIWND eUW, e_UIWND_DISTRICT eUD, bool bCountG
 	if (pEdit != nullptr)
 		pEdit->SetFocus();
 
-	m_eCallerWnd = eUW;
+	m_eCallerWnd         = eUW;
 	m_eCallerWndDistrict = eUD;
-	m_bWareGold = bWareGold;
+	m_bWareGold          = bWareGold;
 
 	switch (eUW)
 	{
@@ -196,26 +198,27 @@ void CCountableItemEditDlg::Open(e_UIWND eUW, e_UIWND_DISTRICT eUD, bool bCountG
 			break;
 	}
 
-	if ( (eUW == UIWND_TRANSACTION) || (eUW == UIWND_PER_TRADE) || (eUW == UIWND_WARE_HOUSE) )
+	if ((eUW == UIWND_TRANSACTION) || (eUW == UIWND_PER_TRADE) || (eUW == UIWND_WARE_HOUSE))
 	{
-		iCX = (rc.right+rc.left)/2;
-		iCY = (rc.bottom+rc.top)/2;
+		iCX    = (rc.right + rc.left) / 2;
+		iCY    = (rc.bottom + rc.top) / 2;
 		rcThis = GetRegion();
-		SetPos(iCX-(rcThis.right-rcThis.left)/2, iCY-(rcThis.bottom-rcThis.top)/2);
+		SetPos(iCX - (rcThis.right - rcThis.left) / 2, iCY - (rcThis.bottom - rcThis.top) / 2);
 	}
 }
 
 void CCountableItemEditDlg::Close()
 {
 	m_bLocked = false;
-//	SetVisible(false);	//이거 쓰지 말고 SetVisibleWithNoSound 함수 써주세요...
+	//	SetVisible(false);	//이거 쓰지 말고 SetVisibleWithNoSound 함수 써주세요...
 	SetVisibleWithNoSound(false);
 
 	CN3UIEdit* pEdit = GetFocusedEdit();
-	if (pEdit) pEdit->KillFocus();
+	if (pEdit)
+		pEdit->KillFocus();
 }
 
-int	CCountableItemEditDlg::GetQuantity() // "edit_trade" Edit Control 에서 정수값을 얻오온다..
+int CCountableItemEditDlg::GetQuantity() // "edit_trade" Edit Control 에서 정수값을 얻오온다..
 {
 	CN3UIEdit* pEdit = nullptr;
 	N3_VERIFY_UI_COMPONENT(pEdit, GetChildByID<CN3UIEdit>("edit_trade"));
@@ -239,42 +242,43 @@ void CCountableItemEditDlg::SetQuantity(int iQuantity) // "edit_trade" Edit Cont
 void CCountableItemEditDlg::SetVisible(bool bVisible)
 {
 	CN3UIBase::SetVisible(bVisible);
-	if(bVisible)
+	if (bVisible)
 		CGameProcedure::s_pUIMgr->SetVisibleFocusedUI(this);
 	else
-		CGameProcedure::s_pUIMgr->ReFocusUI();//this_ui
+		CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
 }
 
 void CCountableItemEditDlg::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFocus)
 {
-	if(bWork)
-	{//여기서는 ReceiveMessage에서 유아이가 보이는지를 체크를 해서 일단 앞쪽에 둔다.
+	if (bWork)
+	{ //여기서는 ReceiveMessage에서 유아이가 보이는지를 체크를 해서 일단 앞쪽에 둔다.
 		ReceiveMessage(m_pBtnCancel, UIMSG_BUTTON_CLICK);
 	}
-	
+
 	CN3UIBase::SetVisibleWithNoSound(bVisible, bWork, bReFocus);
 }
 
 bool CCountableItemEditDlg::Load(File& file)
 {
-	if(false == CN3UIBase::Load(file)) return false;
+	if (false == CN3UIBase::Load(file))
+		return false;
 
-	N3_VERIFY_UI_COMPONENT(m_pBtnOk,		GetChildByID<CN3UIButton>("btn_ok"));
-	N3_VERIFY_UI_COMPONENT(m_pBtnCancel,	GetChildByID<CN3UIButton>("btn_cancel"));
+	N3_VERIFY_UI_COMPONENT(m_pBtnOk, GetChildByID<CN3UIButton>("btn_ok"));
+	N3_VERIFY_UI_COMPONENT(m_pBtnCancel, GetChildByID<CN3UIButton>("btn_cancel"));
 
 	return true;
 }
 
 bool CCountableItemEditDlg::OnKeyPress(int iKey)
 {
-	switch(iKey)
+	switch (iKey)
 	{
-	case DIK_RETURN:
-		ReceiveMessage(m_pBtnOk, UIMSG_BUTTON_CLICK);
-		return true;
-	case DIK_ESCAPE:
-		ReceiveMessage(m_pBtnCancel, UIMSG_BUTTON_CLICK);
-		return true;
+		case DIK_RETURN:
+			ReceiveMessage(m_pBtnOk, UIMSG_BUTTON_CLICK);
+			return true;
+		case DIK_ESCAPE:
+			ReceiveMessage(m_pBtnCancel, UIMSG_BUTTON_CLICK);
+			return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

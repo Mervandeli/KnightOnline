@@ -17,20 +17,20 @@ class CWall;
 class CMapMng;
 class CDlgMakeWall;
 
-class CWallMgr : public CN3BaseFileAccess  
+class CWallMgr : public CN3BaseFileAccess
 {
 protected:
-	__Vector3			m_BaseCube[8];
-	__VertexXyzColor	m_CubeVB[36];
-	__VertexXyzColor	m_LineVB[2];
-	__VertexXyzColor	m_BoardVB[4];
+	__Vector3 m_BaseCube[8];
+	__VertexXyzColor m_CubeVB[36];
+	__VertexXyzColor m_LineVB[2];
+	__VertexXyzColor m_BoardVB[4];
 
 public:
-	CMapMng*				m_pRefMapMng;				// 지형 참조 포인터..
-	std::list<CWall*>		m_pWalls;					// 벽들...
-	CDlgMakeWall*			m_pDlg;						// path make dialog..
-	bool					m_bActive;					// 이기능이 활성화 되어 있는지...1:활성화, 0:비활성화..
-	CWall*					m_pCurrWall;				// 현재 만들고 있는 벽..or 만들려고 준비한 버퍼..
+	CMapMng* m_pRefMapMng;      // 지형 참조 포인터..
+	std::list<CWall*> m_pWalls; // 벽들...
+	CDlgMakeWall* m_pDlg;       // path make dialog..
+	bool m_bActive;             // 이기능이 활성화 되어 있는지...1:활성화, 0:비활성화..
+	CWall* m_pCurrWall;         // 현재 만들고 있는 벽..or 만들려고 준비한 버퍼..
 
 protected:
 	void MakeLine(__Vector3 sv, __Vector3 ev, D3DCOLOR color);
@@ -48,7 +48,7 @@ public:
 	void SetCurrWall(CWall* pWall);
 	void DelWall(CWall* pWall);
 	CWall* GetpWall(int idx);
-		
+
 	void Render();
 	void UpdateWall();
 	void SetActive(bool active);

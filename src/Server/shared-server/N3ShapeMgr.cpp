@@ -13,7 +13,7 @@
 
 CN3ShapeMgr::__CellSub::__CellSub()
 {
-	nCCPolyCount = 0;
+	nCCPolyCount     = 0;
 	pdwCCVertIndices = nullptr;
 }
 
@@ -40,7 +40,7 @@ CN3ShapeMgr::__CellSub::~__CellSub()
 
 CN3ShapeMgr::__CellMain::__CellMain()
 {
-	nShapeCount = 0;
+	nShapeCount    = 0;
 	pwShapeIndices = nullptr;
 }
 
@@ -69,10 +69,10 @@ CN3ShapeMgr::__CellMain::~__CellMain()
 
 CN3ShapeMgr::CN3ShapeMgr()
 {
-	m_fMapWidth = 0.0f;
-	m_fMapLength = 0.0f;
+	m_fMapWidth           = 0.0f;
+	m_fMapLength          = 0.0f;
 	m_nCollisionFaceCount = 0;
-	m_pvCollisions = nullptr;
+	m_pvCollisions        = nullptr;
 	memset(m_pCells, 0, sizeof(m_pCells));
 }
 
@@ -90,8 +90,8 @@ CN3ShapeMgr::~CN3ShapeMgr()
 
 void CN3ShapeMgr::Release()
 {
-	m_fMapWidth = 0.0f;
-	m_fMapLength = 0.0f;
+	m_fMapWidth           = 0.0f;
+	m_fMapLength          = 0.0f;
 	m_nCollisionFaceCount = 0;
 
 	delete[] m_pvCollisions;
@@ -131,13 +131,14 @@ bool CN3ShapeMgr::LoadCollisionData(File& fs)
 
 	// Cell Data 쓰기.
 	int iExist = 0;
-	int z = 0;
+	int z      = 0;
 	for (float fZ = 0.0f; fZ < m_fMapLength; fZ += CELL_MAIN_SIZE, z++)
 	{
 		int x = 0;
 		for (float fX = 0.0f; fX < m_fMapWidth; fX += CELL_MAIN_SIZE, x++)
 		{
-			delete m_pCells[x][z]; m_pCells[x][z] = nullptr;
+			delete m_pCells[x][z];
+			m_pCells[x][z] = nullptr;
 
 			fs.Read(&iExist, 4); // 데이터가 있는 셀인지 쓰고..
 
@@ -155,25 +156,22 @@ bool CN3ShapeMgr::LoadCollisionData(File& fs)
 // 맵의 너비와 높이를 미터 단위로 넣는다..
 bool CN3ShapeMgr::Create(float fMapWidth, float fMapLength)
 {
-	if (fMapWidth <= 0.0f
-		|| fMapWidth > MAX_CELL_MAIN * CELL_MAIN_SIZE
-		|| fMapLength <= 0.0f
+	if (fMapWidth <= 0.0f || fMapWidth > MAX_CELL_MAIN * CELL_MAIN_SIZE || fMapLength <= 0.0f
 		|| fMapLength > MAX_CELL_MAIN * CELL_MAIN_SIZE)
 		return false;
 
-	m_fMapWidth = fMapWidth;
+	m_fMapWidth  = fMapWidth;
 	m_fMapLength = fMapLength;
 
 	return true;
 }
 
-bool CN3ShapeMgr::CheckCollision(
-	const __Vector3& vPos,		// 충돌 위치
-	const __Vector3& vDir,		// 방향 벡터
-	float fSpeedPerSec,			// 초당 움직이는 속도
-	__Vector3* pvCol,			// 충돌 지점 (crash position)
-	__Vector3* pvNormal,		// 충돌한면의 법선벡터 (crash normal)
-	__Vector3* pVec)			// 충돌한 면 의 폴리곤 __Vector3[3] (polygon/triangle of crash)
+bool CN3ShapeMgr::CheckCollision(const __Vector3& vPos, // 충돌 위치
+	const __Vector3& vDir,                              // 방향 벡터
+	float fSpeedPerSec,                                 // 초당 움직이는 속도
+	__Vector3* pvCol,                                   // 충돌 지점 (crash position)
+	__Vector3* pvNormal,                                // 충돌한면의 법선벡터 (crash normal)
+	__Vector3* pVec) // 충돌한 면 의 폴리곤 __Vector3[3] (polygon/triangle of crash)
 {
 	// 움직이는 속도가 없거나 반대로 움직이면 넘어간다..
 	if (fSpeedPerSec <= 0)
@@ -184,7 +182,7 @@ bool CN3ShapeMgr::CheckCollision(
 	// 다음 위치
 	__Vector3 vPosNext = vPos + (vDir * fSpeedPerSec);
 
-	int iSubCellCount = 0;
+	int iSubCellCount  = 0;
 
 	if (fSpeedPerSec < 4.0f)
 	{
@@ -193,7 +191,8 @@ bool CN3ShapeMgr::CheckCollision(
 	}
 	else
 	{
-		iSubCellCount = SubCellPathThru(vPos, vPosNext, 128, ppCells); // 통과하는 서브셀을 가져온다..
+		iSubCellCount = SubCellPathThru(
+			vPos, vPosNext, 128, ppCells); // 통과하는 서브셀을 가져온다..
 	}
 
 	// 없음 말자.
@@ -217,10 +216,12 @@ bool CN3ShapeMgr::CheckCollision(
 			nIndex2 = ppCells[i]->pdwCCVertIndices[j * 3 + 2];
 
 			// NOTE: does the vector intersect the triangle?
-			if (!::_IntersectTriangle(vPos, vDir, m_pvCollisions[nIndex0], m_pvCollisions[nIndex1], m_pvCollisions[nIndex2], fT, fU, fV, &vColTmp))
+			if (!::_IntersectTriangle(vPos, vDir, m_pvCollisions[nIndex0], m_pvCollisions[nIndex1],
+					m_pvCollisions[nIndex2], fT, fU, fV, &vColTmp))
 				continue;
 
-			if (::_IntersectTriangle(vPosNext, vDir, m_pvCollisions[nIndex0], m_pvCollisions[nIndex1], m_pvCollisions[nIndex2]))
+			if (::_IntersectTriangle(vPosNext, vDir, m_pvCollisions[nIndex0],
+					m_pvCollisions[nIndex1], m_pvCollisions[nIndex2]))
 				continue;
 
 			float fDistTmp = (vPos - vColTmp).Magnitude(); // 거리를 재보고..
@@ -234,8 +235,7 @@ bool CN3ShapeMgr::CheckCollision(
 
 				if (pvNormal != nullptr)
 				{
-					pvNormal->Cross(
-						m_pvCollisions[nIndex1] - m_pvCollisions[nIndex0],
+					pvNormal->Cross(m_pvCollisions[nIndex1] - m_pvCollisions[nIndex0],
 						m_pvCollisions[nIndex2] - m_pvCollisions[nIndex0]);
 					pvNormal->Normalize();
 				}
@@ -257,7 +257,8 @@ bool CN3ShapeMgr::CheckCollision(
 }
 
 // 벡터 사이에 걸친 셀포인터 돌려준다..
-int CN3ShapeMgr::SubCellPathThru(const __Vector3& vFrom, const __Vector3& vAt, int iMaxSubCell, __CellSub** ppSubCells)
+int CN3ShapeMgr::SubCellPathThru(
+	const __Vector3& vFrom, const __Vector3& vAt, int iMaxSubCell, __CellSub** ppSubCells)
 {
 	if (ppSubCells == nullptr)
 		return 0;
@@ -297,8 +298,8 @@ int CN3ShapeMgr::SubCellPathThru(const __Vector3& vFrom, const __Vector3& vAt, i
 
 		for (int x = xx1; x <= xx2; x++)
 		{
-			fXMin = (float) (x * CELL_SUB_SIZE);
-			fXMax = (float) ((x + 1) * CELL_SUB_SIZE);
+			fXMin          = (float) (x * CELL_SUB_SIZE);
+			fXMax          = (float) ((x + 1) * CELL_SUB_SIZE);
 
 			// Cohen thuderland algorythm
 			uint32_t dwOC0 = 0, dwOC1 = 0; // OutCode 0, 1
@@ -335,8 +336,7 @@ int CN3ShapeMgr::SubCellPathThru(const __Vector3& vFrom, const __Vector3& vAt, i
 			else if (dwOC0 == 0 && dwOC1 == 0)
 				bPathThru = true;
 			// 선분 한점은 셀의 내부에 한점은 외부에 있음.
-			else if ((dwOC0 == 0 && dwOC1 != 0)
-				|| (dwOC0 != 0 && dwOC1 == 0))
+			else if ((dwOC0 == 0 && dwOC1 != 0) || (dwOC0 != 0 && dwOC1 == 0))
 				bPathThru = true;
 			// 두 L점 모두 셀 외부에 있지만 판단을 다시 해야 한다.
 			else if ((dwOC0 & dwOC1) == 0)
@@ -346,7 +346,7 @@ int CN3ShapeMgr::SubCellPathThru(const __Vector3& vFrom, const __Vector3& vAt, i
 				if (fXCross < fXMin)
 					bPathThru = false; // 완전히 외곽에 있다.
 				else
-					bPathThru = true; // 걸처있다.
+					bPathThru = true;  // 걸처있다.
 			}
 
 			if (!bPathThru)
@@ -357,10 +357,7 @@ int CN3ShapeMgr::SubCellPathThru(const __Vector3& vFrom, const __Vector3& vAt, i
 			int nZ = z / CELL_MAIN_DIVIDE;
 
 			// 메인셀바깥에 있음 지나간다.
-			if (nX < 0
-				|| nX >= MAX_CELL_MAIN
-				|| nZ < 0
-				|| nZ >= MAX_CELL_MAIN)
+			if (nX < 0 || nX >= MAX_CELL_MAIN || nZ < 0 || nZ >= MAX_CELL_MAIN)
 				continue;
 
 			// 메인셀이 널이면 지나간다..
@@ -373,9 +370,7 @@ int CN3ShapeMgr::SubCellPathThru(const __Vector3& vFrom, const __Vector3& vAt, i
 			// NOTE: the check on nX and nZ isn't good enough because
 			//       "z/CELL_MAIN_DIVIDE" will round a small neg "z" to zero
 			//       and we'll run into an error!!!!!
-			if (nXSub < 0
-				|| nXSub >= (MAX_CELL_MAIN % CELL_MAIN_DIVIDE)
-				|| nZSub < 0
+			if (nXSub < 0 || nXSub >= (MAX_CELL_MAIN % CELL_MAIN_DIVIDE) || nZSub < 0
 				|| nZSub >= (MAX_CELL_MAIN % CELL_MAIN_DIVIDE))
 				continue;
 
@@ -396,20 +391,19 @@ float CN3ShapeMgr::GetHeightNearstPos(const __Vector3& vPos, __Vector3* pvNormal
 	__CellSub* pCell = SubCell(vPos.x, vPos.z);
 
 	// 없음 말자.
-	if (pCell == nullptr
-		|| pCell->nCCPolyCount <= 0)
+	if (pCell == nullptr || pCell->nCCPolyCount <= 0)
 		return -FLT_MAX;
 
 	// 꼭대기에 위치를 하고..
 	__Vector3 vPosV = vPos;
-	vPosV.y = 5000.0f;
+	vPosV.y         = 5000.0f;
 
-	__Vector3 vDir(0, -1, 0); // 수직 방향 벡터
+	__Vector3 vDir(0, -1, 0);   // 수직 방향 벡터
 	__Vector3 vColTmp(0, 0, 0); // 최종적으로 가장 가까운 충돌 위치..
 
 	int nIndex0, nIndex1, nIndex2;
 	float fT, fU, fV;
-	float fNearst = FLT_MAX, fHeight = -FLT_MAX;		// 일단 최소값을 큰값으로 잡고..
+	float fNearst = FLT_MAX, fHeight = -FLT_MAX; // 일단 최소값을 큰값으로 잡고..
 
 	for (int i = 0; i < pCell->nCCPolyCount; i++)
 	{
@@ -418,7 +412,8 @@ float CN3ShapeMgr::GetHeightNearstPos(const __Vector3& vPos, __Vector3* pvNormal
 		nIndex2 = pCell->pdwCCVertIndices[i * 3 + 2];
 
 		// 충돌된 점이 있으면..
-		if (!::_IntersectTriangle(vPosV, vDir, m_pvCollisions[nIndex0], m_pvCollisions[nIndex1], m_pvCollisions[nIndex2], fT, fU, fV, &vColTmp))
+		if (!::_IntersectTriangle(vPosV, vDir, m_pvCollisions[nIndex0], m_pvCollisions[nIndex1],
+				m_pvCollisions[nIndex2], fT, fU, fV, &vColTmp))
 			continue;
 
 		float fMinTmp = (vColTmp - vPos).Magnitude();
@@ -431,8 +426,7 @@ float CN3ShapeMgr::GetHeightNearstPos(const __Vector3& vPos, __Vector3* pvNormal
 
 			if (pvNormal != nullptr)
 			{
-				pvNormal->Cross(
-					m_pvCollisions[nIndex1] - m_pvCollisions[nIndex0],
+				pvNormal->Cross(m_pvCollisions[nIndex1] - m_pvCollisions[nIndex0],
 					m_pvCollisions[nIndex2] - m_pvCollisions[nIndex0]);
 				pvNormal->Normalize();
 			}
@@ -448,13 +442,12 @@ float CN3ShapeMgr::GetHeight(float fX, float fZ, __Vector3* pvNormal)
 	__CellSub* pCell = SubCell(fX, fZ); // 서브셀을 가져온다..
 
 	// 없음 말자.
-	if (pCell == nullptr
-		|| pCell->nCCPolyCount <= 0)
+	if (pCell == nullptr || pCell->nCCPolyCount <= 0)
 		return -FLT_MAX;
 
 	__Vector3 vPosV(fX, 5000.0f, fZ); // 꼭대기에 위치를 하고..
-	__Vector3 vDir(0, -1, 0); // 수직 방향 벡터
-	__Vector3 vColTmp(0, 0, 0); // 최종적으로 가장 가까운 충돌 위치..
+	__Vector3 vDir(0, -1, 0);         // 수직 방향 벡터
+	__Vector3 vColTmp(0, 0, 0);       // 최종적으로 가장 가까운 충돌 위치..
 
 	float fT, fU, fV;
 	float fMaxTmp = -FLT_MAX;
@@ -466,7 +459,8 @@ float CN3ShapeMgr::GetHeight(float fX, float fZ, __Vector3* pvNormal)
 		int nIndex2 = pCell->pdwCCVertIndices[i * 3 + 2];
 
 		// 충돌된 점이 있으면..
-		if (!::_IntersectTriangle(vPosV, vDir, m_pvCollisions[nIndex0], m_pvCollisions[nIndex1], m_pvCollisions[nIndex2], fT, fU, fV, &vColTmp))
+		if (!::_IntersectTriangle(vPosV, vDir, m_pvCollisions[nIndex0], m_pvCollisions[nIndex1],
+				m_pvCollisions[nIndex2], fT, fU, fV, &vColTmp))
 			continue;
 
 		if (vColTmp.y > fMaxTmp)
@@ -475,8 +469,7 @@ float CN3ShapeMgr::GetHeight(float fX, float fZ, __Vector3* pvNormal)
 
 			if (pvNormal != nullptr)
 			{
-				pvNormal->Cross(
-					m_pvCollisions[nIndex1] - m_pvCollisions[nIndex0],
+				pvNormal->Cross(m_pvCollisions[nIndex1] - m_pvCollisions[nIndex0],
 					m_pvCollisions[nIndex2] - m_pvCollisions[nIndex0]);
 				pvNormal->Normalize();
 			}
@@ -512,15 +505,13 @@ void CN3ShapeMgr::SubCell(const __Vector3& vPos, __CellSub** ppSubCell)
 				break;
 
 			case 1:
-				if ((x == 0)
-					&& (xx == 0))
+				if ((x == 0) && (xx == 0))
 				{
 					ppSubCell[i] = nullptr;
 					break;
 				}
 
-				if ((x != 0)
-					&& (xx == 0))
+				if ((x != 0) && (xx == 0))
 				{
 					if (m_pCells[x - 1][z] != nullptr)
 						ppSubCell[i] = &m_pCells[x - 1][z]->SubCells[CELL_MAIN_DIVIDE - 1][zz];
@@ -536,36 +527,34 @@ void CN3ShapeMgr::SubCell(const __Vector3& vPos, __CellSub** ppSubCell)
 				break;
 
 			case 2:
-				if (x == 0
-					&& xx == 0)
+				if (x == 0 && xx == 0)
 				{
 					ppSubCell[i] = nullptr;
 					break;
 				}
 
-				if (z == (CELL_MAIN_SIZE - 1)
-					&& zz == (CELL_MAIN_DIVIDE - 1))
+				if (z == (CELL_MAIN_SIZE - 1) && zz == (CELL_MAIN_DIVIDE - 1))
 				{
 					ppSubCell[i] = nullptr;
 					break;
 				}
 
 				// x 감소, z 증가.
-				if (x != 0
-					&& xx == 0)
+				if (x != 0 && xx == 0)
 				{
-					if ((z != (MAX_CELL_MAIN - 1))
-						&& (zz == (CELL_MAIN_DIVIDE - 1)))
+					if ((z != (MAX_CELL_MAIN - 1)) && (zz == (CELL_MAIN_DIVIDE - 1)))
 					{
 						if (m_pCells[x - 1][z + 1] != nullptr)
-							ppSubCell[i] = &m_pCells[x - 1][z + 1]->SubCells[CELL_MAIN_DIVIDE - 1][0];
+							ppSubCell[i] = &m_pCells[x - 1][z + 1]
+												->SubCells[CELL_MAIN_DIVIDE - 1][0];
 						else
 							ppSubCell[i] = nullptr;
 					}
 					else
 					{
 						if (m_pCells[x - 1][z] != nullptr)
-							ppSubCell[i] = &m_pCells[x - 1][z]->SubCells[CELL_MAIN_DIVIDE - 1][zz + 1];
+							ppSubCell[i] = &m_pCells[x - 1][z]
+												->SubCells[CELL_MAIN_DIVIDE - 1][zz + 1];
 						else
 							ppSubCell[i] = nullptr;
 					}
@@ -573,14 +562,13 @@ void CN3ShapeMgr::SubCell(const __Vector3& vPos, __CellSub** ppSubCell)
 				}
 
 				// x 감소, z 증가.
-				if (z != (MAX_CELL_MAIN - 1)
-					&& zz == (CELL_MAIN_DIVIDE - 1))
+				if (z != (MAX_CELL_MAIN - 1) && zz == (CELL_MAIN_DIVIDE - 1))
 				{
-					if (x != 0
-						&& xx == 0)
+					if (x != 0 && xx == 0)
 					{
 						if (m_pCells[x - 1][z + 1] != nullptr)
-							ppSubCell[i] = &m_pCells[x - 1][z + 1]->SubCells[CELL_MAIN_DIVIDE - 1][0];
+							ppSubCell[i] = &m_pCells[x - 1][z + 1]
+												->SubCells[CELL_MAIN_DIVIDE - 1][0];
 						else
 							ppSubCell[i] = nullptr;
 					}
@@ -602,15 +590,13 @@ void CN3ShapeMgr::SubCell(const __Vector3& vPos, __CellSub** ppSubCell)
 
 			// z 증가.
 			case 3:
-				if (z == (MAX_CELL_MAIN - 1)
-					&& zz == (CELL_MAIN_DIVIDE - 1))
+				if (z == (MAX_CELL_MAIN - 1) && zz == (CELL_MAIN_DIVIDE - 1))
 				{
 					ppSubCell[i] = nullptr;
 					break;
 				}
 
-				if (z != (MAX_CELL_MAIN - 1)
-					&& zz == (CELL_MAIN_DIVIDE - 1))
+				if (z != (MAX_CELL_MAIN - 1) && zz == (CELL_MAIN_DIVIDE - 1))
 				{
 					if (m_pCells[x - 1][z] != nullptr)
 						ppSubCell[i] = &m_pCells[x - 1][z]->SubCells[xx][0];
@@ -627,25 +613,21 @@ void CN3ShapeMgr::SubCell(const __Vector3& vPos, __CellSub** ppSubCell)
 
 			// x 증가, z 증가.
 			case 4:
-				if (x == (MAX_CELL_MAIN - 1)
-					&& xx == (CELL_MAIN_DIVIDE - 1))
+				if (x == (MAX_CELL_MAIN - 1) && xx == (CELL_MAIN_DIVIDE - 1))
 				{
 					ppSubCell[i] = nullptr;
 					break;
 				}
 
-				if (z == (MAX_CELL_MAIN - 1)
-					&& zz == (CELL_MAIN_DIVIDE - 1))
+				if (z == (MAX_CELL_MAIN - 1) && zz == (CELL_MAIN_DIVIDE - 1))
 				{
 					ppSubCell[i] = nullptr;
 					break;
 				}
 
-				if (x != (MAX_CELL_MAIN - 1)
-					&& xx == (CELL_MAIN_DIVIDE - 1))
+				if (x != (MAX_CELL_MAIN - 1) && xx == (CELL_MAIN_DIVIDE - 1))
 				{
-					if (z != (MAX_CELL_MAIN - 1)
-						&& zz == (CELL_MAIN_DIVIDE - 1))
+					if (z != (MAX_CELL_MAIN - 1) && zz == (CELL_MAIN_DIVIDE - 1))
 					{
 						if (m_pCells[x + 1][z + 1] != nullptr)
 							ppSubCell[i] = &m_pCells[x + 1][z + 1]->SubCells[0][0];
@@ -662,11 +644,9 @@ void CN3ShapeMgr::SubCell(const __Vector3& vPos, __CellSub** ppSubCell)
 					break;
 				}
 
-				if (z != (MAX_CELL_MAIN - 1)
-					&& zz == (CELL_MAIN_DIVIDE - 1))
+				if (z != (MAX_CELL_MAIN - 1) && zz == (CELL_MAIN_DIVIDE - 1))
 				{
-					if (x != (MAX_CELL_MAIN - 1)
-						&& xx == (CELL_MAIN_DIVIDE - 1))
+					if (x != (MAX_CELL_MAIN - 1) && xx == (CELL_MAIN_DIVIDE - 1))
 					{
 						if (m_pCells[x + 1][z + 1] != nullptr)
 							ppSubCell[i] = &m_pCells[x + 1][z + 1]->SubCells[0][0];
@@ -691,15 +671,13 @@ void CN3ShapeMgr::SubCell(const __Vector3& vPos, __CellSub** ppSubCell)
 
 			// x 증가.
 			case 5:
-				if (x == (MAX_CELL_MAIN - 1)
-					&& xx == (CELL_MAIN_DIVIDE - 1))
+				if (x == (MAX_CELL_MAIN - 1) && xx == (CELL_MAIN_DIVIDE - 1))
 				{
 					ppSubCell[i] = nullptr;
 					break;
 				}
 
-				if (x != (MAX_CELL_MAIN - 1)
-					&& xx == (CELL_MAIN_DIVIDE - 1))
+				if (x != (MAX_CELL_MAIN - 1) && xx == (CELL_MAIN_DIVIDE - 1))
 				{
 					if (m_pCells[x + 1][z] != nullptr)
 						ppSubCell[i] = &m_pCells[x + 1][z]->SubCells[0][zz];
@@ -716,28 +694,25 @@ void CN3ShapeMgr::SubCell(const __Vector3& vPos, __CellSub** ppSubCell)
 
 			// x 증가. z 감소.
 			case 6:
-				if (x == (MAX_CELL_MAIN - 1)
-					&& xx == (CELL_MAIN_DIVIDE - 1))
+				if (x == (MAX_CELL_MAIN - 1) && xx == (CELL_MAIN_DIVIDE - 1))
 				{
 					ppSubCell[i] = nullptr;
 					break;
 				}
 
-				if (z == 0
-					&& zz == 0)
+				if (z == 0 && zz == 0)
 				{
 					ppSubCell[i] = nullptr;
 					break;
 				}
 
-				if (x != (MAX_CELL_MAIN - 1)
-					&& xx == (CELL_MAIN_DIVIDE - 1))
+				if (x != (MAX_CELL_MAIN - 1) && xx == (CELL_MAIN_DIVIDE - 1))
 				{
-					if (z != 0
-						&& zz == 0)
+					if (z != 0 && zz == 0)
 					{
 						if (m_pCells[x + 1][z - 1] != nullptr)
-							ppSubCell[i] = &m_pCells[x + 1][z - 1]->SubCells[0][CELL_MAIN_DIVIDE - 1];
+							ppSubCell[i] = &m_pCells[x + 1][z - 1]
+												->SubCells[0][CELL_MAIN_DIVIDE - 1];
 						else
 							ppSubCell[i] = nullptr;
 					}
@@ -751,21 +726,21 @@ void CN3ShapeMgr::SubCell(const __Vector3& vPos, __CellSub** ppSubCell)
 					break;
 				}
 
-				if (z != 0
-					&& zz == 0)
+				if (z != 0 && zz == 0)
 				{
-					if (x != (CELL_MAIN_SIZE - 1)
-						&& xx == (CELL_MAIN_DIVIDE - 1))
+					if (x != (CELL_MAIN_SIZE - 1) && xx == (CELL_MAIN_DIVIDE - 1))
 					{
 						if (m_pCells[x + 1][z - 1] != nullptr)
-							ppSubCell[i] = &m_pCells[x + 1][z - 1]->SubCells[0][CELL_MAIN_DIVIDE - 1];
+							ppSubCell[i] = &m_pCells[x + 1][z - 1]
+												->SubCells[0][CELL_MAIN_DIVIDE - 1];
 						else
 							ppSubCell[i] = nullptr;
 					}
 					else
 					{
 						if (m_pCells[x][z - 1] != nullptr)
-							ppSubCell[i] = &m_pCells[x][z - 1]->SubCells[xx + 1][CELL_MAIN_DIVIDE - 1];
+							ppSubCell[i] = &m_pCells[x][z - 1]
+												->SubCells[xx + 1][CELL_MAIN_DIVIDE - 1];
 						else
 							ppSubCell[i] = nullptr;
 					}
@@ -780,15 +755,13 @@ void CN3ShapeMgr::SubCell(const __Vector3& vPos, __CellSub** ppSubCell)
 
 			// z 감소.
 			case 7:
-				if (z == 0
-					&& zz == 0)
+				if (z == 0 && zz == 0)
 				{
 					ppSubCell[i] = nullptr;
 					break;
 				}
 
-				if (z != 0
-					&& zz == 0)
+				if (z != 0 && zz == 0)
 				{
 					if (m_pCells[x][z - 1] != nullptr)
 						ppSubCell[i] = &m_pCells[x][z - 1]->SubCells[xx][CELL_MAIN_DIVIDE - 1];
@@ -805,56 +778,54 @@ void CN3ShapeMgr::SubCell(const __Vector3& vPos, __CellSub** ppSubCell)
 
 			// x 감소, z 감소.
 			case 8:
-				if (x == 0
-					&& xx == 0)
+				if (x == 0 && xx == 0)
 				{
 					ppSubCell[i] = nullptr;
 					break;
 				}
 
-				if (z == 0
-					&& zz == 0)
+				if (z == 0 && zz == 0)
 				{
 					ppSubCell[i] = nullptr;
 					break;
 				}
 
-				if (x != 0
-					&& xx == 0)
+				if (x != 0 && xx == 0)
 				{
-					if (z != 0
-						&& zz == 0)
+					if (z != 0 && zz == 0)
 					{
 						if (m_pCells[x - 1][z - 1] != nullptr)
-							ppSubCell[i] = &m_pCells[x - 1][z - 1]->SubCells[CELL_MAIN_DIVIDE - 1][CELL_MAIN_DIVIDE - 1];
+							ppSubCell[i] = &m_pCells[x - 1][z - 1]->SubCells[CELL_MAIN_DIVIDE - 1]
+																			[CELL_MAIN_DIVIDE - 1];
 						else
 							ppSubCell[i] = nullptr;
 					}
 					else
 					{
 						if (m_pCells[x - 1][z] != nullptr)
-							ppSubCell[i] = &m_pCells[x - 1][z]->SubCells[CELL_MAIN_DIVIDE - 1][zz - 1];
+							ppSubCell[i] = &m_pCells[x - 1][z]
+												->SubCells[CELL_MAIN_DIVIDE - 1][zz - 1];
 						else
 							ppSubCell[i] = nullptr;
 					}
 					break;
 				}
 
-				if (z != 0
-					&& zz == 0)
+				if (z != 0 && zz == 0)
 				{
-					if (x != 0
-						&& xx == 0)
+					if (x != 0 && xx == 0)
 					{
 						if (m_pCells[x - 1][z - 1] != nullptr)
-							ppSubCell[i] = &m_pCells[x - 1][z - 1]->SubCells[CELL_MAIN_DIVIDE - 1][CELL_MAIN_DIVIDE - 1];
+							ppSubCell[i] = &m_pCells[x - 1][z - 1]->SubCells[CELL_MAIN_DIVIDE - 1]
+																			[CELL_MAIN_DIVIDE - 1];
 						else
 							ppSubCell[i] = nullptr;
 					}
 					else
 					{
 						if (m_pCells[x][z - 1] != nullptr)
-							ppSubCell[i] = &m_pCells[x][z - 1]->SubCells[xx - 1][CELL_MAIN_DIVIDE - 1];
+							ppSubCell[i] = &m_pCells[x][z - 1]
+												->SubCells[xx - 1][CELL_MAIN_DIVIDE - 1];
 						else
 							ppSubCell[i] = nullptr;
 					}
@@ -866,6 +837,6 @@ void CN3ShapeMgr::SubCell(const __Vector3& vPos, __CellSub** ppSubCell)
 				else
 					ppSubCell[i] = nullptr;
 				break;
-		}	// switch
-	}	// for 
+		} // switch
+	} // for
 }

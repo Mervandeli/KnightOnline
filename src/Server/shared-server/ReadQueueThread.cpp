@@ -4,8 +4,8 @@
 
 using namespace std::chrono_literals;
 
-ReadQueueThread::ReadQueueThread(SharedMemoryQueue& sharedMemoryQueue)
-	: _sharedMemoryQueue(sharedMemoryQueue)
+ReadQueueThread::ReadQueueThread(SharedMemoryQueue& sharedMemoryQueue) :
+	_sharedMemoryQueue(sharedMemoryQueue)
 {
 }
 

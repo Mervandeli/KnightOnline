@@ -25,8 +25,8 @@ void CGameEvent::RunEvent(CUser* pUser)
 			break;
 
 		case ZONE_TRAP_DEAD:
-		//	TRACE(_T("&&& User - zone trap dead ,, name=%hs\n"), pUser->m_pUserData->m_id);
-		//	pUser->Dead();
+			//	TRACE(_T("&&& User - zone trap dead ,, name=%hs\n"), pUser->m_pUserData->m_id);
+			//	pUser->Dead();
 			break;
 
 		case ZONE_TRAP_AREA:

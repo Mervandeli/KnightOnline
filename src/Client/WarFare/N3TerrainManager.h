@@ -15,16 +15,16 @@ class CN3TerrainManager : public CN3WorldBase
 {
 	friend class CN3WorldManager;
 
-	class CN3Terrain*		m_pTerrain;										  // 지형 클래스
-	class CN3ShapeMgr*		m_pShapes;										// 물체 클래스
-	class CN3SkyMng*		m_pSky;											  // 하늘 클래스
-	class CBirdMng*			m_pBirdMng;									     // 하늘에 날라다니는 새들 관리..
+	class CN3Terrain* m_pTerrain; // 지형 클래스
+	class CN3ShapeMgr* m_pShapes; // 물체 클래스
+	class CN3SkyMng* m_pSky;      // 하늘 클래스
+	class CBirdMng* m_pBirdMng;   // 하늘에 날라다니는 새들 관리..
 
 	// Function..
 	void InitWorld(int iZoneID, const __Vector3& vPosPlayer);
 	void Tick();
 
-//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
 	CN3Terrain* GetTerrainRef();
 	CN3SkyMng* GetSkyRef();
 
@@ -40,17 +40,17 @@ class CN3TerrainManager : public CN3WorldBase
 
 	// Shapes..
 	bool CheckCollisionCameraWithShape(__Vector3& vEyeResult, const __Vector3& vAt, float fNP);
-	float GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal = nullptr); 
+	float GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal = nullptr);
 	void RenderCollisionWithShape(const __Vector3& vPos);
-	float GetHeightWithShape(float fX, float fZ, __Vector3* pvNormal = nullptr); 
+	float GetHeightWithShape(float fX, float fZ, __Vector3* pvNormal = nullptr);
 	CN3Shape* ShapeGetByIDWithShape(int iID);
 	CN3Shape* PickWithShape(int iXScreen, int iYScreen, bool bMustHaveEvent, __Vector3* pvPick = nullptr);
-	bool CheckCollisionWithShape(	const __Vector3& vPos,				 // 충돌 위치
-														const __Vector3& vDir,				   // 방향 벡터
-														float fSpeedPerSec,					    // 초당 움직이는 속도
-														__Vector3* pvCol = nullptr,			 // 충돌 지점
-														__Vector3* pvNormal = nullptr,		 // 충돌한면의 법선벡터
-														__Vector3* pVec = nullptr);			// 충돌한 면 의 폴리곤 __Vector3[3]
+	bool CheckCollisionWithShape(const __Vector3& vPos, // 충돌 위치
+		const __Vector3& vDir,                          // 방향 벡터
+		float fSpeedPerSec,                             // 초당 움직이는 속도
+		__Vector3* pvCol    = nullptr,                  // 충돌 지점
+		__Vector3* pvNormal = nullptr,                  // 충돌한면의 법선벡터
+		__Vector3* pVec     = nullptr);                     // 충돌한 면 의 폴리곤 __Vector3[3]
 
 	// Sky..
 	D3DCOLOR GetSkyColorWithSky();
@@ -67,7 +67,7 @@ class CN3TerrainManager : public CN3WorldBase
 
 	// Rendering..
 	void RenderTerrain();
-	void RenderShape();	
+	void RenderShape();
 	void RenderSky();
 	void RenderBirdMgr();
 	void RenderSkyWeather();

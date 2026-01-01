@@ -7,13 +7,12 @@
 
 #include <db-library/fwd.h>
 
-typedef std::vector <_USER_DATA*>			UserDataArray;
+typedef std::vector<_USER_DATA*> UserDataArray;
 
 class AujardApp;
 class CDBAgent
 {
 public:
-	
 	/// \brief updates which nation won the war and which charId killed the commander
 	/// \returns true if update successful, otherwise false
 	bool UpdateBattleEvent(const char* charId, int nation);
@@ -31,7 +30,8 @@ public:
 	/// \param checkType 0 for USERDATA, 1 for WAREHOUSE
 	/// \param compareData is WAREHOUSE.nMoney when checkType is 1, otherwise USERDATA.Exp
 	/// \returns true when input data matches database record, false otherwise
-	bool CheckUserData(const char* accountId, const char* charId, int checkType, int userUpdateTime, int compareData);
+	bool CheckUserData(const char* accountId, const char* charId, int checkType, int userUpdateTime,
+		int compareData);
 
 	/// \brief removes the CURRENTUSER record for accountId
 	/// \returns true on success, otherwise false
@@ -45,7 +45,8 @@ public:
 	/// \param clientIp
 	/// \param init 0x01 to insert, 0x02 to update CURRENTUSER
 	/// \returns true when CURRENTUSER successfully updated, otherwise false
-	bool SetLogInInfo(const char* accountId, const char* charId, const char* serverIp, int serverId, const char* clientIp, uint8_t init);
+	bool SetLogInInfo(const char* accountId, const char* charId, const char* serverIp, int serverId,
+		const char* clientIp, uint8_t init);
 
 	/// \brief loads knights clan metadata into the supplied buffer
 	/// \param knightsId
@@ -80,7 +81,7 @@ public:
 	/// \brief attemps to delete a knights clan from the database
 	/// \return 0 for success, 7 if not found
 	int DeleteKnights(int knightsId);
-	
+
 	/// \brief attempts to update a knights clan
 	/// \returns 0 on success, 2 for charId not found or db error, 7 for not found, 8 for capacity error
 	int UpdateKnights(int type, char* charId, int knightsId, int domination);
@@ -112,11 +113,12 @@ public:
 	/// \brief attempts to create a new character
 	/// \returns NEW_CHAR_SUCCESS on success, or one of the following on error:
 	/// NEW_CHAR_ERROR, NEW_CHAR_NO_FREE_SLOT, NEW_CHAR_INVALID_RACE, NEW_CHAR_NAME_IN_USE, NEW_CHAR_SYNC_ERROR
-	int CreateNewChar(char* accountId, int index, char* charId, int race, int Class, int hair, int face, int str, int sta, int dex, int intel, int cha);
+	int CreateNewChar(char* accountId, int index, char* charId, int race, int Class, int hair,
+		int face, int str, int sta, int dex, int intel, int cha);
 
 	/// \brief attempts to login a character to the game server
 	/// \returns -1 for failure, 0 for unselected nation, 1 for karus, 2 for elmorad
-	int	AccountLogInReq(char* accountId, char* password);	// return Nation value
+	int AccountLogInReq(char* accountId, char* password); // return Nation value
 
 	/// \brief updates the database with the data from UserData[userId]
 	/// \param charId
@@ -133,7 +135,7 @@ public:
 	//bool UpdateCouponEvent(const char* accountId, char* charId, char* cpid, int itemId, int count);
 	//bool CheckCouponEvent(const char* accountId);
 	//bool DeleteChar(int index, char* id, char* charId, char* socno);
-	
+
 	/// \brief attempts connections with db::ConnectionManager to needed dbTypes
 	/// \returns true is successful, false otherwise
 	bool InitDatabase();
@@ -141,12 +143,12 @@ public:
 	/// \brief resets a UserData[userId] record.  Called after logout actions
 	/// \see UserData
 	void ResetUserData(int userId);
-	
+
 	CDBAgent();
 	virtual ~CDBAgent();
 
-	UserDataArray	UserData;
-	
+	UserDataArray UserData;
+
 private:
 	/// \brief reference back to the main AujardApp instance
 	AujardApp* _main;

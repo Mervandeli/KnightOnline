@@ -18,19 +18,19 @@ class CDlgSetSound;
 
 typedef struct __SoundInfo
 {
-	char	szName[256];
-	DWORD	dwID;
-	char	szBGM[4][256];
-	float	fBGMRegenTime[4];
-	char	szBGE[4][256];
-	float	fBGERegenTime[4];
+	char szName[256];
+	DWORD dwID;
+	char szBGM[4][256];
+	float fBGMRegenTime[4];
+	char szBGE[4][256];
+	float fBGERegenTime[4];
 
 	__SoundInfo()
 	{
 		ZeroMemory(szName, 256);
 		dwID = 0;
 
-		for(int i=0;i<4;i++)
+		for (int i = 0; i < 4; i++)
 		{
 			ZeroMemory(szBGM[i], 256);
 			fBGMRegenTime[i] = 0.0f;
@@ -44,15 +44,15 @@ typedef struct __SoundInfo
 class CSoundMgr : public CN3BaseFileAccess
 {
 public:
-	int						m_iVersion;
-	std::list<CSoundCell*>	m_pSound;
-	CSoundCell*				m_pCurrSound;
+	int m_iVersion;
+	std::list<CSoundCell*> m_pSound;
+	CSoundCell* m_pCurrSound;
 
-	int						m_MapSize;
-		
-	CMapMng*				m_pRefMapMng;
-	bool					m_bActive;		// 이기능이 활성화 되어 있는지...1:활성화, 0:비활성화..
-	CDlgSetSound*			m_pDlgSound;
+	int m_MapSize;
+
+	CMapMng* m_pRefMapMng;
+	bool m_bActive; // 이기능이 활성화 되어 있는지...1:활성화, 0:비활성화..
+	CDlgSetSound* m_pDlgSound;
 
 public:
 	void DelSound(CSoundCell* pEvent);

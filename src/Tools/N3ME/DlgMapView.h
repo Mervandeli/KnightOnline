@@ -14,32 +14,34 @@ class CBitMapFile;
 class CMainFrame;
 class CDlgMapView : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgMapView(CWnd* pParent = nullptr);   // standard constructor
+	CDlgMapView(CWnd* pParent = nullptr); // standard constructor
 
 	void UpData(void);
 	void ColorMapTemp(void);
 	void SetMapView(void);
 	void Tick(void);
 	void Render(void);
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgMapView)
-	enum { IDD = IDD_ALL_MAP_VIEW };
-		// NOTE: the ClassWizard will add data members here
+	enum
+	{
+		IDD = IDD_ALL_MAP_VIEW
+	};
+	// NOTE: the ClassWizard will add data members here
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgMapView)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
 public:
-	BOOL Select_Map_Edit ;
-	CMainFrame*	m_pFrame;
+	BOOL Select_Map_Edit;
+	CMainFrame* m_pFrame;
 	CBitMapFile bmpf;
 
 	RECT DragRect;
@@ -48,16 +50,14 @@ public:
 	CBitMapFile BMF;
 	LPDIRECT3DDEVICE9 m_pD3DDevice;
 
-	int  Brush_Size;
-	HBRUSH hbrush,OldBrush ;
-	HPEN	PenRed,oldpen,PenBlue;
+	int Brush_Size;
+	HBRUSH hbrush, OldBrush;
+	HPEN PenRed, oldpen, PenBlue;
 
 	int Map_View_Size;
 
-
-// Implementation
+	// Implementation
 protected:
-
 	// Generated message map functions
 	//{{AFX_MSG(CDlgMapView)
 	virtual BOOL OnInitDialog();

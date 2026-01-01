@@ -17,36 +17,38 @@ class CMapMng;
 
 class CDlgShapeList : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgShapeList(CWnd* pParent = nullptr);   // standard constructor
+	CDlgShapeList(CWnd* pParent = nullptr); // standard constructor
 
 	CN3Scene* m_pSceneRef;
-	BOOL	m_IsSourceObj;		// Display용이냐? (툴에서 오브젝트 목록)
+	BOOL m_IsSourceObj;                     // Display용이냐? (툴에서 오브젝트 목록)
 	CMapMng* m_pMapMng;
 
-// Dialog Data
+											// Dialog Data
 	//{{AFX_DATA(CDlgShapeList)
-	enum { IDD = IDD_SHAPE_LIST };
-	CListBox	m_ListShape;
+	enum
+	{
+		IDD = IDD_SHAPE_LIST
+	};
+	CListBox m_ListShape;
 	//}}AFX_DATA
 
 	void UpdateTree(CN3Scene* pScene);
 	void SelectObject(void* pItemData);
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgShapeList)
-	public:
+public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgShapeList)
 	virtual BOOL OnInitDialog();

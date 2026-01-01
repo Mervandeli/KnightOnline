@@ -14,34 +14,33 @@ class CDlgSetDTex;
 
 class CDlgDelDTex : public CDialog
 {
-// Construction
+	// Construction
 public:
 	CString m_SelDTexName;
-	CDlgDelDTex(CWnd* pParent = NULL);   // standard constructor
+	CDlgDelDTex(CWnd* pParent = NULL); // standard constructor
 
 	CDlgSetDTex* m_pParent;
 
-	void	SetFileList(CComboBox* pCB);
+	void SetFileList(CComboBox* pCB);
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgDelDTex)
-	enum { IDD = IDD_DELDTEX };
-	CListBox	m_TexList;
+	enum
+	{
+		IDD = IDD_DELDTEX
+	};
+	CListBox m_TexList;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgDelDTex)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-	
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgDelDTex)
 	afx_msg void OnSelchangeListDeldtex();

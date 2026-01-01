@@ -13,16 +13,16 @@
 
 struct __VertexSkinned
 {
-	__Vector3	vOrigin; // 원래 점 위치..
-	int			nAffect; // 관절 몇개가 영향을 주는지..
-	int*		pnJoints; // 관절 인덱스
-	float*		pfWeights; // 가중치
+	__Vector3 vOrigin; // 원래 점 위치..
+	int nAffect;       // 관절 몇개가 영향을 주는지..
+	int* pnJoints;     // 관절 인덱스
+	float* pfWeights;  // 가중치
 
 	__VertexSkinned()
 	{
-		vOrigin = {};
-		nAffect = 0;
-		pnJoints = nullptr;
+		vOrigin   = {};
+		nAffect   = 0;
+		pnJoints  = nullptr;
 		pfWeights = nullptr;
 	}
 
@@ -45,25 +45,27 @@ protected:
 
 	static int SortWeightsProc(const void* pArg1, const void* pArg2);
 #endif // end of _N3TOOL
-	
-	__VertexSkinned*	m_pSkinVertices;
+
+	__VertexSkinned* m_pSkinVertices;
 
 public:
-	__VertexSkinned*	SkinVertices() { return m_pSkinVertices; }
-	bool				Create(int nFC, int nVC, int nUVC);
-	bool				Load(File& file) override;
+	__VertexSkinned* SkinVertices()
+	{
+		return m_pSkinVertices;
+	}
+	bool Create(int nFC, int nVC, int nUVC);
+	bool Load(File& file) override;
 
-	bool				CheckCollisionPrecisely(const __Vector3& vPos, const __Vector3& vDir, __Vector3* pvPick);
+	bool CheckCollisionPrecisely(const __Vector3& vPos, const __Vector3& vDir, __Vector3* pvPick);
 
 #ifdef _N3TOOL
-	bool				Save(File& file) override;
-	void				RecalcWeight();		// 웨이트값 다시 계산하기
-#endif // end of _N3TOOL
-	
+	bool Save(File& file) override;
+	void RecalcWeight(); // 웨이트값 다시 계산하기
+#endif                   // end of _N3TOOL
+
 	void Release() override;
 	CN3Skin();
 	~CN3Skin() override;
-
 };
 
 #endif // !defined(AFX_N3Skin_h__INCLUDED_)

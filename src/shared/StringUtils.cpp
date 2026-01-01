@@ -5,8 +5,8 @@
 #include <functional>
 #include <algorithm>
 
-static constexpr char WhitespaceCharsA[]		= " \t\n\r\f\v";
-static constexpr wchar_t WhitespaceCharsW[]		= L" \t\n\r\f\v";
+static constexpr char WhitespaceCharsA[]    = " \t\n\r\f\v";
+static constexpr wchar_t WhitespaceCharsW[] = L" \t\n\r\f\v";
 
 void _string_format(const std::string_view fmt, std::string* result, va_list args)
 {

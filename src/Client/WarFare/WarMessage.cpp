@@ -7,8 +7,8 @@
 #include "GameBase.h"
 #include "text_resources.h"
 
-#define MESSAGE_FONT_SIZE		20
-#define WAR_MESSAGE_SHOW_TIME	60
+#define MESSAGE_FONT_SIZE     20
+#define WAR_MESSAGE_SHOW_TIME 60
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -17,7 +17,7 @@
 CWarMessage::CWarMessage()
 {
 	m_pMessageFont = nullptr;
-	m_fTime = 0.0f;
+	m_fTime        = 0.0f;
 }
 
 CWarMessage::~CWarMessage()
@@ -31,7 +31,7 @@ void CWarMessage::InitFont()
 
 	std::string szFont = fmt::format_text_resource(IDS_FONT_ID);
 
-	m_pMessageFont = new CDFont(szFont, MESSAGE_FONT_SIZE);
+	m_pMessageFont     = new CDFont(szFont, MESSAGE_FONT_SIZE);
 	__ASSERT(m_pMessageFont, "Font Create Fail!!");
 
 	if (m_pMessageFont)
@@ -45,13 +45,14 @@ void CWarMessage::InitFont()
 		m_ptMessage.y = 20;
 #endif
 		m_ptMessage.x = CN3Base::s_CameraData.vp.Width;
-
 	}
 }
 
 void CWarMessage::Release()
 {
-	if (m_pMessageFont) delete m_pMessageFont; m_pMessageFont = nullptr;
+	if (m_pMessageFont)
+		delete m_pMessageFont;
+	m_pMessageFont = nullptr;
 }
 
 void CWarMessage::SetMessage(const std::string& szText, uint32_t dwFlags, uint32_t dwColor)
@@ -66,7 +67,8 @@ void CWarMessage::SetMessage(const std::string& szText, uint32_t dwFlags, uint32
 
 void CWarMessage::RenderMessage()
 {
-	if (m_fTime <= 0) return;
+	if (m_fTime <= 0)
+		return;
 
 	if (m_pMessageFont)
 	{
@@ -85,10 +87,10 @@ void CWarMessage::Tick()
 {
 	if (m_fTime > 0)
 	{
-		m_fTime -= CN3Base::s_fSecPerFrm;
+		m_fTime                -= CN3Base::s_fSecPerFrm;
 
-		const int iScreenWidth = CN3Base::s_CameraData.vp.Width;
+		const int iScreenWidth  = CN3Base::s_CameraData.vp.Width;
 
-		m_ptMessage.x = iScreenWidth - ((int)(100 * (WAR_MESSAGE_SHOW_TIME - m_fTime)) % (iScreenWidth + m_pMessageFont->GetSize().cx));
+		m_ptMessage.x = iScreenWidth - ((int) (100 * (WAR_MESSAGE_SHOW_TIME - m_fTime)) % (iScreenWidth + m_pMessageFont->GetSize().cx));
 	}
 }

@@ -9,30 +9,29 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-
 class CKscViewerView : public CView
 {
 protected: // create from serialization only
 	CKscViewerView();
 	DECLARE_DYNCREATE(CKscViewerView)
 
-// Attributes
+	// Attributes
 public:
 	CKscViewerDoc* GetDocument();
 
-// Operations
+	// Operations
 public:
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CKscViewerView)
-	public:
-	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
+public:
+	virtual void OnDraw(CDC* pDC); // overridden to draw this view
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	protected:
+
+protected:
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	BOOL DrawImage();
 	virtual ~CKscViewerView();
@@ -42,8 +41,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CKscViewerView)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -52,9 +50,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-#ifndef _DEBUG  // debug version in KscViewerView.cpp
+#ifndef _DEBUG // debug version in KscViewerView.cpp
 inline CKscViewerDoc* CKscViewerView::GetDocument()
-   { return (CKscViewerDoc*)m_pDocument; }
+{
+	return (CKscViewerDoc*) m_pDocument;
+}
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

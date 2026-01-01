@@ -7,7 +7,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 CN3ShapeExtra::CN3ShapeExtra()
@@ -23,7 +23,7 @@ CN3ShapeExtra::~CN3ShapeExtra()
 void CN3ShapeExtra::Release()
 {
 	CN3Shape::Release();
-	
+
 	m_Rotations.clear();
 }
 
@@ -68,8 +68,7 @@ void CN3ShapeExtra::Tick(float fFrm)
 			continue;
 
 		__Rotation* pRot = &m_Rotations[i];
-		if (pRot->fRadianPerSec == 0
-			|| pRot->fRadianCur == pRot->fRadianToReach)
+		if (pRot->fRadianPerSec == 0 || pRot->fRadianCur == pRot->fRadianToReach)
 			continue;
 
 		// 도는 방향..
@@ -78,15 +77,15 @@ void CN3ShapeExtra::Tick(float fFrm)
 		else
 			fDir = -1.0f;
 
-		fRotDelta = pRot->fRadianPerSec * fDir * CN3Base::s_fSecPerFrm;
+		fRotDelta         = pRot->fRadianPerSec * fDir * CN3Base::s_fSecPerFrm;
 		pRot->fRadianCur += fRotDelta;
 
 		// 원하는 곳까지 다 열렸다!!
 		if (std::abs(pRot->fRadianToReach - pRot->fRadianCur) <= fRotDelta)
 		{
 			bNeedRemakeCollisionMeshes = true;
-			pRot->fRadianPerSec = 0;
-			pRot->fRadianCur = pRot->fRadianToReach;
+			pRot->fRadianPerSec        = 0;
+			pRot->fRadianCur           = pRot->fRadianToReach;
 		}
 
 		qRot.RotationAxis(pRot->vAxis, pRot->fRadianCur);
@@ -99,16 +98,19 @@ void CN3ShapeExtra::Tick(float fFrm)
 		MakeCollisionMeshByParts(); // 충돌메시를 다시 만든다..
 }
 
-void CN3ShapeExtra::RotateTo(int iPart, const __Vector3& vAxis, float fRadianToReach, float fRadianPerSec, bool bImmediately)
+void CN3ShapeExtra::RotateTo(
+	int iPart, const __Vector3& vAxis, float fRadianToReach, float fRadianPerSec, bool bImmediately)
 {
-	if (iPart < 0
-		|| iPart >= static_cast<int>(m_Rotations.size()))
+	if (iPart < 0 || iPart >= static_cast<int>(m_Rotations.size()))
 		return;
 
-	__Rotation* pRot = &(m_Rotations[iPart]);
-	
+	__Rotation* pRot     = &(m_Rotations[iPart]);
+
 	pRot->fRadianToReach = fRadianToReach;
-	pRot->fRadianPerSec = fRadianPerSec;
-	pRot->vAxis = vAxis;
-	if(bImmediately) pRot->fRadianCur = pRot->fRadianToReach - 0.01f; // 이러면 직빵으로 열린다.. 약간 값을 빼주는 이유는 한번은 틱을 돌게 하기 위해서이다.
+	pRot->fRadianPerSec  = fRadianPerSec;
+	pRot->vAxis          = vAxis;
+	if (bImmediately)
+		pRot->fRadianCur =
+			pRot->fRadianToReach
+			- 0.01f; // 이러면 직빵으로 열린다.. 약간 값을 빼주는 이유는 한번은 틱을 돌게 하기 위해서이다.
 }

@@ -17,44 +17,38 @@ using namespace std::chrono_literals;
 // This will only save periodically.
 static constexpr auto SECONDS_SINCE_LAST_HEARTBEAT_TO_SAVE = 30s;
 
-constexpr int MAX_SMQ_SEND_QUEUE_RETRY_COUNT = 50;
+constexpr int MAX_SMQ_SEND_QUEUE_RETRY_COUNT               = 50;
 
 #include <Aujard/binder/AujardBinder.h>
 #include <Aujard/model/AujardModel.h>
 namespace model = aujard_model;
 
-AujardApp::AujardApp(logger::Logger& logger)
-	: AppThread(logger),
-	LoggerSendQueue(MAX_SMQ_SEND_QUEUE_RETRY_COUNT)
+AujardApp::AujardApp(logger::Logger& logger) :
+	AppThread(logger), LoggerSendQueue(MAX_SMQ_SEND_QUEUE_RETRY_COUNT)
 {
-	_sendPacketCount = 0;
-	_packetCount = 0;
-	_recvPacketCount = 0;
+	_sendPacketCount                                = 0;
+	_packetCount                                    = 0;
+	_recvPacketCount                                = 0;
 
 	db::ConnectionManager::DefaultConnectionTimeout = DB_PROCESS_TIMEOUT;
 	db::ConnectionManager::Create();
 
 	_dbPoolCheckThread = std::make_unique<TimerThread>(
-		1min,
-		std::bind(&db::ConnectionManager::ExpireUnusedPoolConnections));
+		1min, std::bind(&db::ConnectionManager::ExpireUnusedPoolConnections));
 
 	_heartbeatCheckThread = std::make_unique<TimerThread>(
-		40s,
-		std::bind(&AujardApp::CheckHeartbeat, this));
+		40s, std::bind(&AujardApp::CheckHeartbeat, this));
 
 	_concurrentCheckThread = std::make_unique<TimerThread>(
-		5min,
-		std::bind(&AujardApp::ConCurrentUserCount, this));
+		5min, std::bind(&AujardApp::ConCurrentUserCount, this));
 
 	_packetCheckThread = std::make_unique<TimerThread>(
-		2min,
-		std::bind(&AujardApp::WritePacketLog, this));
+		2min, std::bind(&AujardApp::WritePacketLog, this));
 
 	_readQueueThread = std::make_unique<AujardReadQueueThread>();
 
-	_smqOpenThread = std::make_unique<TimerThread>(
-		5s,
-		std::bind(&AujardApp::AttemptOpenSharedMemoryThreadTick, this));
+	_smqOpenThread   = std::make_unique<TimerThread>(
+        5s, std::bind(&AujardApp::AttemptOpenSharedMemoryThreadTick, this));
 }
 
 AujardApp::~AujardApp()
@@ -130,19 +124,17 @@ bool AujardApp::LoadConfig(CIni& iniFile)
 	datasourcePass = iniFile.GetString(ini::ODBC, ini::ACCOUNT_PWD, "knight");
 
 	db::ConnectionManager::SetDatasourceConfig(
-		modelUtil::DbType::ACCOUNT,
-		datasourceName, datasourceUser, datasourcePass);
+		modelUtil::DbType::ACCOUNT, datasourceName, datasourceUser, datasourcePass);
 
 	datasourceName = iniFile.GetString(ini::ODBC, ini::GAME_DSN, "KN_online");
 	datasourceUser = iniFile.GetString(ini::ODBC, ini::GAME_UID, "knight");
 	datasourcePass = iniFile.GetString(ini::ODBC, ini::GAME_PWD, "knight");
 
 	db::ConnectionManager::SetDatasourceConfig(
-		modelUtil::DbType::GAME,
-		datasourceName, datasourceUser, datasourcePass);
+		modelUtil::DbType::GAME, datasourceName, datasourceUser, datasourcePass);
 
 	_serverId = iniFile.GetInt(ini::ZONE_INFO, ini::GROUP_INFO, 1);
-	_zoneId = iniFile.GetInt(ini::ZONE_INFO, ini::ZONE_INFO, 1);
+	_zoneId   = iniFile.GetInt(ini::ZONE_INFO, ini::ZONE_INFO, 1);
 
 	return true;
 }
@@ -160,7 +152,8 @@ bool AujardApp::OnStart()
 	// until it can finally be opened.
 	if (!AttemptOpenSharedMemory())
 	{
-		spdlog::info("AujardApp::OnStart: shared memory unavailable, waiting for memory to become available");
+		spdlog::info("AujardApp::OnStart: shared memory unavailable, waiting for memory to become "
+					 "available");
 		_smqOpenThread->start();
 	}
 	else
@@ -175,18 +168,15 @@ bool AujardApp::AttemptOpenSharedMemory()
 {
 	bool openedAll = true;
 
-	if (!LoggerRecvQueue.IsOpen()
-		&& !LoggerRecvQueue.Open(SMQ_LOGGERSEND))
+	if (!LoggerRecvQueue.IsOpen() && !LoggerRecvQueue.Open(SMQ_LOGGERSEND))
 		openedAll = false;
 
-	if (!LoggerSendQueue.IsOpen()
-		&& !LoggerSendQueue.Open(SMQ_LOGGERRECV))
+	if (!LoggerSendQueue.IsOpen() && !LoggerSendQueue.Open(SMQ_LOGGERRECV))
 		openedAll = false;
 
 	// NOTE: This looks unsafe, but the server isn't started up until all of this finishes,
 	//       so nothing else is using _dbAgent.UserData yet.
-	if (_dbAgent.UserData.empty()
-		&& !InitSharedMemory())
+	if (_dbAgent.UserData.empty() && !InitSharedMemory())
 		openedAll = false;
 
 	return openedAll;
@@ -239,8 +229,7 @@ bool AujardApp::LoadItemTable()
 	recordset_loader::STLMap loader(ItemArray);
 	if (!loader.Load_ForbidEmpty())
 	{
-		spdlog::error("AujardApp::LoadItemTable: failed: {}",
-			loader.GetError().Message);
+		spdlog::error("AujardApp::LoadItemTable: failed: {}", loader.GetError().Message);
 		return false;
 	}
 
@@ -250,29 +239,26 @@ bool AujardApp::LoadItemTable()
 void AujardApp::SelectCharacter(const char* buffer)
 {
 	int index = 0, userId = -1, sendIndex = 0, idLen1 = 0, idLen2 = 0, tempUserId = -1,
-		packetIndex = 0;
-	uint8_t init = 0x01;
-	char sendBuff[256] = {},
-		accountId[MAX_ID_SIZE + 1] = {},
-		charId[MAX_ID_SIZE + 1] = {};
+		packetIndex    = 0;
+	uint8_t init       = 0x01;
+	char sendBuff[256] = {}, accountId[MAX_ID_SIZE + 1] = {}, charId[MAX_ID_SIZE + 1] = {};
 
 	_USER_DATA* user = nullptr;
 
-	userId = GetShort(buffer, index);
-	idLen1 = GetShort(buffer, index);
+	userId           = GetShort(buffer, index);
+	idLen1           = GetShort(buffer, index);
 	GetString(accountId, buffer, idLen1, index);
 	idLen2 = GetShort(buffer, index);
 	GetString(charId, buffer, idLen2, index);
-	init = GetByte(buffer, index);
+	init        = GetByte(buffer, index);
 	packetIndex = GetDWORD(buffer, index);
 
-	spdlog::debug("AujardApp::SelectCharacter: acctId={}, charId={}, index={}",
-		accountId, charId, packetIndex);
-	
-	_recvPacketCount++;		// packet count
+	spdlog::debug("AujardApp::SelectCharacter: acctId={}, charId={}, index={}", accountId, charId,
+		packetIndex);
 
-	if (userId < 0
-		|| userId >= MAX_USER)
+	_recvPacketCount++; // packet count
+
+	if (userId < 0 || userId >= MAX_USER)
 		goto fail_return;
 
 	if (strlen(accountId) == 0)
@@ -315,7 +301,7 @@ void AujardApp::SelectCharacter(const char* buffer)
 	SetByte(sendBuff, 0x01, sendIndex);
 	SetByte(sendBuff, init, sendIndex);
 
-	_packetCount++;	
+	_packetCount++;
 
 	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
 	{
@@ -337,20 +323,16 @@ fail_return:
 
 void AujardApp::UserLogOut(const char* buffer)
 {
-	int index = 0, userId = -1, accountIdLen = 0,
-		charIdLen = 0, sendIndex = 0;
-	char charId[MAX_ID_SIZE + 1] = {},
-		accountId[MAX_ID_SIZE + 1] = {},
-		sendBuff[256] = {};
+	int index = 0, userId = -1, accountIdLen = 0, charIdLen = 0, sendIndex = 0;
+	char charId[MAX_ID_SIZE + 1] = {}, accountId[MAX_ID_SIZE + 1] = {}, sendBuff[256] = {};
 
-	userId = GetShort(buffer, index);
+	userId       = GetShort(buffer, index);
 	accountIdLen = GetShort(buffer, index);
 	GetString(accountId, buffer, accountIdLen, index);
 	charIdLen = GetShort(buffer, index);
 	GetString(charId, buffer, charIdLen, index);
 
-	if (userId < 0
-		|| userId >= MAX_USER)
+	if (userId < 0 || userId >= MAX_USER)
 		return;
 
 	if (strlen(charId) == 0)
@@ -373,7 +355,8 @@ bool AujardApp::HandleUserLogout(int userId, uint8_t saveType, bool forceLogout)
 	_USER_DATA* pUser = _dbAgent.UserData[userId];
 	if (pUser == nullptr || std::strlen(pUser->m_id) == 0)
 	{
-		spdlog::error("AujardApp::HandleUserLogout: Invalid logout: UserData[{}] is not in use", userId);
+		spdlog::error(
+			"AujardApp::HandleUserLogout: Invalid logout: UserData[{}] is not in use", userId);
 		return false;
 	}
 
@@ -385,32 +368,32 @@ bool AujardApp::HandleUserLogout(int userId, uint8_t saveType, bool forceLogout)
 
 	// update UserData (USERDATA/WAREHOUSE)
 	bool userdataSuccess = HandleUserUpdate(userId, *pUser, saveType);
-	
+
 	// Log results
-	bool success = userdataSuccess && logoutResult;
+	bool success         = userdataSuccess && logoutResult;
 	if (!success)
 	{
-		spdlog::error("AujardApp::HandleUserLogout: Invalid Logout: {}, {} (UserData: {}, Logout: {})",
+		spdlog::error(
+			"AujardApp::HandleUserLogout: Invalid Logout: {}, {} (UserData: {}, Logout: {})",
 			pUser->m_Accountid, pUser->m_id, userdataSuccess, logoutResult);
 		return false;
 	}
 
 	spdlog::debug("AujardApp::HandleUserLogout: Logout: {}, {} (UserData: {}, Logout: {})",
-	pUser->m_Accountid, pUser->m_id, userdataSuccess, logoutResult);
+		pUser->m_Accountid, pUser->m_id, userdataSuccess, logoutResult);
 
 	// reset the object stored in UserData[userId] before returning
 	// this will reset data like accountId/charId, so logging must
 	// occur beforehand
 	_dbAgent.ResetUserData(userId);
-	
+
 	return success;
 }
 
 bool AujardApp::HandleUserUpdate(int userId, const _USER_DATA& user, uint8_t saveType)
 {
-	auto sleepTime = 10ms;
-	int updateWarehouseResult = 0, updateUserResult = 0,
-		retryCount = 0, maxRetry = 10;
+	auto sleepTime            = 10ms;
+	int updateWarehouseResult = 0, updateUserResult = 0, retryCount = 0, maxRetry = 10;
 
 	// attempt updates
 	updateUserResult = _dbAgent.UpdateUser(user.m_id, userId, saveType);
@@ -425,7 +408,8 @@ bool AujardApp::HandleUserUpdate(int userId, const _USER_DATA& user, uint8_t sav
 	{
 		if (retryCount >= maxRetry)
 		{
-			spdlog::error("AujardApp::HandleUserUpdate: UserData Save Error: [accountId={} charId={} (W:{},U:{})]",
+			spdlog::error("AujardApp::HandleUserUpdate: UserData Save Error: [accountId={} "
+						  "charId={} (W:{},U:{})]",
 				user.m_Accountid, user.m_id, updateWarehouseResult, updateUserResult);
 			break;
 		}
@@ -439,26 +423,31 @@ bool AujardApp::HandleUserUpdate(int userId, const _USER_DATA& user, uint8_t sav
 
 		if (!updateWarehouseResult)
 		{
-			updateWarehouseResult = _dbAgent.UpdateWarehouseData(user.m_Accountid, userId, saveType);
+			updateWarehouseResult = _dbAgent.UpdateWarehouseData(
+				user.m_Accountid, userId, saveType);
 		}
 	}
-	
+
 	// Verify saved data/timestamp
-	updateWarehouseResult = _dbAgent.CheckUserData(user.m_Accountid, user.m_id, 1, user.m_dwTime, user.m_iBank);
-	updateUserResult = _dbAgent.CheckUserData(user.m_Accountid, user.m_id, 2, user.m_dwTime, user.m_iExp);
+	updateWarehouseResult = _dbAgent.CheckUserData(
+		user.m_Accountid, user.m_id, 1, user.m_dwTime, user.m_iBank);
+	updateUserResult = _dbAgent.CheckUserData(
+		user.m_Accountid, user.m_id, 2, user.m_dwTime, user.m_iExp);
 	for (retryCount = 0; !updateWarehouseResult || !updateUserResult; retryCount++)
 	{
 		if (retryCount >= maxRetry)
 		{
 			if (!updateWarehouseResult)
 			{
-				spdlog::error("AujardApp::HandleUserUpdate: Warehouse Save Check Error [accountId={} charId={} (W:{})]",
+				spdlog::error("AujardApp::HandleUserUpdate: Warehouse Save Check Error "
+							  "[accountId={} charId={} (W:{})]",
 					user.m_Accountid, user.m_id, updateWarehouseResult);
 			}
 
 			if (!updateUserResult)
 			{
-				spdlog::error("AujardApp::HandleUserUpdate: UserData Save Check Error: [accountId={} charId={} (U:{})]",
+				spdlog::error("AujardApp::HandleUserUpdate: UserData Save Check Error: "
+							  "[accountId={} charId={} (U:{})]",
 					user.m_Accountid, user.m_id, updateUserResult);
 			}
 			break;
@@ -467,7 +456,8 @@ bool AujardApp::HandleUserUpdate(int userId, const _USER_DATA& user, uint8_t sav
 		if (!updateWarehouseResult)
 		{
 			_dbAgent.UpdateWarehouseData(user.m_Accountid, userId, saveType);
-			updateWarehouseResult = _dbAgent.CheckUserData(user.m_Accountid, user.m_id, 1, user.m_dwTime, user.m_iBank);
+			updateWarehouseResult = _dbAgent.CheckUserData(
+				user.m_Accountid, user.m_id, 1, user.m_dwTime, user.m_iBank);
 		}
 
 		std::this_thread::sleep_for(sleepTime);
@@ -475,7 +465,8 @@ bool AujardApp::HandleUserUpdate(int userId, const _USER_DATA& user, uint8_t sav
 		if (!updateUserResult)
 		{
 			_dbAgent.UpdateUser(user.m_id, userId, saveType);
-			updateUserResult = _dbAgent.CheckUserData(user.m_Accountid, user.m_id, 2, user.m_dwTime, user.m_iExp);
+			updateUserResult = _dbAgent.CheckUserData(
+				user.m_Accountid, user.m_id, 2, user.m_dwTime, user.m_iExp);
 		}
 	}
 
@@ -484,15 +475,12 @@ bool AujardApp::HandleUserUpdate(int userId, const _USER_DATA& user, uint8_t sav
 
 void AujardApp::AccountLogIn(const char* buffer)
 {
-	int index = 0, userId = -1, accountIdLen = 0,
-		passwordLen = 0, sendIndex = 0;
-	int nation = -1;
+	int index = 0, userId = -1, accountIdLen = 0, passwordLen = 0, sendIndex = 0;
+	int nation                      = -1;
 
-	char accountId[MAX_ID_SIZE + 1] = {},
-		password[MAX_PW_SIZE + 1] = {},
-		sendBuff[256] = {};
+	char accountId[MAX_ID_SIZE + 1] = {}, password[MAX_PW_SIZE + 1] = {}, sendBuff[256] = {};
 
-	userId = GetShort(buffer, index);
+	userId       = GetShort(buffer, index);
 	accountIdLen = GetShort(buffer, index);
 	GetString(accountId, buffer, accountIdLen, index);
 	passwordLen = GetShort(buffer, index);
@@ -511,14 +499,13 @@ void AujardApp::AccountLogIn(const char* buffer)
 void AujardApp::SelectNation(const char* buffer)
 {
 	int index = 0, userId = -1, accountIdLen = 0, sendIndex = 0;
-	int nation = -1;
-	char accountId[MAX_ID_SIZE + 1] = {},
-		sendBuff[256] = {};
+	int nation                      = -1;
+	char accountId[MAX_ID_SIZE + 1] = {}, sendBuff[256] = {};
 
-	userId = GetShort(buffer, index);
+	userId       = GetShort(buffer, index);
 	accountIdLen = GetShort(buffer, index);
 	GetString(accountId, buffer, accountIdLen, index);
-	nation = GetByte(buffer, index);
+	nation      = GetByte(buffer, index);
 
 	bool result = _dbAgent.NationSelect(accountId, nation);
 
@@ -536,30 +523,29 @@ void AujardApp::SelectNation(const char* buffer)
 
 void AujardApp::CreateNewChar(const char* buffer)
 {
-	int index = 0, userId = -1, accountIdLen = 0, charIdLen = 0, sendIndex = 0,
-		result = 0, charIndex = 0, race = 0, Class = 0, hair = 0,
-		face = 0, str = 0, sta = 0, dex = 0, intel = 0, cha = 0;
-	char accountId[MAX_ID_SIZE + 1] = {},
-		charId[MAX_ID_SIZE + 1] = {},
-		sendBuff[256] = {};
+	int index = 0, userId = -1, accountIdLen = 0, charIdLen = 0, sendIndex = 0, result = 0,
+		charIndex = 0, race = 0, Class = 0, hair = 0, face = 0, str = 0, sta = 0, dex = 0,
+		intel = 0, cha = 0;
+	char accountId[MAX_ID_SIZE + 1] = {}, charId[MAX_ID_SIZE + 1] = {}, sendBuff[256] = {};
 
-	userId = GetShort(buffer, index);
+	userId       = GetShort(buffer, index);
 	accountIdLen = GetShort(buffer, index);
 	GetString(accountId, buffer, accountIdLen, index);
 	charIndex = GetByte(buffer, index);
 	charIdLen = GetShort(buffer, index);
 	GetString(charId, buffer, charIdLen, index);
-	race = GetByte(buffer, index);
-	Class = GetShort(buffer, index);
-	face = GetByte(buffer, index);
-	hair = GetByte(buffer, index);
-	str = GetByte(buffer, index);
-	sta = GetByte(buffer, index);
-	dex = GetByte(buffer, index);
-	intel = GetByte(buffer, index);
-	cha = GetByte(buffer, index);
+	race   = GetByte(buffer, index);
+	Class  = GetShort(buffer, index);
+	face   = GetByte(buffer, index);
+	hair   = GetByte(buffer, index);
+	str    = GetByte(buffer, index);
+	sta    = GetByte(buffer, index);
+	dex    = GetByte(buffer, index);
+	intel  = GetByte(buffer, index);
+	cha    = GetByte(buffer, index);
 
-	result = _dbAgent.CreateNewChar(accountId, charIndex, charId, race, Class, hair, face, str, sta, dex, intel, cha);
+	result = _dbAgent.CreateNewChar(
+		accountId, charIndex, charId, race, Class, hair, face, str, sta, dex, intel, cha);
 
 	SetByte(sendBuff, WIZ_NEW_CHAR, sendIndex);
 	SetShort(sendBuff, userId, sendIndex);
@@ -571,15 +557,13 @@ void AujardApp::CreateNewChar(const char* buffer)
 
 void AujardApp::DeleteChar(const char* buffer)
 {
-	int index = 0, userId = -1, accountIdLen = 0, charIdLen = 0,
-		sendIndex = 0, result = 0, charIndex = 0, socNoLen = 0;
-	char accountId[MAX_ID_SIZE + 1] = {},
-		charId[MAX_ID_SIZE + 1] = {},
-		socNo[15] = {},
-		sendBuff[256] = {};
+	int index = 0, userId = -1, accountIdLen = 0, charIdLen = 0, sendIndex = 0, result = 0,
+		charIndex = 0, socNoLen = 0;
+	char accountId[MAX_ID_SIZE + 1] = {}, charId[MAX_ID_SIZE + 1] = {}, socNo[15] = {},
+								 sendBuff[256] = {};
 
-	userId = GetShort(buffer, index);
-	accountIdLen = GetShort(buffer, index);
+	userId                                     = GetShort(buffer, index);
+	accountIdLen                               = GetShort(buffer, index);
 	GetString(accountId, buffer, accountIdLen, index);
 	charIndex = GetByte(buffer, index);
 	charIdLen = GetShort(buffer, index);
@@ -606,20 +590,16 @@ void AujardApp::DeleteChar(const char* buffer)
 
 void AujardApp::AllCharInfoReq(const char* buffer)
 {
-	int index = 0, userId = 0, accountIdLen = 0, sendIndex = 0,
-		charBuffIndex = 0;
-	char accountId[MAX_ID_SIZE + 1] = {},
-		sendBuff[1024] = {},
-		charBuff[1024] = {},
-		charId1[MAX_ID_SIZE + 1] = {},
-		charId2[MAX_ID_SIZE + 1] = {},
-		charId3[MAX_ID_SIZE + 1] = {};
+	int index = 0, userId = 0, accountIdLen = 0, sendIndex = 0, charBuffIndex = 0;
+	char accountId[MAX_ID_SIZE + 1] = {}, sendBuff[1024] = {}, charBuff[1024] = {},
+								 charId1[MAX_ID_SIZE + 1] = {}, charId2[MAX_ID_SIZE + 1] = {},
+								 charId3[MAX_ID_SIZE + 1] = {};
 
-	userId = GetShort(buffer, index);
-	accountIdLen = GetShort(buffer, index);
+	userId                                                = GetShort(buffer, index);
+	accountIdLen                                          = GetShort(buffer, index);
 	GetString(accountId, buffer, accountIdLen, index);
 
-	SetByte(charBuff, 0x01, charBuffIndex);	// result
+	SetByte(charBuff, 0x01, charBuffIndex); // result
 
 	_dbAgent.GetAllCharID(accountId, charId1, charId2, charId3);
 	_dbAgent.LoadCharInfo(charId1, charBuff, charBuffIndex);
@@ -638,12 +618,12 @@ void AujardApp::AllCharInfoReq(const char* buffer)
 void AujardApp::AllSaveRoutine()
 {
 	// TODO:  100ms seems excessive
-	auto sleepTime = 100ms;
+	auto sleepTime     = 100ms;
 	bool allUsersSaved = true;
 
 	// log the disconnect
 	spdlog::error("AujardApp::AllSaveRoutine: Ebenezer disconnected. Saving users...");
-	
+
 	for (int userId = 0; userId < static_cast<int>(_dbAgent.UserData.size()); userId++)
 	{
 		_USER_DATA* pUser = _dbAgent.UserData[userId];
@@ -670,7 +650,8 @@ void AujardApp::AllSaveRoutine()
 	}
 
 	if (allUsersSaved)
-		spdlog::info("AujardApp::AllSaveRoutine: Ebenezer disconnect: all users saved successfully");
+		spdlog::info(
+			"AujardApp::AllSaveRoutine: Ebenezer disconnect: all users saved successfully");
 	else
 		spdlog::error("AujardApp::AllSaveRoutine: Ebenezer disconnect: not all users saved");
 }
@@ -691,8 +672,8 @@ void AujardApp::ConCurrentUserCount()
 		usercount++;
 	}
 
-	spdlog::trace("AujardApp::ConCurrentUserCount: [serverId={} zoneId={} userCount={}]",
-		_serverId, _zoneId, usercount);
+	spdlog::trace("AujardApp::ConCurrentUserCount: [serverId={} zoneId={} userCount={}]", _serverId,
+		_zoneId, usercount);
 
 	_dbAgent.UpdateConCurrentUserCount(_serverId, _zoneId, usercount);
 }
@@ -700,21 +681,17 @@ void AujardApp::ConCurrentUserCount()
 void AujardApp::UserDataSave(const char* buffer)
 {
 	int index = 0, userId = -1, accountIdLen = 0, charIdLen = 0;
-	char accountId[MAX_ID_SIZE + 1] = {},
-		charId[MAX_ID_SIZE + 1] = {};
+	char accountId[MAX_ID_SIZE + 1] = {}, charId[MAX_ID_SIZE + 1] = {};
 
-	userId = GetShort(buffer, index);
+	userId       = GetShort(buffer, index);
 	accountIdLen = GetShort(buffer, index);
 	GetString(accountId, buffer, accountIdLen, index);
 	charIdLen = GetShort(buffer, index);
 	GetString(charId, buffer, charIdLen, index);
 
-	if (userId < 0
-		|| userId >= MAX_USER
-		|| strlen(accountId) == 0
-		|| strlen(charId) == 0)
+	if (userId < 0 || userId >= MAX_USER || strlen(accountId) == 0 || strlen(charId) == 0)
 		return;
-	
+
 	_USER_DATA* pUser = _dbAgent.UserData[userId];
 	if (pUser == nullptr)
 		return;
@@ -794,36 +771,34 @@ void AujardApp::KnightsPacket(const char* buffer)
 			break;
 
 		default:
-			spdlog::error("AujardApp::KnightsPacket: Invalid WIZ_KNIGHTS_PROCESS command code received: {:X}",
+			spdlog::error(
+				"AujardApp::KnightsPacket: Invalid WIZ_KNIGHTS_PROCESS command code received: {:X}",
 				command);
 	}
 }
 
 void AujardApp::CreateKnights(const char* buffer)
 {
-	int index = 0, sendIndex = 0, nameLen = 0, chiefNameLen = 0, knightsId = 0,
-		userId = -1, nation = 0, result = 0, community = 0;
-	char knightsName[MAX_ID_SIZE + 1] = {},
-		chiefName[MAX_ID_SIZE + 1] = {},
-		sendBuff[256] = {};
+	int index = 0, sendIndex = 0, nameLen = 0, chiefNameLen = 0, knightsId = 0, userId = -1,
+		nation = 0, result = 0, community = 0;
+	char knightsName[MAX_ID_SIZE + 1] = {}, chiefName[MAX_ID_SIZE + 1] = {}, sendBuff[256] = {};
 
-	userId = GetShort(buffer, index);
+	userId    = GetShort(buffer, index);
 	community = GetByte(buffer, index);
 	knightsId = GetShort(buffer, index);
-	nation = GetByte(buffer, index);
-	nameLen = GetShort(buffer, index);
+	nation    = GetByte(buffer, index);
+	nameLen   = GetShort(buffer, index);
 	GetString(knightsName, buffer, nameLen, index);
 	chiefNameLen = GetShort(buffer, index);
 	GetString(chiefName, buffer, chiefNameLen, index);
 
-	if (userId < 0
-		|| userId >= MAX_USER)
+	if (userId < 0 || userId >= MAX_USER)
 		return;
 
 	result = _dbAgent.CreateKnights(knightsId, nation, knightsName, chiefName, community);
 
-	spdlog::trace("AujardApp::CreateKnights: userId={}, knightsId={}, result={}",
-		userId, knightsId, result);
+	spdlog::trace(
+		"AujardApp::CreateKnights: userId={}, knightsId={}, result={}", userId, knightsId, result);
 
 	SetByte(sendBuff, KNIGHTS_CREATE, sendIndex);
 	SetShort(sendBuff, userId, sendIndex);
@@ -843,14 +818,13 @@ void AujardApp::CreateKnights(const char* buffer)
 void AujardApp::JoinKnights(const char* buffer)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1;
-	uint8_t result = 0;
+	uint8_t result     = 0;
 	char sendBuff[256] = {};
 
-	userId = GetShort(buffer, index);
-	knightsId = GetShort(buffer, index);
+	userId             = GetShort(buffer, index);
+	knightsId          = GetShort(buffer, index);
 
-	if (userId < 0
-		|| userId >= MAX_USER)
+	if (userId < 0 || userId >= MAX_USER)
 		return;
 
 	_USER_DATA* pUser = _dbAgent.UserData[userId];
@@ -859,8 +833,8 @@ void AujardApp::JoinKnights(const char* buffer)
 
 	result = _dbAgent.UpdateKnights(KNIGHTS_JOIN, pUser->m_id, knightsId, 0);
 
-	spdlog::trace("AujardApp::JoinKnights: userId={}, charId={}, knightsId={}, result={}",
-		userId, pUser->m_id, knightsId, result);
+	spdlog::trace("AujardApp::JoinKnights: userId={}, charId={}, knightsId={}, result={}", userId,
+		pUser->m_id, knightsId, result);
 
 	SetByte(sendBuff, KNIGHTS_JOIN, sendIndex);
 	SetShort(sendBuff, userId, sendIndex);
@@ -874,14 +848,13 @@ void AujardApp::JoinKnights(const char* buffer)
 void AujardApp::WithdrawKnights(const char* buffer)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1;
-	uint8_t result = 0;
+	uint8_t result     = 0;
 	char sendBuff[256] = {};
 
-	userId = GetShort(buffer, index);
-	knightsId = GetShort(buffer, index);
+	userId             = GetShort(buffer, index);
+	knightsId          = GetShort(buffer, index);
 
-	if (userId < 0
-		|| userId >= MAX_USER)
+	if (userId < 0 || userId >= MAX_USER)
 		return;
 
 	_USER_DATA* pUser = _dbAgent.UserData[userId];
@@ -889,8 +862,8 @@ void AujardApp::WithdrawKnights(const char* buffer)
 		return;
 
 	result = _dbAgent.UpdateKnights(KNIGHTS_WITHDRAW, pUser->m_id, knightsId, 0);
-	spdlog::trace("AujardApp::WithdrawKnights: userId={}, knightsId={}, result={}",
-		userId, knightsId, result);
+	spdlog::trace("AujardApp::WithdrawKnights: userId={}, knightsId={}, result={}", userId,
+		knightsId, result);
 
 	SetByte(sendBuff, KNIGHTS_WITHDRAW, sendIndex);
 	SetShort(sendBuff, userId, sendIndex);
@@ -903,23 +876,20 @@ void AujardApp::WithdrawKnights(const char* buffer)
 
 void AujardApp::ModifyKnightsMember(const char* buffer, uint8_t command)
 {
-	int index = 0, sendIndex = 0, knightsId = 0, userId = -1, charIdLen = 0,
-		removeFlag = 0;
-	uint8_t result = 0;
-	char sendBuff[256] = {},
-		charId[MAX_ID_SIZE + 1] = {};
+	int index = 0, sendIndex = 0, knightsId = 0, userId = -1, charIdLen = 0, removeFlag = 0;
+	uint8_t result     = 0;
+	char sendBuff[256] = {}, charId[MAX_ID_SIZE + 1] = {};
 
-	userId = GetShort(buffer, index);
+	userId    = GetShort(buffer, index);
 	knightsId = GetShort(buffer, index);
 	charIdLen = GetShort(buffer, index);
 	GetString(charId, buffer, charIdLen, index);
 	removeFlag = GetByte(buffer, index);
 
-	if (userId < 0
-		|| userId >= MAX_USER)
+	if (userId < 0 || userId >= MAX_USER)
 		return;
 
-/*	if( remove_flag == 0 && command == KNIGHTS_REMOVE )	{		// 없는 유저 추방시에는 디비에서만 처리한다
+	/*	if( remove_flag == 0 && command == KNIGHTS_REMOVE )	{		// 없는 유저 추방시에는 디비에서만 처리한다
 		result = m_DBAgent.UpdateKnights( command, userid, knightindex, remove_flag );
 		TRACE(_T("ModifyKnights - command=%d, nid=%d, index=%d, result=%d \n"), command, uid, knightindex, result);
 		return;
@@ -943,29 +913,29 @@ void AujardApp::ModifyKnightsMember(const char* buffer, uint8_t command)
 		std::string cmdStr;
 		switch (command)
 		{
-		case KNIGHTS_REMOVE:
-			cmdStr = "KNIGHTS_REMOVE";
-			break;
-		case KNIGHTS_ADMIT:
-			cmdStr = "KNIGHTS_ADMIT";
-			break;
-		case KNIGHTS_REJECT:
-			cmdStr = "KNIGHTS_REJECT";
-			break;
-		case KNIGHTS_CHIEF:
-			cmdStr = "KNIGHTS_CHIEF";
-			break;
-		case KNIGHTS_VICECHIEF:
-			cmdStr = "KNIGHTS_VICECHIEF";
-			break;
-		case KNIGHTS_OFFICER:
-			cmdStr = "KNIGHTS_OFFICER";
-			break;
-		case KNIGHTS_PUNISH:
-			cmdStr = "KNIGHTS_PUNISH";
-			break;
-		default:
-			cmdStr = "ModifyKnightsMember";
+			case KNIGHTS_REMOVE:
+				cmdStr = "KNIGHTS_REMOVE";
+				break;
+			case KNIGHTS_ADMIT:
+				cmdStr = "KNIGHTS_ADMIT";
+				break;
+			case KNIGHTS_REJECT:
+				cmdStr = "KNIGHTS_REJECT";
+				break;
+			case KNIGHTS_CHIEF:
+				cmdStr = "KNIGHTS_CHIEF";
+				break;
+			case KNIGHTS_VICECHIEF:
+				cmdStr = "KNIGHTS_VICECHIEF";
+				break;
+			case KNIGHTS_OFFICER:
+				cmdStr = "KNIGHTS_OFFICER";
+				break;
+			case KNIGHTS_PUNISH:
+				cmdStr = "KNIGHTS_PUNISH";
+				break;
+			default:
+				cmdStr = "ModifyKnightsMember";
 		}
 
 		spdlog::error("AujardApp::ModifyKnightsMember: Packet Drop: {}", cmdStr);
@@ -975,18 +945,17 @@ void AujardApp::ModifyKnightsMember(const char* buffer, uint8_t command)
 void AujardApp::DestroyKnights(const char* buffer)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1;
-	uint8_t result = 0;
+	uint8_t result     = 0;
 	char sendBuff[256] = {};
 
-	userId = GetShort(buffer, index);
-	knightsId = GetShort(buffer, index);
-	if (userId < 0
-		|| userId >= MAX_USER)
+	userId             = GetShort(buffer, index);
+	knightsId          = GetShort(buffer, index);
+	if (userId < 0 || userId >= MAX_USER)
 		return;
 
 	result = _dbAgent.DeleteKnights(knightsId);
-	spdlog::trace("AujardApp::DestroyKnights: userId={}, knightsId={}, result={}",
-	userId, knightsId, result);
+	spdlog::trace(
+		"AujardApp::DestroyKnights: userId={}, knightsId={}, result={}", userId, knightsId, result);
 
 	SetByte(sendBuff, KNIGHTS_DESTROY, sendIndex);
 	SetShort(sendBuff, userId, sendIndex);
@@ -999,17 +968,14 @@ void AujardApp::DestroyKnights(const char* buffer)
 
 void AujardApp::AllKnightsMember(const char* buffer)
 {
-	int index = 0, sendIndex = 0, knightsId = 0, userId = -1,
-		dbIndex = 0, count = 0;
-	char sendBuff[2048] = {},
-		dbBuff[2048] = {};
+	int index = 0, sendIndex = 0, knightsId = 0, userId = -1, dbIndex = 0, count = 0;
+	char sendBuff[2048] = {}, dbBuff[2048] = {};
 
-	userId = GetShort(buffer, index);
+	userId    = GetShort(buffer, index);
 	knightsId = GetShort(buffer, index);
 	//int page = GetShort( pBuf, index );
 
-	if (userId < 0
-		|| userId >= MAX_USER)
+	if (userId < 0 || userId >= MAX_USER)
 		return;
 
 	//if( page < 0 )  return;
@@ -1019,8 +985,8 @@ void AujardApp::AllKnightsMember(const char* buffer)
 
 	SetByte(sendBuff, KNIGHTS_MEMBER_REQ, sendIndex);
 	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, 0x00, sendIndex);		// Success
-	SetShort(sendBuff, 4 + dbIndex, sendIndex);	// total packet size -> int16_t(*3) + buff_index 
+	SetByte(sendBuff, 0x00, sendIndex);         // Success
+	SetShort(sendBuff, 4 + dbIndex, sendIndex); // total packet size -> int16_t(*3) + buff_index
 	//SetShort( send_buff, page, send_index );
 	SetShort(sendBuff, count, sendIndex);
 	SetString(sendBuff, dbBuff, dbIndex, sendIndex);
@@ -1031,15 +997,12 @@ void AujardApp::AllKnightsMember(const char* buffer)
 
 void AujardApp::KnightsList(const char* buffer)
 {
-	int index = 0, sendIndex = 0, knightsId = 0, userId = -1,
-		dbIndex = 0;
-	char sendBuff[256] = {},
-		dbBuff[256] = {};
+	int index = 0, sendIndex = 0, knightsId = 0, userId = -1, dbIndex = 0;
+	char sendBuff[256] = {}, dbBuff[256] = {};
 
-	userId = GetShort(buffer, index);
+	userId    = GetShort(buffer, index);
 	knightsId = GetShort(buffer, index);
-	if (userId < 0
-		|| userId >= MAX_USER)
+	if (userId < 0 || userId >= MAX_USER)
 		return;
 
 	_dbAgent.LoadKnightsInfo(knightsId, dbBuff, dbIndex);
@@ -1055,25 +1018,22 @@ void AujardApp::KnightsList(const char* buffer)
 
 void AujardApp::SetLogInInfo(const char* buffer)
 {
-	int index = 0, accountIdLen = 0, charIdLen = 0, serverId = 0, serverIpLen = 0,
-	clientIpLen = 0, userId = -1, sendIndex = 0;
-	char accountId[MAX_ID_SIZE + 1] = {},
-		serverIp[20] = {},
-		clientIp[20] = {},
-		charId[MAX_ID_SIZE + 1] = {},
-		sendBuff[256] = {};
+	int index = 0, accountIdLen = 0, charIdLen = 0, serverId = 0, serverIpLen = 0, clientIpLen = 0,
+		userId = -1, sendIndex = 0;
+	char accountId[MAX_ID_SIZE + 1] = {}, serverIp[20] = {}, clientIp[20] = {},
+								 charId[MAX_ID_SIZE + 1] = {}, sendBuff[256] = {};
 
-	userId = GetShort(buffer, index);
+	userId       = GetShort(buffer, index);
 	accountIdLen = GetShort(buffer, index);
 	GetString(accountId, buffer, accountIdLen, index);
 	charIdLen = GetShort(buffer, index);
 	GetString(charId, buffer, charIdLen, index);
 	serverIpLen = GetShort(buffer, index);
 	GetString(serverIp, buffer, serverIpLen, index);
-	serverId = GetShort(buffer, index);
+	serverId    = GetShort(buffer, index);
 	clientIpLen = GetShort(buffer, index);
 	GetString(clientIp, buffer, clientIpLen, index);
-	
+
 	// init: 0x01 to insert, 0x02 to update CURRENTUSER
 	uint8_t init = GetByte(buffer, index);
 
@@ -1081,11 +1041,12 @@ void AujardApp::SetLogInInfo(const char* buffer)
 	{
 		SetByte(sendBuff, WIZ_LOGIN_INFO, sendIndex);
 		SetShort(sendBuff, userId, sendIndex);
-		SetByte(sendBuff, 0x00, sendIndex);							// FAIL
+		SetByte(sendBuff, 0x00, sendIndex); // FAIL
 
 		if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
 		{
-			spdlog::error("AujardApp::SetLoginInfo: Packet Drop: WIZ_LOGIN_INFO [accountId={}, charId={}, init={}]",
+			spdlog::error("AujardApp::SetLoginInfo: Packet Drop: WIZ_LOGIN_INFO [accountId={}, "
+						  "charId={}, init={}]",
 				accountId, charId, init);
 		}
 	}
@@ -1096,7 +1057,7 @@ void AujardApp::UserKickOut(const char* buffer)
 	int index = 0, accountIdLen = 0;
 	char accountId[MAX_ID_SIZE + 1] = {};
 
-	accountIdLen = GetShort(buffer, index);
+	accountIdLen                    = GetShort(buffer, index);
 	GetString(accountId, buffer, accountIdLen, index);
 
 	_dbAgent.AccountLogout(accountId);
@@ -1113,14 +1074,14 @@ void AujardApp::BattleEventResult(const char* data)
 	int _type = 0, result = 0, charIdLen = 0, index = 0;
 	char charId[MAX_ID_SIZE + 1] = {};
 
-	_type = GetByte(data, index);
-	result = GetByte(data, index);
-	charIdLen = GetByte(data, index);
-	if (charIdLen > 0
-		&& charIdLen < MAX_ID_SIZE + 1)
+	_type                        = GetByte(data, index);
+	result                       = GetByte(data, index);
+	charIdLen                    = GetByte(data, index);
+	if (charIdLen > 0 && charIdLen < MAX_ID_SIZE + 1)
 	{
 		GetString(charId, data, charIdLen, index);
-		spdlog::info("AujardApp::BattleEventResult : The user who killed the enemy commander is {}, _type={}, nation={}",
+		spdlog::info("AujardApp::BattleEventResult : The user who killed the enemy commander is "
+					 "{}, _type={}, nation={}",
 			charId, _type, result);
 		_dbAgent.UpdateBattleEvent(charId, result);
 	}
@@ -1129,10 +1090,8 @@ void AujardApp::BattleEventResult(const char* data)
 void AujardApp::CouponEvent(const char* data)
 {
 	int index = 0, sendIndex = 0;
-	char strAccountName[MAX_ID_SIZE + 1] = {},
-		strCharName[MAX_ID_SIZE + 1] = {},
-		strCouponID[MAX_ID_SIZE + 1] = {},
-		sendBuff[256] = {};
+	char strAccountName[MAX_ID_SIZE + 1] = {}, strCharName[MAX_ID_SIZE + 1] = {},
+									  strCouponID[MAX_ID_SIZE + 1] = {}, sendBuff[256] = {};
 
 	int nType = GetByte(data, index);
 	if (nType == CHECK_COUPON_EVENT)
@@ -1140,12 +1099,12 @@ void AujardApp::CouponEvent(const char* data)
 		int nSid = GetShort(data, index);
 		int nLen = GetShort(data, index);
 		GetString(strAccountName, data, nLen, index);
-		int nEventNum = GetDWORD(data, index);
+		int nEventNum   = GetDWORD(data, index);
 		// 비러머글 대사문 >.<
 		int nMessageNum = GetDWORD(data, index);
 		// TODO: Not implemented. Allow nResult to default to 0
 		// int nResult = _dbAgent.CheckCouponEvent(strAccountName);
-		int nResult = 0;
+		int nResult     = 0;
 
 		SetByte(sendBuff, DB_COUPON_EVENT, sendIndex);
 		SetShort(sendBuff, nSid, sendIndex);
@@ -1160,15 +1119,15 @@ void AujardApp::CouponEvent(const char* data)
 	}
 	else if (nType == UPDATE_COUPON_EVENT)
 	{
-		/*int nSid =*/ GetShort(data, index);
+		/*int nSid =*/GetShort(data, index);
 		int nLen = GetShort(data, index);
 		GetString(strAccountName, data, nLen, index);
 		int nCharLen = GetShort(data, index);
 		GetString(strCharName, data, nCharLen, index);
 		int nCouponLen = GetShort(data, index);
 		GetString(strCouponID, data, nCouponLen, index);
-		/*int nItemID =*/ GetDWORD(data, index);
-		/*int nItemCount =*/ GetDWORD(data, index);
+		/*int nItemID =*/GetDWORD(data, index);
+		/*int nItemCount =*/GetDWORD(data, index);
 
 		// TODO: not implemented.  Allow nResult to default to 0
 		// int nResult = _dbAgent.UpdateCouponEvent(strAccountName, strCharName, strCouponID, nItemID, nItemCount);
@@ -1180,7 +1139,7 @@ void AujardApp::CheckHeartbeat()
 	if (_heartbeatReceivedTime == 0)
 		return;
 
-	time_t currentTime = time(nullptr);
+	time_t currentTime               = time(nullptr);
 	time_t secondsSinceLastHeartbeat = currentTime - _heartbeatReceivedTime;
 
 	if (secondsSinceLastHeartbeat > SECONDS_SINCE_LAST_HEARTBEAT_TO_SAVE.count())

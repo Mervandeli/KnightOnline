@@ -14,12 +14,12 @@
 
 //////////////////////////////////////////////////////////////////////
 
-class CUICreateClanName : public CN3UIBase  
+class CUICreateClanName : public CN3UIBase
 {
 public:
-	CN3UIString*	m_pText_Title;
-	CN3UIEdit*		m_pEdit_ClanName;
-	std::string		m_szClanName;
+	CN3UIString* m_pText_Title;
+	CN3UIEdit* m_pEdit_ClanName;
+	std::string m_szClanName;
 
 public:
 	CUICreateClanName();

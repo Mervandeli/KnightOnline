@@ -6,22 +6,20 @@
 
 #include <set>
 
-CUser::CUser(SocketManager* socketManager)
-	: TcpServerSocket(socketManager)
+CUser::CUser(SocketManager* socketManager) : TcpServerSocket(socketManager)
 {
 }
 
 bool CUser::PullOutCore(char*& data, int& length)
 {
-	uint8_t*	pTmp;
-	int			len;
-	bool		foundCore;
-	MYSHORT		slen;
+	uint8_t* pTmp;
+	int len;
+	bool foundCore;
+	MYSHORT slen;
 
 	len = _recvCircularBuffer.GetValidCount();
 
-	if (len == 0
-		|| len < 0)
+	if (len == 0 || len < 0)
 		return false;
 
 	pTmp = new uint8_t[len];
@@ -30,22 +28,21 @@ bool CUser::PullOutCore(char*& data, int& length)
 
 	foundCore = false;
 
-	int	sPos = 0, ePos = 0;
+	int sPos = 0, ePos = 0;
 
 	for (int i = 0; i < len && !foundCore; i++)
 	{
 		if (i + 2 >= len)
 			break;
 
-		if (pTmp[i] == PACKET_START1
-			&& pTmp[i + 1] == PACKET_START2)
+		if (pTmp[i] == PACKET_START1 && pTmp[i + 1] == PACKET_START2)
 		{
-			sPos = i + 2;
+			sPos      = i + 2;
 
 			slen.b[0] = pTmp[sPos];
 			slen.b[1] = pTmp[sPos + 1];
 
-			length = slen.i;
+			length    = slen.i;
 
 			if (length < 0)
 				goto cancelRoutine;
@@ -57,18 +54,17 @@ bool CUser::PullOutCore(char*& data, int& length)
 
 			if ((ePos + 2) > len)
 				goto cancelRoutine;
-//			ASSERT(ePos+2 <= len);
+			//			ASSERT(ePos+2 <= len);
 
-			if (pTmp[ePos] == PACKET_END1
-				&& pTmp[ePos + 1] == PACKET_END2)
+			if (pTmp[ePos] == PACKET_END1 && pTmp[ePos + 1] == PACKET_END2)
 			{
 				data = new char[length + 1];
 				memcpy(data, (pTmp + sPos + 2), length);
 				data[length] = 0;
-				foundCore = true;
-//				int head = _recvCircularBuffer.GetHeadPos(), tail = _recvCircularBuffer.GetTailPos();
-//				TRACE("data : %s, len : %d\n", data, length);
-//				TRACE("head : %d, tail : %d\n", head, tail );
+				foundCore    = true;
+				//				int head = _recvCircularBuffer.GetHeadPos(), tail = _recvCircularBuffer.GetTailPos();
+				//				TRACE("data : %s, len : %d\n", data, length);
+				//				TRACE("head : %d, tail : %d\n", head, tail );
 				break;
 			}
 			else
@@ -94,8 +90,7 @@ int CUser::Send(char* pBuf, int length)
 	assert(length >= 0);
 	assert((length + PacketHeaderSize) <= MAX_PACKET_SIZE);
 
-	if (length < 0
-		|| (length + PacketHeaderSize) > MAX_PACKET_SIZE)
+	if (length < 0 || (length + PacketHeaderSize) > MAX_PACKET_SIZE)
 		return -1;
 
 	char sendBuffer[MAX_PACKET_SIZE];
@@ -143,7 +138,7 @@ void CUser::Parsing(int /*len*/, char* pData)
 				SetString2(buff, pInfo->strServerName, send_index);
 
 				if (pInfo->sUserCount <= pInfo->sUserLimit)
-					SetShort(buff, pInfo->sUserCount, send_index);   // 기범이가 ^^;
+					SetShort(buff, pInfo->sUserCount, send_index); // 기범이가 ^^;
 				else
 					SetShort(buff, -1, send_index);
 			}
@@ -170,24 +165,20 @@ void CUser::Parsing(int /*len*/, char* pData)
 void CUser::LogInReq(char* pBuf)
 {
 	int index = 0, idlen = 0, pwdlen = 0, send_index = 0, result = 0, serverno = 0;
-	bool bCurrentuser = false;
-	char send_buff[256] = {},
-		accountid[MAX_ID_SIZE + 1] = {},
-		pwd[MAX_PW_SIZE + 1] = {};
+	bool bCurrentuser   = false;
+	char send_buff[256] = {}, accountid[MAX_ID_SIZE + 1] = {}, pwd[MAX_PW_SIZE + 1] = {};
 	std::string serverIp;
 	int16_t sPremiumTimeDaysRemaining = -1;
-	VersionManagerApp* appInstance = VersionManagerApp::instance();
+	VersionManagerApp* appInstance    = VersionManagerApp::instance();
 
-	idlen = GetShort(pBuf, index);
-	if (idlen > MAX_ID_SIZE
-		|| idlen <= 0)
+	idlen                             = GetShort(pBuf, index);
+	if (idlen > MAX_ID_SIZE || idlen <= 0)
 		goto fail_return;
 
 	GetString(accountid, pBuf, idlen, index);
 
 	pwdlen = GetShort(pBuf, index);
-	if (pwdlen > MAX_PW_SIZE
-		|| pwdlen < 0)
+	if (pwdlen > MAX_PW_SIZE || pwdlen < 0)
 		goto fail_return;
 
 	GetString(pwd, pBuf, pwdlen, index);
@@ -211,7 +202,8 @@ void CUser::LogInReq(char* pBuf)
 		{
 			SetByte(send_buff, result, send_index);
 
-			if (!appInstance->DbProcess.LoadPremiumServiceUser(accountid, &sPremiumTimeDaysRemaining))
+			if (!appInstance->DbProcess.LoadPremiumServiceUser(
+					accountid, &sPremiumTimeDaysRemaining))
 				sPremiumTimeDaysRemaining = -1;
 
 			SetShort(send_buff, sPremiumTimeDaysRemaining, send_index);
@@ -227,7 +219,7 @@ void CUser::LogInReq(char* pBuf)
 
 fail_return:
 	SetByte(send_buff, LS_LOGIN_REQ, send_index);
-	SetByte(send_buff, AUTH_NOT_FOUND, send_index);				// id, pwd 이상...
+	SetByte(send_buff, AUTH_NOT_FOUND, send_index); // id, pwd 이상...
 	Send(send_buff, send_index);
 }
 
@@ -258,11 +250,13 @@ void CUser::SendDownloadInfo(int version)
 
 void CUser::NewsReq()
 {
-	constexpr char szHeader[] = "Login Notice";	// this isn't really used, but it's always set to this
-	constexpr char szEmpty[] = "<empty>";		// unofficial but when used, will essentially cause it to skip since it's not formatted.
+	constexpr char
+		szHeader[] = "Login Notice"; // this isn't really used, but it's always set to this
+	constexpr char szEmpty[] =
+		"<empty>"; // unofficial but when used, will essentially cause it to skip since it's not formatted.
 
 	char send_buff[8192];
-	int send_index = 0;
+	int send_index                 = 0;
 	VersionManagerApp* appInstance = VersionManagerApp::instance();
 
 	SetByte(send_buff, LS_NEWS, send_index);

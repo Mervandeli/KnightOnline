@@ -6,7 +6,7 @@
 #include "EVENT_DATA.h"
 #include <shared-server/STLMap.h>
 
-typedef CSTLMap <EVENT_DATA>				EventDataArray;
+typedef CSTLMap<EVENT_DATA> EventDataArray;
 
 class EVENT
 {

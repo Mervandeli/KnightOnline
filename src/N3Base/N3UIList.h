@@ -15,19 +15,19 @@
 class CN3UIString;
 typedef std::list<CN3UIString*>::iterator it_pString;
 
-class CN3UIList : public CN3UIBase  
+class CN3UIList : public CN3UIBase
 {
 protected:
-	int						m_iCurSel;		// 현재 선택..
-	std::list<CN3UIString*>	m_ListString;	// String List
-	class CN3UIScrollBar*	m_pScrollBarRef;
+	int m_iCurSel;                        // 현재 선택..
+	std::list<CN3UIString*> m_ListString; // String List
+	class CN3UIScrollBar* m_pScrollBarRef;
 
-	std::string				m_szFontName;
-	uint32_t				m_dwFontHeight;
-	BOOL					m_bFontBold;
-	BOOL					m_bFontItalic;
-	D3DCOLOR				m_crFont;
-	
+	std::string m_szFontName;
+	uint32_t m_dwFontHeight;
+	BOOL m_bFontBold;
+	BOOL m_bFontItalic;
+	D3DCOLOR m_crFont;
+
 public:
 	const std::string& FontName() const
 	{
@@ -54,28 +54,27 @@ public:
 		return m_bFontItalic;
 	}
 
-	void	SetFont(const std::string& szFontName, uint32_t dwHeight, BOOL bBold, BOOL bItalic);
-	void	SetFontColor(D3DCOLOR color);
-	void	SetFontColor(int iIndex, D3DCOLOR color);
+	void SetFont(const std::string& szFontName, uint32_t dwHeight, BOOL bBold, BOOL bItalic);
+	void SetFontColor(D3DCOLOR color);
+	void SetFontColor(int iIndex, D3DCOLOR color);
 
-	void	ResetContent();
-	void	UpdateChildRegions();
-	int		AddStrings(const std::string* pszStrings, int iStringCount);
-	int		AddString(const std::string& szString);
-	bool	InsertString(int iIndex, const std::string& szString);
-	bool	DeleteString(int iIndex);
-	bool	GetString(int iIndex, std::string& szString);
-	bool	SetString(int iIndex, const std::string& szString);
+	void ResetContent();
+	void UpdateChildRegions();
+	int AddStrings(const std::string* pszStrings, int iStringCount);
+	int AddString(const std::string& szString);
+	bool InsertString(int iIndex, const std::string& szString);
+	bool DeleteString(int iIndex);
+	bool GetString(int iIndex, std::string& szString);
+	bool SetString(int iIndex, const std::string& szString);
 
-	int	GetCurSel() const
+	int GetCurSel() const
 	{
 		return m_iCurSel;
 	}
 
 	bool SetCurSel(int iIndex)
 	{
-		if (iIndex < 0
-			|| iIndex >= static_cast<int>(m_ListString.size()))
+		if (iIndex < 0 || iIndex >= static_cast<int>(m_ListString.size()))
 			m_iCurSel = -1;
 		else
 			m_iCurSel = iIndex;
@@ -89,20 +88,20 @@ public:
 		return static_cast<int>(m_ListString.size());
 	}
 
-	int		GetScrollPos() const;
-	bool	SetScrollPos(int iScrollPos);
-	
-	void	Render() override;
-	bool	ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
-	bool	Load(File& file) override;
+	int GetScrollPos() const;
+	bool SetScrollPos(int iScrollPos);
+
+	void Render() override;
+	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
+	bool Load(File& file) override;
 	uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
 
 #ifdef _N3TOOL
-	bool	Save(File& file) override;
-	virtual void	operator = (const CN3UIList& other);
+	bool Save(File& file) override;
+	virtual void operator=(const CN3UIList& other);
 #endif
 
-	void	Release() override;
+	void Release() override;
 	CN3UIList();
 	~CN3UIList() override;
 };

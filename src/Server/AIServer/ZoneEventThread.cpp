@@ -5,8 +5,7 @@
 #include "NpcThread.h"
 #include "RoomEvent.h"
 
-ZoneEventThread::ZoneEventThread()
-	: Thread()
+ZoneEventThread::ZoneEventThread() : Thread()
 {
 	_main = AIServerApp::instance();
 }
@@ -36,8 +35,7 @@ void ZoneEventThread::thread_loop()
 					continue;
 
 				// 1:init, 2:progress, 3:clear
-				if (pRoom->m_byStatus == 1
-					|| pRoom->m_byStatus == 3)
+				if (pRoom->m_byStatus == 1 || pRoom->m_byStatus == 3)
 					continue;
 
 				// 여기서 처리하는 로직...

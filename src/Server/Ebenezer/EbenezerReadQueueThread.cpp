@@ -3,8 +3,8 @@
 #include "EbenezerApp.h"
 #include "User.h"
 
-EbenezerReadQueueThread::EbenezerReadQueueThread()
-	: ReadQueueThread(EbenezerApp::instance()->m_LoggerRecvQueue)
+EbenezerReadQueueThread::EbenezerReadQueueThread() :
+	ReadQueueThread(EbenezerApp::instance()->m_LoggerRecvQueue)
 {
 }
 
@@ -15,13 +15,12 @@ void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 	int index = 0, uid = -1, send_index = 0, buff_length = 0;
 	uint8_t command, result;
 	char send_buff[1024] = {};
-	CUser* pUser = nullptr;
+	CUser* pUser         = nullptr;
 
-	command = GetByte(buffer, index);
-	uid = GetShort(buffer, index);
+	command              = GetByte(buffer, index);
+	uid                  = GetShort(buffer, index);
 
-	if (command == (KNIGHTS_ALLLIST_REQ + 0x10)
-		&& uid == -1)
+	if (command == (KNIGHTS_ALLLIST_REQ + 0x10) && uid == -1)
 	{
 		appInstance->m_KnightsManager.RecvKnightsAllList(buffer + index);
 		return;
@@ -38,26 +37,26 @@ void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 			if (result == 0xFF)
 				memset(pUser->m_strAccountID, 0, sizeof(pUser->m_strAccountID));
 			SetByte(send_buff, WIZ_LOGIN, send_index);
-			SetByte(send_buff, result, send_index);					// 성공시 국가 정보
+			SetByte(send_buff, result, send_index); // 성공시 국가 정보
 			pUser->Send(send_buff, send_index);
 			break;
 
 		case WIZ_SEL_NATION:
 			SetByte(send_buff, WIZ_SEL_NATION, send_index);
-			SetByte(send_buff, GetByte(buffer, index), send_index);	// 국가 정보
+			SetByte(send_buff, GetByte(buffer, index), send_index); // 국가 정보
 			pUser->Send(send_buff, send_index);
 			break;
 
 		case WIZ_NEW_CHAR:
 			result = GetByte(buffer, index);
 			SetByte(send_buff, WIZ_NEW_CHAR, send_index);
-			SetByte(send_buff, result, send_index);					// 성공시 국가 정보
+			SetByte(send_buff, result, send_index); // 성공시 국가 정보
 			pUser->Send(send_buff, send_index);
 			break;
 
 		case WIZ_DEL_CHAR:
 			pUser->RecvDeleteChar(buffer + index);
-		/*	result = GetByte( buffer, index );
+			/*	result = GetByte( buffer, index );
 			SetByte( send_buff, WIZ_DEL_CHAR, send_index );
 			SetByte( send_buff, result, send_index );					// 성공시 국가 정보
 			SetByte( send_buff, GetByte( buffer, index ), send_index );
@@ -79,8 +78,7 @@ void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 			break;
 
 		case WIZ_LOGOUT:
-			if (pUser != nullptr
-				&& strlen(pUser->m_pUserData->m_id) != 0)
+			if (pUser != nullptr && strlen(pUser->m_pUserData->m_id) != 0)
 			{
 				spdlog::debug("EbenezerApp::ReadQueueThread: WIZ_LOGOUT [charId={}]",
 					pUser->m_pUserData->m_id);

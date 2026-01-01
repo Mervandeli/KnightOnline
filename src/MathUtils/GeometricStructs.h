@@ -28,8 +28,7 @@ struct _RECT
 
 inline bool IsPointInRect(const _POINT p, const _RECT r)
 {
-	return p.x >= r.left && p.x <= r.right
-		&& p.y >= r.top && p.y <= r.bottom;
+	return p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom;
 }
 
 #endif // MATHUTILS_GEOMETRICSTRUCTS_H

@@ -17,101 +17,98 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
 CNPCPathMgr::CNPCPathMgr()
 {
 	m_pPaths.clear();
-	m_bActive = false;
-	m_pRefMapMng = nullptr;
+	m_bActive      = false;
+	m_pRefMapMng   = nullptr;
 
 	m_pDlgMakePath = new CDlgMakeNPCPath;
 	m_pDlgMakePath->Create(IDD_MAKE_NPCPATH);
 	m_pDlgMakePath->ShowWindow(FALSE);
 	m_pDlgMakePath->m_pRefNPCPathMgr = this;
 
-	m_pCurrPath = nullptr;
-	m_pppRefEvent = nullptr;
-	m_bRenderMovableRegion = false;
+	m_pCurrPath                      = nullptr;
+	m_pppRefEvent                    = nullptr;
+	m_bRenderMovableRegion           = false;
 
-	m_BaseCube[0].Set(0, 1, 0);	// 앞쪽 LT
-	m_BaseCube[1].Set(1, 1, 0);	// 앞쪽 RT
+	m_BaseCube[0].Set(0, 1, 0); // 앞쪽 LT
+	m_BaseCube[1].Set(1, 1, 0); // 앞쪽 RT
 	m_BaseCube[2].Set(0, 0, 0); // 앞쪽 LB
 	m_BaseCube[3].Set(1, 0, 0); // 앞쪽 RB
 	m_BaseCube[4].Set(0, 1, 1); // 뒤쪽 LT
 	m_BaseCube[5].Set(1, 1, 1); // 뒤쪽 RT
 	m_BaseCube[6].Set(0, 0, 1); // 뒤쪽 LB
-	m_BaseCube[7].Set(1, 0, 1);	// 뒤쪽 RB 
+	m_BaseCube[7].Set(1, 0, 1); // 뒤쪽 RB
 
-	m_LTStartVertex.Set(0,0,0);
-	m_RBStartVertex.Set(0,0,0);
+	m_LTStartVertex.Set(0, 0, 0);
+	m_RBStartVertex.Set(0, 0, 0);
 
-	m_LTActVertex.Set(0,0,0);
-	m_RBActVertex.Set(0,0,0);
+	m_LTActVertex.Set(0, 0, 0);
+	m_RBActVertex.Set(0, 0, 0);
 }
-
 
 CNPCPathMgr::CNPCPathMgr(CMapMng* pMapMng)
 {
 	m_pPaths.clear();
-	m_bActive = false;
-	m_pRefMapMng = pMapMng;
+	m_bActive      = false;
+	m_pRefMapMng   = pMapMng;
 
 	m_pDlgMakePath = new CDlgMakeNPCPath;
 	m_pDlgMakePath->Create(IDD_MAKE_NPCPATH, m_pRefMapMng->m_pMainFrm);
 	m_pDlgMakePath->ShowWindow(FALSE);
 	m_pDlgMakePath->m_pRefNPCPathMgr = this;
 
-	m_pCurrPath = nullptr;
-	m_pppRefEvent = nullptr;
-	m_bRenderMovableRegion = false;
+	m_pCurrPath                      = nullptr;
+	m_pppRefEvent                    = nullptr;
+	m_bRenderMovableRegion           = false;
 
-	m_BaseCube[0].Set(0, 1, 0);	// 앞쪽 LT
-	m_BaseCube[1].Set(1, 1, 0);	// 앞쪽 RT
+	m_BaseCube[0].Set(0, 1, 0); // 앞쪽 LT
+	m_BaseCube[1].Set(1, 1, 0); // 앞쪽 RT
 	m_BaseCube[2].Set(0, 0, 0); // 앞쪽 LB
 	m_BaseCube[3].Set(1, 0, 0); // 앞쪽 RB
 	m_BaseCube[4].Set(0, 1, 1); // 뒤쪽 LT
 	m_BaseCube[5].Set(1, 1, 1); // 뒤쪽 RT
 	m_BaseCube[6].Set(0, 0, 1); // 뒤쪽 LB
-	m_BaseCube[7].Set(1, 0, 1);	// 뒤쪽 RB 
+	m_BaseCube[7].Set(1, 0, 1); // 뒤쪽 RB
 
-	m_LTStartVertex.Set(0,0,0);
-	m_RBStartVertex.Set(0,0,0);
+	m_LTStartVertex.Set(0, 0, 0);
+	m_RBStartVertex.Set(0, 0, 0);
 
-	m_LTActVertex.Set(0,0,0);
-	m_RBActVertex.Set(0,0,0);
+	m_LTActVertex.Set(0, 0, 0);
+	m_RBActVertex.Set(0, 0, 0);
 }
-
 
 CNPCPathMgr::~CNPCPathMgr()
 {
 	std::list<CNPCPath*>::iterator it;
-	for(it = m_pPaths.begin(); it != m_pPaths.end(); it++)
+	for (it = m_pPaths.begin(); it != m_pPaths.end(); it++)
 	{
 		delete (*it);
 		(*it) = nullptr;
 	}
 	m_pPaths.clear();
 
-	if(m_pCurrPath)
+	if (m_pCurrPath)
 	{
 		delete m_pCurrPath;
 		m_pCurrPath = nullptr;
 	}
 
-	if(m_pDlgMakePath) 
+	if (m_pDlgMakePath)
 	{
 		m_pDlgMakePath->DestroyWindow();
 		delete m_pDlgMakePath;
 		m_pDlgMakePath = nullptr;
 	}
 
-	m_pppRefEvent = nullptr;
+	m_pppRefEvent          = nullptr;
 	m_bRenderMovableRegion = false;
 }
-
 
 //
 //	FileName은 경로명 하나도 안들어간 순수한 파일이름과 확장자..
@@ -138,7 +135,7 @@ void CNPCPathMgr::LoadFromFile(const char* FileName)
 
 	for (int i = 0; i < NumPath; i++)
 	{
-		CNPCPath* pPath = new CNPCPath;
+		CNPCPath* pPath      = new CNPCPath;
 		pPath->m_pRefTerrain = m_pRefMapMng->GetTerrain();
 		pPath->Load(npcPathFile);
 		m_pPaths.push_back(pPath);
@@ -148,7 +145,7 @@ void CNPCPathMgr::LoadFromFile(const char* FileName)
 void CNPCPathMgr::SaveToFile(const char* FileName)
 {
 	char szOldPath[_MAX_PATH];
-	GetCurrentDirectory(_MAX_PATH, szOldPath);	
+	GetCurrentDirectory(_MAX_PATH, szOldPath);
 	SetCurrentDirectory(s_szPath.c_str());
 
 	CreateDirectory("npcpath", nullptr); // 경로 만들고..
@@ -163,9 +160,9 @@ void CNPCPathMgr::SaveToFile(const char* FileName)
 
 		std::list<CNPCPath*>::iterator itPath;
 		CNPCPath* pPath;
-		for(itPath = m_pPaths.begin(); itPath != m_pPaths.end(); itPath++)
+		for (itPath = m_pPaths.begin(); itPath != m_pPaths.end(); itPath++)
 		{
-			pPath = (*itPath);
+			pPath            = (*itPath);
 			pPath->m_iZoneID = m_pRefMapMng->m_iZoneID;
 			pPath->Save(file);
 		}
@@ -180,10 +177,12 @@ void CNPCPathMgr::MakeServerDataFile(const char* FullFileName)
 {
 	// text 파일 버전...
 	FILE* stream = fopen(FullFileName, "w");
-	if(!stream)	return;
+	if (!stream)
+		return;
 
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	if(!pFrm) return;
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
+	if (!pFrm)
+		return;
 
 	std::list<CNPCPath*>::iterator itPath;
 	std::list<__Vector3>::iterator itVertex;
@@ -207,29 +206,30 @@ void CNPCPathMgr::MakeServerDataFile(const char* FullFileName)
 	fprintf(stream, "\tDotCnt");
 	fprintf(stream, "\n");
 
-	for(itPath = m_pPaths.begin(); itPath != m_pPaths.end(); itPath++)
+	for (itPath = m_pPaths.begin(); itPath != m_pPaths.end(); itPath++)
 	{
 		pPath = (*itPath);
-		if(!pPath->CheckValid()) continue;
+		if (!pPath->CheckValid())
+			continue;
 
 		RECT rt;
-		SetRect(&rt, (int)pPath->m_LTStartVertex.x, (int)pPath->m_LTStartVertex.z,
-					(int)pPath->m_RBStartVertex.x, (int)pPath->m_RBStartVertex.z );
+		SetRect(&rt, (int) pPath->m_LTStartVertex.x, (int) pPath->m_LTStartVertex.z,
+			(int) pPath->m_RBStartVertex.x, (int) pPath->m_RBStartVertex.z);
 
 		RECT LimitRC;
-		SetRect(&LimitRC, (int)pPath->m_LTActVertex.x, (int)pPath->m_LTActVertex.z,
-					(int)pPath->m_RBActVertex.x, (int)pPath->m_RBActVertex.z );
+		SetRect(&LimitRC, (int) pPath->m_LTActVertex.x, (int) pPath->m_LTActVertex.z,
+			(int) pPath->m_RBActVertex.x, (int) pPath->m_RBActVertex.z);
 
-		int DotCount = static_cast<int>(pPath->m_Path.size());
+		int DotCount     = static_cast<int>(pPath->m_Path.size());
 		pPath->m_iZoneID = m_pRefMapMng->m_iZoneID;
 
 		fprintf(stream, "%04d", pPath->m_iZoneID);
 		fprintf(stream, "\t%03d", pPath->m_iNPCID);
 		fprintf(stream, "\t%02d", pPath->m_iActType);
-		fprintf(stream, "\t%02d", (int)pPath->m_cAttr_Regen);
-		fprintf(stream, "\t%02d", (int)pPath->m_cAttr_Group);
-		fprintf(stream, "\t%02d", (int)pPath->m_cAttr_Create);
-		fprintf(stream, "\t%02d", (int)pPath->m_cAttr_Option);
+		fprintf(stream, "\t%02d", (int) pPath->m_cAttr_Regen);
+		fprintf(stream, "\t%02d", (int) pPath->m_cAttr_Group);
+		fprintf(stream, "\t%02d", (int) pPath->m_cAttr_Create);
+		fprintf(stream, "\t%02d", (int) pPath->m_cAttr_Option);
 		fprintf(stream, "\t%04d", rt.left);
 		fprintf(stream, "\t%04d", rt.top);
 		fprintf(stream, "\t%04d", rt.right);
@@ -243,32 +243,34 @@ void CNPCPathMgr::MakeServerDataFile(const char* FullFileName)
 		fprintf(stream, "\t%02d\t", DotCount);
 
 		__Vector3 Vertex;
-		int x,z;
-		for(itVertex = pPath->m_Path.begin(); itVertex != pPath->m_Path.end(); itVertex++)
+		int x, z;
+		for (itVertex = pPath->m_Path.begin(); itVertex != pPath->m_Path.end(); itVertex++)
 		{
 			Vertex = (*itVertex);
 
-			x = (int)Vertex.x;
-			z = (int)Vertex.z;
+			x      = (int) Vertex.x;
+			z      = (int) Vertex.z;
 			fprintf(stream, "%04d%04d", x, z);
 		}
 		fprintf(stream, "\n");
 	}
-	fclose(stream);	
+	fclose(stream);
 }
 
 void CNPCPathMgr::SetActive(bool active)
 {
-	if(m_bActive==active) return;
+	if (m_bActive == active)
+		return;
 	m_bActive = active;
 
-	if(active)
+	if (active)
 	{
 		m_pDlgMakePath->ShowWindow(TRUE);
 
 		CNPCPath* pPath = new CNPCPath;
-		if(m_pRefMapMng) pPath->m_pRefTerrain = m_pRefMapMng->GetTerrain();
-		if(m_pCurrPath)
+		if (m_pRefMapMng)
+			pPath->m_pRefTerrain = m_pRefMapMng->GetTerrain();
+		if (m_pCurrPath)
 		{
 			delete m_pCurrPath;
 			m_pCurrPath = nullptr;
@@ -279,7 +281,7 @@ void CNPCPathMgr::SetActive(bool active)
 	{
 		m_pDlgMakePath->ShowWindow(FALSE);
 
-		if(m_pCurrPath)
+		if (m_pCurrPath)
 		{
 			delete m_pCurrPath;
 			m_pCurrPath = nullptr;
@@ -289,20 +291,23 @@ void CNPCPathMgr::SetActive(bool active)
 
 BOOL CNPCPathMgr::MouseMsgFilter(LPMSG pMsg)
 {
-	if(!m_pRefMapMng) return FALSE;
+	if (!m_pRefMapMng)
+		return FALSE;
 	CLyTerrain* pRefTerrain = m_pRefMapMng->GetTerrain();
-	if(!m_bActive || !pRefTerrain) return FALSE;
+	if (!m_bActive || !pRefTerrain)
+		return FALSE;
 
-	switch(pMsg->message)
+	switch (pMsg->message)
 	{
-	case WM_LBUTTONUP:
+		case WM_LBUTTONUP:
 		{
-			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
+			POINT point = { short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam)) };
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
+			if (!pRefTerrain->Pick(point.x, point.y, &vec, nullptr))
+				break;
 
-			if(m_pDlgMakePath->m_State==0)	// 시작 RECT 그림.
+			if (m_pDlgMakePath->m_State == 0) // 시작 RECT 그림.
 			{
 				m_pCurrPath->m_LTStartVertex = m_LTStartVertex;
 				m_pCurrPath->m_RBStartVertex = m_RBStartVertex;
@@ -310,85 +315,89 @@ BOOL CNPCPathMgr::MouseMsgFilter(LPMSG pMsg)
 				//MakeStartRectVB(m_LTStartVertex, m_RBStartVertex, 0xff00ffff);
 			}
 
-			if(m_pDlgMakePath->m_State==1)	// 길 만듦
+			if (m_pDlgMakePath->m_State == 1)                                            // 길 만듦
 			{
 				__Vector3 PrevPos;
-				if(false==m_pCurrPath->GetPath(m_pCurrPath->GetSize()-1, &PrevPos))	// 
+				if (false == m_pCurrPath->GetPath(m_pCurrPath->GetSize() - 1, &PrevPos)) //
 				{
-					if(m_pCurrPath->GetSize() < MAX_NPCPATH) m_pCurrPath->AddPos(vec);
+					if (m_pCurrPath->GetSize() < MAX_NPCPATH)
+						m_pCurrPath->AddPos(vec);
 					m_pDlgMakePath->SetNumPoint(m_pCurrPath->GetSize());
 				}
 				else
 				{
 					__Vector3 tmpVec = vec - PrevPos;
 					tmpVec.Normalize();
-					tmpVec *= MAX_LEN_PATH;
+					tmpVec     *= MAX_LEN_PATH;
 
-					float dist = DISTANCE2D(PrevPos,vec);
-					while(dist > MAX_LEN_PATH)
+					float dist  = DISTANCE2D(PrevPos, vec);
+					while (dist > MAX_LEN_PATH)
 					{
 						PrevPos += tmpVec;
-						if(m_pCurrPath->GetSize() < MAX_NPCPATH) m_pCurrPath->AddPos(PrevPos);
+						if (m_pCurrPath->GetSize() < MAX_NPCPATH)
+							m_pCurrPath->AddPos(PrevPos);
 						m_pDlgMakePath->SetNumPoint(m_pCurrPath->GetSize());
 
-						dist = DISTANCE2D(PrevPos,vec);
+						dist = DISTANCE2D(PrevPos, vec);
 					}
-					if(m_pCurrPath->GetSize() < MAX_NPCPATH) m_pCurrPath->AddPos(vec);
+					if (m_pCurrPath->GetSize() < MAX_NPCPATH)
+						m_pCurrPath->AddPos(vec);
 					m_pDlgMakePath->SetNumPoint(m_pCurrPath->GetSize());
 				}
-				
 			}
 
-			if(m_pDlgMakePath->m_State==2)	// 시작 RECT 그림.
+			if (m_pDlgMakePath->m_State == 2) // 시작 RECT 그림.
 			{
 				m_pCurrPath->m_LTActVertex = m_LTActVertex;
 				m_pCurrPath->m_RBActVertex = m_RBActVertex;
 				SetLTRB(&(m_pCurrPath->m_LTActVertex), &(m_pCurrPath->m_RBActVertex));
 				//MakeStartRectVB(m_LTStartVertex, m_RBStartVertex, 0xff00ffff);
-			}			
+			}
 		}
-		return TRUE;
-	case WM_LBUTTONDOWN:
+			return TRUE;
+		case WM_LBUTTONDOWN:
 		{
-			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
+			POINT point = { short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam)) };
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
+			if (!pRefTerrain->Pick(point.x, point.y, &vec, nullptr))
+				break;
 
-			if(m_pDlgMakePath->m_State==0)
+			if (m_pDlgMakePath->m_State == 0)
 			{
 				m_LTStartVertex = m_RBStartVertex = vec;
 			}
-			if(m_pDlgMakePath->m_State==2)
+			if (m_pDlgMakePath->m_State == 2)
 			{
 				m_LTActVertex = m_RBActVertex = vec;
 			}
 		}
-		return TRUE;
+			return TRUE;
 
-	case WM_MOUSEMOVE:
+		case WM_MOUSEMOVE:
 		{
 			DWORD_PTR nFlags = pMsg->wParam;
-			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
+			POINT point      = { short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam)) };
 
 			__Vector3 vec;
-//			if(nFlags & MK_SHIFT)
-//			{
-//				if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
-//				
-//				CStatusBar* pBar = m_pRefMapMng->GetStatusBar();
-//				CString str; str.Format("X:%f Y:%f Z:%f", vec.x, vec.y, vec.z);
-//				if (pBar) pBar->SetPaneText(0, str);
-//				return TRUE;
-//			}
+			//			if(nFlags & MK_SHIFT)
+			//			{
+			//				if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
+			//
+			//				CStatusBar* pBar = m_pRefMapMng->GetStatusBar();
+			//				CString str; str.Format("X:%f Y:%f Z:%f", vec.x, vec.y, vec.z);
+			//				if (pBar) pBar->SetPaneText(0, str);
+			//				return TRUE;
+			//			}
 
-			if(m_pDlgMakePath->m_State==0)
+			if (m_pDlgMakePath->m_State == 0)
 			{
-				if(nFlags & MK_LBUTTON)
+				if (nFlags & MK_LBUTTON)
 				{
-					if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
+					if (!pRefTerrain->Pick(point.x, point.y, &vec, nullptr))
+						break;
 
-					m_RBStartVertex = vec;
+					m_RBStartVertex              = vec;
 
 					m_pCurrPath->m_LTStartVertex = m_LTStartVertex;
 					m_pCurrPath->m_RBStartVertex = m_RBStartVertex;
@@ -396,13 +405,14 @@ BOOL CNPCPathMgr::MouseMsgFilter(LPMSG pMsg)
 					//MakeStartRectVB(lt, rb, 0xff00ffff);
 				}
 			}
-			if(m_pDlgMakePath->m_State==2)
+			if (m_pDlgMakePath->m_State == 2)
 			{
-				if(nFlags & MK_LBUTTON)
+				if (nFlags & MK_LBUTTON)
 				{
-					if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
+					if (!pRefTerrain->Pick(point.x, point.y, &vec, nullptr))
+						break;
 
-					m_RBActVertex = vec;
+					m_RBActVertex              = vec;
 
 					m_pCurrPath->m_LTActVertex = m_LTActVertex;
 					m_pCurrPath->m_RBActVertex = m_RBActVertex;
@@ -411,57 +421,57 @@ BOOL CNPCPathMgr::MouseMsgFilter(LPMSG pMsg)
 				}
 			}
 		}
-		return TRUE;
+			return TRUE;
 
-	case WM_RBUTTONUP:
-		if(m_pDlgMakePath->m_State==1)
-		{
-			m_pCurrPath->DelPrevPos();
-			m_pDlgMakePath->SetNumPoint(m_pCurrPath->GetSize());
-		}
-		return TRUE;
+		case WM_RBUTTONUP:
+			if (m_pDlgMakePath->m_State == 1)
+			{
+				m_pCurrPath->DelPrevPos();
+				m_pDlgMakePath->SetNumPoint(m_pCurrPath->GetSize());
+			}
+			return TRUE;
 	}
 	return TRUE;
 }
 
 void CNPCPathMgr::UpdatePath()
 {
-	m_pCurrPath->m_iNPCID = m_pDlgMakePath->m_iSelNPCID;
-	m_pCurrPath->m_iNumNPC = m_pDlgMakePath->m_NumNPC;
-	m_pCurrPath->m_iRegenTime = m_pDlgMakePath->m_iRegenTime;
-	m_pCurrPath->m_iActType = m_pDlgMakePath->m_iSelActType;
-	m_pCurrPath->m_iZoneID = m_pRefMapMng->m_iZoneID;
+	m_pCurrPath->m_iNPCID       = m_pDlgMakePath->m_iSelNPCID;
+	m_pCurrPath->m_iNumNPC      = m_pDlgMakePath->m_NumNPC;
+	m_pCurrPath->m_iRegenTime   = m_pDlgMakePath->m_iRegenTime;
+	m_pCurrPath->m_iActType     = m_pDlgMakePath->m_iSelActType;
+	m_pCurrPath->m_iZoneID      = m_pRefMapMng->m_iZoneID;
 	m_pCurrPath->m_cAttr_Create = m_pDlgMakePath->m_cSelAttrCreate;
-	m_pCurrPath->m_cAttr_Group = m_pDlgMakePath->m_cSelAttrGroup;
-	m_pCurrPath->m_cAttr_Regen = m_pDlgMakePath->m_cSelAttrRegen;
+	m_pCurrPath->m_cAttr_Group  = m_pDlgMakePath->m_cSelAttrGroup;
+	m_pCurrPath->m_cAttr_Regen  = m_pDlgMakePath->m_cSelAttrRegen;
 	m_pCurrPath->m_cAttr_Option = m_pDlgMakePath->m_cSelOption;
 
 	strcpy(m_pCurrPath->m_strNPCName, m_pDlgMakePath->m_strSelNPCName);
 
-//	m_pCurrPath->m_LTStartVertex = m_LTStartVertex;
-//	m_pCurrPath->m_RBStartVertex = m_RBStartVertex;
-	
+	//	m_pCurrPath->m_LTStartVertex = m_LTStartVertex;
+	//	m_pCurrPath->m_RBStartVertex = m_RBStartVertex;
+
 	m_pPaths.push_back(m_pCurrPath);
 
 	CNPCPath* pPath = new CNPCPath;
-	if(m_pRefMapMng) pPath->m_pRefTerrain = m_pRefMapMng->GetTerrain();
+	if (m_pRefMapMng)
+		pPath->m_pRefTerrain = m_pRefMapMng->GetTerrain();
 	m_pCurrPath = pPath;
 	m_pDlgMakePath->SetNumPoint(m_pCurrPath->GetSize());
 }
 
 CNPCPath* CNPCPathMgr::GetpPath(int idx)
 {
-	if (idx < 0
-		|| idx >= static_cast<int>(m_pPaths.size()))
+	if (idx < 0 || idx >= static_cast<int>(m_pPaths.size()))
 		return nullptr;
 
 	std::list<CNPCPath*>::iterator itPath;
 	itPath = m_pPaths.begin();
-	for(int i=0;i<idx;i++)
+	for (int i = 0; i < idx; i++)
 	{
 		itPath++;
 	}
-	
+
 	return (*itPath);
 }
 
@@ -472,9 +482,9 @@ void CNPCPathMgr::Render()
 
 	__Matrix44 mtx;
 	mtx.Identity();
-		
+
 	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, mtx.toD3D()); // 월드 행렬 적용..
-	
+
 	// set texture
 	hr = s_lpD3DDev->SetTexture(0, nullptr);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
@@ -493,7 +503,8 @@ void CNPCPathMgr::Render()
 
 	//갈 수 없는 곳 빨간색으로 칠하기..
 	hr = s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
-	if(m_bRenderMovableRegion)RenderMovableRegion();
+	if (m_bRenderMovableRegion)
+		RenderMovableRegion();
 	hr = s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 
 	//이미 만들어진 길 그리기...
@@ -501,86 +512,95 @@ void CNPCPathMgr::Render()
 	std::list<__Vector3>::iterator itVertex;
 	CNPCPath* pPath;
 	__Vector3 PrevVertex, Vertex;
-	
-	for(itPath = m_pPaths.begin(); itPath != m_pPaths.end(); itPath++)
+
+	for (itPath = m_pPaths.begin(); itPath != m_pPaths.end(); itPath++)
 	{
 		pPath = (*itPath);
 		__Vector3 RgnLT, RgnRB;
 		RgnLT = (*itPath)->m_LTStartVertex;
 		RgnRB = (*itPath)->m_RBStartVertex;
-		
+
 		MakeRectVB(m_StartRectVB, RgnLT, RgnRB, pPath->m_dwColor);
-		hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 12, m_StartRectVB, sizeof(__VertexXyzColor));
+		hr = s_lpD3DDev->DrawPrimitiveUP(
+			D3DPT_LINELIST, 12, m_StartRectVB, sizeof(__VertexXyzColor));
 
 		RgnLT = (*itPath)->m_LTActVertex;
 		RgnRB = (*itPath)->m_RBActVertex;
 		MakeRectVB(m_ActRectVB, RgnLT, RgnRB, pPath->m_dwColor);
 		hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 12, m_ActRectVB, sizeof(__VertexXyzColor));
 
-		for(itVertex = pPath->m_Path.begin(); itVertex != pPath->m_Path.end(); itVertex++)
+		for (itVertex = pPath->m_Path.begin(); itVertex != pPath->m_Path.end(); itVertex++)
 		{
-			Vertex = (*itVertex);
+			Vertex    = (*itVertex);
 			Vertex.y += 0.5f;
-						
-			if(itVertex==pPath->m_Path.begin()) PrevVertex = Vertex;
-			
+
+			if (itVertex == pPath->m_Path.begin())
+				PrevVertex = Vertex;
+
 			MakeLine(PrevVertex, Vertex);
 			MakeCube(Vertex, pPath->m_dwColor);
-						
+
 			hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 1, m_LineVB, sizeof(__VertexXyzColor));
-			hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 12, m_CubeVB, sizeof(__VertexXyzColor));
-			
+			hr = s_lpD3DDev->DrawPrimitiveUP(
+				D3DPT_TRIANGLELIST, 12, m_CubeVB, sizeof(__VertexXyzColor));
+
 			PrevVertex = Vertex;
 		}
 	}
 
 	//다이얼로그 창에서 선택된 길 그리기..
 	CNPCPath* pSelPath = m_pDlgMakePath->m_pSelPath;
-	if(pSelPath)
+	if (pSelPath)
 	{
 		MakeRectVB(m_StartRectVB, pSelPath->m_LTStartVertex, pSelPath->m_RBStartVertex, 0xff00ff00);
-		hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 12, m_StartRectVB, sizeof(__VertexXyzColor));
+		hr = s_lpD3DDev->DrawPrimitiveUP(
+			D3DPT_LINELIST, 12, m_StartRectVB, sizeof(__VertexXyzColor));
 
 		MakeRectVB(m_ActRectVB, pSelPath->m_LTActVertex, pSelPath->m_RBActVertex, 0xff00ff00);
 		hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 12, m_ActRectVB, sizeof(__VertexXyzColor));
-		
-		for(itVertex = pSelPath->m_Path.begin(); itVertex != pSelPath->m_Path.end(); itVertex++)
+
+		for (itVertex = pSelPath->m_Path.begin(); itVertex != pSelPath->m_Path.end(); itVertex++)
 		{
-			Vertex = (*itVertex);
+			Vertex    = (*itVertex);
 			Vertex.y += 0.5f;
 
-			if(itVertex==pSelPath->m_Path.begin()) PrevVertex = Vertex;
+			if (itVertex == pSelPath->m_Path.begin())
+				PrevVertex = Vertex;
 
 			MakeLine(PrevVertex, Vertex);
 			MakeCube(Vertex, 0xff00ff00);
-			
+
 			hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 1, m_LineVB, sizeof(__VertexXyzColor));
-			hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 12, m_CubeVB, sizeof(__VertexXyzColor));		
-			
+			hr = s_lpD3DDev->DrawPrimitiveUP(
+				D3DPT_TRIANGLELIST, 12, m_CubeVB, sizeof(__VertexXyzColor));
+
 			PrevVertex = Vertex;
 		}
 	}
 
 	//만들고 있는 길 & 영역 그리기..
-	MakeRectVB(m_StartRectVB, m_pCurrPath->m_LTStartVertex, m_pCurrPath->m_RBStartVertex, 0xffff0000);
+	MakeRectVB(
+		m_StartRectVB, m_pCurrPath->m_LTStartVertex, m_pCurrPath->m_RBStartVertex, 0xffff0000);
 	hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 12, m_StartRectVB, sizeof(__VertexXyzColor));
 
 	MakeRectVB(m_ActRectVB, m_pCurrPath->m_LTActVertex, m_pCurrPath->m_RBActVertex, 0xffff0000);
 	hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 12, m_ActRectVB, sizeof(__VertexXyzColor));
 
-	for(itVertex = m_pCurrPath->m_Path.begin(); itVertex != m_pCurrPath->m_Path.end(); itVertex++)
+	for (itVertex = m_pCurrPath->m_Path.begin(); itVertex != m_pCurrPath->m_Path.end(); itVertex++)
 	{
-		Vertex = (*itVertex);
+		Vertex    = (*itVertex);
 		Vertex.y += 0.5f;
 
-		if(itVertex==m_pCurrPath->m_Path.begin()) PrevVertex = Vertex;
+		if (itVertex == m_pCurrPath->m_Path.begin())
+			PrevVertex = Vertex;
 
 		MakeLine(PrevVertex, Vertex);
 		MakeCube(Vertex, 0xffff0000);
-		
+
 		hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINELIST, 1, m_LineVB, sizeof(__VertexXyzColor));
-		hr = s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 12, m_CubeVB, sizeof(__VertexXyzColor));		
-		
+		hr = s_lpD3DDev->DrawPrimitiveUP(
+			D3DPT_TRIANGLELIST, 12, m_CubeVB, sizeof(__VertexXyzColor));
+
 		PrevVertex = Vertex;
 	}
 
@@ -597,47 +617,47 @@ void CNPCPathMgr::MakeCube(__Vector3 cv, D3DCOLOR color)
 	cv.z -= 0.5f;
 
 	//front lt...
-	tmp = cv + m_BaseCube[0];
-	m_CubeVB[0].Set(tmp.x, tmp.y, tmp.z, color);			
+	tmp   = cv + m_BaseCube[0];
+	m_CubeVB[0].Set(tmp.x, tmp.y, tmp.z, color);
 	tmp = cv + m_BaseCube[1];
-	m_CubeVB[1].Set(tmp.x, tmp.y, tmp.z, color);			
+	m_CubeVB[1].Set(tmp.x, tmp.y, tmp.z, color);
 	tmp = cv + m_BaseCube[2];
 	m_CubeVB[2].Set(tmp.x, tmp.y, tmp.z, color);
-	
+
 	//front rb...
 	m_CubeVB[3] = m_CubeVB[2];
 	m_CubeVB[4] = m_CubeVB[1];
-	tmp = cv + m_BaseCube[3];
+	tmp         = cv + m_BaseCube[3];
 	m_CubeVB[5].Set(tmp.x, tmp.y, tmp.z, color);
 
 	//right lt..
 	m_CubeVB[6] = m_CubeVB[1];
-	tmp = cv + m_BaseCube[5];
+	tmp         = cv + m_BaseCube[5];
 	m_CubeVB[7].Set(tmp.x, tmp.y, tmp.z, color);
-	m_CubeVB[8] = m_CubeVB[5];
+	m_CubeVB[8]  = m_CubeVB[5];
 
 	//right rb..
-	m_CubeVB[9] = m_CubeVB[8]; 
+	m_CubeVB[9]  = m_CubeVB[8];
 	m_CubeVB[10] = m_CubeVB[7];
-	tmp = cv + m_BaseCube[7];
+	tmp          = cv + m_BaseCube[7];
 	m_CubeVB[11].Set(tmp.x, tmp.y, tmp.z, color);
 
 	//back lt..
 	m_CubeVB[12] = m_CubeVB[7];
-	tmp = cv + m_BaseCube[4];
+	tmp          = cv + m_BaseCube[4];
 	m_CubeVB[13].Set(tmp.x, tmp.y, tmp.z, color);
 	m_CubeVB[14] = m_CubeVB[11];
 
 	//back rb..
 	m_CubeVB[15] = m_CubeVB[14];
 	m_CubeVB[16] = m_CubeVB[13];
-	tmp = cv + m_BaseCube[6];
+	tmp          = cv + m_BaseCube[6];
 	m_CubeVB[17].Set(tmp.x, tmp.y, tmp.z, color);
 
 	//left lt..
 	m_CubeVB[18] = m_CubeVB[13];
 	m_CubeVB[19] = m_CubeVB[0];
-	m_CubeVB[20] = m_CubeVB[17];			
+	m_CubeVB[20] = m_CubeVB[17];
 
 	//left rb..
 	m_CubeVB[21] = m_CubeVB[20];
@@ -647,7 +667,7 @@ void CNPCPathMgr::MakeCube(__Vector3 cv, D3DCOLOR color)
 	//top lt..
 	m_CubeVB[24] = m_CubeVB[13];
 	m_CubeVB[25] = m_CubeVB[12];
-	m_CubeVB[26] = m_CubeVB[0];			
+	m_CubeVB[26] = m_CubeVB[0];
 
 	//top rb..
 	m_CubeVB[27] = m_CubeVB[26];
@@ -657,7 +677,7 @@ void CNPCPathMgr::MakeCube(__Vector3 cv, D3DCOLOR color)
 	//bottom lt..
 	m_CubeVB[30] = m_CubeVB[2];
 	m_CubeVB[31] = m_CubeVB[5];
-	m_CubeVB[32] = m_CubeVB[17];			
+	m_CubeVB[32] = m_CubeVB[17];
 
 	//botom rb..
 	m_CubeVB[33] = m_CubeVB[32];
@@ -675,19 +695,19 @@ void CNPCPathMgr::SetLTRB(__Vector3* pLT, __Vector3* pRB)
 {
 	__Vector3 tmp, vLT, vRB;
 	vLT = tmp = (*pLT);
-	vRB = (*pRB);
-	
-	if(vLT.x > vRB.x)
+	vRB       = (*pRB);
+
+	if (vLT.x > vRB.x)
 	{
 		vLT.x = vRB.x;
 		vRB.x = tmp.x;
 	}
-	if(vLT.y < vRB.y)
+	if (vLT.y < vRB.y)
 	{
 		vLT.y = vRB.y;
 		vRB.y = tmp.y;
 	}
-	if(vLT.z < vRB.z)
+	if (vLT.z < vRB.z)
 	{
 		vLT.z = vRB.z;
 		vRB.z = tmp.z;
@@ -742,10 +762,10 @@ void CNPCPathMgr::MakeRectVB(__VertexXyzColor* pVB, __Vector3 lt, __Vector3 rb, 
 void CNPCPathMgr::DelPath(CNPCPath* pPath)
 {
 	std::list<CNPCPath*>::iterator itPath;
-	
-	for(itPath = m_pPaths.begin(); itPath != m_pPaths.end(); itPath++)
+
+	for (itPath = m_pPaths.begin(); itPath != m_pPaths.end(); itPath++)
 	{
-		if(pPath == (*itPath))
+		if (pPath == (*itPath))
 		{
 			delete pPath;
 			m_pPaths.erase(itPath);
@@ -756,7 +776,7 @@ void CNPCPathMgr::DelPath(CNPCPath* pPath)
 
 void CNPCPathMgr::SetCurrPath(CNPCPath* pPath)
 {
-	if(m_pCurrPath)
+	if (m_pCurrPath)
 	{
 		delete m_pCurrPath;
 		m_pCurrPath = nullptr;
@@ -766,10 +786,10 @@ void CNPCPathMgr::SetCurrPath(CNPCPath* pPath)
 
 	m_pCurrPath = pPath;
 	m_pDlgMakePath->SetNumPoint(m_pCurrPath->GetSize());
-	
-	for(itPath = m_pPaths.begin(); itPath != m_pPaths.end(); itPath++)
+
+	for (itPath = m_pPaths.begin(); itPath != m_pPaths.end(); itPath++)
 	{
-		if(pPath == (*itPath))
+		if (pPath == (*itPath))
 		{
 			m_pPaths.erase(itPath);
 			return;
@@ -779,12 +799,13 @@ void CNPCPathMgr::SetCurrPath(CNPCPath* pPath)
 
 void CNPCPathMgr::RenderMovableRegion()
 {
-	if(!m_pRefMapMng) return;
+	if (!m_pRefMapMng)
+		return;
 	CLyTerrain* pRefTerrain = m_pRefMapMng->GetTerrain();
-	
-	int HeightMapSize = pRefTerrain->m_iHeightMapSize;
 
-	__VertexXyzColor	TileVB[4];
+	int HeightMapSize       = pRefTerrain->m_iHeightMapSize;
+
+	__VertexXyzColor TileVB[4];
 	D3DCOLOR color = 0xffff0000;
 
 	POINT cam;
@@ -792,75 +813,84 @@ void CNPCPathMgr::RenderMovableRegion()
 	cam.y = s_CameraData.vEye.z / TERRAIN_CELL_SIZE;
 
 	RECT rt;
-	if( (cam.x-100) >= 0) rt.left = cam.x-100;
-	else rt.left = 0;
+	if ((cam.x - 100) >= 0)
+		rt.left = cam.x - 100;
+	else
+		rt.left = 0;
 
-	if( (cam.x+100) < (HeightMapSize-1) ) rt.right = cam.x+100;
-	else rt.right = HeightMapSize-1;
+	if ((cam.x + 100) < (HeightMapSize - 1))
+		rt.right = cam.x + 100;
+	else
+		rt.right = HeightMapSize - 1;
 
-	if( (cam.y-100) >= 0 ) rt.bottom = cam.y-100;
-	else rt.bottom = 0;
+	if ((cam.y - 100) >= 0)
+		rt.bottom = cam.y - 100;
+	else
+		rt.bottom = 0;
 
-	if( (cam.y+100) < (HeightMapSize-1) ) rt.top = cam.y+100;
-	else rt.top = HeightMapSize-1;
+	if ((cam.y + 100) < (HeightMapSize - 1))
+		rt.top = cam.y + 100;
+	else
+		rt.top = HeightMapSize - 1;
 
-	for(int x=rt.left; x<rt.right; x++)
+	for (int x = rt.left; x < rt.right; x++)
 	{
-		for(int z=rt.bottom; z<rt.top; z++)
+		for (int z = rt.bottom; z < rt.top; z++)
 		{
-			if(m_pppRefEvent[x][z]!=0) continue;
+			if (m_pppRefEvent[x][z] != 0)
+				continue;
 
-			if((x+z)%2==0)	// 슬래쉬 모양의 타일..
+			if ((x + z) % 2 == 0) // 슬래쉬 모양의 타일..
 			{
 				__Vector3 v;
-				v.x = x*TERRAIN_CELL_SIZE;
-				v.z = z*TERRAIN_CELL_SIZE;
+				v.x = x * TERRAIN_CELL_SIZE;
+				v.z = z * TERRAIN_CELL_SIZE;
 				v.y = pRefTerrain->GetHeight(v.x, v.z) + 0.3f;
 				TileVB[0].Set(v.x, v.y, v.z, color);
 
-				v.z = (z+1)*TERRAIN_CELL_SIZE;
+				v.z = (z + 1) * TERRAIN_CELL_SIZE;
 				v.y = pRefTerrain->GetHeight(v.x, v.z) + 0.3f;
 				TileVB[1].Set(v.x, v.y, v.z, color);
 
-				v.x = (x+1)*TERRAIN_CELL_SIZE;
+				v.x = (x + 1) * TERRAIN_CELL_SIZE;
 				v.y = pRefTerrain->GetHeight(v.x, v.z) + 0.3f;
 				TileVB[2].Set(v.x, v.y, v.z, color);
 
-				v.z = z*TERRAIN_CELL_SIZE;
+				v.z = z * TERRAIN_CELL_SIZE;
 				v.y = pRefTerrain->GetHeight(v.x, v.z) + 0.3f;
-				TileVB[3].Set(v.x, v.y, v.z, color);				
+				TileVB[3].Set(v.x, v.y, v.z, color);
 			}
-			if((x+z)%2==1)	//백슬레쉬 모양의 타일..
+			if ((x + z) % 2 == 1) //백슬레쉬 모양의 타일..
 			{
 				__Vector3 v;
-				v.x = x*TERRAIN_CELL_SIZE;
-				v.z = (z+1)*TERRAIN_CELL_SIZE;
+				v.x = x * TERRAIN_CELL_SIZE;
+				v.z = (z + 1) * TERRAIN_CELL_SIZE;
 				v.y = pRefTerrain->GetHeight(v.x, v.z) + 0.3f;
 				TileVB[0].Set(v.x, v.y, v.z, color);
 
-				v.x = (x+1)*TERRAIN_CELL_SIZE;
+				v.x = (x + 1) * TERRAIN_CELL_SIZE;
 				v.y = pRefTerrain->GetHeight(v.x, v.z) + 0.3f;
 				TileVB[1].Set(v.x, v.y, v.z, color);
 
-				v.z = z*TERRAIN_CELL_SIZE;
+				v.z = z * TERRAIN_CELL_SIZE;
 				v.y = pRefTerrain->GetHeight(v.x, v.z) + 0.3f;
 				TileVB[2].Set(v.x, v.y, v.z, color);
 
-				v.x = x*TERRAIN_CELL_SIZE;
+				v.x = x * TERRAIN_CELL_SIZE;
 				v.y = pRefTerrain->GetHeight(v.x, v.z) + 0.3f;
 				TileVB[3].Set(v.x, v.y, v.z, color);
 			}
 
 			s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, TileVB, sizeof(__VertexXyzColor));
 		}
-	}	
+	}
 }
 
 void CNPCPathMgr::TransPos(float x, float z)
 {
 	std::list<CNPCPath*>::iterator itPath;
 	CNPCPath* pPath;
-	for(itPath = m_pPaths.begin(); itPath != m_pPaths.end(); itPath++)
+	for (itPath = m_pPaths.begin(); itPath != m_pPaths.end(); itPath++)
 	{
 		pPath = (*itPath);
 		pPath->TransPos(x, z);

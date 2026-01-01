@@ -11,16 +11,16 @@
 
 #include <N3Base/N3UIBase.h>
 
-class CUITradeExplanation : public CN3UIBase  
+class CUITradeExplanation : public CN3UIBase
 {
 protected:
-	class CN3UIButton*		m_pBtn_PageUp;
-	class CN3UIButton*		m_pBtn_PageDown;
-	class CN3UIButton*		m_pBtn_Close;
-	class CN3UIString*		m_pText_Explanation;
+	class CN3UIButton* m_pBtn_PageUp;
+	class CN3UIButton* m_pBtn_PageDown;
+	class CN3UIButton* m_pBtn_Close;
+	class CN3UIString* m_pText_Explanation;
 
 	std::string m_szExplanation;
-	int			m_iCurSel;
+	int m_iCurSel;
 
 public:
 	bool OnKeyPress(int iKey) override;

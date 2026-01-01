@@ -15,7 +15,7 @@
 //
 void CNpcThread::thread_loop()
 {
-	uint32_t dwTickTime	= 0;
+	uint32_t dwTickTime = 0;
 
 	srand((unsigned int) time(nullptr));
 	myrand(1, 10000);
@@ -40,50 +40,47 @@ void CNpcThread::thread_loop()
 			if (pNpc->m_sNid < 0)
 				continue;
 
-			fTime3 = fTime2 - pNpc->m_fDelayTime;
+			fTime3     = fTime2 - pNpc->m_fDelayTime;
 			dwTickTime = static_cast<uint32_t>(fTime3 * 1000);
 
 			//if(i==0)
 			//TRACE(_T("thread time = %.2f, %.2f, %.2f, delay=%d, state=%d, nid=%d\n"), pNpc->m_fDelayTime, fTime2, fTime3, dwTickTime, pNpc->m_NpcState, pNpc->m_sNid+NPC_BAND);
 
-			if (pNpc->m_Delay > (int) dwTickTime
-				&& !pNpc->m_bFirstLive
-				&& pNpc->m_Delay != 0)
+			if (pNpc->m_Delay > (int) dwTickTime && !pNpc->m_bFirstLive && pNpc->m_Delay != 0)
 			{
 				if (pNpc->m_Delay < 0)
 					pNpc->m_Delay = 0;
 
 				//적발견시... (2002. 04.23수정, 부하줄이기)
-				if (pNpc->m_NpcState == NPC_STANDING
-					&& pNpc->CheckFindEnemy())
+				if (pNpc->m_NpcState == NPC_STANDING && pNpc->CheckFindEnemy())
 				{
 					if (pNpc->FindEnemy())
 					{
 						pNpc->m_NpcState = NPC_ATTACKING;
-						pNpc->m_Delay = 0;
+						pNpc->m_Delay    = 0;
 					}
 				}
 
 				continue;
 			}
 
-			fTime3 = fTime2 - pNpc->m_fHPChangeTime;
+			fTime3     = fTime2 - pNpc->m_fHPChangeTime;
 			dwTickTime = static_cast<uint32_t>(fTime3 * 1000);
 
 			// 10초마다 HP를 회복 시켜준다
 			if (10000 < dwTickTime)
 				pNpc->HpChange();
 
-			pNpc->DurationMagic_4(fTime2);		// 마법 처리...
-			pNpc->DurationMagic_3(fTime2);		// 지속마법..
+			pNpc->DurationMagic_4(fTime2); // 마법 처리...
+			pNpc->DurationMagic_3(fTime2); // 지속마법..
 
 			switch (pNpc->m_NpcState)
 			{
-				case NPC_LIVE:					// 방금 살아난 경우
+				case NPC_LIVE: // 방금 살아난 경우
 					pNpc->NpcLive();
 					break;
 
-				case NPC_STANDING:						// 하는 일 없이 서있는 경우
+				case NPC_STANDING: // 하는 일 없이 서있는 경우
 					pNpc->NpcStanding();
 					break;
 

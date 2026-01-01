@@ -1,11 +1,10 @@
 ﻿#pragma once
 
 #ifndef __AFXWIN_H__
-	#error "include 'pch.h' before including this file for PCH"
+#error "include 'pch.h' before including this file for PCH"
 #endif
 
-#include "resource.h"		// main symbols
-
+#include "resource.h" // main symbols
 
 // CTblEditorApp:
 // See TblEditor.cpp for the implementation of this class
@@ -18,12 +17,12 @@ public:
 	CTblEditorApp();
 	~CTblEditorApp() override;
 
-// Overrides
+	// Overrides
 public:
 	BOOL InitInstance() override;
 	BOOL ProcessMessageFilter(int code, LPMSG lpMsg) override;
 
-// Implementation
+	// Implementation
 
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnAppAbout();

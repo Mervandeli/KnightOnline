@@ -12,28 +12,29 @@
 
 class CDlgDelGroup : public CDialog
 {
-// Construction
+	// Construction
 public:
-	int		m_SelGroupID;
-	CDlgDelGroup(CWnd* pParent = nullptr);   // standard constructor
+	int m_SelGroupID;
+	CDlgDelGroup(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+										   // Dialog Data
 	//{{AFX_DATA(CDlgDelGroup)
-	enum { IDD = IDD_DEL_GROUP };
-	CListBox	m_GroupList;
+	enum
+	{
+		IDD = IDD_DEL_GROUP
+	};
+	CListBox m_GroupList;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgDelGroup)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgDelGroup)
 	virtual BOOL OnInitDialog();

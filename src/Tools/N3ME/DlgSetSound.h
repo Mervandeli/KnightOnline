@@ -15,44 +15,46 @@ class CSoundCell;
 
 class CDlgSetSound : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgSetSound(CWnd* pParent = nullptr);   // standard constructor
+	CDlgSetSound(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+										   // Dialog Data
 	//{{AFX_DATA(CDlgSetSound)
-	enum { IDD = IDD_EDIT_BGM };
-	CListBox	m_ListSoundGroup;
-	CListBox	m_ListSoundInfo;
+	enum
+	{
+		IDD = IDD_EDIT_BGM
+	};
+	CListBox m_ListSoundGroup;
+	CListBox m_ListSoundInfo;
 	//}}AFX_DATA
 
 public:
-// Variables...
-	CSoundMgr*	m_pRefSoundMgr;
-	CSoundCell*	m_pSelSound;
+	// Variables...
+	CSoundMgr* m_pRefSoundMgr;
+	CSoundCell* m_pSelSound;
 
-	int			m_iIdx_Min;
-	int			m_iIdx_Max;
+	int m_iIdx_Min;
+	int m_iIdx_Max;
 
-// functions...
-	void	Clear();
-	void	AddSoundInfo(CSoundCell* pSound);
-	void	AddSoundGroup(char* szTitle, LPSOUNDINFO pSoundInfo);
-	int		MakeIdx();
-	bool	LoadSoundGroup(File& file);
-	bool	SaveSoundGroup(File& file);
-	LPSOUNDINFO	GetSoundGroup(DWORD dwID);
+	// functions...
+	void Clear();
+	void AddSoundInfo(CSoundCell* pSound);
+	void AddSoundGroup(char* szTitle, LPSOUNDINFO pSoundInfo);
+	int MakeIdx();
+	bool LoadSoundGroup(File& file);
+	bool SaveSoundGroup(File& file);
+	LPSOUNDINFO GetSoundGroup(DWORD dwID);
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgSetSound)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgSetSound)
 	afx_msg void OnBtnAddSoundgroup();

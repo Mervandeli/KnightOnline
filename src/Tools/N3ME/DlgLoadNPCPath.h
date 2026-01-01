@@ -12,29 +12,30 @@
 
 class CDlgLoadNPCPath : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgLoadNPCPath(CWnd* pParent = nullptr);   // standard constructor
+	CDlgLoadNPCPath(CWnd* pParent = nullptr); // standard constructor
 
-	CString	m_SelFileName;
+	CString m_SelFileName;
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgLoadNPCPath)
-	enum { IDD = IDD_LOAD_NPCPATH };
-	CListBox	m_NPCPathFileList;
+	enum
+	{
+		IDD = IDD_LOAD_NPCPATH
+	};
+	CListBox m_NPCPathFileList;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgLoadNPCPath)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgLoadNPCPath)
 	afx_msg void OnSelchangeListNpcpath();

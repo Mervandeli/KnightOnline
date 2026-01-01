@@ -10,7 +10,7 @@
 class CN3FXPartBottomBoardGame : public CN3FXPartBottomBoard
 {
 public:
-	float	GetGroundHeight(float x, float z);
+	float GetGroundHeight(float x, float z);
 
 public:
 	CN3FXPartBottomBoardGame();

@@ -11,10 +11,10 @@
 
 #include <iosfwd>
 
-typedef CSTLMap <CGameEvent>		EventArray;
-typedef CSTLMap <_OBJECT_EVENT>		ObjectEventArray;
-typedef CSTLMap <_REGENE_EVENT>		ObjectRegeneArray;
-typedef	CSTLMap <_WARP_INFO>		WarpArray;
+typedef CSTLMap<CGameEvent> EventArray;
+typedef CSTLMap<_OBJECT_EVENT> ObjectEventArray;
+typedef CSTLMap<_REGENE_EVENT> ObjectRegeneArray;
+typedef CSTLMap<_WARP_INFO> WarpArray;
 
 class CUser;
 class EbenezerApp;
@@ -22,20 +22,20 @@ class EbenezerApp;
 class C3DMap
 {
 private:
-	ObjectEventArray	m_ObjectEventArray;
-	ObjectRegeneArray	m_ObjectRegeneArray;
+	ObjectEventArray m_ObjectEventArray;
+	ObjectRegeneArray m_ObjectRegeneArray;
 
-	EventArray	m_EventArray;
+	EventArray m_EventArray;
 	CN3ShapeMgr m_N3ShapeMgr;
 
-	float**		m_fHeight;
+	float** m_fHeight;
 
-	int			m_nXRegion;
-	int			m_nZRegion;
+	int m_nXRegion;
+	int m_nZRegion;
 
 public:
-	int			m_nMapSize;		// Grid Unit ex) 4m
-	float		m_fUnitDist;	// i Grid Distance
+	int m_nMapSize;    // Grid Unit ex) 4m
+	float m_fUnitDist; // i Grid Distance
 
 	void LoadWarpList(File& fs);
 	void LoadRegeneEvent(File& fs);
@@ -79,22 +79,23 @@ public:
 	C3DMap();
 	virtual ~C3DMap();
 
-	int	m_nServerNo;
+	int m_nServerNo;
 	int m_nZoneNumber;
 	float m_fInitX;
 	float m_fInitZ;
 	float m_fInitY;
-	uint8_t	m_bType;		// Zone Type : 1 -> common zone,  2 -> battle zone, 3 -> 24 hour open battle zone
-	int16_t	m_sMaxUser;
+	uint8_t
+		m_bType; // Zone Type : 1 -> common zone,  2 -> battle zone, 3 -> 24 hour open battle zone
+	int16_t m_sMaxUser;
 
 	CRegion** m_ppRegion;
 	int16_t** m_ppnEvent;
 
-	WarpArray	m_WarpArray;
+	WarpArray m_WarpArray;
 
 	EbenezerApp* m_pMain;
 
-	uint32_t m_wBundle;	// Zone Item Max Count
+	uint32_t m_wBundle; // Zone Item Max Count
 };
 
-#endif // SERVER_EBENEZER_MAP_H
+#endif                  // SERVER_EBENEZER_MAP_H
