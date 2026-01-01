@@ -195,7 +195,7 @@ public:
 		m_iZoneID = id;
 		if (m_pTerrain)
 			m_pTerrain->m_iZoneID = id;
-	}                            //지형 존 아이디 셋팅.
+	} //지형 존 아이디 셋팅.
 	void ImportShape(const char* szFullPath);
 	void MakeTerrainMovableAttr(
 		CN3ShapeMgr* pShapeMgr); //지형에서 갈수 있는 타일과 갈 수 없는 타일을 정리해라..
@@ -219,7 +219,7 @@ public:
 	int GetCursorMode() const
 	{
 		return m_CursorMode;
-	}                                              // 마우스 커서의 이용방법을 얻는다.
+	} // 마우스 커서의 이용방법을 얻는다.
 	void Invalidate();                             // View 화면 갱신
 	void FocusSelObj();                            // 선택된 객체로 포터스를 옮긴다.
 	void FocusAll();                               // 전체 맵을 볼수 있도록 한다.

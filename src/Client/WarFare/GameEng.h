@@ -23,7 +23,7 @@ enum e_ViewPoint
 	VP_FOWARD       = 2, // 플레이어 앞에서 바라봄..
 	VP_THIRD_PERSON = 3, // 삼인칭 모드 .. 마우스도 동작함..
 	VP_UNKNOWN      = 0xffffffff
-};                       // 개발을 위해 카메라만 빠르게....
+}; // 개발을 위해 카메라만 빠르게....
 
 const float CAMERA_MOVE_SPEED = 5.0f;
 

@@ -32,7 +32,7 @@ protected:
 
 	int m_iLineSize; // 버튼을 눌렀을때 trackbar가 움직여지는 크기
 
-	// Operations
+					 // Operations
 public:
 	void Release() override;
 	bool Load(File& file) override;

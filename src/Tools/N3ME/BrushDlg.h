@@ -16,7 +16,7 @@ class CBrushDlg : public CDialog
 public:
 	CBrushDlg(CWnd* pParent = nullptr); // standard constructor
 
-	// Attributes
+										// Attributes
 protected:
 	CLyTerrain* m_pTerrain;
 
@@ -51,7 +51,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 													 //}}AFX_VIRTUAL
 
-	// Implementation
+													 // Implementation
 protected:
 	// Generated message map functions
 	//{{AFX_MSG(CBrushDlg)

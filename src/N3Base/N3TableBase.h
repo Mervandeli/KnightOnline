@@ -29,7 +29,7 @@ protected:
 	std::vector<DATA_TYPE> m_DataTypes; // 실제 사용되는 정보의 데이타 타입
 	MAP_TYPE m_Datas;                   // 실제 사용되는 정보
 
-	// Operations
+										// Operations
 public:
 	const MAP_TYPE& GetMap() const
 	{

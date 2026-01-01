@@ -1093,7 +1093,7 @@ int CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 			case ITEM_ATTRIB_UPGRADE:
 				if (spItem->pItemBasic != nullptr && spItem->pItemExt != nullptr)
 				{
-					const int iItemGrade = (std::min)(3, spItem->pItemBasic->byGrade + spItem->pItemExt->bySoulBind);
+					const int iItemGrade = std::min(3, spItem->pItemBasic->byGrade + spItem->pItemExt->bySoulBind);
 					if (iItemGrade == ITEM_GRADE_LOW_CLASS)
 						m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_LOW_CLASS);
 					else if (iItemGrade == ITEM_GRADE_MIDDLE_CLASS)

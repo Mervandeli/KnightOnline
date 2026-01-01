@@ -43,7 +43,7 @@ CN3IMesh::~CN3IMesh()
 	delete[] m_pwUVsIndices;
 	m_pwUVsIndices = nullptr; // 텍스처 좌표 인덱스 리스트.
 
-	//	if(m_lpVB) m_lpVB->Release();
+							  //	if(m_lpVB) m_lpVB->Release();
 }
 
 void CN3IMesh::Release()

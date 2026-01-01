@@ -833,8 +833,7 @@ BOOL CPondMng::SelectVtxByDragRect(RECT* pRect, BOOL bAdd, BOOL bSelectPond)
 				else
 					m_SelVtxArray.InsertAt(0, pVtx); // 추가
 
-				pSelPond->InputSelectPos(
-					pVtx->x, pVtx->y, pVtx->z);      //	좌표입력하여 가상의 영역잡음
+				pSelPond->InputSelectPos(pVtx->x, pVtx->y, pVtx->z); //	좌표입력하여 가상의 영역잡음
 			}
 		}
 	}

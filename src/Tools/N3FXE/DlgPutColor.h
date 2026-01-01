@@ -41,7 +41,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 													 //}}AFX_VIRTUAL
 
-	// Implementation
+													 // Implementation
 protected:
 	void GradateColor(int start, int end);
 	void GradateAlpha(int start, int end);

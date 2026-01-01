@@ -87,7 +87,7 @@ CGameEng::CGameEng()
 	m_fFPDeltaCur           = 1.0f; // 현재
 	m_fFPDeltaToReach       = 1.0f; // 이값을 목표로 해서 변한다.
 
-	//	m_fLightDeltaCur = 1.0f;
+									//	m_fLightDeltaCur = 1.0f;
 	//	m_fLightDeltaToReach = 1.0f; // 이값을 목표로 해서 변한다.
 }
 

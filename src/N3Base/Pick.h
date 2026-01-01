@@ -25,7 +25,7 @@ protected:
 	__Vector3 m_vPickRayDir;  // 충돌 체크할 직선의 방향
 	__Vector3 m_vPickRayOrig; // 충돌 체크할 직선의 시작점
 
-	// Operations
+							  // Operations
 public:
 	BOOL PickByBox(__Vector3& vMin, __Vector3& vMax, __Vector3& vIntersect);
 	void SetPickXY(long x, long y); // 클라이언트 좌표를 넣어준다..

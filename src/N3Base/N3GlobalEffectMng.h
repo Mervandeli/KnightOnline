@@ -41,7 +41,7 @@ protected:
 	CN3GERain* m_pGERain; // 비
 	CN3GESnow* m_pGESnow; // 눈
 
-	// Operations
+						  // Operations
 public:
 	virtual void Release();
 	void Tick();

@@ -87,7 +87,7 @@ protected:
 	void RecalcLineBuffers(); // 채팅창 사이즈가 변했을때 호출해주면 line buffer를 다시 계산해서 넣어준다.
 	void CreateLines();
 
-	// Operations
+							  // Operations
 public:
 	void SetNoticeTitle(const std::string& szString, D3DCOLOR color);
 	void ShowContinueMsg();
@@ -115,7 +115,7 @@ public:
 	const std::string& GetString() const
 	{
 		return m_szString;
-	}                                 //son, chat_in
+	} //son, chat_in
 	void AddChatMsg(e_ChatMode eCM, const std::string& szString,
 		D3DCOLOR color = 0xffffffff); // 채팅 메세지를 저장하고 알맞은 형태로 화면에 출력해준다.
 	void AddContinueMsg(e_ChatMode eCM, const std::string& szString, D3DCOLOR color = 0xffffffff);

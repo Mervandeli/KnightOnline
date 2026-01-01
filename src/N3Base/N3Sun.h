@@ -41,7 +41,7 @@ protected:
 
 	__SunPart m_Parts[NUM_SUNPART];
 	float m_fCurRadian; // 현재 해의 회전위치
-	// Operations
+						// Operations
 public:
 	void SetCurAngle(float fAngle)
 	{

@@ -18,7 +18,7 @@ class CDlgRiverProperty : public CDialog
 public:
 	CDlgRiverProperty(CRiverMng* pRiverMng, CWnd* pParent = nullptr); // standard constructor
 
-	// Attributes
+																	  // Attributes
 public:
 	BOOL m_IsModalDialog;
 

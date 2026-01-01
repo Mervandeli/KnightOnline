@@ -146,7 +146,7 @@ public:
 	{
 		return m_pIndices;
 	}; // 제대로된 Index가 아님
-	   // (제대로 된 인덱스를 얻으려면 N3PMeshInstance로 만든후 LOD조정후 인덱스값을 얻으면 된다.)
+	// (제대로 된 인덱스를 얻으려면 N3PMeshInstance로 만든후 LOD조정후 인덱스값을 얻으면 된다.)
 
 #ifdef _N3TOOL
 	void CopyMesh(CN3PMesh* pSrcPMesh);

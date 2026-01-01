@@ -35,7 +35,7 @@ protected:
 	__Vector3 m_vOffsetPos; // Joint와 떨어진 정도
 	__Vector3 m_vOffsetDir; // Joint와 떨어진 방향
 
-	// Operations
+							// Operations
 public:
 	void Tick(const __Matrix44& mtxParent);
 	void Tick(const class CN3Chr* pChr);

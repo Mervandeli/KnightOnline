@@ -39,7 +39,7 @@ protected:
 		__VertexTransformedColor m_pVB[2]; // vertex 버퍼
 	};
 
-	// Attributes
+										   // Attributes
 public:
 	/*
 	static bool		AddEdit(CN3UIEdit* pEdit);
@@ -69,7 +69,7 @@ protected:
 	std::string m_szPassword; // password buffer
 
 	CN3SndObj* m_pSnd_Typing; // 타이핑 할 때 나는 소리
-	// Operations
+							  // Operations
 public:
 	const std::string& GetString() override;
 	void SetString(const std::string& szString) override;

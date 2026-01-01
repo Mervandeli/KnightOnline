@@ -30,7 +30,7 @@ public:
 
 	CImageList
 		m_ImgList; // 0:Position, 1:Rotation, 2:Scale 3:Camera, 4:Light, 5:Texture, 6:Shape, 7:Shape_Part
-		// 8:Character, 9:Joint, 10:Character_Part, 11:Character_Plug, 12:Progressive_Mesh, 13:IndexedMesh, 14:Terrain, 15:Normal_Mesh
+	// 8:Character, 9:Joint, 10:Character_Part, 11:Character_Plug, 12:Progressive_Mesh, 13:IndexedMesh, 14:Terrain, 15:Normal_Mesh
 
 public:
 	void UpdateWindowPos();
@@ -40,7 +40,7 @@ protected:
 	CFormViewProperty(); // protected constructor used by dynamic creation
 	DECLARE_DYNCREATE(CFormViewProperty)
 
-	// Form Data
+						 // Form Data
 public:
 	//{{AFX_DATA(CFormViewProperty)
 	enum

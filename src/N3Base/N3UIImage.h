@@ -42,7 +42,7 @@ protected:
 	float m_fCurAnimFrame;         // 현재 그려질 animate frame index (소수는 버리고 사용하자)
 	CN3UIImage** m_pAnimImagesRef; // Animate 될 자식 이미지들 참조 포인터들
 
-	//	Operations
+								   //	Operations
 public:
 	D3DCOLOR GetColor()
 	{
@@ -52,7 +52,7 @@ public:
 	CN3Texture* GetTex() const
 	{
 		return m_pTexRef;
-	}                                                                 // Texture 포인터 얻기
+	} // Texture 포인터 얻기
 	void SetTex(const std::string& szFN);                             // Texture 지정
 	void SetUVRect(float left, float top, float right, float bottom); // image의 uv좌표 지정
 	void SetColor(D3DCOLOR color);                                    // 칼라 지정

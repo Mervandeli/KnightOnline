@@ -18,8 +18,7 @@ protected:
 
 		bool operator()(std::string_view lhs, std::string_view rhs) const
 		{
-			const size_t minLength = (std::min)(
-				lhs.size(), rhs.size()); // NOTE: allow for Windows.h defining min
+			const size_t minLength = std::min(lhs.size(), rhs.size());
 			for (size_t i = 0; i < minLength; i++)
 			{
 				int a = std::tolower(lhs[i]);

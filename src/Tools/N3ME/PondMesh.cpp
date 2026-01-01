@@ -644,15 +644,15 @@ void CPondMesh::CalcuWidth(int iSx, int iSy, int iEx, int iEy)
 	if (iSx < 0 || iSx > m_iWaterScaleWidth || iSy < 0 || iSy > m_iWaterScaleHeight)
 		return;
 
-	int iHeightNum     = iSy * m_iWaterScaleWidth;
+	int iHeightNum            = iSy * m_iWaterScaleWidth;
 	//	----------------------------------------------------------------------------------
 	//	계산해야할 첫점을 구한다
-	__Vector3 vBakPick = *(
-		m_pVertices + iHeightNum + iSx); //	백업된 전의 좌표(참조하여 새로운 좌표 계산)
-	__Vector3 vNowPick = *(
-		m_pViewVts + iHeightNum + iSx);  //	현재 지정된 점(나중에 여러개 지정되게)
-	__Vector3* pLRVertices    = m_pVertices + iHeightNum; //	계산할 첫 점(백업용)
-	__VertexXyzT2* pLRViewVer = m_pViewVts + iHeightNum;  //	계산할 첫 점(현재용)
+	//	백업된 전의 좌표(참조하여 새로운 좌표 계산)
+	__Vector3 vBakPick        = m_pVertices[iHeightNum + iSx];
+	//	현재 지정된 점(나중에 여러개 지정되게)
+	__Vector3 vNowPick        = m_pViewVts[iHeightNum + iSx];
+	__Vector3* pLRVertices    = &m_pVertices[iHeightNum]; //	계산할 첫 점(백업용)
+	__VertexXyzT2* pLRViewVer = &m_pViewVts[iHeightNum];  //	계산할 첫 점(현재용)
 	//	----------------------------------------------------------------------------------
 
 	//	----------------------------------------------------------------------------------

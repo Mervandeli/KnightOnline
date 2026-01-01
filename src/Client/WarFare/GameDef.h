@@ -439,7 +439,7 @@ enum e_ItemClass
 	ITEM_CLASS_CONSUMABLE    = 255, // Consumable items with 'charges' that use the durability/duration instead of stacks
 
 	ITEM_CLASS_UNKNOWN       = 0xffffffff
-};                                  //
+}; //
 
 enum e_ItemGrade
 {

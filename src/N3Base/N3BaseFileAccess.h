@@ -39,7 +39,7 @@ public:
 	const std::string& FileName() const
 	{
 		return m_szFileName;
-	}                                                                         // Full Path
+	} // Full Path
 	void FileNameSet(const std::string& szFileName);
 
 	bool LoadFromFile();                                                      // 파일에서 읽어오기.

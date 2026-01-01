@@ -54,7 +54,7 @@ protected:
 	__Vector3*
 		m_vPrevScaleArray; // 이번 마우스 드래그 이전에 확대/축소값들 (선택된 객체들 모두의 값을 가지고 있어야 하기 때문에 배열)
 
-	// Operations
+						   // Operations
 public:
 	virtual void Tick();
 	virtual void Render();

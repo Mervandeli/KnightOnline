@@ -61,7 +61,7 @@ public:
 	__VertexColor m_VDir[6];           // 방향 표시 용
 	__VertexTransformed m_VPreview[6]; // 텍스처 프리뷰 용
 
-	//	LPDIRECT3DDEVICE8	m_lpD3DDevExtra;
+									   //	LPDIRECT3DDEVICE8	m_lpD3DDevExtra;
 
 public:
 	//	bool CreateExtraDevice(int nWidth, int nHeight);

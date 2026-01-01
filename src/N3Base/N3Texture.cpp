@@ -336,7 +336,7 @@ bool CN3Texture::Load(File& file)
 	{
 		iWCreate /= 2;
 		iHCreate /= 2;
-	}                               // DXT 지원이 안되면 너비 높이를 줄인다.
+	} // DXT 지원이 안되면 너비 높이를 줄인다.
 	if (m_iLOD > 0 && m_iLOD <= 2 && HeaderOrg.nWidth >= 16
 		&& HeaderOrg.nHeight >= 16) // LOD 만큼 작게 생성..
 	{

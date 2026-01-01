@@ -20,7 +20,7 @@ protected:
 	CFormViewTool(); // protected constructor used by dynamic creation
 	DECLARE_DYNCREATE(CFormViewTool)
 
-	// Form Data
+					 // Form Data
 public:
 	//{{AFX_DATA(CFormViewTool)
 	enum

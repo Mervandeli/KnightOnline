@@ -62,7 +62,7 @@ public:
 	CN3UIBase* GetFocusedUI()
 	{
 		return m_pUIFocused;
-	}                                   // 찍은 UI 가져오기..
+	} // 찍은 UI 가져오기..
 	void SetFocusedUI(CN3UIBase* pUI);  // 찍은 UI 가져오기..
 	CN3UIBase* GetTopUI(bool bVisible); // 최상위에 있는 UI 가져오기.
 	void SetVisibleFocusedUI(CN3UIBase* pUI);

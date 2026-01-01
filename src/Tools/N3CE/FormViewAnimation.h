@@ -39,7 +39,7 @@ protected:
 	CFormViewAnimation(); // protected constructor used by dynamic creation
 	DECLARE_DYNCREATE(CFormViewAnimation)
 
-	// Form Data
+						  // Form Data
 public:
 	//{{AFX_DATA(CFormViewAnimation)
 	enum

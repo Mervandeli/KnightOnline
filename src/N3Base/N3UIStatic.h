@@ -22,7 +22,7 @@ protected:
 	CN3UIImage* m_pImageBkGnd;  // 배경 이미지 참조 포인터 (실제는 child리스트에서 관리)
 	CN3SndObj* m_pSnd_Click;    // static이 눌리는 순간 내는 소리
 
-	// Operations
+								// Operations
 public:
 	virtual const std::string& GetString();
 	virtual void SetString(const std::string& szString);

@@ -40,7 +40,7 @@ protected:
 	CN3Texture* m_pTex;              // 눈 텍스쳐
 	__SnowParticle* m_pSnowParticle; // 눈송이 정보
 
-	// Operations
+									 // Operations
 public:
 	void Release();
 	void Tick();

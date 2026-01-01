@@ -210,19 +210,46 @@ bool CGameProcCharacterCreate::MsgSendCharacterCreate()
 		for (char c : szID)
 		{
 			// CompadmreString(LOCALE_USER_DEFAULT, NORM_IGNOREWIDTH, id, strlen(id), pUser->m_UserId, strlen(pUser->m_UserId) ) == CSTR_EQUAL )
-			if ('~' == c || '`' == c || '!' == c || '@' == c || '#' == c || '$' == c || '%' == c || '^' == c || '&' == c || '*' == c
-				|| '(' == c || ')' == c ||
-				//				'_' == c ||
-				'-' == c || '+' == c || '=' == c || '|' == c || '\\' == c || '<' == c || '>' == c || ',' == c || '.' == c || '?' == c
-				|| '/' == c || '{' == c || '[' == c || '}' == c || ']' == c || '\"' == c || '\'' == c || ' ' == c)
+			switch (c)
+			case '~':
+			case '`':
+			case '!':
+			case '@':
+			case '#':
+			case '$':
+			case '%':
+			case '^':
+			case '&':
+			case '*':
+			case '(':
+			case ')':
+			// case '_':
+			case '-':
+			case '+':
+			case '=':
+			case '|':
+			case '\\':
+			case '<':
+			case '>':
+			case ',':
+			case '.':
+			case '?':
+			case '/':
+			case '{':
+			case '[':
+			case '}':
+			case ']':
+			case '\"':
+			case '\'':
+			case ' ':
 			{
 				bHasSpecialLetter = true;
 				eErrCode          = ERROR_CHARACTER_CREATE_INVALID_NAME_HAS_SPECIAL_LETTER;
-				break;
 			}
+			break;
 		}
 
-		if (false == bHasSpecialLetter)
+		if (!bHasSpecialLetter)
 		{
 			__InfoPlayerBase* pInfoBase  = &(s_pPlayer->m_InfoBase);
 			__InfoPlayerMySelf* pInfoExt = &(s_pPlayer->m_InfoExt);

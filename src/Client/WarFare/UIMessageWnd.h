@@ -32,7 +32,7 @@ protected:
 	void RecalcLineBuffer(); // 채팅창 사이즈가 변했을때 호출해주면 line buffer를 다시 계산해서 넣어준다.
 	void CreateLines();
 
-	// Operations
+							 // Operations
 public:
 	bool OnKeyPress(int iKey) override;
 	BOOL MoveOffset(int iOffsetX, int iOffsetY) override; // offsetY만큼 이동해준다.(region, children, move rect 이동)

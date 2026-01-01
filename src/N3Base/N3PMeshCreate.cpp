@@ -113,10 +113,11 @@ void CN3PMeshCreate::combine_modified(
 
 	// The angle change weighted by the area of the triangle.
 	float weighted_angle_change = (1.0f - cosangdiff) * (oldarea + newarea);
+
+	// cosangdiff가 1보다 아주 조금 클때가 있어서 weighted_angle_change가 -값이 나올때가 있다.
 	if (weighted_angle_change < 0.0f)
-		weighted_angle_change =
-			0.0f; // cosangdiff가 1보다 아주 조금 클때가 있어서 weighted_angle_change가 -값이 나올때가 있다.
-				  //__ASSERT(weighted_angle_change>=0.0f, "weighted_angle_change > 0 이어야 한다.");
+		weighted_angle_change = 0.0f;
+	//__ASSERT(weighted_angle_change>=0.0f, "weighted_angle_change > 0 이어야 한다.");
 
 	// These numbers are not in the same "units", one being length^3 and the other length^2
 	// And let's put some arbitrary weighting on these things.

@@ -70,7 +70,7 @@ protected:
 
 	BOOL m_bViewGrid;       // 그리드 보기..
 
-	// Operations
+							// Operations
 public:
 	CN3UIBase* Pick(const POINT& point, CN3UIBase* pUI);
 	void SetMode(eUIE_MODE eMode); // 모드를 변경하는 함수(Edit, Preview)

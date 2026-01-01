@@ -37,7 +37,7 @@ protected:
 	float m_fFadeTimeCur; // 지난시간..
 	int m_iFadeMode;      // 1 - FadeIn 0... -1 FadeOut
 
-	// Operations
+						  // Operations
 public:
 	virtual bool NeedDelete()
 	{

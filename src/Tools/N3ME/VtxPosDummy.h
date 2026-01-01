@@ -23,7 +23,7 @@ public:
 protected:
 	CTypedPtrArray<CPtrArray, __VertexXyzT1*> m_SelVtxArray; // 선택된 점들
 
-	// Operations
+															 // Operations
 public:
 	virtual void Tick();
 	virtual void Render();

@@ -90,7 +90,7 @@ protected:
 	BOOL m_Is2D;             // 2D Text인가?
 	SIZE m_Size;             // 쓴 글씨들이 차지하는 크기(pixel단위, 가로 세로)
 
-	// Operations
+							 // Operations
 public:
 	bool IsSetText()
 	{

@@ -138,7 +138,7 @@ protected:
 	float m_fAnimTexFPS;          // AnimTexture의 초당 frame 수;
 	DWORD m_dwAlphaFactor;        // 강을 투명하게 하기 위한 알파값
 
-	// Operations
+								  // Operations
 public:
 	void Release() override;
 	bool Load(File& file) override;

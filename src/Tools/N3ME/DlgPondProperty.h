@@ -20,7 +20,7 @@ class CDlgPondProperty : public CDialog
 public:
 	CDlgPondProperty(CPondMng* pPondMng, CWnd* pParent = nullptr); // standard constructor
 
-	// Attributes
+																   // Attributes
 public:
 	BOOL m_IsModalDialog;
 

@@ -52,7 +52,7 @@ protected:
 	e_CLOUDTEX m_eBackupCloud;                        // 2번째 구름 변경해야 할 texture종류 저장
 	float m_fBackupTime;                              // 2번째 구름 변경해야 할 시간 저장
 
-	// Operations
+													  // Operations
 public:
 	void ChangeColor1(D3DCOLOR color, float fSec)
 	{

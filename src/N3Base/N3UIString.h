@@ -70,7 +70,7 @@ public:
 	void ClearOnlyStringBuffer()
 	{
 		m_szString.clear();
-	}                             // string 버퍼만 지운다.
+	} // string 버퍼만 지운다.
 	void SetStartLine(int iLine); // multiline일경우 시작하는 라인 변경하기
 
 	virtual void operator=(const CN3UIString& other);

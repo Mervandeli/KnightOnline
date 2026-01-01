@@ -92,8 +92,8 @@ bool CPlayerOther::Init(e_Race eRace, int iFace, int iHair, uint32_t* pdwItemIDs
 			else if (5 == i)
 			{
 			} // 망토
-			  //			else if(6 == i) { ePlug = PLUG_POS_RIGHTHAND; }
-			  //			else if(7 == i) { ePlug = PLUG_POS_LEFTHAND; }
+			//			else if(6 == i) { ePlug = PLUG_POS_RIGHTHAND; }
+			//			else if(7 == i) { ePlug = PLUG_POS_LEFTHAND; }
 		}
 		else
 		{

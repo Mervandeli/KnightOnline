@@ -65,7 +65,7 @@ protected:
 	float m_fTimeToDelay;         // 지연시간..
 
 	int m_iStepValue;             // 변화값 StepIt()을 통한 변화되는 값
-	//	Operations
+								  //	Operations
 public:
 	void Tick() override;
 	void Render() override;

@@ -84,7 +84,7 @@ protected:
 	RECT m_rcSelDrag;                  // 드래그 영역
 	__VertexXyzColor m_CreateLine[2];  // 강 처음 생성할때 보이는 선
 
-	// Operations
+									   // Operations
 public:
 	void Tick();
 	void Render();

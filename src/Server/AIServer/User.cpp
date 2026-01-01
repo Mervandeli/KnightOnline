@@ -302,7 +302,7 @@ void CUser::Dead(int tid, int nDamage)
 	if (tid > 0)
 		SendAll(buff, send_index); // thread 에서 send
 
-	/*	SetByte(buff, AG_DEAD, send_index );
+								   /*	SetByte(buff, AG_DEAD, send_index );
 	SetShort(buff, m_iUserId, send_index );
 	SetFloat(buff, m_curx, send_index);
 	SetFloat(buff, m_curz, send_index);

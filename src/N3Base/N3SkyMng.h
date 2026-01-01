@@ -127,7 +127,7 @@ public:
 		SW_CLEAR = 1, // 맑음
 		SW_RAINY,     // 비
 		SW_SNOW
-	};                // 눈
+	}; // 눈
 protected:
 	class CN3Sky* m_pSky;
 	class CN3Moon* m_pMoon;
@@ -166,7 +166,7 @@ protected:
 	class CN3SndObj* m_pSnd_Weather_Snow;
 #endif                          // #ifdef _N3GAME
 
-	// Operations
+								// Operations
 public:
 #ifdef _N3TOOL
 	void InitToDefaultHardCoding();

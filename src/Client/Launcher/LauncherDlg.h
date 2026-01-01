@@ -55,7 +55,7 @@ public:
 
 	HKEY m_hRegistryKey; // 레지스트리 키 핸들..
 
-	// Construction
+						 // Construction
 public:
 	void PacketSend_DownloadInfo();
 	void PacketReceive_DownloadInfo(const BYTE* pBuf, int& iIndex);

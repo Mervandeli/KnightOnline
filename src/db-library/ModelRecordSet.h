@@ -160,8 +160,7 @@ public:
 			{
 				rowCount = result.get<int64_t>(0);
 				if (_selectLimit > 0)
-					rowCount = (std::min)(
-						rowCount, _selectLimit); // NOTE: allow for Windows.h defining min
+					rowCount = std::min(rowCount, _selectLimit);
 
 				_rowCount = rowCount;
 			}

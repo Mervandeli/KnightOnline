@@ -33,7 +33,7 @@ public:
 	void Resize();              // 위치와 크기 조정
 	void Clear();               // 초기화
 
-	// Overrides
+								// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CProgressBar)
 	//}}AFX_VIRTUAL

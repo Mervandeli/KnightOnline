@@ -5415,9 +5415,10 @@ void CNpc::SendNpcInfoAll(char* temp_send, int& index, int /*count*/)
 
 int CNpc::GetDir(float x1, float z1, float x2, float z2)
 {
-	int nDir; //	3 4 5
-			  //	2 8 6
-			  //	1 0 7
+	// 3 4 5
+	// 2 8 6
+	// 1 0 7
+	int nDir;
 
 	int x11     = (int) x1 / TILE_SIZE;
 	int y11     = (int) z1 / TILE_SIZE;

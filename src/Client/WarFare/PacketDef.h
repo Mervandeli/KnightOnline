@@ -37,7 +37,7 @@ enum e_SubPacket_State
 	N3_SP_STATE_CHANGE_SIZE          = 0x03,
 	N3_SP_STATE_CHANGE_ACTION        = 0x04, // 1 - 인사, 11 - 도발
 	N3_SP_STATE_CHANGE_VISIBLE       = 0x05
-};                                           // 투명 0 ~ 255
+}; // 투명 0 ~ 255
 
 // Sub Packet
 enum e_SubPacket_Party
@@ -52,7 +52,7 @@ enum e_SubPacket_Party
 	N3_SP_PARTY_OR_FORCE_LEVEL_CHANGE  = 0x07, // Recv - s1(ID), b1(Level)
 	N3_SP_PARTY_OR_FORCE_CLASS_CHANGE  = 0x08, // Recv - s1(ID), b1(Class)드물지만 전직할때...
 	N3_SP_PARTY_OR_FORCE_STATUS_CHANGE = 0x09
-};                                             // Recv - s1(ID), b1(Status)독, 저주, 지속성마법, 축복
+}; // Recv - s1(ID), b1(Status)독, 저주, 지속성마법, 축복
 
 // Sub Packet
 enum e_SubPacket_PerTrade
@@ -96,7 +96,7 @@ enum e_SubPacket_ClassChange
 	N3_SP_CLASS_CHANGE_ALREADY      = 0x03, // Already..
 	N3_SP_CLASS_CHANGE_ITEM_IN_SLOT = 0x04, // Item in Slot..
 	N3_SP_CLASS_CHANGE_FAILURE      = 0x00
-};                                          // Failure..
+}; // Failure..
 
 enum e_SubPacket_Knights
 {
@@ -155,7 +155,7 @@ enum e_SubPacket_KnightsList
 	N3_SP_KNIGHTS_LIST_BASIC_ALL    = 0x01, // Receive - s1(knights Count) { s21(id, 이름길이), str1(이름) }
 	N3_SP_KNIGHTS_LIST_BASIC_INSERT = 0x02, // Receive - s2(id, 이름길이), str1(이름)
 	N3_SP_KNIGHTS_LIST_BASIC_REMOVE = 0x03
-};                                          // Receive - s1(id)
+}; // Receive - s1(id)
 
 enum e_SubPacket_Administrator
 {
@@ -163,7 +163,7 @@ enum e_SubPacket_Administrator
 	N3_SP_ADMINISTRATOR_FORBID_CONNECT = 0x02, // 접속금지 및 쫓아내기.. Send b1(Type) s1(유저이름길이), str1(유저이름)
 	N3_SP_ADMINISTRATOR_CHAT_FORBID    = 0x03, // 채팅금지 Send b1(Type) s1(유저이름길이), str1(유저이름)
 	N3_SP_ADMINISTRATOR_CHAT_PERMIT    = 0x04
-};                                             // 채팅허가 Send b1(Type) s1(유저이름길이), str1(유저이름)
+}; // 채팅허가 Send b1(Type) s1(유저이름길이), str1(유저이름)
 
 enum e_SubPacket_WareHouse
 {
@@ -181,13 +181,13 @@ enum e_Party_BBS
 	N3_SP_PARTY_REGISTER        = 0x01, // 파티 게시판에 등록
 	N3_SP_PARTY_REGISTER_CANCEL = 0x02, // 파티 게시판에서 등록 취소
 	N3_SP_PARTY_BBS_DATA        = 0x03
-};                                      // 파티 게시 정보 요구
+}; // 파티 게시 정보 요구
 
 enum e_Trade_BBS_Kind
 {
 	N3_SP_TRADE_BBS_BUY  = 0x01, // 사는 물건 목록
 	N3_SP_TRADE_BBS_SELL = 0x02
-};                               // 파는 물건 목록
+}; // 파는 물건 목록
 
 enum e_Trade_BBS_Sub
 {
@@ -196,6 +196,6 @@ enum e_Trade_BBS_Sub
 	N3_SP_TYPE_BBS_DATA        = 0x03, // 게시판 정보 요구
 	N3_SP_TYPE_BBS_OPEN        = 0x04, // 상거래 게시판 열기
 	N3_SP_TYPE_BBS_TRADE       = 0x05
-};                                     // 게시판에서 거래 신청하기
+}; // 게시판에서 거래 신청하기
 
-#endif                                 // end of #ifndef __PACKET_DEF_H_
+#endif // end of #ifndef __PACKET_DEF_H_

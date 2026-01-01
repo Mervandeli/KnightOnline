@@ -210,7 +210,7 @@ public:
 	virtual void SetRegion(const RECT& pRect)
 	{
 		m_rcRegion = pRect;
-	}                                // 영역 지정
+	} // 영역 지정
 	virtual BOOL MoveOffset(
 		int iOffsetX, int iOffsetY); // offset만큼 이동해준다.(region, children, move rect 이동)
 	virtual void SetSize(int iWidth, int iHeight); // 크기 지정

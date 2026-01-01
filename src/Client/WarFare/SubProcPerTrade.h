@@ -25,14 +25,12 @@ enum e_PerTradeResultCode
 	PER_TRADE_RESULT_MY_DISAGREE = 0, // 거래를 신청받은 내가 거래 신청을 취소..
 	PER_TRADE_RESULT_OTHER_DISAGREE,  // 거래를 신청받은 상대방이 거래 신청을 취소..
 	PER_TRADE_RESULT_MY_CANCEL,       // 거래를 신청한 내가 거래 신청을 취소..
-
 };
 
 enum e_PerTradeProceedCode
 {                                  // 아이템 거래가 계속되는 상태를 정의..
 	PER_TRADE_RESULT_MY_AGREE = 0, // 거래를 신청받은 내가 거래 신청을 허락..
 	PER_TRADE_RESULT_OTHER_AGREE,  // 거래를 신청받은 상대방이 거래 신청을 허락..
-
 };
 
 enum e_PerTradeItemKindBackup

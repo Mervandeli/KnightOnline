@@ -36,7 +36,7 @@ protected:
 	float m_fMoonRatio;    // 달의 pixel싸이즈
 	int m_iMoonPhaseIndex; // 달의 모양 인덱스 0~23;
 
-	// Operations
+						   // Operations
 public:
 	void Init(const std::string& szTexFN);
 	void SetMoonPhase(int iIndex); // 달의 모양 설정

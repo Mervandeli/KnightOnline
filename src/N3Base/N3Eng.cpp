@@ -572,7 +572,7 @@ void CN3Eng::Present(HWND hWnd, RECT* pRC)
 
 	s_fFrmPerSec = 1.0f / s_fSecPerFrm; // 초당 프레임 수 측정..
 
-	//	fTimePrev = fTime;
+										//	fTimePrev = fTime;
 	// 프레임 율 측정...
 	////////////////////////////////////////////////////////////////////////////////
 }

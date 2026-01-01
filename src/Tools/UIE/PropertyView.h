@@ -31,7 +31,7 @@ protected:
 	CPropertyView(); // protected constructor used by dynamic creation
 	DECLARE_DYNCREATE(CPropertyView)
 
-	// Form Data
+					 // Form Data
 public:
 	//{{AFX_DATA(CPropertyView)
 	enum

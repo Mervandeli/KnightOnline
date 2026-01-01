@@ -51,7 +51,7 @@ protected:
 	CPoint m_ptMouseOld;       // 마우스의 이전 지점 기억
 	BOOL m_bDeselect;          // deselect 할 것인가?
 	CPoint m_ptClickOffset;    // 선택 영역을 움직이려고 할때 click했을경우의
-		// 선택창의 클릭지점 상대좌표(선택 영역lefttop 0,0 기준)(image pixel좌표계)
+	// 선택창의 클릭지점 상대좌표(선택 영역lefttop 0,0 기준)(image pixel좌표계)
 
 	enum eDRAGTYPE
 	{
@@ -85,7 +85,7 @@ protected:
 	int m_iImageTypeCount;             // 선택되어야 할 이미지 종류의 수
 	CRect m_ImageRects[MAX_IMAGETYPE]; // m_iImageTypeCount만큼의 ImageRect
 	int m_iCurSelectedImage;           // 현재 선택된 ImageType
-	// Operations
+									   // Operations
 public:
 	void Release();
 	BOOL Zoom(BOOL bZoomIn);           // in : 확대, out : 축소
@@ -102,7 +102,7 @@ public:
 	void SetImageTypeCount(int iCount)
 	{
 		m_iImageTypeCount = iCount;
-	}                                   // image type 갯수 정하기
+	} // image type 갯수 정하기
 	BOOL SetImageTypeIndex(int iIndex); // zero base 선택된 image type정하기
 	CRect GetImageRect(int iIndex);
 	BOOL AutoMultiRectSelect(BOOL bHorizon, CString& strErrMsg);

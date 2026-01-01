@@ -59,7 +59,7 @@ public:
 	RECT m_rcChr;
 	CN3TableBase<__TABLE_NEW_CHR> m_Tbl_InitValue; // 사운드 소스 정보 테이블..
 
-	//	int						m_InitValue[TRIBE_NUM][CVAL_NUM];
+												   //	int						m_InitValue[TRIBE_NUM][CVAL_NUM];
 
 protected:
 	virtual bool ProcessPacket(Packet& pkt);

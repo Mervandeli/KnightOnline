@@ -1319,7 +1319,8 @@ void CMagicProcess::ExecuteType3(int magicid, int sid, int tid, int data1, int /
 		if (pTUser == nullptr || pTUser->m_bResHpType == USER_DEAD)
 			continue;
 
-#if 0 // NOTE: negated by the above check              \
+		// NOTE: negated by the above check
+#if 0
 	  // Check if target exists and not already dead.
 		if (pTUser == nullptr
 			|| pTUser->m_bResHpType == USER_DEAD)

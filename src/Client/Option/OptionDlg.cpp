@@ -36,7 +36,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 													 //}}AFX_VIRTUAL
 
-	// Implementation
+													 // Implementation
 protected:
 	//{{AFX_MSG(CAboutDlg)
 	//}}AFX_MSG
@@ -105,12 +105,15 @@ struct Resolution
 
 static std::vector<Resolution> s_supportedResolutions;
 
-static Resolution DefaultResolutions[] = { { 1024, 768 }, { 1152, 864 }, { 1280, 768 },
-	{ 1280, 800 }, { 1280, 960 }, { 1280, 1024 }, { 1360, 768 }, { 1366, 768 }, { 1600, 1200 } };
+static Resolution DefaultResolutions[] = {
+	{ 1024, 768 }, { 1152, 864 }, { 1280, 768 },  //
+	{ 1280, 800 }, { 1280, 960 }, { 1280, 1024 }, //
+	{ 1360, 768 }, { 1366, 768 }, { 1600, 1200 }  //
+};
 
 // The game supports at minimum, a resolution of 1024x768.
 // The UIs will not fit on anything smaller than this.
-constexpr Resolution MIN_RESOLUTION    = { 1024, 768 };
+constexpr Resolution MIN_RESOLUTION = { 1024, 768 };
 
 /*
  * LoadSupportedResolutions will load a vector of valid resolutions for the primary monitor.

@@ -122,16 +122,20 @@ void AudioDecoderThread::decode_impl_mp3(StreamedAudioHandle* handle)
 		AudioDecodedChunk decodedChunk = {};
 		decodedChunk.Data.resize(asset->PcmChunkSize);
 
-		size_t done = 0;
-		int error   = mpg123_read(
-            handle->Mp3Handle, &decodedChunk.Data[0], asset->PcmChunkSize, &done);
+		size_t done;
+		int error;
+
+		done  = 0;
+		error = mpg123_read(handle->Mp3Handle, &decodedChunk.Data[0], asset->PcmChunkSize, &done);
 
 		// The first read will invoke MPG123_NEW_FORMAT.
 		// This is where we'd fetch the format data, but we don't really care about it.
 		// Retry the read so we can decode the chunk.
 		while (error == MPG123_NEW_FORMAT)
+		{
 			error = mpg123_read(
 				handle->Mp3Handle, &decodedChunk.Data[0], asset->PcmChunkSize, &done);
+		}
 
 		// Decoded a chunk
 		if (error == MPG123_OK)
@@ -179,19 +183,20 @@ void AudioDecoderThread::decode_impl_pcm(StreamedAudioHandle* handle)
 		return;
 
 	const size_t ChunksToDecode = MAX_AUDIO_STREAM_BUFFER_COUNT - handle->DecodedChunks.size();
-	FileReaderHandle& fileReaderHandle = handle->FileReaderHandle;
-	FileReader* file                   = asset->File.get();
-	const size_t fileSize              = static_cast<size_t>(file->Size());
+	FileReader* file            = asset->File.get();
+	const size_t fileSize       = static_cast<size_t>(file->Size());
 
 	for (size_t i = 0; i < ChunksToDecode; i++)
 	{
 		AudioDecodedChunk decodedChunk = {};
 
-		const size_t bytesRemaining    = fileSize > fileReaderHandle.Offset
-											 ? fileSize - fileReaderHandle.Offset
-											 : 0;
+		size_t bytesRemaining;
+		if (fileSize > handle->FileReaderHandle.Offset)
+			bytesRemaining = fileSize - handle->FileReaderHandle.Offset;
+		else
+			bytesRemaining = 0;
 
-		size_t bytesToRead             = asset->PcmChunkSize;
+		size_t bytesToRead = asset->PcmChunkSize;
 		if (bytesRemaining < bytesToRead)
 			bytesToRead = bytesRemaining;
 
@@ -221,7 +226,8 @@ void AudioDecoderThread::decode_impl_pcm(StreamedAudioHandle* handle)
 		decodedChunk.Data.resize(bytesToRead);
 
 		std::memcpy(&decodedChunk.Data[0],
-			static_cast<const uint8_t*>(file->Memory()) + fileReaderHandle.Offset, bytesToRead);
+			static_cast<const uint8_t*>(file->Memory()) + handle->FileReaderHandle.Offset,
+			bytesToRead);
 
 		handle->FileReaderHandle.Offset += bytesToRead;
 
