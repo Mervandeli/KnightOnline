@@ -17,7 +17,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -27,12 +27,10 @@ static char THIS_FILE[]=__FILE__;
 
 CUINPCEvent::CUINPCEvent()
 {
-
 }
 
 CUINPCEvent::~CUINPCEvent()
 {
-
 }
 
 void CUINPCEvent::Release()
@@ -42,7 +40,8 @@ void CUINPCEvent::Release()
 
 bool CUINPCEvent::Load(File& file)
 {
-	if(CN3UIBase::Load(file)==false) return false;
+	if (CN3UIBase::Load(file) == false)
+		return false;
 
 	N3_VERIFY_UI_COMPONENT(m_pBtn_Repair, GetChildByID<CN3UIButton>("Btn_Repair"));
 	N3_VERIFY_UI_COMPONENT(m_pText_Repair, GetChildByID<CN3UIString>("Text_Repair"));
@@ -53,11 +52,11 @@ bool CUINPCEvent::Load(File& file)
 
 bool CUINPCEvent::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	if (dwMsg == UIMSG_BUTTON_CLICK)					
+	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
-		if(pSender->m_szID == "Btn_Sale")
+		if (pSender->m_szID == "Btn_Sale")
 		{
-			if (CGameProcedure::s_pProcMain->m_pSubProcPerTrade->m_ePerTradeState != PER_TRADE_STATE_NONE) 	/* 개인간 상거래 중이면.. */
+			if (CGameProcedure::s_pProcMain->m_pSubProcPerTrade->m_ePerTradeState != PER_TRADE_STATE_NONE) /* 개인간 상거래 중이면.. */
 				return true;
 
 			Close();
@@ -70,9 +69,9 @@ bool CUINPCEvent::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			CGameProcedure::s_pProcMain->DoCommercialTransaction(m_iTradeID);
 		}
 
-		if(pSender->m_szID == "Btn_Repair")
+		if (pSender->m_szID == "Btn_Repair")
 		{
-			if (CGameProcedure::s_pProcMain->m_pSubProcPerTrade->m_ePerTradeState != PER_TRADE_STATE_NONE) 	/* 개인간 상거래 중이면.. */
+			if (CGameProcedure::s_pProcMain->m_pSubProcPerTrade->m_ePerTradeState != PER_TRADE_STATE_NONE) /* 개인간 상거래 중이면.. */
 				return true;
 
 			Close();
@@ -83,11 +82,9 @@ bool CUINPCEvent::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			if (CGameProcedure::s_pProcMain->m_pUISkillTreeDlg->IsVisible())
 				CGameProcedure::s_pProcMain->m_pUISkillTreeDlg->Close();
 			CGameProcedure::s_pProcMain->m_pUIInventory->Open(INV_STATE_REPAIR);
-
 		}
 
-
-		if(pSender->m_szID == "btn_close")
+		if (pSender->m_szID == "btn_close")
 			Close();
 	}
 
@@ -101,7 +98,7 @@ void CUINPCEvent::Open(e_NpcEvent eNpcEvent, int iTradeId, int iIDTarget)
 	m_iTradeID  = iTradeId;
 	std::string szStr;
 
-	switch(eNpcEvent)
+	switch (eNpcEvent)
 	{
 		case NPC_EVENT_ITEM_TRADE:
 			szStr = fmt::format_text_resource(IDS_NPC_EVENT_TITLE_TRADE);
@@ -138,7 +135,7 @@ void CUINPCEvent::Close()
 
 bool CUINPCEvent::OnKeyPress(int iKey)
 {
-	if(DIK_ESCAPE == iKey)
+	if (DIK_ESCAPE == iKey)
 	{
 		this->Close();
 		return true;
@@ -150,8 +147,8 @@ bool CUINPCEvent::OnKeyPress(int iKey)
 void CUINPCEvent::SetVisible(bool bVisible)
 {
 	CN3UIBase::SetVisible(bVisible);
-	if(bVisible)
+	if (bVisible)
 		CGameProcedure::s_pUIMgr->SetVisibleFocusedUI(this);
 	else
-		CGameProcedure::s_pUIMgr->ReFocusUI();//this_ui
+		CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
 }

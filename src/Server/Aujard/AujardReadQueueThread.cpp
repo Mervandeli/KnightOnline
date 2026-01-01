@@ -2,8 +2,8 @@
 #include "AujardReadQueueThread.h"
 #include "AujardApp.h"
 
-AujardReadQueueThread::AujardReadQueueThread()
-	: ReadQueueThread(AujardApp::instance()->LoggerRecvQueue)
+AujardReadQueueThread::AujardReadQueueThread() :
+	ReadQueueThread(AujardApp::instance()->LoggerRecvQueue)
 {
 }
 
@@ -11,8 +11,8 @@ void AujardReadQueueThread::process_packet(const char* buffer, int /*len*/)
 {
 	AujardApp* appInstance = AujardApp::instance();
 
-	int index = 0;
-	uint8_t command = GetByte(buffer, index);
+	int index              = 0;
+	uint8_t command        = GetByte(buffer, index);
 	switch (command)
 	{
 		case WIZ_LOGIN:

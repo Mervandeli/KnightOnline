@@ -8,13 +8,11 @@ using test::ExpectVector3Near;
 class QuaternionTest : public ::testing::Test
 {
 protected:
-	static constexpr float View[4][4] =
-	{
-		{ -0.342704505f,   0.397026330f,  0.851424575f, 0.000000000f },
-		{  0.000000000f,   0.906307697f, -0.422618717f, 0.000000000f },
-		{ -0.939443290f,  -0.144833341f, -0.310595691f, 0.000000000f },
-		{   432.886841f,   -84.8252563f,  -150.401611f,  1.00000000f }
-	};
+	static constexpr float View[4][4] = { { -0.342704505f, 0.397026330f, 0.851424575f,
+											  0.000000000f },
+		{ 0.000000000f, 0.906307697f, -0.422618717f, 0.000000000f },
+		{ -0.939443290f, -0.144833341f, -0.310595691f, 0.000000000f },
+		{ 432.886841f, -84.8252563f, -150.401611f, 1.00000000f } };
 
 	__Matrix44 mtxView;
 
@@ -100,7 +98,7 @@ TEST_F(QuaternionTest, Set_MatchesReference)
 TEST_F(QuaternionTest, RotationAxis_Vector3_MatchesReferenceWithinTolerance)
 {
 	const __Quaternion expectedQuat = { -0.137427822f, -0.219884515f, -0.247370064f, 0.933580399f };
-	const __Vector3 rot = { 0.5f, 0.8f, 0.9f };
+	const __Vector3 rot             = { 0.5f, 0.8f, 0.9f };
 
 	SCOPED_TRACE("__Quaternion::RotationAxis(const __Vector3&, float)");
 
@@ -114,7 +112,7 @@ TEST_F(QuaternionTest, RotationAxis_Vector3_MatchesReferenceWithinTolerance)
 TEST_F(QuaternionTest, RotationAxis_Floats_MatchesReferenceWithinTolerance)
 {
 	const __Quaternion expectedQuat = { -0.137427822f, -0.219884515f, -0.247370064f, 0.933580399f };
-	const __Vector3 rot = { 0.5f, 0.8f, 0.9f };
+	const __Vector3 rot             = { 0.5f, 0.8f, 0.9f };
 
 	SCOPED_TRACE("__Quaternion::RotationAxis(float, float, float, float)");
 
@@ -157,8 +155,8 @@ TEST_F(QuaternionTest, AxisAngle_MatchesReferenceWithinTolerance)
 TEST_F(QuaternionTest, Slerp_MatchesReferenceWithinTolerance)
 {
 	const __Quaternion expectedQuat = { 0.150000006f, 0.799938679f, -0.177342355f, 0.559689105f };
-	const __Quaternion lhsQuat = { 0.15f, 0.799938679f, -0.177342355f, 0.559689105f };
-	const __Quaternion rhsQuat = { -0.15f, -0.799938679f, 0.177342355f, -0.559689105f };
+	const __Quaternion lhsQuat      = { 0.15f, 0.799938679f, -0.177342355f, 0.559689105f };
+	const __Quaternion rhsQuat      = { -0.15f, -0.799938679f, 0.177342355f, -0.559689105f };
 
 	SCOPED_TRACE("__Quaternion::Slerp(const __Quaternion&, const __Quaternion&, float)");
 
@@ -184,8 +182,8 @@ TEST_F(QuaternionTest, RotationYawPitchRoll_MatchesReferenceWithinTolerance)
 TEST_F(QuaternionTest, Multiply_Quaternion_MatchesReferenceWithinTolerance)
 {
 	const __Quaternion expectedQuat = { 0.465000004f, 0.295000017f, 0.310000002f, -0.242500007f };
-	const __Quaternion lhsQuat = { 0.5f, 0.8f, 0.9f, 0.75f };
-	const __Quaternion rhsQuat = { 0.2f, 0.3f, 0.1f, 0.25f };
+	const __Quaternion lhsQuat      = { 0.5f, 0.8f, 0.9f, 0.75f };
+	const __Quaternion rhsQuat      = { 0.2f, 0.3f, 0.1f, 0.25f };
 
 	SCOPED_TRACE("__Quaternion::operator*(const __Quaternion&)");
 
@@ -196,12 +194,12 @@ TEST_F(QuaternionTest, Multiply_Quaternion_MatchesReferenceWithinTolerance)
 TEST_F(QuaternionTest, MultiplyAssign_Quaternion_MatchesReferenceWithinTolerance)
 {
 	const __Quaternion expectedQuat = { 0.465000004f, 0.295000017f, 0.310000002f, -0.242500007f };
-	const __Quaternion lhsQuat = { 0.5f, 0.8f, 0.9f, 0.75f };
-	const __Quaternion rhsQuat = { 0.2f, 0.3f, 0.1f, 0.25f };
+	const __Quaternion lhsQuat      = { 0.5f, 0.8f, 0.9f, 0.75f };
+	const __Quaternion rhsQuat      = { 0.2f, 0.3f, 0.1f, 0.25f };
 
 	SCOPED_TRACE("__Quaternion::operator*=(const __Quaternion&)");
 
-	__Quaternion quat = lhsQuat;
-	quat *= rhsQuat;
+	__Quaternion quat  = lhsQuat;
+	quat              *= rhsQuat;
 	ExpectQuaternionNear(quat, expectedQuat, EpsilonWithTolerance);
 }

@@ -11,7 +11,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -22,8 +22,8 @@ static char THIS_FILE[]=__FILE__;
 CUIHelp::CUIHelp()
 {
 	m_pBtn_Close = nullptr;
-	m_pBtn_Prev = nullptr;
-	m_pBtn_Next = nullptr;
+	m_pBtn_Prev  = nullptr;
+	m_pBtn_Next  = nullptr;
 
 	for (int i = 0; i < MAX_HELP_PAGE; i++)
 		m_pPages[i] = nullptr;
@@ -51,9 +51,9 @@ bool CUIHelp::Load(File& file)
 		}
 	}
 
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Close,	GetChildByID<CN3UIButton>("Btn_Close"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Prev,		GetChildByID<CN3UIButton>("Btn_Left"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Next,		GetChildByID<CN3UIButton>("Btn_Right"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Close, GetChildByID<CN3UIButton>("Btn_Close"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Prev, GetChildByID<CN3UIButton>("Btn_Left"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Next, GetChildByID<CN3UIButton>("Btn_Right"));
 
 	return true;
 }
@@ -113,28 +113,28 @@ void CUIHelp::Release()
 	CN3UIBase::Release();
 
 	m_pBtn_Close = nullptr;
-	m_pBtn_Prev = nullptr;
-	m_pBtn_Next = nullptr;
+	m_pBtn_Prev  = nullptr;
+	m_pBtn_Next  = nullptr;
 
-	for (int i = 0; i < MAX_HELP_PAGE; i++) 
+	for (int i = 0; i < MAX_HELP_PAGE; i++)
 		m_pPages[i] = nullptr;
 }
 
 bool CUIHelp::OnKeyPress(int iKey)
 {
-	switch(iKey)
+	switch (iKey)
 	{
-	case DIK_PRIOR:
-		ReceiveMessage(m_pBtn_Prev, UIMSG_BUTTON_CLICK);
-		return true;
+		case DIK_PRIOR:
+			ReceiveMessage(m_pBtn_Prev, UIMSG_BUTTON_CLICK);
+			return true;
 
-	case DIK_NEXT:
-		ReceiveMessage(m_pBtn_Next, UIMSG_BUTTON_CLICK);
-		return true;
+		case DIK_NEXT:
+			ReceiveMessage(m_pBtn_Next, UIMSG_BUTTON_CLICK);
+			return true;
 
-	case DIK_ESCAPE:
-		ReceiveMessage(m_pBtn_Close, UIMSG_BUTTON_CLICK);
-		return true;
+		case DIK_ESCAPE:
+			ReceiveMessage(m_pBtn_Close, UIMSG_BUTTON_CLICK);
+			return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);
@@ -146,5 +146,5 @@ void CUIHelp::SetVisible(bool bVisible)
 	if (bVisible)
 		CGameProcedure::s_pUIMgr->SetVisibleFocusedUI(this);
 	else
-		CGameProcedure::s_pUIMgr->ReFocusUI();//this_ui
+		CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
 }

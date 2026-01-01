@@ -15,27 +15,28 @@ class CDlgChangeImage : public CDialog
 public:
 	CString m_szFN_Old;
 	CString m_szFN_New;
-// Construction
+	// Construction
 public:
-	CDlgChangeImage(CWnd* pParent = nullptr);   // standard constructor
+	CDlgChangeImage(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+											  // Dialog Data
 	//{{AFX_DATA(CDlgChangeImage)
-	enum { IDD = IDD_CHANGE_IMAGE_FILE_NAME };
-		// NOTE: the ClassWizard will add data members here
+	enum
+	{
+		IDD = IDD_CHANGE_IMAGE_FILE_NAME
+	};
+	// NOTE: the ClassWizard will add data members here
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgChangeImage)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgChangeImage)
 	afx_msg void OnBBrowseOldFile();

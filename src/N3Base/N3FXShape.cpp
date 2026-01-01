@@ -7,7 +7,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -16,20 +16,20 @@ static char THIS_FILE[]=__FILE__;
 
 CN3FXSPart::CN3FXSPart()
 {
-	m_vPivot.Set(0,0,0);
+	m_vPivot.Set(0, 0, 0);
 	m_WorldMtx.Identity();
 
 	m_bOutOfCameraRange = TRUE;
 
-	m_fTexFPS = 10.0f;
-	m_fTexIndex = 0;
+	m_fTexFPS           = 10.0f;
+	m_fTexIndex         = 0;
 	m_TexRefs.clear();
 
 	m_bTexLoop = true;
-	
+
 	m_Mtl.Init();
 
-//	m_pPM = nullptr;
+	//	m_pPM = nullptr;
 
 	m_pRefShape = nullptr;
 }
@@ -39,25 +39,24 @@ CN3FXSPart::~CN3FXSPart()
 	for (size_t i = 0; i < m_TexRefs.size(); i++)
 		s_MngTex.Delete(&m_TexRefs[i]);
 
-//	if(m_pPM) { m_pPM->Release(); delete m_pPM; m_pPM = nullptr; }
+	//	if(m_pPM) { m_pPM->Release(); delete m_pPM; m_pPM = nullptr; }
 }
 
 void CN3FXSPart::Release()
 {
-	m_vPivot.Set(0,0,0); // Local 축
-	m_WorldMtx.Identity(); // World Matrix.. Shape Loading 때 미리 계산해야 좋다..		
-	m_bOutOfCameraRange = TRUE; // Camera 범위 바깥에 있음...
+	m_vPivot.Set(0, 0, 0);       // Local 축
+	m_WorldMtx.Identity();       // World Matrix.. Shape Loading 때 미리 계산해야 좋다..
+	m_bOutOfCameraRange = TRUE;  // Camera 범위 바깥에 있음...
 
-	m_fTexFPS = 10.0f; // Texture Animation Interval;
-	m_fTexIndex = 0; // Current Texture Index.. Animation 시킬때 필요한 인덱스이다..
+	m_fTexFPS           = 10.0f; // Texture Animation Interval;
+	m_fTexIndex         = 0;     // Current Texture Index.. Animation 시킬때 필요한 인덱스이다..
 
 	for (size_t i = 0; i < m_TexRefs.size(); i++)
 		s_MngTex.Delete(&m_TexRefs[i]);
 	m_TexRefs.clear();
 
-//	if(m_pPM) { m_pPM->Release(); delete m_pPM; m_pPM = nullptr; }
+	//	if(m_pPM) { m_pPM->Release(); delete m_pPM; m_pPM = nullptr; }
 	m_FXPMInst.Release();
-
 }
 
 ////////////////////////////////// tex ///////////////////////////////////////////
@@ -76,8 +75,7 @@ void CN3FXSPart::TexAlloc(int nCount)
 
 CN3Texture* CN3FXSPart::Tex(int iIndex)
 {
-	if (iIndex < 0
-		|| iIndex >= static_cast<int>(m_TexRefs.size()))
+	if (iIndex < 0 || iIndex >= static_cast<int>(m_TexRefs.size()))
 		return nullptr;
 
 	return m_TexRefs[iIndex];
@@ -95,30 +93,31 @@ CN3Texture* CN3FXSPart::TexSet(int iIndex, const std::string& szFN)
 
 void CN3FXSPart::TexSet(int iIndex, CN3Texture* pTex)
 {
-	if (iIndex < 0
-		|| iIndex >= static_cast<int>(m_TexRefs.size()))
+	if (iIndex < 0 || iIndex >= static_cast<int>(m_TexRefs.size()))
 		return;
 
 	s_MngTex.Delete(&m_TexRefs[iIndex]);
 }
 
 // timeGetTime 으로 얻은 값을 넣으면 Texture Animation 을 컨트롤 한다..
-void CN3FXSPart::Tick(const __Matrix44& mtxParent) 
+void CN3FXSPart::Tick(const __Matrix44& mtxParent)
 {
 	CN3FXPMesh* pFXPMesh = m_FXPMInst.GetMesh();
-	if(nullptr == pFXPMesh) return;
+	if (nullptr == pFXPMesh)
+		return;
 
 	m_bOutOfCameraRange = FALSE;
 
 	m_WorldMtx.Identity();
 	m_WorldMtx.PosSet(m_vPivot);
-	m_WorldMtx *= mtxParent;
+	m_WorldMtx    *= mtxParent;
 
 	////////////////////////////////////////////////////////////////////////////
 	// 카메라와 멀리 떨어지면 지나간다..
-	float fDist = (m_WorldMtx.Pos() - s_CameraData.vEye).Magnitude();
-	float fRadius = Radius();
-	if(s_CameraData.IsOutOfFrustum(this->m_WorldMtx.Pos(), fRadius * 3.0f)) // 카메라 사면체 바깥이면 지나간다..
+	float fDist    = (m_WorldMtx.Pos() - s_CameraData.vEye).Magnitude();
+	float fRadius  = Radius();
+	if (s_CameraData.IsOutOfFrustum(
+			this->m_WorldMtx.Pos(), fRadius * 3.0f)) // 카메라 사면체 바깥이면 지나간다..
 	{
 		m_bOutOfCameraRange = TRUE;
 		return;
@@ -136,15 +135,17 @@ void CN3FXSPart::Tick(const __Matrix44& mtxParent)
 
 void CN3FXSPart::Render()
 {
-	if(m_bOutOfCameraRange) return;
-	if(m_bOutOfCameraRange || m_FXPMInst.GetNumVertices() <= 0) return;
-	
+	if (m_bOutOfCameraRange)
+		return;
+	if (m_bOutOfCameraRange || m_FXPMInst.GetNumVertices() <= 0)
+		return;
+
 #ifdef _DEBUG
 	CN3Base::s_RenderInfo.nShape_Part++; // Rendering Information Update...
 #endif
-	
+
 	LPDIRECT3DTEXTURE9 lpTex = nullptr;
-	int iTC = static_cast<int>(m_TexRefs.size());
+	int iTC                  = static_cast<int>(m_TexRefs.size());
 	if (iTC > 0)
 	{
 		int iTexIndex = (int) m_fTexIndex;
@@ -157,41 +158,43 @@ void CN3FXSPart::Render()
 			return;
 	}
 
-	if(m_Mtl.nRenderFlags & RF_ALPHABLENDING) // Alpha 사용
+	if (m_Mtl.nRenderFlags & RF_ALPHABLENDING) // Alpha 사용
 	{
 		__AlphaPrimitive* pAP = s_AlphaMgr.Add();
-		if(pAP)
+		if (pAP)
 		{
-			pAP->bUseVB				= FALSE;
-			pAP->dwBlendDest		= m_Mtl.dwDestBlend;
-			pAP->dwBlendSrc			= m_Mtl.dwSrcBlend;
-			pAP->dwFVF				= FVF_XYZCOLORT1;
-			pAP->dwPrimitiveSize	= sizeof(__VertexXyzColorT1);
-			pAP->fCameraDistance	= (s_CameraData.vEye - (this->Min() + (this->Max()-this->Min())*0.5f)).Magnitude();
-			pAP->lpTex				= lpTex;
-			pAP->ePrimitiveType		= D3DPT_TRIANGLELIST;
-			pAP->nPrimitiveCount	= m_FXPMInst.GetNumIndices() / 3;
+			pAP->bUseVB          = FALSE;
+			pAP->dwBlendDest     = m_Mtl.dwDestBlend;
+			pAP->dwBlendSrc      = m_Mtl.dwSrcBlend;
+			pAP->dwFVF           = FVF_XYZCOLORT1;
+			pAP->dwPrimitiveSize = sizeof(__VertexXyzColorT1);
+			pAP->fCameraDistance = (s_CameraData.vEye
+									- (this->Min() + (this->Max() - this->Min()) * 0.5f))
+									   .Magnitude();
+			pAP->lpTex           = lpTex;
+			pAP->ePrimitiveType  = D3DPT_TRIANGLELIST;
+			pAP->nPrimitiveCount = m_FXPMInst.GetNumIndices() / 3;
 			//pAP->nRenderFlags		= RF_ALPHABLENDING | RF_NOTUSEFOG | RF_DIFFUSEALPHA | RF_NOTUSELIGHT | RF_DOUBLESIDED;
-			pAP->nRenderFlags		= m_Mtl.nRenderFlags;
-			pAP->nVertexCount		= m_FXPMInst.GetNumVertices();
-			pAP->MtxWorld			= m_WorldMtx;
-			pAP->pVertices			= m_FXPMInst.GetVertices();
-			pAP->pwIndices			= m_FXPMInst.GetIndices();
+			pAP->nRenderFlags    = m_Mtl.nRenderFlags;
+			pAP->nVertexCount    = m_FXPMInst.GetNumVertices();
+			pAP->MtxWorld        = m_WorldMtx;
+			pAP->pVertices       = m_FXPMInst.GetVertices();
+			pAP->pwIndices       = m_FXPMInst.GetIndices();
 		}
-		return; // 렌더링 안하지롱.
+		return;                      // 렌더링 안하지롱.
 	}
 
 	s_lpD3DDev->SetMaterial(&m_Mtl); // 재질 설정..
 	s_lpD3DDev->SetTexture(0, lpTex);
-	if(nullptr != lpTex)
+	if (nullptr != lpTex)
 	{
-		s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
-		s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );		
-		s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
 
-		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
-		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE );
-		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );		
+		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
 	}
 	else
 	{
@@ -204,22 +207,30 @@ void CN3FXSPart::Render()
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, m_WorldMtx.toD3D());
 
 	DWORD dwCullMode, dwZWriteEnable, dwZBufferEnable, dwLight;
-	s_lpD3DDev->GetRenderState( D3DRS_ZWRITEENABLE, &dwZWriteEnable );
-	s_lpD3DDev->GetRenderState( D3DRS_ZENABLE, &dwZBufferEnable );
-	s_lpD3DDev->GetRenderState( D3DRS_CULLMODE, &dwCullMode );
-	s_lpD3DDev->GetRenderState( D3DRS_LIGHTING, &dwLight );
+	s_lpD3DDev->GetRenderState(D3DRS_ZWRITEENABLE, &dwZWriteEnable);
+	s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &dwZBufferEnable);
+	s_lpD3DDev->GetRenderState(D3DRS_CULLMODE, &dwCullMode);
+	s_lpD3DDev->GetRenderState(D3DRS_LIGHTING, &dwLight);
 
-	if(m_pRefShape->m_dwZEnable != dwZBufferEnable) s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, m_pRefShape->m_dwZEnable);
-	if(m_pRefShape->m_dwZWrite != dwZWriteEnable) s_lpD3DDev->SetRenderState(D3DRS_ZWRITEENABLE, m_pRefShape->m_dwZWrite);
-	if(m_pRefShape->m_dwLight != dwLight) s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, m_pRefShape->m_dwLight);
-	if(m_pRefShape->m_dwDoubleSide != dwCullMode) s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, m_pRefShape->m_dwDoubleSide);
-	
+	if (m_pRefShape->m_dwZEnable != dwZBufferEnable)
+		s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, m_pRefShape->m_dwZEnable);
+	if (m_pRefShape->m_dwZWrite != dwZWriteEnable)
+		s_lpD3DDev->SetRenderState(D3DRS_ZWRITEENABLE, m_pRefShape->m_dwZWrite);
+	if (m_pRefShape->m_dwLight != dwLight)
+		s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, m_pRefShape->m_dwLight);
+	if (m_pRefShape->m_dwDoubleSide != dwCullMode)
+		s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, m_pRefShape->m_dwDoubleSide);
+
 	m_FXPMInst.Render();
 
-	if(m_pRefShape->m_dwZEnable != dwZBufferEnable) s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, dwZBufferEnable);
-	if(m_pRefShape->m_dwZWrite != dwZWriteEnable) s_lpD3DDev->SetRenderState(D3DRS_ZWRITEENABLE, dwZWriteEnable);
-	if(m_pRefShape->m_dwLight != dwLight) s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, dwLight);
-	if(m_pRefShape->m_dwDoubleSide != dwCullMode) s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, dwCullMode);
+	if (m_pRefShape->m_dwZEnable != dwZBufferEnable)
+		s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, dwZBufferEnable);
+	if (m_pRefShape->m_dwZWrite != dwZWriteEnable)
+		s_lpD3DDev->SetRenderState(D3DRS_ZWRITEENABLE, dwZWriteEnable);
+	if (m_pRefShape->m_dwLight != dwLight)
+		s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, dwLight);
+	if (m_pRefShape->m_dwDoubleSide != dwCullMode)
+		s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, dwCullMode);
 
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, mtx.toD3D());
 }
@@ -232,7 +243,8 @@ bool CN3FXSPart::Load(File& file)
 	file.Read(&m_vPivot, sizeof(__Vector3));
 
 	file.Read(&nL, 4); // Mesh FileName
-	file.Read(szFN, nL); szFN[nL] = '\0'; // 메시 파일 이름..
+	file.Read(szFN, nL);
+	szFN[nL] = '\0';   // 메시 파일 이름..
 
 	//m_pRefShape의 경로와 읽어들인 파일명을 합쳐라...
 	char szPath[_MAX_PATH];
@@ -242,7 +254,8 @@ bool CN3FXSPart::Load(File& file)
 	_splitpath(szFN, nullptr, nullptr, szFName, szExt);
 	_makepath(szPath, nullptr, szDir, szFName, szExt);
 
-	if(!this->MeshSet(szPath)) return false;
+	if (!this->MeshSet(szPath))
+		return false;
 
 	file.Read(&m_Mtl, sizeof(__Material)); // 재질
 
@@ -250,14 +263,15 @@ bool CN3FXSPart::Load(File& file)
 	file.Read(&iTC, 4);
 	file.Read(&m_fTexFPS, 4);
 	m_TexRefs.clear();
-	this->TexAlloc(iTC); // Texture Pointer Pointer 할당..
-	for(int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기..
+	this->TexAlloc(iTC);          // Texture Pointer Pointer 할당..
+	for (int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기..
 	{
 		file.Read(&nL, 4);
-		if(nL > 0)
+		if (nL > 0)
 		{
-			file.Read(szFN, nL); szFN[nL] = '\0'; // 텍스처 파일 이름..
-			
+			file.Read(szFN, nL);
+			szFN[nL] = '\0'; // 텍스처 파일 이름..
+
 			_splitpath(szFN, nullptr, nullptr, szFName, szExt);
 			_makepath(szPath, nullptr, szDir, szFName, szExt);
 			m_TexRefs[j] = s_MngTex.Get(szPath);
@@ -270,26 +284,27 @@ bool CN3FXSPart::Load(File& file)
 void CN3FXSPart::Duplicate(CN3FXSPart* pSrc)
 {
 	m_vPivot = pSrc->m_vPivot;
-	if(pSrc->Mesh()) MeshSet(pSrc->Mesh()->FileName());
-	
-	m_Mtl = pSrc->m_Mtl;
-	
-	int iTC = 0;
-	iTC = pSrc->TexCount();
+	if (pSrc->Mesh())
+		MeshSet(pSrc->Mesh()->FileName());
+
+	m_Mtl     = pSrc->m_Mtl;
+
+	int iTC   = 0;
+	iTC       = pSrc->TexCount();
 	m_fTexFPS = m_fTexFPS;
 
-	m_TexRefs.clear();	
-	this->TexAlloc(iTC); // Texture Pointer Pointer 할당..
-	for(int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기..
+	m_TexRefs.clear();
+	this->TexAlloc(iTC);          // Texture Pointer Pointer 할당..
+	for (int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기..
 	{
-		if(pSrc->Tex(j))
+		if (pSrc->Tex(j))
 			m_TexRefs[j] = s_MngTex.Get(pSrc->Tex(j)->FileName());
 	}
 	return;
 }
 
 bool CN3FXSPart::Save(File& file)
-{	
+{
 	return true;
 }
 
@@ -311,13 +326,13 @@ CN3FXShape::CN3FXShape()
 	m_mtxParent.Identity();
 	m_mtxFinalTransform.Identity();
 
-	m_dwSrcBlend = D3DBLEND_ONE;
-	m_dwDestBlend = D3DBLEND_ONE;
-	m_bAlpha = TRUE;
+	m_dwSrcBlend   = D3DBLEND_ONE;
+	m_dwDestBlend  = D3DBLEND_ONE;
+	m_bAlpha       = TRUE;
 
-	m_dwZEnable = D3DZB_TRUE;
-	m_dwZWrite = TRUE;
-	m_dwLight = FALSE;
+	m_dwZEnable    = D3DZB_TRUE;
+	m_dwZWrite     = TRUE;
+	m_dwLight      = FALSE;
 	m_dwDoubleSide = D3DCULL_NONE;
 }
 
@@ -339,7 +354,7 @@ void CN3FXShape::Release()
 		delete pPart;
 	}
 	m_Parts.clear();
-	
+
 	CN3TransformCollision::Release();
 }
 
@@ -375,7 +390,7 @@ bool CN3FXShape::Load(File& file)
 		m_Parts.assign(iPC, nullptr);
 		for (int i = 0; i < iPC; i++)
 		{
-			m_Parts[i] = new CN3FXSPart();
+			m_Parts[i]              = new CN3FXSPart();
 			m_Parts[i]->m_pRefShape = this;
 			if (!m_Parts[i]->Load(file))
 				return false;
@@ -384,7 +399,7 @@ bool CN3FXShape::Load(File& file)
 		}
 	}
 
-	uint32_t dwTmp;		
+	uint32_t dwTmp;
 	file.Read(&dwTmp, 4); // 소속
 	file.Read(&dwTmp, 4); // 속성 0
 	file.Read(&dwTmp, 4); // 속성 1
@@ -422,8 +437,7 @@ bool CN3FXShape::Save(File& file)
 
 void CN3FXShape::PartDelete(int iIndex)
 {
-	if (iIndex < 0
-		|| iIndex >= static_cast<int>(m_Parts.size()))
+	if (iIndex < 0 || iIndex >= static_cast<int>(m_Parts.size()))
 		return;
 
 	auto it = m_Parts.begin();
@@ -443,8 +457,8 @@ void CN3FXShape::FindMinMax()
 {
 	__Vector3 vMin(FLT_MAX, FLT_MAX, FLT_MAX);
 	__Vector3 vMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-	__Vector3 vMinTmp(0,0,0);
-	__Vector3 vMaxTmp(0,0,0);
+	__Vector3 vMinTmp(0, 0, 0);
+	__Vector3 vMaxTmp(0, 0, 0);
 
 	// 가장 큰 지점찾기..
 	__Matrix44 mtxWI = m_mtxFinalTransform.Inverse(); // World Matrix Inverse
@@ -454,50 +468,59 @@ void CN3FXShape::FindMinMax()
 		vMinTmp = pPart->Min() * mtxWI; // 월드 상의 최소값을 로컬 좌표로 바꾸어준다..
 		vMaxTmp = pPart->Max() * mtxWI; // 월드 상의 최대값을 로컬 좌표로 바꾸어준다..
 
-		if (vMinTmp.x < vMin.x) vMin.x = vMinTmp.x;
-		if (vMinTmp.y < vMin.y) vMin.y = vMinTmp.y;
-		if (vMinTmp.z < vMin.z) vMin.z = vMinTmp.z;
-		if (vMaxTmp.x > vMax.x) vMax.x = vMaxTmp.x;
-		if (vMaxTmp.y > vMax.y) vMax.y = vMaxTmp.y;
-		if (vMaxTmp.z > vMax.z) vMax.z = vMaxTmp.z;
+		if (vMinTmp.x < vMin.x)
+			vMin.x = vMinTmp.x;
+		if (vMinTmp.y < vMin.y)
+			vMin.y = vMinTmp.y;
+		if (vMinTmp.z < vMin.z)
+			vMin.z = vMinTmp.z;
+		if (vMaxTmp.x > vMax.x)
+			vMax.x = vMaxTmp.x;
+		if (vMaxTmp.y > vMax.y)
+			vMax.y = vMaxTmp.y;
+		if (vMaxTmp.z > vMax.z)
+			vMax.z = vMaxTmp.z;
 	}
 
 	// 최대 최소값을 저장
-	m_vMin = vMin * m_mtxFinalTransform;
-	m_vMax = vMax * m_mtxFinalTransform;
+	m_vMin    = vMin * m_mtxFinalTransform;
+	m_vMax    = vMax * m_mtxFinalTransform;
 
 	// 최대 최소값을 갖고 반지름 계산한다..
-	m_fRadius  = (m_vMax - m_vMin).Magnitude() * 0.5f;
+	m_fRadius = (m_vMax - m_vMin).Magnitude() * 0.5f;
 }
 
 void CN3FXShape::Duplicate(CN3FXShape* pSrc)
 {
-	if(!pSrc) return;
+	if (!pSrc)
+		return;
 
-	m_dwSrcBlend = pSrc->m_dwSrcBlend;
-	m_dwDestBlend = pSrc->m_dwDestBlend;
-	m_bAlpha = pSrc->m_bAlpha;
+	m_dwSrcBlend   = pSrc->m_dwSrcBlend;
+	m_dwDestBlend  = pSrc->m_dwDestBlend;
+	m_bAlpha       = pSrc->m_bAlpha;
 
-	m_dwZEnable = pSrc->m_dwZEnable;
-	m_dwZWrite = pSrc->m_dwZWrite;
-	m_dwLight = pSrc->m_dwLight;
+	m_dwZEnable    = pSrc->m_dwZEnable;
+	m_dwZWrite     = pSrc->m_dwZWrite;
+	m_dwLight      = pSrc->m_dwLight;
 	m_dwDoubleSide = pSrc->m_dwDoubleSide;
-		
+
 	//CN3TransformCollision::Load(file); // 기본정보 읽기...
 	//transform collision...
 	SetRadius(pSrc->Radius());
 	SetMin(pSrc->Min());
 	SetMax(pSrc->Max());
 
-	if(pSrc->CollisionMesh()) SetMeshCollision(pSrc->CollisionMesh()->FileName());
-	if(pSrc->ClimbMesh()) SetMeshClimb(pSrc->ClimbMesh()->FileName());
+	if (pSrc->CollisionMesh())
+		SetMeshCollision(pSrc->CollisionMesh()->FileName());
+	if (pSrc->ClimbMesh())
+		SetMeshClimb(pSrc->ClimbMesh()->FileName());
 
 	//transform....
 	ScaleSet(pSrc->Scale());
 	PosSet(pSrc->m_vPos);
 	RotSet(pSrc->Rot());
 
-	//basefileaccess		
+	//basefileaccess
 	FileNameSet(pSrc->FileName());
 
 	m_Matrix = pSrc->m_Matrix;
@@ -508,7 +531,7 @@ void CN3FXShape::Duplicate(CN3FXShape* pSrc)
 	m_KeyScale.Duplicate(&(pSrc->m_KeyScale));
 
 	m_fFrmWhole = pSrc->m_fFrmWhole;
-	m_fFrmCur = 0.0f;
+	m_fFrmCur   = 0.0f;
 
 	for (CN3FXSPart* pPart : m_Parts)
 		delete pPart;
@@ -520,7 +543,7 @@ void CN3FXShape::Duplicate(CN3FXShape* pSrc)
 		m_Parts.assign(partCount, nullptr);
 		for (size_t i = 0; i < partCount; i++)
 		{
-			m_Parts[i] = new CN3FXSPart();
+			m_Parts[i]              = new CN3FXSPart();
 			m_Parts[i]->m_pRefShape = this;
 			m_Parts[i]->Duplicate(pSrc->m_Parts[i]);
 			//m_Parts[i]->ReCalcMatrix(m_Matrix); // Part Matrix 계산
@@ -532,13 +555,16 @@ void CN3FXShape::Duplicate(CN3FXShape* pSrc)
 
 void CN3FXShape::SetCurrFrm(float fFrm)
 {
-	if(FRAME_SELFPLAY == fFrm)
+	if (FRAME_SELFPLAY == fFrm)
 	{
 		m_fFrmCur += s_fSecPerFrm;
-		if(m_fFrmCur < 0) m_fFrmCur = 0.0f;
-		if(m_fFrmCur >= m_fFrmWhole) m_fFrmCur = 0.0f;		
+		if (m_fFrmCur < 0)
+			m_fFrmCur = 0.0f;
+		if (m_fFrmCur >= m_fFrmWhole)
+			m_fFrmCur = 0.0f;
 	}
-	else m_fFrmCur = fFrm;
+	else
+		m_fFrmCur = fFrm;
 }
 
 float CN3FXShape::GetCurrFrm()
@@ -546,18 +572,20 @@ float CN3FXShape::GetCurrFrm()
 	return m_fFrmCur;
 }
 
-void CN3FXShape::SetPartsMtl(BOOL bAlpha, uint32_t dwSrcBlend, uint32_t dwDestBlend, uint32_t dwZEnable, uint32_t dwZWrite, uint32_t dwLight, uint32_t dwDoubleSide)
+void CN3FXShape::SetPartsMtl(BOOL bAlpha, uint32_t dwSrcBlend, uint32_t dwDestBlend,
+	uint32_t dwZEnable, uint32_t dwZWrite, uint32_t dwLight, uint32_t dwDoubleSide)
 {
-	m_dwSrcBlend = dwSrcBlend;
-	m_dwDestBlend = dwDestBlend;
-	m_bAlpha = bAlpha;
+	m_dwSrcBlend          = dwSrcBlend;
+	m_dwDestBlend         = dwDestBlend;
+	m_bAlpha              = bAlpha;
 
-	m_dwZEnable = dwZEnable;
-	m_dwZWrite = dwZWrite;
-	m_dwLight = dwLight;
-	m_dwDoubleSide = dwDoubleSide;
+	m_dwZEnable           = dwZEnable;
+	m_dwZWrite            = dwZWrite;
+	m_dwLight             = dwLight;
+	m_dwDoubleSide        = dwDoubleSide;
 
-	uint32_t dwRenderFlag = RF_ALPHABLENDING | RF_NOTUSEFOG | RF_DIFFUSEALPHA | RF_NOTUSELIGHT | RF_DOUBLESIDED | RF_NOTZWRITE | RF_NOTZBUFFER;
+	uint32_t dwRenderFlag = RF_ALPHABLENDING | RF_NOTUSEFOG | RF_DIFFUSEALPHA | RF_NOTUSELIGHT
+							| RF_DOUBLESIDED | RF_NOTZWRITE | RF_NOTZBUFFER;
 
 	if (m_dwZEnable == D3DZB_TRUE)
 		dwRenderFlag ^= RF_NOTZBUFFER;

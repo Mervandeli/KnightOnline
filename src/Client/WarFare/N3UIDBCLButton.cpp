@@ -7,7 +7,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -26,8 +26,8 @@ uint32_t CN3UIDBCLButton::MouseProc(uint32_t dwFlags, const POINT& ptCur, const 
 {
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
 
-	RECT rect = GetRegion();
-	if(!::PtInRect(&rect, ptCur))		// 영역 밖이면
+	RECT rect      = GetRegion();
+	if (!::PtInRect(&rect, ptCur)) // 영역 밖이면
 	{
 		dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);
 		return dwRet;

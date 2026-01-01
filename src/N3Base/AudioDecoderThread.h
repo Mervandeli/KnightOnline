@@ -5,9 +5,9 @@
 
 #include <shared/Thread.h>
 
-#include <memory>	// std::shared_ptr<>
-#include <mutex>	// std::mutex
-#include <vector>	// std::vector<>
+#include <memory> // std::shared_ptr<>
+#include <mutex>  // std::mutex
+#include <vector> // std::vector<>
 
 /// \enum e_AudioDecoderQueueType
 /// \brief Describes operations queued for the audio decoder thread.
@@ -37,9 +37,7 @@ public:
 	///
 	/// The tuple consists of a queue operation type and the associated
 	/// streamed audio handle.
-	using QueueType = std::tuple<
-		e_AudioDecoderQueueType,
-		std::shared_ptr<StreamedAudioHandle>>;
+	using QueueType = std::tuple<e_AudioDecoderQueueType, std::shared_ptr<StreamedAudioHandle>>;
 
 	/// Returns a mutex protecting decoder execution.
 	///

@@ -15,20 +15,20 @@
 
 #include <list>
 class CN3Joint;
-typedef std::list<CN3Joint*>::iterator	it_Joint;
+typedef std::list<CN3Joint*>::iterator it_Joint;
 
 const int MAX_JOINT_TRANSFORM = 64;
 
 class CN3Joint : public CN3Transform
 {
-	friend class CN3Joint; // Position, Rotation, Scale 값들을 자유롭게 다룰수 있어야 한다..
+	friend class CN3Joint;  // Position, Rotation, Scale 값들을 자유롭게 다룰수 있어야 한다..
 public:
-	__Quaternion			m_qOrient;		// Joint Orient Quaternion
-	CN3AnimKey				m_KeyOrient;	// Joint Orient 키값... nullptr 이면 없는거다..
+	__Quaternion m_qOrient; // Joint Orient Quaternion
+	CN3AnimKey m_KeyOrient; // Joint Orient 키값... nullptr 이면 없는거다..
 
 protected:
-	CN3Joint*				m_pParent;
-	std::list<CN3Joint*>	m_Children;
+	CN3Joint* m_pParent;
+	std::list<CN3Joint*> m_Children;
 
 public:
 	void ChildDelete(CN3Joint* pChild);
@@ -38,8 +38,8 @@ public:
 	void KeyDelete(CN3Joint* pJoint, int nKS, int nKE);
 #endif // end of _N3TOOL
 
-	void MatricesGet(__Matrix44 *pMtxs, int& nJointIndex);
-	
+	void MatricesGet(__Matrix44* pMtxs, int& nJointIndex);
+
 	void Tick(float fFrm) override;
 	bool TickAnimationKey(float fFrm) override;
 	void ReCalcMatrix() override;
@@ -59,8 +59,7 @@ public:
 
 	CN3Joint* Child(int index)
 	{
-		if (index < 0
-			|| index >= static_cast<int>(m_Children.size()))
+		if (index < 0 || index >= static_cast<int>(m_Children.size()))
 			return nullptr;
 
 		auto it = m_Children.begin();
@@ -69,12 +68,24 @@ public:
 	}
 
 	void NodeCount(int& nCount);
-	BOOL FindPointerByID(int nID, CN3Joint *&pJoint);
+	BOOL FindPointerByID(int nID, CN3Joint*& pJoint);
 #ifdef _N3TOOL
 	BOOL FindIndex(const std::string& szName, int& nIndex);
-	BOOL FindPointerByName(const std::string& szName, CN3Joint*& pJoint); // 이름을 넣으면 해당 노드의 포인터를 돌려준다..
-	void RotSet(const __Quaternion& qtRot) { m_qRot = qtRot; this->ReCalcMatrix(); }
-	void RotSet(float x, float y, float z, float w) { m_qRot.x = x; m_qRot.y = y; m_qRot.z = z; m_qRot.w = w; this->ReCalcMatrix(); }
+	BOOL FindPointerByName(const std::string& szName,
+		CN3Joint*& pJoint); // 이름을 넣으면 해당 노드의 포인터를 돌려준다..
+	void RotSet(const __Quaternion& qtRot)
+	{
+		m_qRot = qtRot;
+		this->ReCalcMatrix();
+	}
+	void RotSet(float x, float y, float z, float w)
+	{
+		m_qRot.x = x;
+		m_qRot.y = y;
+		m_qRot.z = z;
+		m_qRot.w = w;
+		this->ReCalcMatrix();
+	}
 	void Render(const __Matrix44* pMtxParent = nullptr, float fUnitSize = 0.1f);
 #endif // end of _N3TOOL
 

@@ -15,31 +15,33 @@ class CWall;
 
 class CDlgMakeWall : public CDialog
 {
-// Construction
+	// Construction
 public:
 	void ResetAll();
-	CDlgMakeWall(CWnd* pParent = nullptr);   // standard constructor
+	CDlgMakeWall(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+										   // Dialog Data
 	//{{AFX_DATA(CDlgMakeWall)
-	enum { IDD = IDD_MAKE_WALL };
-	CListBox	m_WallList;
+	enum
+	{
+		IDD = IDD_MAKE_WALL
+	};
+	CListBox m_WallList;
 	//}}AFX_DATA
 
-// Variables..
-	CWallMgr*	m_pRefWallMgr;
-	CWall*		m_pSelWall;
+	// Variables..
+	CWallMgr* m_pRefWallMgr;
+	CWall* m_pSelWall;
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgMakeWall)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgMakeWall)
 	afx_msg void OnBtnDelete();

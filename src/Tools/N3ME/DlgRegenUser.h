@@ -14,34 +14,34 @@
 
 class CDlgRegenUser : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgRegenUser(CWnd* pParent = nullptr);   // standard constructor
+	CDlgRegenUser(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+											// Dialog Data
 	//{{AFX_DATA(CDlgRegenUser)
-	enum { IDD = IDD_MAKE_REGEN_USER };
-	CListBox	m_LBRegion;
-	CString	m_PathName;
+	enum
+	{
+		IDD = IDD_MAKE_REGEN_USER
+	};
+	CListBox m_LBRegion;
+	CString m_PathName;
 	//}}AFX_DATA
 
 	CRegenUser* m_pRefRegenUser;
 
-
 	void PutRegion(VERTEXRECT* pVR);
 	void ClearList();
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgRegenUser)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgRegenUser)
 	afx_msg void OnBtnLoadPathset();

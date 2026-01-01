@@ -7,14 +7,13 @@
 // Feel free to modifiy and/or distribute this file, but
 // do not remove this header.
 //
-// I would appreciate a notification of any bugs discovered or 
+// I would appreciate a notification of any bugs discovered or
 // improvements that could be made.
 //
 // This file is provided "as is" with no expressed or implied warranty.
 //
 //	History:
-//		PMM	12/21/1999		Initial implementation.		
-
+//		PMM	12/21/1999		Initial implementation.
 
 #include "stdafx.h"
 #include "MacProgressCtrl.h"
@@ -25,8 +24,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-#define	IDT_INDETERMINATE		100
-#define	IND_BAND_WIDTH			20
+#define IDT_INDETERMINATE 100
+#define IND_BAND_WIDTH    20
 
 // Funtion prototypes.
 COLORREF LightenColor(const COLORREF crColor, BYTE byIncreaseVal);
@@ -44,19 +43,19 @@ COLORREF LightenColor(const COLORREF crColor, BYTE byIncreaseVal)
 // Remarks		:	Lightens a color by increasing the RGB values by the given number.
 //
 {
-	BYTE byRed = GetRValue(crColor);
+	BYTE byRed   = GetRValue(crColor);
 	BYTE byGreen = GetGValue(crColor);
-	BYTE byBlue = GetBValue(crColor);
+	BYTE byBlue  = GetBValue(crColor);
 
 	if ((byRed + byIncreaseVal) <= 255)
 		byRed = BYTE(byRed + byIncreaseVal);
-	if ((byGreen + byIncreaseVal)	<= 255)
+	if ((byGreen + byIncreaseVal) <= 255)
 		byGreen = BYTE(byGreen + byIncreaseVal);
 	if ((byBlue + byIncreaseVal) <= 255)
 		byBlue = BYTE(byBlue + byIncreaseVal);
 
 	return RGB(byRed, byGreen, byBlue);
-}	// LightenColorref
+} // LightenColorref
 
 //-------------------------------------------------------------------
 //
@@ -70,9 +69,9 @@ COLORREF DarkenColor(const COLORREF crColor, BYTE byReduceVal)
 // Remarks		:	Darkens a color by reducing the RGB values by the given number.
 //
 {
-	BYTE byRed = GetRValue(crColor);
+	BYTE byRed   = GetRValue(crColor);
 	BYTE byGreen = GetGValue(crColor);
-	BYTE byBlue = GetBValue(crColor);
+	BYTE byBlue  = GetBValue(crColor);
 
 	if (byRed >= byReduceVal)
 		byRed = BYTE(byRed - byReduceVal);
@@ -82,7 +81,7 @@ COLORREF DarkenColor(const COLORREF crColor, BYTE byReduceVal)
 		byBlue = BYTE(byBlue - byReduceVal);
 
 	return RGB(byRed, byGreen, byBlue);
-}	// DarkenColorref
+} // DarkenColorref
 
 /////////////////////////////////////////////////////////////////////////////
 // CMacProgressCtrl
@@ -99,11 +98,11 @@ CMacProgressCtrl::CMacProgressCtrl()
 //
 {
 	m_bIndeterminate = FALSE;
-	m_nIndOffset = 0;
-	m_crColor = ::GetSysColor(COLOR_HIGHLIGHT);
+	m_nIndOffset     = 0;
+	m_crColor        = ::GetSysColor(COLOR_HIGHLIGHT);
 	GetColors();
 	CreatePens();
-}	// CMacProgressCtrl
+} // CMacProgressCtrl
 
 //-------------------------------------------------------------------
 //
@@ -117,15 +116,14 @@ CMacProgressCtrl::~CMacProgressCtrl()
 //
 {
 	DeletePens();
-}	// ~CMacProgressCtrl
-
+} // ~CMacProgressCtrl
 
 BEGIN_MESSAGE_MAP(CMacProgressCtrl, CProgressCtrl)
-	//{{AFX_MSG_MAP(CMacProgressCtrl)
-	ON_WM_PAINT()
-	ON_WM_TIMER()
-	ON_WM_ERASEBKGND()
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CMacProgressCtrl)
+ON_WM_PAINT()
+ON_WM_TIMER()
+ON_WM_ERASEBKGND()
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -133,31 +131,31 @@ END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------
 //
-void CMacProgressCtrl::OnPaint() 
+void CMacProgressCtrl::OnPaint()
 //
 // Return Value:	None.
 //
 // Parameters	:	None.
 //
-// Remarks		:	The framework calls this member function when Windows 
-//						or an application makes a request to repaint a portion 
+// Remarks		:	The framework calls this member function when Windows
+//						or an application makes a request to repaint a portion
 //						of an application뭩 window.
 //
 {
 	CPaintDC dcPaint(this); // device context for painting
 	CRect rect, rectClient;
 	GetClientRect(rectClient);
-	rect = rectClient;
+	rect           = rectClient;
 	BOOL bVertical = GetStyle() & PBS_VERTICAL;
 
 	// Create a memory DC for drawing.
 	CDC dc;
 	dc.CreateCompatibleDC(&dcPaint);
- 	int nSavedDC = dc.SaveDC();
+	int nSavedDC = dc.SaveDC();
 	CBitmap bmp;
 	bmp.CreateCompatibleBitmap(&dcPaint, rect.Width(), rect.Height());
-	CBitmap *pOldBmp = dc.SelectObject(&bmp);
-	
+	CBitmap* pOldBmp = dc.SelectObject(&bmp);
+
 	CBrush br1(m_crColorLightest);
 	CBrush br2(::GetSysColor(COLOR_3DFACE));
 	dc.FillRect(rect, &br2);
@@ -169,29 +167,32 @@ void CMacProgressCtrl::OnPaint()
 	if (bVertical)
 	{
 		if (!m_bIndeterminate)
-			rect.top = rect.bottom - int(((float)rect.Height() * float(GetPos() - nLower)) / float(nUpper - nLower));
+			rect.top = rect.bottom
+					   - int(((float) rect.Height() * float(GetPos() - nLower))
+							 / float(nUpper - nLower));
 		dc.FillRect(rect, &br1);
 		DrawVerticalBar(&dc, rect);
 	}
 	else
-  	{
+	{
 		if (!m_bIndeterminate)
-			rect.right = int(((float)rect.Width() * float(GetPos() - nLower)) / float(nUpper - nLower));
+			rect.right = int(
+				((float) rect.Width() * float(GetPos() - nLower)) / float(nUpper - nLower));
 		dc.FillRect(rect, &br1);
 		DrawHorizontalBar(&dc, rect);
 	}
 
-	dcPaint.BitBlt(rectClient.left, rectClient.top, rectClient.Width(), rectClient.Height(), 
-						&dc, rectClient.left, rectClient.top, SRCCOPY);
+	dcPaint.BitBlt(rectClient.left, rectClient.top, rectClient.Width(), rectClient.Height(), &dc,
+		rectClient.left, rectClient.top, SRCCOPY);
 
 	dc.SelectObject(pOldBmp);
 	dc.RestoreDC(nSavedDC);
 	dc.DeleteDC();
-}	// OnPaint	
+} // OnPaint
 
 //-------------------------------------------------------------------
 //
-void CMacProgressCtrl::DrawHorizontalBar(CDC *pDC, const CRect rect)
+void CMacProgressCtrl::DrawHorizontalBar(CDC* pDC, const CRect rect)
 //
 // Return Value:	None.
 //
@@ -204,23 +205,23 @@ void CMacProgressCtrl::DrawHorizontalBar(CDC *pDC, const CRect rect)
 	if (!rect.Width())
 		return;
 
-	int nLeft = rect.left;
-	int nTop = rect.top;
-	int nBottom = rect.bottom;
+	int nLeft     = rect.left;
+	int nTop      = rect.top;
+	int nBottom   = rect.bottom;
 
 	// Assume we're not drawing the indeterminate state.
-	CPen *pOldPen = pDC->SelectObject(&m_penColorLight);
+	CPen* pOldPen = pDC->SelectObject(&m_penColorLight);
 
 	if (m_bIndeterminate)
 	{
-		pOldPen = pDC->SelectObject(&m_penColor);
+		pOldPen       = pDC->SelectObject(&m_penColor);
 		int nNumBands = (rect.Width() / IND_BAND_WIDTH) + 2;
-		int nHeight = rect.Height() + 1;
+		int nHeight   = rect.Height() + 1;
 
-		int nAdjust = nLeft - IND_BAND_WIDTH + m_nIndOffset;
-		int nXpos = 0;
-		int nYpos1 = nTop + 1;
-		int nYpos2 = nBottom - 2;
+		int nAdjust   = nLeft - IND_BAND_WIDTH + m_nIndOffset;
+		int nXpos     = 0;
+		int nYpos1    = nTop + 1;
+		int nYpos2    = nBottom - 2;
 
 		for (int i = 0; i < nNumBands; i++)
 		{
@@ -253,12 +254,12 @@ void CMacProgressCtrl::DrawHorizontalBar(CDC *pDC, const CRect rect)
 			pDC->LineTo(nXpos + nHeight + 4, nBottom);
 			pDC->MoveTo(nXpos + 7, nTop);
 			pDC->LineTo(nXpos + nHeight + 6, nBottom);
-		}	// for the number of bands
-	}	// if indeterminate
+		} // for the number of bands
+	} // if indeterminate
 	else
 	{
 		int nRight = rect.right;
-	
+
 		pDC->MoveTo(nLeft + 2, nBottom - 4);
 		pDC->LineTo(nRight - 2, nBottom - 4);
 		pDC->MoveTo(nLeft + 2, nTop + 2);
@@ -283,7 +284,7 @@ void CMacProgressCtrl::DrawHorizontalBar(CDC *pDC, const CRect rect)
 		pDC->LineTo(nRight - 2, nBottom - 3);
 		pDC->MoveTo(nLeft + 2, nTop + 1);
 		pDC->LineTo(nRight - 1, nTop + 1);
-		
+
 		pDC->SelectObject(&m_penColorDark);
 		pDC->MoveTo(nLeft + 2, nBottom - 2);
 		pDC->LineTo(nRight - 2, nBottom - 2);
@@ -299,19 +300,19 @@ void CMacProgressCtrl::DrawHorizontalBar(CDC *pDC, const CRect rect)
 
 		pDC->SelectObject(&m_penShadow);
 		pDC->MoveTo(nRight, nTop);
- 		pDC->LineTo(nRight, nBottom);
+		pDC->LineTo(nRight, nBottom);
 
 		pDC->SelectObject(&m_penLiteShadow);
- 		pDC->MoveTo(nRight + 1, nTop);
+		pDC->MoveTo(nRight + 1, nTop);
 		pDC->LineTo(nRight + 1, nBottom);
-	}	// if not indeterminate
+	} // if not indeterminate
 
 	pDC->SelectObject(pOldPen);
-}	// DrawHorizontalBar
+} // DrawHorizontalBar
 
 //-------------------------------------------------------------------
 //
-void CMacProgressCtrl::DrawVerticalBar(CDC *pDC, const CRect rect)
+void CMacProgressCtrl::DrawVerticalBar(CDC* pDC, const CRect rect)
 //
 // Return Value:	None.
 //
@@ -325,22 +326,22 @@ void CMacProgressCtrl::DrawVerticalBar(CDC *pDC, const CRect rect)
 	if (!nHeight)
 		return;
 
-	int nLeft = rect.left;
-	int nTop = rect.top;
-	int nRight = rect.right;
-	int nBottom = rect.bottom;
+	int nLeft     = rect.left;
+	int nTop      = rect.top;
+	int nRight    = rect.right;
+	int nBottom   = rect.bottom;
 
-	CPen *pOldPen = pDC->SelectObject(&m_penColor);
+	CPen* pOldPen = pDC->SelectObject(&m_penColor);
 
 	if (m_bIndeterminate)
 	{
 		int nNumBands = (nHeight / IND_BAND_WIDTH) + 2;
-		int nHeight = rect.Width() + 1;
+		int nHeight   = rect.Width() + 1;
 
-		int nAdjust = nBottom - m_nIndOffset;
-		int nXpos1 = nLeft;
-		int nXpos2 = nRight + 1;
-		int nYpos = nTop + 1;
+		int nAdjust   = nBottom - m_nIndOffset;
+		int nXpos1    = nLeft;
+		int nXpos2    = nRight + 1;
+		int nYpos     = nTop + 1;
 
 		for (int i = 0; i < nNumBands; i++)
 		{
@@ -373,8 +374,8 @@ void CMacProgressCtrl::DrawVerticalBar(CDC *pDC, const CRect rect)
 			pDC->LineTo(nXpos2, nYpos + nHeight + 4);
 			pDC->MoveTo(nXpos1, nYpos + 6);
 			pDC->LineTo(nXpos2, nYpos + nHeight + 6);
-		}	// for the number of bands
-	}	// if indeterminate
+		} // for the number of bands
+	} // if indeterminate
 	else
 	{
 		if (nHeight > 3)
@@ -395,7 +396,7 @@ void CMacProgressCtrl::DrawVerticalBar(CDC *pDC, const CRect rect)
 			pDC->LineTo(nRight - 4, nTop + 1);
 			pDC->SetPixel(nLeft + 1, nTop + 1, m_crColorLight);
 			pDC->SetPixel(nRight - 3, nTop + 1, m_crColorLight);
-			
+
 			pDC->SelectObject(&m_penColorLighter);
 			pDC->MoveTo(nLeft + 3, nBottom - 3);
 			pDC->LineTo(nLeft + 3, nTop + 1);
@@ -420,32 +421,32 @@ void CMacProgressCtrl::DrawVerticalBar(CDC *pDC, const CRect rect)
 		else
 		{
 			CBrush br(m_crColor);
-			CBrush *pOldBrush = pDC->SelectObject(&br);
+			CBrush* pOldBrush = pDC->SelectObject(&br);
 			pDC->SelectObject(&m_penColorDark);
 			pDC->Rectangle(rect);
 			pDC->SelectObject(pOldBrush);
 		}
-	}	// if not indeterminate
+	} // if not indeterminate
 
 	pDC->SelectObject(pOldPen);
-}	// DrawVerticalBar
+} // DrawVerticalBar
 
 //-------------------------------------------------------------------
 //
-BOOL CMacProgressCtrl::OnEraseBkgnd(CDC* pDC) 
+BOOL CMacProgressCtrl::OnEraseBkgnd(CDC* pDC)
 //
 // Return Value:	Nonzero if it erases the background; otherwise 0.
 //
 // Parameters	:	pDC - Specifies the device-context object.
 //
-// Remarks		:	The framework calls this member function when the 
-//						CWnd object background needs erasing (for example, 
-//						when resized). It is called to prepare an invalidated 
+// Remarks		:	The framework calls this member function when the
+//						CWnd object background needs erasing (for example,
+//						when resized). It is called to prepare an invalidated
 //						region for painting.
 //
 {
-		return TRUE;
-}	// OnEraseBkgnd
+	return TRUE;
+} // OnEraseBkgnd
 
 //-------------------------------------------------------------------
 //
@@ -455,30 +456,30 @@ void CMacProgressCtrl::GetColors()
 //
 // Parameters	:	None.
 //
-// Remarks		:	Calculates the lighter and darker colors, as well as 
+// Remarks		:	Calculates the lighter and darker colors, as well as
 //						the shadow colors.
 //
 {
-	m_crColorLight = LightenColor(m_crColor, 51);
-	m_crColorLighter = LightenColor(m_crColorLight, 51);
-	m_crColorLightest = LightenColor(m_crColorLighter, 51);
-	m_crColorDark = DarkenColor(m_crColor, 51);
-	m_crColorDarker = DarkenColor(m_crColorDark, 51);
-	m_crDkShadow = ::GetSysColor(COLOR_3DDKSHADOW);
-	m_crLiteShadow = ::GetSysColor(COLOR_3DSHADOW);
+	m_crColorLight           = LightenColor(m_crColor, 51);
+	m_crColorLighter         = LightenColor(m_crColorLight, 51);
+	m_crColorLightest        = LightenColor(m_crColorLighter, 51);
+	m_crColorDark            = DarkenColor(m_crColor, 51);
+	m_crColorDarker          = DarkenColor(m_crColorDark, 51);
+	m_crDkShadow             = ::GetSysColor(COLOR_3DDKSHADOW);
+	m_crLiteShadow           = ::GetSysColor(COLOR_3DSHADOW);
 
 	// Get a color halfway between COLOR_3DDKSHADOW and COLOR_3DSHADOW
-	BYTE byRed3DDkShadow = GetRValue(m_crDkShadow);
-	BYTE byRed3DLiteShadow = GetRValue(m_crLiteShadow);
-	BYTE byGreen3DDkShadow = GetGValue(m_crDkShadow);
+	BYTE byRed3DDkShadow     = GetRValue(m_crDkShadow);
+	BYTE byRed3DLiteShadow   = GetRValue(m_crLiteShadow);
+	BYTE byGreen3DDkShadow   = GetGValue(m_crDkShadow);
 	BYTE byGreen3DLiteShadow = GetGValue(m_crLiteShadow);
-	BYTE byBlue3DDkShadow = GetBValue(m_crDkShadow);
-	BYTE byBlue3DLiteShadow = GetBValue(m_crLiteShadow);
+	BYTE byBlue3DDkShadow    = GetBValue(m_crDkShadow);
+	BYTE byBlue3DLiteShadow  = GetBValue(m_crLiteShadow);
 
-	m_crShadow = RGB(byRed3DLiteShadow + ((byRed3DDkShadow - byRed3DLiteShadow) >> 1),
-						  byGreen3DLiteShadow + ((byGreen3DDkShadow - byGreen3DLiteShadow) >> 1),
-						  byBlue3DLiteShadow + ((byBlue3DDkShadow - byBlue3DLiteShadow) >> 1));
-}	// GetColors
+	m_crShadow               = RGB(byRed3DLiteShadow + ((byRed3DDkShadow - byRed3DLiteShadow) >> 1),
+					  byGreen3DLiteShadow + ((byGreen3DDkShadow - byGreen3DLiteShadow) >> 1),
+					  byBlue3DLiteShadow + ((byBlue3DDkShadow - byBlue3DLiteShadow) >> 1));
+} // GetColors
 
 //-------------------------------------------------------------------
 //
@@ -496,7 +497,7 @@ void CMacProgressCtrl::SetColor(COLORREF crColor)
 	GetColors();
 	CreatePens();
 	RedrawWindow();
-}	// SetColor
+} // SetColor
 
 //-------------------------------------------------------------------
 //
@@ -510,7 +511,7 @@ COLORREF CMacProgressCtrl::GetColor()
 //
 {
 	return m_crColor;
-}	// GetColor
+} // GetColor
 
 //-------------------------------------------------------------------
 //
@@ -533,7 +534,7 @@ void CMacProgressCtrl::CreatePens()
 	m_penDkShadow.CreatePen(PS_SOLID, 1, m_crDkShadow);
 	m_penShadow.CreatePen(PS_SOLID, 1, m_crShadow);
 	m_penLiteShadow.CreatePen(PS_SOLID, 1, m_crLiteShadow);
-}	// CreatePens
+} // CreatePens
 
 //-------------------------------------------------------------------
 //
@@ -562,7 +563,7 @@ void CMacProgressCtrl::DeletePens()
 		m_penShadow.DeleteObject();
 	if (m_penLiteShadow.m_hObject)
 		m_penLiteShadow.DeleteObject();
-}	// DeletePens
+} // DeletePens
 
 //-------------------------------------------------------------------
 //
@@ -591,7 +592,7 @@ void CMacProgressCtrl::SetIndeterminate(BOOL bIndeterminate)
 		KillTimer(IDT_INDETERMINATE);
 		RedrawWindow();
 	}
-}	// SetIndeterminate
+} // SetIndeterminate
 
 //-------------------------------------------------------------------
 //
@@ -605,7 +606,7 @@ BOOL CMacProgressCtrl::GetIndeterminate()
 //
 {
 	return m_bIndeterminate;
-}	// GetIndeterminate
+} // GetIndeterminate
 
 //-------------------------------------------------------------------
 //
@@ -615,8 +616,8 @@ void CMacProgressCtrl::OnTimer(UINT_PTR nIDEvent)
 //
 // Parameters	:	nIDEvent - Specifies the identifier of the timer.
 //
-// Remarks		:	The framework calls this member function after each 
-//						interval specified in the SetTimer member function used 
+// Remarks		:	The framework calls this member function after each
+//						interval specified in the SetTimer member function used
 //						to install a timer.
 //
 {
@@ -631,4 +632,4 @@ void CMacProgressCtrl::OnTimer(UINT_PTR nIDEvent)
 
 		SetTimer(IDT_INDETERMINATE, 25, nullptr);
 	}
-}	// OnTimer
+} // OnTimer

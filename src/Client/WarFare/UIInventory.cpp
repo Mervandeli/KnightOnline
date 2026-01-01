@@ -31,38 +31,39 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
-static bool g_bItemClassGroup[26][26] = {	// [아이템][플레이어]	
-//	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }	// 초기그룹
-//	  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25
-	{ 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1 },	// 0번 Group
-	{ 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1 },	// 1번 Group
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },	// 2번 Group
-	{ 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1 },	// 3번 Group
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 },	// 4번 Group
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },	// 5번 Group
-	{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0 },	// 6번 Group
-	{ 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 },	// 7번 Group
-	{ 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 },	// 8번 Group
-	{ 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1 },	// 9번 Group
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0 },	// 10번 Group
-	{ 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1 },	// 11번 Group
-	{ 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1 },	// 12번 Group
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0 },	// 13번 Group
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 },	// 14번 Group
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },	// 15번 Group
-	{ 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0 },	// 16번 Group
-	{ 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0 },	// 17번 Group
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },	// 18번 Group
-	{ 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0 },	// 19번 Group
-	{ 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0 },	// 20번 Group
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1 },	// 21번 Group
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1 },	// 22번 Group
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1 },	// 23번 Group
-	{ 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0 },	// 24번 Group
-	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 } };	// 25번 Group (모든 Class)
+static bool g_bItemClassGroup[26][26] = { // [아이템][플레이어]
+	//	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }	// 초기그룹
+	//	  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25
+	{ 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, // 0번 Group
+	{ 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1 }, // 1번 Group
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 }, // 2번 Group
+	{ 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1 }, // 3번 Group
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 }, // 4번 Group
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 }, // 5번 Group
+	{ 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0 }, // 6번 Group
+	{ 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 }, // 7번 Group
+	{ 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 }, // 8번 Group
+	{ 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1 }, // 9번 Group
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0 }, // 10번 Group
+	{ 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1 }, // 11번 Group
+	{ 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1 }, // 12번 Group
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0 }, // 13번 Group
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 }, // 14번 Group
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // 15번 Group
+	{ 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0 }, // 16번 Group
+	{ 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0 }, // 17번 Group
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 }, // 18번 Group
+	{ 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0 }, // 19번 Group
+	{ 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0 }, // 20번 Group
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1 }, // 21번 Group
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1 }, // 22번 Group
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1 }, // 23번 Group
+	{ 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0 }, // 24번 Group
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+};                                                                                    // 25번 Group (모든 Class)
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -70,20 +71,22 @@ static bool g_bItemClassGroup[26][26] = {	// [아이템][플레이어]
 
 CUIInventory::CUIInventory()
 {
-	for( int i = 0; i < ITEM_SLOT_COUNT; i++ )	m_pMySlot[i] = nullptr;
-	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )	m_pMyInvWnd[i] = nullptr;
+	for (int i = 0; i < ITEM_SLOT_COUNT; i++)
+		m_pMySlot[i] = nullptr;
+	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
+		m_pMyInvWnd[i] = nullptr;
 
-	m_pUITooltipDlg = nullptr;
+	m_pUITooltipDlg   = nullptr;
 	s_bWaitFromServer = false;
 
-	m_bOpenningNow = false; // 열리고 있다..
-	m_bClosingNow = false;	// 닫히고 있다..
-	m_fMoveDelta = 0; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
+	m_bOpenningNow    = false; // 열리고 있다..
+	m_bClosingNow     = false; // 닫히고 있다..
+	m_fMoveDelta      = 0;     // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
 
-	m_bDestoyDlgAlive	= false;
-	m_pText_Weight = nullptr;
+	m_bDestoyDlgAlive = false;
+	m_pText_Weight    = nullptr;
 
-	m_iRBtnDownOffs = -1;
+	m_iRBtnDownOffs   = -1;
 	m_bRBtnProcessing = false;
 }
 
@@ -96,18 +99,18 @@ void CUIInventory::Release()
 {
 	CN3UIBase::Release();
 
-	for( int i = 0; i < ITEM_SLOT_COUNT; i++ )
+	for (int i = 0; i < ITEM_SLOT_COUNT; i++)
 	{
-		if ( m_pMySlot[i] != nullptr )
+		if (m_pMySlot[i] != nullptr)
 		{
 			delete m_pMySlot[i];
 			m_pMySlot[i] = nullptr;
 		}
 	}
 
-	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )
+	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
-		if ( m_pMyInvWnd[i] != nullptr )
+		if (m_pMyInvWnd[i] != nullptr)
 		{
 			delete m_pMyInvWnd[i];
 			m_pMyInvWnd[i] = nullptr;
@@ -115,28 +118,28 @@ void CUIInventory::Release()
 	}
 
 	m_bOpenningNow = false; // 열리고 있다..
-	m_bClosingNow = false;	// 닫히고 있다..
-	m_fMoveDelta = 0; // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
+	m_bClosingNow  = false; // 닫히고 있다..
+	m_fMoveDelta   = 0;     // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
 	m_pText_Weight = nullptr;
 }
 
 bool CUIInventory::HasAnyItemInSlot()
 {
-	for( int i = 0; i < ITEM_SLOT_COUNT; i++ )
+	for (int i = 0; i < ITEM_SLOT_COUNT; i++)
 	{
-		if ( m_pMySlot[i] != nullptr )
+		if (m_pMySlot[i] != nullptr)
 			return true;
 	}
-	return false;	
+	return false;
 }
 
 void CUIInventory::ReleaseItem()
 {
-	for( int i = 0; i < ITEM_SLOT_COUNT; i++ )
+	for (int i = 0; i < ITEM_SLOT_COUNT; i++)
 	{
-		if ( m_pMySlot[i] != nullptr )
+		if (m_pMySlot[i] != nullptr)
 		{
-			if ( m_pMySlot[i]->pUIIcon )
+			if (m_pMySlot[i]->pUIIcon)
 			{
 				RemoveChild(m_pMySlot[i]->pUIIcon);
 				m_pMySlot[i]->pUIIcon->Release();
@@ -144,16 +147,16 @@ void CUIInventory::ReleaseItem()
 				m_pMySlot[i]->pUIIcon = nullptr;
 			}
 
-			delete m_pMySlot[i];	
+			delete m_pMySlot[i];
 			m_pMySlot[i] = nullptr;
 		}
 	}
 
-	for(int i = 0; i < MAX_ITEM_INVENTORY; i++ )
+	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
-		if ( m_pMyInvWnd[i] != nullptr )
+		if (m_pMyInvWnd[i] != nullptr)
 		{
-			if ( m_pMyInvWnd[i]->pUIIcon )
+			if (m_pMyInvWnd[i]->pUIIcon)
 			{
 				RemoveChild(m_pMyInvWnd[i]->pUIIcon);
 				m_pMyInvWnd[i]->pUIIcon->Release();
@@ -170,19 +173,19 @@ void CUIInventory::ReleaseItem()
 void CUIInventory::Open(e_InvenState eIS)
 {
 	m_eInvenState = eIS;
-	if ( eIS == INV_STATE_REPAIR )
+	if (eIS == INV_STATE_REPAIR)
 	{
 		CGameProcedure::SetGameCursor(CGameProcedure::s_hCursorPreRepair, true);
 	}
 
 	CGameProcedure::s_pProcMain->m_pUIInventory->GoldUpdate();
-	
+
 	// 스르륵 열린다!!
 	SetVisible(true);
 	this->SetPos(CN3Base::s_CameraData.vp.Width, 10);
-	m_fMoveDelta = 0;
-	m_bOpenningNow = true;
-	m_bClosingNow = false;
+	m_fMoveDelta    = 0;
+	m_bOpenningNow  = true;
+	m_bClosingNow   = false;
 
 	m_iRBtnDownOffs = -1;
 }
@@ -203,9 +206,10 @@ void CUIInventory::GoldUpdate()
 
 void CUIInventory::Close(bool bByKey)
 {
-	if ( m_eInvenState == INV_STATE_REPAIR )
+	if (m_eInvenState == INV_STATE_REPAIR)
 	{
-		if (bByKey) return;
+		if (bByKey)
+			return;
 		CGameProcedure::RestoreGameCursor();
 
 		if (CGameProcedure::s_pProcMain->m_pUIRepairTooltip->IsVisible())
@@ -223,38 +227,41 @@ void CUIInventory::Close(bool bByKey)
 	CN3UIWndBase::AllHighLightIconFree();
 
 	// 스르륵 닫힌다..!!
-//	SetVisible(false); // 다 닫히고 나서 해준다..
+	//	SetVisible(false); // 다 닫히고 나서 해준다..
 	RECT rc = this->GetRegion();
 	this->SetPos(CN3Base::s_CameraData.vp.Width - (rc.right - rc.left), 10);
-	m_fMoveDelta = 0;
+	m_fMoveDelta   = 0;
 	m_bOpenningNow = false;
-	m_bClosingNow = true;
+	m_bClosingNow  = true;
 
-	if(m_pSnd_CloseUI) m_pSnd_CloseUI->Play(); // 닫는 소리..
+	if (m_pSnd_CloseUI)
+		m_pSnd_CloseUI->Play(); // 닫는 소리..
 
 	m_iRBtnDownOffs = -1;
 }
 
 void CUIInventory::Tick()
 {
-	if (!m_bVisible) return;	// 보이지 않으면 자식들을 tick하지 않는다.
+	if (!m_bVisible)
+		return;         // 보이지 않으면 자식들을 tick하지 않는다.
 
-	if(m_bOpenningNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면..
+	if (m_bOpenningNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면..
 	{
-		POINT ptCur = this->GetPos();
-		RECT rc = this->GetRegion();
-		float fWidth = (float)(rc.right - rc.left);
+		POINT ptCur   = this->GetPos();
+		RECT rc       = this->GetRegion();
+		float fWidth  = (float) (rc.right - rc.left);
 
-		float fDelta = 5000.0f * CN3Base::s_fSecPerFrm;
-		fDelta *= (fWidth - m_fMoveDelta) / fWidth;
-		if(fDelta < 2.0f) fDelta = 2.0f;
+		float fDelta  = 5000.0f * CN3Base::s_fSecPerFrm;
+		fDelta       *= (fWidth - m_fMoveDelta) / fWidth;
+		if (fDelta < 2.0f)
+			fDelta = 2.0f;
 		m_fMoveDelta += fDelta;
 
-		int iXLimit = CN3Base::s_CameraData.vp.Width - (int)fWidth;
-		ptCur.x = CN3Base::s_CameraData.vp.Width - (int)m_fMoveDelta;
-		if(ptCur.x <= iXLimit) // 다열렸다!!
+		int iXLimit   = CN3Base::s_CameraData.vp.Width - (int) fWidth;
+		ptCur.x       = CN3Base::s_CameraData.vp.Width - (int) m_fMoveDelta;
+		if (ptCur.x <= iXLimit) // 다열렸다!!
 		{
-			ptCur.x = iXLimit;
+			ptCur.x        = iXLimit;
 			m_bOpenningNow = false;
 		}
 
@@ -262,22 +269,23 @@ void CUIInventory::Tick()
 
 		CN3UIWndBase::AllHighLightIconFree();
 	}
-	else if(m_bClosingNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면..
+	else if (m_bClosingNow) // 오른쪽에서 왼쪽으로 스르륵...열려야 한다면..
 	{
-		POINT ptCur = this->GetPos();
-		RECT rc = this->GetRegion();
-		float fWidth = (float)(rc.right - rc.left);
+		POINT ptCur   = this->GetPos();
+		RECT rc       = this->GetRegion();
+		float fWidth  = (float) (rc.right - rc.left);
 
-		float fDelta = 5000.0f * CN3Base::s_fSecPerFrm;
-		fDelta *= (fWidth - m_fMoveDelta) / fWidth;
-		if(fDelta < 2.0f) fDelta = 2.0f;
+		float fDelta  = 5000.0f * CN3Base::s_fSecPerFrm;
+		fDelta       *= (fWidth - m_fMoveDelta) / fWidth;
+		if (fDelta < 2.0f)
+			fDelta = 2.0f;
 		m_fMoveDelta += fDelta;
 
-		int iXLimit = CN3Base::s_CameraData.vp.Width;
-		ptCur.x = CN3Base::s_CameraData.vp.Width - (int)(fWidth - m_fMoveDelta);
-		if(ptCur.x >= iXLimit) // 다 닫혔다..!!
+		int iXLimit   = CN3Base::s_CameraData.vp.Width;
+		ptCur.x       = CN3Base::s_CameraData.vp.Width - (int) (fWidth - m_fMoveDelta);
+		if (ptCur.x >= iXLimit) // 다 닫혔다..!!
 		{
-			ptCur.x = iXLimit;
+			ptCur.x       = iXLimit;
 			m_bClosingNow = false;
 
 			this->SetVisibleWithNoSound(false, false, true); // 다 닫혔으니 눈에서 안보이게 한다.
@@ -297,45 +305,48 @@ void CUIInventory::Tick()
 
 void CUIInventory::Render()
 {
-	if (!m_bVisible) return;	// 보이지 않으면 자식들을 render하지 않는다.
+	if (!m_bVisible)
+		return; // 보이지 않으면 자식들을 render하지 않는다.
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
 	m_pUITooltipDlg->DisplayTooltipsDisable();
-	RECT rUser = m_pArea_User->GetRegion();
+	RECT rUser              = m_pArea_User->GetRegion();
 
-	bool bTooltipRender = false;
+	bool bTooltipRender     = false;
 	__IconItemSkill* spItem = nullptr;
 
 	RECT rcRegion;
-	SetRect(&rcRegion, rUser.left, rUser.top, rUser.right, rUser.bottom);			// 영역 지정
+	SetRect(&rcRegion, rUser.left, rUser.top, rUser.right, rUser.bottom); // 영역 지정
 	char strDummy[32];
 	lstrcpy(strDummy, "elmo_ecli666");
 
-	for(UIListReverseItor itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
+	for (UIListReverseItor itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
-		if ( (m_szID != "Base_Iteminfo") && (pChild->GetID() != "area_samma") )
+		if ((m_szID != "Base_Iteminfo") && (pChild->GetID() != "area_samma"))
 		{
-			if ( (GetState() == UI_STATE_ICON_MOVING) && (pChild->UIType() == UI_TYPE_ICON) && (CN3UIWndBase::s_sSelectedIconInfo.pItemSelect) &&
-				((CN3UIIcon *)pChild == CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pUIIcon) )	continue;
+			if ((GetState() == UI_STATE_ICON_MOVING) && (pChild->UIType() == UI_TYPE_ICON)
+				&& (CN3UIWndBase::s_sSelectedIconInfo.pItemSelect)
+				&& ((CN3UIIcon*) pChild == CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pUIIcon))
+				continue;
 			pChild->Render();
 		}
-		if ( pChild->m_szID == strDummy )
+		if (pChild->m_szID == strDummy)
 			CGameBase::s_pPlayer->InventoryChrRender(rcRegion);
-		if ( (pChild->UIType() == UI_TYPE_ICON) && (pChild->GetStyle() & UISTYLE_ICON_HIGHLIGHT)  && (!m_bOpenningNow) && (!m_bClosingNow))
+		if ((pChild->UIType() == UI_TYPE_ICON) && (pChild->GetStyle() & UISTYLE_ICON_HIGHLIGHT) && (!m_bOpenningNow) && (!m_bClosingNow))
 		{
 			bTooltipRender = true;
-			spItem = GetHighlightIconItem( (CN3UIIcon* )pChild );
+			spItem         = GetHighlightIconItem((CN3UIIcon*) pChild);
 		}
 	}
 
 	if (m_bDestoyDlgAlive)
 		m_pArea_Destroy->Render();
 
-	if ( (GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::s_sSelectedIconInfo.pItemSelect))
-		CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pUIIcon->Render();		
+	if ((GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::s_sSelectedIconInfo.pItemSelect))
+		CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pUIIcon->Render();
 
 	// 갯수 표시되야 할 아이템 갯수 표시..
-	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )
+	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
 		if (m_pMyInvWnd[i] != nullptr
 			&& ((m_pMyInvWnd[i]->pItemBasic->byContable == UIITEM_TYPE_COUNTABLE)
@@ -344,23 +355,23 @@ void CUIInventory::Render()
 		{
 			// string 얻기..
 			CN3UIString* pStr = GetChildStringByiOrder(i);
-			if(pStr) 
+			if (pStr)
 			{
-				if ( (GetState() == UI_STATE_ICON_MOVING) && (m_pMyInvWnd[i] == CN3UIWndBase::s_sSelectedIconInfo.pItemSelect) )
+				if ((GetState() == UI_STATE_ICON_MOVING) && (m_pMyInvWnd[i] == CN3UIWndBase::s_sSelectedIconInfo.pItemSelect))
 				{
 					pStr->SetVisible(false);
 				}
 				else
 				{
-					if ( m_pMyInvWnd[i]->pUIIcon->IsVisible() )
+					if (m_pMyInvWnd[i]->pUIIcon->IsVisible())
 					{
 						pStr->SetVisible(true);
-						
+
 						if (m_pMyInvWnd[i]->pItemBasic->byClass == ITEM_CLASS_CONSUMABLE)
 							pStr->SetStringAsInt(m_pMyInvWnd[i]->iDurability);
 						else
 							pStr->SetStringAsInt(m_pMyInvWnd[i]->iCount);
-						
+
 						pStr->Render();
 					}
 					else
@@ -374,25 +385,31 @@ void CUIInventory::Render()
 		{
 			// string 얻기..
 			CN3UIString* pStr = GetChildStringByiOrder(i);
-			if(pStr) 
+			if (pStr)
 				pStr->SetVisible(false);
 		}
 	}
 
 	// 수리모드이면.. 리턴;
-	if (m_eInvenState == INV_STATE_REPAIR) { CGameProcedure::s_pProcMain->m_pUIRepairTooltip->Render(); return;	}
-	
-	if ( bTooltipRender && spItem )
-		m_pUITooltipDlg->DisplayTooltipsEnable(ptCur.x, ptCur.y, spItem );
+	if (m_eInvenState == INV_STATE_REPAIR)
+	{
+		CGameProcedure::s_pProcMain->m_pUIRepairTooltip->Render();
+		return;
+	}
+
+	if (bTooltipRender && spItem)
+		m_pUITooltipDlg->DisplayTooltipsEnable(ptCur.x, ptCur.y, spItem);
 }
 
 void CUIInventory::InitIconWnd(e_UIWND eWnd)
 {
 	N3_VERIFY_UI_COMPONENT(m_pArea_User, GetChildByID<CN3UIArea>("area_char"));
-	if(nullptr == m_pArea_User) return;
+	if (nullptr == m_pArea_User)
+		return;
 
 	N3_VERIFY_UI_COMPONENT(m_pArea_Destroy, GetChildByID<CN3UIArea>("area_samma"));
-	if(nullptr == m_pArea_Destroy) return;
+	if (nullptr == m_pArea_Destroy)
+		return;
 
 	N3_VERIFY_UI_COMPONENT(m_pText_Weight, GetChildByID<CN3UIString>("text_weight"));
 	__TABLE_UI_RESRC* pTblUI = CGameBase::s_pTbl_UI.Find(CGameBase::s_pPlayer->m_InfoBase.eNation);
@@ -402,14 +419,15 @@ void CUIInventory::InitIconWnd(e_UIWND eWnd)
 	m_pUITooltipDlg->Init(this);
 	m_pUITooltipDlg->LoadFromFile(pTblUI->szItemInfo);
 	m_pUITooltipDlg->InitPos();
-	m_pUITooltipDlg->SetVisible(FALSE);	
+	m_pUITooltipDlg->SetVisible(FALSE);
 
 	CN3UIWndBase::InitIconWnd(eWnd);
 }
 
 void CUIInventory::UpdateWeight(std::string str)
 {
-	if(nullptr == m_pText_Weight) return;
+	if (nullptr == m_pText_Weight)
+		return;
 
 	m_pText_Weight->SetString(str);
 }
@@ -417,62 +435,62 @@ void CUIInventory::UpdateWeight(std::string str)
 void CUIInventory::InitIconUpdate()
 {
 	CN3UIArea* pArea;
-	float fUVAspect = (float)45.0f/(float)64.0f;
+	float fUVAspect = (float) 45.0f / (float) 64.0f;
 
-	for( int i = 0; i < ITEM_SLOT_COUNT; i++ )
+	for (int i = 0; i < ITEM_SLOT_COUNT; i++)
 	{
-		if ( m_pMySlot[i] != nullptr )
+		if (m_pMySlot[i] != nullptr)
 		{
 			m_pMySlot[i]->pUIIcon = new CN3UIIcon;
 			m_pMySlot[i]->pUIIcon->Init(this);
 			m_pMySlot[i]->pUIIcon->SetTex(m_pMySlot[i]->szIconFN);
-			m_pMySlot[i]->pUIIcon->SetUVRect(0,0, fUVAspect, fUVAspect);
+			m_pMySlot[i]->pUIIcon->SetUVRect(0, 0, fUVAspect, fUVAspect);
 			m_pMySlot[i]->pUIIcon->SetUIType(UI_TYPE_ICON);
-			m_pMySlot[i]->pUIIcon->SetStyle(UISTYLE_ICON_ITEM|UISTYLE_ICON_CERTIFICATION_NEED);
+			m_pMySlot[i]->pUIIcon->SetStyle(UISTYLE_ICON_ITEM | UISTYLE_ICON_CERTIFICATION_NEED);
 			pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SLOT, i);
-			if ( pArea )
+			if (pArea)
 			{
 				m_pMySlot[i]->pUIIcon->SetRegion(pArea->GetRegion());
 				m_pMySlot[i]->pUIIcon->SetMoveRect(pArea->GetRegion());
 			}
-			if ( m_pMySlot[i]->iDurability == 0 )
-				m_pMySlot[i]->pUIIcon->SetStyle(m_pMySlot[i]->pUIIcon->GetStyle() | UISTYLE_DURABILITY_EXHAUST);	
+			if (m_pMySlot[i]->iDurability == 0)
+				m_pMySlot[i]->pUIIcon->SetStyle(m_pMySlot[i]->pUIIcon->GetStyle() | UISTYLE_DURABILITY_EXHAUST);
 		}
 	}
 
-	for(int i = 0; i < MAX_ITEM_INVENTORY; i++ )
+	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
-		if ( m_pMyInvWnd[i] != nullptr )
+		if (m_pMyInvWnd[i] != nullptr)
 		{
 			m_pMyInvWnd[i]->pUIIcon = new CN3UIIcon;
 			m_pMyInvWnd[i]->pUIIcon->Init(this);
 			m_pMyInvWnd[i]->pUIIcon->SetTex(m_pMyInvWnd[i]->szIconFN);
-			m_pMyInvWnd[i]->pUIIcon->SetUVRect(0,0, fUVAspect, fUVAspect);
+			m_pMyInvWnd[i]->pUIIcon->SetUVRect(0, 0, fUVAspect, fUVAspect);
 			m_pMyInvWnd[i]->pUIIcon->SetUIType(UI_TYPE_ICON);
-			m_pMyInvWnd[i]->pUIIcon->SetStyle(UISTYLE_ICON_ITEM|UISTYLE_ICON_CERTIFICATION_NEED);
+			m_pMyInvWnd[i]->pUIIcon->SetStyle(UISTYLE_ICON_ITEM | UISTYLE_ICON_CERTIFICATION_NEED);
 			pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, i);
-			if ( pArea )
+			if (pArea)
 			{
 				m_pMyInvWnd[i]->pUIIcon->SetRegion(pArea->GetRegion());
 				m_pMyInvWnd[i]->pUIIcon->SetMoveRect(pArea->GetRegion());
 			}
-			if ( m_pMyInvWnd[i]->iDurability == 0 )
-				m_pMyInvWnd[i]->pUIIcon->SetStyle(m_pMyInvWnd[i]->pUIIcon->GetStyle() | UISTYLE_DURABILITY_EXHAUST);	
+			if (m_pMyInvWnd[i]->iDurability == 0)
+				m_pMyInvWnd[i]->pUIIcon->SetStyle(m_pMyInvWnd[i]->pUIIcon->GetStyle() | UISTYLE_DURABILITY_EXHAUST);
 		}
 	}
 }
 
 __IconItemSkill* CUIInventory::GetHighlightIconItem(CN3UIIcon* pUIIcon)
 {
-	for( int i = 0; i < ITEM_SLOT_COUNT; i++ )
+	for (int i = 0; i < ITEM_SLOT_COUNT; i++)
 	{
-		if ( (m_pMySlot[i] != nullptr) && (m_pMySlot[i]->pUIIcon == pUIIcon) )
+		if ((m_pMySlot[i] != nullptr) && (m_pMySlot[i]->pUIIcon == pUIIcon))
 			return m_pMySlot[i];
 	}
 
-	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )
+	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
-		if ( (m_pMyInvWnd[i] != nullptr) && (m_pMyInvWnd[i]->pUIIcon == pUIIcon) )
+		if ((m_pMyInvWnd[i] != nullptr) && (m_pMyInvWnd[i]->pUIIcon == pUIIcon))
 			return m_pMyInvWnd[i];
 	}
 	return nullptr;
@@ -480,15 +498,15 @@ __IconItemSkill* CUIInventory::GetHighlightIconItem(CN3UIIcon* pUIIcon)
 
 e_UIWND_DISTRICT CUIInventory::GetWndDistrict(__IconItemSkill* spItem)
 {
-	for( int i = 0; i < ITEM_SLOT_COUNT; i++ )
+	for (int i = 0; i < ITEM_SLOT_COUNT; i++)
 	{
-		if ( (m_pMySlot[i] != nullptr) && (m_pMySlot[i] == spItem) )
+		if ((m_pMySlot[i] != nullptr) && (m_pMySlot[i] == spItem))
 			return UIWND_DISTRICT_INVENTORY_SLOT;
 	}
 
-	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )
+	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
-		if ( (m_pMyInvWnd[i] != nullptr) && (m_pMyInvWnd[i] == spItem) )
+		if ((m_pMyInvWnd[i] != nullptr) && (m_pMyInvWnd[i] == spItem))
 			return UIWND_DISTRICT_INVENTORY_INV;
 	}
 	return UIWND_DISTRICT_UNKNOWN;
@@ -499,20 +517,20 @@ int CUIInventory::GetItemiOrder(__IconItemSkill* spItem, e_UIWND_DISTRICT eWndDi
 	int iReturn = -1;
 	int i;
 
-	switch ( eWndDist )
+	switch (eWndDist)
 	{
 		case UIWND_DISTRICT_INVENTORY_SLOT:
-			for( i = 0; i < ITEM_SLOT_COUNT; i++ )
+			for (i = 0; i < ITEM_SLOT_COUNT; i++)
 			{
-				if ( (m_pMySlot[i] != nullptr) && (m_pMySlot[i] == spItem) )
+				if ((m_pMySlot[i] != nullptr) && (m_pMySlot[i] == spItem))
 					return i;
 			}
 			break;
 
 		case UIWND_DISTRICT_INVENTORY_INV:
-			for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
+			for (i = 0; i < MAX_ITEM_INVENTORY; i++)
 			{
-				if ( (m_pMyInvWnd[i] != nullptr) && (m_pMyInvWnd[i] == spItem) )
+				if ((m_pMyInvWnd[i] != nullptr) && (m_pMyInvWnd[i] == spItem))
 					return i;
 			}
 			break;
@@ -525,56 +543,68 @@ RECT CUIInventory::GetSampleRect()
 {
 	RECT rect;
 	CN3UIArea* pArea;
-	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
-	pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, 0);
-	rect = pArea->GetRegion();
-	float fWidth = (float)(rect.right - rect.left);
-	float fHeight = (float)(rect.bottom - rect.top);
-	fWidth *= 0.5f; fHeight *= 0.5f;
-	rect.left = ptCur.x - (int)fWidth;  rect.right  = ptCur.x + (int)fWidth;
-	rect.top  = ptCur.y - (int)fHeight; rect.bottom = ptCur.y + (int)fHeight;
+	POINT ptCur    = CGameProcedure::s_pLocalInput->MouseGetPos();
+	pArea          = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, 0);
+	rect           = pArea->GetRegion();
+	float fWidth   = (float) (rect.right - rect.left);
+	float fHeight  = (float) (rect.bottom - rect.top);
+	fWidth        *= 0.5f;
+	fHeight       *= 0.5f;
+	rect.left      = ptCur.x - (int) fWidth;
+	rect.right     = ptCur.x + (int) fWidth;
+	rect.top       = ptCur.y - (int) fHeight;
+	rect.bottom    = ptCur.y + (int) fHeight;
 	return rect;
 }
 
 uint32_t CUIInventory::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld)
 {
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
-	if (!m_bVisible) return dwRet;
-	if (s_bWaitFromServer) { dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);  return dwRet; }
+	if (!m_bVisible)
+		return dwRet;
+	if (s_bWaitFromServer)
+	{
+		dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);
+		return dwRet;
+	}
 
 	// 수리모드이면.. 리턴;
-	if (m_eInvenState == INV_STATE_REPAIR) { dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);  return dwRet; }
+	if (m_eInvenState == INV_STATE_REPAIR)
+	{
+		dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);
+		return dwRet;
+	}
 
-	if (m_bDestoyDlgAlive)	
-	{ 
+	if (m_bDestoyDlgAlive)
+	{
 		CN3UIImage* pImg = nullptr;
 		N3_VERIFY_UI_COMPONENT(pImg, m_pArea_Destroy->GetChildByID<CN3UIImage>("img_Destroy"));
 
-		if (!pImg) return dwRet;
+		if (!pImg)
+			return dwRet;
 		if (!pImg->IsIn(ptCur.x, ptCur.y))
 		{
 			//this_ui_add_start
 			//파괴하는 창이 열려있을때 그창을 벗어나서 인벤토리창에서 클릭과 같은 행동을 하면 캐릭터가 이동을 해서 방지하는 차원에서...
-			if(IsIn(ptCur.x, ptCur.y))
+			if (IsIn(ptCur.x, ptCur.y))
 				dwRet |= UI_MOUSEPROC_INREGION;
 			//this_ui_add_end
 
 			return dwRet;
 		}
 
-		for ( int i = 0; i < m_pArea_Destroy->GetChildrenCount(); i++ )
+		for (int i = 0; i < m_pArea_Destroy->GetChildrenCount(); i++)
 		{
 			CN3UIBase* pChild = m_pArea_Destroy->GetChildByIndex(i);
-			if (pChild)	
-				dwRet |= pChild->MouseProc(dwFlags, ptCur, ptOld);  
+			if (pChild)
+				dwRet |= pChild->MouseProc(dwFlags, ptCur, ptOld);
 		}
 		return dwRet;
 	}
 
 	// 드래그 되는 아이콘 갱신..
-	if ( (GetState() == UI_STATE_ICON_MOVING) && 
-			(CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd == UIWND_INVENTORY) &&
-			(CN3UIWndBase::s_sSelectedIconInfo.pItemSelect) )
+	if ((GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd == UIWND_INVENTORY)
+		&& (CN3UIWndBase::s_sSelectedIconInfo.pItemSelect))
 	{
 		CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(GetSampleRect());
 		CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(GetSampleRect());
@@ -585,26 +615,26 @@ uint32_t CUIInventory::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POI
 
 void CUIInventory::SendInvMsg(uint8_t bDir, int iItemID, int SrcPos, int DestPos)
 {
-	uint8_t byBuff[100];												// 버퍼.. 
-	int iOffset=0;												// 옵셋..
+	uint8_t byBuff[100];                                    // 버퍼..
+	int iOffset = 0;                                        // 옵셋..
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_ITEM_MOVE);				// Item Move
-	CAPISocket::MP_AddByte(byBuff, iOffset, bDir);						
-	CAPISocket::MP_AddDword(byBuff, iOffset, iItemID);					
-	CAPISocket::MP_AddByte(byBuff, iOffset, (byte)SrcPos);				
-	CAPISocket::MP_AddByte(byBuff, iOffset, (byte)DestPos);						
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_ITEM_MOVE); // Item Move
+	CAPISocket::MP_AddByte(byBuff, iOffset, bDir);
+	CAPISocket::MP_AddDword(byBuff, iOffset, iItemID);
+	CAPISocket::MP_AddByte(byBuff, iOffset, (byte) SrcPos);
+	CAPISocket::MP_AddByte(byBuff, iOffset, (byte) DestPos);
 
 	//TRACE("Send Inv Move %d, %d, %d, %d \n", bDir, iItemID, SrcPos, DestPos );
 
-	CGameProcedure::s_pProcMain->s_pSocket->Send(byBuff, iOffset);									// 보냄..
+	CGameProcedure::s_pProcMain->s_pSocket->Send(byBuff, iOffset); // 보냄..
 }
 
 int CUIInventory::GetInvDestinationIndex(__IconItemSkill* spItem)
 {
-	if( CN3UIWndBase::s_sSelectedIconInfo.pItemSelect == nullptr )
+	if (CN3UIWndBase::s_sSelectedIconInfo.pItemSelect == nullptr)
 		return false;
 
-	for( int i = 0; i < MAX_ITEM_INVENTORY; i++ )
+	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
 		if (!m_pMyInvWnd[i])
 			return i;
@@ -613,29 +643,31 @@ int CUIInventory::GetInvDestinationIndex(__IconItemSkill* spItem)
 	return -1;
 }
 
-int	CUIInventory::GetArmDestinationIndex(__IconItemSkill* spItem)
+int CUIInventory::GetArmDestinationIndex(__IconItemSkill* spItem)
 {
-	if( CN3UIWndBase::s_sSelectedIconInfo.pItemSelect == nullptr )
+	if (CN3UIWndBase::s_sSelectedIconInfo.pItemSelect == nullptr)
 		return false;
 
-	__TABLE_ITEM_BASIC*		pItem;
+	__TABLE_ITEM_BASIC* pItem;
 	__TABLE_ITEM_EXT* pItemExt = nullptr;
-	pItem = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemBasic;
-	pItemExt = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt;
+	pItem                      = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemBasic;
+	pItemExt                   = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt;
 
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
-	if(ITEM_TYPE_UNKNOWN == eType) return false;
+	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(
+		pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+	if (ITEM_TYPE_UNKNOWN == eType)
+		return false;
 
-	if ( IsValidRaceAndClass(pItem, CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt) )
+	if (IsValidRaceAndClass(pItem, CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt))
 	{
-		switch ( pItem->byAttachPoint )
+		switch (pItem->byAttachPoint)
 		{
 			case ITEM_ATTACH_POS_DUAL:
-				if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT] && m_pMySlot[ITEM_SLOT_POS_HAND_LEFT])	// 양쪽에 있는 경우..
-					return ITEM_SLOT_POS_HAND_RIGHT;				// 둘다 있으면 오른쪽..
-				if (!m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT])	// 오른쪽에 없는 경우..
+				if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT] && m_pMySlot[ITEM_SLOT_POS_HAND_LEFT]) // 양쪽에 있는 경우..
+					return ITEM_SLOT_POS_HAND_RIGHT;                                           // 둘다 있으면 오른쪽..
+				if (!m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT])                                      // 오른쪽에 없는 경우..
 					return ITEM_SLOT_POS_HAND_RIGHT;
 				else
 				{
@@ -652,29 +684,29 @@ int	CUIInventory::GetArmDestinationIndex(__IconItemSkill* spItem)
 			case ITEM_ATTACH_POS_HAND_LEFT:
 				return ITEM_SLOT_POS_HAND_LEFT;
 
-			case ITEM_ATTACH_POS_TWOHAND_RIGHT:				// 양손검을 오른손에 찰때..
-				if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT] && m_pMySlot[ITEM_SLOT_POS_HAND_LEFT])	// 양쪽에 있는 경우..
+			case ITEM_ATTACH_POS_TWOHAND_RIGHT:                                                // 양손검을 오른손에 찰때..
+				if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT] && m_pMySlot[ITEM_SLOT_POS_HAND_LEFT]) // 양쪽에 있는 경우..
 					return -1;
-				else 
+				else
 					return ITEM_SLOT_POS_HAND_RIGHT;
 
-			case ITEM_ATTACH_POS_TWOHAND_LEFT:				// 양손검을 오른손에 찰때..
-				if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT] && m_pMySlot[ITEM_SLOT_POS_HAND_LEFT])	// 양쪽에 있는 경우..
+			case ITEM_ATTACH_POS_TWOHAND_LEFT:                                                 // 양손검을 오른손에 찰때..
+				if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT] && m_pMySlot[ITEM_SLOT_POS_HAND_LEFT]) // 양쪽에 있는 경우..
 					return -1;
-				else 
+				else
 					return ITEM_SLOT_POS_HAND_LEFT;
 
 			case ITEM_ATTACH_POS_EAR:
-				if (!m_pMySlot[ITEM_SLOT_POS_EAR_RIGHT])	// 오른쪽에 없는 경우..
+				if (!m_pMySlot[ITEM_SLOT_POS_EAR_RIGHT]) // 오른쪽에 없는 경우..
 					return ITEM_SLOT_POS_EAR_RIGHT;
-				if (!m_pMySlot[ITEM_SLOT_POS_EAR_LEFT])		// 왼쪽에 없는 경우..
+				if (!m_pMySlot[ITEM_SLOT_POS_EAR_LEFT])  // 왼쪽에 없는 경우..
 					return ITEM_SLOT_POS_EAR_LEFT;
-				return ITEM_SLOT_POS_EAR_RIGHT;				// 둘다 있으면 오른쪽..
+				return ITEM_SLOT_POS_EAR_RIGHT;          // 둘다 있으면 오른쪽..
 
-			case ITEM_ATTACH_POS_HEAD:		
+			case ITEM_ATTACH_POS_HEAD:
 				return ITEM_SLOT_POS_HEAD;
 
-			case ITEM_ATTACH_POS_NECK:		
+			case ITEM_ATTACH_POS_NECK:
 				return ITEM_SLOT_POS_NECK;
 
 			case ITEM_ATTACH_POS_UPPER:
@@ -687,11 +719,11 @@ int	CUIInventory::GetArmDestinationIndex(__IconItemSkill* spItem)
 				return ITEM_SLOT_POS_BELT;
 
 			case ITEM_ATTACH_POS_FINGER:
-				if (!m_pMySlot[ITEM_SLOT_POS_RING_RIGHT])	// 오른쪽에 없는 경우..
+				if (!m_pMySlot[ITEM_SLOT_POS_RING_RIGHT]) // 오른쪽에 없는 경우..
 					return ITEM_SLOT_POS_RING_RIGHT;
-				if (!m_pMySlot[ITEM_SLOT_POS_RING_LEFT])		// 왼쪽에 없는 경우..
+				if (!m_pMySlot[ITEM_SLOT_POS_RING_LEFT])  // 왼쪽에 없는 경우..
 					return ITEM_SLOT_POS_RING_LEFT;
-				return ITEM_SLOT_POS_RING_RIGHT;				// 둘다 있으면 오른쪽..
+				return ITEM_SLOT_POS_RING_RIGHT;          // 둘다 있으면 오른쪽..
 
 			case ITEM_ATTACH_POS_LOWER:
 				return ITEM_SLOT_POS_LOWER;
@@ -704,7 +736,7 @@ int	CUIInventory::GetArmDestinationIndex(__IconItemSkill* spItem)
 			default:
 				return -1;
 		}
-	}			
+	}
 
 	return -1;
 }
@@ -712,44 +744,44 @@ int	CUIInventory::GetArmDestinationIndex(__IconItemSkill* spItem)
 bool CUIInventory::CheckIconDropIfSuccessSendToServer(__IconItemSkill* spItem)
 {
 	// 먼저 아이템이 들어갈 수 있는지 검사하고..
-	bool  bFound = false;
-	bool  bArm = true;
+	bool bFound = false;
+	bool bArm   = true;
 	CN3UIArea* pArea;
-	int   i, iDestiOrder;
+	int i, iDestiOrder;
 
 	if (!m_bRBtnProcessing)
 	{
 		POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
-		for( i = 0; i < ITEM_SLOT_COUNT; i++ )
+		for (i = 0; i < ITEM_SLOT_COUNT; i++)
 		{
 			pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SLOT, i);
-			if ( pArea && pArea->IsIn(ptCur.x, ptCur.y) )
+			if (pArea && pArea->IsIn(ptCur.x, ptCur.y))
 			{
-				bFound = true;
-				bArm = true;
+				bFound      = true;
+				bArm        = true;
 				iDestiOrder = i;
 				break;
 			}
 		}
-		if ( !bFound )
+		if (!bFound)
 		{
-			for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
+			for (i = 0; i < MAX_ITEM_INVENTORY; i++)
 			{
 				pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, i);
-				if ( pArea && pArea->IsIn(ptCur.x, ptCur.y) )
+				if (pArea && pArea->IsIn(ptCur.x, ptCur.y))
 				{
-					bFound = true;
-					bArm = false;
+					bFound      = true;
+					bArm        = false;
 					iDestiOrder = i;
 					break;
 				}
 			}
 		}
 
-		if ( !bFound )		// 못 찾았으면 인벤토리 캐릭터 영역 검색..
+		if (!bFound) // 못 찾았으면 인벤토리 캐릭터 영역 검색..
 		{
-			if ( m_pArea_User->IsIn(ptCur.x, ptCur.y) )
-			{	
+			if (m_pArea_User->IsIn(ptCur.x, ptCur.y))
+			{
 				// 인벤 영역의 아이콘이 아니면.. false return..
 				if (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict == UIWND_DISTRICT_INVENTORY_INV)
 				{
@@ -757,7 +789,7 @@ bool CUIInventory::CheckIconDropIfSuccessSendToServer(__IconItemSkill* spItem)
 					if (iDestiOrder != -1)
 					{
 						bFound = true;
-						bArm = true;
+						bArm   = true;
 					}
 				}
 			}
@@ -771,7 +803,7 @@ bool CUIInventory::CheckIconDropIfSuccessSendToServer(__IconItemSkill* spItem)
 			if (iDestiOrder != -1)
 			{
 				bFound = true;
-				bArm = true;
+				bArm   = true;
 			}
 		}
 		else
@@ -780,48 +812,50 @@ bool CUIInventory::CheckIconDropIfSuccessSendToServer(__IconItemSkill* spItem)
 			if (iDestiOrder != -1)
 			{
 				bFound = true;
-				bArm = false;
-			}				
+				bArm   = false;
+			}
 		}
 	}
 
-	if ( !bFound )	return false;	// 못 찾았으므로.. 실패..
+	if (!bFound)
+		return false; // 못 찾았으므로.. 실패..
 
-	// 본격적으로 Recovery Info를 활용하기 시작한다.. 
+	// 본격적으로 Recovery Info를 활용하기 시작한다..
 	// 먼저 WaitFromServer를 On으로 하고.. Select Info를 Recovery Info로 복사..
-	s_bWaitFromServer									= true;
-	s_sRecoveryJobInfo.pItemSource						= s_sSelectedIconInfo.pItemSelect;
-	s_sRecoveryJobInfo.UIWndSourceStart.UIWnd			= s_sSelectedIconInfo.UIWndSelect.UIWnd;
-	s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict	= s_sSelectedIconInfo.UIWndSelect.UIWndDistrict;
-	s_sRecoveryJobInfo.UIWndSourceStart.iOrder			= s_sSelectedIconInfo.UIWndSelect.iOrder;
-	s_sRecoveryJobInfo.UIWndSourceEnd.UIWnd				= UIWND_INVENTORY;
-	s_sRecoveryJobInfo.pItemTarget						= nullptr;
+	s_bWaitFromServer                                 = true;
+	s_sRecoveryJobInfo.pItemSource                    = s_sSelectedIconInfo.pItemSelect;
+	s_sRecoveryJobInfo.UIWndSourceStart.UIWnd         = s_sSelectedIconInfo.UIWndSelect.UIWnd;
+	s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict = s_sSelectedIconInfo.UIWndSelect.UIWndDistrict;
+	s_sRecoveryJobInfo.UIWndSourceStart.iOrder        = s_sSelectedIconInfo.UIWndSelect.iOrder;
+	s_sRecoveryJobInfo.UIWndSourceEnd.UIWnd           = UIWND_INVENTORY;
+	s_sRecoveryJobInfo.pItemTarget                    = nullptr;
 	// 검사하는 도중에 Recovery Info중에 pItemTarget를 필요하다면 작성하고 false를 리턴할때는 원래대로..
 
 	// Arm -> Arm
-	if ( (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict == UIWND_DISTRICT_INVENTORY_SLOT) && bArm )
+	if ((CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict == UIWND_DISTRICT_INVENTORY_SLOT) && bArm)
 	{
 		// 기존 아이콘이 있는지 살펴보고 기존 아이템이 없으면..
-		if ( !m_pMySlot[iDestiOrder] )
+		if (!m_pMySlot[iDestiOrder])
 		{
-			if ( IsValidPosFromArmToArm(iDestiOrder) )
+			if (IsValidPosFromArmToArm(iDestiOrder))
 			{
-				// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성.. 
+				// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성..
 				// 그리고 서버가 성공을 줄 경우 해야할 작업 정보를 작성..
-				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_SLOT;				
-				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder			= iDestiOrder;
+				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
+				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder        = iDestiOrder;
 
-				// Send To Server.. 
-				SendInvMsg(0x04, CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID+
-					CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID, 
+				// Send To Server..
+				SendInvMsg(0x04,
+					CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID
+						+ CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
 					CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder, iDestiOrder);
 				return true;
 			}
 			else
 			{
-				s_bWaitFromServer					= false;
-				s_sRecoveryJobInfo.pItemSource		= nullptr;
-				s_sRecoveryJobInfo.pItemTarget		= nullptr;
+				s_bWaitFromServer              = false;
+				s_sRecoveryJobInfo.pItemSource = nullptr;
+				s_sRecoveryJobInfo.pItemTarget = nullptr;
 				return false;
 			}
 		}
@@ -829,57 +863,59 @@ bool CUIInventory::CheckIconDropIfSuccessSendToServer(__IconItemSkill* spItem)
 		else
 		{
 			// 아이콘이 들어갈 수 있으면..
-			if ( IsValidPosFromArmToArm(iDestiOrder) )
+			if (IsValidPosFromArmToArm(iDestiOrder))
 			{
 				// 기존 아이콘 정보를 pItemTarget과 UIWndTargetStart를 셋팅하고..
-				CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget					= m_pMySlot[iDestiOrder];
-				CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd			= UIWND_INVENTORY;
+				CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget                    = m_pMySlot[iDestiOrder];
+				CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd         = UIWND_INVENTORY;
 				CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
-				CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder		= iDestiOrder;
-				CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd			= UIWND_INVENTORY;
+				CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder        = iDestiOrder;
+				CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd           = UIWND_INVENTORY;
 
 				// 그 반대도 가능하면..
-				if ( IsValidPosFromArmToArmInverse(CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder) )
+				if (IsValidPosFromArmToArmInverse(CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder))
 				{
-					// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성.. 
+					// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성..
 					// 그리고 서버가 성공을 줄 경우 해야할 작업 정보를 작성..
-					CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_SLOT;				
-					CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder			= iDestiOrder;
+					CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
+					CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder        = iDestiOrder;
 
-					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_SLOT;
-					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder			= CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
+					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
+					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder = CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
 
-					// Send To Server.. 
-					SendInvMsg(0x04, CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID+
-						CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID, 
+					// Send To Server..
+					SendInvMsg(0x04,
+						CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID
+							+ CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
 						CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder, iDestiOrder);
 					return true;
 				}
 			}
 			else
 			{
-				s_bWaitFromServer					= false;
-				s_sRecoveryJobInfo.pItemSource		= nullptr;
-				s_sRecoveryJobInfo.pItemTarget		= nullptr;
+				s_bWaitFromServer              = false;
+				s_sRecoveryJobInfo.pItemSource = nullptr;
+				s_sRecoveryJobInfo.pItemTarget = nullptr;
 				return false;
 			}
 		}
 	}
 	// Arm -> Inv
-	else if ( (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict == UIWND_DISTRICT_INVENTORY_SLOT) && !bArm )
+	else if ((CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict == UIWND_DISTRICT_INVENTORY_SLOT) && !bArm)
 	{
 		// 기존 아이콘이 있는지 살펴보고 기존 아이템이 없으면..
-		if ( !m_pMyInvWnd[iDestiOrder] )
+		if (!m_pMyInvWnd[iDestiOrder])
 		{
 			// 아이콘은 당연히 들어갈 수 있당.. ^^
-			// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성.. 
+			// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성..
 			// 그리고 서버가 성공을 줄 경우 해야할 작업 정보를 작성..
-			CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;				
-			CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder			= iDestiOrder;
+			CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict = UIWND_DISTRICT_INVENTORY_INV;
+			CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder        = iDestiOrder;
 
-			// Send To Server.. 
-			SendInvMsg(0x02, CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID+
-				CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID, 
+			// Send To Server..
+			SendInvMsg(0x02,
+				CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID
+					+ CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
 				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder, iDestiOrder);
 			return true;
 		}
@@ -888,287 +924,296 @@ bool CUIInventory::CheckIconDropIfSuccessSendToServer(__IconItemSkill* spItem)
 		{
 			// 인벤토리 빈슬롯을 찾아 들어간다..
 			bFound = false;
-			for( i = 0; i < MAX_ITEM_INVENTORY; i++ )
+			for (i = 0; i < MAX_ITEM_INVENTORY; i++)
 			{
-				if ( !m_pMyInvWnd[i] )
+				if (!m_pMyInvWnd[i])
 				{
 					bFound = true;
 					break;
 				}
 			}
 
-			if ( bFound )	// 빈 슬롯을 찾았으면..
+			if (bFound) // 빈 슬롯을 찾았으면..
 			{
-				// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성.. 
+				// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성..
 				// 그리고 서버가 성공을 줄 경우 해야할 작업 정보를 작성..
-				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;				
-				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder			= i;
+				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict = UIWND_DISTRICT_INVENTORY_INV;
+				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder        = i;
 
-				// Send To Server.. 
-				SendInvMsg(0x02, CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID+
-					CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID, 
+				// Send To Server..
+				SendInvMsg(0x02,
+					CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID
+						+ CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
 					CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder, i);
 				return true;
 			}
 			else
 			{
-				s_bWaitFromServer				= false;
-				s_sRecoveryJobInfo.pItemSource	= nullptr;
-				s_sRecoveryJobInfo.pItemTarget	= nullptr;
+				s_bWaitFromServer              = false;
+				s_sRecoveryJobInfo.pItemSource = nullptr;
+				s_sRecoveryJobInfo.pItemTarget = nullptr;
 				return false;
 			}
 		}
 	}
 	// Inv -> Arm
-	else if ( (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict == UIWND_DISTRICT_INVENTORY_INV) && bArm )
+	else if ((CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict == UIWND_DISTRICT_INVENTORY_INV) && bArm)
 	{
 		// 검에 장착하는 경우는 기존 아이콘이 있는지 살펴볼 필요가 없다.. 왜냐면, 검사하는 함수가 하니까..
 		// 기존 아이콘이 있는지 살펴보고 기존 아이템이 없으면..
-		if ( !m_pMySlot[iDestiOrder] )
+		if (!m_pMySlot[iDestiOrder])
 		{
-			if ( IsValidPosFromInvToArm(iDestiOrder) )
+			if (IsValidPosFromInvToArm(iDestiOrder))
 			{
-				// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성.. 
+				// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성..
 				// 그리고 서버가 성공을 줄 경우 해야할 작업 정보를 작성..
-				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_SLOT;				
-				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder			= iDestiOrder;
+				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
+				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder        = iDestiOrder;
 
-				// Send To Server.. 
-				SendInvMsg(0x01, CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID+
-					CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID, 
+				// Send To Server..
+				SendInvMsg(0x01,
+					CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID
+						+ CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
 					CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder, iDestiOrder);
 				return true;
 			}
 			else
 			{
-				s_bWaitFromServer					= false;
-				s_sRecoveryJobInfo.pItemSource		= nullptr;
-				s_sRecoveryJobInfo.pItemTarget		= nullptr;
+				s_bWaitFromServer              = false;
+				s_sRecoveryJobInfo.pItemSource = nullptr;
+				s_sRecoveryJobInfo.pItemTarget = nullptr;
 				return false;
 			}
 		}
 		// 기존 아이콘이 있으면..
 		else
 		{
-			if ( IsValidPosFromInvToArm(iDestiOrder) )
+			if (IsValidPosFromInvToArm(iDestiOrder))
 			{
-				// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성.. 
+				// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성..
 				// 그리고 서버가 성공을 줄 경우 해야할 작업 정보를 작성..
-				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_SLOT;				
-				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder			= iDestiOrder;
+				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
+				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder        = iDestiOrder;
 
 				// 검에 장착하는 경우가 아니면..
-				if ( (iDestiOrder != ITEM_SLOT_POS_HAND_RIGHT) && (iDestiOrder != ITEM_SLOT_POS_HAND_LEFT) )
+				if ((iDestiOrder != ITEM_SLOT_POS_HAND_RIGHT) && (iDestiOrder != ITEM_SLOT_POS_HAND_LEFT))
 				{
-					CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget					= m_pMySlot[iDestiOrder];
-					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd			= UIWND_INVENTORY;
+					CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget                    = m_pMySlot[iDestiOrder];
+					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd         = UIWND_INVENTORY;
 					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
-					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder		= iDestiOrder;
-					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd			= UIWND_INVENTORY;
-					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;
-					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder			= CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
+					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder        = iDestiOrder;
+					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd           = UIWND_INVENTORY;
+					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict   = UIWND_DISTRICT_INVENTORY_INV;
+					CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder = CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
 				}
-				// Send To Server.. 
-				SendInvMsg(0x01, CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID+
-					CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID, 
+				// Send To Server..
+				SendInvMsg(0x01,
+					CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID
+						+ CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
 					CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder, iDestiOrder);
 				return true;
 			}
 			else
 			{
-				s_bWaitFromServer					= false;
-				s_sRecoveryJobInfo.pItemSource		= nullptr;
-				s_sRecoveryJobInfo.pItemTarget		= nullptr;
+				s_bWaitFromServer              = false;
+				s_sRecoveryJobInfo.pItemSource = nullptr;
+				s_sRecoveryJobInfo.pItemTarget = nullptr;
 				return false;
 			}
 		}
 	}
 	// Inv -> Inv
-	else if ( (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict == UIWND_DISTRICT_INVENTORY_INV) && !bArm )
+	else if ((CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict == UIWND_DISTRICT_INVENTORY_INV) && !bArm)
 	{
 		// 기존 아이콘이 있는지 살펴보고 기존 아이템이 없으면..
-		if ( !m_pMyInvWnd[iDestiOrder] )
+		if (!m_pMyInvWnd[iDestiOrder])
 		{
-			// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성.. 
+			// 아이콘이 들어갈 수 있으면.. 서버가 실패를 줄 경우를 대비해서 백업 정보를 작성..
 			// 그리고 서버가 성공을 줄 경우 해야할 작업 정보를 작성..
-			CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;				
-			CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder			= iDestiOrder;
+			CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict = UIWND_DISTRICT_INVENTORY_INV;
+			CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder        = iDestiOrder;
 
-			// Send To Server.. 
-			SendInvMsg(0x03, CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID+
-				CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID, 
+			// Send To Server..
+			SendInvMsg(0x03,
+				CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID
+					+ CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
 				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder, iDestiOrder);
 			return true;
 		}
-		// 기존 아이콘이 있으면.. 
+		// 기존 아이콘이 있으면..
 		else
 		{
-			CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;				
-			CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder			= iDestiOrder;
+			CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict   = UIWND_DISTRICT_INVENTORY_INV;
+			CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder          = iDestiOrder;
 
-			CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget					= m_pMyInvWnd[iDestiOrder];
-			CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd			= UIWND_INVENTORY;
+			CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget                    = m_pMyInvWnd[iDestiOrder];
+			CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd         = UIWND_INVENTORY;
 			CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict = UIWND_DISTRICT_INVENTORY_INV;
-			CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder		= iDestiOrder;
-			CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd			= UIWND_INVENTORY;
-			CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;
-			CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder			= CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
-			// Send To Server.. 
-			SendInvMsg(0x03, CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID+
-				CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID, 
+			CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder        = iDestiOrder;
+			CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd           = UIWND_INVENTORY;
+			CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict   = UIWND_DISTRICT_INVENTORY_INV;
+			CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder          = CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
+			// Send To Server..
+			SendInvMsg(0x03,
+				CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic->dwID
+					+ CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt->dwID,
 				CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder, iDestiOrder);
 			return true;
 		}
 	}
-	
-	s_bWaitFromServer					= false;
-	s_sRecoveryJobInfo.pItemSource		= nullptr;
-	s_sRecoveryJobInfo.pItemTarget		= nullptr;
+
+	s_bWaitFromServer              = false;
+	s_sRecoveryJobInfo.pItemSource = nullptr;
+	s_sRecoveryJobInfo.pItemTarget = nullptr;
 	return false;
 }
 
-inline	bool CUIInventory::InvOpsSomething(__IconItemSkill* spItem)
+inline bool CUIInventory::InvOpsSomething(__IconItemSkill* spItem)
 {
-	if (!spItem) return false;
+	if (!spItem)
+		return false;
 	CN3UIArea* pArea = nullptr;
 
 	// 검사한다..성공이면 서버에게 보냄..
-	if ( CheckIconDropIfSuccessSendToServer(spItem) )												
-	{																								
+	if (CheckIconDropIfSuccessSendToServer(spItem))
+	{
 		// 아이콘 이동.. Source.. 같은 아이콘 내에서 움직이는 거면.. 굳이 제거하고 추가할  필요없이 이동만 하면 된다..
-		if ( CN3UIWndBase::s_sRecoveryJobInfo.pItemSource )											
-		{																							
+		if (CN3UIWndBase::s_sRecoveryJobInfo.pItemSource)
+		{
 			// 제거..
-			switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict )				
-			{																						
-				case UIWND_DISTRICT_INVENTORY_SLOT:														
-					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;		
-					break;																			
+			switch (CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict)
+			{
+				case UIWND_DISTRICT_INVENTORY_SLOT:
+					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
+					break;
 
-				case UIWND_DISTRICT_INVENTORY_INV:													
-					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;	
-					break;																			
-			}																						
-		}																							
-		if ( CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget )											
-		{																							
+				case UIWND_DISTRICT_INVENTORY_INV:
+					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
+					break;
+			}
+		}
+		if (CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget)
+		{
 			// 제거..
-			switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict )				
-			{																							
-				case UIWND_DISTRICT_INVENTORY_SLOT:													
-					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder] = nullptr;		
-					break;																			
+			switch (CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict)
+			{
+				case UIWND_DISTRICT_INVENTORY_SLOT:
+					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder] = nullptr;
+					break;
 
-				case UIWND_DISTRICT_INVENTORY_INV:													
-					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder] = nullptr;	
-					break;																				
-			}																						
-		}																							
+				case UIWND_DISTRICT_INVENTORY_INV:
+					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder] = nullptr;
+					break;
+			}
+		}
 
 		// 아이콘 이동.. Source.. 같은 아이콘 내에서 움직이는 거면.. 굳이 제거하고 추가할  필요없이 이동만 하면 된다..
-		if ( CN3UIWndBase::s_sRecoveryJobInfo.pItemSource )											
-		{																								
-			__IconItemSkill*	spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource;				
+		if (CN3UIWndBase::s_sRecoveryJobInfo.pItemSource)
+		{
+			__IconItemSkill* spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource;
 
 			// 추가..
-			switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict )				
-			{																						
-				case UIWND_DISTRICT_INVENTORY_SLOT:													
-					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SLOT, CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder);	
-					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItem;												
-					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());				
-					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());			
-					break;																													
+			switch (CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict)
+			{
+				case UIWND_DISTRICT_INVENTORY_SLOT:
+					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SLOT, CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder);
+					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItem;
+					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
+					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
+					break;
 
-				case UIWND_DISTRICT_INVENTORY_INV:																							
-					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder);	
-					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItem;											
-					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());			
-					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());			
-					break;																													
-			}																																
-		}																																	
+				case UIWND_DISTRICT_INVENTORY_INV:
+					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder);
+					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = spItem;
+					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
+					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
+					break;
+			}
+		}
 
-		if ( CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget )																					
-		{																																	
-			__IconItemSkill*	spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget;														
+		if (CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget)
+		{
+			__IconItemSkill* spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget;
 
 			// 추가..
-			switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict )														
-			{																																
-				case UIWND_DISTRICT_INVENTORY_SLOT:																								
-					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SLOT, CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder);	
-					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder] = spItem;												
-					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());				
-					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());			
-					break;																													
+			switch (CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict)
+			{
+				case UIWND_DISTRICT_INVENTORY_SLOT:
+					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SLOT, CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder);
+					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder] = spItem;
+					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
+					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
+					break;
 
-				case UIWND_DISTRICT_INVENTORY_INV:																							
-					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder);		
-					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder] = spItem;													
-					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());			
-					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());			
-					break;																													
-			}																																
-		}																																	
+				case UIWND_DISTRICT_INVENTORY_INV:
+					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder);
+					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder] = spItem;
+					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
+					m_pMyInvWnd[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
+					break;
+			}
+		}
 
-		CN3UIWndBase::AllHighLightIconFree();																								
-		SetState(UI_STATE_COMMON_NONE);																										
-		return true;																														
-	}																																		
-	else																																	
-	{																																		
-		CN3UIWndBase::AllHighLightIconFree();																								
-		SetState(UI_STATE_COMMON_NONE);																										
-		return false;																														
-	}			
+		CN3UIWndBase::AllHighLightIconFree();
+		SetState(UI_STATE_COMMON_NONE);
+		return true;
+	}
+	else
+	{
+		CN3UIWndBase::AllHighLightIconFree();
+		SetState(UI_STATE_COMMON_NONE);
+		return false;
+	}
 }
 
 bool CUIInventory::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 {
 	CN3UIArea* pArea = nullptr;
 
-	if (!m_bVisible) return false;
-	if (!spItem) return false;
+	if (!m_bVisible)
+		return false;
+	if (!spItem)
+		return false;
 
 	// 내가 가졌던 아이콘이 아니면..
-	if ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd != m_eUIWnd )
+	if (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd != m_eUIWnd)
 		return false;
 
 	// 내가 가졌던 아이콘이고 인벤토리 내에서 즉, Arm->Arm, Arm->Inv, Inv->Arm, Inv->Inv이다..
-	// 선택된 아이콘과 같으면.. 
-	switch ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict )
+	// 선택된 아이콘과 같으면..
+	switch (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict)
 	{
 		case UIWND_DISTRICT_INVENTORY_SLOT:
 			pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SLOT, CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder);
-			break;	
+			break;
 
 		case UIWND_DISTRICT_INVENTORY_INV:
 			pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder);
-			break;	
+			break;
 	}
 
-	if ( (pArea) && (pArea->IsIn(ptCur.x, ptCur.y)) )
+	if ((pArea) && (pArea->IsIn(ptCur.x, ptCur.y)))
 	{
-		if (GetState()  == UI_STATE_ICON_MOVING)
+		if (GetState() == UI_STATE_ICON_MOVING)
 		{
-			if (spItem) PlayItemSound(spItem->pItemBasic);
-			CN3UIWndBase::AllHighLightIconFree();																								
-			SetState(UI_STATE_COMMON_NONE);																										
+			if (spItem)
+				PlayItemSound(spItem->pItemBasic);
+			CN3UIWndBase::AllHighLightIconFree();
+			SetState(UI_STATE_COMMON_NONE);
 			return false;
 		}
 	}
-	else if ( m_pArea_Destroy->IsIn(ptCur.x, ptCur.y) )
+	else if (m_pArea_Destroy->IsIn(ptCur.x, ptCur.y))
 	{
 		m_bDestoyDlgAlive = true;
 
 		// 움직일 수 없다..
-		RECT rect = { 0, 0, 0, 0 };
+		RECT rect         = { 0, 0, 0, 0 };
 
-		switch ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict )
+		switch (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict)
 		{
 			case UIWND_DISTRICT_INVENTORY_SLOT:
-				if ( m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr )
+				if (m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
 				{
 					m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(m_pArea_Destroy->GetRegion());
 					m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(rect);
@@ -1176,7 +1221,7 @@ bool CUIInventory::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 				break;
 
 			case UIWND_DISTRICT_INVENTORY_INV:
-				if ( m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr )
+				if (m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
 				{
 					m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(m_pArea_Destroy->GetRegion());
 					m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(rect);
@@ -1184,13 +1229,13 @@ bool CUIInventory::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 				break;
 		}
 
-		CN3UIWndBase::s_sRecoveryJobInfo.pItemSource					= CN3UIWndBase::s_sSelectedIconInfo.pItemSelect;
-		CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.UIWnd			= CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd;
+		CN3UIWndBase::s_sRecoveryJobInfo.pItemSource                    = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect;
+		CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.UIWnd         = CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd;
 		CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict = CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict;
-		CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder		= CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder;
+		CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder        = CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder;
 
-		CN3UIWndBase::AllHighLightIconFree();																								
-		SetState(UI_STATE_COMMON_NONE);	
+		CN3UIWndBase::AllHighLightIconFree();
+		SetState(UI_STATE_COMMON_NONE);
 		return true;
 	}
 	else
@@ -1203,84 +1248,91 @@ void CUIInventory::ReceiveResultFromServer(uint8_t bResult)
 {
 	CN3UIArea* pArea = nullptr;
 
-	if (bResult == 0x01)		// 성공..
+	if (bResult == 0x01) // 성공..
 	{
 		// 아이콘은 바뀌었으니 실제 데이터를 이동..
-		if ( CN3UIWndBase::s_sRecoveryJobInfo.pItemSource )
+		if (CN3UIWndBase::s_sRecoveryJobInfo.pItemSource)
 		{
-			__IconItemSkill*	spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource;
-			e_ItemSlot eSlot = ITEM_SLOT_UNKNOWN;
+			__IconItemSkill* spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource;
+			e_ItemSlot eSlot        = ITEM_SLOT_UNKNOWN;
 
 			// 제거..
-			switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict )
+			switch (CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict)
 			{
 				case UIWND_DISTRICT_INVENTORY_SLOT:
-					eSlot = (e_ItemSlot)CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
-					if (!spItem) return;
+					eSlot = (e_ItemSlot) CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
+					if (!spItem)
+						return;
 					this->ItemDelete(spItem->pItemBasic, spItem->pItemExt, eSlot);
 					break;
 			}
 		}
 
-		if ( CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget )
+		if (CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget)
 		{
-			__IconItemSkill*	spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget;
-			if (!spItem) return;
+			__IconItemSkill* spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget;
+			if (!spItem)
+				return;
 			e_ItemSlot eSlot = ITEM_SLOT_UNKNOWN;
 
 			// 제거..
-			switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict )
+			switch (CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict)
 			{
 				case UIWND_DISTRICT_INVENTORY_SLOT:
-					eSlot = (e_ItemSlot)CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder;
-					if (!spItem) return;
-					this->ItemDelete(spItem->pItemBasic,  spItem->pItemExt, eSlot);
+					eSlot = (e_ItemSlot) CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder;
+					if (!spItem)
+						return;
+					this->ItemDelete(spItem->pItemBasic, spItem->pItemExt, eSlot);
 					break;
 			}
 		}
 
 		// 아이콘은 바뀌었으니 실제 데이터를 이동..
-		if ( CN3UIWndBase::s_sRecoveryJobInfo.pItemSource )
+		if (CN3UIWndBase::s_sRecoveryJobInfo.pItemSource)
 		{
-			__IconItemSkill*	spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource;
-			if (!spItem) return;
+			__IconItemSkill* spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource;
+			if (!spItem)
+				return;
 
 			// 추가..
 			e_ItemSlot eSlot = ITEM_SLOT_UNKNOWN;
-			switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict )
+			switch (CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict)
 			{
 				case UIWND_DISTRICT_INVENTORY_SLOT:
-					eSlot = (e_ItemSlot)CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder;
-					if (!spItem) return;
+					eSlot = (e_ItemSlot) CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder;
+					if (!spItem)
+						return;
 					ItemAdd(spItem->pItemBasic, spItem->pItemExt, eSlot);
 					break;
 			}
 		}
 
-		if ( CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget )
+		if (CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget)
 		{
-			__IconItemSkill*	spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget;
-			if (!spItem) return;
+			__IconItemSkill* spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget;
+			if (!spItem)
+				return;
 			e_ItemSlot eSlot = ITEM_SLOT_UNKNOWN;
 
 			// 추가..
-			switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict )
+			switch (CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict)
 			{
 				case UIWND_DISTRICT_INVENTORY_SLOT:
-					eSlot = (e_ItemSlot)CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder;
-					if (!spItem) return;
+					eSlot = (e_ItemSlot) CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder;
+					if (!spItem)
+						return;
 					ItemAdd(spItem->pItemBasic, spItem->pItemExt, eSlot);
 					break;
 			}
 		}
 	}
-	else						// 실패..
+	else // 실패..
 	{
 		// 아이콘을 원상태로..
-		if ( CN3UIWndBase::s_sRecoveryJobInfo.pItemSource )
+		if (CN3UIWndBase::s_sRecoveryJobInfo.pItemSource)
 		{
 			// 제거..
-			switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict )
+			switch (CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.UIWndDistrict)
 			{
 				case UIWND_DISTRICT_INVENTORY_SLOT:
 					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceEnd.iOrder] = nullptr;
@@ -1293,10 +1345,10 @@ void CUIInventory::ReceiveResultFromServer(uint8_t bResult)
 		}
 
 		// 아이콘 이동.. Target..
-		if ( CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget )
+		if (CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget)
 		{
 			// 제거..
-			switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict )
+			switch (CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict)
 			{
 				case UIWND_DISTRICT_INVENTORY_SLOT:
 					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder] = nullptr;
@@ -1308,12 +1360,12 @@ void CUIInventory::ReceiveResultFromServer(uint8_t bResult)
 			}
 		}
 
-		if ( CN3UIWndBase::s_sRecoveryJobInfo.pItemSource )
+		if (CN3UIWndBase::s_sRecoveryJobInfo.pItemSource)
 		{
-			__IconItemSkill*	spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource;
+			__IconItemSkill* spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource;
 
 			// 추가..
-			switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict )
+			switch (CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict)
 			{
 				case UIWND_DISTRICT_INVENTORY_SLOT:
 					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SLOT, CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder);
@@ -1332,12 +1384,12 @@ void CUIInventory::ReceiveResultFromServer(uint8_t bResult)
 		}
 
 		// 아이콘 이동.. Target..
-		if ( CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget )
+		if (CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget)
 		{
-			__IconItemSkill*	spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget;
+			__IconItemSkill* spItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget;
 
 			// 추가..
-			switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict )
+			switch (CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict)
 			{
 				case UIWND_DISTRICT_INVENTORY_SLOT:
 					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SLOT, CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder);
@@ -1359,12 +1411,14 @@ void CUIInventory::ReceiveResultFromServer(uint8_t bResult)
 	CN3UIWndBase::AllHighLightIconFree();
 	SetState(UI_STATE_COMMON_NONE);
 
-	s_bWaitFromServer				= false;
-	s_sRecoveryJobInfo.pItemSource	= nullptr;
-	s_sRecoveryJobInfo.pItemTarget	= nullptr;
+	s_bWaitFromServer              = false;
+	s_sRecoveryJobInfo.pItemSource = nullptr;
+	s_sRecoveryJobInfo.pItemTarget = nullptr;
 
-	if (CGameProcedure::s_pProcMain->m_pUISkillTreeDlg) CGameProcedure::s_pProcMain->m_pUISkillTreeDlg->UpdateDisableCheck();
-	if (CGameProcedure::s_pProcMain->m_pUIHotKeyDlg) CGameProcedure::s_pProcMain->m_pUIHotKeyDlg->UpdateDisableCheck();
+	if (CGameProcedure::s_pProcMain->m_pUISkillTreeDlg)
+		CGameProcedure::s_pProcMain->m_pUISkillTreeDlg->UpdateDisableCheck();
+	if (CGameProcedure::s_pProcMain->m_pUIHotKeyDlg)
+		CGameProcedure::s_pProcMain->m_pUIHotKeyDlg->UpdateDisableCheck();
 }
 
 void CUIInventory::CancelIconDrop(__IconItemSkill* spItem)
@@ -1383,13 +1437,13 @@ void CUIInventory::IconRestore()
 {
 	CN3UIArea* pArea;
 
-	switch ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict )
+	switch (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict)
 	{
 		case UIWND_DISTRICT_INVENTORY_SLOT:
-			if ( m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr )
+			if (m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
 			{
 				pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SLOT, CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder);
-				if ( pArea )
+				if (pArea)
 				{
 					m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
 					m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
@@ -1398,10 +1452,10 @@ void CUIInventory::IconRestore()
 			break;
 
 		case UIWND_DISTRICT_INVENTORY_INV:
-			if ( m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr )
+			if (m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
 			{
 				pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder);
-				if ( pArea )
+				if (pArea)
 				{
 					m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
 					m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
@@ -1414,7 +1468,7 @@ void CUIInventory::IconRestore()
 int CUIInventory::GetIndexInArea(POINT pt)
 {
 	CN3UIArea* pArea;
-	RECT	rect;
+	RECT rect;
 
 	for (int i = 0; i < ITEM_SLOT_COUNT; i++)
 	{
@@ -1424,7 +1478,7 @@ int CUIInventory::GetIndexInArea(POINT pt)
 		{
 			rect = pArea->GetRegion();
 
-			if ( (pt.x >= rect.left) && (pt.x <= rect.right) && (pt.y >= rect.top) && (pt.y <= rect.bottom) )
+			if ((pt.x >= rect.left) && (pt.x <= rect.right) && (pt.y >= rect.top) && (pt.y <= rect.bottom))
 				return i;
 		}
 	}
@@ -1437,7 +1491,7 @@ int CUIInventory::GetIndexInArea(POINT pt)
 		{
 			rect = pArea->GetRegion();
 
-			if ( (pt.x >= rect.left) && (pt.x <= rect.right) && (pt.y >= rect.top) && (pt.y <= rect.bottom) )
+			if ((pt.x >= rect.left) && (pt.x <= rect.right) && (pt.y >= rect.top) && (pt.y <= rect.bottom))
 				return i + ITEM_SLOT_COUNT;
 		}
 	}
@@ -1448,19 +1502,21 @@ int CUIInventory::GetIndexInArea(POINT pt)
 bool CUIInventory::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
 // Temp Define
-#define FAIL_CODE {		\
-				SetState(UI_STATE_COMMON_NONE);	\
-				return false;	\
-			}
+#define FAIL_CODE                       \
+	{                                   \
+		SetState(UI_STATE_COMMON_NONE); \
+		return false;                   \
+	}
 
-// Code Begin
-	if(nullptr == pSender) return false;
+	// Code Begin
+	if (nullptr == pSender)
+		return false;
 	__IconItemSkill* spItem = nullptr;
 	e_UIWND_DISTRICT eUIWnd;
 	int iOrder;
 	uint32_t dwBitMask = 0x0f1f0000;
 
-	if (dwMsg == UIMSG_BUTTON_CLICK)					
+	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
 		if (pSender->m_szID == "btn_close")
 		{
@@ -1479,7 +1535,8 @@ bool CUIInventory::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		}
 	}
 
-	if (m_eInvenState == INV_STATE_REPAIR) FAIL_CODE
+	if (m_eInvenState == INV_STATE_REPAIR)
+		FAIL_CODE
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
 
 	switch (dwMsg & dwBitMask)
@@ -1489,107 +1546,112 @@ bool CUIInventory::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			break;
 
 		case UIMSG_ICON_RUP:
+		{
+			int iRBtn = GetIndexInArea(ptCur);
+			if (iRBtn != -1 && m_iRBtnDownOffs != -1 && m_iRBtnDownOffs == iRBtn)
 			{
-				int iRBtn = GetIndexInArea(ptCur);
-				if (iRBtn != -1 && m_iRBtnDownOffs != -1 && m_iRBtnDownOffs == iRBtn)
+				bool bSlot;
+				if ((iRBtn - ITEM_SLOT_COUNT) >= 0)
 				{
-					bool bSlot;
-					if ((iRBtn - ITEM_SLOT_COUNT) >= 0)
-					{
-						bSlot = false;
-						iRBtn -= ITEM_SLOT_COUNT;
-					}
-					else
-						bSlot = true;
-					
-					// Get Item..
-					spItem = GetHighlightIconItem((CN3UIIcon* )pSender);
-					
-					CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd = UIWND_INVENTORY;
-					CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder = iRBtn;
-					CN3UIWndBase::s_sSelectedIconInfo.pItemSelect = spItem;
-
-					// player right-clicked on an equipped item
-					if (bSlot)
-					{
-						CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
-					}
-					// player right-clicked on item which is not equipped
-					else
-					{
-						CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict = UIWND_DISTRICT_INVENTORY_INV;
-
-						// determine if there's an empty slot on the skillbar (CUIHotKeyDlg)
-						// if so, we should allocate an icon there
-						CUIHotKeyDlg* pDlg = CGameProcedure::s_pProcMain->m_pUIHotKeyDlg;
-						int iIndex;
-						if (pDlg->GetEmptySlotIndex(iIndex))
-						{
-							CN3UIWndBase::s_sSkillSelectInfo.UIWnd = UIWND_INVENTORY;
-
-							if (pDlg->SetReceiveSelectedItem(iIndex))
-								return true;
-						}
-					}
-
-					if (spItem) PlayItemSound(spItem->pItemBasic);
-
-					//..
-					m_bRBtnProcessing = true;
-					InvOpsSomething(spItem);
-					m_bRBtnProcessing = false;
+					bSlot  = false;
+					iRBtn -= ITEM_SLOT_COUNT;
 				}
+				else
+					bSlot = true;
+
+				// Get Item..
+				spItem                                               = GetHighlightIconItem((CN3UIIcon*) pSender);
+
+				CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd  = UIWND_INVENTORY;
+				CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder = iRBtn;
+				CN3UIWndBase::s_sSelectedIconInfo.pItemSelect        = spItem;
+
+				// player right-clicked on an equipped item
+				if (bSlot)
+				{
+					CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
+				}
+				// player right-clicked on item which is not equipped
+				else
+				{
+					CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict = UIWND_DISTRICT_INVENTORY_INV;
+
+					// determine if there's an empty slot on the skillbar (CUIHotKeyDlg)
+					// if so, we should allocate an icon there
+					CUIHotKeyDlg* pDlg                                          = CGameProcedure::s_pProcMain->m_pUIHotKeyDlg;
+					int iIndex;
+					if (pDlg->GetEmptySlotIndex(iIndex))
+					{
+						CN3UIWndBase::s_sSkillSelectInfo.UIWnd = UIWND_INVENTORY;
+
+						if (pDlg->SetReceiveSelectedItem(iIndex))
+							return true;
+					}
+				}
+
+				if (spItem)
+					PlayItemSound(spItem->pItemBasic);
+
+				//..
+				m_bRBtnProcessing = true;
+				InvOpsSomething(spItem);
+				m_bRBtnProcessing = false;
 			}
-			break;
+		}
+		break;
 
 		// NOTE: These events are the same.
 		// UIMSG_AREA_DOWN_FIRST was only used for the inventory, but they're otherwise identical.
 		// case UIMSG_AREA_DOWN_FIRST:
 		case UIMSG_BUTTON_CLICK:
-			// 개인간 거래중이고.. 내 아이디가 "area_gold"이면..  
+			// 개인간 거래중이고.. 내 아이디가 "area_gold"이면..
 			// SubProcPerTrade에 함수를 호출..	( 그 함수는 edit하는 중이 아니면.. 호출)
-			if ( (CGameProcedure::s_pProcMain->m_pSubProcPerTrade->m_ePerTradeState == PER_TRADE_STATE_NORMAL) &&
-				(pSender->m_szID.compare("area_gold") == 0)	)
-					CGameProcedure::s_pProcMain->m_pSubProcPerTrade->RequestItemCountEdit();
-				break;
+			if ((CGameProcedure::s_pProcMain->m_pSubProcPerTrade->m_ePerTradeState == PER_TRADE_STATE_NORMAL)
+				&& (pSender->m_szID.compare("area_gold") == 0))
+				CGameProcedure::s_pProcMain->m_pSubProcPerTrade->RequestItemCountEdit();
+			break;
 			break;
 
 		case UIMSG_ICON_DOWN_FIRST:
 			CN3UIWndBase::AllHighLightIconFree();
 
 			// Get Item..
-			spItem = GetHighlightIconItem((CN3UIIcon* )pSender);
+			spItem                                              = GetHighlightIconItem((CN3UIIcon*) pSender);
 
 			// Save Select Info..
 			CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd = UIWND_INVENTORY;
-			eUIWnd = GetWndDistrict(spItem);
-			if ( eUIWnd == UIWND_DISTRICT_UNKNOWN )	FAIL_CODE
+			eUIWnd                                              = GetWndDistrict(spItem);
+			if (eUIWnd == UIWND_DISTRICT_UNKNOWN)
+				FAIL_CODE
 			CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict = eUIWnd;
-			iOrder = GetItemiOrder(spItem, eUIWnd);
-			if ( iOrder == -1 )	FAIL_CODE
+			iOrder                                                      = GetItemiOrder(spItem, eUIWnd);
+			if (iOrder == -1)
+				FAIL_CODE
 			CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder = iOrder;
-			CN3UIWndBase::s_sSelectedIconInfo.pItemSelect = spItem;
+			CN3UIWndBase::s_sSelectedIconInfo.pItemSelect        = spItem;
 			// Do Ops..
-			((CN3UIIcon* )pSender)->SetRegion(GetSampleRect());
-			((CN3UIIcon* )pSender)->SetMoveRect(GetSampleRect());
+			((CN3UIIcon*) pSender)->SetRegion(GetSampleRect());
+			((CN3UIIcon*) pSender)->SetMoveRect(GetSampleRect());
 			// Sound..
-			if (spItem) PlayItemSound(spItem->pItemBasic);
+			if (spItem)
+				PlayItemSound(spItem->pItemBasic);
 			break;
 
 		case UIMSG_ICON_UP:
 			// 아이콘 매니저 윈도우들을 돌아 다니면서 검사..
-			if ( !CGameProcedure::s_pUIMgr->BroadcastIconDropMsg(CN3UIWndBase::s_sSelectedIconInfo.pItemSelect) )
+			if (!CGameProcedure::s_pUIMgr->BroadcastIconDropMsg(CN3UIWndBase::s_sSelectedIconInfo.pItemSelect))
 				// 아이콘 위치 원래대로..
 				IconRestore();
 			else
 			{
-				if (CN3UIWndBase::s_sSelectedIconInfo.pItemSelect) PlayItemSound(CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemBasic);
+				if (CN3UIWndBase::s_sSelectedIconInfo.pItemSelect)
+					PlayItemSound(CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemBasic);
 			}
 			SetState(UI_STATE_COMMON_NONE);
 			break;
 
 		case UIMSG_ICON_DOWN:
-			if ( GetState()  == UI_STATE_ICON_MOVING )
+			if (GetState() == UI_STATE_ICON_MOVING)
 			{
 				CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pUIIcon->SetRegion(GetSampleRect());
 				CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pUIIcon->SetMoveRect(GetSampleRect());
@@ -1600,8 +1662,8 @@ bool CUIInventory::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			SetState(UI_STATE_COMMON_NONE);
 
 			// 아이콘 위치 원래대로..
-			IconRestore();				
-			break;			
+			IconRestore();
+			break;
 	}
 
 	return true;
@@ -1612,31 +1674,33 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 	int iNeedValue;
 
 	char szBuf[256] = "";
-	bool	bValid = false;
+	bool bValid     = false;
 
-	if (!pItem) return false;
+	if (!pItem)
+		return false;
 
 	// 종족..
-	switch ( pItem->byNeedRace )
+	switch (pItem->byNeedRace)
 	{
 		case 0:
 			bValid = true;
 			break;
 
 		default:
-			if ( pItem->byNeedRace == CGameBase::s_pPlayer->m_InfoBase.eRace )
+			if (pItem->byNeedRace == CGameBase::s_pPlayer->m_InfoBase.eRace)
 				bValid = true;
 			break;
 	}
 
-	__InfoPlayerMySelf*	pInfoExt = nullptr;
-	pInfoExt = &(CGameBase::s_pPlayer->m_InfoExt);
-	if (!pInfoExt)	return false;
+	__InfoPlayerMySelf* pInfoExt = nullptr;
+	pInfoExt                     = &(CGameBase::s_pPlayer->m_InfoExt);
+	if (!pInfoExt)
+		return false;
 
 	std::string szMsg;
-	if ( bValid )
+	if (bValid)
 	{
-		// 직업..		
+		// 직업..
 		if (pItem->byNeedClass != 0)
 		{
 			switch (pItem->byNeedClass)
@@ -1821,24 +1885,25 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 						return false;
 					}
 					break;
-			}					
+			}
 		}
 
-		if ( (pItem->byAttachPoint == ITEM_LIMITED_EXHAUST) && (CGameBase::s_pPlayer->m_InfoBase.iLevel < pItem->cNeedLevel+pItemExt->siNeedLevel) )
+		if ((pItem->byAttachPoint == ITEM_LIMITED_EXHAUST)
+			&& (CGameBase::s_pPlayer->m_InfoBase.iLevel < pItem->cNeedLevel + pItemExt->siNeedLevel))
 		{
 			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_LEVEL);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 			return false;
 		}
 
-		if ( pInfoExt->iRank < pItem->byNeedRank+pItemExt->siNeedRank )
+		if (pInfoExt->iRank < pItem->byNeedRank + pItemExt->siNeedRank)
 		{
 			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_RANK);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
 			return false;
 		}
-		
-		if ( pInfoExt->iTitle < pItem->byNeedTitle+pItemExt->siNeedTitle )
+
+		if (pInfoExt->iTitle < pItem->byNeedTitle + pItemExt->siNeedTitle)
 		{
 			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_TITLE);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
@@ -1848,7 +1913,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 		iNeedValue = pItem->byNeedStrength;
 		if (iNeedValue != 0)
 			iNeedValue += pItemExt->siNeedStrength;
-		if ( pInfoExt->iStrength < iNeedValue )
+		if (pInfoExt->iStrength < iNeedValue)
 		{
 			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_POWER);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
@@ -1858,7 +1923,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 		iNeedValue = pItem->byNeedStamina;
 		if (iNeedValue != 0)
 			iNeedValue += pItemExt->siNeedStamina;
-		if ( pInfoExt->iStamina < iNeedValue )
+		if (pInfoExt->iStamina < iNeedValue)
 		{
 			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_STR);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
@@ -1868,7 +1933,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 		iNeedValue = pItem->byNeedDexterity;
 		if (iNeedValue != 0)
 			iNeedValue += pItemExt->siNeedDexterity;
-		if ( pInfoExt->iDexterity < iNeedValue )
+		if (pInfoExt->iDexterity < iNeedValue)
 		{
 			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_DEX);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff1010);
@@ -1878,7 +1943,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 		iNeedValue = pItem->byNeedInteli;
 		if (iNeedValue != 0)
 			iNeedValue += pItemExt->siNeedInteli;
-		if ( pInfoExt->iIntelligence < iNeedValue )
+		if (pInfoExt->iIntelligence < iNeedValue)
 		{
 			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_INT);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
@@ -1888,7 +1953,7 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 		iNeedValue = pItem->byNeedMagicAttack;
 		if (iNeedValue != 0)
 			iNeedValue += pItemExt->siNeedMagicAttack;
-		if ( pInfoExt->iMagicAttak < iNeedValue )
+		if (pInfoExt->iMagicAttak < iNeedValue)
 		{
 			szMsg = fmt::format_text_resource(IDS_MSG_VALID_CLASSNRACE_LOW_CHA);
 			CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
@@ -1907,27 +1972,29 @@ bool CUIInventory::IsValidRaceAndClass(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_E
 
 bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 {
-	if( CN3UIWndBase::s_sSelectedIconInfo.pItemSelect == nullptr )
+	if (CN3UIWndBase::s_sSelectedIconInfo.pItemSelect == nullptr)
 		return false;
 
-	__TABLE_ITEM_BASIC*		pItem;
+	__TABLE_ITEM_BASIC* pItem;
 	__TABLE_ITEM_EXT* pItemExt;
 
-	pItem = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemBasic;
+	pItem    = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemBasic;
 	pItemExt = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt;
 
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
-	if(ITEM_TYPE_UNKNOWN == eType) return false;
+	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(
+		pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+	if (ITEM_TYPE_UNKNOWN == eType)
+		return false;
 
-	if ( IsValidRaceAndClass(pItem, CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt) )
+	if (IsValidRaceAndClass(pItem, CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt))
 	{
-		switch ( iOrder )
+		switch (iOrder)
 		{
 			case ITEM_SLOT_POS_EAR_RIGHT:
 			case ITEM_SLOT_POS_EAR_LEFT:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_EAR:
 						return true;
@@ -1936,7 +2003,7 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 				break;
 
 			case ITEM_SLOT_POS_HEAD:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_HEAD:
 						return true;
@@ -1945,7 +2012,7 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 				break;
 
 			case ITEM_SLOT_POS_NECK:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_NECK:
 						return true;
@@ -1954,7 +2021,7 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 				break;
 
 			case ITEM_SLOT_POS_UPPER:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_UPPER:
 						return true;
@@ -1963,7 +2030,7 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 				break;
 
 			case ITEM_SLOT_POS_SHOULDER:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_CLOAK:
 						return true;
@@ -1971,43 +2038,45 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 				}
 				break;
 
-			case ITEM_SLOT_POS_HAND_RIGHT:				// 오른손..
-				switch ( pItem->byAttachPoint )
+			case ITEM_SLOT_POS_HAND_RIGHT: // 오른손..
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_DUAL:
 					case ITEM_ATTACH_POS_HAND_RIGHT:
 						// 완손에 양손 무기가 있는지 알아본당..
-						if ( (m_pMySlot[ITEM_SLOT_POS_HAND_LEFT]) 
-							&& (m_pMySlot[ITEM_SLOT_POS_HAND_LEFT]->pItemBasic->byAttachPoint == ITEM_ATTACH_POS_TWOHAND_LEFT) )
+						if ((m_pMySlot[ITEM_SLOT_POS_HAND_LEFT])
+							&& (m_pMySlot[ITEM_SLOT_POS_HAND_LEFT]->pItemBasic->byAttachPoint == ITEM_ATTACH_POS_TWOHAND_LEFT))
 						{
 							// 오른손에 무기가 있는 경우 false 리턴.. ^^
-							if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT]) 
+							if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT])
 								return false;
-							// 오른손에 무기가 없는 경우.. 왼손 무기가 인벤토리로.. ^^ 
+							// 오른손에 무기가 없는 경우.. 왼손 무기가 인벤토리로.. ^^
 							else
 							{
-								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget					= m_pMySlot[ITEM_SLOT_POS_HAND_LEFT];
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd			= UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget                    = m_pMySlot[ITEM_SLOT_POS_HAND_LEFT];
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd         = UIWND_INVENTORY;
 								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder		= ITEM_SLOT_POS_HAND_LEFT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd			= UIWND_INVENTORY;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder			= CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder        = ITEM_SLOT_POS_HAND_LEFT;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd           = UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict   = UIWND_DISTRICT_INVENTORY_INV;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder = CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart
+																							 .iOrder;
 								return true;
 							}
 						}
-						else	// 왼손에 양손무기가 없는 경우.. 
+						else // 왼손에 양손무기가 없는 경우..
 						{
 							// 오른손에 무기가 있는 경우.. Item Exchange.. ^^
-							if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT]) 
+							if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT])
 							{
-								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget					= m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT];
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd			= UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget                    = m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT];
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd         = UIWND_INVENTORY;
 								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder		= ITEM_SLOT_POS_HAND_RIGHT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd			= UIWND_INVENTORY;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder			= CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder        = ITEM_SLOT_POS_HAND_RIGHT;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd           = UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict   = UIWND_DISTRICT_INVENTORY_INV;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder = CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart
+																							 .iOrder;
 								return true;
 							}
 							// 오른손에 무기가 없는 경우..  true 리턴..
@@ -2016,37 +2085,39 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 						}
 						break;
 
-					case ITEM_ATTACH_POS_TWOHAND_RIGHT:				// 양손검을 오른손에 찰때..
-						if ( m_pMySlot[ITEM_SLOT_POS_HAND_LEFT] )	// 왼손에 무기가 있고..
+					case ITEM_ATTACH_POS_TWOHAND_RIGHT:         // 양손검을 오른손에 찰때..
+						if (m_pMySlot[ITEM_SLOT_POS_HAND_LEFT]) // 왼손에 무기가 있고..
 						{
 							// 오른손에 무기가 있는 경우 false 리턴.. ^^
-							if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT]) 
+							if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT])
 								return false;
 							// 오른손에 무기가 없는 경우 .. 왼손의 무기가 인벤토리로.. ^^
 							else
 							{
-								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget					= m_pMySlot[ITEM_SLOT_POS_HAND_LEFT];
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd			= UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget                    = m_pMySlot[ITEM_SLOT_POS_HAND_LEFT];
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd         = UIWND_INVENTORY;
 								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder		= ITEM_SLOT_POS_HAND_LEFT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd			= UIWND_INVENTORY;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder			= CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder        = ITEM_SLOT_POS_HAND_LEFT;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd           = UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict   = UIWND_DISTRICT_INVENTORY_INV;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder = CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart
+																							 .iOrder;
 								return true;
 							}
 						}
-						else										// 왼손에 무기가 없고..	
+						else // 왼손에 무기가 없고..
 						{
 							// 오른손에 무기가 있는 경우.. Item Exchange.. ^^
-							if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT]) 
+							if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT])
 							{
-								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget					= m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT];
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd			= UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget                    = m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT];
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd         = UIWND_INVENTORY;
 								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder		= ITEM_SLOT_POS_HAND_RIGHT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd			= UIWND_INVENTORY;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder			= CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder        = ITEM_SLOT_POS_HAND_RIGHT;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd           = UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict   = UIWND_DISTRICT_INVENTORY_INV;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder = CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart
+																							 .iOrder;
 								return true;
 							}
 							// 오른손에 무기가 없는 경우..  true 리턴..
@@ -2058,42 +2129,44 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 				break;
 
 			case ITEM_SLOT_POS_HAND_LEFT:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_DUAL:
 					case ITEM_ATTACH_POS_HAND_LEFT:
 						// 오른손에 양손 무기가 있는지 알아본당..
-						if ( (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT]) 
-							&& (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT]->pItemBasic->byAttachPoint == ITEM_ATTACH_POS_TWOHAND_RIGHT) )
+						if ((m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT])
+							&& (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT]->pItemBasic->byAttachPoint == ITEM_ATTACH_POS_TWOHAND_RIGHT))
 						{
 							// 왼손에 무기가 있는 경우 false 리턴.. ^^
-							if (m_pMySlot[ITEM_SLOT_POS_HAND_LEFT]) 
+							if (m_pMySlot[ITEM_SLOT_POS_HAND_LEFT])
 								return false;
-							// 왼손에 무기가 없는 경우.. 오른손 무기가 인벤토리로.. ^^ 
+							// 왼손에 무기가 없는 경우.. 오른손 무기가 인벤토리로.. ^^
 							else
 							{
-								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget					= m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT];
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd			= UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget                    = m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT];
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd         = UIWND_INVENTORY;
 								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder		= ITEM_SLOT_POS_HAND_RIGHT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd			= UIWND_INVENTORY;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder			= CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder        = ITEM_SLOT_POS_HAND_RIGHT;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd           = UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict   = UIWND_DISTRICT_INVENTORY_INV;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder = CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart
+																							 .iOrder;
 								return true;
 							}
 						}
-						else	// 오른손에 양손무기가 없는 경우.. 
+						else // 오른손에 양손무기가 없는 경우..
 						{
 							// 왼손에 무기가 있는 경우.. Item Exchange.. ^^
-							if (m_pMySlot[ITEM_SLOT_POS_HAND_LEFT]) 
+							if (m_pMySlot[ITEM_SLOT_POS_HAND_LEFT])
 							{
-								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget					= m_pMySlot[ITEM_SLOT_POS_HAND_LEFT];
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd			= UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget                    = m_pMySlot[ITEM_SLOT_POS_HAND_LEFT];
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd         = UIWND_INVENTORY;
 								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder		= ITEM_SLOT_POS_HAND_LEFT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd			= UIWND_INVENTORY;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder			= CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder        = ITEM_SLOT_POS_HAND_LEFT;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd           = UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict   = UIWND_DISTRICT_INVENTORY_INV;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder = CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart
+																							 .iOrder;
 								return true;
 							}
 							// 왼손에 무기가 없는 경우..  true 리턴..
@@ -2102,37 +2175,39 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 						}
 						break;
 
-					case ITEM_ATTACH_POS_TWOHAND_LEFT:				// 양손검을 왼손에 찰때..
-						if ( m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT] )	// 오른손에 무기가 있고..
+					case ITEM_ATTACH_POS_TWOHAND_LEFT:           // 양손검을 왼손에 찰때..
+						if (m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT]) // 오른손에 무기가 있고..
 						{
 							// 왼손에 무기가 있는 경우 false 리턴.. ^^
-							if (m_pMySlot[ITEM_SLOT_POS_HAND_LEFT]) 
+							if (m_pMySlot[ITEM_SLOT_POS_HAND_LEFT])
 								return false;
-							// 왼손에 무기가 없는 경우.. 오른손 무기가 인벤토리로.. ^^ 
+							// 왼손에 무기가 없는 경우.. 오른손 무기가 인벤토리로.. ^^
 							else
 							{
-								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget					= m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT];
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd			= UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget                    = m_pMySlot[ITEM_SLOT_POS_HAND_RIGHT];
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd         = UIWND_INVENTORY;
 								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder		= ITEM_SLOT_POS_HAND_RIGHT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd			= UIWND_INVENTORY;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder			= CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder        = ITEM_SLOT_POS_HAND_RIGHT;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd           = UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict   = UIWND_DISTRICT_INVENTORY_INV;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder = CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart
+																							 .iOrder;
 								return true;
 							}
 						}
-						else	// 오른손에 양손무기가 없는 경우.. 
+						else // 오른손에 양손무기가 없는 경우..
 						{
 							// 왼손에 무기가 있는 경우.. Item Exchange.. ^^
-							if (m_pMySlot[ITEM_SLOT_POS_HAND_LEFT]) 
+							if (m_pMySlot[ITEM_SLOT_POS_HAND_LEFT])
 							{
-								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget					= m_pMySlot[ITEM_SLOT_POS_HAND_LEFT];
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd			= UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget                    = m_pMySlot[ITEM_SLOT_POS_HAND_LEFT];
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWnd         = UIWND_INVENTORY;
 								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.UIWndDistrict = UIWND_DISTRICT_INVENTORY_SLOT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder		= ITEM_SLOT_POS_HAND_LEFT;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd			= UIWND_INVENTORY;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict	= UIWND_DISTRICT_INVENTORY_INV;
-								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder			= CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetStart.iOrder        = ITEM_SLOT_POS_HAND_LEFT;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWnd           = UIWND_INVENTORY;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.UIWndDistrict   = UIWND_DISTRICT_INVENTORY_INV;
+								CN3UIWndBase::s_sRecoveryJobInfo.UIWndTargetEnd.iOrder = CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart
+																							 .iOrder;
 								return true;
 							}
 							// 왼손에 무기가 없는 경우..  true 리턴..
@@ -2144,7 +2219,7 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 				break;
 
 			case ITEM_SLOT_POS_BELT:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_BELT:
 						return true;
@@ -2154,7 +2229,7 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 
 			case ITEM_SLOT_POS_RING_RIGHT:
 			case ITEM_SLOT_POS_RING_LEFT:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_FINGER:
 						return true;
@@ -2163,7 +2238,7 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 				break;
 
 			case ITEM_SLOT_POS_LOWER:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_LOWER:
 						return true;
@@ -2172,7 +2247,7 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 				break;
 
 			case ITEM_SLOT_POS_GLOVES:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_ARM:
 						return true;
@@ -2181,7 +2256,7 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 				break;
 
 			case ITEM_SLOT_POS_SHOES:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_FOOT:
 						return true;
@@ -2195,26 +2270,28 @@ bool CUIInventory::IsValidPosFromInvToArm(int iOrder)
 
 bool CUIInventory::IsValidPosFromArmToArm(int iOrder)
 {
-	if( CN3UIWndBase::s_sRecoveryJobInfo.pItemSource == nullptr )
+	if (CN3UIWndBase::s_sRecoveryJobInfo.pItemSource == nullptr)
 		return false;
 
-	__TABLE_ITEM_BASIC*		pItem;
+	__TABLE_ITEM_BASIC* pItem;
 	__TABLE_ITEM_EXT* pItemExt;
-	pItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic;
+	pItem    = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemBasic;
 	pItemExt = CN3UIWndBase::s_sRecoveryJobInfo.pItemSource->pItemExt;
 
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
-	if(ITEM_TYPE_UNKNOWN == eType) return false;
+	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(
+		pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+	if (ITEM_TYPE_UNKNOWN == eType)
+		return false;
 
-	if ( IsValidRaceAndClass(pItem, CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt) )
+	if (IsValidRaceAndClass(pItem, CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt))
 	{
-		switch ( iOrder )
+		switch (iOrder)
 		{
 			case ITEM_SLOT_POS_EAR_RIGHT:
 			case ITEM_SLOT_POS_EAR_LEFT:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_EAR:
 						return true;
@@ -2223,7 +2300,7 @@ bool CUIInventory::IsValidPosFromArmToArm(int iOrder)
 				break;
 
 			case ITEM_SLOT_POS_HAND_RIGHT:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_DUAL:
 						return true;
@@ -2232,7 +2309,7 @@ bool CUIInventory::IsValidPosFromArmToArm(int iOrder)
 				break;
 
 			case ITEM_SLOT_POS_HAND_LEFT:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_DUAL:
 						return true;
@@ -2242,7 +2319,7 @@ bool CUIInventory::IsValidPosFromArmToArm(int iOrder)
 
 			case ITEM_SLOT_POS_RING_RIGHT:
 			case ITEM_SLOT_POS_RING_LEFT:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_FINGER:
 						return true;
@@ -2256,26 +2333,28 @@ bool CUIInventory::IsValidPosFromArmToArm(int iOrder)
 
 bool CUIInventory::IsValidPosFromArmToArmInverse(int iOrder)
 {
-	if( CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget == nullptr )
+	if (CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget == nullptr)
 		return false;
 
-	__TABLE_ITEM_BASIC*		pItem;
+	__TABLE_ITEM_BASIC* pItem;
 	__TABLE_ITEM_EXT* pItemExt;
-	pItem = CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget->pItemBasic;
+	pItem    = CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget->pItemBasic;
 	pItemExt = CN3UIWndBase::s_sRecoveryJobInfo.pItemTarget->pItemExt;
 
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
-	if(ITEM_TYPE_UNKNOWN == eType) return false;
+	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(
+		pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+	if (ITEM_TYPE_UNKNOWN == eType)
+		return false;
 
-	if ( IsValidRaceAndClass(pItem, CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt) )
+	if (IsValidRaceAndClass(pItem, CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt))
 	{
 		switch (iOrder)
 		{
 			case ITEM_SLOT_POS_EAR_RIGHT:
 			case ITEM_SLOT_POS_EAR_LEFT:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_EAR:
 						return true;
@@ -2284,7 +2363,7 @@ bool CUIInventory::IsValidPosFromArmToArmInverse(int iOrder)
 				break;
 
 			case ITEM_SLOT_POS_HAND_RIGHT:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_DUAL:
 						return true;
@@ -2293,7 +2372,7 @@ bool CUIInventory::IsValidPosFromArmToArmInverse(int iOrder)
 				break;
 
 			case ITEM_SLOT_POS_HAND_LEFT:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_DUAL:
 						return true;
@@ -2303,7 +2382,7 @@ bool CUIInventory::IsValidPosFromArmToArmInverse(int iOrder)
 
 			case ITEM_SLOT_POS_RING_RIGHT:
 			case ITEM_SLOT_POS_RING_LEFT:
-				switch ( pItem->byAttachPoint )
+				switch (pItem->byAttachPoint)
 				{
 					case ITEM_ATTACH_POS_FINGER:
 						return true;
@@ -2321,18 +2400,24 @@ void CUIInventory::ItemAdd(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_EXT* pItemExt
 	std::string szFN;
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, &szFN, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(
+		pItem, pItemExt, &szFN, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
 
-	if(ITEM_TYPE_PLUG == eType)
+	if (ITEM_TYPE_PLUG == eType)
 	{
-		if(ITEM_SLOT_HAND_LEFT == eSlot) ePlug = PLUG_POS_LEFTHAND;
-		else if(ITEM_SLOT_HAND_RIGHT == eSlot) ePlug = PLUG_POS_RIGHTHAND;
-		else { __ASSERT(0, "Invalid Item Plug Position"); }
+		if (ITEM_SLOT_HAND_LEFT == eSlot)
+			ePlug = PLUG_POS_LEFTHAND;
+		else if (ITEM_SLOT_HAND_RIGHT == eSlot)
+			ePlug = PLUG_POS_RIGHTHAND;
+		else
+		{
+			__ASSERT(0, "Invalid Item Plug Position");
+		}
 
 		CGameBase::s_pPlayer->PlugSet(ePlug, szFN, pItem, pItemExt); // 플러그 셋팅..
 		CGameBase::s_pPlayer->DurabilitySet(eSlot, m_pMySlot[eSlot]->iDurability);
 	}
-	else if(ITEM_TYPE_PART == eType)
+	else if (ITEM_TYPE_PART == eType)
 	{
 		CGameBase::s_pPlayer->PartSet(ePart, szFN, pItem, pItemExt);
 		CGameBase::s_pPlayer->DurabilitySet(eSlot, m_pMySlot[eSlot]->iDurability);
@@ -2341,70 +2426,74 @@ void CUIInventory::ItemAdd(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_EXT* pItemExt
 
 void CUIInventory::ItemDelete(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_EXT* pItemExt, e_ItemSlot eSlot)
 {
-	__TABLE_PLAYER_LOOKS* pLooks = CGameBase::s_pTbl_UPC_Looks.Find(CGameBase::s_pPlayer->m_InfoBase.eRace);	// User Player Character Skin 구조체 포인터..
+	__TABLE_PLAYER_LOOKS* pLooks = CGameBase::s_pTbl_UPC_Looks.Find(
+		CGameBase::s_pPlayer->m_InfoBase.eRace); // User Player Character Skin 구조체 포인터..
 	__ASSERT(pLooks, "NULL Basic Looks!");
-	if(nullptr == pLooks) return;
+	if (nullptr == pLooks)
+		return;
 
 	e_PartPosition ePart;
 	e_PlugPosition ePlug;
-	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
-	
-	if(pLooks)
+	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(
+		pItem, pItemExt, nullptr, nullptr, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+
+	if (pLooks)
 	{
-		if(ITEM_TYPE_PLUG == eType)
+		if (ITEM_TYPE_PLUG == eType)
 		{
-			if(ITEM_SLOT_HAND_LEFT == eSlot) ePlug = PLUG_POS_LEFTHAND;
-			else if(ITEM_SLOT_HAND_RIGHT == eSlot) ePlug = PLUG_POS_RIGHTHAND;
+			if (ITEM_SLOT_HAND_LEFT == eSlot)
+				ePlug = PLUG_POS_LEFTHAND;
+			else if (ITEM_SLOT_HAND_RIGHT == eSlot)
+				ePlug = PLUG_POS_RIGHTHAND;
 
 			CGameBase::s_pPlayer->PlugSet(ePlug, "", nullptr, nullptr); // 플러그 셋팅..
 		}
-		else if(ITEM_TYPE_PART == eType)
+		else if (ITEM_TYPE_PART == eType)
 		{
-			if(PART_POS_HAIR_HELMET == ePart) CGameBase::s_pPlayer->InitHair();
-			else CGameBase::s_pPlayer->PartSet(ePart, pLooks->szPartFNs[ePart], nullptr, nullptr);
+			if (PART_POS_HAIR_HELMET == ePart)
+				CGameBase::s_pPlayer->InitHair();
+			else
+				CGameBase::s_pPlayer->PartSet(ePart, pLooks->szPartFNs[ePart], nullptr, nullptr);
 		}
 	}
 }
 
 void CUIInventory::DurabilityChange(e_ItemSlot eSlot, int iDurability)
 {
-	std::string szDur; 
+	std::string szDur;
 
-	if ( eSlot < ITEM_SLOT_EAR_RIGHT || eSlot >= ITEM_SLOT_COUNT )
+	if (eSlot < ITEM_SLOT_EAR_RIGHT || eSlot >= ITEM_SLOT_COUNT)
 	{
 		__ASSERT(0, "Durability Change Item Index Weird.");
-		CLogWriter::Write("Durability Change Item Index Weird. Slot({}) Durability({})",
-			static_cast<int>(eSlot), iDurability);
+		CLogWriter::Write("Durability Change Item Index Weird. Slot({}) Durability({})", static_cast<int>(eSlot), iDurability);
 		return;
 	}
 
-	if ( m_pMySlot[eSlot] )
+	if (m_pMySlot[eSlot])
 	{
 		m_pMySlot[eSlot]->iDurability = iDurability;
-		if ( iDurability == 0 )
+		if (iDurability == 0)
 		{
-			if(m_pMySlot[eSlot]->pUIIcon && m_pMySlot[eSlot]->pItemBasic) 
+			if (m_pMySlot[eSlot]->pUIIcon && m_pMySlot[eSlot]->pItemBasic)
 			{
 				m_pMySlot[eSlot]->pUIIcon->SetStyle(m_pMySlot[eSlot]->pUIIcon->GetStyle() | UISTYLE_DURABILITY_EXHAUST);
 
 				// 메시지 박스 출력..
-				szDur = fmt::format_text_resource(IDS_DURABILITY_EXOAST,
-					m_pMySlot[eSlot]->pItemBasic->szName);
+				szDur = fmt::format_text_resource(IDS_DURABILITY_EXOAST, m_pMySlot[eSlot]->pItemBasic->szName);
 				CGameProcedure::s_pProcMain->MsgOutput(szDur, 0xffff3b3b);
 			}
 			else
 			{
 				__ASSERT(0, "Durability Change Item NULL icon or NULL item.");
-				CLogWriter::Write("Durability Change Item NULL icon or NULL item. Slot({}) Durability({})",
-					static_cast<int>(eSlot), iDurability);
+				CLogWriter::Write(
+					"Durability Change Item NULL icon or NULL item. Slot({}) Durability({})", static_cast<int>(eSlot), iDurability);
 			}
 		}
 	}
 	else
 	{
 		__ASSERT(0, "Durability Change Item NULL Slot.");
-		CLogWriter::Write("Durability Change Item ... NULL Slot. Slot({}) Durability({})",
-			static_cast<int>(eSlot), iDurability);
+		CLogWriter::Write("Durability Change Item ... NULL Slot. Slot({}) Durability({})", static_cast<int>(eSlot), iDurability);
 	}
 }
 
@@ -2418,9 +2507,7 @@ int CUIInventory::GetCountInInvByID(int iID) const
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
 		__IconItemSkill* spItem = m_pMyInvWnd[i];
-		if (spItem == nullptr
-			|| spItem->pItemBasic->dwID != (iID / 1000 * 1000)
-			|| spItem->pItemExt->dwID != (iID % 1000))
+		if (spItem == nullptr || spItem->pItemBasic->dwID != (iID / 1000 * 1000) || spItem->pItemExt->dwID != (iID % 1000))
 			continue;
 
 		if (spItem->pItemBasic->byClass == ITEM_CLASS_CONSUMABLE)
@@ -2438,10 +2525,11 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 	switch (iDistrict)
 	{
 		case 0x00:
-			if (m_pMySlot[iIndex] && ( (m_pMySlot[iIndex]->pItemBasic->dwID+m_pMySlot[iIndex]->pItemExt->dwID) != iID ) )	// 엉뚱한 아이템이 있는경우..
+			if (m_pMySlot[iIndex]
+				&& ((m_pMySlot[iIndex]->pItemBasic->dwID + m_pMySlot[iIndex]->pItemExt->dwID) != iID)) // 엉뚱한 아이템이 있는경우..
 			{
-				// 아이템 삭제.. 현재 인벤토리 윈도우만.. 
-				spItem = m_pMySlot[iIndex];
+				// 아이템 삭제.. 현재 인벤토리 윈도우만..
+				spItem            = m_pMySlot[iIndex];
 
 				// 인벤토리에서도 지운다..
 				m_pMySlot[iIndex] = nullptr;
@@ -2454,16 +2542,16 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 				delete spItem->pUIIcon;
 				spItem->pUIIcon = nullptr;
 				delete spItem;
-				spItem = nullptr;
+				spItem                     = nullptr;
 
 				// 아이템을 만들어 넣는다..
-				__TABLE_ITEM_BASIC* pItem = nullptr;								// 아이템 테이블 구조체 포인터..	
-				__TABLE_ITEM_EXT* pItemExt = nullptr;								// 아이템 테이블 구조체 포인터..	
+				__TABLE_ITEM_BASIC* pItem  = nullptr;                                                    // 아이템 테이블 구조체 포인터..
+				__TABLE_ITEM_EXT* pItemExt = nullptr;                                                    // 아이템 테이블 구조체 포인터..
 
-				pItem = CGameProcedure::s_pTbl_Items_Basic.Find(iID/1000*1000);	// 열 데이터 얻기..
-				if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
-					pItemExt = CGameProcedure::s_pTbl_Items_Exts[pItem->byExtIndex].Find(iID%1000);	// 열 데이터 얻기..
-				if ( nullptr == pItem || nullptr == pItemExt )
+				pItem                      = CGameProcedure::s_pTbl_Items_Basic.Find(iID / 1000 * 1000); // 열 데이터 얻기..
+				if (pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
+					pItemExt = CGameProcedure::s_pTbl_Items_Exts[pItem->byExtIndex].Find(iID % 1000);    // 열 데이터 얻기..
+				if (nullptr == pItem || nullptr == pItemExt)
 				{
 					__ASSERT(0, "NULL Item");
 					CLogWriter::Write("MyInfo - Inv - Unknown Item {}, IDNumber", iID);
@@ -2473,17 +2561,19 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 				e_PartPosition ePart;
 				e_PlugPosition ePlug;
 				std::string szIconFN;
-				e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
-				if(ITEM_TYPE_UNKNOWN == eType) CLogWriter::Write("MyInfo - slot - Unknown Item");
+				e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug,
+					CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+				if (ITEM_TYPE_UNKNOWN == eType)
+					CLogWriter::Write("MyInfo - slot - Unknown Item");
 				__ASSERT(ITEM_TYPE_UNKNOWN != eType, "Unknown Item");
-				
-				spItem = new __IconItemSkill;
-				spItem->pItemBasic	= pItem;
-				spItem->pItemExt	= pItemExt;
-				spItem->szIconFN = szIconFN; // 아이콘 파일 이름 복사..
-				spItem->iCount	= iCount;
+
+				spItem              = new __IconItemSkill;
+				spItem->pItemBasic  = pItem;
+				spItem->pItemExt    = pItemExt;
+				spItem->szIconFN    = szIconFN; // 아이콘 파일 이름 복사..
+				spItem->iCount      = iCount;
 				spItem->iDurability = iDurability;
-				m_pMySlot[iIndex] = spItem;
+				m_pMySlot[iIndex]   = spItem;
 				return;
 			}
 			else if (m_pMySlot[iIndex])
@@ -2491,9 +2581,9 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 				m_pMySlot[iIndex]->iCount = iCount;
 				if (iCount == 0)
 				{
-					// 아이템 삭제.. 현재 인벤토리 윈도우만.. 
+					// 아이템 삭제.. 현재 인벤토리 윈도우만..
 					__IconItemSkill* spItem;
-					spItem = m_pMySlot[iIndex];
+					spItem            = m_pMySlot[iIndex];
 
 					// 인벤토리에서도 지운다..
 					m_pMySlot[iIndex] = nullptr;
@@ -2509,16 +2599,16 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 					spItem = nullptr;
 				}
 			}
-			else	// 아이템이 없는 경우..
+			else // 아이템이 없는 경우..
 			{
 				// 아이템을 만들어 넣는다..
-				__TABLE_ITEM_BASIC* pItem = nullptr;								// 아이템 테이블 구조체 포인터..	
-				__TABLE_ITEM_EXT* pItemExt = nullptr;								// 아이템 테이블 구조체 포인터..	
+				__TABLE_ITEM_BASIC* pItem  = nullptr;                                                    // 아이템 테이블 구조체 포인터..
+				__TABLE_ITEM_EXT* pItemExt = nullptr;                                                    // 아이템 테이블 구조체 포인터..
 
-				pItem = CGameProcedure::s_pTbl_Items_Basic.Find(iID/1000*1000);	// 열 데이터 얻기..
-				if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
-					pItemExt = CGameProcedure::s_pTbl_Items_Exts[pItem->byExtIndex].Find(iID%1000);	// 열 데이터 얻기..
-				if ( nullptr == pItem || nullptr == pItemExt )
+				pItem                      = CGameProcedure::s_pTbl_Items_Basic.Find(iID / 1000 * 1000); // 열 데이터 얻기..
+				if (pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
+					pItemExt = CGameProcedure::s_pTbl_Items_Exts[pItem->byExtIndex].Find(iID % 1000);    // 열 데이터 얻기..
+				if (nullptr == pItem || nullptr == pItemExt)
 				{
 					__ASSERT(0, "NULL Item");
 					CLogWriter::Write("MyInfo - Inv - Unknown Item {}, IDNumber", iID);
@@ -2528,32 +2618,35 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 				e_PartPosition ePart;
 				e_PlugPosition ePlug;
 				std::string szIconFN;
-				e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
-				if(ITEM_TYPE_UNKNOWN == eType) 
-				{ 
+				e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug,
+					CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+				if (ITEM_TYPE_UNKNOWN == eType)
+				{
 					CLogWriter::Write("MyInfo - slot - Unknown Item");
 					__ASSERT(ITEM_TYPE_UNKNOWN != eType, "Unknown Item");
 					return;
 				}
-				if(ITEM_TYPE_UNKNOWN == eType) CLogWriter::Write("MyInfo - slot - Unknown Item");
+				if (ITEM_TYPE_UNKNOWN == eType)
+					CLogWriter::Write("MyInfo - slot - Unknown Item");
 				__ASSERT(ITEM_TYPE_UNKNOWN != eType, "Unknown Item");
-				
-				spItem = new __IconItemSkill;
-				spItem->pItemBasic	= pItem;
-				spItem->pItemExt	= pItemExt;
-				spItem->szIconFN = szIconFN; // 아이콘 파일 이름 복사..
-				spItem->iCount	= iCount;
+
+				spItem              = new __IconItemSkill;
+				spItem->pItemBasic  = pItem;
+				spItem->pItemExt    = pItemExt;
+				spItem->szIconFN    = szIconFN; // 아이콘 파일 이름 복사..
+				spItem->iCount      = iCount;
 				spItem->iDurability = iDurability;
-				m_pMySlot[iIndex] = spItem;
+				m_pMySlot[iIndex]   = spItem;
 				return;
 			}
 			break;
 
 		case 0x01:
-			if (m_pMyInvWnd[iIndex] && ( (m_pMyInvWnd[iIndex]->pItemBasic->dwID+m_pMyInvWnd[iIndex]->pItemExt->dwID) != iID ) )	// 엉뚱한 아이템이 있는경우..
+			if (m_pMyInvWnd[iIndex]
+				&& ((m_pMyInvWnd[iIndex]->pItemBasic->dwID + m_pMyInvWnd[iIndex]->pItemExt->dwID) != iID)) // 엉뚱한 아이템이 있는경우..
 			{
-				// 아이템 삭제.. 현재 인벤토리 윈도우만.. 
-				spItem = m_pMyInvWnd[iIndex];
+				// 아이템 삭제.. 현재 인벤토리 윈도우만..
+				spItem              = m_pMyInvWnd[iIndex];
 
 				// 인벤토리에서도 지운다..
 				m_pMyInvWnd[iIndex] = nullptr;
@@ -2566,16 +2659,16 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 				delete spItem->pUIIcon;
 				spItem->pUIIcon = nullptr;
 				delete spItem;
-				spItem = nullptr;
+				spItem                     = nullptr;
 
 				// 아이템을 만들어 넣는다..
-				__TABLE_ITEM_BASIC* pItem = nullptr;								// 아이템 테이블 구조체 포인터..	
-				__TABLE_ITEM_EXT* pItemExt = nullptr;								// 아이템 테이블 구조체 포인터..	
+				__TABLE_ITEM_BASIC* pItem  = nullptr;                                                    // 아이템 테이블 구조체 포인터..
+				__TABLE_ITEM_EXT* pItemExt = nullptr;                                                    // 아이템 테이블 구조체 포인터..
 
-				pItem = CGameProcedure::s_pTbl_Items_Basic.Find(iID/1000*1000);	// 열 데이터 얻기..
-				if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
-					pItemExt = CGameProcedure::s_pTbl_Items_Exts[pItem->byExtIndex].Find(iID%1000);	// 열 데이터 얻기..
-				if ( nullptr == pItem || nullptr == pItemExt )
+				pItem                      = CGameProcedure::s_pTbl_Items_Basic.Find(iID / 1000 * 1000); // 열 데이터 얻기..
+				if (pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
+					pItemExt = CGameProcedure::s_pTbl_Items_Exts[pItem->byExtIndex].Find(iID % 1000);    // 열 데이터 얻기..
+				if (nullptr == pItem || nullptr == pItemExt)
 				{
 					__ASSERT(0, "NULL Item");
 					CLogWriter::Write("MyInfo - Inv - Unknown Item {}, IDNumber", iID);
@@ -2585,15 +2678,17 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 				e_PartPosition ePart;
 				e_PlugPosition ePlug;
 				std::string szIconFN;
-				e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
-				if(ITEM_TYPE_UNKNOWN == eType) CLogWriter::Write("MyInfo - slot - Unknown Item");
+				e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug,
+					CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+				if (ITEM_TYPE_UNKNOWN == eType)
+					CLogWriter::Write("MyInfo - slot - Unknown Item");
 				__ASSERT(ITEM_TYPE_UNKNOWN != eType, "Unknown Item");
-				
-				spItem = new __IconItemSkill;
-				spItem->pItemBasic	= pItem;
-				spItem->pItemExt	= pItemExt;
-				spItem->szIconFN = szIconFN; // 아이콘 파일 이름 복사..
-				spItem->iCount	= iCount;
+
+				spItem              = new __IconItemSkill;
+				spItem->pItemBasic  = pItem;
+				spItem->pItemExt    = pItemExt;
+				spItem->szIconFN    = szIconFN; // 아이콘 파일 이름 복사..
+				spItem->iCount      = iCount;
 				spItem->iDurability = iDurability;
 				m_pMyInvWnd[iIndex] = spItem;
 				return;
@@ -2603,9 +2698,9 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 				m_pMyInvWnd[iIndex]->iCount = iCount;
 				if (iCount == 0)
 				{
-					// 아이템 삭제.. 현재 인벤토리 윈도우만.. 
+					// 아이템 삭제.. 현재 인벤토리 윈도우만..
 					__IconItemSkill* spItem;
-					spItem = m_pMyInvWnd[iIndex];
+					spItem              = m_pMyInvWnd[iIndex];
 
 					// 인벤토리에서도 지운다..
 					m_pMyInvWnd[iIndex] = nullptr;
@@ -2621,16 +2716,16 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 					spItem = nullptr;
 				}
 			}
-			else	// 아이템이 없는 경우..
+			else // 아이템이 없는 경우..
 			{
 				// 아이템을 만들어 넣는다..
-				__TABLE_ITEM_BASIC* pItem = nullptr;								// 아이템 테이블 구조체 포인터..	
-				__TABLE_ITEM_EXT* pItemExt = nullptr;								// 아이템 테이블 구조체 포인터..	
+				__TABLE_ITEM_BASIC* pItem  = nullptr;                                                    // 아이템 테이블 구조체 포인터..
+				__TABLE_ITEM_EXT* pItemExt = nullptr;                                                    // 아이템 테이블 구조체 포인터..
 
-				pItem = CGameProcedure::s_pTbl_Items_Basic.Find(iID/1000*1000);	// 열 데이터 얻기..
-				if(pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
-					pItemExt = CGameProcedure::s_pTbl_Items_Exts[pItem->byExtIndex].Find(iID%1000);	// 열 데이터 얻기..
-				if ( nullptr == pItem || nullptr == pItemExt )
+				pItem                      = CGameProcedure::s_pTbl_Items_Basic.Find(iID / 1000 * 1000); // 열 데이터 얻기..
+				if (pItem && pItem->byExtIndex >= 0 && pItem->byExtIndex < MAX_ITEM_EXTENSION)
+					pItemExt = CGameProcedure::s_pTbl_Items_Exts[pItem->byExtIndex].Find(iID % 1000);    // 열 데이터 얻기..
+				if (nullptr == pItem || nullptr == pItemExt)
 				{
 					__ASSERT(0, "NULL Item");
 					CLogWriter::Write("MyInfo - Inv - Unknown Item {}, IDNumber", iID);
@@ -2640,28 +2735,30 @@ void CUIInventory::ItemCountChange(int iDistrict, int iIndex, int iCount, int iI
 				e_PartPosition ePart;
 				e_PlugPosition ePlug;
 				std::string szIconFN;
-				e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
-				if(ITEM_TYPE_UNKNOWN == eType) CLogWriter::Write("MyInfo - slot - Unknown Item");
+				e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug,
+					CGameBase::s_pPlayer->m_InfoBase.eRace); // 아이템에 따른 파일 이름을 만들어서
+				if (ITEM_TYPE_UNKNOWN == eType)
+					CLogWriter::Write("MyInfo - slot - Unknown Item");
 				__ASSERT(ITEM_TYPE_UNKNOWN != eType, "Unknown Item");
-				
-				spItem = new __IconItemSkill;
-				spItem->pItemBasic	= pItem;
-				spItem->pItemExt	= pItemExt;
-				spItem->szIconFN = szIconFN; // 아이콘 파일 이름 복사..
-				spItem->iCount	= iCount;
-				spItem->iDurability = iDurability;
-				m_pMyInvWnd[iIndex] = spItem;
+
+				spItem                       = new __IconItemSkill;
+				spItem->pItemBasic           = pItem;
+				spItem->pItemExt             = pItemExt;
+				spItem->szIconFN             = szIconFN; // 아이콘 파일 이름 복사..
+				spItem->iCount               = iCount;
+				spItem->iDurability          = iDurability;
+				m_pMyInvWnd[iIndex]          = spItem;
 
 				m_pMyInvWnd[iIndex]->pUIIcon = new CN3UIIcon;
 				m_pMyInvWnd[iIndex]->pUIIcon->Init(this);
 				m_pMyInvWnd[iIndex]->pUIIcon->SetTex(m_pMyInvWnd[iIndex]->szIconFN);
-				float fUVAspect = (float)45.0f/(float)64.0f;
-				m_pMyInvWnd[iIndex]->pUIIcon->SetUVRect(0,0, fUVAspect, fUVAspect);
+				float fUVAspect = (float) 45.0f / (float) 64.0f;
+				m_pMyInvWnd[iIndex]->pUIIcon->SetUVRect(0, 0, fUVAspect, fUVAspect);
 				m_pMyInvWnd[iIndex]->pUIIcon->SetUIType(UI_TYPE_ICON);
-				m_pMyInvWnd[iIndex]->pUIIcon->SetStyle(UISTYLE_ICON_ITEM|UISTYLE_ICON_CERTIFICATION_NEED);
+				m_pMyInvWnd[iIndex]->pUIIcon->SetStyle(UISTYLE_ICON_ITEM | UISTYLE_ICON_CERTIFICATION_NEED);
 				CN3UIArea* pArea = nullptr;
-				pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, iIndex);
-				if ( pArea )
+				pArea            = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, iIndex);
+				if (pArea)
 				{
 					m_pMyInvWnd[iIndex]->pUIIcon->SetRegion(pArea->GetRegion());
 					m_pMyInvWnd[iIndex]->pUIIcon->SetMoveRect(pArea->GetRegion());
@@ -2676,25 +2773,26 @@ void CUIInventory::ItemDestroyOK()
 {
 	m_bDestoyDlgAlive = false;
 
-	uint8_t byBuff[32];															// 패킷 버퍼..
-	int iOffset=0;																// 패킷 오프셋..
+	uint8_t byBuff[32];                                       // 패킷 버퍼..
+	int iOffset = 0;                                          // 패킷 오프셋..
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_ITEM_REMOVE);					// 게임 스타트 패킷 커멘드..
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_ITEM_REMOVE); // 게임 스타트 패킷 커멘드..
 
-	switch ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict )
+	switch (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict)
 	{
 		case UIWND_DISTRICT_INVENTORY_SLOT:
-			CAPISocket::MP_AddByte(byBuff, iOffset, 0x01);						// 아이디 길이 패킷에 넣기..
+			CAPISocket::MP_AddByte(byBuff, iOffset, 0x01);                                         // 아이디 길이 패킷에 넣기..
 			break;
 		case UIWND_DISTRICT_INVENTORY_INV:
-			CAPISocket::MP_AddByte(byBuff, iOffset, 0x02);						// 아이디 길이 패킷에 넣기..
+			CAPISocket::MP_AddByte(byBuff, iOffset, 0x02);                                         // 아이디 길이 패킷에 넣기..
 			break;
 	}
-	CAPISocket::MP_AddByte(byBuff, iOffset, CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder);	// 아이디 길이 패킷에 넣기..
-	CAPISocket::MP_AddDword(byBuff, iOffset, CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemBasic->dwID+
-		CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt->dwID);	// 아이디 문자열 패킷에 넣기..
+	CAPISocket::MP_AddByte(byBuff, iOffset, CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder); // 아이디 길이 패킷에 넣기..
+	CAPISocket::MP_AddDword(byBuff, iOffset,
+		CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemBasic->dwID
+			+ CN3UIWndBase::s_sSelectedIconInfo.pItemSelect->pItemExt->dwID);                      // 아이디 문자열 패킷에 넣기..
 
-	CGameProcedure::s_pSocket->Send(byBuff, iOffset);	
+	CGameProcedure::s_pSocket->Send(byBuff, iOffset);
 
 	s_bWaitFromServer = true;
 }
@@ -2702,15 +2800,15 @@ void CUIInventory::ItemDestroyOK()
 void CUIInventory::ItemDestroyCancel()
 {
 	m_bDestoyDlgAlive = false;
-	CN3UIArea* pArea = nullptr;
+	CN3UIArea* pArea  = nullptr;
 
-	switch ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict )
+	switch (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict)
 	{
 		case UIWND_DISTRICT_INVENTORY_SLOT:
-			if ( m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr )
+			if (m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
 			{
 				pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SLOT, CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder);
-				if ( pArea )
+				if (pArea)
 				{
 					m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
 					m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
@@ -2719,10 +2817,10 @@ void CUIInventory::ItemDestroyCancel()
 			break;
 
 		case UIWND_DISTRICT_INVENTORY_INV:
-			if ( m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr )
+			if (m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
 			{
 				pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder);
-				if ( pArea )
+				if (pArea)
 				{
 					m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
 					m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
@@ -2734,20 +2832,21 @@ void CUIInventory::ItemDestroyCancel()
 
 void CUIInventory::ReceiveResultItemRemoveFromServer(int iResult)
 {
-	CN3UIArea* pArea = nullptr;
+	CN3UIArea* pArea        = nullptr;
 	__IconItemSkill* spItem = nullptr;
-	s_bWaitFromServer = false;
+	s_bWaitFromServer       = false;
 
 	switch (iResult)
 	{
-		case 0x01:			// 성공..
-			switch ( CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict )
+		case 0x01: // 성공..
+			switch (CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.UIWndDistrict)
 			{
 				case UIWND_DISTRICT_INVENTORY_SLOT:
 					spItem = m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder];
 					// 내 영역에서도 지운다..
 					m_pMySlot[CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder] = nullptr;
-					this->ItemDelete(spItem->pItemBasic, spItem->pItemExt, (e_ItemSlot)CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder);
+					this->ItemDelete(
+						spItem->pItemBasic, spItem->pItemExt, (e_ItemSlot) CN3UIWndBase::s_sRecoveryJobInfo.UIWndSourceStart.iOrder);
 					break;
 
 				case UIWND_DISTRICT_INVENTORY_INV:
@@ -2758,7 +2857,8 @@ void CUIInventory::ReceiveResultItemRemoveFromServer(int iResult)
 			}
 
 			// iOrder로 내 매니저의 아이템을 리스트에서 삭제한다..
-			if (!spItem) return;
+			if (!spItem)
+				return;
 			RemoveChild(spItem->pUIIcon);
 
 			// 아이콘 리소스 삭제...
@@ -2769,14 +2869,14 @@ void CUIInventory::ReceiveResultItemRemoveFromServer(int iResult)
 			spItem = nullptr;
 			break;
 
-		case 0x00:			// 실패..
-			switch ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict )
+		case 0x00: // 실패..
+			switch (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWndDistrict)
 			{
 				case UIWND_DISTRICT_INVENTORY_SLOT:
-					if ( m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr )
+					if (m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
 					{
 						pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SLOT, CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder);
-						if ( pArea )
+						if (pArea)
 						{
 							m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
 							m_pMySlot[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
@@ -2785,10 +2885,10 @@ void CUIInventory::ReceiveResultItemRemoveFromServer(int iResult)
 					break;
 
 				case UIWND_DISTRICT_INVENTORY_INV:
-					if ( m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr )
+					if (m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder] != nullptr)
 					{
 						pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_INV, CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder);
-						if ( pArea )
+						if (pArea)
 						{
 							m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
 							m_pMyInvWnd[CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
@@ -2799,22 +2899,25 @@ void CUIInventory::ReceiveResultItemRemoveFromServer(int iResult)
 			break;
 	}
 
-	if (CGameProcedure::s_pProcMain->m_pUISkillTreeDlg) CGameProcedure::s_pProcMain->m_pUISkillTreeDlg->UpdateDisableCheck();
-	if (CGameProcedure::s_pProcMain->m_pUIHotKeyDlg) CGameProcedure::s_pProcMain->m_pUIHotKeyDlg->UpdateDisableCheck();
+	if (CGameProcedure::s_pProcMain->m_pUISkillTreeDlg)
+		CGameProcedure::s_pProcMain->m_pUISkillTreeDlg->UpdateDisableCheck();
+	if (CGameProcedure::s_pProcMain->m_pUIHotKeyDlg)
+		CGameProcedure::s_pProcMain->m_pUIHotKeyDlg->UpdateDisableCheck();
 }
 
 bool CUIInventory::CheckWeightValidate(__IconItemSkill* spItem)
 {
 	std::string szMsg;
 
-	if (!spItem)	return false;
+	if (!spItem)
+		return false;
 
-	__InfoPlayerMySelf*	pInfoExt = &(CGameBase::s_pPlayer->m_InfoExt);
-	if ( (pInfoExt->iWeight + spItem->pItemBasic->siWeight) > pInfoExt->iWeightMax)
-	{	 
-		szMsg = fmt::format_text_resource(IDS_ITEM_WEIGHT_OVERFLOW);	
-		CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);	
-		return false;	
+	__InfoPlayerMySelf* pInfoExt = &(CGameBase::s_pPlayer->m_InfoExt);
+	if ((pInfoExt->iWeight + spItem->pItemBasic->siWeight) > pInfoExt->iWeightMax)
+	{
+		szMsg = fmt::format_text_resource(IDS_ITEM_WEIGHT_OVERFLOW);
+		CGameProcedure::s_pProcMain->MsgOutput(szMsg, 0xffff3b3b);
+		return false;
 	}
 
 	return true;
@@ -2823,36 +2926,42 @@ bool CUIInventory::CheckWeightValidate(__IconItemSkill* spItem)
 //this_ui_add_start
 bool CUIInventory::OnKeyPress(int iKey)
 {
-	if(m_bDestoyDlgAlive && m_pArea_Destroy)
+	if (m_bDestoyDlgAlive && m_pArea_Destroy)
 	{
-		switch(iKey)
+		switch (iKey)
 		{
-		case DIK_RETURN:
+			case DIK_RETURN:
 			{
 				CN3UIButton* pBtnDestroyOk = nullptr;
 				N3_VERIFY_UI_COMPONENT(pBtnDestroyOk, m_pArea_Destroy->GetChildByID<CN3UIButton>("btn_Destroy_ok"));
-				if(pBtnDestroyOk) m_pArea_Destroy->ReceiveMessage(pBtnDestroyOk, UIMSG_BUTTON_CLICK);
-				else return false;
+				if (pBtnDestroyOk)
+					m_pArea_Destroy->ReceiveMessage(pBtnDestroyOk, UIMSG_BUTTON_CLICK);
+				else
+					return false;
 			}
-			return true;
-		case DIK_ESCAPE:
+				return true;
+			case DIK_ESCAPE:
 			{
 				CN3UIButton* pBtnDestroyCancel = nullptr;
 				N3_VERIFY_UI_COMPONENT(pBtnDestroyCancel, m_pArea_Destroy->GetChildByID<CN3UIButton>("btn_Destroy_cancel"));
-				if(pBtnDestroyCancel) m_pArea_Destroy->ReceiveMessage(pBtnDestroyCancel, UIMSG_BUTTON_CLICK);
-				else return false;
+				if (pBtnDestroyCancel)
+					m_pArea_Destroy->ReceiveMessage(pBtnDestroyCancel, UIMSG_BUTTON_CLICK);
+				else
+					return false;
 			}
-			return true;
+				return true;
 		}
 	}
 	else
 	{
-		switch(iKey)
+		switch (iKey)
 		{
-		case DIK_ESCAPE:
-			if(!m_bClosingNow) this->Close();
-			if(m_pUITooltipDlg) m_pUITooltipDlg->DisplayTooltipsDisable();
-			return true;
+			case DIK_ESCAPE:
+				if (!m_bClosingNow)
+					this->Close();
+				if (m_pUITooltipDlg)
+					m_pUITooltipDlg->DisplayTooltipsDisable();
+				return true;
 		}
 	}
 
@@ -2862,7 +2971,7 @@ bool CUIInventory::OnKeyPress(int iKey)
 void CUIInventory::SetVisible(bool bVisible)
 {
 	CN3UIBase::SetVisible(bVisible);
-	if(bVisible)
+	if (bVisible)
 		CGameProcedure::s_pUIMgr->SetVisibleFocusedUI(this);
 	else
 		CGameProcedure::s_pUIMgr->ReFocusUI();
@@ -2874,9 +2983,9 @@ void CUIInventory::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFocu
 {
 	CN3UIBase::SetVisibleWithNoSound(bVisible, bWork, bReFocus);
 
-	if(bWork)
+	if (bWork)
 	{
-		if ( m_eInvenState == INV_STATE_REPAIR )
+		if (m_eInvenState == INV_STATE_REPAIR)
 		{
 			CGameProcedure::RestoreGameCursor();
 
@@ -2894,12 +3003,13 @@ void CUIInventory::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFocu
 		SetState(UI_STATE_COMMON_NONE);
 		CN3UIWndBase::AllHighLightIconFree();
 
-		if(m_pUITooltipDlg) m_pUITooltipDlg->DisplayTooltipsDisable();
+		if (m_pUITooltipDlg)
+			m_pUITooltipDlg->DisplayTooltipsDisable();
 	}
 
-	if(bReFocus)
+	if (bReFocus)
 	{
-		if(bVisible)
+		if (bVisible)
 			CGameProcedure::s_pUIMgr->SetVisibleFocusedUI(this);
 		else
 			CGameProcedure::s_pUIMgr->ReFocusUI();
@@ -2912,20 +3022,20 @@ int CUIInventory::GetIndexItemCount(uint32_t dwIndex)
 {
 	int iCnt = 0;
 
-	for( int i = 0; i < ITEM_SLOT_COUNT; i++ )
+	for (int i = 0; i < ITEM_SLOT_COUNT; i++)
 	{
-		if(m_pMySlot[i] && m_pMySlot[i]->pItemBasic)
+		if (m_pMySlot[i] && m_pMySlot[i]->pItemBasic)
 		{
-			if(m_pMySlot[i]->pItemBasic->dwID == dwIndex)
+			if (m_pMySlot[i]->pItemBasic->dwID == dwIndex)
 				iCnt += m_pMySlot[i]->iCount;
 		}
 	}
 
-	for(int i = 0; i < MAX_ITEM_INVENTORY; i++ )
+	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
-		if(m_pMyInvWnd[i] && m_pMyInvWnd[i]->pItemBasic)
+		if (m_pMyInvWnd[i] && m_pMyInvWnd[i]->pItemBasic)
 		{
-			if(m_pMyInvWnd[i]->pItemBasic->dwID == dwIndex)
+			if (m_pMyInvWnd[i]->pItemBasic->dwID == dwIndex)
 				iCnt += m_pMyInvWnd[i]->iCount;
 		}
 	}

@@ -14,32 +14,33 @@
 
 class CDlgFolderSelect : public CDialog
 {
-// Construction
+	// Construction
 public:
 	CString GetFolderName();
 	void SetInitFolderName(CString& FolderName);
-	CDlgFolderSelect(CWnd* pParent = NULL);   // standard constructor
+	CDlgFolderSelect(CWnd* pParent = NULL); // standard constructor
 
-// Dialog Data
+											// Dialog Data
 	//{{AFX_DATA(CDlgFolderSelect)
-	enum { IDD = IDD_FOLDER_SELECT };
-	CDirTreeCtrl	m_DirTree;
-	CComboBox		m_CBFolder;
+	enum
+	{
+		IDD = IDD_FOLDER_SELECT
+	};
+	CDirTreeCtrl m_DirTree;
+	CComboBox m_CBFolder;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgFolderSelect)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 private:
 	CString m_FolderName;
 
-// Implementation
+	// Implementation
 protected:
-
 	// Generated message map functions
 	//{{AFX_MSG(CDlgFolderSelect)
 	virtual BOOL OnInitDialog();

@@ -11,9 +11,9 @@
 
 BB_CircularBuffer::BB_CircularBuffer(int size)
 {
-	ASSERT(size>0);
+	ASSERT(size > 0);
 	m_iBufSize = size;
-	m_pBuffer = new BYTE[m_iBufSize];
+	m_pBuffer  = new BYTE[m_iBufSize];
 
 	m_iHeadPos = 0;
 	m_iTailPos = 0;

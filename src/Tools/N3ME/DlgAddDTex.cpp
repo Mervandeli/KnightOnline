@@ -14,15 +14,12 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgAddDTex dialog
 
-
-CDlgAddDTex::CDlgAddDTex(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgAddDTex::IDD, pParent)
+CDlgAddDTex::CDlgAddDTex(CWnd* pParent /*=nullptr*/) : CDialog(CDlgAddDTex::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgAddDTex)
-		// NOTE: the ClassWizard will add member initialization here
+	// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgAddDTex::DoDataExchange(CDataExchange* pDX)
 {
@@ -32,31 +29,29 @@ void CDlgAddDTex::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgAddDTex, CDialog)
-	//{{AFX_MSG_MAP(CDlgAddDTex)
-	ON_LBN_SELCHANGE(IDC_ADDDTEXLIST, OnSelchangeAdddtexlist)
-	ON_LBN_DBLCLK(IDC_ADDDTEXLIST, OnDblclkAdddtexlist)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgAddDTex)
+ON_LBN_SELCHANGE(IDC_ADDDTEXLIST, OnSelchangeAdddtexlist)
+ON_LBN_DBLCLK(IDC_ADDDTEXLIST, OnDblclkAdddtexlist)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgAddDTex message handlers
 
-void CDlgAddDTex::OnSelchangeAdddtexlist() 
+void CDlgAddDTex::OnSelchangeAdddtexlist()
 {
 	int CurrSel = m_TexList.GetCurSel();
 	//m_TexList.SetCurSel(CurrSel);
 	m_TexList.GetText(CurrSel, m_TexName);
 }
 
-void CDlgAddDTex::OnDblclkAdddtexlist() 
+void CDlgAddDTex::OnDblclkAdddtexlist()
 {
 	OnOK();
 }
 
-
-BOOL CDlgAddDTex::OnInitDialog() 
+BOOL CDlgAddDTex::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
@@ -73,7 +68,7 @@ BOOL CDlgAddDTex::OnInitDialog()
 	SetCurrentDirectory(szNewPath);
 	m_TexList.Dir(DDL_READONLY, "dtex\\*.bmp");
 	SetCurrentDirectory(szOldPath);
-	
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+
+	return TRUE; // return TRUE unless you set the focus to a control
+				 // EXCEPTION: OCX Property Pages should return FALSE
 }

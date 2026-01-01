@@ -24,7 +24,7 @@ void CKnightsManager::PacketProcess(CUser* pUser, char* pBuf)
 	if (pUser == nullptr)
 		return;
 
-	int index = 0;
+	int index       = 0;
 
 	uint8_t command = GetByte(pBuf, index);
 	switch (command)
@@ -83,7 +83,7 @@ void CKnightsManager::CreateKnights(CUser* pUser, char* pBuf)
 	char idname[MAX_ID_SIZE + 1] = {};
 	// DateTime time = DateTime::GetNow();
 
-	char send_buff[256] = {};
+	char send_buff[256]          = {};
 
 	if (pUser == nullptr)
 		return;
@@ -217,14 +217,12 @@ int CKnightsManager::GetKnightsIndex(int nation)
 	knightindex++;
 	if (nation == KARUS)
 	{
-		if (knightindex >= 15000
-			|| knightindex < 0)
+		if (knightindex >= 15000 || knightindex < 0)
 			return -1;
 	}
 	else if (nation == ELMORAD)
 	{
-		if (knightindex < 15000
-			|| knightindex > 30000)
+		if (knightindex < 15000 || knightindex > 30000)
 			return -1;
 	}
 
@@ -239,8 +237,8 @@ void CKnightsManager::JoinKnights(CUser* pUser, char* pBuf)
 {
 	int knightsindex = 0, index = 0, send_index = 0, ret_value = 0, member_id = 0;
 	char send_buff[128] = {};
-	CUser* pTUser = nullptr;
-	CKnights* pKnights = nullptr;
+	CUser* pTUser       = nullptr;
+	CKnights* pKnights  = nullptr;
 
 	if (pUser == nullptr)
 		return;
@@ -252,15 +250,14 @@ void CKnightsManager::JoinKnights(CUser* pUser, char* pBuf)
 		goto fail_return;
 	}
 
-	if (pUser->m_pUserData->m_bFame != CHIEF
-		&& pUser->m_pUserData->m_bFame != VICECHIEF)
+	if (pUser->m_pUserData->m_bFame != CHIEF && pUser->m_pUserData->m_bFame != VICECHIEF)
 	{
 		ret_value = 6;
 		goto fail_return;
 	}
 
 	knightsindex = pUser->m_pUserData->m_bKnights;
-	pKnights = m_pMain->m_KnightsMap.GetData(knightsindex);
+	pKnights     = m_pMain->m_KnightsMap.GetData(knightsindex);
 	if (pKnights == nullptr)
 	{
 		ret_value = 7;
@@ -268,7 +265,7 @@ void CKnightsManager::JoinKnights(CUser* pUser, char* pBuf)
 	}
 
 	// 인원 체크
-/*	if (pKnights->sMembers >= 24)
+	/*	if (pKnights->sMembers >= 24)
 	{
 		ret_value = 8;
 		goto fail_return;
@@ -276,7 +273,7 @@ void CKnightsManager::JoinKnights(CUser* pUser, char* pBuf)
 
 	member_id = GetShort(pBuf, index);
 
-	pTUser = m_pMain->GetUserPtr(member_id);
+	pTUser    = m_pMain->GetUserPtr(member_id);
 	if (pTUser == nullptr)
 	{
 		ret_value = 2;
@@ -323,14 +320,14 @@ void CKnightsManager::JoinKnightsReq(CUser* pUser, char* pBuf)
 {
 	int knightsindex = 0, index = 0, send_index = 0, ret_value = 0, flag = 0, sid = -1;
 	char send_buff[128] = {};
-	CUser* pTUser = nullptr;
-	CKnights* pKnights = nullptr;
+	CUser* pTUser       = nullptr;
+	CKnights* pKnights  = nullptr;
 
 	if (pUser == nullptr)
 		return;
 
-	flag = GetByte(pBuf, index);
-	sid = GetShort(pBuf, index);
+	flag   = GetByte(pBuf, index);
+	sid    = GetShort(pBuf, index);
 
 	pTUser = m_pMain->GetUserPtr(sid);
 	if (pTUser == nullptr)
@@ -357,7 +354,7 @@ void CKnightsManager::JoinKnightsReq(CUser* pUser, char* pBuf)
 	}
 
 	knightsindex = GetShort(pBuf, index);
-	pKnights = m_pMain->m_KnightsMap.GetData(knightsindex);
+	pKnights     = m_pMain->m_KnightsMap.GetData(knightsindex);
 	if (pKnights == nullptr)
 	{
 		ret_value = 7;
@@ -395,8 +392,7 @@ void CKnightsManager::WithdrawKnights(CUser* pUser)
 		return;
 
 	// 기사단에 가입되어 있지 않습니다
-	if (pUser->m_pUserData->m_bKnights < 1
-		|| pUser->m_pUserData->m_bKnights > 30000)
+	if (pUser->m_pUserData->m_bKnights < 1 || pUser->m_pUserData->m_bKnights > 30000)
 	{
 		ret_value = 10;
 		goto fail_return;
@@ -476,9 +472,9 @@ fail_return:
 void CKnightsManager::ModifyKnightsMember(CUser* pUser, char* pBuf, uint8_t command)
 {
 	int index = 0, send_index = 0, idlen = 0, ret_value = 0, remove_flag = 0;
-	char send_buff[128] = {};
+	char send_buff[128]          = {};
 	char userid[MAX_ID_SIZE + 1] = {};
-	CUser* pTUser = nullptr;
+	CUser* pTUser                = nullptr;
 
 	if (pUser == nullptr)
 		return;
@@ -486,8 +482,7 @@ void CKnightsManager::ModifyKnightsMember(CUser* pUser, char* pBuf, uint8_t comm
 	idlen = GetShort(pBuf, index);
 
 	// 잘못된 아이디
-	if (idlen > MAX_ID_SIZE
-		|| idlen <= 0)
+	if (idlen > MAX_ID_SIZE || idlen <= 0)
 	{
 		ret_value = 2;
 		goto fail_return;
@@ -510,8 +505,7 @@ void CKnightsManager::ModifyKnightsMember(CUser* pUser, char* pBuf, uint8_t comm
 	}
 
 	// 기사단, 멤버가입 및 멤버거절, 장교 이상이 할 수 있습니다
-	if (command == KNIGHTS_ADMIT
-		|| command == KNIGHTS_REJECT)
+	if (command == KNIGHTS_ADMIT || command == KNIGHTS_REJECT)
 	{
 		if (pUser->m_pUserData->m_bFame < OFFICER)
 			goto fail_return;
@@ -586,7 +580,7 @@ void CKnightsManager::ModifyKnightsMember(CUser* pUser, char* pBuf, uint8_t comm
 			goto fail_return;
 		}
 
-	/*	if( !strcmp( pKnights->strViceChief_1, "") )	vicechief = 1;
+		/*	if( !strcmp( pKnights->strViceChief_1, "") )	vicechief = 1;
 		else if( !strcmp( pKnights->strViceChief_2, "") )	vicechief = 2;
 		else if( !strcmp( pKnights->strViceChief_3, "") )	vicechief = 3;
 		else {
@@ -595,7 +589,7 @@ void CKnightsManager::ModifyKnightsMember(CUser* pUser, char* pBuf, uint8_t comm
 		}	*/
 	}
 
-	remove_flag = 1;	// 게임상에 있는 유저 추방시 (1)
+	remove_flag = 1; // 게임상에 있는 유저 추방시 (1)
 	SetByte(send_buff, WIZ_KNIGHTS_PROCESS, send_index);
 	SetByte(send_buff, command + 0x10, send_index);
 	SetShort(send_buff, pUser->GetSocketID(), send_index);
@@ -623,8 +617,8 @@ void CKnightsManager::AllKnightsList(CUser* pUser, char* pBuf)
 	if (pUser == nullptr)
 		return;
 
-	page = GetShort(pBuf, index);
-	start = page * 10;			// page : 0 ~
+	page  = GetShort(pBuf, index);
+	start = page * 10; // page : 0 ~
 
 	for (const auto& [_, pKnights] : m_pMain->m_KnightsMap)
 	{
@@ -669,7 +663,7 @@ void CKnightsManager::AllKnightsMember(CUser* pUser)
 	int send_index = 0, ret_value = 0, temp_index = 0, count = 0, onlineCount = 0, pktsize = 0;
 	char send_buff[4096] = {};
 	char temp_buff[4096] = {};
-	CKnights* pKnights = nullptr;
+	CKnights* pKnights   = nullptr;
 
 	if (pUser == nullptr)
 		return;
@@ -689,7 +683,7 @@ void CKnightsManager::AllKnightsMember(CUser* pUser)
 	}
 
 	// 단장
-/*	if (pUser->m_pUserData->m_bFame == CHIEF)
+	/*	if (pUser->m_pUserData->m_bFame == CHIEF)
 	{
 		SetByte( send_buff, WIZ_KNIGHTS_PROCESS, send_index );
 		SetByte( send_buff, KNIGHTS_MEMBER_REQ+0x10, send_index );
@@ -700,11 +694,13 @@ void CKnightsManager::AllKnightsMember(CUser* pUser)
 		return;
 	}*/
 
-	onlineCount = m_pMain->GetKnightsAllMembers(pUser->m_pUserData->m_bKnights, temp_buff, temp_index, 0);
+	onlineCount = m_pMain->GetKnightsAllMembers(
+		pUser->m_pUserData->m_bKnights, temp_buff, temp_index, 0);
 
 	// 직접.. 게임서버에서 유저정보를 참조해서 불러오는 방식 (단장이 아닌 모든 사람)
 	if (pUser->m_pUserData->m_bFame == CHIEF)
-		count = m_pMain->GetKnightsAllMembers(pUser->m_pUserData->m_bKnights, temp_buff, temp_index, 1);
+		count = m_pMain->GetKnightsAllMembers(
+			pUser->m_pUserData->m_bKnights, temp_buff, temp_index, 1);
 	else
 		count = onlineCount;
 
@@ -722,7 +718,7 @@ void CKnightsManager::AllKnightsMember(CUser* pUser)
 	SetString(send_buff, temp_buff, temp_index, send_index);
 	pUser->Send(send_buff, send_index);
 
-/*	SetByte( send_buff, WIZ_KNIGHTS_PROCESS, send_index );
+	/*	SetByte( send_buff, WIZ_KNIGHTS_PROCESS, send_index );
 	SetByte( send_buff, KNIGHTS_MEMBER_REQ+0x10, send_index );
 	SetShort( send_buff, pUser->GetSocketID(), send_index );
 	SetShort( send_buff, pUser->m_pUserData->m_bKnights, send_index );
@@ -739,11 +735,12 @@ fail_return:
 
 void CKnightsManager::CurrentKnightsMember(CUser* pUser, char* pBuf)
 {
-	int index = 0, send_index = 0, buff_index = 0, count = 0, i = 0, page = 0, start = 0, socketCount;
-	char send_buff[128] = {};
+	int index = 0, send_index = 0, buff_index = 0, count = 0, i = 0, page = 0, start = 0,
+		socketCount;
+	char send_buff[128]  = {};
 	char temp_buff[4096] = {};
-	CUser* pTUser = nullptr;
-	CKnights* pKnights = nullptr;
+	CUser* pTUser        = nullptr;
+	CKnights* pKnights   = nullptr;
 	std::string errormsg = fmt::format_db_resource(IDP_KNIGHT_NOT_REGISTERED);
 
 	if (pUser == nullptr)
@@ -756,8 +753,8 @@ void CKnightsManager::CurrentKnightsMember(CUser* pUser, char* pBuf)
 	if (pKnights == nullptr)
 		goto fail_return;
 
-	page = GetShort(pBuf, index);
-	start = page * 10;			// page : 0 ~
+	page        = GetShort(pBuf, index);
+	start       = page * 10; // page : 0 ~
 	socketCount = m_pMain->GetUserSocketCount();
 
 	for (i = 0; i < socketCount; i++)
@@ -810,7 +807,7 @@ void CKnightsManager::ReceiveKnightsProcess(CUser* pUser, const char* pBuf, uint
 	char send_buff[2048] = {};
 	std::string errormsg = fmt::format_db_resource(IDP_KNIGHT_DB_FAIL);
 
-	result = GetByte(pBuf, index);
+	result               = GetByte(pBuf, index);
 
 	//TRACE(_T("ReceiveKnightsProcess - command=%d, result=%d, nid=%d, name=%hs, index=%d, fame=%d\n"), command, result, pUser->GetSocketID(), pUser->m_pUserData->m_id, pUser->m_pUserData->m_bKnights, pUser->m_pUserData->m_bFame);
 
@@ -857,7 +854,7 @@ void CKnightsManager::ReceiveKnightsProcess(CUser* pUser, const char* pBuf, uint
 				break;
 
 			pktsize = GetShort(pBuf, index);
-			count = GetShort(pBuf, index);
+			count   = GetShort(pBuf, index);
 
 			if (count > 24)
 				break;
@@ -886,19 +883,20 @@ void CKnightsManager::ReceiveKnightsProcess(CUser* pUser, const char* pBuf, uint
 
 void CKnightsManager::RecvCreateKnights(CUser* pUser, const char* pBuf)
 {
-	int index = 0, send_index = 0, namelen = 0, idlen = 0, knightsindex = 0, nation = 0, community = 0, money = 0;
-	char send_buff[128] = {};
+	int index = 0, send_index = 0, namelen = 0, idlen = 0, knightsindex = 0, nation = 0,
+		community = 0, money = 0;
+	char send_buff[128]               = {};
 	char knightsname[MAX_ID_SIZE + 1] = {};
-	char chiefname[MAX_ID_SIZE + 1] = {};
-	CKnights* pKnights = nullptr;
+	char chiefname[MAX_ID_SIZE + 1]   = {};
+	CKnights* pKnights                = nullptr;
 
 	if (pUser == nullptr)
 		return;
 
-	community = GetByte(pBuf, index);
+	community    = GetByte(pBuf, index);
 	knightsindex = GetShort(pBuf, index);
-	nation = GetByte(pBuf, index);
-	namelen = GetShort(pBuf, index);
+	nation       = GetByte(pBuf, index);
+	namelen      = GetShort(pBuf, index);
 	GetString(knightsname, pBuf, namelen, index);
 	idlen = GetShort(pBuf, index);
 	GetString(chiefname, pBuf, idlen, index);
@@ -906,24 +904,24 @@ void CKnightsManager::RecvCreateKnights(CUser* pUser, const char* pBuf)
 	pKnights = new CKnights();
 	pKnights->InitializeValue();
 
-	pKnights->m_sIndex = knightsindex;
-	pKnights->m_byFlag = community;
+	pKnights->m_sIndex   = knightsindex;
+	pKnights->m_byFlag   = community;
 	pKnights->m_byNation = nation;
 	strcpy_safe(pKnights->m_strName, knightsname);
 	strcpy_safe(pKnights->m_strChief, chiefname);
 	memset(pKnights->m_strViceChief_1, 0, sizeof(pKnights->m_strViceChief_1));
 	memset(pKnights->m_strViceChief_2, 0, sizeof(pKnights->m_strViceChief_2));
 	memset(pKnights->m_strViceChief_3, 0, sizeof(pKnights->m_strViceChief_3));
-	pKnights->m_sMembers = 1;
-	pKnights->m_nMoney = 0;
-	pKnights->m_nPoints = 0;
-	pKnights->m_byGrade = 5;
-	pKnights->m_byRanking = 0;
+	pKnights->m_sMembers           = 1;
+	pKnights->m_nMoney             = 0;
+	pKnights->m_nPoints            = 0;
+	pKnights->m_byGrade            = 5;
+	pKnights->m_byRanking          = 0;
 
 	pUser->m_pUserData->m_bKnights = knightsindex;
-	pUser->m_pUserData->m_bFame = CHIEF;
-	money = pUser->m_pUserData->m_iGold - 500000;
-	pUser->m_pUserData->m_iGold = money;
+	pUser->m_pUserData->m_bFame    = CHIEF;
+	money                          = pUser->m_pUserData->m_iGold - 500000;
+	pUser->m_pUserData->m_iGold    = money;
 
 	for (int i = 0; i < MAX_CLAN; i++)
 	{
@@ -939,7 +937,7 @@ void CKnightsManager::RecvCreateKnights(CUser* pUser, const char* pBuf)
 	//TRACE(_T("RecvCreateKnights - nid=%d, name=%hs, index=%d, fame=%d, money=%d\n"), pUser->GetSocketID(), pUser->m_pUserData->m_id, knightsindex, pUser->m_pUserData->m_bFame, money);
 
 	//if( pKnights->bFlag == KNIGHTS_TYPE )	{
-/*	memset( send_buff, 0x00, 128 ); send_index = 0;
+	/*	memset( send_buff, 0x00, 128 ); send_index = 0;
 		SetByte( send_buff, WIZ_KNIGHTS_LIST, send_index );
 		SetByte( send_buff, 0x02, send_index );					// Insert Knights From List
 		SetShort( send_buff, knightsindex, send_index );
@@ -957,10 +955,11 @@ void CKnightsManager::RecvCreateKnights(CUser* pUser, const char* pBuf)
 	SetShort(send_buff, knightsindex, send_index);
 	SetShort(send_buff, namelen, send_index);
 	SetString(send_buff, knightsname, namelen, send_index);
-	SetByte(send_buff, 5, send_index);  // knights grade
+	SetByte(send_buff, 5, send_index); // knights grade
 	SetByte(send_buff, 0, send_index);
 	SetDWORD(send_buff, money, send_index);
-	m_pMain->Send_Region(send_buff, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX, pUser->m_RegionZ, nullptr, false);
+	m_pMain->Send_Region(send_buff, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX,
+		pUser->m_RegionZ, nullptr, false);
 	//pUser->Send( send_buff, send_index );
 
 	memset(send_buff, 0, sizeof(send_buff));
@@ -991,12 +990,12 @@ void CKnightsManager::RecvJoinKnights(CUser* pUser, const char* pBuf, uint8_t co
 		return;
 
 	knightsindex = GetShort(pBuf, index);
-	pKnights = m_pMain->m_KnightsMap.GetData(knightsindex);
+	pKnights     = m_pMain->m_KnightsMap.GetData(knightsindex);
 
 	if (command == KNIGHTS_JOIN + 0x10)
 	{
 		pUser->m_pUserData->m_bKnights = knightsindex;
-		pUser->m_pUserData->m_bFame = TRAINEE;
+		pUser->m_pUserData->m_bFame    = TRAINEE;
 		finalstr = fmt::format_db_resource(IDS_KNIGHTS_JOIN, pUser->m_pUserData->m_id);
 
 		// 클랜정보에 추가
@@ -1008,7 +1007,7 @@ void CKnightsManager::RecvJoinKnights(CUser* pUser, const char* pBuf, uint8_t co
 	else
 	{
 		pUser->m_pUserData->m_bKnights = 0;
-		pUser->m_pUserData->m_bFame = 0;
+		pUser->m_pUserData->m_bFame    = 0;
 
 		// 클랜정보에 추가
 		RemoveKnightsUser(knightsindex, pUser->m_pUserData->m_id);
@@ -1039,11 +1038,12 @@ void CKnightsManager::RecvJoinKnights(CUser* pUser, const char* pBuf, uint8_t co
 	if (pKnights != nullptr)
 	{
 		SetString2(send_buff, pKnights->m_strName, send_index);
-		SetByte(send_buff, pKnights->m_byGrade, send_index);  // knights grade
-		SetByte(send_buff, pKnights->m_byRanking, send_index);  // knights grade
+		SetByte(send_buff, pKnights->m_byGrade, send_index);   // knights grade
+		SetByte(send_buff, pKnights->m_byRanking, send_index); // knights grade
 	}
 
-	m_pMain->Send_Region(send_buff, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX, pUser->m_RegionZ, nullptr, false);
+	m_pMain->Send_Region(send_buff, send_index, pUser->m_pUserData->m_bZone, pUser->m_RegionX,
+		pUser->m_RegionZ, nullptr, false);
 	//pUser->Send( send_buff, send_index );
 
 	memset(send_buff, 0, sizeof(send_buff));
@@ -1052,7 +1052,7 @@ void CKnightsManager::RecvJoinKnights(CUser* pUser, const char* pBuf, uint8_t co
 	SetByte(send_buff, KNIGHTS_CHAT, send_index);
 	SetByte(send_buff, 1, send_index);
 	SetShort(send_buff, -1, send_index);
-	SetByte(send_buff, 0, send_index);			// sender name length
+	SetByte(send_buff, 0, send_index); // sender name length
 	SetString2(send_buff, finalstr, send_index);
 	m_pMain->Send_KnightsMember(knightsindex, send_buff, send_index);
 
@@ -1075,15 +1075,15 @@ void CKnightsManager::RecvModifyFame(CUser* pUser, const char* pBuf, uint8_t com
 	char send_buff[128] = {};
 	std::string finalstr;
 	char userid[MAX_ID_SIZE + 1] = {};
-	CUser* pTUser = nullptr;
+	CUser* pTUser                = nullptr;
 
 	if (pUser == nullptr)
 		return;
 
 	int knightsindex = GetShort(pBuf, index);
-	int idlen = GetShort(pBuf, index);
+	int idlen        = GetShort(pBuf, index);
 	GetString(userid, pBuf, idlen, index);
-	/*int vicechief =*/ GetByte(pBuf, index);
+	/*int vicechief =*/GetByte(pBuf, index);
 
 	pTUser = m_pMain->GetUserPtr(userid, NameType::Character);
 
@@ -1093,7 +1093,7 @@ void CKnightsManager::RecvModifyFame(CUser* pUser, const char* pBuf, uint8_t com
 			if (pTUser != nullptr)
 			{
 				pTUser->m_pUserData->m_bKnights = 0;
-				pTUser->m_pUserData->m_bFame = 0;
+				pTUser->m_pUserData->m_bFame    = 0;
 				finalstr = fmt::format_db_resource(IDS_KNIGHTS_REMOVE, pTUser->m_pUserData->m_id);
 
 				RemoveKnightsUser(knightsindex, pTUser->m_pUserData->m_id);
@@ -1113,7 +1113,7 @@ void CKnightsManager::RecvModifyFame(CUser* pUser, const char* pBuf, uint8_t com
 			if (pTUser != nullptr)
 			{
 				pTUser->m_pUserData->m_bKnights = 0;
-				pTUser->m_pUserData->m_bFame = 0;
+				pTUser->m_pUserData->m_bFame    = 0;
 
 				RemoveKnightsUser(knightsindex, pTUser->m_pUserData->m_id);
 			}
@@ -1133,7 +1133,8 @@ void CKnightsManager::RecvModifyFame(CUser* pUser, const char* pBuf, uint8_t com
 			{
 				pTUser->m_pUserData->m_bFame = VICECHIEF;
 				ModifyKnightsUser(knightsindex, pTUser->m_pUserData->m_id);
-				finalstr = fmt::format_db_resource(IDS_KNIGHTS_VICECHIEF, pTUser->m_pUserData->m_id);
+				finalstr = fmt::format_db_resource(
+					IDS_KNIGHTS_VICECHIEF, pTUser->m_pUserData->m_id);
 			}
 			break;
 
@@ -1148,7 +1149,7 @@ void CKnightsManager::RecvModifyFame(CUser* pUser, const char* pBuf, uint8_t com
 			break;
 	}
 
-/*	SetByte(send_buff, WIZ_KNIGHTS_PROCESS, send_index);
+	/*	SetByte(send_buff, WIZ_KNIGHTS_PROCESS, send_index);
 	SetByte(send_buff, command - 0x10, send_index);
 	SetByte(send_buff, 0x01, send_index);
 	pUser->Send( send_buff, send_index);
@@ -1169,7 +1170,8 @@ void CKnightsManager::RecvModifyFame(CUser* pUser, const char* pBuf, uint8_t com
 			SetShort(send_buff, pTUser->GetSocketID(), send_index);
 			SetShort(send_buff, pTUser->m_pUserData->m_bKnights, send_index);
 			SetByte(send_buff, pTUser->m_pUserData->m_bFame, send_index);
-			m_pMain->Send_Region(send_buff, send_index, pTUser->m_pUserData->m_bZone, pTUser->m_RegionX, pTUser->m_RegionZ, nullptr, false);
+			m_pMain->Send_Region(send_buff, send_index, pTUser->m_pUserData->m_bZone,
+				pTUser->m_RegionX, pTUser->m_RegionZ, nullptr, false);
 		}
 		else
 		{
@@ -1187,7 +1189,7 @@ void CKnightsManager::RecvModifyFame(CUser* pUser, const char* pBuf, uint8_t com
 			SetByte(send_buff, KNIGHTS_CHAT, send_index);
 			SetByte(send_buff, 1, send_index);
 			SetShort(send_buff, -1, send_index);
-			SetByte(send_buff, 0, send_index);			// sender name length
+			SetByte(send_buff, 0, send_index); // sender name length
 			SetString2(send_buff, finalstr, send_index);
 			pTUser->Send(send_buff, send_index);
 		}
@@ -1199,7 +1201,7 @@ void CKnightsManager::RecvModifyFame(CUser* pUser, const char* pBuf, uint8_t com
 	SetByte(send_buff, KNIGHTS_CHAT, send_index);
 	SetByte(send_buff, 1, send_index);
 	SetShort(send_buff, -1, send_index);
-	SetByte(send_buff, 0, send_index);			// sender name length
+	SetByte(send_buff, 0, send_index); // sender name length
 	SetString2(send_buff, finalstr, send_index);
 	m_pMain->Send_KnightsMember(knightsindex, send_buff, send_index);
 
@@ -1221,14 +1223,14 @@ void CKnightsManager::RecvDestroyKnights(CUser* pUser, const char* pBuf)
 	char send_buff[128] = {};
 	std::string finalstr;
 	CKnights* pKnights = nullptr;
-	CUser* pTUser = nullptr;
+	CUser* pTUser      = nullptr;
 
 	if (pUser == nullptr)
 		return;
 
 	knightsindex = GetShort(pBuf, index);
 
-	pKnights = m_pMain->m_KnightsMap.GetData(knightsindex);
+	pKnights     = m_pMain->m_KnightsMap.GetData(knightsindex);
 	if (pKnights == nullptr)
 	{
 		//TRACE(_T("### RecvDestoryKnights  Fail == index = %d ###\n"), knightsindex);
@@ -1242,14 +1244,14 @@ void CKnightsManager::RecvDestroyKnights(CUser* pUser, const char* pBuf)
 		finalstr = fmt::format_db_resource(IDS_CLAN_DESTORY, pKnights->m_strName);
 	else if (flag == KNIGHTS_TYPE)
 		finalstr = fmt::format_db_resource(IDS_CLAN_DESTORY, pKnights->m_strName);
-	
+
 	memset(send_buff, 0, sizeof(send_buff));
 	send_index = 0;
 	SetByte(send_buff, WIZ_CHAT, send_index);
 	SetByte(send_buff, KNIGHTS_CHAT, send_index);
 	SetByte(send_buff, 1, send_index);
 	SetShort(send_buff, -1, send_index);
-	SetByte(send_buff, 0, send_index);			// sender name length
+	SetByte(send_buff, 0, send_index); // sender name length
 	SetString2(send_buff, finalstr, send_index);
 	m_pMain->Send_KnightsMember(knightsindex, send_buff, send_index);
 
@@ -1263,7 +1265,7 @@ void CKnightsManager::RecvDestroyKnights(CUser* pUser, const char* pBuf)
 		if (pTUser->m_pUserData->m_bKnights == knightsindex)
 		{
 			pTUser->m_pUserData->m_bKnights = 0;
-			pTUser->m_pUserData->m_bFame = 0;
+			pTUser->m_pUserData->m_bFame    = 0;
 
 			RemoveKnightsUser(knightsindex, pTUser->m_pUserData->m_id);
 
@@ -1275,7 +1277,8 @@ void CKnightsManager::RecvDestroyKnights(CUser* pUser, const char* pBuf)
 			SetShort(send_buff, pTUser->GetSocketID(), send_index);
 			SetShort(send_buff, pTUser->m_pUserData->m_bKnights, send_index);
 			SetByte(send_buff, pTUser->m_pUserData->m_bFame, send_index);
-			m_pMain->Send_Region(send_buff, send_index, pTUser->m_pUserData->m_bZone, pTUser->m_RegionX, pTUser->m_RegionZ, nullptr, false);
+			m_pMain->Send_Region(send_buff, send_index, pTUser->m_pUserData->m_bZone,
+				pTUser->m_RegionX, pTUser->m_RegionZ, nullptr, false);
 			//pTUser->Send( send_buff, send_index );
 		}
 	}
@@ -1301,7 +1304,7 @@ void CKnightsManager::RecvDestroyKnights(CUser* pUser, const char* pBuf)
 		m_pMain->Send_UDP_All(send_buff, send_index, 1);
 
 	//if( flag == KNIGHTS_TYPE )	{
-/*	memset( send_buff, 0x00, 128 ); send_index = 0;
+	/*	memset( send_buff, 0x00, 128 ); send_index = 0;
 		SetByte( send_buff, WIZ_KNIGHTS_LIST, send_index );
 		SetByte( send_buff, 0x03, send_index );					// Knights Remove From List
 		SetShort( send_buff, knightsindex, send_index );
@@ -1316,12 +1319,12 @@ void CKnightsManager::RecvKnightsList(const char* pBuf)
 	int nation = 0, members = 0, index = 0, iLength = 0, knightsindex = 0, points = 0, ranking = 0;
 	char knightsname[MAX_ID_SIZE + 1] = {};
 
-	knightsindex = GetShort(pBuf, index);
-	nation = GetByte(pBuf, index);
-	iLength = GetShort(pBuf, index);
+	knightsindex                      = GetShort(pBuf, index);
+	nation                            = GetByte(pBuf, index);
+	iLength                           = GetShort(pBuf, index);
 	GetString(knightsname, pBuf, iLength, index);
 	members = GetShort(pBuf, index);
-	points = GetDWORD(pBuf, index); // knights grade
+	points  = GetDWORD(pBuf, index); // knights grade
 	ranking = GetByte(pBuf, index);
 
 	if (m_pMain->m_nServerNo == BATTLE)
@@ -1329,18 +1332,18 @@ void CKnightsManager::RecvKnightsList(const char* pBuf)
 		pKnights = m_pMain->m_KnightsMap.GetData(knightsindex);
 		if (pKnights != nullptr)
 		{
-			pKnights->m_sIndex = knightsindex;
+			pKnights->m_sIndex   = knightsindex;
 			pKnights->m_byNation = nation;
 			strcpy_safe(pKnights->m_strName, knightsname);
-			pKnights->m_sMembers = members;
-			pKnights->m_nPoints = points;
-			pKnights->m_byGrade = m_pMain->GetKnightsGrade(points);
+			pKnights->m_sMembers  = members;
+			pKnights->m_nPoints   = points;
+			pKnights->m_byGrade   = m_pMain->GetKnightsGrade(points);
 			pKnights->m_byRanking = ranking;
 		}
 		else
 		{
-			pKnights = new CKnights();
-			pKnights->m_sIndex = knightsindex;
+			pKnights             = new CKnights();
+			pKnights->m_sIndex   = knightsindex;
 			pKnights->m_byNation = nation;
 			strcpy_safe(pKnights->m_strName, knightsname);
 			pKnights->m_sMembers = members;
@@ -1348,15 +1351,16 @@ void CKnightsManager::RecvKnightsList(const char* pBuf)
 			strcpy_safe(pKnights->m_strViceChief_1, "");
 			strcpy_safe(pKnights->m_strViceChief_2, "");
 			strcpy_safe(pKnights->m_strViceChief_3, "");
-			pKnights->m_nMoney = 0;
+			pKnights->m_nMoney      = 0;
 			pKnights->m_sDomination = 0;
-			pKnights->m_nPoints = points;
-			pKnights->m_byGrade = m_pMain->GetKnightsGrade(points);
-			pKnights->m_byRanking = ranking;
+			pKnights->m_nPoints     = points;
+			pKnights->m_byGrade     = m_pMain->GetKnightsGrade(points);
+			pKnights->m_byRanking   = ranking;
 
 			if (!m_pMain->m_KnightsMap.PutData(pKnights->m_sIndex, pKnights))
 			{
-				spdlog::error("KnightsManager::RecvKnightsList: KnightsMap put failed [knightsId={}]",
+				spdlog::error(
+					"KnightsManager::RecvKnightsList: KnightsMap put failed [knightsId={}]",
 					pKnights->m_sIndex);
 				delete pKnights;
 				pKnights = nullptr;
@@ -1370,8 +1374,7 @@ bool CKnightsManager::AddKnightsUser(int knightsId, const char* charId)
 	CKnights* pKnights = m_pMain->m_KnightsMap.GetData(knightsId);
 	if (pKnights == nullptr)
 	{
-		spdlog::error("KnightsManager::AddKnightsUser: knightsId={} not found",
-			knightsId);
+		spdlog::error("KnightsManager::AddKnightsUser: knightsId={} not found", knightsId);
 		return false;
 	}
 
@@ -1395,8 +1398,7 @@ bool CKnightsManager::ModifyKnightsUser(int knightsId, const char* charId)
 	CKnights* pKnights = m_pMain->m_KnightsMap.GetData(knightsId);
 	if (pKnights == nullptr)
 	{
-		spdlog::error("KnightsManager::ModifyKnightsUser: knightsId={} not found",
-			knightsId);
+		spdlog::error("KnightsManager::ModifyKnightsUser: knightsId={} not found", knightsId);
 		return false;
 	}
 
@@ -1422,8 +1424,7 @@ bool CKnightsManager::RemoveKnightsUser(int knightsId, const char* charId)
 	CKnights* pKnights = m_pMain->m_KnightsMap.GetData(knightsId);
 	if (pKnights == nullptr)
 	{
-		spdlog::error("KnightsManager::RemoveKnightsUser: knightsId={} not found",
-			knightsId);
+		spdlog::error("KnightsManager::RemoveKnightsUser: knightsId={} not found", knightsId);
 		return false;
 	}
 
@@ -1450,8 +1451,7 @@ void CKnightsManager::SetKnightsUser(int knightsId, const char* charId)
 	CKnights* pKnights = m_pMain->m_KnightsMap.GetData(knightsId);
 	if (pKnights == nullptr)
 	{
-		spdlog::error("KnightsManager::SetKnightsUser: knightsId={} not found",
-			knightsId);
+		spdlog::error("KnightsManager::SetKnightsUser: knightsId={} not found", knightsId);
 		return;
 	}
 
@@ -1479,23 +1479,22 @@ void CKnightsManager::RecvKnightsAllList(const char* pBuf)
 {
 	int index = 0, knightsId = 0, points = 0, count = 0, ranking = 0;
 	int send_index = 0, temp_index = 0, send_count = 0;
-	CKnights* pKnights = nullptr;
+	CKnights* pKnights  = nullptr;
 	char send_buff[512] = {};
 	char temp_buff[512] = {};
 
-	count = GetByte(pBuf, index);
+	count               = GetByte(pBuf, index);
 
 	for (int i = 0; i < count; i++)
 	{
 		knightsId = GetShort(pBuf, index);
-		points = GetDWORD(pBuf, index);
-		ranking = GetByte(pBuf, index);
+		points    = GetDWORD(pBuf, index);
+		ranking   = GetByte(pBuf, index);
 
-		pKnights = m_pMain->m_KnightsMap.GetData(knightsId);
+		pKnights  = m_pMain->m_KnightsMap.GetData(knightsId);
 		if (pKnights == nullptr)
 		{
-			spdlog::error("KnightsManager::RecvKnightsAllList: knightsId={} not found",
-				knightsId);
+			spdlog::error("KnightsManager::RecvKnightsAllList: knightsId={} not found", knightsId);
 			continue;
 		}
 

@@ -15,18 +15,16 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgEditEventAttr dialog
 
-
-CDlgEditEventAttr::CDlgEditEventAttr(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgEditEventAttr::IDD, pParent)
+CDlgEditEventAttr::CDlgEditEventAttr(CWnd* pParent /*=nullptr*/) :
+	CDialog(CDlgEditEventAttr::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgEditEventAttr)
 	m_EventType = 0;
-	m_EventID = 0;
+	m_EventID   = 0;
 	m_pRefEvent = nullptr;
-	m_ZoneID = 0;
+	m_ZoneID    = 0;
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgEditEventAttr::DoDataExchange(CDataExchange* pDX)
 {
@@ -41,22 +39,21 @@ void CDlgEditEventAttr::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgEditEventAttr, CDialog)
-	//{{AFX_MSG_MAP(CDlgEditEventAttr)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgEditEventAttr)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgEditEventAttr message handlers
 
-void CDlgEditEventAttr::OnOK() 
+void CDlgEditEventAttr::OnOK()
 {
 	UpdateData(TRUE);
 
 	m_pRefEvent->m_EventType = m_EventType;
-	m_pRefEvent->m_EventID = m_EventID;
-	m_pRefEvent->m_ZoneID = m_ZoneID;
+	m_pRefEvent->m_EventID   = m_EventID;
+	m_pRefEvent->m_ZoneID    = m_ZoneID;
 
 	GetDlgItemText(IDC_EDIT_EVENT_ATTR_NAME, m_pRefEvent->m_Name, 80);
 
@@ -71,24 +68,24 @@ void CDlgEditEventAttr::OnOK()
 	GetDlgItemText(IDC_EDIT_EVENT_ATTR_EXE3, m_pRefEvent->m_Exe[2], 256);
 	GetDlgItemText(IDC_EDIT_EVENT_ATTR_EXE4, m_pRefEvent->m_Exe[3], 256);
 	GetDlgItemText(IDC_EDIT_EVENT_ATTR_EXE5, m_pRefEvent->m_Exe[4], 256);
-	
+
 	CDialog::OnOK();
 }
 
-void CDlgEditEventAttr::SetEventCell(CEventCell *pEvent)
+void CDlgEditEventAttr::SetEventCell(CEventCell* pEvent)
 {
-	m_pRefEvent = pEvent;	
+	m_pRefEvent = pEvent;
 }
 
-BOOL CDlgEditEventAttr::OnInitDialog() 
+BOOL CDlgEditEventAttr::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	
-	if(m_pRefEvent)
+
+	if (m_pRefEvent)
 	{
 		m_EventType = m_pRefEvent->m_EventType;
-		m_EventID = m_pRefEvent->m_EventID;
-		m_ZoneID = m_pRefEvent->m_ZoneID;
+		m_EventID   = m_pRefEvent->m_EventID;
+		m_ZoneID    = m_pRefEvent->m_ZoneID;
 
 		SetDlgItemText(IDC_EDIT_EVENT_ATTR_NAME, m_pRefEvent->m_Name);
 
@@ -106,7 +103,7 @@ BOOL CDlgEditEventAttr::OnInitDialog()
 
 		UpdateData(FALSE);
 	}
-	
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+
+	return TRUE; // return TRUE unless you set the focus to a control
+				 // EXCEPTION: OCX Property Pages should return FALSE
 }

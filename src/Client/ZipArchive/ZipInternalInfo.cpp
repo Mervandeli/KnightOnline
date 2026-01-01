@@ -19,7 +19,6 @@ CZipInternalInfo::CZipInternalInfo()
 
 CZipInternalInfo::~CZipInternalInfo()
 {
-
 }
 
 void CZipInternalInfo::Init()

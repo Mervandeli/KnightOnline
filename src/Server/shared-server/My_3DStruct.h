@@ -8,14 +8,18 @@
 #include <MathUtils/MathUtils.h>
 
 #ifndef _DEBUG
-#define __ASSERT(expression, expressionMessage) (void)0
+#define __ASSERT(expr, msg) (void) 0
 #else
-#define __ASSERT(expression, expressionMessage) ASSERT_IMPL(#expression, expression, __FILE__, __LINE__, expressionMessage)
+#define __ASSERT(expr, msg) ASSERT_IMPL(#expr, expr, __FILE__, __LINE__, msg)
 
-static inline void ASSERT_IMPL(const char* expressionString, bool expressionResult, const char* file, int line, const char* expressionMessage)
+static inline void ASSERT_IMPL(const char* expressionString, bool expressionResult,
+	const char* file, int line, const char* expressionMessage)
 {
-	if (!expressionResult)
-		spdlog::error("Assertion failed: {}({}) - {} ({})", file, line, expressionMessage, expressionString);
+	if (expressionResult)
+		return;
+
+	spdlog::error(
+		"Assertion failed: {}({}) - {} ({})", file, line, expressionMessage, expressionString);
 }
 #endif
 

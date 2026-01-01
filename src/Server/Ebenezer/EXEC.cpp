@@ -18,15 +18,15 @@ void EXEC::Parse(const char* line, const std::string& filename, int lineNumber)
 	int index = 0, argsToParse = 0;
 	char temp[1024];
 
-	index += ParseSpace(temp, line + index);
+	index         += ParseSpace(temp, line + index);
 
-	size_t opcode = hashing::djb2::hash(std::string_view(temp));
+	size_t opcode  = hashing::djb2::hash(std::string_view(temp));
 	switch (opcode)
 	{
 		// E SAY {'up' event ID} {'ok' event ID} {talk ID 1} {talk ID 2} {talk ID 3} {talk ID 4} {talk ID 5} {talk ID 6} {talk ID 7} {talk ID 8}
 		// The talk ID refers to the ID in the Quest_Talk TBL in the client.
 		case "SAY"_djb2:
-			m_Exec = EXEC_SAY;
+			m_Exec      = EXEC_SAY;
 			argsToParse = 10;
 			break;
 
@@ -37,43 +37,43 @@ void EXEC::Parse(const char* line, const std::string& filename, int lineNumber)
 		// The menu ID refers to the ID in the Quest_Menu TBL in the client. This is the button text.
 		// The event ID refers to the associated event ID to run on the server when this button is pressed in the client.
 		case "SELECT_MSG"_djb2:
-			m_Exec = EXEC_SELECT_MSG;
+			m_Exec      = EXEC_SELECT_MSG;
 			argsToParse = 22;
 			break;
 
 		// E RUN_EVENT {event ID}
 		case "RUN_EVENT"_djb2:
-			m_Exec = EXEC_RUN_EVENT;
+			m_Exec      = EXEC_RUN_EVENT;
 			argsToParse = 1;
 			break;
 
 		// E GIVE_ITEM {item ID} {item count}
 		case "GIVE_ITEM"_djb2:
-			m_Exec = EXEC_GIVE_ITEM;
+			m_Exec      = EXEC_GIVE_ITEM;
 			argsToParse = 2;
 			break;
 
 		// E ROB_ITEM {item ID} {item count}
 		case "ROB_ITEM"_djb2:
-			m_Exec = EXEC_ROB_ITEM;
+			m_Exec      = EXEC_ROB_ITEM;
 			argsToParse = 2;
 			break;
 
 		// E OPEN_EDITBOX {npc prototype ID - unused} {input message} {next event}
 		case "OPEN_EDITBOX"_djb2:
-			m_Exec = EXEC_OPEN_EDITBOX;
+			m_Exec      = EXEC_OPEN_EDITBOX;
 			argsToParse = 3;
 			break;
 
 		// E GIVE_NOAH {amount}
 		case "GIVE_NOAH"_djb2:
-			m_Exec = EXEC_GIVE_NOAH;
+			m_Exec      = EXEC_GIVE_NOAH;
 			argsToParse = 1;
 			break;
 
 		// E LOG_COUPON_ITEM {item ID} {item count}
 		case "LOG_COUPON_ITEM"_djb2:
-			m_Exec = EXEC_LOG_COUPON_ITEM;
+			m_Exec      = EXEC_LOG_COUPON_ITEM;
 			argsToParse = 2;
 			break;
 
@@ -89,8 +89,8 @@ void EXEC::Parse(const char* line, const std::string& filename, int lineNumber)
 	assert(argsToParse >= 0 && argsToParse <= MAX_EXEC_INT);
 	for (int i = 0; i < argsToParse; i++)
 	{
-		index += ParseSpace(temp, line + index);
-		m_ExecInt[i] = atoi(temp);
+		index        += ParseSpace(temp, line + index);
+		m_ExecInt[i]  = atoi(temp);
 	}
 }
 

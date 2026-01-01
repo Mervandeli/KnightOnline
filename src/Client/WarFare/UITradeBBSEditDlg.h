@@ -14,11 +14,11 @@
 class CUITradeBBSEditDlg : public CN3UIBase
 {
 protected:
-	class CN3UIEdit*		m_pEditTitle;
-	class CN3UIEdit*		m_pEditPrice;
-	class CN3UIEdit*		m_pEditExplanation;
-	class CN3UIButton*		m_pBtn_Ok;
-	class CN3UIButton*		m_pBtn_Cancel;
+	class CN3UIEdit* m_pEditTitle;
+	class CN3UIEdit* m_pEditPrice;
+	class CN3UIEdit* m_pEditExplanation;
+	class CN3UIButton* m_pBtn_Ok;
+	class CN3UIButton* m_pBtn_Cancel;
 
 public:
 	bool OnKeyPress(int iChar) override;
@@ -29,7 +29,7 @@ public:
 
 	std::string GetTradeTitle();
 	std::string GetTradeExplanation();
-	int			GetPrice();
+	int GetPrice();
 
 	CUITradeBBSEditDlg();
 	~CUITradeBBSEditDlg() override;

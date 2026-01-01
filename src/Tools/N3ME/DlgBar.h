@@ -13,33 +13,34 @@
 
 class CDlgBar : public CDialog
 {
-// Construction
+	// Construction
 public:
 	void UpdateDataFromControl();
 	void UpdateInfo();
 	BOOL m_bUpdateingNow;
-	CDlgBar();   // standard constructor
+	CDlgBar(); // standard constructor
 
-// Dialog Data
+			   // Dialog Data
 	//{{AFX_DATA(CDlgBar)
-	enum { IDD = IDR_MAINFRAME };
-	CSliderCtrl	m_sld_Light;
-	CSliderCtrl	m_TileRegion_Slider;
-	CSliderCtrl	m_FP_Slider;
-	int		m_iZoneID;
+	enum
+	{
+		IDD = IDR_MAINFRAME
+	};
+	CSliderCtrl m_sld_Light;
+	CSliderCtrl m_TileRegion_Slider;
+	CSliderCtrl m_FP_Slider;
+	int m_iZoneID;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgBar)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgBar)
 	afx_msg void OnBSetResourcePath();

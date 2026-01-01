@@ -15,12 +15,10 @@ protected:
 	void SetUp() override
 	{
 		static std::atomic<uint32_t> s_testCounter = 0;
-		static const time_t s_time = time(nullptr);
+		static const time_t s_time                 = time(nullptr);
 
-		std::string filename = "FileWriterTest_"
-			+ std::to_string(s_time)
-			+ "_"
-			+ std::to_string(s_testCounter++) + ".tmp";
+		std::string filename = "FileWriterTest_" + std::to_string(s_time) + "_"
+							   + std::to_string(s_testCounter++) + ".tmp";
 
 		_testFilePath = std::filesystem::temp_directory_path() / filename;
 
@@ -140,8 +138,8 @@ TEST_F(FileWriterTest, Write_SucceedsOnWriteOfZero)
 
 TEST_F(FileWriterTest, Write_IsValidFromStart)
 {
-	uint8_t output[4] = { 0, 1, 2, 3 };
-	uint8_t input[4] = {};
+	uint8_t output[4]   = { 0, 1, 2, 3 };
+	uint8_t input[4]    = {};
 	size_t bytesWritten = 0;
 
 	EXPECT_EQ(_file.Size(), 0);

@@ -14,14 +14,14 @@
 
 typedef std::list<LPDTEXTILEATTR>::iterator it_DTexTileAttr;
 
-class CDTexGroup  
+class CDTexGroup
 {
 public:
-	char		m_Name[40];
-	int			m_ID;
+	char m_Name[40];
+	int m_ID;
 
 	std::list<LPDTEXTILEATTR> m_Attributes[DTEX_MAX];
-		
+
 public:
 	void Init();
 	void Release();
@@ -32,7 +32,6 @@ public:
 
 	CDTexGroup();
 	virtual ~CDTexGroup();
-
 };
 
 #endif // !defined(AFX_DTEXGROUP_H__62BBF3A5_4AA0_416F_A7A3_F804F542FE2A__INCLUDED_)

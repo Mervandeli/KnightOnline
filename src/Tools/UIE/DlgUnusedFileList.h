@@ -14,27 +14,28 @@ class CDlgUnusedFileList : public CDialog
 {
 public:
 	CStringArray m_szFileNames;
-// Construction
+	// Construction
 public:
-	CDlgUnusedFileList(CWnd* pParent = nullptr);   // standard constructor
+	CDlgUnusedFileList(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+												 // Dialog Data
 	//{{AFX_DATA(CDlgUnusedFileList)
-	enum { IDD = IDD_UNUSED_FILE };
-	CListBox	m_ListFiles;
+	enum
+	{
+		IDD = IDD_UNUSED_FILE
+	};
+	CListBox m_ListFiles;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgUnusedFileList)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgUnusedFileList)
 	afx_msg void OnBDeleteSelect();

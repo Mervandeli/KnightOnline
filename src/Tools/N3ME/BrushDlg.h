@@ -12,45 +12,47 @@
 class CLyTerrain;
 class CBrushDlg : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CBrushDlg(CWnd* pParent = nullptr);   // standard constructor
+	CBrushDlg(CWnd* pParent = nullptr); // standard constructor
 
-// Attributes
+										// Attributes
 protected:
 	CLyTerrain* m_pTerrain;
 
-// Operations
+	// Operations
 public:
 	void SetTerrain(CLyTerrain* pTerrain);
+
 protected:
 	void SetTerrainBrush();
 
 public:
 	void SetFlatHeight(float height);
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CBrushDlg)
-	enum { IDD = IDD_BRUSH };
-	CSliderCtrl	m_sldSize;
-	CSliderCtrl	m_sldFalloff;
-	float	m_fFalloff;
-	int		m_iSize;
-	int		m_iShape;
-	BOOL	m_bFlat;
-	int		m_rdoFlatMode;
+	enum
+	{
+		IDD = IDD_BRUSH
+	};
+	CSliderCtrl m_sldSize;
+	CSliderCtrl m_sldFalloff;
+	float m_fFalloff;
+	int m_iSize;
+	int m_iShape;
+	BOOL m_bFlat;
+	int m_rdoFlatMode;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CBrushDlg)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CBrushDlg)
 	virtual void OnCancel();

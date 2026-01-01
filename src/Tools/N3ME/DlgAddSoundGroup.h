@@ -14,40 +14,41 @@
 
 class CDlgAddSoundGroup : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgAddSoundGroup(CWnd* pParent = nullptr);   // standard constructor
+	CDlgAddSoundGroup(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+												// Dialog Data
 	//{{AFX_DATA(CDlgAddSoundGroup)
-	enum { IDD = IDD_ADD_SOUNDGROUP };
-	float	m_fBGE_Regen_1;
-	float	m_fBGE_Regen_2;
-	float	m_fBGE_Regen_3;
-	float	m_fBGE_Regen_4;
-	float	m_fBGM_Regen_1;
-	float	m_fBGM_Regen_2;
-	float	m_fBGM_Regen_3;
-	float	m_fBGM_Regen_4;
+	enum
+	{
+		IDD = IDD_ADD_SOUNDGROUP
+	};
+	float m_fBGE_Regen_1;
+	float m_fBGE_Regen_2;
+	float m_fBGE_Regen_3;
+	float m_fBGE_Regen_4;
+	float m_fBGM_Regen_1;
+	float m_fBGM_Regen_2;
+	float m_fBGM_Regen_3;
+	float m_fBGM_Regen_4;
 	//}}AFX_DATA
 
 public:
 	SOUNDINFO m_SndInfo;
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgAddSoundGroup)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
 public:
-	void SetSndInfo(LPSOUNDINFO pSndInfo);	
+	void SetSndInfo(LPSOUNDINFO pSndInfo);
 
-
-// Implementation
+	// Implementation
 protected:
-
 	// Generated message map functions
 	//{{AFX_MSG(CDlgAddSoundGroup)
 	virtual BOOL OnInitDialog();

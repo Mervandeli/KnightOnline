@@ -13,7 +13,7 @@ void CJvCryption::Init()
 uint64_t CJvCryption::GenerateKey()
 {
 #ifdef USE_CRYPTION
-	// because of their sucky encryption method, 0 means it effectively won't be encrypted. 
+	// because of their sucky encryption method, 0 means it effectively won't be encrypted.
 	// We don't want that happening...
 	do
 	{
@@ -31,17 +31,17 @@ uint64_t CJvCryption::GenerateKey()
 void CJvCryption::JvEncryptionFast(int len, uint8_t* datain, uint8_t* dataout)
 {
 #ifdef USE_CRYPTION
-	uint8_t* pkey, lkey, rsk;
+	uint8_t *pkey, lkey, rsk;
 	int rkey = 2157;
 
-	pkey = (uint8_t*) &m_tkey;
-	lkey = (len * 157) & 0xff;
+	pkey     = (uint8_t*) &m_tkey;
+	lkey     = (len * 157) & 0xff;
 
 	for (int i = 0; i < len; i++)
 	{
-		rsk = (rkey >> 8) & 0xff;
-		dataout[i] = ((datain[i] ^ rsk) ^ pkey[(i % 8)]) ^ lkey;
-		rkey *= 2171;
+		rsk         = (rkey >> 8) & 0xff;
+		dataout[i]  = ((datain[i] ^ rsk) ^ pkey[(i % 8)]) ^ lkey;
+		rkey       *= 2171;
 	}
 
 	return;

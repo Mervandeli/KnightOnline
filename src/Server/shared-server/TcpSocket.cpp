@@ -2,22 +2,21 @@
 #include "TcpSocket.h"
 #include "SocketManager.h"
 
-TcpSocket::TcpSocket(SocketManager* socketManager)
-	: _socketManager(socketManager),
-	_socket(*socketManager->GetWorkerPool()),
+TcpSocket::TcpSocket(SocketManager* socketManager) :
+	_socketManager(socketManager), _socket(*socketManager->GetWorkerPool()),
 	_recvCircularBuffer(socketManager->GetRecvBufferSize()),
-	_sendCircularBuffer(socketManager->GetSendBufferSize())	
+	_sendCircularBuffer(socketManager->GetSendBufferSize())
 {
-	_state = CONNECTION_STATE_DISCONNECTED;
-	_socketId = -1;
-	_sendInProgress = false;
-	_socketErrorCount = 0;
+	_state             = CONNECTION_STATE_DISCONNECTED;
+	_socketId          = -1;
+	_sendInProgress    = false;
+	_socketErrorCount  = 0;
 
-	_remoteIpCached = false;
+	_remoteIpCached    = false;
 	_pendingDisconnect = false;
 
-	_recvBufferSize = socketManager->GetRecvBufferSize();
-	_sendBufferSize = socketManager->GetSendBufferSize();
+	_recvBufferSize    = socketManager->GetRecvBufferSize();
+	_sendBufferSize    = socketManager->GetSendBufferSize();
 	_recvBuffer.resize(_recvBufferSize);
 }
 
@@ -31,11 +30,10 @@ int TcpSocket::QueueAndSend(char* buffer, int length)
 	// Add this packet to the circular buffer.
 	// Ensure we do not allow resizing; we do not want these pointers invalidated.
 	auto span = _sendCircularBuffer.PutData(buffer, length, false);
-	if (span.Buffer1 != nullptr
-		&& span.Length1 > 0)
+	if (span.Buffer1 != nullptr && span.Length1 > 0)
 	{
-		auto queuedSend = std::make_unique<QueuedSend>();
-		queuedSend->IsOwned = false;
+		auto queuedSend        = std::make_unique<QueuedSend>();
+		queuedSend->IsOwned    = false;
 		queuedSend->BufferSpan = span;
 		_sendQueue.push(std::move(queuedSend));
 	}
@@ -43,8 +41,8 @@ int TcpSocket::QueueAndSend(char* buffer, int length)
 	// Allocate and queue.
 	else
 	{
-		auto queuedSend = std::make_unique<QueuedSend>();
-		queuedSend->IsOwned = true;
+		auto queuedSend                = std::make_unique<QueuedSend>();
+		queuedSend->IsOwned            = true;
 		queuedSend->BufferSpan.Buffer1 = new char[length];
 		queuedSend->BufferSpan.Length1 = length;
 		memcpy(queuedSend->BufferSpan.Buffer1, buffer, length);
@@ -101,23 +99,24 @@ bool TcpSocket::AsyncSend(bool fromAsyncChain)
 	// Fetch the next entry to send.
 	// Note that we keep this in the queue until the send completes.
 	const auto& queuedSend = _sendQueue.front();
-	const auto& span = queuedSend->BufferSpan;
+	const auto& span       = queuedSend->BufferSpan;
 
 	try
 	{
-		if (span.Buffer2 != nullptr
-			&& span.Length2 > 0)
+		if (span.Buffer2 != nullptr && span.Length2 > 0)
 		{
 			std::array<asio::const_buffer, 2> buffers;
 			buffers[0] = asio::buffer(span.Buffer1, span.Length1);
 			buffers[1] = asio::buffer(span.Buffer2, span.Length2);
-			_socket.async_write_some(buffers,
-				std::bind(&SocketManager::OnPostSend, _socketManager, std::placeholders::_1, std::placeholders::_2, this));
+			_socket.async_write_some(
+				buffers, std::bind(&SocketManager::OnPostSend, _socketManager,
+							 std::placeholders::_1, std::placeholders::_2, this));
 		}
 		else
 		{
 			_socket.async_write_some(asio::buffer(span.Buffer1, span.Length1),
-				std::bind(&SocketManager::OnPostSend, _socketManager, std::placeholders::_1, std::placeholders::_2, this));
+				std::bind(&SocketManager::OnPostSend, _socketManager, std::placeholders::_1,
+					std::placeholders::_2, this));
 		}
 
 		_sendInProgress = true;
@@ -126,8 +125,8 @@ bool TcpSocket::AsyncSend(bool fromAsyncChain)
 	{
 		lock.unlock();
 
-		spdlog::error("TcpSocket::AsyncSend: failed to post send for socketId={}: {}",
-			_socketId, ex.what());
+		spdlog::error(
+			"TcpSocket::AsyncSend: failed to post send for socketId={}: {}", _socketId, ex.what());
 		Close();
 		return false;
 	}
@@ -144,13 +143,14 @@ void TcpSocket::AsyncReceive()
 
 	try
 	{
-		_socket.async_read_some(asio::buffer(_recvBuffer),
-			std::bind(&SocketManager::OnPostReceive, _socketManager, std::placeholders::_1, std::placeholders::_2, this));
+		_socket.async_read_some(
+			asio::buffer(_recvBuffer), std::bind(&SocketManager::OnPostReceive, _socketManager,
+										   std::placeholders::_1, std::placeholders::_2, this));
 	}
 	catch (const asio::system_error& ex)
 	{
-		spdlog::error("TcpSocket::Receive: failed to post receive for socketId={}: {}",
-			_socketId, ex.what());
+		spdlog::error(
+			"TcpSocket::Receive: failed to post receive for socketId={}: {}", _socketId, ex.what());
 		Close();
 	}
 }
@@ -165,7 +165,7 @@ void TcpSocket::ReceivedData(int length)
 
 	_recvCircularBuffer.PutData(_recvBuffer.data(), length);
 
-	char* extractedPacket = nullptr;
+	char* extractedPacket     = nullptr;
 	int extractedPacketLength = 0;
 	while (PullOutCore(extractedPacket, extractedPacketLength))
 	{
@@ -196,8 +196,8 @@ void TcpSocket::CloseProcess()
 		_socket.close(ec);
 		if (ec)
 		{
-			spdlog::error("TcpSocket::CloseProcess: close() failed for socketId={}: {}",
-				_socketId, ec.message());
+			spdlog::error("TcpSocket::CloseProcess: close() failed for socketId={}: {}", _socketId,
+				ec.message());
 		}
 	}
 
@@ -218,8 +218,8 @@ void TcpSocket::InitSocket()
 	_recvCircularBuffer.SetEmpty();
 	_socketErrorCount = 0;
 	_remoteIp.clear();
-	_remoteIpCached = false;
-	_sendInProgress = false;
+	_remoteIpCached    = false;
+	_sendInProgress    = false;
 	_pendingDisconnect = false;
 
 	Initialize();
@@ -234,13 +234,12 @@ const std::string& TcpSocket::GetRemoteIP()
 		asio::ip::tcp::endpoint endpoint = _socket.remote_endpoint(ec);
 		if (!ec)
 		{
-			_remoteIp = endpoint.address().to_string();
+			_remoteIp       = endpoint.address().to_string();
 			_remoteIpCached = true;
 		}
 		else
 		{
-			spdlog::warn("TcpSocket::GetRemoteIP: failed lookup. socketId={}",
-				_socketId);
+			spdlog::warn("TcpSocket::GetRemoteIP: failed lookup. socketId={}", _socketId);
 		}
 	}
 

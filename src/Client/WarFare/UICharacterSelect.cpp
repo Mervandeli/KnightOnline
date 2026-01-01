@@ -14,7 +14,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -27,12 +27,12 @@ CUICharacterSelect::CUICharacterSelect()
 	m_eType = UI_TYPE_BASE;
 	CUICharacterSelect::Release();
 
-	m_pBtnLeft		= nullptr;
-	m_pBtnRight		= nullptr;
-	m_pBtnExit		= nullptr;
-	m_pBtnDelete	= nullptr;
-	m_pBtnBack		= nullptr;
-	m_pUserInfoStr	= nullptr;
+	m_pBtnLeft     = nullptr;
+	m_pBtnRight    = nullptr;
+	m_pBtnExit     = nullptr;
+	m_pBtnDelete   = nullptr;
+	m_pBtnBack     = nullptr;
+	m_pUserInfoStr = nullptr;
 }
 
 CUICharacterSelect::~CUICharacterSelect()
@@ -41,12 +41,12 @@ CUICharacterSelect::~CUICharacterSelect()
 
 void CUICharacterSelect::Release()
 {
-	m_pBtnLeft		= nullptr;
-	m_pBtnRight		= nullptr;
-	m_pBtnExit		= nullptr;
-	m_pBtnDelete	= nullptr;
-	m_pBtnBack		= nullptr;
-	m_pUserInfoStr	= nullptr;
+	m_pBtnLeft     = nullptr;
+	m_pBtnRight    = nullptr;
+	m_pBtnExit     = nullptr;
+	m_pBtnDelete   = nullptr;
+	m_pBtnBack     = nullptr;
+	m_pUserInfoStr = nullptr;
 
 	CN3UIBase::Release();
 }
@@ -65,12 +65,12 @@ bool CUICharacterSelect::Load(File& file)
 
 	// 위치를 화면 해상도에 맞게 바꾸기...
 	POINT pt;
-	RECT rc = GetRegion();
+	RECT rc      = GetRegion();
 	float fRatio = (float) s_CameraData.vp.Width / (rc.right - rc.left);
 
 	if (m_pBtnLeft != nullptr)
 	{
-		pt = m_pBtnLeft->GetPos();
+		pt   = m_pBtnLeft->GetPos();
 		pt.x = (int) (pt.x * fRatio);
 		pt.y = s_CameraData.vp.Height - 10 - m_pBtnLeft->GetHeight();
 		m_pBtnLeft->SetPos(pt.x, pt.y);
@@ -78,7 +78,7 @@ bool CUICharacterSelect::Load(File& file)
 
 	if (m_pBtnRight != nullptr)
 	{
-		pt = m_pBtnRight->GetPos();
+		pt   = m_pBtnRight->GetPos();
 		pt.x = (int) (pt.x * fRatio);
 		pt.y = s_CameraData.vp.Height - 10 - m_pBtnRight->GetHeight();
 		m_pBtnRight->SetPos(pt.x, pt.y);
@@ -86,7 +86,7 @@ bool CUICharacterSelect::Load(File& file)
 
 	if (m_pBtnExit != nullptr)
 	{
-		pt = m_pBtnExit->GetPos();
+		pt   = m_pBtnExit->GetPos();
 		pt.x = (int) (pt.x * fRatio);
 		pt.y = s_CameraData.vp.Height - 10 - m_pBtnExit->GetHeight();
 		m_pBtnExit->SetPos(pt.x, pt.y);
@@ -97,15 +97,15 @@ bool CUICharacterSelect::Load(File& file)
 		// Previous point in sane cases should be be the exit button.
 		// There's a 15 pixel gap between them in the UIF's layout.
 		POINT ptPrev = pt;
-		pt = m_pBtnBack->GetPos();
-		pt.x = (int) (pt.x * fRatio);
-		pt.y = ptPrev.y - 15 - m_pBtnBack->GetHeight();
+		pt           = m_pBtnBack->GetPos();
+		pt.x         = (int) (pt.x * fRatio);
+		pt.y         = ptPrev.y - 15 - m_pBtnBack->GetHeight();
 		m_pBtnBack->SetPos(pt.x, pt.y);
 	}
 
 	if (m_pBtnDelete != nullptr)
 	{
-		pt = m_pBtnDelete->GetPos();
+		pt   = m_pBtnDelete->GetPos();
 		pt.x = (int) (pt.x * fRatio);
 		pt.y = 20;
 		m_pBtnDelete->SetPos(pt.x, pt.y);
@@ -144,7 +144,7 @@ bool CUICharacterSelect::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		}
 		else if (pSender == m_pBtnExit)
 		{
-//			CGameProcedure::ProcActiveSet((CGameProcedure*)CGameProcedure::s_pProcLogIn); // 로그인으로 돌아간다..
+			//			CGameProcedure::ProcActiveSet((CGameProcedure*)CGameProcedure::s_pProcLogIn); // 로그인으로 돌아간다..
 			std::string szMsg = fmt::format_text_resource(IDS_CONFIRM_EXIT_GAME);
 			CGameProcedure::MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_EXIT);
 		}
@@ -183,8 +183,7 @@ void CUICharacterSelect::DisplayChrInfo(__CharacterSelectInfo* pCSInfo)
 		CGameBase::GetTextByClass(pCSInfo->eClass, szClass);
 
 		// Level: %d\nSpecialty: %s\nID: %s
-		szTotal = fmt::format_text_resource(IDS_CHR_SELECT_FMT_INFO,
-			pCSInfo->iLevel, szClass, pCSInfo->szID);
+		szTotal = fmt::format_text_resource(IDS_CHR_SELECT_FMT_INFO, pCSInfo->iLevel, szClass, pCSInfo->szID);
 	}
 	else
 	{
@@ -200,46 +199,48 @@ void CUICharacterSelect::DisplayChrInfo(__CharacterSelectInfo* pCSInfo)
 
 void CUICharacterSelect::DontDisplayInfo()
 {
-	CN3UIBase*	m_pUserInfoStr;
+	CN3UIBase* m_pUserInfoStr;
 	N3_VERIFY_UI_COMPONENT(m_pUserInfoStr, GetChildByID("text00"));
 
-	if ( m_pUserInfoStr ) m_pUserInfoStr->SetVisible(false);
+	if (m_pUserInfoStr)
+		m_pUserInfoStr->SetVisible(false);
 }
 
 bool CUICharacterSelect::OnKeyPress(int iKey)
 {
-	if(CGameProcedure::s_pUIMgr->EnableOperation())
+	if (CGameProcedure::s_pUIMgr->EnableOperation())
 	{
-		switch(iKey)
+		switch (iKey)
 		{
-		case DIK_ESCAPE:
-			ReceiveMessage(m_pBtnExit, UIMSG_BUTTON_CLICK);
-			return true;
-		case DIK_LEFT:
-			ReceiveMessage(m_pBtnLeft, UIMSG_BUTTON_CLICK);
-			return true;
-		case DIK_RIGHT:
-			ReceiveMessage(m_pBtnRight, UIMSG_BUTTON_CLICK);
-			return true;
-		case DIK_NUMPADENTER:
-		case DIK_RETURN:
-			CGameProcedure::s_pProcCharacterSelect->CharacterSelectOrCreate();
-			return true;
+			case DIK_ESCAPE:
+				ReceiveMessage(m_pBtnExit, UIMSG_BUTTON_CLICK);
+				return true;
+			case DIK_LEFT:
+				ReceiveMessage(m_pBtnLeft, UIMSG_BUTTON_CLICK);
+				return true;
+			case DIK_RIGHT:
+				ReceiveMessage(m_pBtnRight, UIMSG_BUTTON_CLICK);
+				return true;
+			case DIK_NUMPADENTER:
+			case DIK_RETURN:
+				CGameProcedure::s_pProcCharacterSelect->CharacterSelectOrCreate();
+				return true;
 		}
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);
 }
 
-uint32_t CUICharacterSelect::MouseProc(uint32_t dwFlags, const POINT &ptCur, const POINT &ptOld)
+uint32_t CUICharacterSelect::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld)
 {
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
-	if (!m_bVisible) return dwRet;
+	if (!m_bVisible)
+		return dwRet;
 
 	// UI 움직이는 코드
 	if (UI_STATE_COMMON_MOVE == m_eState)
 	{
-		if (dwFlags&UI_MOUSE_LBCLICKED)
+		if (dwFlags & UI_MOUSE_LBCLICKED)
 		{
 			SetState(UI_STATE_COMMON_NONE);
 		}
@@ -251,11 +252,11 @@ uint32_t CUICharacterSelect::MouseProc(uint32_t dwFlags, const POINT &ptCur, con
 		return dwRet;
 	}
 
-	if(false == IsIn(ptCur.x, ptCur.y))	// 영역 밖이면
+	if (false == IsIn(ptCur.x, ptCur.y)) // 영역 밖이면
 	{
-		if(false == IsIn(ptOld.x, ptOld.y))
+		if (false == IsIn(ptOld.x, ptOld.y))
 		{
-			return dwRet;// 이전 좌표도 영역 밖이면 
+			return dwRet; // 이전 좌표도 영역 밖이면
 		}
 	}
 	else
@@ -265,25 +266,24 @@ uint32_t CUICharacterSelect::MouseProc(uint32_t dwFlags, const POINT &ptCur, con
 			s_pTooltipCtrl->SetText(m_szToolTip, m_crToolTip);
 	}
 
-	if(m_pChildUI && m_pChildUI->IsVisible())
+	if (m_pChildUI && m_pChildUI->IsVisible())
 		return dwRet;
 
 	// child에게 메세지 전달
-	for(UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
+	for (UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
 	{
-		CN3UIBase* pChild = (*itor);
+		CN3UIBase* pChild   = (*itor);
 		uint32_t dwChildRet = pChild->MouseProc(dwFlags, ptCur, ptOld);
 		if (UI_MOUSEPROC_DONESOMETHING & dwChildRet)
-		{	// 이경우에는 먼가 포커스를 받은 경우이다.
+		{ // 이경우에는 먼가 포커스를 받은 경우이다.
 
-			dwRet |= (UI_MOUSEPROC_CHILDDONESOMETHING|UI_MOUSEPROC_DONESOMETHING);
+			dwRet |= (UI_MOUSEPROC_CHILDDONESOMETHING | UI_MOUSEPROC_DONESOMETHING);
 			return dwRet;
 		}
 	}
 
 	// UI 움직이는 코드
-	if (UI_STATE_COMMON_MOVE != m_eState && 
-			PtInRect(&m_rcMovable, ptCur) && (dwFlags&UI_MOUSE_LBCLICK) )
+	if (UI_STATE_COMMON_MOVE != m_eState && PtInRect(&m_rcMovable, ptCur) && (dwFlags & UI_MOUSE_LBCLICK))
 	{
 		SetState(UI_STATE_COMMON_MOVE);
 		dwRet |= UI_MOUSEPROC_DONESOMETHING;

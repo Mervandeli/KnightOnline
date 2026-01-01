@@ -15,33 +15,35 @@ class CEventCell;
 
 class CDlgEditEvent : public CDialog
 {
-// Construction
+	// Construction
 public:
 	void ResetAll();
 	void SetCurrName(char* pName);
-	CDlgEditEvent(CWnd* pParent = nullptr);   // standard constructor
+	CDlgEditEvent(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+											// Dialog Data
 	//{{AFX_DATA(CDlgEditEvent)
-	enum { IDD = IDD_EDIT_EVENT };
-	CListBox	m_EventList;
-	CString		m_CurrFileName;
+	enum
+	{
+		IDD = IDD_EDIT_EVENT
+	};
+	CListBox m_EventList;
+	CString m_CurrFileName;
 	//}}AFX_DATA
 
-// Variables..
-	CEventMgr*	m_pRefEventMgr;
-	CEventCell*	m_pSelEvent;
+	// Variables..
+	CEventMgr* m_pRefEventMgr;
+	CEventCell* m_pSelEvent;
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgEditEvent)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgEditEvent)
 	afx_msg void OnBtnEventDel();

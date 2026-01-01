@@ -4,8 +4,7 @@
 #include "SendWorkerThread.h"
 #include "User.h"
 
-EbenezerSocketManager::EbenezerSocketManager()
-	: SocketManager(SOCKET_BUFF_SIZE, SOCKET_BUFF_SIZE)
+EbenezerSocketManager::EbenezerSocketManager() : SocketManager(SOCKET_BUFF_SIZE, SOCKET_BUFF_SIZE)
 {
 	_sendWorkerThread = new SendWorkerThread(this);
 }

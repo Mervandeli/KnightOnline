@@ -14,41 +14,43 @@
 class CRiverMng;
 class CDlgRiverProperty : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgRiverProperty(CRiverMng* pRiverMng, CWnd* pParent = nullptr);   // standard constructor
+	CDlgRiverProperty(CRiverMng* pRiverMng, CWnd* pParent = nullptr); // standard constructor
 
-// Attributes
+																	  // Attributes
 public:
 	BOOL m_IsModalDialog;
+
 protected:
-	CRiverMng*	m_pRiverMng;
-// Operations
+	CRiverMng* m_pRiverMng;
+	// Operations
 public:
 	void UpdateInfo();
 	void RiverComboFinding(int iRiverID);
 	void RiverComboSetting();
 
 public:
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgRiverProperty)
-	enum { IDD = IDD_RIVER_PROPERTY };
-	CPropertyList	m_LPRiver;
-	CComboBox		m_ComGoRiver;
+	enum
+	{
+		IDD = IDD_RIVER_PROPERTY
+	};
+	CPropertyList m_LPRiver;
+	CComboBox m_ComGoRiver;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgRiverProperty)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 protected:
-
 	// Generated message map functions
 	//{{AFX_MSG(CDlgRiverProperty)
 	virtual BOOL OnInitDialog();

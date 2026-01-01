@@ -7,7 +7,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -16,14 +16,14 @@ static char THIS_FILE[]=__FILE__;
 
 CN3TransformCollision::CN3TransformCollision()
 {
-	m_dwType |= OBJ_TRANSFORM_COLLISION;
+	m_dwType  |= OBJ_TRANSFORM_COLLISION;
 
-	m_fRadius = 0;
-	m_vMin.Set(0,0,0);
-	m_vMax.Set(0,0,0);
+	m_fRadius  = 0;
+	m_vMin.Set(0, 0, 0);
+	m_vMax.Set(0, 0, 0);
 
 	m_pMeshCollision = nullptr;
-	m_pMeshClimb = nullptr;
+	m_pMeshClimb     = nullptr;
 }
 
 CN3TransformCollision::~CN3TransformCollision()
@@ -35,8 +35,8 @@ CN3TransformCollision::~CN3TransformCollision()
 void CN3TransformCollision::Release()
 {
 	m_fRadius = 0;
-	m_vMin.Set(0,0,0);
-	m_vMax.Set(0,0,0);
+	m_vMin.Set(0, 0, 0);
+	m_vMax.Set(0, 0, 0);
 
 	s_MngVMesh.Delete(&m_pMeshCollision);
 	s_MngVMesh.Delete(&m_pMeshClimb);
@@ -48,20 +48,22 @@ bool CN3TransformCollision::Load(File& file)
 {
 	CN3Transform::Load(file);
 
-	int nL = 0;
+	int nL         = 0;
 	char szFN[512] = "";
 
 	file.Read(&nL, 4); // Mesh FileName
-	if(nL > 0)
+	if (nL > 0)
 	{
-		file.Read(szFN, nL); szFN[nL] = '\0'; // 메시 파일 이름..
+		file.Read(szFN, nL);
+		szFN[nL]         = '\0'; // 메시 파일 이름..
 		m_pMeshCollision = s_MngVMesh.Get(szFN);
 	}
 
 	file.Read(&nL, 4); // Mesh FileName
-	if(nL > 0)
+	if (nL > 0)
 	{
-		file.Read(szFN, nL); szFN[nL] = '\0'; // 메시 파일 이름..
+		file.Read(szFN, nL);
+		szFN[nL]     = '\0'; // 메시 파일 이름..
 		m_pMeshClimb = s_MngVMesh.Get(szFN);
 	}
 	return true;
@@ -121,33 +123,36 @@ void CN3TransformCollision::CollisionMeshSet(const std::string& szFN)
 {
 	s_MngVMesh.Delete(&m_pMeshCollision);
 	m_pMeshCollision = s_MngVMesh.Get(szFN);
-	if(m_pMeshCollision) this->FindMinMax();
+	if (m_pMeshCollision)
+		this->FindMinMax();
 }
 
 void CN3TransformCollision::ClimbMeshSet(const std::string& szFN)
 {
 	s_MngVMesh.Delete(&m_pMeshClimb);
 	m_pMeshClimb = s_MngVMesh.Get(szFN);
-	if(m_pMeshClimb) m_pMeshClimb->FindMinMax();
+	if (m_pMeshClimb)
+		m_pMeshClimb->FindMinMax();
 }
 
-int CN3TransformCollision::CheckCollisionPrecisely(bool bIgnoreBoxCheck, int ixScreen, int iyScreen, __Vector3* pVCol, __Vector3* pVNormal)
+int CN3TransformCollision::CheckCollisionPrecisely(
+	bool bIgnoreBoxCheck, int ixScreen, int iyScreen, __Vector3* pVCol, __Vector3* pVNormal)
 {
 	__Vector3 vPos, vDir; // 2D 좌표를 3D 좌표로 바꾸고..
-	::_Convert2D_To_3DCoordinate(
-		ixScreen, iyScreen,
-		s_CameraData.mtxView, s_CameraData.mtxProjection,
-		s_CameraData.vp.Width, s_CameraData.vp.Height,
-		vPos, vDir);
+	::_Convert2D_To_3DCoordinate(ixScreen, iyScreen, s_CameraData.mtxView,
+		s_CameraData.mtxProjection, s_CameraData.vp.Width, s_CameraData.vp.Height, vPos, vDir);
 
-	if(false == m_pMeshCollision->Pick(m_Matrix, vPos, vDir, pVCol, pVNormal)) return -1;
-	else return 0;
+	if (false == m_pMeshCollision->Pick(m_Matrix, vPos, vDir, pVCol, pVNormal))
+		return -1;
+	else
+		return 0;
 }
 
 #if defined(_DEBUG) || defined(_N3TOOL)
 void CN3TransformCollision::RenderCollisionMesh()
 {
-	if(nullptr == m_pMeshCollision) return;
+	if (nullptr == m_pMeshCollision)
+		return;
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, m_Matrix.toD3D());
 
 	m_pMeshCollision->Render(0xffff0000); // 빨간색.
@@ -155,7 +160,8 @@ void CN3TransformCollision::RenderCollisionMesh()
 
 void CN3TransformCollision::RenderClimbMesh()
 {
-	if(nullptr == m_pMeshClimb) return;
+	if (nullptr == m_pMeshClimb)
+		return;
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, m_Matrix.toD3D());
 
 	m_pMeshClimb->Render(0xff0000ff); // 파란색..
@@ -261,27 +267,34 @@ BOOL CN3TransformCollision::CheckClimb(int x, int y, __Vector3* pVCol, __Vector3
 
 void CN3TransformCollision::FindMinMax()
 {
-	m_vMin.Set(0,0,0);
-	m_vMax.Set(0,0,0);
+	m_vMin.Set(0, 0, 0);
+	m_vMax.Set(0, 0, 0);
 	m_fRadius = 0.0f;
 
-	if(nullptr == m_pMeshCollision || m_pMeshCollision->VertexCount() <= 0) return;
+	if (nullptr == m_pMeshCollision || m_pMeshCollision->VertexCount() <= 0)
+		return;
 
 	m_vMin.Set(FLT_MAX, FLT_MAX, FLT_MAX);
 	m_vMax.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-	
-	int nVC = m_pMeshCollision->VertexCount();
+
+	int nVC        = m_pMeshCollision->VertexCount();
 	__Vector3* pVs = m_pMeshCollision->Vertices();
-	for(int i = 0; i < nVC; i++)
+	for (int i = 0; i < nVC; i++)
 	{
-		if(pVs[i].x < m_vMin.x) m_vMin.x = pVs[i].x;
-		if(pVs[i].y < m_vMin.y) m_vMin.y = pVs[i].y;
-		if(pVs[i].z < m_vMin.z) m_vMin.z = pVs[i].z;
-		if(pVs[i].x > m_vMax.x) m_vMax.x = pVs[i].x;
-		if(pVs[i].y > m_vMax.y) m_vMax.y = pVs[i].y;
-		if(pVs[i].z > m_vMax.z) m_vMax.z = pVs[i].z;
+		if (pVs[i].x < m_vMin.x)
+			m_vMin.x = pVs[i].x;
+		if (pVs[i].y < m_vMin.y)
+			m_vMin.y = pVs[i].y;
+		if (pVs[i].z < m_vMin.z)
+			m_vMin.z = pVs[i].z;
+		if (pVs[i].x > m_vMax.x)
+			m_vMax.x = pVs[i].x;
+		if (pVs[i].y > m_vMax.y)
+			m_vMax.y = pVs[i].y;
+		if (pVs[i].z > m_vMax.z)
+			m_vMax.z = pVs[i].z;
 	}
 
 	// 최대 최소값을 갖고 반지름 계산한다..
-	m_fRadius  = (m_vMax - m_vMin).Magnitude() * 0.5f;
+	m_fRadius = (m_vMax - m_vMin).Magnitude() * 0.5f;
 }

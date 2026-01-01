@@ -22,18 +22,21 @@ class CAboutDlg : public CDialog
 public:
 	CAboutDlg();
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CAboutDlg)
-	enum { IDD = IDD_ABOUTBOX };
+	enum
+	{
+		IDD = IDD_ABOUTBOX
+	};
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CAboutDlg)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
-// Implementation
+													 // Implementation
 protected:
 	//{{AFX_MSG(CAboutDlg)
 	//}}AFX_MSG
@@ -54,15 +57,14 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
-	//{{AFX_MSG_MAP(CAboutDlg)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CAboutDlg)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // COptionDlg dialog
 
-COptionDlg::COptionDlg(CWnd* pParent /*=nullptr*/)
-	: CDialog(COptionDlg::IDD, pParent)
+COptionDlg::COptionDlg(CWnd* pParent /*=nullptr*/) : CDialog(COptionDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(COptionDlg)
 	//}}AFX_DATA_INIT
@@ -85,14 +87,14 @@ void COptionDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(COptionDlg, CDialog)
-	//{{AFX_MSG_MAP(COptionDlg)
-	ON_WM_SYSCOMMAND()
-	ON_WM_PAINT()
-	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_B_APPLY_AND_EXECUTE, OnBApplyAndExecute)
-	ON_WM_HSCROLL()
-	ON_BN_CLICKED(IDC_B_VERSION, OnBVersion)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(COptionDlg)
+ON_WM_SYSCOMMAND()
+ON_WM_PAINT()
+ON_WM_QUERYDRAGICON()
+ON_BN_CLICKED(IDC_B_APPLY_AND_EXECUTE, OnBApplyAndExecute)
+ON_WM_HSCROLL()
+ON_BN_CLICKED(IDC_B_VERSION, OnBVersion)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 struct Resolution
@@ -103,17 +105,10 @@ struct Resolution
 
 static std::vector<Resolution> s_supportedResolutions;
 
-static Resolution DefaultResolutions[] =
-{
-	{ 1024, 768 },
-	{ 1152, 864 },
-	{ 1280, 768 },
-	{ 1280, 800 },
-	{ 1280, 960 },
-	{ 1280, 1024 },
-	{ 1360, 768 },
-	{ 1366, 768 },
-	{ 1600, 1200 }
+static Resolution DefaultResolutions[] = {
+	{ 1024, 768 }, { 1152, 864 }, { 1280, 768 },  //
+	{ 1280, 800 }, { 1280, 960 }, { 1280, 1024 }, //
+	{ 1360, 768 }, { 1366, 768 }, { 1600, 1200 }  //
 };
 
 // The game supports at minimum, a resolution of 1024x768.
@@ -127,13 +122,13 @@ constexpr Resolution MIN_RESOLUTION = { 1024, 768 };
 void COptionDlg::LoadSupportedResolutions()
 {
 	// Get the primary monitor
-	DISPLAY_DEVICE device = {};
-	device.cb = sizeof(DISPLAY_DEVICE);
+	DISPLAY_DEVICE device    = {};
+	device.cb                = sizeof(DISPLAY_DEVICE);
 
 	// We point to the device name instead of copying it / using it directly
 	// that way if we don't find a primary monitor, we pass nullptr as the first param into EnumDisplaySettings.
 	TCHAR* primaryDeviceName = nullptr;
-	int deviceNumber = 0;
+	int deviceNumber         = 0;
 	while (EnumDisplayDevices(nullptr, deviceNumber, &device, EDD_GET_DEVICE_INTERFACE_NAME))
 	{
 		if (device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE)
@@ -151,10 +146,7 @@ void COptionDlg::LoadSupportedResolutions()
 	// If we're going to send a user scrolling for a resolution, it should be one that most
 	// users aren't looking for.
 	auto cmp = [](const Resolution& a, const Resolution& b) -> bool
-	{
-		return a.Width > b.Width
-			|| (a.Width == b.Width && a.Height > b.Height);
-	};
+	{ return a.Width > b.Width || (a.Width == b.Width && a.Height > b.Height); };
 
 	// The same resolution can be listed many times on a monitor depending on available refresh rates.
 	// We should limit it to unique resolutions only.
@@ -162,7 +154,7 @@ void COptionDlg::LoadSupportedResolutions()
 
 	// Discover resolution settings
 	DEVMODE devmode = {};
-	devmode.dmSize = sizeof(DEVMODE);
+	devmode.dmSize  = sizeof(DEVMODE);
 	for (int iModeNum = 0; EnumDisplaySettings(primaryDeviceName, iModeNum, &devmode); iModeNum++)
 	{
 		// Only support 32-bit resolutions.
@@ -174,32 +166,25 @@ void COptionDlg::LoadSupportedResolutions()
 		Resolution resolution = { devmode.dmPelsWidth, devmode.dmPelsHeight };
 
 		// Filter out resolutions with dimensions smaller than our minimum (1024x768)
-		if (resolution.Width < MIN_RESOLUTION.Width
-			|| resolution.Height < MIN_RESOLUTION.Height)
+		if (resolution.Width < MIN_RESOLUTION.Width || resolution.Height < MIN_RESOLUTION.Height)
 			continue;
 
 		auto itr = loadedResolutions.insert(resolution);
 		if (!itr.second)
 			continue;
 
-		s_supportedResolutions.push_back(
-			std::move(resolution));
+		s_supportedResolutions.push_back(std::move(resolution));
 	}
 
 	// We failed to dynamically pull available resolutions, fall back to the hardcoded list
 	if (s_supportedResolutions.empty())
 	{
-		s_supportedResolutions.insert(
-			s_supportedResolutions.begin(),
-			std::begin(DefaultResolutions),
-			std::end(DefaultResolutions));
+		s_supportedResolutions.insert(s_supportedResolutions.begin(),
+			std::begin(DefaultResolutions), std::end(DefaultResolutions));
 	}
 
 	// Sort the vector such that higher resolutions appear at the top of the drop down list.
-	std::sort(
-		s_supportedResolutions.begin(),
-		s_supportedResolutions.end(),
-		cmp);
+	std::sort(s_supportedResolutions.begin(), s_supportedResolutions.end(), cmp);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -229,8 +214,8 @@ BOOL COptionDlg::OnInitDialog()
 
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
-	SetIcon(m_hIcon, TRUE);			// Set big icon
-	SetIcon(m_hIcon, FALSE);		// Set small icon
+	SetIcon(m_hIcon, TRUE);  // Set big icon
+	SetIcon(m_hIcon, FALSE); // Set small icon
 
 	// 각종 컨트롤 초기화..
 	m_SldEffectCount.SetRange(1000, 2000);
@@ -244,15 +229,10 @@ BOOL COptionDlg::OnInitDialog()
 	CString szResolution;
 	for (const auto& resolution : s_supportedResolutions)
 	{
-		szResolution.Format(
-			_T("%u X %u"),
-			resolution.Width,
-			resolution.Height);
+		szResolution.Format(_T("%u X %u"), resolution.Width, resolution.Height);
 		iAdd = m_CB_Resolution.AddString(szResolution);
 
-		m_CB_Resolution.SetItemData(
-			iAdd,
-			MAKELPARAM(resolution.Height, resolution.Width));
+		m_CB_Resolution.SetItemData(iAdd, MAKELPARAM(resolution.Height, resolution.Width));
 	}
 
 	iAdd = m_CB_ColorDepth.AddString(_T("16 Bit"));
@@ -264,18 +244,18 @@ BOOL COptionDlg::OnInitDialog()
 	TCHAR szBuff[_MAX_PATH] = {};
 	GetCurrentDirectory(_countof(szBuff), szBuff);
 
-	m_szInstalledPath = szBuff;
+	m_szInstalledPath       = szBuff;
 
 	// Version 표시
 	CString szServerIniPath = m_szInstalledPath + _T("\\Server.Ini");
-	DWORD dwVersion = GetPrivateProfileInt(_T("Version"), _T("Files"), 0, szServerIniPath);
+	DWORD dwVersion         = GetPrivateProfileInt(_T("Version"), _T("Files"), 0, szServerIniPath);
 	SetDlgItemInt(IDC_E_VERSION, dwVersion);
 
 	// 세팅을 읽어온다..
 	SettingLoad(m_szInstalledPath + _T("\\Option.ini"));
 	SettingUpdate();
 
-	return TRUE;  // return TRUE  unless you set the focus to a control
+	return TRUE; // return TRUE  unless you set the focus to a control
 }
 
 void COptionDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -336,10 +316,11 @@ void COptionDlg::OnOK()
 
 void COptionDlg::OnBApplyAndExecute()
 {
-	CString szExeFN = m_szInstalledPath + _T("\\"); // 실행 파일 이름 만들고..
-	szExeFN += _T("Launcher.exe");
+	CString szExeFN  = m_szInstalledPath + _T("\\"); // 실행 파일 이름 만들고..
+	szExeFN         += _T("Launcher.exe");
 
-	ShellExecute(nullptr, _T("open"), szExeFN, _T(""), m_szInstalledPath, SW_SHOWNORMAL); // 게임 실행..
+	ShellExecute(
+		nullptr, _T("open"), szExeFN, _T(""), m_szInstalledPath, SW_SHOWNORMAL); // 게임 실행..
 
 	OnOK();
 }
@@ -387,25 +368,23 @@ void COptionDlg::SettingSave(CString szIniFile)
 	else
 		m_Option.bEffectVisible = false;
 
-	int iSel = m_CB_Resolution.GetCurSel();
+	int iSel             = m_CB_Resolution.GetCurSel();
 
-	m_Option.iViewWidth = 1024;
+	m_Option.iViewWidth  = 1024;
 	m_Option.iViewHeight = 768;
 
-	if (iSel >= 0
-		&& iSel < (int) s_supportedResolutions.size())
+	if (iSel >= 0 && iSel < (int) s_supportedResolutions.size())
 	{
 		const auto& resolution = s_supportedResolutions[iSel];
-		m_Option.iViewWidth = resolution.Width;
-		m_Option.iViewHeight = resolution.Height;
+		m_Option.iViewWidth    = resolution.Width;
+		m_Option.iViewHeight   = resolution.Height;
 	}
 
 	iSel = m_CB_ColorDepth.GetCurSel();
 	if (CB_ERR != iSel)
 	{
 		m_Option.iViewColorDepth = static_cast<int>(m_CB_ColorDepth.GetItemData(iSel));
-		if (m_Option.iViewColorDepth != 16
-			&& m_Option.iViewColorDepth != 32)
+		if (m_Option.iViewColorDepth != 16 && m_Option.iViewColorDepth != 32)
 			m_Option.iViewColorDepth = 16;
 	}
 	else
@@ -431,16 +410,26 @@ void COptionDlg::SettingSave(CString szIniFile)
 	else if (m_Option.iEffectSndDist > 48)
 		m_Option.iEffectSndDist = 48;
 
-	szBuff.Format(_T("%d"), m_Option.iTexLOD_Chr);		WritePrivateProfileString(_T("Texture"),	_T("LOD_Chr"), szBuff, szIniFile);
-	szBuff.Format(_T("%d"), m_Option.iTexLOD_Shape);	WritePrivateProfileString(_T("Texture"),	_T("LOD_Shape"), szBuff, szIniFile);
-	szBuff.Format(_T("%d"), m_Option.iTexLOD_Terrain);	WritePrivateProfileString(_T("Texture"),	_T("LOD_Terrain"), szBuff, szIniFile);
-	szBuff.Format(_T("%d"), m_Option.iUseShadow);		WritePrivateProfileString(_T("Shadow"),		_T("Use"), szBuff, szIniFile);
-	szBuff.Format(_T("%d"), m_Option.iViewWidth);		WritePrivateProfileString(_T("ViewPort"),	_T("Width"), szBuff, szIniFile);
-	szBuff.Format(_T("%d"), m_Option.iViewHeight);		WritePrivateProfileString(_T("ViewPort"),	_T("Height"), szBuff, szIniFile);
-	szBuff.Format(_T("%d"), m_Option.iViewColorDepth);  WritePrivateProfileString(_T("ViewPort"),	_T("ColorDepth"), szBuff, szIniFile);
-	szBuff.Format(_T("%d"), m_Option.iViewDist);		WritePrivateProfileString(_T("ViewPort"),	_T("Distance"), szBuff, szIniFile);
-	szBuff.Format(_T("%d"), m_Option.iEffectSndDist);	WritePrivateProfileString(_T("Sound"),		_T("Distance"), szBuff, szIniFile);
-	szBuff.Format(_T("%d"), m_Option.iEffectCount);		WritePrivateProfileString(_T("Effect"),		_T("Count"), szBuff, szIniFile);
+	szBuff.Format(_T("%d"), m_Option.iTexLOD_Chr);
+	WritePrivateProfileString(_T("Texture"), _T("LOD_Chr"), szBuff, szIniFile);
+	szBuff.Format(_T("%d"), m_Option.iTexLOD_Shape);
+	WritePrivateProfileString(_T("Texture"), _T("LOD_Shape"), szBuff, szIniFile);
+	szBuff.Format(_T("%d"), m_Option.iTexLOD_Terrain);
+	WritePrivateProfileString(_T("Texture"), _T("LOD_Terrain"), szBuff, szIniFile);
+	szBuff.Format(_T("%d"), m_Option.iUseShadow);
+	WritePrivateProfileString(_T("Shadow"), _T("Use"), szBuff, szIniFile);
+	szBuff.Format(_T("%d"), m_Option.iViewWidth);
+	WritePrivateProfileString(_T("ViewPort"), _T("Width"), szBuff, szIniFile);
+	szBuff.Format(_T("%d"), m_Option.iViewHeight);
+	WritePrivateProfileString(_T("ViewPort"), _T("Height"), szBuff, szIniFile);
+	szBuff.Format(_T("%d"), m_Option.iViewColorDepth);
+	WritePrivateProfileString(_T("ViewPort"), _T("ColorDepth"), szBuff, szIniFile);
+	szBuff.Format(_T("%d"), m_Option.iViewDist);
+	WritePrivateProfileString(_T("ViewPort"), _T("Distance"), szBuff, szIniFile);
+	szBuff.Format(_T("%d"), m_Option.iEffectSndDist);
+	WritePrivateProfileString(_T("Sound"), _T("Distance"), szBuff, szIniFile);
+	szBuff.Format(_T("%d"), m_Option.iEffectCount);
+	WritePrivateProfileString(_T("Effect"), _T("Count"), szBuff, szIniFile);
 
 	m_Option.bSoundBgm = (IsDlgButtonChecked(IDC_C_SOUND_BGM)) ? true : false;
 	m_Option.bSoundBgm ? szBuff = "1" : szBuff = "0";
@@ -472,23 +461,27 @@ void COptionDlg::SettingLoad(CString szIniFile)
 	if (szIniFile.GetLength() <= 0)
 		return;
 
-	m_Option.iTexLOD_Chr		= GetPrivateProfileInt(_T("Texture"),		_T("LOD_Chr"), 0, szIniFile);
-	m_Option.iTexLOD_Shape		= GetPrivateProfileInt(_T("Texture"),		_T("LOD_Shape"), 0, szIniFile);
-	m_Option.iTexLOD_Terrain	= GetPrivateProfileInt(_T("Texture"),		_T("LOD_Terrain"), 0, szIniFile);
-	m_Option.iUseShadow			= GetPrivateProfileInt(_T("Shadow"),		_T("Use"), 1, szIniFile);
-	m_Option.iViewWidth			= GetPrivateProfileInt(_T("ViewPort"),		_T("Width"), 1024, szIniFile);
-	m_Option.iViewHeight		= GetPrivateProfileInt(_T("ViewPort"),		_T("Height"), 768, szIniFile);
-	m_Option.iViewColorDepth	= GetPrivateProfileInt(_T("ViewPort"),		_T("ColorDepth"), 16, szIniFile);
-	m_Option.iViewDist			= GetPrivateProfileInt(_T("ViewPort"),		_T("Distance"), 512, szIniFile);
-	m_Option.iEffectSndDist		= GetPrivateProfileInt(_T("Sound"),			_T("Distance"), 48, szIniFile);
-	m_Option.iEffectCount		= GetPrivateProfileInt(_T("Effect"),		_T("Count"), 2000, szIniFile);
+	m_Option.iTexLOD_Chr     = GetPrivateProfileInt(_T("Texture"), _T("LOD_Chr"), 0, szIniFile);
+	m_Option.iTexLOD_Shape   = GetPrivateProfileInt(_T("Texture"), _T("LOD_Shape"), 0, szIniFile);
+	m_Option.iTexLOD_Terrain = GetPrivateProfileInt(_T("Texture"), _T("LOD_Terrain"), 0, szIniFile);
+	m_Option.iUseShadow      = GetPrivateProfileInt(_T("Shadow"), _T("Use"), 1, szIniFile);
+	m_Option.iViewWidth      = GetPrivateProfileInt(_T("ViewPort"), _T("Width"), 1024, szIniFile);
+	m_Option.iViewHeight     = GetPrivateProfileInt(_T("ViewPort"), _T("Height"), 768, szIniFile);
+	m_Option.iViewColorDepth = GetPrivateProfileInt(
+		_T("ViewPort"), _T("ColorDepth"), 16, szIniFile);
+	m_Option.iViewDist      = GetPrivateProfileInt(_T("ViewPort"), _T("Distance"), 512, szIniFile);
+	m_Option.iEffectSndDist = GetPrivateProfileInt(_T("Sound"), _T("Distance"), 48, szIniFile);
+	m_Option.iEffectCount   = GetPrivateProfileInt(_T("Effect"), _T("Count"), 2000, szIniFile);
 
-	m_Option.bSoundBgm			= GetPrivateProfileInt(_T("Sound"),			_T("Bgm"), 1, szIniFile) != 0;
-	m_Option.bSoundEffect		= GetPrivateProfileInt(_T("Sound"),			_T("Effect"), 1, szIniFile) != 0;
-	m_Option.bSndDuplicated		= GetPrivateProfileInt(_T("Sound"),			_T("Duplicate"), 0, szIniFile) != 0;
-	m_Option.bWindowCursor		= GetPrivateProfileInt(_T("Cursor"),		_T("WindowCursor"), 1, szIniFile) != 0;
-	m_Option.bWindowMode		= GetPrivateProfileInt(_T("Screen"),		_T("WindowMode"), 0, szIniFile) != 0;
-	m_Option.bEffectVisible		= GetPrivateProfileInt(_T("WeaponEffect"),	_T("EffectVisible"), 1, szIniFile) != 0;
+	m_Option.bSoundBgm      = GetPrivateProfileInt(_T("Sound"), _T("Bgm"), 1, szIniFile) != 0;
+	m_Option.bSoundEffect   = GetPrivateProfileInt(_T("Sound"), _T("Effect"), 1, szIniFile) != 0;
+	m_Option.bSndDuplicated = GetPrivateProfileInt(_T("Sound"), _T("Duplicate"), 0, szIniFile) != 0;
+	m_Option.bWindowCursor  = GetPrivateProfileInt(_T("Cursor"), _T("WindowCursor"), 1, szIniFile)
+							 != 0;
+	m_Option.bWindowMode = GetPrivateProfileInt(_T("Screen"), _T("WindowMode"), 0, szIniFile) != 0;
+	m_Option.bEffectVisible = GetPrivateProfileInt(
+								  _T("WeaponEffect"), _T("EffectVisible"), 1, szIniFile)
+							  != 0;
 }
 
 void COptionDlg::SettingUpdate()
@@ -514,8 +507,7 @@ void COptionDlg::SettingUpdate()
 	for (int i = 0; i < (int) s_supportedResolutions.size(); i++)
 	{
 		const auto& resolution = s_supportedResolutions[i];
-		if (m_Option.iViewWidth == resolution.Width
-			&& m_Option.iViewHeight == resolution.Height)
+		if (m_Option.iViewWidth == resolution.Width && m_Option.iViewHeight == resolution.Height)
 		{
 			iSel = i;
 			break;

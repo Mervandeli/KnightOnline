@@ -21,9 +21,9 @@ static char THIS_FILE[] = __FILE__;
 
 CUIMsgBoxOkCancel::CUIMsgBoxOkCancel()
 {
-	m_pBtn_OK = nullptr;
+	m_pBtn_OK     = nullptr;
 	m_pBtn_Cancel = nullptr;
-	m_pText_Msg = nullptr;
+	m_pText_Msg   = nullptr;
 }
 
 CUIMsgBoxOkCancel::~CUIMsgBoxOkCancel()
@@ -34,9 +34,9 @@ void CUIMsgBoxOkCancel::Release()
 {
 	CN3UIBase::Release();
 
-	m_pBtn_OK = nullptr;
+	m_pBtn_OK     = nullptr;
 	m_pBtn_Cancel = nullptr;
-	m_pText_Msg = nullptr;
+	m_pText_Msg   = nullptr;
 }
 
 bool CUIMsgBoxOkCancel::Load(File& file)
@@ -44,9 +44,9 @@ bool CUIMsgBoxOkCancel::Load(File& file)
 	if (!CN3UIBase::Load(file))
 		return false;
 
-	N3_VERIFY_UI_COMPONENT(m_pBtn_OK,		GetChildByID<CN3UIButton>("btn_ok"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel,	GetChildByID<CN3UIButton>("btn_cancel"));
-	N3_VERIFY_UI_COMPONENT(m_pText_Msg,		GetChildByID<CN3UIString>("text_msg"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_OK, GetChildByID<CN3UIButton>("btn_ok"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel, GetChildByID<CN3UIButton>("btn_cancel"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Msg, GetChildByID<CN3UIString>("text_msg"));
 
 	return true;
 }

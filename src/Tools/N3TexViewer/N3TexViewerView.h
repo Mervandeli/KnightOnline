@@ -15,27 +15,27 @@ protected: // create from serialization only
 	CN3TexViewerView();
 	DECLARE_DYNCREATE(CN3TexViewerView)
 
-// Attributes
+	// Attributes
 public:
 	CN3TexViewerDoc* GetDocument();
 
-// Operations
+	// Operations
 public:
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CN3TexViewerView)
-	public:
-	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
+public:
+	virtual void OnDraw(CDC* pDC); // overridden to draw this view
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual void OnInitialUpdate();
-	protected:
+
+protected:
 	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
 	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
 	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CN3TexViewerView();
 #ifdef _DEBUG
@@ -44,8 +44,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CN3TexViewerView)
 	afx_msg void OnViewAlpha();
@@ -56,9 +55,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-#ifndef _DEBUG  // debug version in N3TexViewerView.cpp
+#ifndef _DEBUG // debug version in N3TexViewerView.cpp
 inline CN3TexViewerDoc* CN3TexViewerView::GetDocument()
-   { return (CN3TexViewerDoc*)m_pDocument; }
+{
+	return (CN3TexViewerDoc*) m_pDocument;
+}
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

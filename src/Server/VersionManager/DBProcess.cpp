@@ -31,7 +31,8 @@ bool CDBProcess::InitDatabase() noexcept(false)
 {
 	try
 	{
-		auto conn = db::ConnectionManager::CreatePoolConnection(modelUtil::DbType::ACCOUNT, DB_PROCESS_TIMEOUT);
+		auto conn = db::ConnectionManager::CreatePoolConnection(
+			modelUtil::DbType::ACCOUNT, DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)
 			return false;
 	}
@@ -49,8 +50,7 @@ bool CDBProcess::LoadVersionList(VersionInfoList* versionList)
 	recordset_loader::STLMap loader(*versionList);
 	if (!loader.Load_ForbidEmpty())
 	{
-		spdlog::error("DBProcess::LoadVersionList: failed: {}",
-			loader.GetError().Message);
+		spdlog::error("DBProcess::LoadVersionList: failed: {}", loader.GetError().Message);
 		return false;
 	}
 
@@ -65,7 +65,7 @@ int CDBProcess::AccountLogin(const char* accountId, const char* password)
 	// without a procedure.
 	db::SqlBuilder<model::TbUser> sql;
 	sql.IsWherePK = true;
-	
+
 	try
 	{
 		db::ModelRecordSet<model::TbUser> recordSet;
@@ -102,11 +102,12 @@ int CDBProcess::AccountLogin(const char* accountId, const char* password)
 		db::utils::LogDatabaseError(dbErr, "DBProcess::AccountLogin()");
 		return AUTH_FAILED;
 	}
-	
+
 	return AUTH_OK;
 }
 
-bool CDBProcess::InsertVersion(int version, const char* fileName, const char* compressName, int historyVersion)
+bool CDBProcess::InsertVersion(
+	int version, const char* fileName, const char* compressName, int historyVersion)
 {
 	using ModelType = model::Version;
 
@@ -114,7 +115,8 @@ bool CDBProcess::InsertVersion(int version, const char* fileName, const char* co
 	std::string insert = sql.InsertString();
 	try
 	{
-		auto conn = db::ConnectionManager::CreatePoolConnection(ModelType::DbType(), DB_PROCESS_TIMEOUT);
+		auto conn = db::ConnectionManager::CreatePoolConnection(
+			ModelType::DbType(), DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)
 			return false;
 
@@ -133,7 +135,7 @@ bool CDBProcess::InsertVersion(int version, const char* fileName, const char* co
 		db::utils::LogDatabaseError(dbErr, "DBProcess::InsertVersion()");
 		return false;
 	}
-	
+
 	return false;
 }
 
@@ -145,7 +147,8 @@ bool CDBProcess::DeleteVersion(int version)
 	std::string deleteQuery = sql.DeleteByIdString();
 	try
 	{
-		auto conn = db::ConnectionManager::CreatePoolConnection(ModelType::DbType(), DB_PROCESS_TIMEOUT);
+		auto conn = db::ConnectionManager::CreatePoolConnection(
+			ModelType::DbType(), DB_PROCESS_TIMEOUT);
 		if (conn == nullptr)
 			return false;
 
@@ -160,7 +163,7 @@ bool CDBProcess::DeleteVersion(int version)
 	{
 		db::utils::LogDatabaseError(dbErr, "DBProcess::DeleteVersion()");
 	}
-	
+
 	return false;
 }
 
@@ -176,11 +179,13 @@ bool CDBProcess::LoadUserCountList()
 		{
 			model::Concurrent concurrent = recordSet.get();
 
-			int serverId = concurrent.ServerId - 1;
+			int serverId                 = concurrent.ServerId - 1;
 			if (serverId >= static_cast<int>(appInstance->ServerList.size()))
 				continue;
 
-			appInstance->ServerList[serverId]->sUserCount = concurrent.Zone1Count + concurrent.Zone2Count + concurrent.Zone3Count;
+			appInstance->ServerList[serverId]->sUserCount = concurrent.Zone1Count
+															+ concurrent.Zone2Count
+															+ concurrent.Zone3Count;
 		}
 
 		return true;
@@ -189,7 +194,7 @@ bool CDBProcess::LoadUserCountList()
 	{
 		db::utils::LogDatabaseError(dbErr, "DBProcess::LoadUserCountList()");
 	}
-	
+
 	return false;
 }
 
@@ -203,7 +208,8 @@ bool CDBProcess::IsCurrentUser(const char* accountId, std::string& serverIp, int
 
 		auto stmt = recordSet.prepare(sql);
 		if (stmt == nullptr)
-			throw db::ApplicationError("DBProcess::IsCurrentUser: statement could not be allocated");
+			throw db::ApplicationError(
+				"DBProcess::IsCurrentUser: statement could not be allocated");
 
 		stmt->bind(0, accountId);
 		recordSet.execute();
@@ -212,8 +218,8 @@ bool CDBProcess::IsCurrentUser(const char* accountId, std::string& serverIp, int
 			return false;
 
 		model::CurrentUser user = recordSet.get();
-		serverId = user.ServerId;
-		serverIp = std::move(user.ServerIP);
+		serverId                = user.ServerId;
+		serverIp                = std::move(user.ServerIP);
 
 		return true;
 	}
@@ -228,7 +234,7 @@ bool CDBProcess::IsCurrentUser(const char* accountId, std::string& serverIp, int
 bool CDBProcess::LoadPremiumServiceUser(const char* accountId, int16_t* premiumDaysRemaining)
 {
 	int32_t premiumType = 0, // NOTE: we don't need this in the login server
-		daysRemaining = 0;
+		daysRemaining   = 0;
 	try
 	{
 		db::StoredProc<storedProc::LoadPremiumServiceUser> premium;

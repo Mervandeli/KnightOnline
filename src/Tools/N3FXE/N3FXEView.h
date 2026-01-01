@@ -18,26 +18,25 @@ protected: // create from serialization only
 	CN3FXEView();
 	DECLARE_DYNCREATE(CN3FXEView)
 
-// Attributes
+	// Attributes
 public:
 	CN3FXEDoc* GetDocument();
-	
-// Operations
-public:
 
-// Overrides
+	// Operations
+public:
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CN3FXEView)
-	public:
-	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
+public:
+	virtual void OnDraw(CDC* pDC); // overridden to draw this view
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	protected:
+
+protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
-
 	virtual ~CN3FXEView();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
@@ -45,8 +44,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CN3FXEView)
 	afx_msg void OnSize(UINT nType, int cx, int cy);
@@ -54,9 +52,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-#ifndef _DEBUG  // debug version in N3FXEView.cpp
+#ifndef _DEBUG // debug version in N3FXEView.cpp
 inline CN3FXEDoc* CN3FXEView::GetDocument()
-   { return (CN3FXEDoc*)m_pDocument; }
+{
+	return (CN3FXEDoc*) m_pDocument;
+}
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

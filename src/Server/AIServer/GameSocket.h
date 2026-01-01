@@ -14,9 +14,9 @@ class CIOCPort;
 class CGameSocket : public TcpServerSocket
 {
 public:
-	AIServerApp*	m_pMain;
-	CParty			m_Party;
-	int16_t			_zoneNo;
+	AIServerApp* m_pMain;
+	CParty m_Party;
+	int16_t _zoneNo;
 
 public:
 	CGameSocket(SocketManager* socketManager);
@@ -27,7 +27,7 @@ public:
 	int Send(char* pBuf, int length) override;
 	void CloseProcess() override;
 
-	void Parsing(int length, char* pData) override;	// recv data parsing
+	void Parsing(int length, char* pData) override; // recv data parsing
 	void RecvServerConnect(char* pBuf);
 
 	bool SetUid(float x, float z, int id, int speed);

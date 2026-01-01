@@ -15,9 +15,9 @@
 
 CUIExitMenu::CUIExitMenu()
 {
-	m_pBtn_Chr = nullptr;
+	m_pBtn_Chr    = nullptr;
 	m_pBtn_Option = nullptr;
-	m_pBtn_Exit = nullptr;
+	m_pBtn_Exit   = nullptr;
 	m_pBtn_Cancel = nullptr;
 }
 
@@ -25,8 +25,7 @@ CUIExitMenu::~CUIExitMenu()
 {
 }
 
-void CUIExitMenu::SetVisible(
-	bool bVisible)
+void CUIExitMenu::SetVisible(bool bVisible)
 {
 	CN3UIBase::SetVisible(bVisible);
 
@@ -52,9 +51,7 @@ void CUIExitMenu::SetVisible(
 	}
 }
 
-bool CUIExitMenu::ReceiveMessage(
-	CN3UIBase* pSender,
-	uint32_t dwMsg)
+bool CUIExitMenu::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
 	if (pSender == nullptr)
 		return false;
@@ -149,7 +146,7 @@ bool CUIExitMenu::ReceiveMessage(
 }
 
 void CUIExitMenu::ReturnToCharacterSelection()
-{	
+{
 	if (CGameBase::s_pPlayer != nullptr)
 	{
 		if (CGameProcedure::s_pFX != nullptr)
@@ -157,11 +154,7 @@ void CUIExitMenu::ReturnToCharacterSelection()
 			//CGameBase::s_pPlayer->m_bStopTargetPointerAfterTime = false;
 			//CGameBase::s_pPlayer->m_fStopTargetPointerAfterTime = 0.0f;
 			CGameProcedure::s_pFX->Stop(
-				CGameBase::s_pPlayer->IDNumber(),
-				CGameBase::s_pPlayer->IDNumber(),
-				FXID_TARGET_POINTER,
-				FXID_TARGET_POINTER,
-				true);
+				CGameBase::s_pPlayer->IDNumber(), CGameBase::s_pPlayer->IDNumber(), FXID_TARGET_POINTER, FXID_TARGET_POINTER, true);
 		}
 
 		/*
@@ -175,8 +168,8 @@ void CUIExitMenu::ReturnToCharacterSelection()
 		*/
 	}
 
-	std::string szIP = CGameProcedure::s_pSocket->GetCurrentIP();
-	DWORD dwPort = CGameProcedure::s_pSocket->GetCurrentPort();
+	std::string szIP                              = CGameProcedure::s_pSocket->GetCurrentIP();
+	DWORD dwPort                                  = CGameProcedure::s_pSocket->GetCurrentPort();
 
 	CGameProcedure::s_bNeedReportConnectionClosed = false;
 	CGameProcedure::s_pSocket->Disconnect();
@@ -184,7 +177,7 @@ void CUIExitMenu::ReturnToCharacterSelection()
 
 	CGameProcedure::s_pSocket->Connect(s_hWndBase, szIP.c_str(), dwPort);
 	CGameProcedure::s_bNeedReportConnectionClosed = true;
-	CGameProcedure::s_bIsRestarting = true;
+	CGameProcedure::s_bIsRestarting               = true;
 	CGameProcedure::ProcActiveSet((CGameProcedure*) CGameProcedure::s_pProcCharacterSelect);
 }
 
@@ -193,10 +186,10 @@ bool CUIExitMenu::Load(File& file)
 	if (!CN3UIBase::Load(file))
 		return false;
 
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Chr,		GetChildByID<CN3UIButton>("btn_chr"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Option,	GetChildByID<CN3UIButton>("btn_option"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Exit,		GetChildByID<CN3UIButton>("btn_exit"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel,	GetChildByID<CN3UIButton>("btn_cancel"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Chr, GetChildByID<CN3UIButton>("btn_chr"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Option, GetChildByID<CN3UIButton>("btn_option"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Exit, GetChildByID<CN3UIButton>("btn_exit"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel, GetChildByID<CN3UIButton>("btn_cancel"));
 
 	return true;
 }

@@ -12,29 +12,30 @@
 
 class CDlgAddDTex : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgAddDTex(CWnd* pParent = nullptr);   // standard constructor
+	CDlgAddDTex(CWnd* pParent = nullptr); // standard constructor
 
-	CString	m_TexName;
+	CString m_TexName;
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgAddDTex)
-	enum { IDD = IDD_ADDDTEX };
-	CListBox	m_TexList;
+	enum
+	{
+		IDD = IDD_ADDDTEX
+	};
+	CListBox m_TexList;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgAddDTex)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgAddDTex)
 	afx_msg void OnSelchangeAdddtexlist();

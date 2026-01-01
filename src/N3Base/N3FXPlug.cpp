@@ -9,17 +9,16 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////
 // CN3FXPlugPart
-CN3FXPlugPart::CN3FXPlugPart()
-	: m_vOffsetPos(0, 0, 0), m_vOffsetDir(0, 0, 1)
+CN3FXPlugPart::CN3FXPlugPart() : m_vOffsetPos(0, 0, 0), m_vOffsetDir(0, 0, 1)
 {
-	m_dwType |= OBJ_FX_PLUG_PART;
-	m_pFXB = nullptr;
-	m_nRefIndex = -1;
+	m_dwType    |= OBJ_FX_PLUG_PART;
+	m_pFXB       = nullptr;
+	m_nRefIndex  = -1;
 }
 
 CN3FXPlugPart::~CN3FXPlugPart()
@@ -31,9 +30,11 @@ void CN3FXPlugPart::Release()
 {
 	CN3BaseFileAccess::Release();
 
-	delete m_pFXB; m_pFXB = nullptr;
+	delete m_pFXB;
+	m_pFXB      = nullptr;
 	m_nRefIndex = -1;
-	m_vOffsetPos.Set(0,0,0); m_vOffsetDir.Set(0,0,1);
+	m_vOffsetPos.Set(0, 0, 0);
+	m_vOffsetDir.Set(0, 0, 1);
 }
 
 bool CN3FXPlugPart::Load(File& file)
@@ -51,7 +52,7 @@ bool CN3FXPlugPart::Load(File& file)
 		file.Read(szFN, nStrLen);
 		szFN[nStrLen] = '\0';
 
-		m_pFXB = new CN3FXBundle();
+		m_pFXB        = new CN3FXBundle();
 		if (!m_pFXB->LoadFromFile(szFN))
 		{
 			delete m_pFXB;
@@ -95,12 +96,13 @@ void CN3FXPlugPart::Tick(const __Matrix44& mtxParent)
 	if (m_pFXB)
 	{
 		// 위치
-		m_pFXB->m_vPos = m_vOffsetPos*mtxParent;
+		m_pFXB->m_vPos = m_vOffsetPos * mtxParent;
 
 		// 회전
 		static __Matrix44 mtxRot;
-		mtxRot = mtxParent; mtxRot.PosSet(0,0,0);
-		m_pFXB->m_vDir = m_vOffsetDir*mtxRot;
+		mtxRot = mtxParent;
+		mtxRot.PosSet(0, 0, 0);
+		m_pFXB->m_vDir = m_vOffsetDir * mtxRot;
 
 		m_pFXB->Tick();
 	}
@@ -113,16 +115,17 @@ void CN3FXPlugPart::Tick(const CN3Chr* pChr)
 	{
 		// 위치
 		const __Matrix44* pMtxJoint = pChr->MatrixGet(m_nRefIndex);
-		if (nullptr == pMtxJoint) return;
+		if (nullptr == pMtxJoint)
+			return;
 
 		static __Matrix44 mtx;
-		mtx = *(pMtxJoint);
-		mtx *= pChr->m_Matrix;
-		m_pFXB->m_vPos = m_vOffsetPos*mtx;
-		
+		mtx             = *(pMtxJoint);
+		mtx            *= pChr->m_Matrix;
+		m_pFXB->m_vPos  = m_vOffsetPos * mtx;
+
 		// 회전
-		mtx.PosSet(0,0,0);
-		m_pFXB->m_vDir = m_vOffsetDir*mtx;
+		mtx.PosSet(0, 0, 0);
+		m_pFXB->m_vDir = m_vOffsetDir * mtx;
 
 		m_pFXB->Tick();
 	}
@@ -130,30 +133,35 @@ void CN3FXPlugPart::Tick(const CN3Chr* pChr)
 
 void CN3FXPlugPart::Render()
 {
-	if (m_pFXB) m_pFXB->Render();
+	if (m_pFXB)
+		m_pFXB->Render();
 }
 
 void CN3FXPlugPart::SetFXB(const std::string& strFN)
 {
-	if (nullptr == m_pFXB) m_pFXB = new CN3FXBundle();
-	else m_pFXB->Release();
+	if (nullptr == m_pFXB)
+		m_pFXB = new CN3FXBundle();
+	else
+		m_pFXB->Release();
 	m_pFXB->LoadFromFile(strFN);
 
-	m_vOffsetPos = m_pFXB->m_vPos;	//일단 FXB에 설정되어 있는 vPos와 vDir값을 가져와서 적용.
+	m_vOffsetPos = m_pFXB->m_vPos; //일단 FXB에 설정되어 있는 vPos와 vDir값을 가져와서 적용.
 	m_vOffsetDir = m_pFXB->m_vDir;
 
-	m_pFXB->Init();					// FX 나오게 하기
+	m_pFXB->Init();                // FX 나오게 하기
 	m_pFXB->Trigger();
 }
 
 void CN3FXPlugPart::StopFXB(bool bImmediately)
 {
-	if (m_pFXB) m_pFXB->Stop(bImmediately);
+	if (m_pFXB)
+		m_pFXB->Stop(bImmediately);
 }
 
 void CN3FXPlugPart::TriggerFXB()
 {
-	if (m_pFXB) m_pFXB->Trigger();
+	if (m_pFXB)
+		m_pFXB->Trigger();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -187,7 +195,7 @@ bool CN3FXPlug::Load(File& file)
 	__ASSERT(0 == m_FXPParts.size(), "must 0");
 
 	int nCount;
-	file.Read(&nCount, sizeof(nCount));		// Part의 갯수
+	file.Read(&nCount, sizeof(nCount)); // Part의 갯수
 
 	if (nCount > 0)
 		m_FXPParts.assign(nCount, nullptr);
@@ -233,10 +241,10 @@ bool CN3FXPlug::Save(File& file)
 	if (!CN3BaseFileAccess::Save(file))
 		return false;
 
-	RemoveFXPParts_HaveNoBundle();	// 번들 없는 파트들 지우기
+	RemoveFXPParts_HaveNoBundle();       // 번들 없는 파트들 지우기
 
 	int nCount = static_cast<int>(m_FXPParts.size());
-	file.Write(&nCount, sizeof(nCount));		// Part의 갯수
+	file.Write(&nCount, sizeof(nCount)); // Part의 갯수
 
 	for (CN3FXPlugPart* pPart : m_FXPParts)
 		pPart->Save(file);
@@ -244,7 +252,7 @@ bool CN3FXPlug::Save(File& file)
 	return true;
 }
 
-void CN3FXPlug::RemoveFXPParts_HaveNoBundle()	// 번들 없는 Part들 제거하기
+void CN3FXPlug::RemoveFXPParts_HaveNoBundle() // 번들 없는 Part들 제거하기
 {
 	for (auto itr = m_FXPParts.begin(); itr != m_FXPParts.end();)
 	{
@@ -255,7 +263,7 @@ void CN3FXPlug::RemoveFXPParts_HaveNoBundle()	// 번들 없는 Part들 제거하
 		}
 		else if (pPart->GetFXB() == nullptr)
 		{
-			delete pPart;								// FXB가 없으면 이 파트는 지운다.
+			delete pPart; // FXB가 없으면 이 파트는 지운다.
 			itr = m_FXPParts.erase(itr);
 		}
 		else
@@ -274,12 +282,12 @@ CN3FXPlugPart* CN3FXPlug::FXPPartAdd()
 
 void CN3FXPlug::FXPPartDelete(int nIndex)
 {
-	if (nIndex < 0
-		|| nIndex >= static_cast<int>(m_FXPParts.size()))
+	if (nIndex < 0 || nIndex >= static_cast<int>(m_FXPParts.size()))
 		return;
 
 	std::vector<CN3FXPlugPart*>::iterator itor = m_FXPParts.begin();
-	for (int i=0; i<nIndex; ++i) ++itor;
+	for (int i = 0; i < nIndex; ++i)
+		++itor;
 	delete (*itor);
 	m_FXPParts.erase(itor);
 }

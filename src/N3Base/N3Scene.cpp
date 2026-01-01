@@ -6,7 +6,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -20,26 +20,40 @@ CN3Scene::CN3Scene()
 	memset(m_pCameras, 0, sizeof(m_pCameras));
 	memset(m_pLights, 0, sizeof(m_pLights));
 
-	m_nCameraActive = 0;
+	m_nCameraActive        = 0;
 
-	m_fFrmCur = 0.0f; // Animation Frame;
-	m_fFrmStart = 0.0f; // 전체 프레임.
-	m_fFrmEnd = 1000.0f; // 기본값 프레임.
+	m_fFrmCur              = 0.0f;    // Animation Frame;
+	m_fFrmStart            = 0.0f;    // 전체 프레임.
+	m_fFrmEnd              = 1000.0f; // 기본값 프레임.
 
-	m_nCameraCount = 0; 
-	m_nLightCount = 0;
+	m_nCameraCount         = 0;
+	m_nLightCount          = 0;
 
 	m_bDisableDefaultLight = false;
 
-	m_AmbientLightColor = 0;
+	m_AmbientLightColor    = 0;
 }
 
 CN3Scene::~CN3Scene()
 {
 	int i = 0;
-	for(i = 0; i < MAX_SCENE_CAMERA; i++) { if(m_pCameras[i]) { delete m_pCameras[i]; m_pCameras[i] = nullptr; } }
-	for(i = 0; i < MAX_SCENE_LIGHT; i++) { if(m_pLights[i]) { delete m_pLights[i]; m_pLights[i] = nullptr; } }
-	
+	for (i = 0; i < MAX_SCENE_CAMERA; i++)
+	{
+		if (m_pCameras[i])
+		{
+			delete m_pCameras[i];
+			m_pCameras[i] = nullptr;
+		}
+	}
+	for (i = 0; i < MAX_SCENE_LIGHT; i++)
+	{
+		if (m_pLights[i])
+		{
+			delete m_pLights[i];
+			m_pLights[i] = nullptr;
+		}
+	}
+
 	this->ShapeRelease();
 	this->ChrRelease();
 }
@@ -48,18 +62,32 @@ void CN3Scene::Release()
 {
 	m_nCameraActive = 0;
 
-	m_fFrmCur = 0.0f; // Animation Frame;
-	m_fFrmStart = 0.0f; // 전체 프레임.
-	m_fFrmEnd = 1000.0f; // 기본값 프레임.
+	m_fFrmCur       = 0.0f;    // Animation Frame;
+	m_fFrmStart     = 0.0f;    // 전체 프레임.
+	m_fFrmEnd       = 1000.0f; // 기본값 프레임.
 
-	int i = 0;
-	for(i = 0; i < MAX_SCENE_CAMERA; i++) { if(m_pCameras[i]) { delete m_pCameras[i]; m_pCameras[i] = nullptr; } }
-	for(i = 0; i < MAX_SCENE_LIGHT; i++) { if(m_pLights[i]) { delete m_pLights[i]; m_pLights[i] = nullptr; } }
+	int i           = 0;
+	for (i = 0; i < MAX_SCENE_CAMERA; i++)
+	{
+		if (m_pCameras[i])
+		{
+			delete m_pCameras[i];
+			m_pCameras[i] = nullptr;
+		}
+	}
+	for (i = 0; i < MAX_SCENE_LIGHT; i++)
+	{
+		if (m_pLights[i])
+		{
+			delete m_pLights[i];
+			m_pLights[i] = nullptr;
+		}
+	}
 	this->ShapeRelease();
 	this->ChrRelease();
 
-	m_nCameraCount = 0; 
-	m_nLightCount = 0;
+	m_nCameraCount         = 0;
+	m_nLightCount          = 0;
 
 	m_bDisableDefaultLight = false;
 }
@@ -67,25 +95,26 @@ void CN3Scene::Release()
 bool CN3Scene::Load(File& file)
 {
 	file.Read(&m_nCameraActive, 4);
-	file.Read(&m_fFrmCur, 4); // Animation Frame;
+	file.Read(&m_fFrmCur, 4);   // Animation Frame;
 	file.Read(&m_fFrmStart, 4); // 전체 프레임.
-	file.Read(&m_fFrmEnd, 4); // 전체 프레임.
+	file.Read(&m_fFrmEnd, 4);   // 전체 프레임.
 
 	int i = 0, nL = 0;
 	char szName[512] = "";
 
-	int nCC = 0;
+	int nCC          = 0;
 	file.Read(&nCC, 4); // 카메라..
-	for(i = 0; i < nCC; i++)
+	for (i = 0; i < nCC; i++)
 	{
 		file.Read(&nL, 4);
-		if(nL <= 0) continue;
+		if (nL <= 0)
+			continue;
 
 		file.Read(szName, nL);
-		szName[nL] = '\0';
+		szName[nL]         = '\0';
 
 		CN3Camera* pCamera = new CN3Camera();
-		if(false == pCamera->LoadFromFile(szName))
+		if (false == pCamera->LoadFromFile(szName))
 		{
 			delete pCamera;
 			continue;
@@ -96,36 +125,38 @@ bool CN3Scene::Load(File& file)
 
 	int nLC = 0;
 	file.Read(&nLC, 4); // 카메라..
-	for(i = 0; i < nLC; i++) 
+	for (i = 0; i < nLC; i++)
 	{
 		file.Read(&nL, 4);
-		if(nL <= 0) continue;
+		if (nL <= 0)
+			continue;
 
 		file.Read(szName, nL);
-		szName[nL] = '\0';
+		szName[nL]       = '\0';
 
 		CN3Light* pLight = new CN3Light();
-		if(false == pLight->LoadFromFile(szName))
+		if (false == pLight->LoadFromFile(szName))
 		{
 			delete pLight;
 			continue;
 		}
-		
+
 		this->LightAdd(pLight);
 	}
 
 	int nSC = 0;
 	file.Read(&nSC, 4); // Shapes..
-	for(i = 0; i < nSC; i++)
+	for (i = 0; i < nSC; i++)
 	{
 		file.Read(&nL, 4);
-		if(nL <= 0) continue;
+		if (nL <= 0)
+			continue;
 
 		file.Read(szName, nL);
-		szName[nL] = '\0';
+		szName[nL]       = '\0';
 
 		CN3Shape* pShape = new CN3Shape();
-		if(false == pShape->LoadFromFile(szName))
+		if (false == pShape->LoadFromFile(szName))
 		{
 			delete pShape;
 			continue;
@@ -136,16 +167,17 @@ bool CN3Scene::Load(File& file)
 
 	int nChrC = 0;
 	file.Read(&nChrC, 4); // 캐릭터
-	for(i = 0; i < nChrC; i++)
+	for (i = 0; i < nChrC; i++)
 	{
 		file.Read(&nL, 4);
-		if(nL <= 0) continue;
+		if (nL <= 0)
+			continue;
 
 		file.Read(szName, nL);
-		szName[nL] = '\0';
+		szName[nL]   = '\0';
 
 		CN3Chr* pChr = new CN3Chr();
-		if(false == pChr->LoadFromFile(szName))
+		if (false == pChr->LoadFromFile(szName))
 		{
 			delete pChr;
 			continue;
@@ -154,8 +186,10 @@ bool CN3Scene::Load(File& file)
 		this->ChrAdd(pChr);
 	}
 
-	if(m_nCameraCount <= 0) this->DefaultCameraAdd();
-	if(m_nLightCount <= 0) this->DefaultLightAdd();
+	if (m_nCameraCount <= 0)
+		this->DefaultCameraAdd();
+	if (m_nLightCount <= 0)
+		this->DefaultLightAdd();
 
 	return true;
 }
@@ -167,12 +201,12 @@ bool CN3Scene::Save(File& file)
 	std::filesystem::create_directory(PathGet() + "/Chr", ec);
 	std::filesystem::create_directory(PathGet() + "/Object", ec);
 	std::filesystem::create_directory(PathGet() + "/Item", ec);
-	
+
 	file.Write(&m_nCameraActive, 4);
-	file.Write(&m_fFrmCur, 4); // Animation Frame;
-	file.Write(&m_fFrmStart, 4); // 전체 프레임.
-	file.Write(&m_fFrmEnd, 4); // 전체 프레임.
-	
+	file.Write(&m_fFrmCur, 4);      // Animation Frame;
+	file.Write(&m_fFrmStart, 4);    // 전체 프레임.
+	file.Write(&m_fFrmEnd, 4);      // 전체 프레임.
+
 	file.Write(&m_nCameraCount, 4); // 카메라..
 	for (CN3Camera* camera : m_pCameras)
 	{
@@ -224,17 +258,17 @@ bool CN3Scene::Save(File& file)
 void CN3Scene::Render()
 {
 	int i = 0;
-//	for(i = 0; i < m_nCameraCount; i++)
-//	{
-//		__ASSERT(m_pCameras[i], "Camera pointer is NULL");
-//		if(m_nCameraActive != i) m_pCameras[i]->Render();
-//	}
+	//	for(i = 0; i < m_nCameraCount; i++)
+	//	{
+	//		__ASSERT(m_pCameras[i], "Camera pointer is NULL");
+	//		if(m_nCameraActive != i) m_pCameras[i]->Render();
+	//	}
 
-//	for(i = 0; i < m_nLightCount; i++)
-//	{
-//		__ASSERT(m_pLights[i], "Light pointer is NULL");
-//		m_pLights[i]->Render(nullptr, 0.5f);
-//	}
+	//	for(i = 0; i < m_nLightCount; i++)
+	//	{
+	//		__ASSERT(m_pLights[i], "Light pointer is NULL");
+	//		m_pLights[i]->Render(nullptr, 0.5f);
+	//	}
 	s_lpD3DDev->SetRenderState(D3DRS_AMBIENT, m_AmbientLightColor);
 
 	for (CN3Shape* shape : m_Shapes)
@@ -246,11 +280,11 @@ void CN3Scene::Render()
 
 void CN3Scene::Tick(float fFrm)
 {
-	if (FRAME_SELFPLAY == fFrm
-		|| fFrm < m_fFrmStart
-		|| fFrm > m_fFrmEnd)
+	if (FRAME_SELFPLAY == fFrm || fFrm < m_fFrmStart || fFrm > m_fFrmEnd)
 	{
-		m_fFrmCur += 30.0f / CN3Base::s_fFrmPerSec; // 일정하게 움직이도록 시간에 따라 움직이는 양을 조절..
+		m_fFrmCur += 30.0f
+					 / CN3Base::
+						 s_fFrmPerSec; // 일정하게 움직이도록 시간에 따라 움직이는 양을 조절..
 		if (m_fFrmCur > m_fFrmEnd)
 			m_fFrmCur = m_fFrmStart;
 	}
@@ -302,11 +336,11 @@ void CN3Scene::TickLights(float fFrm)
 	}
 
 	// Ambient Light 바꾸기..
-//	uint32_t dwAmbient =	0xff000000 | 
-//						(((uint32_t)(m_pLights[i]->m_Data.Diffuse.r * 255 * 0.5f)) << 16) | 
-//						(((uint32_t)(m_pLights[i]->m_Data.Diffuse.g * 255 * 0.5f)) << 8) | 
-//						(((uint32_t)(m_pLights[i]->m_Data.Diffuse.b * 255 * 0.5f)) << 0);
-//	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_AMBIENT, dwAmbient);
+	//	uint32_t dwAmbient =	0xff000000 |
+	//						(((uint32_t)(m_pLights[i]->m_Data.Diffuse.r * 255 * 0.5f)) << 16) |
+	//						(((uint32_t)(m_pLights[i]->m_Data.Diffuse.g * 255 * 0.5f)) << 8) |
+	//						(((uint32_t)(m_pLights[i]->m_Data.Diffuse.b * 255 * 0.5f)) << 0);
+	//	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_AMBIENT, dwAmbient);
 }
 
 void CN3Scene::TickShapes(float fFrm)
@@ -323,8 +357,7 @@ void CN3Scene::TickChrs(float fFrm)
 
 int CN3Scene::CameraAdd(CN3Camera* pCamera)
 {
-	if (m_nCameraCount < 0
-		|| m_nCameraCount >= MAX_SCENE_CAMERA)
+	if (m_nCameraCount < 0 || m_nCameraCount >= MAX_SCENE_CAMERA)
 		return -1;
 
 	if (pCamera == nullptr)
@@ -339,13 +372,15 @@ int CN3Scene::CameraAdd(CN3Camera* pCamera)
 
 void CN3Scene::CameraDelete(int iIndex)
 {
-	if(iIndex < 0 || iIndex >= m_nCameraCount) return;
+	if (iIndex < 0 || iIndex >= m_nCameraCount)
+		return;
 
 	delete m_pCameras[iIndex];
 	m_pCameras[iIndex] = nullptr;
-	
+
 	m_nCameraCount--;
-	for(int i = iIndex; i < m_nCameraCount; i++) m_pCameras[i] = m_pCameras[i+1];
+	for (int i = iIndex; i < m_nCameraCount; i++)
+		m_pCameras[i] = m_pCameras[i + 1];
 	m_pCameras[m_nCameraCount] = nullptr;
 }
 
@@ -363,8 +398,7 @@ void CN3Scene::CameraDelete(CN3Camera* pCamera)
 
 void CN3Scene::CameraSetActive(int iIndex)
 {
-	if (iIndex < 0
-		|| iIndex >= m_nCameraCount)
+	if (iIndex < 0 || iIndex >= m_nCameraCount)
 		return;
 
 	m_nCameraActive = iIndex;
@@ -384,8 +418,7 @@ int CN3Scene::LightAdd(CN3Light* pLight)
 
 void CN3Scene::LightDelete(int iIndex)
 {
-	if (iIndex < 0
-		|| iIndex >= m_nLightCount)
+	if (iIndex < 0 || iIndex >= m_nLightCount)
 		return;
 
 	delete m_pLights[iIndex];
@@ -421,8 +454,7 @@ int CN3Scene::ShapeAdd(CN3Shape* pShape)
 
 void CN3Scene::ShapeDelete(int iIndex)
 {
-	if (iIndex < 0
-		|| iIndex >= static_cast<int>(m_Shapes.size()))
+	if (iIndex < 0 || iIndex >= static_cast<int>(m_Shapes.size()))
 		return;
 
 	auto it = m_Shapes.begin();
@@ -466,8 +498,7 @@ int CN3Scene::ChrAdd(CN3Chr* pChr)
 
 void CN3Scene::ChrDelete(int iIndex)
 {
-	if (iIndex < 0
-		|| iIndex >= static_cast<int>(m_Chrs.size()))
+	if (iIndex < 0 || iIndex >= static_cast<int>(m_Chrs.size()))
 		return;
 
 	auto it = m_Chrs.begin();
@@ -481,10 +512,11 @@ void CN3Scene::ChrDelete(CN3Chr* pChr)
 {
 	it_Chr it = m_Chrs.begin(), itEnd = m_Chrs.end();
 	CN3Chr* pChrSrc;
-	for(; it != itEnd; it++);
+	for (; it != itEnd; it++)
+		;
 	{
 		pChrSrc = *it;
-		if(pChr == pChrSrc) 
+		if (pChr == pChrSrc)
 		{
 			delete pChrSrc;
 			m_Chrs.erase(it);
@@ -502,7 +534,8 @@ void CN3Scene::ChrRelease()
 
 bool CN3Scene::LoadDataAndResourcesFromFile(const std::string& szFN)
 {
-	if(szFN.empty()) return false;
+	if (szFN.empty())
+		return false;
 
 	char szPath[512] = "", szDrv[_MAX_DRIVE] = "", szDir[_MAX_DIR] = "";
 	::_splitpath(szFN.c_str(), szDrv, szDir, nullptr, nullptr);
@@ -515,7 +548,8 @@ bool CN3Scene::LoadDataAndResourcesFromFile(const std::string& szFN)
 
 bool CN3Scene::SaveDataAndResourcesToFile(const std::string& szFN)
 {
-	if(szFN.empty()) return false;
+	if (szFN.empty())
+		return false;
 
 	char szPath[512] = "", szDrv[_MAX_DRIVE] = "", szDir[_MAX_DIR] = "";
 	::_splitpath(szFN.c_str(), szDrv, szDir, nullptr, nullptr);
@@ -528,7 +562,7 @@ bool CN3Scene::SaveDataAndResourcesToFile(const std::string& szFN)
 void CN3Scene::DefaultCameraAdd()
 {
 	CN3Camera* pCamera = new CN3Camera();
-	pCamera->m_szName = "DefaultCamera";
+	pCamera->m_szName  = "DefaultCamera";
 	pCamera->FileNameSet("Data\\DefaultCamera.N3Camera");
 	this->CameraAdd(pCamera);
 }
@@ -538,12 +572,12 @@ void CN3Scene::DefaultLightAdd()
 	CN3Light* pLight = new CN3Light();
 	pLight->m_szName = "DefaultLight";
 	pLight->FileNameSet("Data\\DefaultLight.N3Light");
-	int nLight = this->LightAdd(pLight) - 1;
+	int nLight           = this->LightAdd(pLight) - 1;
 
-	__ColorValue ltColor = { 0.7f, 0.7f, 0.7f, 1.0f};
+	__ColorValue ltColor = { 0.7f, 0.7f, 0.7f, 1.0f };
 	pLight->m_Data.InitDirection(0, { -1.0f, -1.0f, 0.5f }, ltColor);
 	pLight->PosSet(1000.0f, 1000.0f, -1000.0f);
-	pLight->m_Data.bOn = TRUE;
+	pLight->m_Data.bOn     = TRUE;
 	pLight->m_Data.nNumber = nLight;
 }
 

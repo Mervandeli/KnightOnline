@@ -18,7 +18,7 @@ protected:
 
 		bool operator()(std::string_view lhs, std::string_view rhs) const
 		{
-			const size_t minLength = (std::min)(lhs.size(), rhs.size()); // NOTE: allow for Windows.h defining min
+			const size_t minLength = std::min(lhs.size(), rhs.size());
 			for (size_t i = 0; i < minLength; i++)
 			{
 				int a = std::tolower(lhs[i]);
@@ -37,7 +37,7 @@ protected:
 	using ConfigEntryMap = std::map<std::string, std::string, ci_less>;
 
 	// Defines the sections containing the key/value pairs
-	using ConfigMap = std::map<std::string, ConfigEntryMap, ci_less>;
+	using ConfigMap      = std::map<std::string, ConfigEntryMap, ci_less>;
 
 	ConfigMap _configMap;
 
@@ -58,11 +58,14 @@ public:
 
 	int GetInt(std::string_view svAppName, std::string_view svKeyName, const int iDefault);
 	bool GetBool(std::string_view svAppName, std::string_view svKeyName, const bool bDefault);
-	std::string GetString(std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault);
-	void GetString(std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault, char* szOutBuffer, size_t nBufferLength);
+	std::string GetString(
+		std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault);
+	void GetString(std::string_view svAppName, std::string_view svKeyName,
+		std::string_view svDefault, char* szOutBuffer, size_t nBufferLength);
 
 	int SetInt(std::string_view svAppName, std::string_view svKeyName, const int iDefault);
-	int SetString(std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault);
+	int SetString(
+		std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault);
 };
 
 #endif // SHARED_INI_H

@@ -14,11 +14,11 @@ class ReadQueueThread;
 class ItemManagerApp : public AppThread
 {
 public:
-	SharedMemoryQueue					LoggerRecvQueue;
+	SharedMemoryQueue LoggerRecvQueue;
 
 private:
-	std::unique_ptr<ReadQueueThread>	_readQueueThread;
-	std::unique_ptr<TimerThread>		_smqOpenThread;
+	std::unique_ptr<ReadQueueThread> _readQueueThread;
+	std::unique_ptr<TimerThread> _smqOpenThread;
 
 public:
 	static ItemManagerApp* instance()

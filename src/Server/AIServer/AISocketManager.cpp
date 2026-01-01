@@ -3,8 +3,7 @@
 #include "SendThreadMain.h"
 #include "GameSocket.h"
 
-AISocketManager::AISocketManager()
-	: SocketManager(SOCKET_BUFF_SIZE, SOCKET_BUFF_SIZE)
+AISocketManager::AISocketManager() : SocketManager(SOCKET_BUFF_SIZE, SOCKET_BUFF_SIZE)
 {
 	_sendThreadMain = new SendThreadMain(this);
 }

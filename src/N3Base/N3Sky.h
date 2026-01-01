@@ -13,28 +13,30 @@
 #include "N3ColorChange.h"
 
 //class CN3Texture;
-class CN3Sky : public CN3Base  
+class CN3Sky : public CN3Base
 {
 	friend class CN3SkyMng;
+
 public:
 	CN3Sky();
 	virtual ~CN3Sky();
 
-// Attributes
+	// Attributes
 public:
 protected:
-	CN3ColorChange		m_SkyColor;
-	CN3ColorChange		m_FogColor;
+	CN3ColorChange m_SkyColor;
+	CN3ColorChange m_FogColor;
 
-	__VertexXyzColor	m_vFronts[4];
-	__VertexXyzColor	m_Bottom[4];
+	__VertexXyzColor m_vFronts[4];
+	__VertexXyzColor m_Bottom[4];
 
-// Operations
+	// Operations
 public:
-	void				Init();
-	void				Render();
-	void				Release() override;
-	virtual				void Tick();
+	void Init();
+	void Render();
+	void Release() override;
+	virtual void Tick();
+
 protected:
 };
 

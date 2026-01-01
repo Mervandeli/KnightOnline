@@ -21,38 +21,37 @@ class CFormViewAnimation;
 class CMainFrame : public CFrameWnd
 {
 public:
-	CN3EngTool		m_Eng;
-	CN3SndMgr		m_SndMgr;
-	CN3SndObj*		m_pSndObj0;
-	CN3SndObj*		m_pSndObj1;
-//	CDlgChrProperty m_DlgProperty;
+	CN3EngTool m_Eng;
+	CN3SndMgr m_SndMgr;
+	CN3SndObj* m_pSndObj0;
+	CN3SndObj* m_pSndObj1;
+	//	CDlgChrProperty m_DlgProperty;
 
 public:
 	CFormViewProperty* GetPaneProperty();
 	CN3CEView* GetPaneRender();
 	CFormViewTool* GetPaneTool();
 	CFormViewAnimation* GetPaneAnimation();
-	
+
 protected: // create from serialization only
 	CMainFrame();
 	DECLARE_DYNCREATE(CMainFrame)
 
-// Attributes
+	// Attributes
 protected:
 	CSplitterWnd m_wndSplitter;
 
-// Operations
+	// Operations
 public:
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CMainFrame)
-	public:
+public:
 	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CMainFrame();
 
@@ -61,11 +60,11 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
-protected:  // control bar embedded members
-	CStatusBar  m_wndStatusBar;
-	CToolBar    m_wndToolBar;
+protected: // control bar embedded members
+	CStatusBar m_wndStatusBar;
+	CToolBar m_wndToolBar;
 
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CMainFrame)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

@@ -19,14 +19,14 @@ public:
 
 	void RotationAxis(const __Vector3& v, float fRadian);
 	void RotationAxis(float fX, float fY, float fZ, float fRadian);
-	void operator = (const __Matrix44& mtx);
+	void operator=(const __Matrix44& mtx);
 
 	void AxisAngle(__Vector3& vAxisResult, float& fRadianResult) const;
 	void Slerp(const __Quaternion& qt1, const __Quaternion& qt2, float fDelta);
 	void RotationYawPitchRoll(float Yaw, float Pitch, float Roll);
 
-	__Quaternion operator * (const __Quaternion& q) const;
-	void operator *= (const __Quaternion& q);
+	__Quaternion operator*(const __Quaternion& q) const;
+	void operator*=(const __Quaternion& q);
 
 public:
 	float x, y, z, w;

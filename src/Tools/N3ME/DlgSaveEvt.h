@@ -12,28 +12,29 @@
 
 class CDlgSaveEvt : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgSaveEvt(CWnd* pParent = nullptr);   // standard constructor
+	CDlgSaveEvt(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+										  // Dialog Data
 	//{{AFX_DATA(CDlgSaveEvt)
-	enum { IDD = IDD_SAVE_EVENT };
-	CListBox	m_SavedFileList;
-	CString	m_FileName;
+	enum
+	{
+		IDD = IDD_SAVE_EVENT
+	};
+	CListBox m_SavedFileList;
+	CString m_FileName;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgSaveEvt)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgSaveEvt)
 	afx_msg void OnSelchangeListSavedEvtFile();

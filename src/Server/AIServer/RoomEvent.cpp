@@ -11,18 +11,18 @@ CRoomEvent::CRoomEvent()
 {
 	m_iZoneNumber = 0;
 	m_sRoomNumber = 0;
-	m_byStatus = 1;
-	m_iInitMinX = 0;
-	m_iInitMinZ = 0;
-	m_iInitMaxX = 0;
-	m_iInitMaxZ = 0;
-	m_iEndMinX = 0;
-	m_iEndMinZ = 0;
-	m_iEndMaxX = 0;
-	m_iEndMaxZ = 0;
-	m_byCheck = 0;
-	m_byRoomType = 0;
-	m_pMain = AIServerApp::instance();
+	m_byStatus    = 1;
+	m_iInitMinX   = 0;
+	m_iInitMinZ   = 0;
+	m_iInitMaxX   = 0;
+	m_iInitMaxZ   = 0;
+	m_iEndMinX    = 0;
+	m_iEndMinZ    = 0;
+	m_iEndMaxX    = 0;
+	m_iEndMaxZ    = 0;
+	m_byCheck     = 0;
+	m_byRoomType  = 0;
+	m_pMain       = AIServerApp::instance();
 
 	Initialize();
 }
@@ -37,17 +37,17 @@ CRoomEvent::~CRoomEvent()
 
 void CRoomEvent::Initialize()
 {
-	m_fDelayTime = 0.0;
+	m_fDelayTime    = 0.0;
 	m_byLogicNumber = 1;
 
 	for (int i = 0; i < MAX_CHECK_EVENT; i++)
 	{
-		m_Logic[i].sNumber = 0;
+		m_Logic[i].sNumber   = 0;
 		m_Logic[i].sOption_1 = 0;
 		m_Logic[i].sOption_2 = 0;
-		m_Exec[i].sNumber = 0;
-		m_Exec[i].sOption_1 = 0;
-		m_Exec[i].sOption_2 = 0;
+		m_Exec[i].sNumber    = 0;
+		m_Exec[i].sOption_1  = 0;
+		m_Exec[i].sOption_2  = 0;
 	}
 }
 
@@ -59,7 +59,7 @@ void CRoomEvent::MainRoom(double currentTime)
 
 	int event_num = m_Logic[m_byLogicNumber - 1].sNumber;
 
-	bCheck = CheckEvent(event_num, currentTime);
+	bCheck        = CheckEvent(event_num, currentTime);
 	if (bCheck)
 	{
 		event_num = m_Exec[m_byLogicNumber - 1].sNumber;
@@ -76,11 +76,10 @@ void CRoomEvent::MainRoom(double currentTime)
 bool CRoomEvent::CheckEvent(int event_num, double currentTime)
 {
 	int nMinute = 0, nOption_1 = 0, nOption_2 = 0;
-	CNpc* pNpc = nullptr;
+	CNpc* pNpc     = nullptr;
 	bool bRetValue = false;
 
-	if (m_byLogicNumber == 0
-		|| m_byLogicNumber > MAX_CHECK_EVENT)
+	if (m_byLogicNumber == 0 || m_byLogicNumber > MAX_CHECK_EVENT)
 	{
 		spdlog::error("RoomEvent::CheckEvent: logicNumber={} out of bounds", m_byLogicNumber);
 		return false;
@@ -91,7 +90,7 @@ bool CRoomEvent::CheckEvent(int event_num, double currentTime)
 		// 특정 몬스터를 죽이는 경우
 		case 1:
 			nOption_1 = m_Logic[m_byLogicNumber - 1].sOption_1;
-			pNpc = GetNpcPtr(nOption_1);
+			pNpc      = GetNpcPtr(nOption_1);
 			if (pNpc != nullptr)
 			{
 				if (pNpc->m_byChangeType == 100)
@@ -99,7 +98,8 @@ bool CRoomEvent::CheckEvent(int event_num, double currentTime)
 			}
 			else
 			{
-				spdlog::error("RoomEvent::CheckEvent: missing NPC definition [npcId={} logicNumber={}]",
+				spdlog::error(
+					"RoomEvent::CheckEvent: missing NPC definition [npcId={} logicNumber={}]",
 					nOption_1, m_byLogicNumber);
 			}
 			//TRACE(_T("---Check Event : monster dead = %d \n"), nMonsterNid);
@@ -110,7 +110,8 @@ bool CRoomEvent::CheckEvent(int event_num, double currentTime)
 			bRetValue = CheckMonsterCount(0, 0, 3);
 			if (bRetValue)
 			{
-				spdlog::debug("RoomEvent::CheckEvent: all monsters are dead [eventId={}]", event_num);
+				spdlog::debug(
+					"RoomEvent::CheckEvent: all monsters are dead [eventId={}]", event_num);
 				return true;
 			}
 			break;
@@ -118,12 +119,13 @@ bool CRoomEvent::CheckEvent(int event_num, double currentTime)
 		// 몇분동안 버텨라
 		case 3:
 			nMinute = m_Logic[m_byLogicNumber - 1].sOption_1;
-			nMinute = nMinute * 60;								// 분을 초로 변환
+			nMinute = nMinute * 60; // 분을 초로 변환
 
 			// Time limit exceeded
 			if (currentTime >= m_fDelayTime + nMinute)
 			{
-				spdlog::debug("RoomEvent::CheckEvent: Time limit met, survival success [currTime={} delayTime={}]",
+				spdlog::debug("RoomEvent::CheckEvent: Time limit met, survival success "
+							  "[currTime={} delayTime={}]",
 					currentTime, m_fDelayTime);
 				return true;
 			}
@@ -141,8 +143,8 @@ bool CRoomEvent::CheckEvent(int event_num, double currentTime)
 			bRetValue = CheckMonsterCount(nOption_1, nOption_2, 1);
 			if (bRetValue)
 			{
-				spdlog::debug("RoomEvent::CheckEvent: killed ({}/{}) monsters.",
-					nOption_1, nOption_2);
+				spdlog::debug(
+					"RoomEvent::CheckEvent: killed ({}/{}) monsters.", nOption_1, nOption_2);
 				return true;
 			}
 			break;
@@ -158,39 +160,41 @@ bool CRoomEvent::CheckEvent(int event_num, double currentTime)
 bool CRoomEvent::RunEvent(int event_num)
 {
 	// char notify[50] = {};
-	CNpc* pNpc = nullptr;
+	CNpc* pNpc    = nullptr;
 	int nOption_1 = 0, nOption_2 = 0;
 	switch (event_num)
 	{
 		// 다른 몬스터의 출현
 		case 1:
 			nOption_1 = m_Exec[m_byLogicNumber - 1].sOption_1;
-			pNpc = GetNpcPtr(nOption_1);
+			pNpc      = GetNpcPtr(nOption_1);
 			if (pNpc != nullptr)
 			{
-				pNpc->m_byChangeType = 3;	// 몬스터 출현해주세여...
+				pNpc->m_byChangeType = 3; // 몬스터 출현해주세여...
 				pNpc->SetLive();
 			}
 			else
 			{
-				spdlog::error("RoomEvent::RunEvent: no NPC definition [npcId={} logicNumber={} eventId={}]",
+				spdlog::error(
+					"RoomEvent::RunEvent: no NPC definition [npcId={} logicNumber={} eventId={}]",
 					nOption_1, m_byLogicNumber, event_num);
 			}
 
 			// 방이 클리어
 			if (m_byCheck == m_byLogicNumber)
 				return true;
-			
+
 			m_byLogicNumber++;
 			break;
 
 		// 문이 열림
 		case 2:
 			nOption_1 = m_Exec[m_byLogicNumber - 1].sOption_1;
-			pNpc = GetNpcPtr(nOption_1);
+			pNpc      = GetNpcPtr(nOption_1);
 			if (pNpc == nullptr)
 			{
-				spdlog::error("RoomEvent::RunEvent: no NPC definition [npcId={} logicNumber={} eventId={}]",
+				spdlog::error(
+					"RoomEvent::RunEvent: no NPC definition [npcId={} logicNumber={} eventId={}]",
 					nOption_1, m_byLogicNumber, event_num);
 			}
 
@@ -200,7 +204,7 @@ bool CRoomEvent::RunEvent(int event_num)
 			// 방이 클리어
 			if (m_byCheck == m_byLogicNumber)
 				return true;
-			
+
 			m_byLogicNumber++;
 			break;
 
@@ -215,7 +219,7 @@ bool CRoomEvent::RunEvent(int event_num)
 		case 4:
 			nOption_1 = m_Exec[m_byLogicNumber - 1].sOption_1;
 			nOption_2 = m_Exec[m_byLogicNumber - 1].sOption_2;
-			/*bRetValue =*/ CheckMonsterCount(nOption_1, nOption_2, 2);
+			/*bRetValue =*/CheckMonsterCount(nOption_1, nOption_2, 2);
 
 			//wsprintf(notify, "** 알림 : [%d, %d] 몬스터 출현 **", nOption_1, nOption_2);
 			//m_pMain->SendSystemMsg( notify, m_iZoneNumber, PUBLIC_CHAT, SEND_ALL);
@@ -223,7 +227,7 @@ bool CRoomEvent::RunEvent(int event_num)
 			// 방이 클리어
 			if (m_byCheck == m_byLogicNumber)
 				return true;
-			
+
 			m_byLogicNumber++;
 			break;
 
@@ -240,7 +244,7 @@ bool CRoomEvent::RunEvent(int event_num)
 			// 방이 클리어
 			if (m_byCheck == m_byLogicNumber)
 				return true;
-			
+
 			m_byLogicNumber++;
 			break;
 
@@ -254,8 +258,8 @@ bool CRoomEvent::RunEvent(int event_num)
 
 CNpc* CRoomEvent::GetNpcPtr(int sid)
 {
-	CNpc* pNpc = nullptr;
-	int* pIDList = nullptr;
+	CNpc* pNpc     = nullptr;
+	int* pIDList   = nullptr;
 	int nMonsterid = 0, count = 0, nMonster = 0;
 
 	{
@@ -272,10 +276,10 @@ CNpc* CRoomEvent::GetNpcPtr(int sid)
 		auto Iter1 = m_mapRoomNpcArray.begin();
 		auto Iter2 = m_mapRoomNpcArray.end();
 
-		pIDList = new int[nMonster];
+		pIDList    = new int[nMonster];
 		for (; Iter1 != Iter2; Iter1++)
 		{
-			nMonsterid = *((*Iter1).second);
+			nMonsterid     = *((*Iter1).second);
 			pIDList[count] = nMonsterid;
 			count++;
 		}
@@ -308,8 +312,8 @@ CNpc* CRoomEvent::GetNpcPtr(int sid)
 bool CRoomEvent::CheckMonsterCount(int sid, int count, int type)
 {
 	int nMonsterCount = 0;
-	CNpc* pNpc = nullptr;
-	int* pIDList = nullptr;
+	CNpc* pNpc        = nullptr;
+	int* pIDList      = nullptr;
 	int nMonsterid = 0, nTotalMonster = 0, nMonster = 0;
 	bool bRetValue = false;
 
@@ -327,10 +331,10 @@ bool CRoomEvent::CheckMonsterCount(int sid, int count, int type)
 		auto Iter1 = m_mapRoomNpcArray.begin();
 		auto Iter2 = m_mapRoomNpcArray.end();
 
-		pIDList = new int[nMonster];
+		pIDList    = new int[nMonster];
 		for (; Iter1 != Iter2; Iter1++)
 		{
-			nMonsterid = *((*Iter1).second);
+			nMonsterid             = *((*Iter1).second);
 			pIDList[nTotalMonster] = nMonsterid;
 			nTotalMonster++;
 		}
@@ -393,17 +397,17 @@ bool CRoomEvent::CheckMonsterCount(int sid, int count, int type)
 
 void CRoomEvent::InitializeRoom()
 {
-	m_byStatus = 1;
-	m_fDelayTime = 0.0;
+	m_byStatus      = 1;
+	m_fDelayTime    = 0.0;
 	m_byLogicNumber = 1;
 
-	CheckMonsterCount(0, 0, 4);	// 몬스터의 m_byChangeType=0으로 초기화 
+	CheckMonsterCount(0, 0, 4); // 몬스터의 m_byChangeType=0으로 초기화
 }
 
 void CRoomEvent::EndEventSay(int option1, int option2)
 {
 	char send_buff[128] = {};
-	int send_index = 0;
+	int send_index      = 0;
 
 	std::string buff;
 

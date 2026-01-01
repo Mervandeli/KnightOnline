@@ -10,18 +10,18 @@
 
 CLocalInput::CLocalInput()
 {
-	m_lpDI = nullptr;
+	m_lpDI          = nullptr;
 	m_lpDIDKeyboard = nullptr;
 
-	m_hWnd = nullptr;
+	m_hWnd          = nullptr;
 
-	m_bNoKeyDown = FALSE;
+	m_bNoKeyDown    = FALSE;
 
-	m_nMouseFlag = 0;
+	m_nMouseFlag    = 0;
 	m_nMouseFlagOld = 0;
 
-	m_dwTickLBDown = 0;
-	m_dwTickRBDown = 0;
+	m_dwTickLBDown  = 0;
+	m_dwTickRBDown  = 0;
 
 	m_ptCurMouse.x = m_ptCurMouse.y = 0;
 	m_ptOldMouse.x = m_ptOldMouse.y = 0;
@@ -37,7 +37,7 @@ CLocalInput::CLocalInput()
 	memset(m_bKeyPresses, 0, sizeof(m_bKeyPresses));
 	memset(m_bKeyPresseds, 0, sizeof(m_bKeyPresseds));
 	memset(m_dwTickKeyPress, 0, sizeof(m_dwTickKeyPress));
-}	
+}
 
 CLocalInput::~CLocalInput()
 {
@@ -59,7 +59,7 @@ CLocalInput::~CLocalInput()
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-// Try to accquire all devices. Use SetActiveDevices() if you do not want 
+// Try to accquire all devices. Use SetActiveDevices() if you do not want
 // some devices.
 //////////////////////////////////////////////////////////////////////////////////
 BOOL CLocalInput::Init(HINSTANCE hInst, HWND hWnd)
@@ -68,7 +68,7 @@ BOOL CLocalInput::Init(HINSTANCE hInst, HWND hWnd)
 
 	m_hWnd = hWnd; // 윈도우 핸들 기억..
 
-	rval = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**) &m_lpDI, nullptr);
+	rval   = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**) &m_lpDI, nullptr);
 	if (rval != DI_OK)
 		return FALSE;
 
@@ -92,7 +92,7 @@ void CLocalInput::SetActiveDevices(BOOL bKeyboard)
 {
 	if (bKeyboard)
 		AcquireKeyboard();
-	else 
+	else
 		UnacquireKeyboard();
 }
 
@@ -110,9 +110,9 @@ void CLocalInput::KeyboardFlushData()
 /////////////////////////////////////////////////////////////////////////////////////////////
 void CLocalInput::MouseSetLimits(int x1, int y1, int x2, int y2)
 {
-	m_rcMLimit.left = x1;
-	m_rcMLimit.top = y1;
-	m_rcMLimit.right = x2;
+	m_rcMLimit.left   = x1;
+	m_rcMLimit.top    = y1;
+	m_rcMLimit.right  = x2;
 	m_rcMLimit.bottom = y2;
 }
 
@@ -123,16 +123,16 @@ void CLocalInput::MouseSetPos(int x, int y)
 {
 	// clamp non-free mouse values to limits
 	if ((m_ptCurMouse.x = x) >= m_rcMLimit.right)
-		m_ptCurMouse.x = m_rcMLimit.right-1;
+		m_ptCurMouse.x = m_rcMLimit.right - 1;
 
 	if ((m_ptCurMouse.y = y) >= m_rcMLimit.bottom)
-		m_ptCurMouse.y = m_rcMLimit.bottom-1;
+		m_ptCurMouse.y = m_rcMLimit.bottom - 1;
 
 	if ((m_ptCurMouse.x = x) <= m_rcMLimit.left)
-		m_ptCurMouse.x = m_rcMLimit.left+1;
+		m_ptCurMouse.x = m_rcMLimit.left + 1;
 
 	if ((m_ptCurMouse.y = y) <= m_rcMLimit.top)
-		m_ptCurMouse.y = m_rcMLimit.top+1;
+		m_ptCurMouse.y = m_rcMLimit.top + 1;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,15 +154,15 @@ void CLocalInput::AcquireKeyboard()
 	if (m_lpDIDKeyboard != nullptr)
 	{
 		HRESULT rval = m_lpDIDKeyboard->Acquire();
-//		if (rval != DI_OK) MessageBox(::GetActiveWindow(), "Acquire Keyboard Failed.", "DirectInput", MB_OK);
+		//		if (rval != DI_OK) MessageBox(::GetActiveWindow(), "Acquire Keyboard Failed.", "DirectInput", MB_OK);
 		if (rval == DI_OK || rval == S_FALSE)
 		{
-//			m_bKeyboard = TRUE;
+			//			m_bKeyboard = TRUE;
 			KeyboardFlushData();
 			return;
 		}
-	}	
-//		m_bKeyboard = FALSE;
+	}
+	//		m_bKeyboard = FALSE;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,12 +171,12 @@ void CLocalInput::AcquireKeyboard()
 void CLocalInput::UnacquireKeyboard()
 {
 	KeyboardFlushData();
-//	m_bKeyboard = FALSE;
+	//	m_bKeyboard = FALSE;
 
 	if (m_lpDIDKeyboard != nullptr)
 	{
 		HRESULT rval = m_lpDIDKeyboard->Unacquire();
-//		if (rval != DI_OK) MessageBox(::GetActiveWindow(), "UnAcquire Keyboard Failed.", "DirectInput", MB_OK);
+		//		if (rval != DI_OK) MessageBox(::GetActiveWindow(), "UnAcquire Keyboard Failed.", "DirectInput", MB_OK);
 	}
 }
 
@@ -195,34 +195,34 @@ void CLocalInput::Tick()
 	///////////////////////
 	//  KEYBOARD
 	///////////////////////
-//	if(m_bKeyboard)
-//	{
-		memcpy(m_byOldKeys, m_byCurKeys, NUMDIKEYS); // 전의 키 상태 기록
+	//	if(m_bKeyboard)
+	//	{
+	memcpy(m_byOldKeys, m_byCurKeys, NUMDIKEYS);                   // 전의 키 상태 기록
 
-		err = m_lpDIDKeyboard->GetDeviceState(NUMDIKEYS, m_byCurKeys); // 현재 키 상태 기록
-		if (err != DI_OK)
-			AcquireKeyboard();
-		else
+	err = m_lpDIDKeyboard->GetDeviceState(NUMDIKEYS, m_byCurKeys); // 현재 키 상태 기록
+	if (err != DI_OK)
+		AcquireKeyboard();
+	else
+	{
+		m_bNoKeyDown = TRUE; // 첨엔 아무것도 안눌림
+
+		for (int i = 0; i < NUMDIKEYS; i++)
 		{
-			m_bNoKeyDown = TRUE; // 첨엔 아무것도 안눌림
+			if (!m_byOldKeys[i] && m_byCurKeys[i])
+				m_bKeyPresses[i] = TRUE; // 눌리는 순간
+			else
+				m_bKeyPresses[i] = FALSE;
 
-			for (int i = 0; i < NUMDIKEYS; i++)
-			{
-				if (!m_byOldKeys[i] && m_byCurKeys[i])
-					m_bKeyPresses[i] = TRUE; // 눌리는 순간
-				else
-					m_bKeyPresses[i] = FALSE;
+			if (m_byOldKeys[i] && !m_byCurKeys[i])
+				m_bKeyPresseds[i] = TRUE; // 눌렀다 떼는 순간..
+			else
+				m_bKeyPresseds[i] = FALSE;
 
-				if (m_byOldKeys[i] && !m_byCurKeys[i])
-					m_bKeyPresseds[i] = TRUE; // 눌렀다 떼는 순간..
-				else
-					m_bKeyPresseds[i] = FALSE;
-
-				if (m_byCurKeys[i])
-					m_bNoKeyDown = FALSE;
-			}
+			if (m_byCurKeys[i])
+				m_bNoKeyDown = FALSE;
 		}
-//	}
+	}
+	//	}
 
 	///////////////////////
 	//  MOUSE
@@ -232,14 +232,14 @@ void CLocalInput::Tick()
 
 	RECT rcClient;
 	::GetClientRect(m_hWnd, &rcClient);
-	::GetCursorPos(&m_ptCurMouse); // 좀 이상해서... 그냥 시스템 마우스 커서 위치 가져오기
+	::GetCursorPos(&m_ptCurMouse);           // 좀 이상해서... 그냥 시스템 마우스 커서 위치 가져오기
 	::ScreenToClient(m_hWnd, &m_ptCurMouse); // 클라이언트 영역으로 변환
 
-	if (PtInRect(&rcClient, m_ptCurMouse)) //  && GetFocus() == m_hWnd) // 스크린 영역 밖에 있거나 포커스가 가있지 않으면..
+	if (PtInRect(&rcClient, m_ptCurMouse))   //  && GetFocus() == m_hWnd) // 스크린 영역 밖에 있거나 포커스가 가있지 않으면..
 	{
 		// 마우스 버튼 상태 보관.
 		m_nMouseFlagOld = m_nMouseFlag;
-		m_nMouseFlag = 0;
+		m_nMouseFlag    = 0;
 
 		// 마우스 상태 가져오기
 		if (_IsKeyDown(VK_LBUTTON))
@@ -272,7 +272,7 @@ void CLocalInput::Tick()
 			m_nMouseFlag |= MOUSE_RBCLICKED;
 
 		static DWORD dwDblClk = GetDoubleClickTime(); // 윈도우의 더블 클릭시간을 가져오고..
-		if (m_nMouseFlag & MOUSE_LBCLICKED) // 왼쪽 더블 클릭 감지
+		if (m_nMouseFlag & MOUSE_LBCLICKED)           // 왼쪽 더블 클릭 감지
 		{
 			static DWORD dwCLicked = 0;
 			if (timeGetTime() < dwCLicked + dwDblClk)
@@ -299,38 +299,38 @@ void CLocalInput::Tick()
 		// 드래그 영역 처리
 		if (m_nMouseFlag & MOUSE_LBDOWN)
 		{
-			m_rcLBDrag.right = m_ptCurMouse.x;
+			m_rcLBDrag.right  = m_ptCurMouse.x;
 			m_rcLBDrag.bottom = m_ptCurMouse.y;
 		}
 
 		if (m_nMouseFlag & MOUSE_MBDOWN)
 		{
-			m_rcMBDrag.right = m_ptCurMouse.x;
+			m_rcMBDrag.right  = m_ptCurMouse.x;
 			m_rcMBDrag.bottom = m_ptCurMouse.y;
 		}
 
 		if (m_nMouseFlag & MOUSE_RBDOWN)
 		{
-			m_rcRBDrag.right = m_ptCurMouse.x;
+			m_rcRBDrag.right  = m_ptCurMouse.x;
 			m_rcRBDrag.bottom = m_ptCurMouse.y;
 		}
 
 		if (m_nMouseFlag & MOUSE_LBCLICK)
 		{
 			m_rcLBDrag.left = m_ptCurMouse.x;
-			m_rcLBDrag.top = m_ptCurMouse.y;
+			m_rcLBDrag.top  = m_ptCurMouse.y;
 		}
 
 		if (m_nMouseFlag & MOUSE_MBCLICK)
 		{
 			m_rcMBDrag.left = m_ptCurMouse.x;
-			m_rcMBDrag.top = m_ptCurMouse.y;
+			m_rcMBDrag.top  = m_ptCurMouse.y;
 		}
 
 		if (m_nMouseFlag & MOUSE_RBCLICK)
 		{
 			m_rcRBDrag.left = m_ptCurMouse.x;
-			m_rcRBDrag.top = m_ptCurMouse.y;
+			m_rcRBDrag.top  = m_ptCurMouse.y;
 		}
 	}
 }

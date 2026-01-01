@@ -5,7 +5,7 @@
 
 Thread::Thread()
 {
-	_canTick = false;
+	_canTick    = false;
 	_isShutdown = true;
 }
 
@@ -14,9 +14,9 @@ void Thread::start()
 	if (_canTick)
 		return;
 
-	_canTick = true;
+	_canTick    = true;
 	_isShutdown = false;
-	_thread = std::thread(&Thread::thread_loop_wrapper, this);
+	_thread     = std::thread(&Thread::thread_loop_wrapper, this);
 }
 
 void Thread::shutdown(bool waitForShutdown /*= true*/)
@@ -40,7 +40,7 @@ void Thread::join()
 {
 	if (!_thread.joinable())
 		return;
-	
+
 	try
 	{
 		_thread.join();
@@ -68,7 +68,7 @@ void Thread::thread_loop_wrapper()
 {
 	thread_loop();
 
-	_canTick = false;
+	_canTick    = false;
 	_isShutdown = true;
 }
 

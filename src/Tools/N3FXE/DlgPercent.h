@@ -12,29 +12,30 @@
 
 class CDlgPercent : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgPercent(CWnd* pParent = nullptr);   // standard constructor
+	CDlgPercent(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+										  // Dialog Data
 	//{{AFX_DATA(CDlgPercent)
-	enum { IDD = IDD_DLG_PERCENT };
-	CSliderCtrl	m_Slider;
-	float	m_fPercent;
-	int		m_iRealValue;
+	enum
+	{
+		IDD = IDD_DLG_PERCENT
+	};
+	CSliderCtrl m_Slider;
+	float m_fPercent;
+	int m_iRealValue;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgPercent)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgPercent)
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);

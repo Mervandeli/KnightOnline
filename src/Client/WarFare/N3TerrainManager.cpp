@@ -16,7 +16,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -29,34 +29,38 @@ CN3TerrainManager::CN3TerrainManager()
 	m_pTerrain = new CN3Terrain;
 
 	// Shape..
-	m_pShapes = new CN3ClientShapeMgr();
+	m_pShapes  = new CN3ClientShapeMgr();
 
 	// Sky..
-	m_pSky = new CN3SkyMng();
+	m_pSky     = new CN3SkyMng();
 
 	// Bird..
 	m_pBirdMng = new CBirdMng();
 
-//	// Grass..
-//	m_pGrasses = new CGrassMng();
+	//	// Grass..
+	//	m_pGrasses = new CGrassMng();
 }
 
 CN3TerrainManager::~CN3TerrainManager()
 {
 	// N3Terrain..
-	delete m_pTerrain;  m_pTerrain = nullptr;
+	delete m_pTerrain;
+	m_pTerrain = nullptr;
 
 	// Shape..
-	delete m_pShapes; m_pShapes = nullptr;
+	delete m_pShapes;
+	m_pShapes = nullptr;
 
 	// Sky..
-	delete m_pSky;		m_pSky = nullptr;
+	delete m_pSky;
+	m_pSky = nullptr;
 
 	// Bird..
-	delete m_pBirdMng; m_pBirdMng = nullptr;
+	delete m_pBirdMng;
+	m_pBirdMng = nullptr;
 
 	// Grass..
-//	delete m_pGrasses; m_pGrasses = nullptr;
+	//	delete m_pGrasses; m_pGrasses = nullptr;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -71,27 +75,26 @@ void CN3TerrainManager::InitWorld(int iZoneID, const __Vector3& vPosPlayer)
 	}
 
 	/*if(iZoneID == 1) m_pTerrain->LoadFromFile(pZone->szTerrainFN, N3FORMAT_VER_1068);//N3FORMAT_VER_1298);//pZone->dwVersion);
-	else*/ m_pTerrain->LoadFromFile(pZone->szTerrainFN);//, N3FORMAT_VER_1298);
+	else*/
+	m_pTerrain->LoadFromFile(pZone->szTerrainFN);  //, N3FORMAT_VER_1298);
 
-
-	m_pTerrain->LoadColorMap(pZone->szColorMapFN);		// 컬러맵 로드..
+	m_pTerrain->LoadColorMap(pZone->szColorMapFN); // 컬러맵 로드..
 	m_pShapes->Release();
 
-
 	/*if(iZoneID == 1) m_pShapes->LoadFromFile(pZone->szObjectPostDataFN, N3FORMAT_VER_1068);
-	else*/ m_pShapes->LoadFromFile(pZone->szObjectPostDataFN);//, N3FORMAT_VER_1298);//, pZone->dwVersion);	// 오브젝트 데이터 로드..
-	
+	else*/
+	m_pShapes->LoadFromFile(pZone->szObjectPostDataFN); //, N3FORMAT_VER_1298);//, pZone->dwVersion);	// 오브젝트 데이터 로드..
 
 	char szFName[_MAX_PATH];
 	_splitpath(pZone->szTerrainFN.c_str(), nullptr, nullptr, szFName, nullptr);
-	std::string szFName2 = fmt::format("{}_Bird",szFName);
+	std::string szFName2 = fmt::format("{}_Bird", szFName);
 
 	char szFullPathName[_MAX_PATH];
 	_makepath(szFullPathName, nullptr, "misc\\bird", szFName2.c_str(), "lst");
 	m_pBirdMng->LoadFromFile(szFullPathName);
 
-//	m_pGrasses->Init(vPosPlayer);
-	m_pSky->LoadFromFile(pZone->szSkySetting); // 하늘, 구름, 태양, 날씨 변화등 정보 및 텍스처 로딩..
+	//	m_pGrasses->Init(vPosPlayer);
+	m_pSky->LoadFromFile(pZone->szSkySetting);                        // 하늘, 구름, 태양, 날씨 변화등 정보 및 텍스처 로딩..
 	m_pSky->SunAndMoonDirectionFixByHour(pZone->iFixedSundDirection); // 해, 달 방향을 고정하든가 혹은 0 이면 고정하지 않는다.
 }
 
@@ -99,7 +102,7 @@ void CN3TerrainManager::Tick()
 {
 	m_pTerrain->Tick();
 	m_pShapes->Tick();
-//	m_pGrasses->Tick((CGameProcedure* )CGameProcedure::s_pProcMain);
+	//	m_pGrasses->Tick((CGameProcedure* )CGameProcedure::s_pProcMain);
 	m_pSky->Tick();
 	m_pBirdMng->Tick();
 }
@@ -116,27 +119,32 @@ CN3SkyMng* CN3TerrainManager::GetSkyRef()
 
 void CN3TerrainManager::RenderTerrain()
 {
-	if (m_pTerrain)		m_pTerrain->Render();
+	if (m_pTerrain)
+		m_pTerrain->Render();
 }
 
 void CN3TerrainManager::RenderShape()
 {
-	if (m_pShapes)		m_pShapes->Render();
+	if (m_pShapes)
+		m_pShapes->Render();
 }
 
 void CN3TerrainManager::RenderSky()
 {
-	if (m_pSky)		m_pSky->Render();
+	if (m_pSky)
+		m_pSky->Render();
 }
 
 void CN3TerrainManager::RenderBirdMgr()
 {
-	if (m_pBirdMng)		m_pBirdMng->Render();
+	if (m_pBirdMng)
+		m_pBirdMng->Render();
 }
 
 void CN3TerrainManager::RenderSkyWeather()
 {
-	if (m_pSky)		m_pSky->RenderWeather();
+	if (m_pSky)
+		m_pSky->RenderWeather();
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -144,7 +152,7 @@ void CN3TerrainManager::RenderSkyWeather()
 // Terrain..
 bool CN3TerrainManager::CheckCollisionCameraWithTerrain(__Vector3& vEyeResult, const __Vector3& vAt, float fNP)
 {
-	if (m_pTerrain)		
+	if (m_pTerrain)
 		return m_pTerrain->CheckCollisionCamera(vEyeResult, vAt, fNP);
 	else
 		return false;
@@ -152,8 +160,7 @@ bool CN3TerrainManager::CheckCollisionCameraWithTerrain(__Vector3& vEyeResult, c
 
 float CN3TerrainManager::GetHeightWithTerrain(float x, float z, bool bWarp)
 {
-
-	if (m_pTerrain)		
+	if (m_pTerrain)
 		return m_pTerrain->GetHeight(x, z);
 	else
 		return -FLT_MAX;
@@ -177,7 +184,8 @@ bool CN3TerrainManager::CheckCollisionWithTerrain(__Vector3& vPos, __Vector3& vD
 
 void CN3TerrainManager::GetNormalWithTerrain(float x, float z, __Vector3& vNormal)
 {
-	if (m_pTerrain)	m_pTerrain->GetNormal(x, z, vNormal);
+	if (m_pTerrain)
+		m_pTerrain->GetNormal(x, z, vNormal);
 }
 
 float CN3TerrainManager::GetWidthByMeterWithTerrain()
@@ -193,7 +201,7 @@ bool CN3TerrainManager::IsInTerrainWithTerrain(float x, float z, __Vector3 vPosB
 	if (m_pTerrain)
 		return m_pTerrain->IsInTerrain(x, z);
 	else
-		return false;	
+		return false;
 }
 
 bool CN3TerrainManager::CheckInclineWithTerrain(const __Vector3& vPos, const __Vector3& vDir, float fIncline)
@@ -201,21 +209,21 @@ bool CN3TerrainManager::CheckInclineWithTerrain(const __Vector3& vPos, const __V
 	if (m_pTerrain)
 		return m_pTerrain->CheckIncline(vPos, vDir, fIncline);
 	else
-		return false;	
+		return false;
 }
 
 // Shapes..
 bool CN3TerrainManager::CheckCollisionCameraWithShape(__Vector3& vEyeResult, const __Vector3& vAt, float fNP)
 {
-	if (m_pShapes) 
+	if (m_pShapes)
 		return m_pShapes->CheckCollisionCamera(vEyeResult, vAt, fNP);
 	else
 		return false;
 }
 
-float CN3TerrainManager::GetHeightNearstPosWithShape(const __Vector3 &vPos, float fDist, __Vector3* pvNormal)
+float CN3TerrainManager::GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal)
 {
-	if (m_pShapes) 
+	if (m_pShapes)
 		return m_pShapes->GetHeightNearstPos(vPos, fDist, pvNormal);
 	else
 		return -FLT_MAX;
@@ -223,12 +231,13 @@ float CN3TerrainManager::GetHeightNearstPosWithShape(const __Vector3 &vPos, floa
 
 void CN3TerrainManager::RenderCollisionWithShape(const __Vector3& vPos)
 {
-	if (m_pShapes) m_pShapes->RenderCollision(vPos);
+	if (m_pShapes)
+		m_pShapes->RenderCollision(vPos);
 }
 
 float CN3TerrainManager::GetHeightWithShape(float fX, float fZ, __Vector3* pvNormal)
 {
-	if (m_pShapes) 
+	if (m_pShapes)
 		return m_pShapes->GetHeight(fX, fZ, pvNormal);
 	else
 		return -FLT_MAX;
@@ -236,7 +245,7 @@ float CN3TerrainManager::GetHeightWithShape(float fX, float fZ, __Vector3* pvNor
 
 CN3Shape* CN3TerrainManager::ShapeGetByIDWithShape(int iID)
 {
-	if (m_pShapes) 
+	if (m_pShapes)
 		return m_pShapes->ShapeGetByID(iID);
 	else
 		return nullptr;
@@ -244,21 +253,21 @@ CN3Shape* CN3TerrainManager::ShapeGetByIDWithShape(int iID)
 
 CN3Shape* CN3TerrainManager::PickWithShape(int iXScreen, int iYScreen, bool bMustHaveEvent, __Vector3* pvPick)
 {
-	if (m_pShapes) 
+	if (m_pShapes)
 		return m_pShapes->Pick(iXScreen, iYScreen, bMustHaveEvent, pvPick);
 	else
 		return nullptr;
 }
 
-bool CN3TerrainManager::CheckCollisionWithShape(	  const __Vector3& vPos,				 // 충돌 위치
-																						const __Vector3& vDir,				   // 방향 벡터
-																						float fSpeedPerSec,					    // 초당 움직이는 속도
-																						__Vector3* pvCol,						 // 충돌 지점
-																						__Vector3* pvNormal,				  // 충돌한면의 법선벡터
-																						__Vector3* pVec)						// 충돌한 면 의 폴리곤 __Vector3[3]
+bool CN3TerrainManager::CheckCollisionWithShape(const __Vector3& vPos, // 충돌 위치
+	const __Vector3& vDir,                                             // 방향 벡터
+	float fSpeedPerSec,                                                // 초당 움직이는 속도
+	__Vector3* pvCol,                                                  // 충돌 지점
+	__Vector3* pvNormal,                                               // 충돌한면의 법선벡터
+	__Vector3* pVec)                                                   // 충돌한 면 의 폴리곤 __Vector3[3]
 {
-	if (m_pShapes) 
-		return m_pShapes->CheckCollision( vPos, vDir, fSpeedPerSec, pvCol, pvNormal, pVec);
+	if (m_pShapes)
+		return m_pShapes->CheckCollision(vPos, vDir, fSpeedPerSec, pvCol, pvNormal, pVec);
 	else
 		return false;
 }
@@ -272,8 +281,8 @@ D3DCOLOR CN3TerrainManager::GetSkyColorWithSky()
 		return 0xffffffff;
 }
 
-float CN3TerrainManager::GetSunAngleByRadinWithSky()	
-{ 	
+float CN3TerrainManager::GetSunAngleByRadinWithSky()
+{
 	if (m_pSky)
 		return m_pSky->GetSunAngleByRadin();
 	else
@@ -282,22 +291,25 @@ float CN3TerrainManager::GetSunAngleByRadinWithSky()
 
 void CN3TerrainManager::RenderWeatherWithSky()
 {
-	if (m_pSky)	m_pSky->RenderWeather();	
+	if (m_pSky)
+		m_pSky->RenderWeather();
 }
 
 void CN3TerrainManager::SetGameTimeWithSky(int iYear, int iMonth, int iDay, int iHour, int iMin)
 {
-	if (m_pSky)	m_pSky->SetGameTime(iYear, iMonth, iDay, iHour, iMin);
+	if (m_pSky)
+		m_pSky->SetGameTime(iYear, iMonth, iDay, iHour, iMin);
 }
 
 void CN3TerrainManager::SetWeatherWithSky(int iWeather, int iPercentage)
 {
-	if (m_pSky)	m_pSky->SetWeather((CN3SkyMng::eSKY_WEATHER)iWeather, iPercentage);
+	if (m_pSky)
+		m_pSky->SetWeather((CN3SkyMng::eSKY_WEATHER) iWeather, iPercentage);
 }
 
 D3DCOLOR CN3TerrainManager::GetLightDiffuseColorWithSky(int iIndex)
 {
-	if (m_pSky)	
+	if (m_pSky)
 		return m_pSky->GetLightDiffuseColor(iIndex);
 	else
 		return 0xffffffff;
@@ -305,15 +317,15 @@ D3DCOLOR CN3TerrainManager::GetLightDiffuseColorWithSky(int iIndex)
 
 D3DCOLOR CN3TerrainManager::GetLightAmbientColorWithSky(int iIndex)
 {
-	if (m_pSky)	
-		return 	m_pSky->GetLightAmbientColor(iIndex);
+	if (m_pSky)
+		return m_pSky->GetLightAmbientColor(iIndex);
 	else
 		return 0xffffffff;
 }
 
 D3DCOLOR CN3TerrainManager::GetFogColorWithSky()
 {
-	if (m_pSky)	
+	if (m_pSky)
 		return m_pSky->GetFogColor();
 	else
 		return 0xffffffff;

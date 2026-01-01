@@ -14,15 +14,12 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgLoadEvt dialog
 
-
-CDlgLoadEvt::CDlgLoadEvt(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgLoadEvt::IDD, pParent)
+CDlgLoadEvt::CDlgLoadEvt(CWnd* pParent /*=nullptr*/) : CDialog(CDlgLoadEvt::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgLoadEvt)
-		// NOTE: the ClassWizard will add member initialization here
+	// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgLoadEvt::DoDataExchange(CDataExchange* pDX)
 {
@@ -32,18 +29,17 @@ void CDlgLoadEvt::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgLoadEvt, CDialog)
-	//{{AFX_MSG_MAP(CDlgLoadEvt)
-	ON_LBN_DBLCLK(IDC_LIST_SAVED_EVT_FILE, OnDblclkListSavedEvtFile)
-	ON_LBN_SELCHANGE(IDC_LIST_SAVED_EVT_FILE, OnSelchangeListSavedEvtFile)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgLoadEvt)
+ON_LBN_DBLCLK(IDC_LIST_SAVED_EVT_FILE, OnDblclkListSavedEvtFile)
+ON_LBN_SELCHANGE(IDC_LIST_SAVED_EVT_FILE, OnSelchangeListSavedEvtFile)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgLoadEvt message handlers
 
-BOOL CDlgLoadEvt::OnInitDialog() 
+BOOL CDlgLoadEvt::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
@@ -63,32 +59,32 @@ BOOL CDlgLoadEvt::OnInitDialog()
 	int count = m_EvtFileList.GetCount();
 
 	CString str;
-	for(int i=0;i<count;i++)
+	for (int i = 0; i < count; i++)
 	{
 		m_EvtFileList.GetText(0, str);
 
 		char szFileName[MAX_PATH];
 		char szExt[_MAX_EXT];
-		_splitpath((LPCTSTR)str, nullptr, nullptr, szFileName, szExt);
+		_splitpath((LPCTSTR) str, nullptr, nullptr, szFileName, szExt);
 
 		//str.Format("%s%s",szFileName,szExt);
-		str.Format("%s",szFileName);
+		str.Format("%s", szFileName);
 		m_EvtFileList.InsertString(count, str);
 		m_EvtFileList.DeleteString(0);
 	}
 
 	SetCurrentDirectory(szOldPath);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+	return TRUE; // return TRUE unless you set the focus to a control
+				 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void CDlgLoadEvt::OnDblclkListSavedEvtFile() 
+void CDlgLoadEvt::OnDblclkListSavedEvtFile()
 {
-	OnOK();	
+	OnOK();
 }
 
-void CDlgLoadEvt::OnSelchangeListSavedEvtFile() 
+void CDlgLoadEvt::OnSelchangeListSavedEvtFile()
 {
 	int CurrSel = m_EvtFileList.GetCurSel();
 	m_EvtFileList.GetText(CurrSel, m_SelFileName);

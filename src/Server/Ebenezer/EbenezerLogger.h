@@ -10,9 +10,7 @@ class EbenezerLogger : public logger::Logger
 {
 public:
 	EbenezerLogger();
-	void SetupExtraLoggers(
-		CIni& ini,
-		std::shared_ptr<spdlog::details::thread_pool> threadPool,
+	void SetupExtraLoggers(CIni& ini, std::shared_ptr<spdlog::details::thread_pool> threadPool,
 		const std::filesystem::path& baseDir) override;
 };
 

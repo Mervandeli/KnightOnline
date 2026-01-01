@@ -63,8 +63,7 @@ public:
 
 	inline bool IsValidServerSocketId(int socketId) const
 	{
-		return socketId >= 0
-			&& socketId < GetServerSocketCount();
+		return socketId >= 0 && socketId < GetServerSocketCount();
 	}
 
 	inline TcpSocket* GetServerSocket(int socketId) const
@@ -94,7 +93,7 @@ public:
 	}
 
 public:
-	template<typename T, typename... Args>
+	template <typename T, typename... Args>
 	inline void AllocateServerSockets(Args&&... args)
 	{
 		// NOTE: The socket manager instance should be declared last.
@@ -127,33 +126,37 @@ protected:
 	void OnPostClientSocketClose(TcpClientSocket* tcpSocket);
 	bool ProcessClose(TcpSocket* tcpSocket);
 
-	virtual void StartUserThreads() {}
-	virtual void ShutdownUserThreads() {}
+	virtual void StartUserThreads()
+	{
+	}
+	virtual void ShutdownUserThreads()
+	{
+	}
 
 public:
 	void Shutdown();
 
 protected:
-	TcpSocket**									_serverSocketArray;
-	TcpSocket**									_inactiveServerSocketArray;
-	TcpClientSocket**							_clientSocketArray;
+	TcpSocket** _serverSocketArray;
+	TcpSocket** _inactiveServerSocketArray;
+	TcpClientSocket** _clientSocketArray;
 
-	int											_serverSocketCount;
-	int											_clientSocketCount;
+	int _serverSocketCount;
+	int _clientSocketCount;
 
-	int											_recvBufferSize;
-	int											_sendBufferSize;
+	int _recvBufferSize;
+	int _sendBufferSize;
 
-	uint32_t									_workerThreadCount;
+	uint32_t _workerThreadCount;
 
 	asio::io_context _io;
-	std::unique_ptr<asio::ip::tcp::acceptor>	_acceptor;
-	std::shared_ptr<asio::thread_pool>			_workerPool;
+	std::unique_ptr<asio::ip::tcp::acceptor> _acceptor;
+	std::shared_ptr<asio::thread_pool> _workerPool;
 
-	std::atomic<bool>							_acceptingConnections;
+	std::atomic<bool> _acceptingConnections;
 
-	std::queue<int>								_socketIdQueue;
-	std::recursive_mutex						_mutex;
+	std::queue<int> _socketIdQueue;
+	std::recursive_mutex _mutex;
 };
 
 #endif // SERVER_SHAREDSERVER_SOCKETMANAGER_H

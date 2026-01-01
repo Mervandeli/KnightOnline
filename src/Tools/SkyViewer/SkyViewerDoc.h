@@ -15,29 +15,28 @@
 class CSkyViewerDoc : public CDocument
 {
 public:
-	CN3SkyMng			m_Sky;
-	CN3GlobalEffectMng	m_Weather;
+	CN3SkyMng m_Sky;
+	CN3GlobalEffectMng m_Weather;
+
 protected: // create from serialization only
 	CSkyViewerDoc();
 	DECLARE_DYNCREATE(CSkyViewerDoc)
 
-// Attributes
+	// Attributes
 public:
-
-// Operations
+	// Operations
 public:
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CSkyViewerDoc)
-	public:
+public:
 	virtual BOOL OnNewDocument();
 	virtual void Serialize(CArchive& ar);
 	virtual BOOL OnOpenDocument(LPCTSTR lpszPathName);
 	virtual BOOL OnSaveDocument(LPCTSTR lpszPathName);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CSkyViewerDoc();
 #ifdef _DEBUG
@@ -46,8 +45,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CSkyViewerDoc)
 	afx_msg void OnFileSaveAsGameFormat();

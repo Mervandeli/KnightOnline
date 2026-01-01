@@ -12,7 +12,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -26,12 +26,12 @@ CSoundMgr::CSoundMgr()
 	m_pSound.clear();
 	m_pCurrSound = nullptr;
 
-	m_MapSize = 0;
-		
+	m_MapSize    = 0;
+
 	m_pRefMapMng = nullptr;
-	m_bActive = false;
-	
-	m_pDlgSound = new CDlgSetSound;
+	m_bActive    = false;
+
+	m_pDlgSound  = new CDlgSetSound;
 	m_pDlgSound->Create(IDD_EDIT_BGM);
 	m_pDlgSound->ShowWindow(FALSE);
 	m_pDlgSound->m_pRefSoundMgr = this;
@@ -40,38 +40,38 @@ CSoundMgr::CSoundMgr()
 CSoundMgr::~CSoundMgr()
 {
 	std::list<CSoundCell*>::iterator it;
-	for(it = m_pSound.begin(); it != m_pSound.end(); it++)
+	for (it = m_pSound.begin(); it != m_pSound.end(); it++)
 	{
 		delete (*it);
 		(*it) = nullptr;
 	}
 	m_pSound.clear();
 
-	if(m_pCurrSound)
+	if (m_pCurrSound)
 	{
 		delete m_pCurrSound;
 		m_pCurrSound = nullptr;
 	}
 
-	if(m_pDlgSound) 
+	if (m_pDlgSound)
 	{
 		m_pDlgSound->DestroyWindow();
 		delete m_pDlgSound;
 		m_pDlgSound = nullptr;
 	}
 
-	m_MapSize = 0;
+	m_MapSize    = 0;
 	m_pRefMapMng = nullptr;
-	m_bActive = false;	
+	m_bActive    = false;
 }
 
 void CSoundMgr::DelSound(CSoundCell* pSound)
 {
 	std::list<CSoundCell*>::iterator itSound;
-	
-	for(itSound = m_pSound.begin(); itSound != m_pSound.end(); itSound++)
+
+	for (itSound = m_pSound.begin(); itSound != m_pSound.end(); itSound++)
 	{
-		if(pSound == (*itSound))
+		if (pSound == (*itSound))
 		{
 			delete pSound;
 			m_pSound.erase(itSound);
@@ -82,19 +82,19 @@ void CSoundMgr::DelSound(CSoundCell* pSound)
 
 void CSoundMgr::SetCurrSound(CSoundCell* pSound)
 {
-	if(m_pCurrSound)
+	if (m_pCurrSound)
 	{
 		delete m_pCurrSound;
 		m_pCurrSound = nullptr;
 	}
 
 	m_pCurrSound = pSound;
-	
-	std::list<CSoundCell*>::iterator itSound;	
-	
-	for(itSound = m_pSound.begin(); itSound != m_pSound.end(); itSound++)
+
+	std::list<CSoundCell*>::iterator itSound;
+
+	for (itSound = m_pSound.begin(); itSound != m_pSound.end(); itSound++)
 	{
-		if(pSound == (*itSound))
+		if (pSound == (*itSound))
 		{
 			m_pSound.erase(itSound);
 			return;
@@ -107,77 +107,83 @@ void CSoundMgr::UpdateSound()
 	m_pSound.push_back(m_pCurrSound);
 
 	CLyTerrain* pRefTerrain = m_pRefMapMng->GetTerrain();
-	CSoundCell* pSound = new CSoundCell(pRefTerrain);
-	m_pCurrSound = pSound;	
+	CSoundCell* pSound      = new CSoundCell(pRefTerrain);
+	m_pCurrSound            = pSound;
 }
 
 BOOL CSoundMgr::MouseMsgFilter(LPMSG pMsg)
 {
-	if(!m_pRefMapMng) return FALSE;
+	if (!m_pRefMapMng)
+		return FALSE;
 	CLyTerrain* pRefTerrain = m_pRefMapMng->GetTerrain();
-	if(!m_bActive || !pRefTerrain) return FALSE;
+	if (!m_bActive || !pRefTerrain)
+		return FALSE;
 
-	switch(pMsg->message)
+	switch (pMsg->message)
 	{
-	case WM_LBUTTONDOWN:
+		case WM_LBUTTONDOWN:
 		{
-			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
+			POINT point = { short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam)) };
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
+			if (!pRefTerrain->Pick(point.x, point.y, &vec, nullptr))
+				break;
 
-			m_pCurrSound->InitRect(vec);		
+			m_pCurrSound->InitRect(vec);
 		}
-		return TRUE;
-	case WM_LBUTTONUP:
+			return TRUE;
+		case WM_LBUTTONUP:
 		{
-			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
+			POINT point = { short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam)) };
 
 			__Vector3 vec;
-			if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
+			if (!pRefTerrain->Pick(point.x, point.y, &vec, nullptr))
+				break;
 
-			m_pCurrSound->AddRect(vec);		
+			m_pCurrSound->AddRect(vec);
 		}
-		return TRUE;
-	case WM_MOUSEMOVE:
+			return TRUE;
+		case WM_MOUSEMOVE:
 		{
 			DWORD_PTR nFlags = pMsg->wParam;
-			POINT point = {short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam))};
-			if(nFlags & MK_LBUTTON)	
+			POINT point      = { short(LOWORD(pMsg->lParam)), short(HIWORD(pMsg->lParam)) };
+			if (nFlags & MK_LBUTTON)
 			{
 				__Vector3 vec;
-				if(!pRefTerrain->Pick(point.x, point.y, &vec, nullptr)) break;
+				if (!pRefTerrain->Pick(point.x, point.y, &vec, nullptr))
+					break;
 				m_pCurrSound->AddRect(vec);
 			}
 		}
-		return TRUE;	
+			return TRUE;
 	}
 	return FALSE;
 }
 
 void CSoundMgr::SetActive(bool active)
 {
-	if(m_bActive==active) return;
+	if (m_bActive == active)
+		return;
 
 	m_bActive = active;
-	if(active)
+	if (active)
 	{
 		m_pDlgSound->ShowWindow(TRUE);
 
 		CLyTerrain* pRefTerrain = m_pRefMapMng->GetTerrain();
-		CSoundCell* pSound = new CSoundCell(pRefTerrain);
-		if(m_pCurrSound)
+		CSoundCell* pSound      = new CSoundCell(pRefTerrain);
+		if (m_pCurrSound)
 		{
 			delete m_pCurrSound;
 			m_pCurrSound = nullptr;
 		}
-		m_pCurrSound = pSound;		
+		m_pCurrSound = pSound;
 	}
 	else
 	{
 		m_pDlgSound->ShowWindow(FALSE);
 
-		if(m_pCurrSound)
+		if (m_pCurrSound)
 		{
 			delete m_pCurrSound;
 			m_pCurrSound = nullptr;
@@ -191,9 +197,9 @@ void CSoundMgr::Render()
 
 	__Matrix44 mtx;
 	mtx.Identity();
-		
+
 	hr = s_lpD3DDev->SetTransform(D3DTS_WORLD, mtx.toD3D()); // 월드 행렬 적용..
-	
+
 	// set texture
 	hr = s_lpD3DDev->SetTexture(0, nullptr);
 	hr = s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
@@ -210,23 +216,24 @@ void CSoundMgr::Render()
 	hr = s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, FALSE);
 	hr = s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
-
 	hr = s_lpD3DDev->SetFVF(FVF_XYZCOLOR);
 
 	//이미 만들어진 길 그리기...
 	std::list<CSoundCell*>::iterator itSound;
 
 	CSoundCell* pSound;
-	for(itSound = m_pSound.begin(); itSound != m_pSound.end(); itSound++)
+	for (itSound = m_pSound.begin(); itSound != m_pSound.end(); itSound++)
 	{
 		pSound = (*itSound);
-		if(!pSound) continue;
+		if (!pSound)
+			continue;
 
 		pSound->Render(0xff0000ff);
 	}
 
 	//대화상자에서 선택된 길 그리기.
-	if(m_pDlgSound->m_pSelSound) m_pDlgSound->m_pSelSound->Render(0xff00ff00);
+	if (m_pDlgSound->m_pSelSound)
+		m_pDlgSound->m_pSelSound->Render(0xff00ff00);
 
 	//만들고 있는 길 & 영역 그리기..
 	m_pCurrSound->Render(0xffff0000);
@@ -253,7 +260,7 @@ bool CSoundMgr::Load(File& file)
 
 	CLyTerrain* pRefTerrain = m_pRefMapMng->GetTerrain();
 
-	int cnt = 0;
+	int cnt                 = 0;
 	file.Read(&cnt, sizeof(int));
 	for (int i = 0; i < cnt; i++)
 	{
@@ -287,9 +294,9 @@ bool CSoundMgr::Save(File& file)
 void CSoundMgr::SaveGameData(File& file)
 {
 	CLyTerrain* pRefTerrain = m_pRefMapMng->GetTerrain();
-	m_MapSize = pRefTerrain->m_iHeightMapSize;
+	m_MapSize               = pRefTerrain->m_iHeightMapSize;
 
-	char* pSound = (char*) GlobalAlloc(GMEM_FIXED, sizeof(char) * m_MapSize * m_MapSize);
+	char* pSound            = (char*) GlobalAlloc(GMEM_FIXED, sizeof(char) * m_MapSize * m_MapSize);
 	memset(pSound, -1, sizeof(char) * m_MapSize * m_MapSize);
 
 	//sound cell들을 면적순으로(큰게 앞으로 오게..)정렬하고...
@@ -307,7 +314,7 @@ void CSoundMgr::SaveGameData(File& file)
 
 	std::map<int, int> tmpMap;
 	std::list<int>::iterator it_int = tmpList.begin();
-	int cnt = static_cast<int>(tmpList.size());
+	int cnt                         = static_cast<int>(tmpList.size());
 
 	file.Write(&cnt, sizeof(int));
 	for (int i = 0; i < cnt; i++)
@@ -329,13 +336,13 @@ void CSoundMgr::SaveGameData(File& file)
 			int str_size = 0;
 			std::string str;
 
-			str = pSI->szBGM[j];
+			str      = pSI->szBGM[j];
 			str_size = static_cast<int>(str.size());
 			file.Write(&str_size, sizeof(int));
 			file.Write(str.c_str(), str_size);
 			file.Write(&(pSI->fBGMRegenTime[j]), sizeof(float));
 
-			str = pSI->szBGE[j];
+			str      = pSI->szBGE[j];
 			str_size = static_cast<int>(str.size());
 			file.Write(&str_size, sizeof(int));
 			file.Write(str.c_str(), str_size);
@@ -379,17 +386,20 @@ void CSoundMgr::SCSort()
 			size_t _I;
 			for (_I = 0; _I < _N && !_A[_I].empty(); ++_I)
 			{
-				SCMerge(_A[_I], _X);//_A[_I].merge(_X, _Pr);
+				SCMerge(_A[_I], _X); //_A[_I].merge(_X, _Pr);
 				_A[_I].swap(_X);
 			}
-			if (_I == _MAXN) SCMerge(_A[_I], _X); // _A[_I].merge(_X, _Pr);
+			if (_I == _MAXN)
+				SCMerge(_A[_I], _X); // _A[_I].merge(_X, _Pr);
 			else
 			{
 				_A[_I].swap(_X);
-				if (_I == _N) ++_N;
+				if (_I == _N)
+					++_N;
 			}
 		}
-		while (0 < _N) SCMerge(m_pSound, _A[--_N]);//m_pVBList_Alive.merge(_A[--_N], _Pr); 
+		while (0 < _N)
+			SCMerge(m_pSound, _A[--_N]); //m_pVBList_Alive.merge(_A[--_N], _Pr);
 	}
 }
 
@@ -406,8 +416,10 @@ void CSoundMgr::SCMerge(std::list<CSoundCell*>& l1, std::list<CSoundCell*>& l2)
 				l1.splice(_F1, l2, _F2, ++_Mid2);
 				_F2 = _Mid2;
 			}
-			else ++_F1;
-			if (_F2 != _L2) l1.splice(_L1, l2, _F2, _L2);			
+			else
+				++_F1;
+		if (_F2 != _L2)
+			l1.splice(_L1, l2, _F2, _L2);
 	}
 }
 
@@ -418,10 +430,11 @@ bool CSoundMgr::SCComp(CSoundCell* pP1, CSoundCell* pP2)
 	rt2 = pP2->m_Rect;
 
 	int dim1, dim2;
-	dim1 = (rt1.Height()+1) * (rt1.Width()+1);
-	dim2 = (rt2.Height()+1) * (rt2.Width()+1);
+	dim1 = (rt1.Height() + 1) * (rt1.Width() + 1);
+	dim2 = (rt2.Height() + 1) * (rt2.Width() + 1);
 
-	if(dim1 < dim2) return true;
+	if (dim1 < dim2)
+		return true;
 	return false;
 }
 

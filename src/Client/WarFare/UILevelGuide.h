@@ -14,22 +14,22 @@
 class CUILevelGuide : public CN3UIBase
 {
 protected:
-	static constexpr int MAX_SEARCH_LEVEL_RANGE	= 5;
-	static constexpr int MAX_QUESTS_PER_PAGE	= 3;
+	static constexpr int MAX_SEARCH_LEVEL_RANGE = 5;
+	static constexpr int MAX_QUESTS_PER_PAGE    = 3;
 
-	CN3UIEdit*		m_pEdit_Level;
-	CN3UIScrollBar*	m_pScroll_Guide[MAX_QUESTS_PER_PAGE];
-	CN3UIString*	m_pText_Guide[MAX_QUESTS_PER_PAGE];
-	CN3UIString*	m_pText_Title[MAX_QUESTS_PER_PAGE];
-	CN3UIString*	m_pText_Page;
-	CN3UIButton*	m_pBtn_Check;
-	CN3UIString*	m_pText_Level;
-	CN3UIButton*	m_pBtn_Up;
-	CN3UIButton*	m_pBtn_Down;
-	CN3UIButton*	m_pBtn_Cancel;
+	CN3UIEdit* m_pEdit_Level;
+	CN3UIScrollBar* m_pScroll_Guide[MAX_QUESTS_PER_PAGE];
+	CN3UIString* m_pText_Guide[MAX_QUESTS_PER_PAGE];
+	CN3UIString* m_pText_Title[MAX_QUESTS_PER_PAGE];
+	CN3UIString* m_pText_Page;
+	CN3UIButton* m_pBtn_Check;
+	CN3UIString* m_pText_Level;
+	CN3UIButton* m_pBtn_Up;
+	CN3UIButton* m_pBtn_Down;
+	CN3UIButton* m_pBtn_Cancel;
 
-	int				m_iSearchLevel;
-	int				m_iPageNo;
+	int m_iSearchLevel;
+	int m_iPageNo;
 
 public:
 	CUILevelGuide();

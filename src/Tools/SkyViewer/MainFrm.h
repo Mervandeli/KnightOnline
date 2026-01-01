@@ -17,34 +17,33 @@
 class CMainFrame : public CFrameWnd
 {
 public:
-	CN3EngTool	m_Eng;
-	CN3Shape	m_ObjectBundle;
-	CN3Camera	m_Camera;
-	CN3Light	m_Lights[3];
-	
+	CN3EngTool m_Eng;
+	CN3Shape m_ObjectBundle;
+	CN3Camera m_Camera;
+	CN3Light m_Lights[3];
+
 protected: // create from serialization only
 	CMainFrame();
 	DECLARE_DYNCREATE(CMainFrame)
 
-// Attributes
+	// Attributes
 public:
-
-// Operations
+	// Operations
 public:
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CMainFrame)
-	public:
+public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	protected:
+
+protected:
 	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
-	class CSkyViewerView*		GetViewRender();
-	class CFormViewProperty*	GetViewProperty();
+	class CSkyViewerView* GetViewRender();
+	class CFormViewProperty* GetViewProperty();
 
 	virtual ~CMainFrame();
 #ifdef _DEBUG
@@ -52,12 +51,12 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
-protected:  // control bar embedded members
-	CStatusBar		m_wndStatusBar;
-	CToolBar		m_wndToolBar;
-	CSplitterWnd	m_wndSplitter;
+protected: // control bar embedded members
+	CStatusBar m_wndStatusBar;
+	CToolBar m_wndToolBar;
+	CSplitterWnd m_wndSplitter;
 
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CMainFrame)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

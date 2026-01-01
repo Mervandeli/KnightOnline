@@ -15,12 +15,11 @@ class CN3Texture;
 class CDTex
 {
 private:
-		
 public:
-	DTEXATTR		m_Attr[NUM_DTEXTILE][NUM_DTEXTILE];
-	CN3Texture*		m_pTex;
-	int				m_ID;
-	
+	DTEXATTR m_Attr[NUM_DTEXTILE][NUM_DTEXTILE];
+	CN3Texture* m_pTex;
+	int m_ID;
+
 public:
 	void Init();
 	void Release();

@@ -12,7 +12,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -22,10 +22,10 @@ static char THIS_FILE[]=__FILE__;
 IMPLEMENT_DYNCREATE(CN3MEDoc, CDocument)
 
 BEGIN_MESSAGE_MAP(CN3MEDoc, CDocument)
-	//{{AFX_MSG_MAP(CN3MEDoc)
-	ON_COMMAND(ID_FILE_IMPORT_POST_DATA_FROM_SCENE, OnFileImportPostDataFromScene)
-	ON_COMMAND(ID_FILE_IMPORT_SHAPES, OnFileImportShapes)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CN3MEDoc)
+ON_COMMAND(ID_FILE_IMPORT_POST_DATA_FROM_SCENE, OnFileImportPostDataFromScene)
+ON_COMMAND(ID_FILE_IMPORT_SHAPES, OnFileImportShapes)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ BOOL CN3MEDoc::OnNewDocument()
 	CWinThread* pThread = AfxGetThread();
 	if (pThread)
 	{
-		CMainFrame* pFrm = (CMainFrame*)pThread->m_pMainWnd;
+		CMainFrame* pFrm = (CMainFrame*) pThread->m_pMainWnd;
 		if (pFrm)
 		{
 			CMapMng* pMapMng = pFrm->GetMapMng();
@@ -66,8 +66,6 @@ BOOL CN3MEDoc::OnNewDocument()
 
 	return TRUE;
 }
-
-
 
 /////////////////////////////////////////////////////////////////////////////
 // CN3MEDoc serialization
@@ -102,71 +100,75 @@ void CN3MEDoc::Dump(CDumpContext& dc) const
 /////////////////////////////////////////////////////////////////////////////
 // CN3MEDoc commands
 
-BOOL CN3MEDoc::OnOpenDocument(LPCTSTR lpszPathName) 
+BOOL CN3MEDoc::OnOpenDocument(LPCTSTR lpszPathName)
 {
 	if (!CDocument::OnOpenDocument(lpszPathName))
 		return FALSE;
 
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
 	if (pFrm)
 	{
 		pFrm->GetMapMng()->m_bLoadingComplete = false;
 		pFrm->GetMapMng()->LoadFromFile(lpszPathName);
 		pFrm->GetMapMng()->m_bLoadingComplete = true;
 
-//		pFrm->GetDTexGroupMng()->Init();
-//		pFrm->GetDTexGroupMng()->LoadFromFile();
-//		pFrm->GetDTexMng()->Init(pFrm);
-//		pFrm->GetDTexMng()->LoadFromFile();
+		//		pFrm->GetDTexGroupMng()->Init();
+		//		pFrm->GetDTexGroupMng()->LoadFromFile();
+		//		pFrm->GetDTexMng()->Init(pFrm);
+		//		pFrm->GetDTexMng()->LoadFromFile();
 	}
 
 	return TRUE;
 }
 
-BOOL CN3MEDoc::OnSaveDocument(LPCTSTR lpszPathName) 
+BOOL CN3MEDoc::OnSaveDocument(LPCTSTR lpszPathName)
 {
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
 	if (pFrm)
 	{
 		pFrm->GetMapMng()->SaveToFile(lpszPathName);
 	}
-	
-	return TRUE;//CDocument::OnSaveDocument(lpszPathName);
+
+	return TRUE; //CDocument::OnSaveDocument(lpszPathName);
 }
 
-
-void CN3MEDoc::OnFileImportPostDataFromScene() 
+void CN3MEDoc::OnFileImportPostDataFromScene()
 {
 	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	CFileDialog dlg(TRUE, "n3scene", nullptr, dwFlags, "N3 Scene file(*.N3Scene)|*.N3Scene||", nullptr);
-	if(dlg.DoModal() == IDCANCEL) return;
-	
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
+	CFileDialog dlg(
+		TRUE, "n3scene", nullptr, dwFlags, "N3 Scene file(*.N3Scene)|*.N3Scene||", nullptr);
+	if (dlg.DoModal() == IDCANCEL)
+		return;
+
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
 	if (pFrm && pFrm->GetMapMng())
 	{
 		CMapMng* pMapMng = pFrm->GetMapMng();
-		pMapMng->ImportPostDataFromScene(dlg.GetPathName());		
+		pMapMng->ImportPostDataFromScene(dlg.GetPathName());
 	}
 }
 
-
-void CN3MEDoc::OnFileImportShapes() 
+void CN3MEDoc::OnFileImportShapes()
 {
 	CMapMng* pMapMng = nullptr;
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	if(pFrm) pMapMng = pFrm->GetMapMng();
-	if(nullptr == pMapMng) return;
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
+	if (pFrm)
+		pMapMng = pFrm->GetMapMng();
+	if (nullptr == pMapMng)
+		return;
 
 	char szBuff[256000] = "";
-	DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
-	CFileDialog dlg(TRUE, "n3shape", nullptr, dwFlags, "Shape files(*.N3Shape)|*.N3Shape||", nullptr);
-	dlg.m_ofn.nMaxFile = 25600;
+	DWORD dwFlags       = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_ALLOWMULTISELECT;
+	CFileDialog dlg(
+		TRUE, "n3shape", nullptr, dwFlags, "Shape files(*.N3Shape)|*.N3Shape||", nullptr);
+	dlg.m_ofn.nMaxFile  = 25600;
 	dlg.m_ofn.lpstrFile = szBuff;
-	if(dlg.DoModal() == IDCANCEL) return;
-	
+	if (dlg.DoModal() == IDCANCEL)
+		return;
+
 	POSITION pos = dlg.GetStartPosition();
 	CString szPath;
-	while(pos != nullptr)
+	while (pos != nullptr)
 	{
 		szPath = dlg.GetNextPathName(pos);
 		pMapMng->ImportShape(szPath);

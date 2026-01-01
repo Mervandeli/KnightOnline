@@ -15,18 +15,18 @@
 
 //////////////////////////////////////////////////////////////////////
 
-class CUIClassChange : public CN3UIBase  
+class CUIClassChange : public CN3UIBase
 {
-	CN3UIButton*		m_pBtn_Ok;
-	CN3UIButton*		m_pBtn_Cancel;
-	CN3UIButton*		m_pBtn_Class;
-	
-	CN3UIString*		m_pText_Warning;
-	CN3UIString*		m_pText_Info;
-	CN3UIString*		m_pText_Title;
-	CN3UIString*		m_pText_Message;
+	CN3UIButton* m_pBtn_Ok;
+	CN3UIButton* m_pBtn_Cancel;
+	CN3UIButton* m_pBtn_Class;
 
-	e_Class				m_eClass;
+	CN3UIString* m_pText_Warning;
+	CN3UIString* m_pText_Info;
+	CN3UIString* m_pText_Title;
+	CN3UIString* m_pText_Message;
+
+	e_Class m_eClass;
 
 public:
 	CUIClassChange();
@@ -34,10 +34,10 @@ public:
 
 	bool Load(File& file) override;
 	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
-		    
+
 	void Open(int iCode);
 	void Close();
-		    
+
 	void RestorePrevClass();
 	void ChangeToWarningState();
 	void ChangeToNormalState();

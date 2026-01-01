@@ -23,9 +23,9 @@ static char THIS_FILE[] = __FILE__;
 IMPLEMENT_DYNCREATE(CN3FXEView, CView)
 
 BEGIN_MESSAGE_MAP(CN3FXEView, CView)
-	//{{AFX_MSG_MAP(CN3FXEView)
-	ON_WM_SIZE()
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CN3FXEView)
+ON_WM_SIZE()
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ END_MESSAGE_MAP()
 
 CN3FXEView::CN3FXEView()
 {
-	// TODO: add construction code here	
+	// TODO: add construction code here
 }
 
 CN3FXEView::~CN3FXEView()
@@ -57,10 +57,9 @@ void CN3FXEView::OnDraw(CDC* pDC)
 	ASSERT_VALID(pDoc);
 	// TODO: add draw code for native data here
 
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
 	pFrm->TickRender();
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 // CN3FXEView diagnostics
@@ -79,38 +78,38 @@ void CN3FXEView::Dump(CDumpContext& dc) const
 CN3FXEDoc* CN3FXEView::GetDocument() // non-debug version is inline
 {
 	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CN3FXEDoc)));
-	return (CN3FXEDoc*)m_pDocument;
+	return (CN3FXEDoc*) m_pDocument;
 }
 #endif //_DEBUG
 
 /////////////////////////////////////////////////////////////////////////////
 // CN3FXEView message handlers
 
-void CN3FXEView::OnSize(UINT nType, int cx, int cy) 
+void CN3FXEView::OnSize(UINT nType, int cx, int cy)
 {
 	CView::OnSize(nType, cx, cy);
-	
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	if(pFrm) pFrm->m_Eng.Reset(TRUE, cx, cy, 0);
-}	
 
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
+	if (pFrm)
+		pFrm->m_Eng.Reset(TRUE, cx, cy, 0);
+}
 
-LRESULT CN3FXEView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
+LRESULT CN3FXEView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
-	CMainFrame* pFrm = (CMainFrame*)AfxGetMainWnd();
-	if(pFrm)
+	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
+	if (pFrm)
 	{
-		MSG	msg;
-		msg.hwnd = m_hWnd;
+		MSG msg;
+		msg.hwnd    = m_hWnd;
 		msg.message = message;
-		msg.wParam = wParam;
-		msg.lParam = lParam;
-		if(pFrm->m_Camera.MoveByWindowMessage(&msg))
+		msg.wParam  = wParam;
+		msg.lParam  = lParam;
+		if (pFrm->m_Camera.MoveByWindowMessage(&msg))
 		{
 			this->Invalidate(FALSE);
 			return TRUE;
 		}
 	}
-	
+
 	return CView::WindowProc(message, wParam, lParam);
 }

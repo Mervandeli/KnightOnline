@@ -6,10 +6,10 @@
 
 CWinCrypt::CWinCrypt()
 {
-	m_bIsLoaded			= false;
-	m_hCryptProvider	= 0;
-	m_hCryptHash		= 0;
-	m_hCryptKey			= 0;
+	m_bIsLoaded      = false;
+	m_hCryptProvider = 0;
+	m_hCryptHash     = 0;
+	m_hCryptKey      = 0;
 }
 
 bool CWinCrypt::Load()
@@ -21,9 +21,11 @@ bool CWinCrypt::Load()
 	// private keys.
 	// If we use CRYPT_VERIFYCONTEXT instead, we don't need access to private keys, so we can avoid
 	// requiring the extra privs.
-	if (!CryptAcquireContext(&m_hCryptProvider, nullptr, Provider, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)
+	if (!CryptAcquireContext(
+			&m_hCryptProvider, nullptr, Provider, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)
 		// Create a new key context instead
-		&& !CryptAcquireContext(&m_hCryptProvider, nullptr, Provider, PROV_RSA_FULL, CRYPT_NEWKEYSET))
+		&& !CryptAcquireContext(
+			&m_hCryptProvider, nullptr, Provider, PROV_RSA_FULL, CRYPT_NEWKEYSET))
 		return false;
 
 	if (!CryptCreateHash(m_hCryptProvider, CALG_SHA, 0, 0, &m_hCryptHash))
@@ -53,13 +55,14 @@ void CWinCrypt::Release()
 		CryptReleaseContext(m_hCryptProvider, 0);
 	}
 
-	m_bIsLoaded			= false;
-	m_hCryptProvider	= 0;
-	m_hCryptHash		= 0;
-	m_hCryptKey			= 0;
+	m_bIsLoaded      = false;
+	m_hCryptProvider = 0;
+	m_hCryptHash     = 0;
+	m_hCryptKey      = 0;
 }
 
-bool CWinCrypt::ReadFile(File& file, void* buffer, size_t bytesToRead, size_t* bytesRead /*= nullptr*/)
+bool CWinCrypt::ReadFile(
+	File& file, void* buffer, size_t bytesToRead, size_t* bytesRead /*= nullptr*/)
 {
 	if (!file.Read(buffer, bytesToRead, bytesRead))
 		return false;
@@ -67,13 +70,7 @@ bool CWinCrypt::ReadFile(File& file, void* buffer, size_t bytesToRead, size_t* b
 	if (IsLoaded())
 	{
 		DWORD dwDataLen = static_cast<DWORD>(bytesToRead);
-		if (!CryptDecrypt(
-			m_hCryptKey,
-			0,
-			TRUE,
-			0,
-			static_cast<BYTE*>(buffer),
-			&dwDataLen))
+		if (!CryptDecrypt(m_hCryptKey, 0, TRUE, 0, static_cast<BYTE*>(buffer), &dwDataLen))
 			return false;
 	}
 

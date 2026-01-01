@@ -14,15 +14,13 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgLoadNPCPath dialog
 
-
-CDlgLoadNPCPath::CDlgLoadNPCPath(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgLoadNPCPath::IDD, pParent)
+CDlgLoadNPCPath::CDlgLoadNPCPath(CWnd* pParent /*=nullptr*/) :
+	CDialog(CDlgLoadNPCPath::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgLoadNPCPath)
-		// NOTE: the ClassWizard will add member initialization here
+	// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgLoadNPCPath::DoDataExchange(CDataExchange* pDX)
 {
@@ -32,29 +30,29 @@ void CDlgLoadNPCPath::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgLoadNPCPath, CDialog)
-	//{{AFX_MSG_MAP(CDlgLoadNPCPath)
-	ON_LBN_SELCHANGE(IDC_LIST_NPCPATH, OnSelchangeListNpcpath)
-	ON_LBN_DBLCLK(IDC_LIST_NPCPATH, OnDblclkListNpcpath)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgLoadNPCPath)
+ON_LBN_SELCHANGE(IDC_LIST_NPCPATH, OnSelchangeListNpcpath)
+ON_LBN_DBLCLK(IDC_LIST_NPCPATH, OnDblclkListNpcpath)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgLoadNPCPath message handlers
 
-void CDlgLoadNPCPath::OnSelchangeListNpcpath() 
+void CDlgLoadNPCPath::OnSelchangeListNpcpath()
 {
 	int CurrSel = m_NPCPathFileList.GetCurSel();
-	m_NPCPathFileList.GetText(CurrSel, m_SelFileName);// TODO: Add your control notification handler code here
+	m_NPCPathFileList.GetText(
+		CurrSel, m_SelFileName); // TODO: Add your control notification handler code here
 }
 
-void CDlgLoadNPCPath::OnDblclkListNpcpath() 
+void CDlgLoadNPCPath::OnDblclkListNpcpath()
 {
 	OnOK();
 }
 
-BOOL CDlgLoadNPCPath::OnInitDialog() 
+BOOL CDlgLoadNPCPath::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
@@ -75,22 +73,22 @@ BOOL CDlgLoadNPCPath::OnInitDialog()
 	int count = m_NPCPathFileList.GetCount();
 
 	CString str;
-	for(int i=0;i<count;i++)
+	for (int i = 0; i < count; i++)
 	{
 		m_NPCPathFileList.GetText(0, str);
 
 		char szFileName[MAX_PATH];
 		char szExt[_MAX_EXT];
-		_splitpath((LPCTSTR)str, nullptr, nullptr, szFileName, szExt);
+		_splitpath((LPCTSTR) str, nullptr, nullptr, szFileName, szExt);
 
 		//str.Format("%s%s",szFileName,szExt);
-		str.Format("%s",szFileName);
+		str.Format("%s", szFileName);
 		m_NPCPathFileList.InsertString(count, str);
 		m_NPCPathFileList.DeleteString(0);
 	}
 
 	SetCurrentDirectory(szOldPath);
-	
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+
+	return TRUE; // return TRUE unless you set the focus to a control
+				 // EXCEPTION: OCX Property Pages should return FALSE
 }

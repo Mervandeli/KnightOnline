@@ -7,20 +7,18 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgInputGroup dialog
-CDlgInputGroup::CDlgInputGroup(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgInputGroup::IDD, pParent)
+CDlgInputGroup::CDlgInputGroup(CWnd* pParent /*=nullptr*/) : CDialog(CDlgInputGroup::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgInputGroup)
 	m_GroupName = _T("");
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgInputGroup::DoDataExchange(CDataExchange* pDX)
 {
@@ -31,11 +29,10 @@ void CDlgInputGroup::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgInputGroup, CDialog)
-	//{{AFX_MSG_MAP(CDlgInputGroup)
-		// NOTE: the ClassWizard will add message map macros here
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgInputGroup)
+// NOTE: the ClassWizard will add message map macros here
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////

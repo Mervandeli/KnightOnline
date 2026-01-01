@@ -12,27 +12,28 @@
 
 class CDlgNewPart : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgNewPart(CWnd* pParent = nullptr);   // standard constructor
+	CDlgNewPart(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+										  // Dialog Data
 	//{{AFX_DATA(CDlgNewPart)
-	enum { IDD = IDD_DLG_NEWPART };
-	int		m_iPartType;
+	enum
+	{
+		IDD = IDD_DLG_NEWPART
+	};
+	int m_iPartType;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgNewPart)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgNewPart)
 	virtual void OnOK();

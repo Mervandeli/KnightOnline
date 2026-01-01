@@ -3,14 +3,14 @@
 
 namespace
 {
-	const __Vector3 Min = { 0.0f, 0.0f, 0.0f };
-	const __Vector3 Max = { 1.0f, 1.0f, 1.0f };
-}
+const __Vector3 Min = { 0.0f, 0.0f, 0.0f };
+const __Vector3 Max = { 1.0f, 1.0f, 1.0f };
+} // namespace
 
 TEST(CheckCollisionByBox, HitsFrontFace)
 {
 	const __Vector3 orig = { 0.5f, 0.5f, -1.0f };
-	const __Vector3 dir = { 0.0f, 0.0f, 1.0f };
+	const __Vector3 dir  = { 0.0f, 0.0f, 1.0f };
 
 	SCOPED_TRACE("CheckCollisionByBox::HitsFrontFace");
 
@@ -20,7 +20,7 @@ TEST(CheckCollisionByBox, HitsFrontFace)
 TEST(CheckCollisionByBox, HitsBackFace)
 {
 	const __Vector3 orig = { 0.5f, 0.5f, 2.0f };
-	const __Vector3 dir = { 0.0f, 0.0f, -1.0f };
+	const __Vector3 dir  = { 0.0f, 0.0f, -1.0f };
 
 	SCOPED_TRACE("CheckCollisionByBox::HitsBackFace");
 
@@ -30,7 +30,7 @@ TEST(CheckCollisionByBox, HitsBackFace)
 TEST(CheckCollisionByBox, HitsTopFace)
 {
 	const __Vector3 orig = { 0.5f, 2.0f, 0.5f };
-	const __Vector3 dir = { 0.0f, -1.0f, 0.0f };
+	const __Vector3 dir  = { 0.0f, -1.0f, 0.0f };
 
 	SCOPED_TRACE("CheckCollisionByBox::HitsTopFace");
 
@@ -40,7 +40,7 @@ TEST(CheckCollisionByBox, HitsTopFace)
 TEST(CheckCollisionByBox, HitsBottomFace)
 {
 	const __Vector3 orig = { 0.5f, -1.0f, 0.5f };
-	const __Vector3 dir = { 0.0f, 1.0f, 0.0f };
+	const __Vector3 dir  = { 0.0f, 1.0f, 0.0f };
 
 	SCOPED_TRACE("CheckCollisionByBox::HitsBottomFace");
 
@@ -50,7 +50,7 @@ TEST(CheckCollisionByBox, HitsBottomFace)
 TEST(CheckCollisionByBox, HitsLeftFace)
 {
 	const __Vector3 orig = { -1.0f, 0.5f, 0.5f };
-	const __Vector3 dir = { 1.0f, 0.0f, 0.0f };
+	const __Vector3 dir  = { 1.0f, 0.0f, 0.0f };
 
 	SCOPED_TRACE("CheckCollisionByBox::HitsLeftFace");
 
@@ -60,7 +60,7 @@ TEST(CheckCollisionByBox, HitsLeftFace)
 TEST(CheckCollisionByBox, HitsRightFace)
 {
 	const __Vector3 orig = { 2.0f, 0.5f, 0.5f };
-	const __Vector3 dir = { -1.0f, 0.0f, 0.0f };
+	const __Vector3 dir  = { -1.0f, 0.0f, 0.0f };
 
 	SCOPED_TRACE("CheckCollisionByBox::HitsRightFace");
 
@@ -70,7 +70,7 @@ TEST(CheckCollisionByBox, HitsRightFace)
 TEST(CheckCollisionByBox, HitsEdge)
 {
 	const __Vector3 orig = { -1.0f, 0.0f, 0.0f };
-	const __Vector3 dir = { 1.0f, 0.0f, 0.0f };
+	const __Vector3 dir  = { 1.0f, 0.0f, 0.0f };
 
 	SCOPED_TRACE("CheckCollisionByBox::HitsEdge");
 
@@ -80,7 +80,7 @@ TEST(CheckCollisionByBox, HitsEdge)
 TEST(CheckCollisionByBox, HitsVertex)
 {
 	const __Vector3 orig = { -1.0f, -1.0f, -1.0f };
-	const __Vector3 dir = { 1.0f, 1.0f, 1.0f };
+	const __Vector3 dir  = { 1.0f, 1.0f, 1.0f };
 
 	SCOPED_TRACE("CheckCollisionByBox::HitsVertex");
 
@@ -90,7 +90,7 @@ TEST(CheckCollisionByBox, HitsVertex)
 TEST(CheckCollisionByBox, RayMissesBox)
 {
 	const __Vector3 orig = { -1.0f, -1.0f, -1.0f };
-	const __Vector3 dir = { -1.0f, -1.0f, 0.0f };
+	const __Vector3 dir  = { -1.0f, -1.0f, 0.0f };
 
 	SCOPED_TRACE("CheckCollisionByBox::RayMissesBox");
 
@@ -100,7 +100,7 @@ TEST(CheckCollisionByBox, RayMissesBox)
 TEST(CheckCollisionByBox, RayStartsInsideBox)
 {
 	const __Vector3 orig = { 0.5f, 0.5f, 0.5f };
-	const __Vector3 dir = { 1.0f, 0.0f, 0.0f };
+	const __Vector3 dir  = { 1.0f, 0.0f, 0.0f };
 
 	SCOPED_TRACE("CheckCollisionByBox::RayStartsInsideBox");
 
@@ -112,7 +112,7 @@ TEST(CheckCollisionByBox, RayStartsInsideBox)
 TEST(CheckCollisionByBox, RayParallelToFacesMisses)
 {
 	const __Vector3 orig = { 2.0f, 2.0f, 2.0f };
-	const __Vector3 dir = { 0.0f, 1.0f, 0.0f };
+	const __Vector3 dir  = { 0.0f, 1.0f, 0.0f };
 
 	SCOPED_TRACE("CheckCollisionByBox::RayParallelToFacesMisses");
 

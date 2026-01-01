@@ -16,28 +16,28 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
-CN3TableBase<__TABLE_TEXTS>				CGameBase::s_pTbl_Texts;
-CN3TableBase<__TABLE_ZONE>				CGameBase::s_pTbl_Zones;
-CN3TableBase<__TABLE_UI_RESRC>			CGameBase::s_pTbl_UI;
-CN3TableBase<__TABLE_ITEM_BASIC>		CGameBase::s_pTbl_Items_Basic;
-CN3TableBase<__TABLE_ITEM_EXT>			CGameBase::s_pTbl_Items_Exts[MAX_ITEM_EXTENSION];
-CN3TableBase<__TABLE_PLAYER_LOOKS>		CGameBase::s_pTbl_UPC_Looks;
-CN3TableBase<__TABLE_PLAYER_LOOKS>		CGameBase::s_pTbl_NPC_Looks;
-CN3TableBase<__TABLE_UPC_SKILL>			CGameBase::s_pTbl_Skill;
-CN3TableBase<__TABLE_EXCHANGE_QUEST>	CGameBase::s_pTbl_Exchange_Quest;
-CN3TableBase<__TABLE_FX>				CGameBase::s_pTbl_FXSource;
-CN3TableBase<__TABLE_QUEST_MENU>		CGameBase::s_pTbl_QuestMenu;
-CN3TableBase<__TABLE_QUEST_TALK>		CGameBase::s_pTbl_QuestTalk;
-CN3TableBase<__TABLE_QUEST_CONTENT>		CGameBase::s_pTbl_QuestContent;
-CN3TableBase<__TABLE_HELP>				CGameBase::s_pTbl_Help;
+CN3TableBase<__TABLE_TEXTS> CGameBase::s_pTbl_Texts;
+CN3TableBase<__TABLE_ZONE> CGameBase::s_pTbl_Zones;
+CN3TableBase<__TABLE_UI_RESRC> CGameBase::s_pTbl_UI;
+CN3TableBase<__TABLE_ITEM_BASIC> CGameBase::s_pTbl_Items_Basic;
+CN3TableBase<__TABLE_ITEM_EXT> CGameBase::s_pTbl_Items_Exts[MAX_ITEM_EXTENSION];
+CN3TableBase<__TABLE_PLAYER_LOOKS> CGameBase::s_pTbl_UPC_Looks;
+CN3TableBase<__TABLE_PLAYER_LOOKS> CGameBase::s_pTbl_NPC_Looks;
+CN3TableBase<__TABLE_UPC_SKILL> CGameBase::s_pTbl_Skill;
+CN3TableBase<__TABLE_EXCHANGE_QUEST> CGameBase::s_pTbl_Exchange_Quest;
+CN3TableBase<__TABLE_FX> CGameBase::s_pTbl_FXSource;
+CN3TableBase<__TABLE_QUEST_MENU> CGameBase::s_pTbl_QuestMenu;
+CN3TableBase<__TABLE_QUEST_TALK> CGameBase::s_pTbl_QuestTalk;
+CN3TableBase<__TABLE_QUEST_CONTENT> CGameBase::s_pTbl_QuestContent;
+CN3TableBase<__TABLE_HELP> CGameBase::s_pTbl_Help;
 
-CN3WorldManager*	CGameBase::s_pWorldMgr	= nullptr;	// Manages the current loaded zone
-CPlayerOtherMgr*	CGameBase::s_pOPMgr		= nullptr;	// Manages other loaded characters and NPCs
-CPlayerMySelf*		CGameBase::s_pPlayer	= nullptr;	// The local player instance
-	
+CN3WorldManager* CGameBase::s_pWorldMgr = nullptr; // Manages the current loaded zone
+CPlayerOtherMgr* CGameBase::s_pOPMgr    = nullptr; // Manages other loaded characters and NPCs
+CPlayerMySelf* CGameBase::s_pPlayer     = nullptr; // The local player instance
+
 CGameBase::CGameBase()
 {
 }
@@ -49,50 +49,66 @@ CGameBase::~CGameBase()
 void CGameBase::StaticMemberInit()
 {
 	std::string szLangTail = "_us.tbl";
-	int iLangID = ::GetUserDefaultLangID();
+	int iLangID            = ::GetUserDefaultLangID();
 	if (0x0404 == iLangID)
 		szLangTail = "_TW.tbl"; // Taiwan Language
 
 	std::string szFN;
-	szFN = "Data\\Texts" + szLangTail;		s_pTbl_Texts.LoadFromFile(szFN);
-	szFN = "Data\\Zones.tbl";				s_pTbl_Zones.LoadFromFile(szFN);
-	szFN = "Data\\UIs" + szLangTail;		s_pTbl_UI.LoadFromFile(szFN);
-	szFN = "Data\\UPC_DefaultLooks.tbl";	s_pTbl_UPC_Looks.LoadFromFile(szFN);
-	szFN = "Data\\Item_Org" + szLangTail;	s_pTbl_Items_Basic.LoadFromFile(szFN);
+	szFN = "Data\\Texts" + szLangTail;
+	s_pTbl_Texts.LoadFromFile(szFN);
+	szFN = "Data\\Zones.tbl";
+	s_pTbl_Zones.LoadFromFile(szFN);
+	szFN = "Data\\UIs" + szLangTail;
+	s_pTbl_UI.LoadFromFile(szFN);
+	szFN = "Data\\UPC_DefaultLooks.tbl";
+	s_pTbl_UPC_Looks.LoadFromFile(szFN);
+	szFN = "Data\\Item_Org" + szLangTail;
+	s_pTbl_Items_Basic.LoadFromFile(szFN);
 
-	szFN = "Data\\Quest_Menu" + szLangTail;	s_pTbl_QuestMenu.LoadFromFile(szFN);
-	szFN = "Data\\Quest_Talk" + szLangTail;	s_pTbl_QuestTalk.LoadFromFile(szFN);
-	szFN = "Data\\Quest_Content" + szLangTail;	s_pTbl_QuestContent.LoadFromFile(szFN);
-	szFN = "Data\\Help" + szLangTail;		s_pTbl_Help.LoadFromFile(szFN);
+	szFN = "Data\\Quest_Menu" + szLangTail;
+	s_pTbl_QuestMenu.LoadFromFile(szFN);
+	szFN = "Data\\Quest_Talk" + szLangTail;
+	s_pTbl_QuestTalk.LoadFromFile(szFN);
+	szFN = "Data\\Quest_Content" + szLangTail;
+	s_pTbl_QuestContent.LoadFromFile(szFN);
+	szFN = "Data\\Help" + szLangTail;
+	s_pTbl_Help.LoadFromFile(szFN);
 
 	std::string szFNTmp;
 	for (int i = 0; i < MAX_ITEM_EXTENSION; i++)
 	{
 		szFNTmp = fmt::format("Data\\Item_Ext_{}", i);
-		szFN = szFNTmp + szLangTail;
+		szFN    = szFNTmp + szLangTail;
 		s_pTbl_Items_Exts[i].LoadFromFile(szFN);
 	}
 
-	szFN = "Data\\NPC_Looks.tbl";					s_pTbl_NPC_Looks.LoadFromFile(szFN);
-	szFN = "Data\\skill_magic_main" + szLangTail;	s_pTbl_Skill.LoadFromFile(szFN);
-	szFN = "Data\\Exchange_Quest.tbl";				s_pTbl_Exchange_Quest.LoadFromFile(szFN);
-	szFN = "Data\\fx.tbl";							s_pTbl_FXSource.LoadFromFile(szFN);
+	szFN = "Data\\NPC_Looks.tbl";
+	s_pTbl_NPC_Looks.LoadFromFile(szFN);
+	szFN = "Data\\skill_magic_main" + szLangTail;
+	s_pTbl_Skill.LoadFromFile(szFN);
+	szFN = "Data\\Exchange_Quest.tbl";
+	s_pTbl_Exchange_Quest.LoadFromFile(szFN);
+	szFN = "Data\\fx.tbl";
+	s_pTbl_FXSource.LoadFromFile(szFN);
 
 	s_pWorldMgr = new CN3WorldManager();
-	s_pOPMgr = new CPlayerOtherMgr();
-	s_pPlayer = new CPlayerMySelf();
+	s_pOPMgr    = new CPlayerOtherMgr();
+	s_pPlayer   = new CPlayerMySelf();
 }
 
 void CGameBase::StaticMemberRelease()
 {
-	delete s_pPlayer;	s_pPlayer = nullptr;
-	delete s_pOPMgr;	s_pOPMgr = nullptr;
-	delete s_pWorldMgr;	s_pWorldMgr = nullptr;
+	delete s_pPlayer;
+	s_pPlayer = nullptr;
+	delete s_pOPMgr;
+	s_pOPMgr = nullptr;
+	delete s_pWorldMgr;
+	s_pWorldMgr = nullptr;
 }
 
 bool CGameBase::GetTextByClass(e_Class eClass, std::string& szText)
 {
-	switch(eClass)
+	switch (eClass)
 	{
 		case CLASS_KINDOF_WARRIOR:
 			szText = fmt::format_text_resource(IDS_CLASS_KINDOF_WARRIOR);
@@ -147,7 +163,7 @@ bool CGameBase::GetTextByClass(e_Class eClass, std::string& szText)
 		case CLASS_KA_PRIEST:
 			szText = fmt::format_text_resource(IDS_CLASS_PRIEST);
 			break;
-		
+
 		case CLASS_KA_BERSERKER:
 			szText = fmt::format_text_resource(IDS_CLASS_KA_BERSERKER);
 			break;
@@ -172,7 +188,7 @@ bool CGameBase::GetTextByClass(e_Class eClass, std::string& szText)
 		case CLASS_KA_DARKPRIEST:
 			szText = fmt::format_text_resource(IDS_CLASS_KA_DARKPRIEST);
 			break;
-		
+
 		case CLASS_EL_BLADE:
 			szText = fmt::format_text_resource(IDS_CLASS_EL_BLADE);
 			break;
@@ -197,7 +213,7 @@ bool CGameBase::GetTextByClass(e_Class eClass, std::string& szText)
 		case CLASS_EL_DRUID:
 			szText = fmt::format_text_resource(IDS_CLASS_EL_DRUID);
 			break;
-		
+
 		default:
 			__ASSERT(0, "Invalid Class");
 			szText = "Unknown Class";
@@ -209,16 +225,33 @@ bool CGameBase::GetTextByClass(e_Class eClass, std::string& szText)
 
 bool CGameBase::GetTextByKnightsDuty(e_KnightsDuty eDuty, std::string& szText)
 {
-	switch(eDuty)
+	switch (eDuty)
 	{
-		case KNIGHTS_DUTY_UNKNOWN:		szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_UNKNOWN); break;
-		case KNIGHTS_DUTY_PUNISH:		szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_PUNISH); break;
-		case KNIGHTS_DUTY_TRAINEE:		szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_TRAINEE); break;
-		case KNIGHTS_DUTY_KNIGHT:		szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_KNIGHT); break;
-		case KNIGHTS_DUTY_OFFICER:		szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_OFFICER); break;
-		case KNIGHTS_DUTY_VICECHIEF:	szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_VICECHIEF); break;
-		case KNIGHTS_DUTY_CHIEF:		szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_CHIEF); break;
-		default: __ASSERT(0, "Invalid Knights Duty"); szText = "Unknown Duty"; return false;
+		case KNIGHTS_DUTY_UNKNOWN:
+			szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_UNKNOWN);
+			break;
+		case KNIGHTS_DUTY_PUNISH:
+			szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_PUNISH);
+			break;
+		case KNIGHTS_DUTY_TRAINEE:
+			szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_TRAINEE);
+			break;
+		case KNIGHTS_DUTY_KNIGHT:
+			szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_KNIGHT);
+			break;
+		case KNIGHTS_DUTY_OFFICER:
+			szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_OFFICER);
+			break;
+		case KNIGHTS_DUTY_VICECHIEF:
+			szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_VICECHIEF);
+			break;
+		case KNIGHTS_DUTY_CHIEF:
+			szText = fmt::format_text_resource(IDS_KNIGHTS_DUTY_CHIEF);
+			break;
+		default:
+			__ASSERT(0, "Invalid Knights Duty");
+			szText = "Unknown Duty";
+			return false;
 	}
 
 	return true;
@@ -226,7 +259,7 @@ bool CGameBase::GetTextByKnightsDuty(e_KnightsDuty eDuty, std::string& szText)
 
 bool CGameBase::GetTextByItemClass(e_ItemClass eItemClass, std::string& szText)
 {
-	switch(eItemClass)
+	switch (eItemClass)
 	{
 		case ITEM_CLASS_DAGGER:
 			szText = fmt::format_text_resource(IDS_ITEM_CLASS_DAGGER);
@@ -297,8 +330,8 @@ bool CGameBase::GetTextByItemClass(e_ItemClass eItemClass, std::string& szText)
 
 		case ITEM_CLASS_LAUNCHER:
 			szText = fmt::format_text_resource(IDS_ITEM_CLASS_LAUNCHER);
-			break; 
-						
+			break;
+
 		case ITEM_CLASS_STAFF:
 			szText = fmt::format_text_resource(IDS_ITEM_CLASS_STAFF);
 			break;
@@ -308,7 +341,7 @@ bool CGameBase::GetTextByItemClass(e_ItemClass eItemClass, std::string& szText)
 		case ITEM_CLASS_JAVELIN:
 			szText = fmt::format_text_resource(IDS_ITEM_CLASS_JAVELIN);
 			break;
-		
+
 		case ITEM_CLASS_ARMOR_WARRIOR:
 			szText = fmt::format_text_resource(IDS_ITEM_CLASS_ARMOR_WARRIOR);
 			break;
@@ -319,10 +352,10 @@ bool CGameBase::GetTextByItemClass(e_ItemClass eItemClass, std::string& szText)
 			szText = fmt::format_text_resource(IDS_ITEM_CLASS_ARMOR_MAGE);
 			break;
 		case ITEM_CLASS_ARMOR_PRIEST:
-			szText = fmt::format_text_resource(IDS_ITEM_CLASS_ARMOR_PRIEST); 
+			szText = fmt::format_text_resource(IDS_ITEM_CLASS_ARMOR_PRIEST);
 			break;
 		default:
-//			__ASSERT(0, "Invalid Item Class"); szText = "Unknown Item Class";
+			//			__ASSERT(0, "Invalid Item Class"); szText = "Unknown Item Class";
 			return false;
 	}
 
@@ -331,14 +364,26 @@ bool CGameBase::GetTextByItemClass(e_ItemClass eItemClass, std::string& szText)
 
 bool CGameBase::GetTextByAttrib(e_ItemAttrib eAttrib, std::string& szAttrib)
 {
-	switch(eAttrib)
+	switch (eAttrib)
 	{
-		case ITEM_ATTRIB_GENERAL:		szAttrib = fmt::format_text_resource(IDS_ITEM_ATTRIB_GENERAL); break;
-		case ITEM_ATTRIB_MAGIC:			szAttrib = fmt::format_text_resource(IDS_ITEM_ATTRIB_MAGIC); break;
-		case ITEM_ATTRIB_LAIR:			szAttrib = fmt::format_text_resource(IDS_ITEM_ATTRIB_LAIR); break;
-		case ITEM_ATTRIB_CRAFT:			szAttrib = fmt::format_text_resource(IDS_ITEM_ATTRIB_CRAFT); break;
-		case ITEM_ATTRIB_UNIQUE:		szAttrib = fmt::format_text_resource(IDS_ITEM_ATTRIB_UNIQUE); break;
-		case ITEM_ATTRIB_UPGRADE:		szAttrib = fmt::format_text_resource(IDS_ITEM_ATTRIB_UPGRADE); break;
+		case ITEM_ATTRIB_GENERAL:
+			szAttrib = fmt::format_text_resource(IDS_ITEM_ATTRIB_GENERAL);
+			break;
+		case ITEM_ATTRIB_MAGIC:
+			szAttrib = fmt::format_text_resource(IDS_ITEM_ATTRIB_MAGIC);
+			break;
+		case ITEM_ATTRIB_LAIR:
+			szAttrib = fmt::format_text_resource(IDS_ITEM_ATTRIB_LAIR);
+			break;
+		case ITEM_ATTRIB_CRAFT:
+			szAttrib = fmt::format_text_resource(IDS_ITEM_ATTRIB_CRAFT);
+			break;
+		case ITEM_ATTRIB_UNIQUE:
+			szAttrib = fmt::format_text_resource(IDS_ITEM_ATTRIB_UNIQUE);
+			break;
+		case ITEM_ATTRIB_UPGRADE:
+			szAttrib = fmt::format_text_resource(IDS_ITEM_ATTRIB_UPGRADE);
+			break;
 		default:
 			return false;
 	}
@@ -348,7 +393,7 @@ bool CGameBase::GetTextByAttrib(e_ItemAttrib eAttrib, std::string& szAttrib)
 
 e_Class_Represent CGameBase::GetRepresentClass(e_Class eClass)
 {
-	switch(eClass)
+	switch (eClass)
 	{
 		case CLASS_KA_WARRIOR:
 		case CLASS_KA_BERSERKER:
@@ -388,11 +433,17 @@ e_Class_Represent CGameBase::GetRepresentClass(e_Class eClass)
 
 bool CGameBase::GetTextByNation(e_Nation eNation, std::string& szText)
 {
-	switch(eNation)
+	switch (eNation)
 	{
-		case NATION_ELMORAD:	szText = fmt::format_text_resource(IDS_NATION_ELMORAD); break;
-		case NATION_KARUS:		szText = fmt::format_text_resource(IDS_NATION_KARUS); break;
-		default: szText = fmt::format_text_resource(IDS_NATION_UNKNOWN); return false;
+		case NATION_ELMORAD:
+			szText = fmt::format_text_resource(IDS_NATION_ELMORAD);
+			break;
+		case NATION_KARUS:
+			szText = fmt::format_text_resource(IDS_NATION_KARUS);
+			break;
+		default:
+			szText = fmt::format_text_resource(IDS_NATION_UNKNOWN);
+			return false;
 	}
 
 	return true;
@@ -400,7 +451,7 @@ bool CGameBase::GetTextByNation(e_Nation eNation, std::string& szText)
 
 bool CGameBase::GetTextByRace(e_Race eRace, std::string& szText)
 {
-	switch(eRace)
+	switch (eRace)
 	{
 		case RACE_EL_BABARIAN:
 			szText = fmt::format_text_resource(IDS_RACE_EL_BABARIAN);
@@ -424,9 +475,9 @@ bool CGameBase::GetTextByRace(e_Race eRace, std::string& szText)
 		case RACE_KA_PURITUAREK:
 			szText = fmt::format_text_resource(IDS_RACE_KA_PURITUAREK);
 			break;
-			
+
 		default:
-			szText = fmt::format_text_resource(IDS_NATION_UNKNOWN); 
+			szText = fmt::format_text_resource(IDS_NATION_UNKNOWN);
 			return false;
 	}
 
@@ -443,73 +494,88 @@ D3DCOLOR CGameBase::GetIDColorByLevelDifference(int iLevelDiff)
 	// Blue     = 2 to 4 levels below
 	// Green    = 5 to 7 levels below
 	// Sky blue = 8+ levels below (no EXP gained)
-	
+
 	D3DCOLOR crID = 0xffffffff;
-	if(iLevelDiff >= 8)			crID = D3DCOLOR_ARGB(255, 255, 0, 255);
-	else if(iLevelDiff >= 5)	crID = D3DCOLOR_ARGB(255, 255, 0, 0);
-	else if(iLevelDiff >= 2)	crID = D3DCOLOR_ARGB(255, 255, 255, 0);
-	else if(iLevelDiff >= -1)	crID = D3DCOLOR_ARGB(255, 255, 255, 255);
-	else if(iLevelDiff >= -4)	crID = D3DCOLOR_ARGB(255, 0, 0, 255);
-	else if(iLevelDiff >= -7)	crID = D3DCOLOR_ARGB(255, 0, 255, 0);
-	else crID = D3DCOLOR_ARGB(255, 0, 255, 255);
+	if (iLevelDiff >= 8)
+		crID = D3DCOLOR_ARGB(255, 255, 0, 255);
+	else if (iLevelDiff >= 5)
+		crID = D3DCOLOR_ARGB(255, 255, 0, 0);
+	else if (iLevelDiff >= 2)
+		crID = D3DCOLOR_ARGB(255, 255, 255, 0);
+	else if (iLevelDiff >= -1)
+		crID = D3DCOLOR_ARGB(255, 255, 255, 255);
+	else if (iLevelDiff >= -4)
+		crID = D3DCOLOR_ARGB(255, 0, 0, 255);
+	else if (iLevelDiff >= -7)
+		crID = D3DCOLOR_ARGB(255, 0, 255, 0);
+	else
+		crID = D3DCOLOR_ARGB(255, 0, 255, 255);
 
 	return crID;
 }
 
 // Generate requested resource filenames using the given item data
-e_ItemType CGameBase::MakeResrcFileNameForUPC(	__TABLE_ITEM_BASIC* pItem,
-												__TABLE_ITEM_EXT* pItemExt,
-												std::string* pszResrcFN,
-												std::string* pszIconFN,
-												e_PartPosition& ePartPosition,
-												e_PlugPosition& ePlugPosition,
-												e_Race eRace /*= RACE_UNKNOWN*/)
-{	
+e_ItemType CGameBase::MakeResrcFileNameForUPC(__TABLE_ITEM_BASIC* pItem, __TABLE_ITEM_EXT* pItemExt, std::string* pszResrcFN,
+	std::string* pszIconFN, e_PartPosition& ePartPosition, e_PlugPosition& ePlugPosition, e_Race eRace /*= RACE_UNKNOWN*/)
+{
 	ePartPosition = PART_POS_UNKNOWN;
 	ePlugPosition = PLUG_POS_UNKNOWN;
-	if(pszResrcFN) *pszResrcFN = "";
-	if(pszIconFN) *pszIconFN = "";
+	if (pszResrcFN)
+		*pszResrcFN = "";
+	if (pszIconFN)
+		*pszIconFN = "";
 
-	if(nullptr == pItem) return ITEM_TYPE_UNKNOWN;
-	
-	e_ItemType eType	= ITEM_TYPE_UNKNOWN;
-	e_ItemPosition ePos	= (e_ItemPosition)pItem->byAttachPoint;
+	if (nullptr == pItem)
+		return ITEM_TYPE_UNKNOWN;
 
-	int iPos = 0;
+	e_ItemType eType    = ITEM_TYPE_UNKNOWN;
+	e_ItemPosition ePos = (e_ItemPosition) pItem->byAttachPoint;
+
+	int iPos            = 0;
 	std::string szExt; // File extension
-	
-	if(ePos >= ITEM_POS_DUAL && ePos <= ITEM_POS_TWOHANDLEFT)
+
+	if (ePos >= ITEM_POS_DUAL && ePos <= ITEM_POS_TWOHANDLEFT)
 	{
-		if(ITEM_POS_DUAL == ePos || ITEM_POS_RIGHTHAND == ePos || ITEM_POS_TWOHANDRIGHT == ePos) ePlugPosition = PLUG_POS_RIGHTHAND;
-		else if(ITEM_POS_LEFTHAND == ePos || ITEM_POS_TWOHANDLEFT == ePos) ePlugPosition = PLUG_POS_LEFTHAND;
+		if (ITEM_POS_DUAL == ePos || ITEM_POS_RIGHTHAND == ePos || ITEM_POS_TWOHANDRIGHT == ePos)
+			ePlugPosition = PLUG_POS_RIGHTHAND;
+		else if (ITEM_POS_LEFTHAND == ePos || ITEM_POS_TWOHANDLEFT == ePos)
+			ePlugPosition = PLUG_POS_LEFTHAND;
 
 		eType = ITEM_TYPE_PLUG;
 		szExt = ".n3cplug";
 	}
-	else if(ePos >= ITEM_POS_UPPER && ePos <= ITEM_POS_SHOES)
+	else if (ePos >= ITEM_POS_UPPER && ePos <= ITEM_POS_SHOES)
 	{
-		if(ITEM_POS_UPPER == ePos)			ePartPosition = PART_POS_UPPER;
-		else if(ITEM_POS_LOWER == ePos)		ePartPosition = PART_POS_LOWER;
-		else if(ITEM_POS_HEAD == ePos)		ePartPosition = PART_POS_HAIR_HELMET;
-		else if(ITEM_POS_GLOVES == ePos)	ePartPosition = PART_POS_HANDS;
-		else if(ITEM_POS_SHOES == ePos)		ePartPosition = PART_POS_FEET;
-		else { __ASSERT(0, "lll"); }
-		
+		if (ITEM_POS_UPPER == ePos)
+			ePartPosition = PART_POS_UPPER;
+		else if (ITEM_POS_LOWER == ePos)
+			ePartPosition = PART_POS_LOWER;
+		else if (ITEM_POS_HEAD == ePos)
+			ePartPosition = PART_POS_HAIR_HELMET;
+		else if (ITEM_POS_GLOVES == ePos)
+			ePartPosition = PART_POS_HANDS;
+		else if (ITEM_POS_SHOES == ePos)
+			ePartPosition = PART_POS_FEET;
+		else
+		{
+			__ASSERT(0, "lll");
+		}
+
 		eType = ITEM_TYPE_PART;
 		szExt = ".n3cpart";
-		iPos = ePartPosition + 1;
+		iPos  = ePartPosition + 1;
 	}
-	else if(ePos >= ITEM_POS_EAR && ePos <= ITEM_POS_INVENTORY)
+	else if (ePos >= ITEM_POS_EAR && ePos <= ITEM_POS_INVENTORY)
 	{
 		eType = ITEM_TYPE_ICONONLY;
 		szExt = ".dxt";
 	}
-	else if(ePos == ITEM_POS_GOLD)
+	else if (ePos == ITEM_POS_GOLD)
 	{
 		eType = ITEM_TYPE_GOLD;
 		szExt = ".dxt";
 	}
-	else if(ePos == ITEM_POS_SONGPYUN)
+	else if (ePos == ITEM_POS_SONGPYUN)
 	{
 		eType = ITEM_TYPE_SONGPYUN;
 		szExt = ".dxt";
@@ -521,7 +587,7 @@ e_ItemType CGameBase::MakeResrcFileNameForUPC(	__TABLE_ITEM_BASIC* pItem,
 
 	// replace icon/resource IDs if they're overridden by the item
 	int iIDResrc = 0, iIDIcon = 0;
-	
+
 	if (pItemExt != nullptr && pItemExt->dwIDResrc != 0)
 		iIDResrc = pItemExt->dwIDResrc;
 	else
@@ -537,23 +603,15 @@ e_ItemType CGameBase::MakeResrcFileNameForUPC(	__TABLE_ITEM_BASIC* pItem,
 		if (pItem->dwIDResrc)
 		{
 			// NOTE: no idea but perhaps this will work for now
-			if (eRace != RACE_UNKNOWN && ePos >= /*ITEM_POS_DUAL*/ITEM_POS_UPPER && ePos <= ITEM_POS_SHOES)
+			if (eRace != RACE_UNKNOWN && ePos >= /*ITEM_POS_DUAL*/ ITEM_POS_UPPER && ePos <= ITEM_POS_SHOES)
 			{
-				*pszResrcFN = fmt::format("Item\\{:01}_{:04}_{:02}_{:01}{}",
-					(iIDResrc / 10000000),
-					((iIDResrc / 1000) % 10000) + eRace,
-					(iIDResrc / 10) % 100,
-					iIDResrc % 10,
-					szExt);
+				*pszResrcFN = fmt::format("Item\\{:01}_{:04}_{:02}_{:01}{}", (iIDResrc / 10000000), ((iIDResrc / 1000) % 10000) + eRace,
+					(iIDResrc / 10) % 100, iIDResrc % 10, szExt);
 			}
 			else
 			{
-				*pszResrcFN = fmt::format("Item\\{:01}_{:04}_{:02}_{:01}{}",
-					(iIDResrc / 10000000),
-					(iIDResrc / 1000) % 10000,
-					(iIDResrc / 10) % 100,
-					iIDResrc % 10,
-					szExt);
+				*pszResrcFN = fmt::format("Item\\{:01}_{:04}_{:02}_{:01}{}", (iIDResrc / 10000000), (iIDResrc / 1000) % 10000,
+					(iIDResrc / 10) % 100, iIDResrc % 10, szExt);
 			}
 		}
 		// Some items don't have models -- only icons.
@@ -565,13 +623,10 @@ e_ItemType CGameBase::MakeResrcFileNameForUPC(	__TABLE_ITEM_BASIC* pItem,
 
 	if (pszIconFN)
 	{
-		*pszIconFN = fmt::format("UI\\ItemIcon_{:01}_{:04}_{:02}_{:01}.dxt",
-			(iIDIcon / 10000000),
-			(iIDIcon / 1000) % 10000,
-			(iIDIcon / 10) % 100,
-			iIDIcon % 10);
+		*pszIconFN = fmt::format(
+			"UI\\ItemIcon_{:01}_{:04}_{:02}_{:01}.dxt", (iIDIcon / 10000000), (iIDIcon / 1000) % 10000, (iIDIcon / 10) % 100, iIDIcon % 10);
 	}
-	
+
 	return eType;
 }
 
@@ -592,8 +647,10 @@ bool CGameBase::IsValidCharacter(CPlayerBase* pCharacter)
 
 CPlayerBase* CGameBase::CharacterGetByID(int iID, bool bFromAlive)
 {
-	if(iID < 0) return nullptr;
-	if(iID == s_pPlayer->IDNumber()) return s_pPlayer;
+	if (iID < 0)
+		return nullptr;
+	if (iID == s_pPlayer->IDNumber())
+		return s_pPlayer;
 	return s_pOPMgr->CharacterGetByID(iID, bFromAlive);
 }
 
@@ -604,16 +661,16 @@ std::string CGameBase::FormatNumber(int iNumber)
 
 	// Where the digits actually start - if it has a sign, this will be at 1.
 	// Otherwise, it will start at 0.
-	size_t nDigitStart = (iNumber < 0 ? 1 : 0);
+	size_t nDigitStart          = (iNumber < 0 ? 1 : 0);
 
 	// Full number of digits (excluding the sign).
-	size_t nDigitCount = szOrigNum.size() - nDigitStart;
+	size_t nDigitCount          = szOrigNum.size() - nDigitStart;
 
 	// Number of commas that will be generated.
-	size_t nCommaCount = (nDigitCount - 1) / 3;
+	size_t nCommaCount          = (nDigitCount - 1) / 3;
 
-	// Number of leading digits. 
-	size_t nLeadingDigits = nDigitCount % 3;
+	// Number of leading digits.
+	size_t nLeadingDigits       = nDigitCount % 3;
 	if (nLeadingDigits == 0)
 		nLeadingDigits = 3;
 

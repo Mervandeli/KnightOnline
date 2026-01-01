@@ -12,29 +12,30 @@
 
 class CDlgLoadTileSet : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgLoadTileSet(CWnd* pParent = nullptr);   // standard constructor
+	CDlgLoadTileSet(CWnd* pParent = nullptr); // standard constructor
 
-	CString		m_SelFileName;
+	CString m_SelFileName;
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgLoadTileSet)
-	enum { IDD = IDD_LOAD_TILESET };
-	CListBox	m_ListTileSet;
+	enum
+	{
+		IDD = IDD_LOAD_TILESET
+	};
+	CListBox m_ListTileSet;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgLoadTileSet)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgLoadTileSet)
 	virtual BOOL OnInitDialog();

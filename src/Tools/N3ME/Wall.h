@@ -12,10 +12,10 @@
 #include <N3Base/N3Base.h>
 #include <list>
 
-class CWall : public CN3Base  
+class CWall : public CN3Base
 {
 public:
-	char	m_Name[80];
+	char m_Name[80];
 	std::list<__Vector3> m_Wall;
 
 public:
@@ -24,11 +24,11 @@ public:
 		return static_cast<int>(m_Wall.size());
 	}
 
-	void	Load(File& file);
-	void	Save(File& file);
-	bool	GetVertex(int idx, __Vector3* pPos);	// idx째 점 가져오기..
-	void	AddVertex(__Vector3 Vertex);	//path더하기.
-	void	DelPrevVertex();
+	void Load(File& file);
+	void Save(File& file);
+	bool GetVertex(int idx, __Vector3* pPos); // idx째 점 가져오기..
+	void AddVertex(__Vector3 Vertex);         //path더하기.
+	void DelPrevVertex();
 
 	CWall();
 	~CWall() override;

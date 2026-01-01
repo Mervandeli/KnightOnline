@@ -14,15 +14,13 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgSaveNewTileSet dialog
 
-
-CDlgSaveNewTileSet::CDlgSaveNewTileSet(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgSaveNewTileSet::IDD, pParent)
+CDlgSaveNewTileSet::CDlgSaveNewTileSet(CWnd* pParent /*=nullptr*/) :
+	CDialog(CDlgSaveNewTileSet::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgSaveNewTileSet)
 	m_NewTileSetName = _T("");
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgSaveNewTileSet::DoDataExchange(CDataExchange* pDX)
 {
@@ -33,19 +31,18 @@ void CDlgSaveNewTileSet::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgSaveNewTileSet, CDialog)
-	//{{AFX_MSG_MAP(CDlgSaveNewTileSet)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgSaveNewTileSet)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgSaveNewTileSet message handlers
 
-BOOL CDlgSaveNewTileSet::OnInitDialog() 
+BOOL CDlgSaveNewTileSet::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	
+
 	// TODO: Add extra initialization here
 	char szOldPath[_MAX_PATH];
 	GetCurrentDirectory(_MAX_PATH, szOldPath);
@@ -63,12 +60,12 @@ BOOL CDlgSaveNewTileSet::OnInitDialog()
 	int count = m_ListTileSet.GetCount();
 
 	CString str;
-	for(int i=0;i<count;i++)
+	for (int i = 0; i < count; i++)
 	{
 		m_ListTileSet.GetText(0, str);
 
 		char szFileName[MAX_PATH];
-		_splitpath((LPCTSTR)str, nullptr, nullptr, szFileName, nullptr);
+		_splitpath((LPCTSTR) str, nullptr, nullptr, szFileName, nullptr);
 
 		str.Format(szFileName);
 		m_ListTileSet.InsertString(count, str);
@@ -76,7 +73,7 @@ BOOL CDlgSaveNewTileSet::OnInitDialog()
 	}
 
 	SetCurrentDirectory(szOldPath);
-	
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+
+	return TRUE; // return TRUE unless you set the focus to a control
+				 // EXCEPTION: OCX Property Pages should return FALSE
 }

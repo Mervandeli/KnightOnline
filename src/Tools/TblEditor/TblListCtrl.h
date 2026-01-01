@@ -14,8 +14,7 @@ class CTblListCtrl : public CListCtrl
 		DECLARE_MESSAGE_MAP()
 
 	public:
-		CInPlaceEdit()
-			: m_iLeft(0)
+		CInPlaceEdit() : m_iLeft(0)
 		{
 		}
 
@@ -25,7 +24,8 @@ class CTblListCtrl : public CListCtrl
 			CEdit::OnWindowPosChanging(lpwndpos);
 		}
 
-		inline void SetLeft(int left) {
+		inline void SetLeft(int left)
+		{
 			m_iLeft = left;
 		}
 
@@ -60,10 +60,10 @@ protected:
 	afx_msg void OnContextMenuDeleteSelectedRow();
 
 protected:
-	CInPlaceEdit			m_Edit;
-	const CTblEditorBase*	m_pTblBase;
+	CInPlaceEdit m_Edit;
+	const CTblEditorBase* m_pTblBase;
 
-	int						m_iItem;
-	int						m_iSubItem;
+	int m_iItem;
+	int m_iSubItem;
 };
 

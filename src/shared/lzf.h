@@ -39,12 +39,12 @@
 
 #pragma once
 
-#define LZF_MARGIN 128
+#define LZF_MARGIN  128
 #define LZF_VERSION 0x0105 /* 1.5, API version */
 #define AVOID_ERRNO 1
 
 #ifndef HLOG
-# define HLOG 16
+#define HLOG 16
 #endif
 
 /*
@@ -53,7 +53,7 @@
 * (very roughly) 15% faster. This is the preferred mode of operation.
 */
 #ifndef VERY_FAST
-# define VERY_FAST 1
+#define VERY_FAST 1
 #endif
 
 /*
@@ -64,7 +64,7 @@
 * possibly disable this for text data.
 */
 #ifndef ULTRA_FAST
-# define ULTRA_FAST 0
+#define ULTRA_FAST 0
 #endif
 
 /*
@@ -72,11 +72,11 @@
 */
 #ifndef STRICT_ALIGN
 
-# if !(defined(__i386) || defined (__amd64))
-#  define STRICT_ALIGN 1
-# else
-#  define STRICT_ALIGN 0
-# endif
+#if !(defined(__i386) || defined(__amd64))
+#define STRICT_ALIGN 1
+#else
+#define STRICT_ALIGN 0
+#endif
 
 #endif
 
@@ -86,7 +86,7 @@
 * deterministic/repeatable when the configuration otherwise is the same).
 */
 #ifndef INIT_HTAB
-# define INIT_HTAB 0
+#define INIT_HTAB 0
 #endif
 
 /*
@@ -95,7 +95,7 @@
 * the documentation in lzf.h.
 */
 #ifndef AVOID_ERRNO
-# define AVOID_ERRNO 0
+#define AVOID_ERRNO 0
 #endif
 
 /*
@@ -104,7 +104,7 @@
 * NOTE: this breaks the prototype in lzf.h.
 */
 #ifndef LZF_STATE_ARG
-# define LZF_STATE_ARG 0
+#define LZF_STATE_ARG 0
 #endif
 
 /*
@@ -116,7 +116,7 @@
 * (<1% slowdown), but might slow down older cpus considerably.
 */
 #ifndef CHECK_INPUT
-# define CHECK_INPUT 1
+#define CHECK_INPUT 1
 #endif
 
 /*****************************************************************************/
@@ -124,33 +124,33 @@
 
 typedef unsigned char u8;
 
-typedef const u8 *LZF_STATE[1 << (HLOG)];
+typedef const u8* LZF_STATE[1 << (HLOG)];
 
 #if !STRICT_ALIGN
 /* for unaligned accesses we need a 16 bit datatype. */
-# include <limits.h>
-# if USHRT_MAX == 65535
+#include <limits.h>
+#if USHRT_MAX == 65535
 typedef unsigned short u16;
-# elif UINT_MAX == 65535
+#elif UINT_MAX == 65535
 typedef unsigned int u16;
-# else
-#  undef STRICT_ALIGN
-#  define STRICT_ALIGN 1
-# endif
+#else
+#undef STRICT_ALIGN
+#define STRICT_ALIGN 1
+#endif
 #endif
 
 #if ULTRA_FAST
-# if defined(VERY_FAST)
-#  undef VERY_FAST
-# endif
+#if defined(VERY_FAST)
+#undef VERY_FAST
+#endif
 #endif
 
 #if INIT_HTAB
-# ifdef __cplusplus
-#  include <cstring>
-# else
-#  include <string.h>
-# endif
+#ifdef __cplusplus
+#include <cstring>
+#else
+#include <string.h>
+#endif
 #endif
 
 #define HSIZE (1 << (HLOG))
@@ -162,15 +162,15 @@ typedef unsigned int u16;
 * it works ;)
 */
 #ifndef FRST
-# define FRST(p) (((p[0]) << 8) | p[1])
-# define NEXT(v,p) (((v) << 8) | p[2])
-# if ULTRA_FAST
-#  define IDX(h) ((( h             >> (3*8 - HLOG)) - h  ) & (HSIZE - 1))
-# elif VERY_FAST
-#  define IDX(h) ((( h             >> (3*8 - HLOG)) - h*5) & (HSIZE - 1))
-# else
-#  define IDX(h) ((((h ^ (h << 5)) >> (3*8 - HLOG)) - h*5) & (HSIZE - 1))
-# endif
+#define FRST(p)    (((p[0]) << 8) | p[1])
+#define NEXT(v, p) (((v) << 8) | p[2])
+#if ULTRA_FAST
+#define IDX(h) (((h >> (3 * 8 - HLOG)) - h) & (HSIZE - 1))
+#elif VERY_FAST
+#define IDX(h) (((h >> (3 * 8 - HLOG)) - h * 5) & (HSIZE - 1))
+#else
+#define IDX(h) ((((h ^ (h << 5)) >> (3 * 8 - HLOG)) - h * 5) & (HSIZE - 1))
+#endif
 #endif
 /*
 * IDX works because it is very similar to a multiplicative hash, e.g.
@@ -183,23 +183,23 @@ typedef unsigned int u16;
 
 #if 0
 /* original lzv-like hash function, much worse and thus slower */
-# define FRST(p) (p[0] << 5) ^ p[1]
-# define NEXT(v,p) ((v) << 5) ^ p[2]
-# define IDX(h) ((h) & (HSIZE - 1))
+#define FRST(p)    (p[0] << 5) ^ p[1]
+#define NEXT(v, p) ((v) << 5) ^ p[2]
+#define IDX(h)     ((h) & (HSIZE - 1))
 #endif
 
-#define        MAX_LIT        (1 <<  5)
-#define        MAX_OFF        (1 << 13)
-#define        MAX_REF        ((1 << 8) + (1 << 3))
+#define MAX_LIT (1 << 5)
+#define MAX_OFF (1 << 13)
+#define MAX_REF ((1 << 8) + (1 << 3))
 
 #if __GNUC__ >= 3
-# define expect(expr,value)         __builtin_expect ((expr),(value))
+#define expect(expr, value) __builtin_expect((expr), (value))
 #else
-# define expect(expr,value)         (expr)
+#define expect(expr, value) (expr)
 #endif
 
-#define expect_false(expr) expect ((expr) != 0, 0)
-#define expect_true(expr)  expect ((expr) != 0, 1)
+#define expect_false(expr) expect((expr) != 0, 0)
+#define expect_true(expr)  expect((expr) != 0, 1)
 
 /*
 * compressed format
@@ -210,14 +210,13 @@ typedef unsigned int u16;
 *
 */
 
-unsigned int
-	lzf_compress (const void *const in_data, unsigned int in_len,
-	void *out_data, unsigned int out_len
+unsigned int lzf_compress(
+	const void* const in_data, unsigned int in_len, void* out_data, unsigned int out_len
 #if LZF_STATE_ARG
-	, LZF_STATE htab
+	,
+	LZF_STATE htab
 #endif
-	);
-
+);
 
 /*
 * Decompress data compressed with some version of the lzf_compress
@@ -236,21 +235,18 @@ unsigned int
 */
 
 #if AVOID_ERRNO
-# define SET_ERRNO(n)
+#define SET_ERRNO(n)
 #else
-# include <errno.h>
-# define SET_ERRNO(n) errno = (n)
+#include <errno.h>
+#define SET_ERRNO(n) errno = (n)
 #endif
 
 #if (__i386 || __amd64) && __GNUC__ >= 3
-# define lzf_movsb(dst, src, len)                \
-	asm ("rep movsb"                              \
-	: "=D" (dst), "=S" (src), "=c" (len)     \
-	:  "0" (dst),  "1" (src),  "2" (len));
+#define lzf_movsb(dst, src, len)                                                       \
+	asm("rep movsb" : "=D"(dst), "=S"(src), "=c"(len) : "0"(dst), "1"(src), "2"(len));
 #endif
 
-unsigned int 
-	lzf_decompress (const void *const in_data,  unsigned int in_len,
-	void             *out_data, unsigned int out_len);
+unsigned int lzf_decompress(
+	const void* const in_data, unsigned int in_len, void* out_data, unsigned int out_len);
 
 #endif // SHARED_LZF_H

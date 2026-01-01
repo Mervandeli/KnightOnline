@@ -25,11 +25,11 @@ static char THIS_FILE[] = __FILE__;
 
 CUINPCChangeEvent::CUINPCChangeEvent()
 {
-	m_pBtn_Repoint0 = nullptr;
-	m_pBtn_Repoint1 = nullptr;
-	m_pBtn_Close = nullptr;
+	m_pBtn_Repoint0   = nullptr;
+	m_pBtn_Repoint1   = nullptr;
+	m_pBtn_Close      = nullptr;
 
-	m_pDlg = nullptr;
+	m_pDlg            = nullptr;
 
 	m_bSendedAllPoint = false;
 }
@@ -65,10 +65,10 @@ bool CUINPCChangeEvent::Load(File& file)
 	N3_VERIFY_UI_COMPONENT(m_pBtn_Close, GetChildByID<CN3UIButton>("Btn_close"));
 
 	// UIPointInitDlg.. ^^
-	e_Nation eNation = CGameBase::s_pPlayer->m_InfoBase.eNation; // 국가....
+	e_Nation eNation       = CGameBase::s_pPlayer->m_InfoBase.eNation; // 국가....
 	__TABLE_UI_RESRC* pTbl = CGameProcedure::s_pTbl_UI.Find(eNation);
 
-	m_pDlg = new CUIPointInitDlg();
+	m_pDlg                 = new CUIPointInitDlg();
 	m_pDlg->LoadFromFile(pTbl->szChangeInitBill);
 
 	// 위치 계산 ..

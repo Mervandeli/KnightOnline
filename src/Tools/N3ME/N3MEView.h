@@ -14,38 +14,42 @@ class CN3MEDoc;
 class CN3MEView : public CView
 {
 public:
-
 protected: // create from serialization only
 	CN3MEView();
 	DECLARE_DYNCREATE(CN3MEView)
 
-// Attributes
+	// Attributes
 public:
-	CPoint		m_CurrMousePos;
-	CN3MEDoc*	GetDocument();
-	void		SetMapMng(CMapMng* pMapMng) {m_pMapMng = pMapMng;}
+	CPoint m_CurrMousePos;
+	CN3MEDoc* GetDocument();
+	void SetMapMng(CMapMng* pMapMng)
+	{
+		m_pMapMng = pMapMng;
+	}
+
 protected:
-//	LYCAMERADATA	m_LyCamera;
-//	CMove			m_Move;
-	CMapMng*		m_pMapMng;
-	
-// Operations
+	//	LYCAMERADATA	m_LyCamera;
+	//	CMove			m_Move;
+	CMapMng* m_pMapMng;
+
+	// Operations
 public:
 protected:
 	void Render();
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CN3MEView)
-	public:
-	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
+public:
+	virtual void OnDraw(CDC* pDC); // overridden to draw this view
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual void OnInitialUpdate();
-	protected:
+
+protected:
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CN3MEView();
 #ifdef _DEBUG
@@ -54,8 +58,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CN3MEView)
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
@@ -65,9 +68,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-#ifndef _DEBUG  // debug version in N3MEView.cpp
+#ifndef _DEBUG // debug version in N3MEView.cpp
 inline CN3MEDoc* CN3MEView::GetDocument()
-   { return (CN3MEDoc*)m_pDocument; }
+{
+	return (CN3MEDoc*) m_pDocument;
+}
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

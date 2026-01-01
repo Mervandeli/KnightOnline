@@ -8,9 +8,9 @@
 
 struct _SEND_DATA
 {
-	int16_t	sCurZone;				// 현재의 존
-	int16_t	sLength;				// 패킷의 길이
-	char	pBuf[MAX_PACKET_SIZE];	// 패킷의 내용..
+	int16_t sCurZone;           // 현재의 존
+	int16_t sLength;            // 패킷의 길이
+	char pBuf[MAX_PACKET_SIZE]; // 패킷의 내용..
 };
 
 class CGameSocket;

@@ -14,16 +14,14 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgNewFileName dialog
 
-
-CDlgNewFileName::CDlgNewFileName(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgNewFileName::IDD, pParent)
+CDlgNewFileName::CDlgNewFileName(CWnd* pParent /*=nullptr*/) :
+	CDialog(CDlgNewFileName::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgNewFileName)
-	m_strExt = _T("");
+	m_strExt         = _T("");
 	m_strNewFileName = _T("");
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgNewFileName::DoDataExchange(CDataExchange* pDX)
 {
@@ -36,11 +34,10 @@ void CDlgNewFileName::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgNewFileName, CDialog)
-	//{{AFX_MSG_MAP(CDlgNewFileName)
-		// NOTE: the ClassWizard will add message map macros here
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgNewFileName)
+// NOTE: the ClassWizard will add message map macros here
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////

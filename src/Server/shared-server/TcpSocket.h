@@ -40,14 +40,16 @@ public:
 	}
 
 	TcpSocket(SocketManager* socketManager);
-	virtual ~TcpSocket() {}
+	virtual ~TcpSocket()
+	{
+	}
 
 	virtual int Send(char* pBuf, int length) = 0;
 
 protected:
 	int QueueAndSend(char* buffer, int length);
 	virtual bool PullOutCore(char*& data, int& length) = 0;
-	virtual void ReleaseToManager() = 0;
+	virtual void ReleaseToManager()                    = 0;
 
 private:
 	bool AsyncSend(bool fromAsyncChain);
@@ -59,22 +61,24 @@ public:
 	virtual void CloseProcess();
 	void InitSocket();
 	virtual void Parsing(int length, char* pData) = 0;
-	virtual void Initialize() {}
+	virtual void Initialize()
+	{
+	}
 	const std::string& GetRemoteIP();
 
 protected:
-	SocketManager*			_socketManager;
-	RawSocket_t				_socket;
+	SocketManager* _socketManager;
+	RawSocket_t _socket;
 
-	int						_recvBufferSize;
-	int						_sendBufferSize;
+	int _recvBufferSize;
+	int _sendBufferSize;
 
 	// Data is written here directly from the socket. It shouldn't be used directly.
-	std::vector<char>		_recvBuffer;
+	std::vector<char> _recvBuffer;
 
 	// Received data is output to the circular buffer from _recvBuffer.
 	// This should be parsed to handle packets.
-	CCircularBuffer			_recvCircularBuffer;
+	CCircularBuffer _recvCircularBuffer;
 
 	// Sends are queued for consistency.
 	// These are typically submitted as spans of the circular buffer, so we usually just send {portion 1},{len 1}.
@@ -86,8 +90,8 @@ protected:
 	// This buffer is considered owned (by the send queue), so the buffer will be freed once the send is complete.
 	struct QueuedSend
 	{
-		CircularBufferSpan	BufferSpan = {};
-		bool				IsOwned = false;
+		CircularBufferSpan BufferSpan = {};
+		bool IsOwned                  = false;
 
 		~QueuedSend()
 		{
@@ -96,20 +100,20 @@ protected:
 		}
 	};
 
-	std::queue<std::unique_ptr<QueuedSend>>	_sendQueue;
-	std::recursive_mutex	_sendMutex;
+	std::queue<std::unique_ptr<QueuedSend>> _sendQueue;
+	std::recursive_mutex _sendMutex;
 
-	CCircularBuffer			_sendCircularBuffer;
-	bool					_sendInProgress;
+	CCircularBuffer _sendCircularBuffer;
+	bool _sendInProgress;
 
-	bool					_remoteIpCached;
-	std::string				_remoteIp;
+	bool _remoteIpCached;
+	std::string _remoteIp;
 
-	e_ConnectionState		_state;
-	bool					_pendingDisconnect;
-	int16_t					_socketErrorCount;
+	e_ConnectionState _state;
+	bool _pendingDisconnect;
+	int16_t _socketErrorCount;
 
-	int						_socketId;
+	int _socketId;
 };
 
 #endif // SERVER_SHAREDSERVER_TCPSOCKET_H

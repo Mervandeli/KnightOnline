@@ -15,12 +15,12 @@ struct __CharacterSelectInfo;
 class CUICharacterSelect : public CN3UIBase
 {
 protected:
-	CN3UIBase*		m_pBtnLeft;
-	CN3UIBase*		m_pBtnRight;
-	CN3UIBase*		m_pBtnExit;
-	CN3UIBase*		m_pBtnDelete;
-	CN3UIBase*		m_pBtnBack;
-	CN3UIString*	m_pUserInfoStr;
+	CN3UIBase* m_pBtnLeft;
+	CN3UIBase* m_pBtnRight;
+	CN3UIBase* m_pBtnExit;
+	CN3UIBase* m_pBtnDelete;
+	CN3UIBase* m_pBtnBack;
+	CN3UIString* m_pUserInfoStr;
 
 public:
 	uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;

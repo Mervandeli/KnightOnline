@@ -14,45 +14,46 @@
 
 class CDlgEditWarp : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgEditWarp(CWnd* pParent = nullptr);   // standard constructor
+	CDlgEditWarp(CWnd* pParent = nullptr); // standard constructor
 
-// variables...
-	CWarpMgr*	m_pRefWarpMgr;
-	WARPINFO	m_tmpInfo;
+										   // variables...
+	CWarpMgr* m_pRefWarpMgr;
+	WARPINFO m_tmpInfo;
 
-// functions..
-	void	ResetAll();
-	void	SetEditor();
-	void	GetEditor();
+	// functions..
+	void ResetAll();
+	void SetEditor();
+	void GetEditor();
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgEditWarp)
-	enum { IDD = IDD_EDIT_WARP };
-	CListBox	m_ListWarp;
-	float	m_fRadius;
-	float	m_fPosX;
-	float	m_fPosY;
-	float	m_fPosZ;
-	CString	m_strName;
-	int		m_iMoney;
-	short	m_sID;
-	short	m_sZoneID;
-	CString	m_AgreeState;
+	enum
+	{
+		IDD = IDD_EDIT_WARP
+	};
+	CListBox m_ListWarp;
+	float m_fRadius;
+	float m_fPosX;
+	float m_fPosY;
+	float m_fPosZ;
+	CString m_strName;
+	int m_iMoney;
+	short m_sID;
+	short m_sZoneID;
+	CString m_AgreeState;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgEditWarp)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgEditWarp)
 	afx_msg void OnBtnDelete();

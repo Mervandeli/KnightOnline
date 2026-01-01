@@ -12,30 +12,30 @@
 
 class CProgressBar : public CProgressCtrl
 {
-// Construction
+	// Construction
 public:
 	CProgressBar();
 
-// Attributes
+	// Attributes
 public:
 protected:
 	CString m_strMessage;
 	int m_nSize;
 	CRect m_Rect;
 
-// Operations
+	// Operations
 public:
 	BOOL Create(LPCTSTR strMessage, int nSize, int MaxValue);
 	CStatusBar* GetStatusBar();
 	void Resize();
 	void Clear();
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CProgressBar)
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CProgressBar();
 

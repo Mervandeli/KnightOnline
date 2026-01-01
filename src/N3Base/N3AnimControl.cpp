@@ -6,7 +6,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ bool CN3AnimControl::Load(File& file)
 #ifdef _N3TOOL
 bool CN3AnimControl::Save(File& file)
 {
-	int nL = 0;
+	int nL    = 0;
 	int iSize = static_cast<int>(m_Datas.size());
 	file.Write(&iSize, 4);
 
@@ -76,16 +76,16 @@ __AnimData* CN3AnimControl::Add()
 #ifdef _N3TOOL
 __AnimData* CN3AnimControl::Insert(int nIndex)
 {
-	if (nIndex < 0
-		|| nIndex >= static_cast<int>(m_Datas.size()))
+	if (nIndex < 0 || nIndex >= static_cast<int>(m_Datas.size()))
 		return nullptr;
-	
+
 	it_Ani it = m_Datas.begin();
-	for(int i = 0; i < nIndex; i++, it++);
+	for (int i = 0; i < nIndex; i++, it++)
+		;
 
 	__AnimData Data;
 	Data.szName = "No Name";
-	it = m_Datas.insert(it, Data);
+	it          = m_Datas.insert(it, Data);
 
 	return &(*it);
 }
@@ -97,12 +97,10 @@ void CN3AnimControl::Swap(int nAni1, int nAni2)
 	if (nAni1 == nAni2)
 		return;
 
-	if (nAni1 < 0
-		|| nAni1 >= static_cast<int>(m_Datas.size()))
+	if (nAni1 < 0 || nAni1 >= static_cast<int>(m_Datas.size()))
 		return;
 
-	if (nAni2 < 0
-		|| nAni2 >= static_cast<int>(m_Datas.size()))
+	if (nAni2 < 0 || nAni2 >= static_cast<int>(m_Datas.size()))
 		return;
 
 	__AnimData Tmp = m_Datas[nAni2];
@@ -114,12 +112,12 @@ void CN3AnimControl::Swap(int nAni1, int nAni2)
 #ifdef _N3TOOL
 void CN3AnimControl::Delete(int nIndex)
 {
-	if (nIndex < 0
-		|| nIndex >= static_cast<int>(m_Datas.size()))
+	if (nIndex < 0 || nIndex >= static_cast<int>(m_Datas.size()))
 		return;
 
 	it_Ani it = m_Datas.begin();
-	for(int i = 0; i < nIndex; i++, it++);
+	for (int i = 0; i < nIndex; i++, it++)
+		;
 
 	m_Datas.erase(it);
 }

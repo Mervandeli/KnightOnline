@@ -18,8 +18,8 @@ public:
 protected:
 	void thread_loop() override;
 
-	std::chrono::milliseconds	_tickDelay;
-	TickCallback_t				_tickCallback;
+	std::chrono::milliseconds _tickDelay;
+	TickCallback_t _tickCallback;
 };
 
 #endif // SHARED_TIMERTHREAD_H

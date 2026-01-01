@@ -18,43 +18,43 @@ CNpc::~CNpc()
 
 void CNpc::Initialize()
 {
-	m_pMain = EbenezerApp::instance();
+	m_pMain      = EbenezerApp::instance();
 
-	m_sNid = -1;				// NPC (서버상의)일련번호
-	m_sSid = 0;
-	m_sZoneIndex = -1;			// Current Zone Index(배열)
-	m_sCurZone = -1;			// Current Zone number
-	m_fCurX = 0;				// Current X Pos;
-	m_fCurY = 0;				// Current Y Pos;
-	m_fCurZ = 0;				// Current Z Pos;
-	m_sPid = 0;					// MONSTER(NPC) Picture ID
-	m_sSize = 100;				// MONSTER(NPC) Size
-	memset(m_strName, 0, sizeof(m_strName));		// MONSTER(NPC) Name
-	m_iMaxHP = 0;				// 최대 HP
-	m_iHP = 0;					// 현재 HP
+	m_sNid       = -1;                       // NPC (서버상의)일련번호
+	m_sSid       = 0;
+	m_sZoneIndex = -1;                       // Current Zone Index(배열)
+	m_sCurZone   = -1;                       // Current Zone number
+	m_fCurX      = 0;                        // Current X Pos;
+	m_fCurY      = 0;                        // Current Y Pos;
+	m_fCurZ      = 0;                        // Current Z Pos;
+	m_sPid       = 0;                        // MONSTER(NPC) Picture ID
+	m_sSize      = 100;                      // MONSTER(NPC) Size
+	memset(m_strName, 0, sizeof(m_strName)); // MONSTER(NPC) Name
+	m_iMaxHP        = 0;                     // 최대 HP
+	m_iHP           = 0;                     // 현재 HP
 	//m_byState = 0;			// 몬스터 (NPC) 상태이상
-	m_tNpcType = 0;				// NPC Type
-								// 0 : Normal Monster
-								// 1 : NPC
-								// 2 : 각 입구,출구 NPC
-								// 3 : 경비병
-	m_byGroup = 0;
-	m_byLevel = 0;
+	m_tNpcType      = 0; // NPC Type
+						 // 0 : Normal Monster
+						 // 1 : NPC
+						 // 2 : 각 입구,출구 NPC
+						 // 3 : 경비병
+	m_byGroup       = 0;
+	m_byLevel       = 0;
 	m_iSellingGroup = 0;
-//	m_dwStepDelay = 0;		
+	//	m_dwStepDelay = 0;
 
-	m_sRegion_X = 0;			// region x position
-	m_sRegion_Z = 0;			// region z position
-	m_iWeapon_1 = 0;
-	m_iWeapon_2 = 0;
-	m_NpcState = NPC_LIVE;
-	m_byGateOpen = 1;
-	m_sHitRate = 0;
-	m_byObjectType = NORMAL_OBJECT;
-	m_byDirection = 0;			// npc의 방향,,
+	m_sRegion_X     = 0; // region x position
+	m_sRegion_Z     = 0; // region z position
+	m_iWeapon_1     = 0;
+	m_iWeapon_2     = 0;
+	m_NpcState      = NPC_LIVE;
+	m_byGateOpen    = 1;
+	m_sHitRate      = 0;
+	m_byObjectType  = NORMAL_OBJECT;
+	m_byDirection   = 0;  // npc의 방향,,
 
-	m_byEvent = -1;				//  This is for the event.
-	m_byTrapNumber = 0;
+	m_byEvent       = -1; //  This is for the event.
+	m_byTrapNumber  = 0;
 }
 
 void CNpc::MoveResult(float xpos, float ypos, float zpos, float speed)
@@ -65,7 +65,7 @@ void CNpc::MoveResult(float xpos, float ypos, float zpos, float speed)
 
 	RegisterRegion();
 
-	int send_index = 0;
+	int send_index     = 0;
 	char pOutBuf[1024] = {};
 
 	SetByte(pOutBuf, WIZ_NPC_MOVE, send_index);
@@ -81,13 +81,14 @@ void CNpc::MoveResult(float xpos, float ypos, float zpos, float speed)
 
 void CNpc::NpcInOut(uint8_t Type, float fx, float fz, float fy)
 {
-	int send_index = 0;
+	int send_index  = 0;
 	char buff[1024] = {};
 
-	C3DMap* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
+	C3DMap* pMap    = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 	{
-		spdlog::error("Npc::NpcInOut: no map found for zoneIndex={} [serial={} npcId={} npcName={} x={} z={}]",
+		spdlog::error("Npc::NpcInOut: no map found for zoneIndex={} [serial={} npcId={} npcName={} "
+					  "x={} z={}]",
 			m_sZoneIndex, m_sNid, m_sSid, m_strName, m_sRegion_X, m_sRegion_Z);
 		return;
 	}
@@ -125,21 +126,23 @@ void CNpc::RegisterRegion()
 	iRegX = (int) (m_fCurX / VIEW_DISTANCE);
 	iRegZ = (int) (m_fCurZ / VIEW_DISTANCE);
 
-	if (m_sRegion_X != iRegX
-		|| m_sRegion_Z != iRegZ)
+	if (m_sRegion_X != iRegX || m_sRegion_Z != iRegZ)
 	{
 		C3DMap* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
 		if (pMap == nullptr)
 			return;
 
-		old_region_x = m_sRegion_X;	old_region_z = m_sRegion_Z;
+		old_region_x = m_sRegion_X;
+		old_region_z = m_sRegion_Z;
 		pMap->RegionNpcRemove(m_sRegion_X, m_sRegion_Z, m_sNid);
 		m_sRegion_X = iRegX;
 		m_sRegion_Z = iRegZ;
 		pMap->RegionNpcAdd(m_sRegion_X, m_sRegion_Z, m_sNid);
 
-		RemoveRegion(old_region_x - m_sRegion_X, old_region_z - m_sRegion_Z);	// delete npc 는 계산 방향이 진행방향의 반대...
-		InsertRegion(m_sRegion_X - old_region_x, m_sRegion_Z - old_region_z);	// add npc 는 계산 방향이 진행방향...
+		RemoveRegion(old_region_x - m_sRegion_X,
+			old_region_z - m_sRegion_Z); // delete npc 는 계산 방향이 진행방향의 반대...
+		InsertRegion(m_sRegion_X - old_region_x,
+			m_sRegion_Z - old_region_z); // add npc 는 계산 방향이 진행방향...
 	}
 }
 
@@ -148,7 +151,7 @@ void CNpc::RemoveRegion(int del_x, int del_z)
 	int send_index = 0;
 	char buff[128] = {};
 
-	C3DMap* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
+	C3DMap* pMap   = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 		return;
 
@@ -159,9 +162,12 @@ void CNpc::RemoveRegion(int del_x, int del_z)
 	// x 축으로 이동되었을때...
 	if (del_x != 0)
 	{
-		m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x * 2, m_sRegion_Z + del_z - 1);
-		m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x * 2, m_sRegion_Z + del_z);
-		m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x * 2, m_sRegion_Z + del_z + 1);
+		m_pMain->Send_UnitRegion(
+			pMap, buff, send_index, m_sRegion_X + del_x * 2, m_sRegion_Z + del_z - 1);
+		m_pMain->Send_UnitRegion(
+			pMap, buff, send_index, m_sRegion_X + del_x * 2, m_sRegion_Z + del_z);
+		m_pMain->Send_UnitRegion(
+			pMap, buff, send_index, m_sRegion_X + del_x * 2, m_sRegion_Z + del_z + 1);
 
 		// TRACE(_T("Remove : (%d %d), (%d %d), (%d %d)\n"), m_sRegion_X+del_x*2, m_sRegion_Z+del_z-1, m_sRegion_X+del_x*2, m_sRegion_Z+del_z, m_sRegion_X+del_x*2, m_sRegion_Z+del_z+1 );
 	}
@@ -169,21 +175,26 @@ void CNpc::RemoveRegion(int del_x, int del_z)
 	// z 축으로 이동되었을때...
 	if (del_z != 0)
 	{
-		m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x, m_sRegion_Z + del_z * 2);
+		m_pMain->Send_UnitRegion(
+			pMap, buff, send_index, m_sRegion_X + del_x, m_sRegion_Z + del_z * 2);
 
 		// x, z 축 둘다 이동되었을때 겹치는 부분 한번만 보낸다..
 		if (del_x < 0)
 		{
-			m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x + 1, m_sRegion_Z + del_z * 2);
+			m_pMain->Send_UnitRegion(
+				pMap, buff, send_index, m_sRegion_X + del_x + 1, m_sRegion_Z + del_z * 2);
 		}
 		else if (del_x > 0)
 		{
-			m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x - 1, m_sRegion_Z + del_z * 2);
+			m_pMain->Send_UnitRegion(
+				pMap, buff, send_index, m_sRegion_X + del_x - 1, m_sRegion_Z + del_z * 2);
 		}
 		else
 		{
-			m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x - 1, m_sRegion_Z + del_z * 2);
-			m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x + 1, m_sRegion_Z + del_z * 2);
+			m_pMain->Send_UnitRegion(
+				pMap, buff, send_index, m_sRegion_X + del_x - 1, m_sRegion_Z + del_z * 2);
+			m_pMain->Send_UnitRegion(
+				pMap, buff, send_index, m_sRegion_X + del_x + 1, m_sRegion_Z + del_z * 2);
 
 			// TRACE(_T("Remove : (%d %d), (%d %d), (%d %d)\n"), m_sRegion_X+del_x-1, m_sRegion_Z+del_z*2, m_sRegion_X+del_x, m_sRegion_Z+del_z*2, m_sRegion_X+del_x+1, m_sRegion_Z+del_z*2 );
 		}
@@ -195,7 +206,7 @@ void CNpc::InsertRegion(int del_x, int del_z)
 	int send_index = 0;
 	char buff[128] = {};
 
-	C3DMap* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
+	C3DMap* pMap   = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 		return;
 
@@ -246,13 +257,11 @@ int CNpc::GetRegionNpcList(int region_x, int region_z, char* buff, int& t_count)
 
 	int buff_index = 0;
 
-	C3DMap* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
+	C3DMap* pMap   = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 		return 0;
 
-	if (region_x < 0
-		|| region_z < 0
-		|| region_x > pMap->GetXRegionMax()
+	if (region_x < 0 || region_z < 0 || region_x > pMap->GetXRegionMax()
 		|| region_z > pMap->GetZRegionMax())
 		return 0;
 

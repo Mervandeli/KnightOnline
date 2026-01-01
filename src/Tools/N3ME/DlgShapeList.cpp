@@ -28,16 +28,13 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgShapeList dialog
 
-
-CDlgShapeList::CDlgShapeList(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgShapeList::IDD, pParent)
+CDlgShapeList::CDlgShapeList(CWnd* pParent /*=nullptr*/) : CDialog(CDlgShapeList::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgShapeList)
-		// NOTE: the ClassWizard will add member initialization here
+	// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 	m_IsSourceObj = TRUE;
 }
-
 
 void CDlgShapeList::DoDataExchange(CDataExchange* pDX)
 {
@@ -47,30 +44,28 @@ void CDlgShapeList::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgShapeList, CDialog)
-	//{{AFX_MSG_MAP(CDlgShapeList)
-	ON_LBN_SELCHANGE(IDC_LIST_OBJ, OnSelchangeListObj)
-	ON_WM_SIZE()
-	ON_BN_CLICKED(IDC_BTN_SORT, OnBtnSort)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgShapeList)
+ON_LBN_SELCHANGE(IDC_LIST_OBJ, OnSelchangeListObj)
+ON_WM_SIZE()
+ON_BN_CLICKED(IDC_BTN_SORT, OnBtnSort)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgShapeList message handlers
 
-
 void CDlgShapeList::UpdateTree(CN3Scene* pScene)
 {
 	m_ListShape.ResetContent();
-	
+
 	m_pSceneRef = pScene;
 
-	int nSC = m_pSceneRef->ShapeCount();
-	for(int i = 0; i < nSC; i++)
+	int nSC     = m_pSceneRef->ShapeCount();
+	for (int i = 0; i < nSC; i++)
 	{
 		CN3Shape* pShape = m_pSceneRef->ShapeGet(i);
-		if(pShape)
+		if (pShape)
 		{
 			char szFName[MAX_PATH];
 			_splitpath(pShape->FileName().c_str(), nullptr, nullptr, szFName, nullptr);
@@ -83,9 +78,9 @@ void CDlgShapeList::UpdateTree(CN3Scene* pScene)
 void CDlgShapeList::SelectObject(void* pItemData)
 {
 	int nSC = m_ListShape.GetCount();
-	for(int i = 0; i < nSC; i++)
+	for (int i = 0; i < nSC; i++)
 	{
-		if(m_ListShape.GetItemDataPtr(i)==pItemData)
+		if (m_ListShape.GetItemDataPtr(i) == pItemData)
 		{
 			m_ListShape.SetCurSel(i);
 			return;
@@ -93,96 +88,104 @@ void CDlgShapeList::SelectObject(void* pItemData)
 	}
 }
 
-BOOL CDlgShapeList::OnInitDialog() 
+BOOL CDlgShapeList::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
 	m_ListShape.ResetContent();
-	
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+
+	return TRUE; // return TRUE unless you set the focus to a control
+				 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void CDlgShapeList::OnSelchangeListObj() 
+void CDlgShapeList::OnSelchangeListObj()
 {
 	int SelCount = m_ListShape.GetSelCount();
-	int* SelIdx = new int[SelCount];
+	int* SelIdx  = new int[SelCount];
 	m_ListShape.GetSelItems(SelCount, SelIdx);
-	for(int i=0;i<SelCount;i++)
+	for (int i = 0; i < SelCount; i++)
 	{
-		CN3Shape* pShape = (CN3Shape*)m_ListShape.GetItemDataPtr(SelIdx[i]);
-		if(pShape)
+		CN3Shape* pShape = (CN3Shape*) m_ListShape.GetItemDataPtr(SelIdx[i]);
+		if (pShape)
 		{
-			if(i==0) m_pMapMng->SelectObject((CN3Base*)pShape, m_IsSourceObj);
-			else m_pMapMng->SelectObject((CN3Base*)pShape, m_IsSourceObj, !m_IsSourceObj);
+			if (i == 0)
+				m_pMapMng->SelectObject((CN3Base*) pShape, m_IsSourceObj);
+			else
+				m_pMapMng->SelectObject((CN3Base*) pShape, m_IsSourceObj, !m_IsSourceObj);
 		}
 	}
 	delete[] SelIdx;
 
 	int idx = m_ListShape.GetCurSel();
-	if(idx<0) return;
-	
+	if (idx < 0)
+		return;
+
 	CWnd* pWnd = GetDlgItem(IDC_PREVIEW);
 	if (pWnd && m_ListShape.GetSafeHwnd())
 	{
-		CN3Shape* pShape = (CN3Shape*)m_ListShape.GetItemDataPtr(idx);
-		if(pShape)
+		CN3Shape* pShape = (CN3Shape*) m_ListShape.GetItemDataPtr(idx);
+		if (pShape)
 		{
 			//m_pMapMng->SelectObject((CN3Base*)pShape, m_IsSourceObj, !m_IsSourceObj);
-			m_pMapMng->RenderObjectToWindow((CN3TransformCollision*)pShape, pWnd->m_hWnd);
+			m_pMapMng->RenderObjectToWindow((CN3TransformCollision*) pShape, pWnd->m_hWnd);
 		}
 		else
 		{
 			CRect rc;
 			pWnd->GetClientRect(&rc);
 			CDC* pDC = pWnd->GetDC();
-			pDC->FillSolidRect(&rc, RGB(192,192,192));
+			pDC->FillSolidRect(&rc, RGB(192, 192, 192));
 			pWnd->ReleaseDC(pDC);
 		}
 	}
 	pWnd->Invalidate();
 
-	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+	CMainFrame* pFrame = (CMainFrame*) AfxGetMainWnd();
 	pFrame->m_pDlgSowSeed->Invalidate(false);
-
 }
 
-void CDlgShapeList::OnSize(UINT nType, int cx, int cy) 
+void CDlgShapeList::OnSize(UINT nType, int cx, int cy)
 {
 	CDialog::OnSize(nType, cx, cy);
 
-	const int iPreviewCX = 200;	const int iPreviewCY = 150;
-	const int iButtonCY = 20;
-	if(m_ListShape.GetSafeHwnd() != nullptr)
+	const int iPreviewCX = 200;
+	const int iPreviewCY = 150;
+	const int iButtonCY  = 20;
+	if (m_ListShape.GetSafeHwnd() != nullptr)
 	{
-		int iPreviewTop = cy-iPreviewCY;
-		int iPreviewLeft = (cx-iPreviewCX)/2; if (iPreviewLeft<0) iPreviewLeft = 0;
-		m_ListShape.SetWindowPos(nullptr, 0, iButtonCY, cx, iPreviewTop-iButtonCY, SWP_NOZORDER);
-		GetDlgItem(IDC_PREVIEW)->SetWindowPos(nullptr, iPreviewLeft, iPreviewTop, iPreviewCX, iPreviewCY, SWP_NOZORDER);
+		int iPreviewTop  = cy - iPreviewCY;
+		int iPreviewLeft = (cx - iPreviewCX) / 2;
+		if (iPreviewLeft < 0)
+			iPreviewLeft = 0;
+		m_ListShape.SetWindowPos(nullptr, 0, iButtonCY, cx, iPreviewTop - iButtonCY, SWP_NOZORDER);
+		GetDlgItem(IDC_PREVIEW)
+			->SetWindowPos(
+				nullptr, iPreviewLeft, iPreviewTop, iPreviewCX, iPreviewCY, SWP_NOZORDER);
 	}
 }
 
-BOOL CDlgShapeList::PreTranslateMessage(MSG* pMsg) 
+BOOL CDlgShapeList::PreTranslateMessage(MSG* pMsg)
 {
 	HACCEL hAccel = LoadAccelerators(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
-	if (hAccel) TranslateAccelerator(AfxGetMainWnd()->m_hWnd, hAccel, pMsg);
+	if (hAccel)
+		TranslateAccelerator(AfxGetMainWnd()->m_hWnd, hAccel, pMsg);
 	return CDialog::PreTranslateMessage(pMsg);
 }
 
-void CDlgShapeList::OnBtnSort() 
+void CDlgShapeList::OnBtnSort()
 {
 	ShapeMap Map;
 	Map.clear();
 
 	int cnt = m_ListShape.GetCount();
 	int i;
-	for(i=0;i<cnt;i++)
+	for (i = 0; i < cnt; i++)
 	{
 		char buff[MAX_PATH];
 		std::string str;
-		CN3Shape* pShape;		
-		
-		pShape = (CN3Shape*)m_ListShape.GetItemDataPtr(i);
+		CN3Shape* pShape;
+
+		pShape = (CN3Shape*) m_ListShape.GetItemDataPtr(i);
 		m_ListShape.GetText(i, buff);
 		str = buff;
 
@@ -192,9 +195,9 @@ void CDlgShapeList::OnBtnSort()
 	m_ListShape.ResetContent();
 
 	SMIter it = Map.begin();
-	for(i=0;i<cnt;i++)
+	for (i = 0; i < cnt; i++)
 	{
-		std::string str = (*it).first;
+		std::string str  = (*it).first;
 		CN3Shape* pShape = (*it).second;
 
 		m_ListShape.InsertString(i, str.c_str());

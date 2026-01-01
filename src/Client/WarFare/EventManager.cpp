@@ -12,10 +12,10 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
-#define EVENT_TYPE_POISON	3
+#define EVENT_TYPE_POISON 3
 
 CEventCell::CEventCell()
 {
@@ -43,7 +43,6 @@ CEventManager::~CEventManager()
 	Release();
 }
 
-
 bool CEventManager::LoadFromFile(const char* szFileName)
 {
 	Release();
@@ -55,7 +54,7 @@ bool CEventManager::LoadFromFile(const char* szFileName)
 	int nEventCellCount = 0;
 	gevFile.Read(&nEventCellCount, sizeof(int));
 
-	for(int i = 0; i < nEventCellCount; i++)
+	for (int i = 0; i < nEventCellCount; i++)
 	{
 		CEventCell* pEventCell = new CEventCell();
 		pEventCell->Load(gevFile);
@@ -94,7 +93,7 @@ int16_t CEventManager::SetPos(float fX, float fZ)
 		if (m_sEventType != pEventCell->m_sEventType)
 			Behavior(pEventCell->m_sEventType, m_sEventType);
 
-		m_rcEvent = pEventCell->m_Rect;
+		m_rcEvent    = pEventCell->m_Rect;
 		m_sEventType = pEventCell->m_sEventType;
 		return pEventCell->m_sEventType;
 	}
@@ -111,10 +110,14 @@ int16_t CEventManager::SetPos(float fX, float fZ)
 
 bool CEventManager::PtInRect(int x, int z, RECT rc)
 {
-	if (x < rc.left)	return false;
-	if (x > rc.right)	return false;
-	if (z < rc.top)		return false;
-	if (z > rc.bottom)	return false;
+	if (x < rc.left)
+		return false;
+	if (x > rc.right)
+		return false;
+	if (z < rc.top)
+		return false;
+	if (z > rc.bottom)
+		return false;
 
 	return true;
 }

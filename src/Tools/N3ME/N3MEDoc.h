@@ -15,23 +15,21 @@ protected: // create from serialization only
 	CN3MEDoc();
 	DECLARE_DYNCREATE(CN3MEDoc)
 
-// Attributes
+	// Attributes
 public:
-
-// Operations
+	// Operations
 public:
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CN3MEDoc)
-	public:
+public:
 	virtual BOOL OnNewDocument();
 	virtual void Serialize(CArchive& ar);
 	virtual BOOL OnOpenDocument(LPCTSTR lpszPathName);
 	virtual BOOL OnSaveDocument(LPCTSTR lpszPathName);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CN3MEDoc();
 #ifdef _DEBUG
@@ -40,8 +38,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CN3MEDoc)
 	afx_msg void OnFileImportPostDataFromScene();

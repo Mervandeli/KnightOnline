@@ -2,8 +2,7 @@
 #include "RecvUDPThread.h"
 #include "UdpSocket.h"
 
-RecvUDPThread::RecvUDPThread(CUdpSocket* udpSocket)
-	: _udpSocket(udpSocket)
+RecvUDPThread::RecvUDPThread(CUdpSocket* udpSocket) : _udpSocket(udpSocket)
 {
 }
 

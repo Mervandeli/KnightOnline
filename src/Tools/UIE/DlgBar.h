@@ -12,27 +12,28 @@
 
 class CDlgBar : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgBar(CWnd* pParent = nullptr);   // standard constructor
+	CDlgBar(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+									  // Dialog Data
 	//{{AFX_DATA(CDlgBar)
-	enum { IDD = IDR_MAINFRAME };
-		// NOTE: the ClassWizard will add data members here
+	enum
+	{
+		IDD = IDR_MAINFRAME
+	};
+	// NOTE: the ClassWizard will add data members here
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgBar)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgBar)
 	afx_msg void OnButtonBasepath();

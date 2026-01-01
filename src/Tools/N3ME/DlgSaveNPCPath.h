@@ -12,28 +12,29 @@
 
 class CDlgSaveNPCPath : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgSaveNPCPath(CWnd* pParent = nullptr);   // standard constructor
+	CDlgSaveNPCPath(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+											  // Dialog Data
 	//{{AFX_DATA(CDlgSaveNPCPath)
-	enum { IDD = IDD_SAVE_NPCPATH };
-	CListBox	m_SavedFileList;
-	CString	m_NewFileName;
+	enum
+	{
+		IDD = IDD_SAVE_NPCPATH
+	};
+	CListBox m_SavedFileList;
+	CString m_NewFileName;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgSaveNPCPath)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgSaveNPCPath)
 	afx_msg void OnSelchangeListNpcpathfilename();

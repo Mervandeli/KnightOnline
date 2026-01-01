@@ -10,31 +10,30 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-static constexpr int MAX_COLUMN_WIDTH		= 300; // Allow maximum width of 300px
+static constexpr int MAX_COLUMN_WIDTH    = 300; // Allow maximum width of 300px
 
-static constexpr int CODEPAGE_KOREAN		= 949;
-static constexpr int CODEPAGE_ENGLISH_US	= 1252;
-static constexpr int CODEPAGE_TURKISH		= 1254;
+static constexpr int CODEPAGE_KOREAN     = 949;
+static constexpr int CODEPAGE_ENGLISH_US = 1252;
+static constexpr int CODEPAGE_TURKISH    = 1254;
 
 IMPLEMENT_DYNCREATE(CTblEditorView, CFormView)
 
 BEGIN_MESSAGE_MAP(CTblEditorView, CFormView)
-	ON_WM_CREATE()
-	ON_WM_DROPFILES()
-	ON_MESSAGE(WM_USER_LIST_MODIFIED, OnListModified)
-	ON_COMMAND(ID_ENCODING_KOREAN, OnSetEncoding_Korean)
-	ON_COMMAND(ID_ENCODING_ENGLISH_US, OnSetEncoding_EnglishUS)
-	ON_COMMAND(ID_ENCODING_TURKISH, OnSetEncoding_Turkish)
-	ON_COMMAND(ID_EXIT, OnMenuExit)
+ON_WM_CREATE()
+ON_WM_DROPFILES()
+ON_MESSAGE(WM_USER_LIST_MODIFIED, OnListModified)
+ON_COMMAND(ID_ENCODING_KOREAN, OnSetEncoding_Korean)
+ON_COMMAND(ID_ENCODING_ENGLISH_US, OnSetEncoding_EnglishUS)
+ON_COMMAND(ID_ENCODING_TURKISH, OnSetEncoding_Turkish)
+ON_COMMAND(ID_EXIT, OnMenuExit)
 END_MESSAGE_MAP()
 
-CTblEditorView::CTblEditorView()
-	: CFormView(IDD_TBLEDITOR_DIALOG)
+CTblEditorView::CTblEditorView() : CFormView(IDD_TBLEDITOR_DIALOG)
 {
-	m_iEditItem			= 0;
-	m_iEditSubItem		= 0;
+	m_iEditItem       = 0;
+	m_iEditSubItem    = 0;
 
-	m_iStringCodePage	= CODEPAGE_KOREAN;
+	m_iStringCodePage = CODEPAGE_KOREAN;
 }
 
 void CTblEditorView::RefreshTable()
@@ -45,10 +44,9 @@ void CTblEditorView::RefreshTable()
 	CTblEditorDoc* pDoc = static_cast<CTblEditorDoc*>(m_pDocument);
 	ASSERT_VALID(pDoc);
 
-	const CTblEditorBase& tbl = pDoc->GetTbl();
+	const CTblEditorBase& tbl                        = pDoc->GetTbl();
 
-	const std::map<int, std::vector<CStringA>>& rows
-		= tbl.GetRows();
+	const std::map<int, std::vector<CStringA>>& rows = tbl.GetRows();
 
 	m_ListCtrl.DeleteAllItems();
 
@@ -65,12 +63,12 @@ void CTblEditorView::RefreshTable()
 	// Add column headers and measure initial width
 	for (size_t i = 0; i < columnCount; i++)
 	{
-		const int iColNo = static_cast<int>(i);
+		const int iColNo   = static_cast<int>(i);
 
 		CString headerText = tbl.GetFullColumnName(iColNo);
 
-		CSize size = dc.GetTextExtent(headerText);
-		columnWidths[i] = size.cx + 20;  // +20 padding
+		CSize size         = dc.GetTextExtent(headerText);
+		columnWidths[i]    = size.cx + 20;                             // +20 padding
 
 		m_ListCtrl.InsertColumn(iColNo, headerText, LVCFMT_LEFT, 100); // use a width of 100 for now
 	}
@@ -78,9 +76,9 @@ void CTblEditorView::RefreshTable()
 	// Add rows and measure contents
 	for (const auto& it : rows)
 	{
-		constexpr int Padding = 10;
+		constexpr int Padding               = 10;
 
-		int rowIndex = it.first;
+		int rowIndex                        = it.first;
 		const std::vector<CStringA>& fields = it.second;
 
 		CStringA firstFieldA;
@@ -89,21 +87,22 @@ void CTblEditorView::RefreshTable()
 
 		CString firstField = DecodeField(firstFieldA, 0);
 
-		int nItem = m_ListCtrl.InsertItem(rowIndex, firstField);
+		int nItem          = m_ListCtrl.InsertItem(rowIndex, firstField);
 
-		CSize size = dc.GetTextExtent(firstField);
+		CSize size         = dc.GetTextExtent(firstField);
 		if (size.cx + Padding > columnWidths[0])
 			columnWidths[0] = std::min<int>(size.cx + Padding, static_cast<int>(MAX_COLUMN_WIDTH));
 
 		for (size_t i = 1; i < fields.size() && i < columnCount; i++)
 		{
-			int iColNo = static_cast<int>(i);
+			int iColNo   = static_cast<int>(i);
 			CString text = DecodeField(fields[i], iColNo);
 			m_ListCtrl.SetItemText(nItem, iColNo, text);
 
 			CSize size = dc.GetTextExtent(text);
 			if (size.cx + Padding > columnWidths[i])
-				columnWidths[i] = std::min<int>(size.cx + Padding, static_cast<int>(MAX_COLUMN_WIDTH));
+				columnWidths[i] = std::min<int>(
+					size.cx + Padding, static_cast<int>(MAX_COLUMN_WIDTH));
 		}
 	}
 
@@ -115,10 +114,7 @@ void CTblEditorView::RefreshTable()
 		m_ListCtrl.SetColumnWidth(static_cast<int>(i), columnWidths[i]);
 }
 
-CString CTblEditorView::DecodeField(
-	const CStringA& fieldA,
-	int iColNo)
-	const
+CString CTblEditorView::DecodeField(const CStringA& fieldA, int iColNo) const
 {
 	CTblEditorDoc* pDoc = static_cast<CTblEditorDoc*>(m_pDocument);
 	ASSERT_VALID(pDoc);
@@ -141,8 +137,7 @@ CString CTblEditorView::DecodeField(
 	return field;
 }
 
-void CTblEditorView::BuildTableForSave(
-	std::map<int, std::vector<CStringA>>& newRows)
+void CTblEditorView::BuildTableForSave(std::map<int, std::vector<CStringA>>& newRows)
 {
 	CTblEditorDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -182,8 +177,7 @@ void CTblEditorView::BuildTableForSave(
 	}
 }
 
-bool CTblEditorView::SaveTable(
-	const CString& savePath)
+bool CTblEditorView::SaveTable(const CString& savePath)
 {
 	CTblEditorDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -226,8 +220,7 @@ bool CTblEditorView::SaveTable(
 	return true;
 }
 
-void CTblEditorView::SetCodePage(
-	int codepage)
+void CTblEditorView::SetCodePage(int codepage)
 {
 	CWnd* pWnd = AfxGetApp()->GetMainWnd();
 	ASSERT_VALID(pWnd);
@@ -238,9 +231,12 @@ void CTblEditorView::SetCodePage(
 	CMenu* pMenu = pWnd->GetMenu();
 	if (pMenu != nullptr)
 	{
-		pMenu->CheckMenuItem(ID_ENCODING_KOREAN,		codepage == CODEPAGE_KOREAN		? MF_CHECKED : MF_UNCHECKED);
-		pMenu->CheckMenuItem(ID_ENCODING_ENGLISH_US,	codepage == CODEPAGE_ENGLISH_US	? MF_CHECKED : MF_UNCHECKED);
-		pMenu->CheckMenuItem(ID_ENCODING_TURKISH,		codepage == CODEPAGE_TURKISH	? MF_CHECKED : MF_UNCHECKED);
+		pMenu->CheckMenuItem(
+			ID_ENCODING_KOREAN, codepage == CODEPAGE_KOREAN ? MF_CHECKED : MF_UNCHECKED);
+		pMenu->CheckMenuItem(
+			ID_ENCODING_ENGLISH_US, codepage == CODEPAGE_ENGLISH_US ? MF_CHECKED : MF_UNCHECKED);
+		pMenu->CheckMenuItem(
+			ID_ENCODING_TURKISH, codepage == CODEPAGE_TURKISH ? MF_CHECKED : MF_UNCHECKED);
 	}
 
 	// TODO: List should be backed by this row data to avoid all of this unnecessary work.
@@ -250,7 +246,7 @@ void CTblEditorView::SetCodePage(
 
 	m_iStringCodePage = codepage;
 
-	int iTopIndex = m_ListCtrl.GetTopIndex();
+	int iTopIndex     = m_ListCtrl.GetTopIndex();
 
 	RefreshTable();
 
@@ -282,18 +278,12 @@ void CTblEditorView::OnInitialUpdate()
 	CTblEditorBase& tbl = pDoc->GetTbl();
 	m_ListCtrl.AttachTbl(&tbl);
 
-	m_ListCtrl.SetExtendedStyle(
-		m_ListCtrl.GetExtendedStyle()
-		| LVS_EX_FULLROWSELECT
-		| LVS_EX_GRIDLINES
-		| LVS_EX_SUBITEMIMAGES
-		| LVS_EX_ONECLICKACTIVATE);
+	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle() | LVS_EX_FULLROWSELECT
+								| LVS_EX_GRIDLINES | LVS_EX_SUBITEMIMAGES
+								| LVS_EX_ONECLICKACTIVATE);
 }
 
-void CTblEditorView::OnUpdate(
-	CView* pSender,
-	LPARAM lHint,
-	CObject* pHint)
+void CTblEditorView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 {
 	if (lHint == CTblEditorDoc::HINT_DOCUMENT_LOADED)
 		RefreshTable();
@@ -301,8 +291,7 @@ void CTblEditorView::OnUpdate(
 	CFormView::OnUpdate(pSender, lHint, pHint);
 }
 
-int CTblEditorView::OnCreate(
-	LPCREATESTRUCT lpCreateStruct)
+int CTblEditorView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CFormView::OnCreate(lpCreateStruct) == -1)
 		return -1;
@@ -311,14 +300,13 @@ int CTblEditorView::OnCreate(
 	return 0;
 }
 
-void CTblEditorView::OnDropFiles(
-	HDROP hDropInfo)
+void CTblEditorView::OnDropFiles(HDROP hDropInfo)
 {
 	CTblEditorDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
 	TCHAR szFile[MAX_PATH + 1] = {};
-	UINT uiFiles = DragQueryFile(hDropInfo, 0xFFFF, nullptr, 0);
+	UINT uiFiles               = DragQueryFile(hDropInfo, 0xFFFF, nullptr, 0);
 	::DragQueryFile(hDropInfo, 0, szFile, MAX_PATH);
 	::DragFinish(hDropInfo);
 
@@ -328,9 +316,7 @@ void CTblEditorView::OnDropFiles(
 	CFormView::OnDropFiles(hDropInfo);
 }
 
-LRESULT CTblEditorView::OnListModified(
-	WPARAM wParam,
-	LPARAM lParam)
+LRESULT CTblEditorView::OnListModified(WPARAM wParam, LPARAM lParam)
 {
 	CTblEditorDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);

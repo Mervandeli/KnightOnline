@@ -11,7 +11,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -19,18 +19,14 @@ static char THIS_FILE[]=__FILE__;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CUIImageTooltipDlg::CUIImageTooltipDlg()
-	: m_CYellow(D3DCOLOR_XRGB(255, 255, 0)), 
-	m_CBlue(D3DCOLOR_XRGB(128, 128, 255)),
-	m_CGold(D3DCOLOR_XRGB(220, 199, 124)),
-	m_CIvory(D3DCOLOR_XRGB(200, 124, 199)),
-	m_CGreen(D3DCOLOR_XRGB(128, 255, 0)),
-	m_CWhite(D3DCOLOR_XRGB(255, 255, 255)),
+CUIImageTooltipDlg::CUIImageTooltipDlg() :
+	m_CYellow(D3DCOLOR_XRGB(255, 255, 0)), m_CBlue(D3DCOLOR_XRGB(128, 128, 255)), m_CGold(D3DCOLOR_XRGB(220, 199, 124)),
+	m_CIvory(D3DCOLOR_XRGB(200, 124, 199)), m_CGreen(D3DCOLOR_XRGB(128, 255, 0)), m_CWhite(D3DCOLOR_XRGB(255, 255, 255)),
 	m_CRed(D3DCOLOR_XRGB(255, 60, 60))
 {
-	m_iPosXBack = 0;
-	m_iPosYBack = 0;
-	m_pImg = nullptr;
+	m_iPosXBack   = 0;
+	m_iPosYBack   = 0;
+	m_pImg        = nullptr;
 	m_iTooltipNum = 0;
 
 	ResetItem();
@@ -44,9 +40,9 @@ void CUIImageTooltipDlg::Release()
 {
 	CN3UIBase::Release();
 
-	m_iPosXBack = 0;
-	m_iPosYBack = 0;
-	m_pImg = nullptr;
+	m_iPosXBack   = 0;
+	m_iPosYBack   = 0;
+	m_pImg        = nullptr;
 	m_iTooltipNum = 0;
 
 	ResetItem();
@@ -91,7 +87,7 @@ void CUIImageTooltipDlg::SetPosSomething(int xpos, int ypos)
 	if (m_iTooltipNum <= 0)
 		return;
 
-	int iWidth = 0;
+	int iWidth   = 0;
 	int iPadding = 8;
 
 	for (int i = 0; i < m_iTooltipNum; i++)
@@ -104,51 +100,51 @@ void CUIImageTooltipDlg::SetPosSomething(int xpos, int ypos)
 			iWidth = currentWidth;
 	}
 
-	int iHeight = m_pStr[m_iTooltipNum - 1]->GetRegion().bottom - m_pStr[0]->GetRegion().top;
+	int iHeight  = m_pStr[m_iTooltipNum - 1]->GetRegion().bottom - m_pStr[0]->GetRegion().top;
 
-	iWidth += iPadding * 2;
-	iHeight += static_cast<int>(iPadding * 1.5);
+	iWidth      += iPadding * 2;
+	iHeight     += static_cast<int>(iPadding * 1.5);
 
 	RECT rect, rect2;
 
 	int iRight, iTop, iBottom, iX, iY;
 
-	iRight = CN3Base::s_CameraData.vp.Width;
-	iTop = 0;
+	iRight  = CN3Base::s_CameraData.vp.Width;
+	iTop    = 0;
 	iBottom = CN3Base::s_CameraData.vp.Height;
 
 	if ((xpos + 26 + iWidth) < iRight)
 	{
-		rect.left = xpos + 26;
+		rect.left  = xpos + 26;
 		rect.right = rect.left + iWidth;
-		iX = xpos + 26;
+		iX         = xpos + 26;
 	}
 	else
 	{
-		rect.left = xpos - iWidth;
+		rect.left  = xpos - iWidth;
 		rect.right = xpos;
-		iX = xpos - iWidth;
+		iX         = xpos - iWidth;
 	}
 
 	if ((ypos - iHeight) > iTop)
 	{
-		rect.top = ypos - iHeight;
+		rect.top    = ypos - iHeight;
 		rect.bottom = ypos;
-		iY = ypos - iHeight;
+		iY          = ypos - iHeight;
 	}
 	else
 	{
 		if ((ypos + iHeight) < iBottom)
 		{
-			rect.top = ypos;
+			rect.top    = ypos;
 			rect.bottom = ypos + iHeight;
-			iY = ypos;
+			iY          = ypos;
 		}
 		else
 		{
-			rect.top = iBottom - iHeight;
+			rect.top    = iBottom - iHeight;
 			rect.bottom = iBottom;
-			iY = rect.top;
+			iY          = rect.top;
 		}
 	}
 
@@ -161,8 +157,8 @@ void CUIImageTooltipDlg::SetPosSomething(int xpos, int ypos)
 			continue;
 
 		// add padding to rects
-		rect2 = m_pStr[i]->GetRegion();
-		rect2.left = rect.left + iPadding;
+		rect2       = m_pStr[i]->GetRegion();
+		rect2.left  = rect.left + iPadding;
 		rect2.right = rect.right - iPadding;
 		m_pStr[i]->SetRegion(rect2);
 
@@ -181,38 +177,46 @@ void CUIImageTooltipDlg::SetPosSomething(int xpos, int ypos)
 	m_iPosYBack = ypos;
 }
 
-int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bool bPrice, bool bBuy)
+int CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bool bPrice, bool bBuy)
 {
-	int iIndex = 0;
+	int iIndex                   = 0;
 
-	__InfoPlayerMySelf*	pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
+	__InfoPlayerMySelf* pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
 
-#define ERROR_EXCEPTION									\
-{		\
-	if (bPrice && (iIndex > MAX_TOOLTIP_COUNT-2))	 {__ASSERT(0, "Too Many Tooltip Item Info");	goto exceptions;}	\
-	if (!bPrice && (iIndex > MAX_TOOLTIP_COUNT-1))	 {__ASSERT(0, "Too Many Tooltip Item Info");	goto exceptions;}	\
-}
+#define ERROR_EXCEPTION                                  \
+	{                                                    \
+		if (bPrice && (iIndex > MAX_TOOLTIP_COUNT - 2))  \
+		{                                                \
+			__ASSERT(0, "Too Many Tooltip Item Info");   \
+			goto exceptions;                             \
+		}                                                \
+		if (!bPrice && (iIndex > MAX_TOOLTIP_COUNT - 1)) \
+		{                                                \
+			__ASSERT(0, "Too Many Tooltip Item Info");   \
+			goto exceptions;                             \
+		}                                                \
+	}
 
 	if (m_pStr[iIndex] != nullptr)
 	{
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
 
 		std::string szStr = fmt::format_text_resource(IDS_TOOLTIP_GOLD);
-		if ( spItem->pItemBasic->szName == szStr )
+		if (spItem->pItemBasic->szName == szStr)
 		{
 			// 돈이면 흰색..
 			m_pStr[iIndex]->SetColor(m_CWhite);
 			m_pstdstr[iIndex] = fmt::format("{}  {}", spItem->iCount, spItem->pItemBasic->szName);
-			iIndex++;			
+			iIndex++;
 
-			for( int i = iIndex; i < MAX_TOOLTIP_COUNT; i++ )
+			for (int i = iIndex; i < MAX_TOOLTIP_COUNT; i++)
 				m_pstdstr[iIndex] = "";
 
-			return iIndex;	
+			return iIndex;
 		}
 		else
 		{
-			e_ItemAttrib eTA = (e_ItemAttrib)(spItem->pItemExt->byMagicOrRare);
+			e_ItemAttrib eTA = (e_ItemAttrib) (spItem->pItemExt->byMagicOrRare);
 			switch (eTA)
 			{
 				case ITEM_ATTRIB_GENERAL:
@@ -254,7 +258,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	iIndex++;
 
-	if ( (spItem->pItemBasic->byContable != UIITEM_TYPE_COUNTABLE) && (spItem->pItemBasic->byContable != UIITEM_TYPE_COUNTABLE_SMALL) )
+	if ((spItem->pItemBasic->byContable != UIITEM_TYPE_COUNTABLE) && (spItem->pItemBasic->byContable != UIITEM_TYPE_COUNTABLE_SMALL))
 	{
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
 		e_ItemClass eIC = (e_ItemClass) (spItem->pItemBasic->byClass);
@@ -263,7 +267,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 		iIndex++;
 	}
 
-	e_Race eRace = (e_Race)spItem->pItemBasic->byNeedRace;
+	e_Race eRace = (e_Race) spItem->pItemBasic->byNeedRace;
 	if (eRace != RACE_ALL)
 	{
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
@@ -276,7 +280,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if ((int)spItem->pItemBasic->byNeedClass != 0)
+	if ((int) spItem->pItemBasic->byNeedClass != 0)
 	{
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNCENTER);
 		e_Class eClass = (e_Class) spItem->pItemBasic->byNeedClass;
@@ -462,16 +466,15 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 				else
 					m_pStr[iIndex]->SetColor(m_CRed);
 				break;
-		}					
+		}
 
 		iIndex++;
 	}
 	ERROR_EXCEPTION
 
-	if (spItem->pItemBasic->siDamage+spItem->pItemExt->siDamage != 0)
+	if (spItem->pItemBasic->siDamage + spItem->pItemExt->siDamage != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DAMAGE,
-			spItem->pItemBasic->siDamage + spItem->pItemExt->siDamage);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DAMAGE, spItem->pItemBasic->siDamage + spItem->pItemExt->siDamage);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CWhite);
@@ -504,8 +507,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 
 	if (spItem->pItemBasic->siAttackRange != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTACKRANGE,
-			(float) spItem->pItemBasic->siAttackRange / 10.0f);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTACKRANGE, (float) spItem->pItemBasic->siAttackRange / 10.0f);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CWhite);
@@ -513,10 +515,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siHitRate != 0)
+	if (spItem->pItemExt->siHitRate != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_HITRATE_OVER,
-			spItem->pItemExt->siHitRate);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_HITRATE_OVER, spItem->pItemExt->siHitRate);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CWhite);
@@ -524,10 +525,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siEvationRate != 0)
+	if (spItem->pItemExt->siEvationRate != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_AVOIDRATE_OVER,
-			spItem->pItemExt->siEvationRate);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_AVOIDRATE_OVER, spItem->pItemExt->siEvationRate);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CWhite);
@@ -535,10 +535,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemBasic->siWeight != 0)
+	if (spItem->pItemBasic->siWeight != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_WEIGHT,
-			spItem->pItemBasic->siWeight * 0.1f);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_WEIGHT, spItem->pItemBasic->siWeight * 0.1f);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CWhite);
@@ -546,28 +545,16 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemBasic->siMaxDurability+spItem->pItemExt->siMaxDurability != 1)
+	if (spItem->pItemBasic->siMaxDurability + spItem->pItemExt->siMaxDurability != 1)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_MAX_DURABILITY,
-			spItem->pItemBasic->siMaxDurability + spItem->pItemExt->siMaxDurability);
+		m_pstdstr[iIndex] = fmt::format_text_resource(
+			IDS_TOOLTIP_MAX_DURABILITY, spItem->pItemBasic->siMaxDurability + spItem->pItemExt->siMaxDurability);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CWhite);
 		iIndex++;
 
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_CUR_DURABILITY,
-			spItem->iDurability);
-
-		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
-		m_pStr[iIndex]->SetColor(m_CWhite);
-		iIndex++;
-	}
-	ERROR_EXCEPTION
-
-	if( spItem->pItemBasic->siDefense+spItem->pItemExt->siDefense != 0)
-	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE,
-			spItem->pItemBasic->siDefense + spItem->pItemExt->siDefense);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_CUR_DURABILITY, spItem->iDurability);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CWhite);
@@ -575,10 +562,19 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siDefenseRateDagger != 0)
+	if (spItem->pItemBasic->siDefense + spItem->pItemExt->siDefense != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE_RATE_DAGGER,
-			spItem->pItemExt->siDefenseRateDagger);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE, spItem->pItemBasic->siDefense + spItem->pItemExt->siDefense);
+
+		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
+		m_pStr[iIndex]->SetColor(m_CWhite);
+		iIndex++;
+	}
+	ERROR_EXCEPTION
+
+	if (spItem->pItemExt->siDefenseRateDagger != 0)
+	{
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE_RATE_DAGGER, spItem->pItemExt->siDefenseRateDagger);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -586,10 +582,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siDefenseRateSword != 0)
+	if (spItem->pItemExt->siDefenseRateSword != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE_RATE_SWORD,
-			spItem->pItemExt->siDefenseRateSword);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE_RATE_SWORD, spItem->pItemExt->siDefenseRateSword);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -597,10 +592,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siDefenseRateBlow != 0)
+	if (spItem->pItemExt->siDefenseRateBlow != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE_RATE_BLOW,
-			spItem->pItemExt->siDefenseRateBlow);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE_RATE_BLOW, spItem->pItemExt->siDefenseRateBlow);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -608,10 +602,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siDefenseRateAxe != 0)
+	if (spItem->pItemExt->siDefenseRateAxe != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE_RATE_AXE,
-			spItem->pItemExt->siDefenseRateAxe);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE_RATE_AXE, spItem->pItemExt->siDefenseRateAxe);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -619,10 +612,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siDefenseRateSpear != 0)
+	if (spItem->pItemExt->siDefenseRateSpear != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE_RATE_SPEAR,
-			spItem->pItemExt->siDefenseRateSpear);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE_RATE_SPEAR, spItem->pItemExt->siDefenseRateSpear);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -630,10 +622,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siDefenseRateArrow != 0)
+	if (spItem->pItemExt->siDefenseRateArrow != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE_RATE_ARROW,
-			spItem->pItemExt->siDefenseRateArrow);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_DEFENSE_RATE_ARROW, spItem->pItemExt->siDefenseRateArrow);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -641,10 +632,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->byDamageFire != 0)	// 화염속성
+	if (spItem->pItemExt->byDamageFire != 0) // 화염속성
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC1,
-			spItem->pItemExt->byDamageFire);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC1, spItem->pItemExt->byDamageFire);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -652,10 +642,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->byDamageIce != 0)	
+	if (spItem->pItemExt->byDamageIce != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC2,
-			spItem->pItemExt->byDamageIce);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC2, spItem->pItemExt->byDamageIce);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -663,10 +652,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->byDamageThuner != 0)	
+	if (spItem->pItemExt->byDamageThuner != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC3,
-			spItem->pItemExt->byDamageThuner);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC3, spItem->pItemExt->byDamageThuner);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -674,10 +662,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->byDamagePoison != 0)	
+	if (spItem->pItemExt->byDamagePoison != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC4,
-			spItem->pItemExt->byDamagePoison);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC4, spItem->pItemExt->byDamagePoison);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -685,10 +672,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->byStillHP != 0)	
+	if (spItem->pItemExt->byStillHP != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC5,
-			spItem->pItemExt->byStillHP);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC5, spItem->pItemExt->byStillHP);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -696,10 +682,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->byDamageMP != 0)	
+	if (spItem->pItemExt->byDamageMP != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC6,
-			spItem->pItemExt->byDamageMP);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC6, spItem->pItemExt->byDamageMP);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -707,10 +692,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->byStillMP != 0)	
+	if (spItem->pItemExt->byStillMP != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC7,
-			spItem->pItemExt->byStillMP);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_ATTRMAGIC7, spItem->pItemExt->byStillMP);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -718,10 +702,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siBonusStr != 0)
+	if (spItem->pItemExt->siBonusStr != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSSTR,
-			spItem->pItemExt->siBonusStr);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSSTR, spItem->pItemExt->siBonusStr);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -729,10 +712,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siBonusSta != 0)
+	if (spItem->pItemExt->siBonusSta != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSSTA,
-			spItem->pItemExt->siBonusSta);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSSTA, spItem->pItemExt->siBonusSta);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -740,10 +722,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siBonusHP != 0)
+	if (spItem->pItemExt->siBonusHP != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSHP,
-			spItem->pItemExt->siBonusHP);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSHP, spItem->pItemExt->siBonusHP);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -751,10 +732,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siBonusDex != 0)
+	if (spItem->pItemExt->siBonusDex != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSDEX,
-			spItem->pItemExt->siBonusDex);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSDEX, spItem->pItemExt->siBonusDex);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -762,10 +742,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siBonusMSP != 0)
+	if (spItem->pItemExt->siBonusMSP != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSWIZ,
-			spItem->pItemExt->siBonusMSP);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSWIZ, spItem->pItemExt->siBonusMSP);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -773,10 +752,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siBonusInt != 0)
+	if (spItem->pItemExt->siBonusInt != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSINT,
-			spItem->pItemExt->siBonusInt);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSINT, spItem->pItemExt->siBonusInt);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -784,10 +762,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siBonusMagicAttak != 0)
+	if (spItem->pItemExt->siBonusMagicAttak != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSMAGICATTACK,
-			spItem->pItemExt->siBonusMagicAttak);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BONUSMAGICATTACK, spItem->pItemExt->siBonusMagicAttak);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -795,10 +772,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siRegistFire != 0)
+	if (spItem->pItemExt->siRegistFire != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_REGISTFIRE,
-			spItem->pItemExt->siRegistFire);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_REGISTFIRE, spItem->pItemExt->siRegistFire);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -806,10 +782,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siRegistIce != 0)
+	if (spItem->pItemExt->siRegistIce != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_REGISTICE,
-			spItem->pItemExt->siRegistIce);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_REGISTICE, spItem->pItemExt->siRegistIce);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -817,10 +792,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siRegistElec != 0)
+	if (spItem->pItemExt->siRegistElec != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_REGISTELEC,
-			spItem->pItemExt->siRegistElec);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_REGISTELEC, spItem->pItemExt->siRegistElec);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -828,10 +802,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siRegistMagic != 0)
+	if (spItem->pItemExt->siRegistMagic != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_REGISTMAGIC,
-			spItem->pItemExt->siRegistMagic);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_REGISTMAGIC, spItem->pItemExt->siRegistMagic);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -839,10 +812,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siRegistPoison != 0)
+	if (spItem->pItemExt->siRegistPoison != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_REGISTPOISON,
-			spItem->pItemExt->siRegistPoison);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_REGISTPOISON, spItem->pItemExt->siRegistPoison);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -850,10 +822,9 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( spItem->pItemExt->siRegistCurse != 0)
+	if (spItem->pItemExt->siRegistCurse != 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_REGISTCURSE,
-			spItem->pItemExt->siRegistCurse);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_REGISTCURSE, spItem->pItemExt->siRegistCurse);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 		m_pStr[iIndex]->SetColor(m_CGreen);
@@ -861,10 +832,11 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	}
 	ERROR_EXCEPTION
 
-	if( /*(spItem->pItemBasic->byAttachPoint == ITEM_LIMITED_EXHAUST) &&*/ spItem->pItemBasic->cNeedLevel+spItem->pItemExt->siNeedLevel > 1)
+	if (/*(spItem->pItemBasic->byAttachPoint == ITEM_LIMITED_EXHAUST) &&*/ spItem->pItemBasic->cNeedLevel + spItem->pItemExt->siNeedLevel
+		> 1)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_NEEDLEVEL,
-			spItem->pItemBasic->cNeedLevel + spItem->pItemExt->siNeedLevel);
+		m_pstdstr[iIndex] = fmt::format_text_resource(
+			IDS_TOOLTIP_NEEDLEVEL, spItem->pItemBasic->cNeedLevel + spItem->pItemExt->siNeedLevel);
 
 		if (SetTooltipTextColor(CGameBase::s_pPlayer->m_InfoBase.iLevel, spItem->pItemBasic->cNeedLevel + spItem->pItemExt->siNeedLevel))
 			m_pStr[iIndex]->SetColor(m_CWhite);
@@ -877,12 +849,11 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 
 	if ((spItem->pItemBasic->byNeedRank + spItem->pItemExt->siNeedRank) > 0)
 	{
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_NEEDRANK,
-			spItem->pItemBasic->byNeedRank + spItem->pItemExt->siNeedRank);
+		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_NEEDRANK, spItem->pItemBasic->byNeedRank + spItem->pItemExt->siNeedRank);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 
-		if (SetTooltipTextColor(pInfoExt->iRank, spItem->pItemBasic->byNeedRank+spItem->pItemExt->siNeedRank))
+		if (SetTooltipTextColor(pInfoExt->iRank, spItem->pItemBasic->byNeedRank + spItem->pItemExt->siNeedRank))
 			m_pStr[iIndex]->SetColor(m_CWhite);
 		else
 			m_pStr[iIndex]->SetColor(m_CRed);
@@ -898,7 +869,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 
-		if (SetTooltipTextColor(pInfoExt->iTitle, spItem->pItemBasic->byNeedTitle+spItem->pItemExt->siNeedTitle))
+		if (SetTooltipTextColor(pInfoExt->iTitle, spItem->pItemBasic->byNeedTitle + spItem->pItemExt->siNeedTitle))
 			m_pStr[iIndex]->SetColor(m_CWhite);
 		else
 			m_pStr[iIndex]->SetColor(m_CRed);
@@ -911,24 +882,23 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	iNeedValue = spItem->pItemBasic->byNeedStrength;
 	if (iNeedValue != 0)
 		iNeedValue += spItem->pItemExt->siNeedStrength;
-	if( iNeedValue > 0)
+	if (iNeedValue > 0)
 	{
 		std::string szReduce;
 		if (spItem->pItemExt->siNeedStrength < 0)
 		{
-			if (spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE
-				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE
+			if (spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE || spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE
 				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE_REVERSE
 				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE_REVERSE)
 				szReduce = fmt::format_text_resource(IDS_TOOLTIP_REDUCE);
 		}
 
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_NEEDSTRENGTH,
-			spItem->pItemBasic->byNeedStrength + spItem->pItemExt->siNeedStrength, szReduce);
+		m_pstdstr[iIndex] = fmt::format_text_resource(
+			IDS_TOOLTIP_NEEDSTRENGTH, spItem->pItemBasic->byNeedStrength + spItem->pItemExt->siNeedStrength, szReduce);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 
-		if (SetTooltipTextColor(pInfoExt->iStrength, spItem->pItemBasic->byNeedStrength+spItem->pItemExt->siNeedStrength))
+		if (SetTooltipTextColor(pInfoExt->iStrength, spItem->pItemBasic->byNeedStrength + spItem->pItemExt->siNeedStrength))
 			m_pStr[iIndex]->SetColor(m_CWhite);
 		else
 			m_pStr[iIndex]->SetColor(m_CRed);
@@ -940,24 +910,23 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	iNeedValue = spItem->pItemBasic->byNeedStamina;
 	if (iNeedValue != 0)
 		iNeedValue += spItem->pItemExt->siNeedStamina;
-	if( iNeedValue > 0)		
+	if (iNeedValue > 0)
 	{
 		std::string szReduce;
 		if (spItem->pItemExt->siNeedStamina < 0)
 		{
-			if (spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE
-				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE
+			if (spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE || spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE
 				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE_REVERSE
 				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE_REVERSE)
 				szReduce = fmt::format_text_resource(IDS_TOOLTIP_REDUCE);
 		}
 
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_NEEDSTAMINA,
-			spItem->pItemBasic->byNeedStamina + spItem->pItemExt->siNeedStamina, szReduce);
+		m_pstdstr[iIndex] = fmt::format_text_resource(
+			IDS_TOOLTIP_NEEDSTAMINA, spItem->pItemBasic->byNeedStamina + spItem->pItemExt->siNeedStamina, szReduce);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 
-		if (SetTooltipTextColor(pInfoExt->iStamina, spItem->pItemBasic->byNeedStamina+spItem->pItemExt->siNeedStamina)) 
+		if (SetTooltipTextColor(pInfoExt->iStamina, spItem->pItemBasic->byNeedStamina + spItem->pItemExt->siNeedStamina))
 			m_pStr[iIndex]->SetColor(m_CWhite);
 		else
 			m_pStr[iIndex]->SetColor(m_CRed);
@@ -969,24 +938,23 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	iNeedValue = spItem->pItemBasic->byNeedDexterity;
 	if (iNeedValue != 0)
 		iNeedValue += spItem->pItemExt->siNeedDexterity;
-	if( iNeedValue > 0)		
+	if (iNeedValue > 0)
 	{
 		std::string szReduce;
 		if (spItem->pItemExt->siNeedDexterity < 0)
 		{
-			if (spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE
-				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE
+			if (spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE || spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE
 				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE_REVERSE
 				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE_REVERSE)
 				szReduce = fmt::format_text_resource(IDS_TOOLTIP_REDUCE);
 		}
 
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_NEEDDEXTERITY,
-			spItem->pItemBasic->byNeedDexterity + spItem->pItemExt->siNeedDexterity, szReduce);
+		m_pstdstr[iIndex] = fmt::format_text_resource(
+			IDS_TOOLTIP_NEEDDEXTERITY, spItem->pItemBasic->byNeedDexterity + spItem->pItemExt->siNeedDexterity, szReduce);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 
-		if (SetTooltipTextColor(pInfoExt->iDexterity, spItem->pItemBasic->byNeedDexterity+spItem->pItemExt->siNeedDexterity))
+		if (SetTooltipTextColor(pInfoExt->iDexterity, spItem->pItemBasic->byNeedDexterity + spItem->pItemExt->siNeedDexterity))
 			m_pStr[iIndex]->SetColor(m_CWhite);
 		else
 			m_pStr[iIndex]->SetColor(m_CRed);
@@ -998,24 +966,23 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	iNeedValue = spItem->pItemBasic->byNeedInteli;
 	if (iNeedValue != 0)
 		iNeedValue += spItem->pItemExt->siNeedInteli;
-	if( iNeedValue > 0)			
+	if (iNeedValue > 0)
 	{
 		std::string szReduce;
 		if (spItem->pItemExt->siNeedInteli < 0)
 		{
-			if (spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE
-				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE
+			if (spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE || spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE
 				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE_REVERSE
 				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE_REVERSE)
 				szReduce = fmt::format_text_resource(IDS_TOOLTIP_REDUCE);
 		}
 
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_NEEDINTELLI,
-			spItem->pItemBasic->byNeedInteli + spItem->pItemExt->siNeedInteli, szReduce);
+		m_pstdstr[iIndex] = fmt::format_text_resource(
+			IDS_TOOLTIP_NEEDINTELLI, spItem->pItemBasic->byNeedInteli + spItem->pItemExt->siNeedInteli, szReduce);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 
-		if (SetTooltipTextColor(pInfoExt->iIntelligence, spItem->pItemBasic->byNeedInteli+spItem->pItemExt->siNeedInteli))
+		if (SetTooltipTextColor(pInfoExt->iIntelligence, spItem->pItemBasic->byNeedInteli + spItem->pItemExt->siNeedInteli))
 			m_pStr[iIndex]->SetColor(m_CWhite);
 		else
 			m_pStr[iIndex]->SetColor(m_CRed);
@@ -1027,24 +994,23 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	iNeedValue = spItem->pItemBasic->byNeedMagicAttack;
 	if (iNeedValue != 0)
 		iNeedValue += spItem->pItemExt->siNeedMagicAttack;
-	if( iNeedValue > 0)			
+	if (iNeedValue > 0)
 	{
 		std::string szReduce;
 		if (spItem->pItemExt->siNeedMagicAttack < 0)
 		{
-			if (spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE
-				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE
+			if (spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE || spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE
 				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UNIQUE_REVERSE
 				|| spItem->pItemExt->byMagicOrRare == ITEM_ATTRIB_UPGRADE_REVERSE)
 				szReduce = fmt::format_text_resource(IDS_TOOLTIP_REDUCE);
 		}
 
-		m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_NEEDMAGICATTACK,
-			spItem->pItemBasic->byNeedMagicAttack + spItem->pItemExt->siNeedMagicAttack, szReduce);
+		m_pstdstr[iIndex] = fmt::format_text_resource(
+			IDS_TOOLTIP_NEEDMAGICATTACK, spItem->pItemBasic->byNeedMagicAttack + spItem->pItemExt->siNeedMagicAttack, szReduce);
 
 		m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 
-		if (SetTooltipTextColor(pInfoExt->iMagicAttak, spItem->pItemBasic->byNeedMagicAttack+spItem->pItemExt->siNeedMagicAttack))
+		if (SetTooltipTextColor(pInfoExt->iMagicAttak, spItem->pItemBasic->byNeedMagicAttack + spItem->pItemExt->siNeedMagicAttack))
 			m_pStr[iIndex]->SetColor(m_CWhite);
 		else
 			m_pStr[iIndex]->SetColor(m_CRed);
@@ -1056,7 +1022,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 	if (spItem->pItemBasic != nullptr)
 	{
 		const std::string& szRemark = spItem->pItemBasic->szRemark;
-	
+
 		if (!szRemark.empty())
 		{
 			size_t totalWords = 1;
@@ -1127,7 +1093,7 @@ int	CUIImageTooltipDlg::CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bo
 			case ITEM_ATTRIB_UPGRADE:
 				if (spItem->pItemBasic != nullptr && spItem->pItemExt != nullptr)
 				{
-					const int iItemGrade = (std::min)(3, spItem->pItemBasic->byGrade + spItem->pItemExt->bySoulBind);
+					const int iItemGrade = std::min(3, spItem->pItemBasic->byGrade + spItem->pItemExt->bySoulBind);
 					if (iItemGrade == ITEM_GRADE_LOW_CLASS)
 						m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_LOW_CLASS);
 					else if (iItemGrade == ITEM_GRADE_MIDDLE_CLASS)
@@ -1150,34 +1116,32 @@ exceptions:;
 
 	if (bPrice)
 	{
-		if (bBuy)	
+		if (bBuy)
 		{
-			m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BUY_PRICE,
-				CGameBase::FormatNumber(spItem->GetBuyPrice()));
+			m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_BUY_PRICE, CGameBase::FormatNumber(spItem->GetBuyPrice()));
 
 			m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 
-			if (SetTooltipTextColor(pInfoExt->iGold, spItem->pItemBasic->iPrice*spItem->pItemExt->siPriceMultiply))
+			if (SetTooltipTextColor(pInfoExt->iGold, spItem->pItemBasic->iPrice * spItem->pItemExt->siPriceMultiply))
 				m_pStr[iIndex]->SetColor(m_CWhite);
 			else
 				m_pStr[iIndex]->SetColor(m_CRed);
 		}
 		else
-		{	
-			m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_SELL_PRICE,
-				CGameBase::FormatNumber(spItem->GetSellPrice()));
+		{
+			m_pstdstr[iIndex] = fmt::format_text_resource(IDS_TOOLTIP_SELL_PRICE, CGameBase::FormatNumber(spItem->GetSellPrice()));
 
 			m_pStr[iIndex]->SetStyle(UI_STR_TYPE_HALIGN, UISTYLE_STRING_ALIGNLEFT);
 			m_pStr[iIndex]->SetColor(m_CWhite);
 		}
 
-		iIndex++;			
+		iIndex++;
 	}
 
 	for (int i = iIndex; i < MAX_TOOLTIP_COUNT; i++)
 		m_pstdstr[iIndex].clear();
 
-	return iIndex;	// 임시..	반드시 1보다 크다..
+	return iIndex; // 임시..	반드시 1보다 크다..
 }
 
 void CUIImageTooltipDlg::DisplayTooltipsEnable(int xpos, int ypos, __IconItemSkill* spItem, bool bPrice, bool bBuy)
@@ -1190,7 +1154,7 @@ void CUIImageTooltipDlg::DisplayTooltipsEnable(int xpos, int ypos, __IconItemSki
 
 	if (!IsVisible())
 		SetVisible(true);
-	
+
 	if (IsItemChanged(spItem))
 	{
 		UpdateItem(spItem);
@@ -1198,8 +1162,7 @@ void CUIImageTooltipDlg::DisplayTooltipsEnable(int xpos, int ypos, __IconItemSki
 		m_iTooltipNum = CalcTooltipStringNumAndWrite(spItem, bPrice, bBuy);
 		SetPosSomething(xpos, ypos);
 	}
-	else if (m_iPosXBack != xpos
-		|| m_iPosYBack != ypos)
+	else if (m_iPosXBack != xpos || m_iPosYBack != ypos)
 	{
 		SetPosSomething(xpos, ypos);
 	}
@@ -1209,9 +1172,7 @@ void CUIImageTooltipDlg::DisplayTooltipsEnable(int xpos, int ypos, __IconItemSki
 
 bool CUIImageTooltipDlg::IsItemChanged(const __IconItemSkill* spItem) const
 {
-	if (m_dwID_Basic == spItem->pItemBasic->dwID
-		&& m_dwID_Ext == spItem->pItemExt->dwID
-		&& m_iDurability == spItem->iDurability
+	if (m_dwID_Basic == spItem->pItemBasic->dwID && m_dwID_Ext == spItem->pItemExt->dwID && m_iDurability == spItem->iDurability
 		&& m_iCount == spItem->iCount)
 		return false;
 
@@ -1220,8 +1181,7 @@ bool CUIImageTooltipDlg::IsItemChanged(const __IconItemSkill* spItem) const
 
 void CUIImageTooltipDlg::UpdateItem(const __IconItemSkill* spItem)
 {
-	if (spItem == nullptr
-		|| spItem->pItemBasic == nullptr)
+	if (spItem == nullptr || spItem->pItemBasic == nullptr)
 	{
 		ResetItem();
 		return;
@@ -1234,14 +1194,14 @@ void CUIImageTooltipDlg::UpdateItem(const __IconItemSkill* spItem)
 	else
 		m_dwID_Ext = 0;
 
-	m_iCount = spItem->iCount;
+	m_iCount      = spItem->iCount;
 	m_iDurability = spItem->iDurability;
 }
 
 void CUIImageTooltipDlg::ResetItem()
 {
-	m_dwID_Basic = 0;
-	m_dwID_Ext = 0;
-	m_iCount = 0;
+	m_dwID_Basic  = 0;
+	m_dwID_Ext    = 0;
+	m_iCount      = 0;
 	m_iDurability = 0;
 }

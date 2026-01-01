@@ -8,7 +8,7 @@
 LOGIC_ELSE::LOGIC_ELSE()
 {
 	m_LogicElse = LOGIC_CHECK_NONE;
-	m_bAnd = true;
+	m_bAnd      = true;
 	for (int i = 0; i < MAX_LOGIC_ELSE_INT; i++)
 		m_LogicElseInt[i] = -1;
 }
@@ -30,9 +30,9 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::string& filename, int li
 	int index = 0, argsToParse = 0;
 	char temp[1024];
 
-	index += ParseSpace(temp, line + index);
+	index         += ParseSpace(temp, line + index);
 
-	size_t opcode = hashing::djb2::hash(std::string_view(temp));
+	size_t opcode  = hashing::djb2::hash(std::string_view(temp));
 	switch (opcode)
 	{
 		// A CHECK_UNDER_WEIGHT
@@ -94,7 +94,7 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::string& filename, int li
 			m_LogicElse = LOGIC_CHECK_NOAH;
 			argsToParse = 2;
 			break;
-		
+
 		// A CHECK_LV {minimum} {maximum}
 		case "CHECK_LV"_djb2:
 			m_LogicElse = LOGIC_CHECK_LV;
@@ -118,7 +118,7 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::string& filename, int li
 			m_LogicElse = LOGIC_CHECK_NATION;
 			argsToParse = 1;
 			break;
-			
+
 		// A EXIST_COM_EVENT {com event ID}
 		case "EXIST_COM_EVENT"_djb2:
 			m_LogicElse = LOGIC_EXIST_COM_EVENT;
@@ -137,8 +137,9 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::string& filename, int li
 			argsToParse = 1;
 			break;
 
-#if 0 // TODO
-		// A CHECK_PPCARD_SERIAL
+			// TODO:
+#if 0
+	  // A CHECK_PPCARD_SERIAL
 		case "CHECK_PPCARD_SERIAL"_djb2:
 			m_LogicElse = LOGIC_CHECK_PPCARD_SERIAL;
 			argsToParse = 1; // officially it always parses 1 even though it doesn't use it
@@ -235,8 +236,9 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::string& filename, int li
 			argsToParse = 1;
 			break;
 
-#if 0 // TODO
-		// A CHECK_STAT_TOTAL {minimum} {maximum}
+			// TODO:
+#if 0
+	   // A CHECK_STAT_TOTAL {minimum} {maximum}
 		case "CHECK_STAT_TOTAL"_djb2:
 			m_LogicElse = LOGIC_CHECK_STAT_TOTAL;
 			argsToParse = 2;
@@ -265,15 +267,16 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::string& filename, int li
 			break;
 
 		default:
-			spdlog::warn("LOGIC_ELSE::Parse_and: unhandled opcode '{}' ({}:{})", temp, filename, lineNumber);
+			spdlog::warn(
+				"LOGIC_ELSE::Parse_and: unhandled opcode '{}' ({}:{})", temp, filename, lineNumber);
 			break;
 	}
 
 	assert(argsToParse >= 0 && argsToParse <= MAX_LOGIC_ELSE_INT);
 	for (int i = 0; i < argsToParse; i++)
 	{
-		index += ParseSpace(temp, line + index);
-		m_LogicElseInt[i] = atoi(temp);
+		index             += ParseSpace(temp, line + index);
+		m_LogicElseInt[i]  = atoi(temp);
 	}
 
 	m_bAnd = true;

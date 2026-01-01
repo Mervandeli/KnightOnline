@@ -4,7 +4,7 @@
 DateTime::DateTime()
 {
 	_unixTimestamp = 0;
-	_tm = {};
+	_tm            = {};
 }
 
 DateTime::DateTime(time_t timestamp)
@@ -12,7 +12,8 @@ DateTime::DateTime(time_t timestamp)
 	Set(timestamp);
 }
 
-DateTime::DateTime(int year, int month, int day, int hour /*= 0*/, int minute /*= 0*/, int second /*= 0*/)
+DateTime::DateTime(
+	int year, int month, int day, int hour /*= 0*/, int minute /*= 0*/, int second /*= 0*/)
 {
 	Set(year, month, day, hour, minute, second);
 }
@@ -39,27 +40,28 @@ void DateTime::Set(time_t timestamp)
 
 void DateTime::Set(tm* tm_)
 {
-	_tm = *tm_;
+	_tm            = *tm_;
 	_unixTimestamp = mktime(tm_);
 }
 
 void DateTime::Set(const DateTime& other)
 {
-	_tm = other._tm;
+	_tm            = other._tm;
 	_unixTimestamp = other._unixTimestamp;
 }
 
-void DateTime::Set(int year, int month, int day, int hour /*= 0*/, int minute /*= 0*/, int second /*= 0*/)
+void DateTime::Set(
+	int year, int month, int day, int hour /*= 0*/, int minute /*= 0*/, int second /*= 0*/)
 {
 	memset(&_tm, 0, sizeof(_tm));
 
 	// Now update it with the data specified
 	_tm.tm_year = year - TM_YEAR_BASE;
-	_tm.tm_mon = month - 1;
+	_tm.tm_mon  = month - 1;
 	_tm.tm_mday = day;
 	_tm.tm_hour = hour;
-	_tm.tm_min = minute;
-	_tm.tm_sec = second;
+	_tm.tm_min  = minute;
+	_tm.tm_sec  = second;
 
 	// Finally reconstruct it, so the other data is updated.
 	Update();

@@ -17,46 +17,49 @@ class CViewProperty : public CFormView
 {
 protected:
 	CN3ViewerDoc* GetDocument();
-	CViewProperty();           // protected constructor used by dynamic creation
+	CViewProperty(); // protected constructor used by dynamic creation
 	DECLARE_DYNCREATE(CViewProperty)
 
-// Form Data
+					 // Form Data
 public:
 	//{{AFX_DATA(CViewProperty)
-	enum { IDD = IDD_BASE };
-	CPropertyList	m_LPMaterial;
-	CPropertyList	m_LPLight;
-	CPropertyList	m_LPCamera;
-	CComboBox	m_CBShapePart; // Shape Part Number	
-	CComboBox	m_CBChrPart; // Character Part Number
-	CComboBox	m_CBChrLOD; // Character LOD Number
-	CComboBox	m_CBChrPlug; // Chraracter Plug Number
-	CPropertyList	m_LPTransform;
-	CPropertyList	m_LPShape;
-	CPropertyList	m_LPChr;
-	CPropertyList	m_LPCPart;
-	CPropertyList	m_LPCPlug;
+	enum
+	{
+		IDD = IDD_BASE
+	};
+	CPropertyList m_LPMaterial;
+	CPropertyList m_LPLight;
+	CPropertyList m_LPCamera;
+	CComboBox m_CBShapePart; // Shape Part Number
+	CComboBox m_CBChrPart;   // Character Part Number
+	CComboBox m_CBChrLOD;    // Character LOD Number
+	CComboBox m_CBChrPlug;   // Chraracter Plug Number
+	CPropertyList m_LPTransform;
+	CPropertyList m_LPShape;
+	CPropertyList m_LPChr;
+	CPropertyList m_LPCPart;
+	CPropertyList m_LPCPlug;
 	//}}AFX_DATA
 
-// Attributes
+	// Attributes
 public:
-
-// Operations
+	// Operations
 public:
 	void UpdateInfo();
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CViewProperty)
-	public:
+public:
 	virtual void OnInitialUpdate();
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	virtual void OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 protected:
 	virtual ~CViewProperty();
 #ifdef _DEBUG
@@ -72,9 +75,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-#ifndef _DEBUG  // debug version in N3ViewerView.cpp
+#ifndef _DEBUG // debug version in N3ViewerView.cpp
 inline CN3ViewerDoc* CViewProperty::GetDocument()
-   { return (CN3ViewerDoc*)m_pDocument; }
+{
+	return (CN3ViewerDoc*) m_pDocument;
+}
 #endif
 /////////////////////////////////////////////////////////////////////////////
 

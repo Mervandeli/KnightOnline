@@ -10,7 +10,7 @@
 
 namespace argparse
 {
-	class ArgumentParser;
+class ArgumentParser;
 }
 
 class CIni;
@@ -119,12 +119,12 @@ private:
 	CIni* _iniFile;
 
 protected:
-	logger::Logger&		_logger;
-	int					_exitCode;
-	bool				_headless;
+	logger::Logger& _logger;
+	int _exitCode;
+	bool _headless;
 
-	static AppThread*	s_instance;
-	static bool			s_shutdown;
+	static AppThread* s_instance;
+	static bool s_shutdown;
 };
 
 #endif // SERVER_SHAREDSERVER_APPTHREAD_H

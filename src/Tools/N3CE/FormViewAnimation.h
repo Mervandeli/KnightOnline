@@ -20,12 +20,12 @@ class CN3CEDoc;
 class CFormViewAnimation : public CFormView
 {
 public:
-	BOOL		m_bUpdatingNow;
-	__AnimData	m_AnimDataTemp; // 임시 복사 및 붙이기용..
+	BOOL m_bUpdatingNow;
+	__AnimData m_AnimDataTemp; // 임시 복사 및 붙이기용..
 
 public:
-	static int SortByName(const void *pArg1, const void *pArg2);
-	static int SortByFrame(const void *pArg1, const void *pArg2);
+	static int SortByName(const void* pArg1, const void* pArg2);
+	static int SortByFrame(const void* pArg1, const void* pArg2);
 	void OnOK();
 	void GetData();
 	void UpdateFrameSliderAndOther();
@@ -36,39 +36,42 @@ public:
 	CN3CEDoc* GetDocument();
 
 protected:
-	CFormViewAnimation();           // protected constructor used by dynamic creation
+	CFormViewAnimation(); // protected constructor used by dynamic creation
 	DECLARE_DYNCREATE(CFormViewAnimation)
 
-// Form Data
+						  // Form Data
 public:
 	//{{AFX_DATA(CFormViewAnimation)
-	enum { IDD = IDD_ANIMATION };
-	CListBox			m_ListSound;
-	CMacSliderCtrl		m_SldSceneFrm;
-	CMacSliderCtrl		m_SldFrm;
-	CButton				m_CPlay;
-	CListBox			m_ListAnim0;
-	CListBox			m_ListAnim1;
+	enum
+	{
+		IDD = IDD_ANIMATION
+	};
+	CListBox m_ListSound;
+	CMacSliderCtrl m_SldSceneFrm;
+	CMacSliderCtrl m_SldFrm;
+	CButton m_CPlay;
+	CListBox m_ListAnim0;
+	CListBox m_ListAnim1;
 	//}}AFX_DATA
 
-// Attributes
+	// Attributes
 public:
-
-// Operations
+	// Operations
 public:
 	__AnimData* GetCurAniData();
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CFormViewAnimation)
-	public:
+public:
 	virtual void OnInitialUpdate();
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 	virtual void OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 protected:
 	virtual ~CFormViewAnimation();
 #ifdef _DEBUG
@@ -130,9 +133,11 @@ protected:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-#ifndef _DEBUG  // debug version in FormViewAnimation.cpp
+#ifndef _DEBUG // debug version in FormViewAnimation.cpp
 inline CN3CEDoc* CFormViewAnimation::GetDocument()
-   { return (CN3CEDoc*)m_pDocument; }
+{
+	return (CN3CEDoc*) m_pDocument;
+}
 #endif
 
 //{{AFX_INSERT_LOCATION}}

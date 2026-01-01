@@ -30,14 +30,16 @@ protected:
 	void thread_loop_wrapper();
 
 	virtual void thread_loop() = 0;
-	virtual void before_shutdown() {}
+	virtual void before_shutdown()
+	{
+	}
 
 protected:
-	std::mutex				_mutex;
-	std::condition_variable	_cv;
-	std::thread				_thread;
-	bool					_canTick;
-	bool					_isShutdown;
+	std::mutex _mutex;
+	std::condition_variable _cv;
+	std::thread _thread;
+	bool _canTick;
+	bool _isShutdown;
 };
 
 #endif // SHARED_THREAD_H

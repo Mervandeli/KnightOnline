@@ -16,21 +16,21 @@ public:
 	{
 		char szDeviceName[128];
 		char szDeviceDesc[128];
-		int  nAdapter;
-		int  nDevice;
-		
-		D3DDEVTYPE      DevType;
-		int             nModeCount;
+		int nAdapter;
+		int nDevice;
+
+		D3DDEVTYPE DevType;
+		int nModeCount;
 		D3DDISPLAYMODE* pModes;
 	} __D3DDevInfo;
 
 protected:
-	int           m_nModeActive;
-	int           m_nAdapterCount;
+	int m_nModeActive;
+	int m_nAdapterCount;
 	__D3DDEV_INFO m_DeviceInfo;
 
 public:
-	LPDIRECT3D9  m_lpD3D;
+	LPDIRECT3D9 m_lpD3D;
 	LPDIRECTDRAW m_lpDD;
 
 public:
@@ -47,18 +47,10 @@ public:
 	static void Present(HWND hWnd, RECT* pRC = nullptr);
 	static void WaitForDeviceRestoration();
 
-	bool Init(
-		BOOL bWindowed,
-		HWND hWnd,
-		uint32_t dwWidth,
-		uint32_t dwHeight,
-		uint32_t dwBPP,
+	bool Init(BOOL bWindowed, HWND hWnd, uint32_t dwWidth, uint32_t dwHeight, uint32_t dwBPP,
 		BOOL bUseHW);
 
-	BOOL FindDepthStencilFormat(
-		UINT iAdapter,
-		D3DDEVTYPE DeviceType,
-		D3DFORMAT TargetFormat,
+	BOOL FindDepthStencilFormat(UINT iAdapter, D3DDEVTYPE DeviceType, D3DFORMAT TargetFormat,
 		D3DFORMAT* pDepthStencilFormat);
 
 public:

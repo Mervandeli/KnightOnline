@@ -19,45 +19,45 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
-#define CHILD_UI_SELL_MSG			1
-#define CHILD_UI_TRADE_MSG			2
-#define CHILD_UI_EXPLANATION_EDIT	3
-#define CHILD_UI_EXPLANATION		4
+#define CHILD_UI_SELL_MSG         1
+#define CHILD_UI_TRADE_MSG        2
+#define CHILD_UI_EXPLANATION_EDIT 3
+#define CHILD_UI_EXPLANATION      4
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-#define TRADE_BBS_MAXSTRING	69
-#define TRADE_BBS_MAX_LINE	23
+#define TRADE_BBS_MAXSTRING       69
+#define TRADE_BBS_MAX_LINE        23
 
 CUITradeSellBBS::CUITradeSellBBS()
 {
-//	m_pList_Infos			= nullptr;
-	m_pBtn_PageUp			= nullptr;
-	m_pBtn_PageDown			= nullptr;
-	m_pBtn_Refresh			= nullptr;
-	m_pBtn_Close			= nullptr;
-	m_pBtn_Register			= nullptr;
-	m_pBtn_RegisterCancel	= nullptr;
-	m_pBtn_Whisper			= nullptr;
-	m_pBtn_Trade			= nullptr;
+	//	m_pList_Infos			= nullptr;
+	m_pBtn_PageUp         = nullptr;
+	m_pBtn_PageDown       = nullptr;
+	m_pBtn_Refresh        = nullptr;
+	m_pBtn_Close          = nullptr;
+	m_pBtn_Register       = nullptr;
+	m_pBtn_RegisterCancel = nullptr;
+	m_pBtn_Whisper        = nullptr;
+	m_pBtn_Trade          = nullptr;
 
-	m_pImage_Sell			= nullptr;
-	m_pImage_Buy			= nullptr;
-	m_pImage_Sell_Title		= nullptr;
-	m_pImage_Buy_Title		= nullptr;
+	m_pImage_Sell         = nullptr;
+	m_pImage_Buy          = nullptr;
+	m_pImage_Sell_Title   = nullptr;
+	m_pImage_Buy_Title    = nullptr;
 
-	m_pString_Page			= nullptr;
+	m_pString_Page        = nullptr;
 
-	m_byBBSKind				= 0;
-	m_iCurPage				= 0;
-	m_iMaxPage				= 0;
-	m_bProcessing			= false;
-	m_fTime					= 0.0f;
-	m_iCurIndex				= -1;
+	m_byBBSKind           = 0;
+	m_iCurPage            = 0;
+	m_iMaxPage            = 0;
+	m_bProcessing         = false;
+	m_fTime               = 0.0f;
+	m_iCurIndex           = -1;
 }
 
 CUITradeSellBBS::~CUITradeSellBBS()
@@ -67,7 +67,8 @@ CUITradeSellBBS::~CUITradeSellBBS()
 
 bool CUITradeSellBBS::Load(File& file)
 {
-	if(CN3UIBase::Load(file)==false) return false;
+	if (CN3UIBase::Load(file) == false)
+		return false;
 
 	N3_VERIFY_UI_COMPONENT(m_pBtn_PageUp, GetChildByID<CN3UIButton>("btn_page_up"));
 	N3_VERIFY_UI_COMPONENT(m_pBtn_PageDown, GetChildByID<CN3UIButton>("btn_page_down"));
@@ -86,16 +87,16 @@ bool CUITradeSellBBS::Load(File& file)
 	N3_VERIFY_UI_COMPONENT(m_pString_Page, GetChildByID<CN3UIString>("string_page"));
 
 	std::string szID;
-	for(int i = 0; i < TRADE_BBS_MAXSTRING; i++)
+	for (int i = 0; i < TRADE_BBS_MAXSTRING; i++)
 	{
 		szID = fmt::format("text_{:02}", i);
 		N3_VERIFY_UI_COMPONENT(m_pText[i], GetChildByID<CN3UIString>(szID));
 	}
 
-	m_iCurPage = 0; // 현재 페이지..
+	m_iCurPage               = 0; // 현재 페이지..
 
-	__TABLE_UI_RESRC*	pTblUI	= nullptr;
-	pTblUI = CGameBase::s_pTbl_UI.Find(NATION_ELMORAD);
+	__TABLE_UI_RESRC* pTblUI = nullptr;
+	pTblUI                   = CGameBase::s_pTbl_UI.Find(NATION_ELMORAD);
 
 	m_MsgBox.LoadFromFile(pTblUI->szMessageBox);
 
@@ -107,7 +108,7 @@ bool CUITradeSellBBS::Load(File& file)
 
 	m_UIExplanation.LoadFromFile(pTblUI->szTradeMemolist);
 
-	rt = m_UIExplanation.GetRegion();
+	rt   = m_UIExplanation.GetRegion();
 	pt.x = (CN3Base::s_CameraData.vp.Width - (rt.right - rt.left)) / 2;
 	pt.y = (CN3Base::s_CameraData.vp.Height - (rt.bottom - rt.top)) / 2;
 	m_UIExplanation.SetPos(pt.x, pt.y);
@@ -118,69 +119,69 @@ bool CUITradeSellBBS::Load(File& file)
 bool CUITradeSellBBS::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
 	int iID = -1;
-	if( dwMsg == UIMSG_BUTTON_CLICK )
+	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
-		if(pSender == m_pBtn_Refresh)
+		if (pSender == m_pBtn_Refresh)
 		{
 			float fTime = CN3Base::TimeGet();
-			if( fTime - m_fTime < 3.0f )
-				return true;//너무 자주 새데이터 요청을 못하게 함 3초에 한번정도로 제약을 둠.
+			if (fTime - m_fTime < 3.0f)
+				return true; //너무 자주 새데이터 요청을 못하게 함 3초에 한번정도로 제약을 둠.
 			m_fTime = fTime;
 
 			this->MsgSend_RefreshData(m_iCurPage);
 		}
-		else if(pSender == m_pBtn_PageUp)
+		else if (pSender == m_pBtn_PageUp)
 		{
 			int iCurPage = m_iCurPage;
 			iCurPage--;
-			if(iCurPage >= 0)
+			if (iCurPage >= 0)
 			{
 				this->MsgSend_RefreshData(iCurPage);
 			}
 		}
-		else if(pSender == m_pBtn_PageDown)
+		else if (pSender == m_pBtn_PageDown)
 		{
 			int iCurPage = m_iCurPage;
 			iCurPage++;
-			if(iCurPage < m_iMaxPage)
+			if (iCurPage < m_iMaxPage)
 			{
 				this->MsgSend_RefreshData(iCurPage);
 			}
 		}
-		else if(pSender == m_pBtn_Close)
+		else if (pSender == m_pBtn_Close)
 		{
 			m_iCurPage = 0;
-			m_fTime = 0.0f;
+			m_fTime    = 0.0f;
 			this->SetVisible(false);
 		}
-		else if(pSender == m_pBtn_Register)
+		else if (pSender == m_pBtn_Register)
 		{
 			m_pBtn_Register->SetState(UI_STATE_BUTTON_NORMAL);
 			OnButtonRegister();
 		}
-		else if(pSender == m_pBtn_RegisterCancel)
+		else if (pSender == m_pBtn_RegisterCancel)
 		{
 			OnButtonRegisterCancel();
 		}
-		else if(pSender == m_pBtn_Whisper)
+		else if (pSender == m_pBtn_Whisper)
 		{
 			OnButtonWhisper();
 		}
-		else if(pSender == m_pBtn_Trade)
+		else if (pSender == m_pBtn_Trade)
 		{
 			m_pBtn_Trade->SetState(UI_STATE_BUTTON_NORMAL);
-			if(m_bProcessing == false)
+			if (m_bProcessing == false)
 				OnButtonTrade();
 		}
 	}
-	else if( dwMsg == UIMSG_STRING_LCLICK )
+	else if (dwMsg == UIMSG_STRING_LCLICK)
 	{
-		if(SelectedString(pSender, iID))
+		if (SelectedString(pSender, iID))
 		{
 			m_iCurIndex = iID;
 		}
 	}
-	else if( dwMsg == UIMSG_STRING_LDCLICK )
+	else if (dwMsg == UIMSG_STRING_LDCLICK)
 	{
 		OnListExplanation();
 	}
@@ -190,11 +191,11 @@ bool CUITradeSellBBS::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 void CUITradeSellBBS::MsgRecv_TradeBBS(Packet& pkt)
 {
-	m_bProcessing	= false;
+	m_bProcessing     = false;
 
-	uint8_t bySubType	= pkt.read<uint8_t>();
-	uint8_t byBBSKind	= pkt.read<uint8_t>();
-	uint8_t byResult	= pkt.read<uint8_t>();
+	uint8_t bySubType = pkt.read<uint8_t>();
+	uint8_t byBBSKind = pkt.read<uint8_t>();
+	uint8_t byResult  = pkt.read<uint8_t>();
 
 	if (byResult != 0x01)
 	{
@@ -210,15 +211,15 @@ void CUITradeSellBBS::MsgRecv_TradeBBS(Packet& pkt)
 
 			switch (bySubResult)
 			{
-				case 1://1: 일반적인 실패
+				case 1: //1: 일반적인 실패
 					szMsg = fmt::format_text_resource(IDS_TRADE_BBS_FAIL1);
 					break;
 
-				case 2://2: 돈이 없어서 실패
+				case 2: //2: 돈이 없어서 실패
 					szMsg = fmt::format_text_resource(IDS_TRADE_BBS_FAIL2);
 					break;
 
-				case 3://3: 항목이 없어서 실패
+				case 3: //3: 항목이 없어서 실패
 					szMsg = fmt::format_text_resource(IDS_TRADE_BBS_FAIL4);
 					break;
 			}
@@ -239,13 +240,13 @@ void CUITradeSellBBS::MsgRecv_TradeBBS(Packet& pkt)
 
 			switch (bySubResult)
 			{
-				case 1://1: 일반적인 실패
+				case 1: //1: 일반적인 실패
 					szMsg = fmt::format_text_resource(IDS_TRADE_BBS_FAIL5);
 					break;
-				case 2://2: 돈이 없어서 실패
+				case 2: //2: 돈이 없어서 실패
 					szMsg = fmt::format_text_resource(IDS_TRADE_BBS_FAIL2);
 					break;
-				case 3://3: 항목이 없어서 실패
+				case 3: //3: 항목이 없어서 실패
 					szMsg = fmt::format_text_resource(IDS_TRADE_BBS_FAIL4);
 					break;
 			}
@@ -257,7 +258,8 @@ void CUITradeSellBBS::MsgRecv_TradeBBS(Packet& pkt)
 
 	if (bySubType == N3_SP_TYPE_BBS_OPEN)
 	{
-		if (!IsVisible()) SetVisible(true);
+		if (!IsVisible())
+			SetVisible(true);
 
 		if (byBBSKind == N3_SP_TRADE_BBS_BUY)
 		{
@@ -307,30 +309,33 @@ void CUITradeSellBBS::MsgRecv_RefreshData(Packet& pkt)
 	int iLen;
 	m_Datas.clear();
 
-	for( int i = 0 ; i < TRADE_BBS_MAX_LINE ; i++ )
+	for (int i = 0; i < TRADE_BBS_MAX_LINE; i++)
 	{
 		__InfoTradeSellBBS Info;
 		Info.sID = pkt.read<int16_t>();
+		iLen     = pkt.read<int16_t>();
+		if (iLen > 0)
+			pkt.readString(Info.szID, iLen);
 		iLen = pkt.read<int16_t>();
-		if(iLen>0) pkt.readString(Info.szID, iLen);
+		if (iLen > 0)
+			pkt.readString(Info.szTitle, iLen);
 		iLen = pkt.read<int16_t>();
-		if(iLen>0) pkt.readString(Info.szTitle, iLen);
-		iLen = pkt.read<int16_t>();
-		if(iLen>0) pkt.readString(Info.szExplanation, iLen);
-		Info.iPrice = pkt.read<uint32_t>();		//아이템에 제시한 가격
-		Info.sIndex = pkt.read<int16_t>();		//등록된 인덱스
+		if (iLen > 0)
+			pkt.readString(Info.szExplanation, iLen);
+		Info.iPrice = pkt.read<uint32_t>(); //아이템에 제시한 가격
+		Info.sIndex = pkt.read<int16_t>();  //등록된 인덱스
 
-		if( Info.sID != -1 )
+		if (Info.sID != -1)
 			m_Datas.push_back(Info);
 	}
 
-	int16_t sPage = pkt.read<int16_t>();
+	int16_t sPage  = pkt.read<int16_t>();
 	int16_t sTotal = pkt.read<int16_t>();
 
 	//TRACE("TRADE_BBS_PAGE:%d\n",sPage);
-	m_iCurPage = sPage;
-	m_iMaxPage = sTotal / TRADE_BBS_MAX_LINE;
-	if( (sTotal % TRADE_BBS_MAX_LINE) > 0 )
+	m_iCurPage     = sPage;
+	m_iMaxPage     = sTotal / TRADE_BBS_MAX_LINE;
+	if ((sTotal % TRADE_BBS_MAX_LINE) > 0)
 		m_iMaxPage++;
 
 	RefreshPage();
@@ -338,15 +343,17 @@ void CUITradeSellBBS::MsgRecv_RefreshData(Packet& pkt)
 
 void CUITradeSellBBS::RefreshPage()
 {
-	if(m_pString_Page) m_pString_Page->SetStringAsInt(m_iCurPage+1); // 페이지 표시..
+	if (m_pString_Page)
+		m_pString_Page->SetStringAsInt(m_iCurPage + 1); // 페이지 표시..
 
 	ResetContent();
 
 	it_TradeSellBBS it = m_Datas.begin();
 
-	for( int i = 0 ; i < TRADE_BBS_MAX_LINE ; i++ )
+	for (int i = 0; i < TRADE_BBS_MAX_LINE; i++)
 	{
-		if(it==m_Datas.end()) break;
+		if (it == m_Datas.end())
+			break;
 
 		__InfoTradeSellBBS ITSB = (*it);
 		SetContentString(i, ITSB.szID.c_str(), ITSB.iPrice, ITSB.szTitle.c_str());
@@ -356,61 +363,64 @@ void CUITradeSellBBS::RefreshPage()
 
 void CUITradeSellBBS::MsgSend_RefreshData(int iCurPage)
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if (m_bProcessing)
+		return; //전에 보낸 패킷 응답이 없으면
 
 	uint8_t byBuff[10];
-	int iOffset=0;
+	int iOffset = 0;
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_MARKET_BBS);	
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_MARKET_BBS);
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_TYPE_BBS_DATA);
 	CAPISocket::MP_AddByte(byBuff, iOffset, m_byBBSKind);
-	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)iCurPage);
+	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t) iCurPage);
 	CGameProcedure::s_pSocket->Send(byBuff, iOffset);
 
 	m_bProcessing = true;
-
 }
 
 void CUITradeSellBBS::MsgSend_Register()
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
-	if(!CGameProcedure::s_pProcMain->m_pUITradeBBSEdit) return;
+	if (m_bProcessing)
+		return; //전에 보낸 패킷 응답이 없으면
+	if (!CGameProcedure::s_pProcMain->m_pUITradeBBSEdit)
+		return;
 	int16_t sLen = 0;
 	std::string szTitle;
 	std::string szExplanation;
-	int	iPrice = 0;
+	int iPrice       = 0;
 
-	szTitle			= CGameProcedure::s_pProcMain->m_pUITradeBBSEdit->GetTradeTitle();
-	szExplanation	= CGameProcedure::s_pProcMain->m_pUITradeBBSEdit->GetTradeExplanation();
-	iPrice			= CGameProcedure::s_pProcMain->m_pUITradeBBSEdit->GetPrice();
+	szTitle          = CGameProcedure::s_pProcMain->m_pUITradeBBSEdit->GetTradeTitle();
+	szExplanation    = CGameProcedure::s_pProcMain->m_pUITradeBBSEdit->GetTradeExplanation();
+	iPrice           = CGameProcedure::s_pProcMain->m_pUITradeBBSEdit->GetPrice();
 
-	sLen = 15;
-	sLen += (int16_t)szTitle.size();
-	sLen += (int16_t)szExplanation.size();
+	sLen             = 15;
+	sLen            += (int16_t) szTitle.size();
+	sLen            += (int16_t) szExplanation.size();
 
-	uint8_t* byBuff = new uint8_t[sLen];
-	int iOffset=0;
+	uint8_t* byBuff  = new uint8_t[sLen];
+	int iOffset      = 0;
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_MARKET_BBS);	
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_MARKET_BBS);
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_TYPE_REGISTER);
 	CAPISocket::MP_AddByte(byBuff, iOffset, m_byBBSKind);
-	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)szTitle.size());
+	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t) szTitle.size());
 	CAPISocket::MP_AddString(byBuff, iOffset, szTitle);
-	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t)szExplanation.size());
+	CAPISocket::MP_AddShort(byBuff, iOffset, (int16_t) szExplanation.size());
 	CAPISocket::MP_AddString(byBuff, iOffset, szExplanation);
 	CAPISocket::MP_AddDword(byBuff, iOffset, iPrice);
 	CGameProcedure::s_pSocket->Send(byBuff, iOffset);
 
 	m_bProcessing = true;
-	delete [] byBuff;
+	delete[] byBuff;
 }
 
 void CUITradeSellBBS::MsgSend_RegisterCancel(int16_t sIndex)
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if (m_bProcessing)
+		return; //전에 보낸 패킷 응답이 없으면
 
 	uint8_t byBuff[10];
-	int iOffset=0;
+	int iOffset = 0;
 
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_MARKET_BBS);
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_TYPE_REGISTER_CANCEL);
@@ -425,24 +435,24 @@ void CUITradeSellBBS::CallBackProc(int iID, uint32_t dwFlag)
 {
 	//TRACE("OnButton ID:%d Btn %d\n",iID, dwFlag);
 
-	if(iID == CHILD_UI_SELL_MSG)
+	if (iID == CHILD_UI_SELL_MSG)
 	{
-		if(dwFlag == 1)//OK
+		if (dwFlag == 1) //OK
 		{
-			if(CGameProcedure::s_pProcMain->m_pUITradeBBSEdit)
-				CGameProcedure::s_pProcMain->m_pUITradeBBSEdit->ShowWindow(CHILD_UI_EXPLANATION_EDIT,this);
+			if (CGameProcedure::s_pProcMain->m_pUITradeBBSEdit)
+				CGameProcedure::s_pProcMain->m_pUITradeBBSEdit->ShowWindow(CHILD_UI_EXPLANATION_EDIT, this);
 		}
 	}
-	else if(iID == CHILD_UI_TRADE_MSG)
+	else if (iID == CHILD_UI_TRADE_MSG)
 	{
-		if(dwFlag == 1)//OK
+		if (dwFlag == 1) //OK
 		{
 			MsgSend_PerTrade();
 		}
 	}
-	else if(iID == CHILD_UI_EXPLANATION_EDIT)
+	else if (iID == CHILD_UI_EXPLANATION_EDIT)
 	{
-		if(dwFlag == 1)//OK
+		if (dwFlag == 1) //OK
 		{
 			MsgSend_Register();
 		}
@@ -450,18 +460,17 @@ void CUITradeSellBBS::CallBackProc(int iID, uint32_t dwFlag)
 		{
 		}
 	}
-	else if(iID == CHILD_UI_EXPLANATION)
+	else if (iID == CHILD_UI_EXPLANATION)
 	{
-		if(dwFlag == 1)//pageup
+		if (dwFlag == 1) //pageup
 		{
 			RefreshExplanation(true);
 		}
-		else if(dwFlag == 2)//pagedown
+		else if (dwFlag == 2) //pagedown
 		{
 			RefreshExplanation(false);
 		}
 	}
-
 }
 
 void CUITradeSellBBS::OnButtonRegister()
@@ -494,42 +503,47 @@ void CUITradeSellBBS::OnButtonRegister()
 
 void CUITradeSellBBS::OnButtonRegisterCancel()
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
-	if(m_iCurIndex <= -1) return;
+	if (m_bProcessing)
+		return; //전에 보낸 패킷 응답이 없으면
+	if (m_iCurIndex <= -1)
+		return;
 
 	it_TradeSellBBS it = m_Datas.begin();
 
-	for( int i = 0 ; i < TRADE_BBS_MAX_LINE ; i++, it++ )
+	for (int i = 0; i < TRADE_BBS_MAX_LINE; i++, it++)
 	{
-		if( it == m_Datas.end() ) break;
-		if( i == m_iCurIndex )
+		if (it == m_Datas.end())
+			break;
+		if (i == m_iCurIndex)
 		{
 			__InfoTradeSellBBS ITSB = (*it);
 
 			if (lstrcmpi(ITSB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) == 0)
-			{//자기것만 등록해제하게..
+			{ //자기것만 등록해제하게..
 				MsgSend_RegisterCancel(ITSB.sIndex);
 				break;
 			}
 			else if (CGameProcedure::s_pProcMain->s_pPlayer->m_InfoBase.iAuthority == AUTHORITY_MANAGER)
-			{//운영자에게는 해제 권한을 준다...(도배나 욕설등의 게시물 삭제를 위해서...)
+			{ //운영자에게는 해제 권한을 준다...(도배나 욕설등의 게시물 삭제를 위해서...)
 				MsgSend_RegisterCancel(ITSB.sIndex);
 				break;
 			}
 		}
-	}//for(
+	} //for(
 }
 
 void CUITradeSellBBS::OnButtonWhisper()
 {
-	if(m_iCurIndex <= -1) return;
+	if (m_iCurIndex <= -1)
+		return;
 
 	it_TradeSellBBS it = m_Datas.begin();
 
-	for( int i = 0 ; i < TRADE_BBS_MAX_LINE ; i++, it++ )
+	for (int i = 0; i < TRADE_BBS_MAX_LINE; i++, it++)
 	{
-		if( it == m_Datas.end() ) break;
-		if( i == m_iCurIndex )
+		if (it == m_Datas.end())
+			break;
+		if (i == m_iCurIndex)
 		{
 			__InfoTradeSellBBS ITSB = (*it);
 			//나 자신에게는 귓속말을 못하게 한다...
@@ -543,24 +557,27 @@ void CUITradeSellBBS::OnButtonWhisper()
 void CUITradeSellBBS::SetVisible(bool bVisible)
 {
 	CN3UIBase::SetVisible(bVisible);
-	if(bVisible)
+	if (bVisible)
 		CGameProcedure::s_pUIMgr->SetVisibleFocusedUI(this);
 	else
-		CGameProcedure::s_pUIMgr->ReFocusUI();//this_ui
+		CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
 }
 
 void CUITradeSellBBS::OnButtonTrade()
 {
-	if(m_bProcessing) return; //전에 보낸 패킷 응답이 없으면
+	if (m_bProcessing)
+		return; //전에 보낸 패킷 응답이 없으면
 
-	if(m_iCurIndex <= -1) return;
+	if (m_iCurIndex <= -1)
+		return;
 
 	it_TradeSellBBS it = m_Datas.begin();
 
-	for( int i = 0 ; i < TRADE_BBS_MAX_LINE ; i++, it++ )
+	for (int i = 0; i < TRADE_BBS_MAX_LINE; i++, it++)
 	{
-		if( it == m_Datas.end() ) break;
-		if( i == m_iCurIndex )
+		if (it == m_Datas.end())
+			break;
+		if (i == m_iCurIndex)
 		{
 			__InfoTradeSellBBS ITSB = (*it);
 
@@ -568,7 +585,7 @@ void CUITradeSellBBS::OnButtonTrade()
 			{
 				std::string szMsg = fmt::format_text_resource(IDS_TRADE_BBS_PER_TRADE, 5000);
 
-				m_ITSB = ITSB;
+				m_ITSB            = ITSB;
 				m_MsgBox.SetBoxStyle(MB_YESNO);
 				m_MsgBox.m_eBehavior = BEHAVIOR_NOTHING;
 				m_MsgBox.SetTitle("");
@@ -577,7 +594,7 @@ void CUITradeSellBBS::OnButtonTrade()
 				break;
 			}
 		}
-	}//for(
+	} //for(
 }
 
 void CUITradeSellBBS::RefreshExplanation(bool bPageUp)
@@ -614,27 +631,29 @@ void CUITradeSellBBS::RefreshExplanation(bool bPageUp)
 			m_UIExplanation.SetExplanation(m_iCurIndex, ITSB.szExplanation);
 			break;
 		}
-	}//for(
+	} //for(
 }
 
 void CUITradeSellBBS::OnListExplanation()
 {
-	if(m_iCurIndex <= -1) return;
+	if (m_iCurIndex <= -1)
+		return;
 
 	it_TradeSellBBS it = m_Datas.begin();
 
-	for( int i = 0 ; i < TRADE_BBS_MAX_LINE ; i++, it++ )
+	for (int i = 0; i < TRADE_BBS_MAX_LINE; i++, it++)
 	{
-		if( it == m_Datas.end() ) break;
-		if( i == m_iCurIndex )
+		if (it == m_Datas.end())
+			break;
+		if (i == m_iCurIndex)
 		{
 			__InfoTradeSellBBS ITSB = (*it);
 
 			m_UIExplanation.ShowWindow(CHILD_UI_EXPLANATION, this);
-			m_UIExplanation.SetExplanation(m_iCurIndex,ITSB.szExplanation);
+			m_UIExplanation.SetExplanation(m_iCurIndex, ITSB.szExplanation);
 			break;
 		}
-	}//for(
+	} //for(
 }
 
 void CUITradeSellBBS::MsgSend_PerTrade()
@@ -649,9 +668,9 @@ void CUITradeSellBBS::MsgSend_PerTrade()
 
 	uint8_t byBuff[10];
 
-	int iOffset=0;
+	int iOffset = 0;
 
-	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_MARKET_BBS);	
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_MARKET_BBS);
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_TYPE_BBS_TRADE);
 	CAPISocket::MP_AddByte(byBuff, iOffset, m_byBBSKind);
 	CAPISocket::MP_AddShort(byBuff, iOffset, m_ITSB.sIndex);
@@ -662,11 +681,11 @@ void CUITradeSellBBS::MsgSend_PerTrade()
 
 bool CUITradeSellBBS::OnKeyPress(int iKey)
 {
-	switch(iKey)
+	switch (iKey)
 	{
-	case DIK_ESCAPE:
-		SetVisible(false);
-		return true;
+		case DIK_ESCAPE:
+			SetVisible(false);
+			return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);
@@ -674,17 +693,20 @@ bool CUITradeSellBBS::OnKeyPress(int iKey)
 
 void CUITradeSellBBS::RenderSelectContent()
 {
-	if(!IsVisible())	return;
-	if(m_iCurIndex < 0)	return;
-	if(m_iCurIndex >= TRADE_BBS_MAX_LINE) return;
+	if (!IsVisible())
+		return;
+	if (m_iCurIndex < 0)
+		return;
+	if (m_iCurIndex >= TRADE_BBS_MAX_LINE)
+		return;
 
 	RECT rc, rc1;
-	if(m_pText[m_iCurIndex])
+	if (m_pText[m_iCurIndex])
 	{
 		rc = m_pText[m_iCurIndex]->GetRegion();
-		if(m_pText[m_iCurIndex + TRADE_BBS_MAX_LINE*2])
+		if (m_pText[m_iCurIndex + TRADE_BBS_MAX_LINE * 2])
 		{
-			rc1 = m_pText[m_iCurIndex + TRADE_BBS_MAX_LINE*2]->GetRegion();
+			rc1      = m_pText[m_iCurIndex + TRADE_BBS_MAX_LINE * 2]->GetRegion();
 			rc.right = rc1.right;
 		}
 	}
@@ -692,10 +714,10 @@ void CUITradeSellBBS::RenderSelectContent()
 		return;
 
 	__VertexTransformedColor vLines[5];
-	vLines[0].Set((float)rc.left, (float)rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
-	vLines[1].Set((float)rc.right, (float)rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
-	vLines[2].Set((float)rc.right, (float)rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
-	vLines[3].Set((float)rc.left, (float)rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+	vLines[0].Set((float) rc.left, (float) rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+	vLines[1].Set((float) rc.right, (float) rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+	vLines[2].Set((float) rc.right, (float) rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+	vLines[3].Set((float) rc.left, (float) rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
 	vLines[4] = vLines[0];
 
 	DWORD dwZ, dwFog, dwAlpha, dwCOP, dwCA1, dwSrcBlend, dwDestBlend, dwVertexShader, dwAOP, dwAA1;
@@ -722,7 +744,7 @@ void CUITradeSellBBS::RenderSelectContent()
 
 	CN3Base::s_lpD3DDev->SetFVF(FVF_TRANSFORMEDCOLOR);
 	CN3Base::s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINESTRIP, 4, vLines, sizeof(__VertexTransformedColor));
-	
+
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, dwZ);
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, dwFog);
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlpha);
@@ -756,7 +778,8 @@ bool CUITradeSellBBS::SelectedString(CN3UIBase* pSender, int& iID)
 
 void CUITradeSellBBS::Render()
 {
-	if(!IsVisible()) return;
+	if (!IsVisible())
+		return;
 
 	CN3UIBase::Render();
 	RenderSelectContent();
@@ -764,14 +787,14 @@ void CUITradeSellBBS::Render()
 
 void CUITradeSellBBS::ResetContent()
 {
-	if(m_Datas.size()>0)
+	if (m_Datas.size() > 0)
 		m_iCurIndex = 0;
 	else
 		m_iCurIndex = -1;
 
-	for(int i = 0 ; i < TRADE_BBS_MAXSTRING ; i++)
+	for (int i = 0; i < TRADE_BBS_MAXSTRING; i++)
 	{
-		if(m_pText[i])
+		if (m_pText[i])
 		{
 			m_pText[i]->SetString("");
 			m_pText[i]->SetColor(0xffffffff);
@@ -783,10 +806,10 @@ void CUITradeSellBBS::SetContentString(int iIndex, std::string szID, int iPrice,
 {
 	std::string szGold = fmt::format_text_resource(IDS_TOOLTIP_GOLD);
 
-	if(m_pText[iIndex])
+	if (m_pText[iIndex])
 		m_pText[iIndex]->SetString(szID);
 
-	if(m_pText[iIndex + TRADE_BBS_MAX_LINE])
+	if (m_pText[iIndex + TRADE_BBS_MAX_LINE])
 		m_pText[iIndex + TRADE_BBS_MAX_LINE]->SetString(szTitle);
 
 	if (m_pText[iIndex + TRADE_BBS_MAX_LINE * 2] != nullptr)

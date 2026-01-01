@@ -2,8 +2,7 @@
 #include "TcpClientSocket.h"
 #include "SocketManager.h"
 
-TcpClientSocket::TcpClientSocket(SocketManager* socketManager)
-	: TcpSocket(socketManager)
+TcpClientSocket::TcpClientSocket(SocketManager* socketManager) : TcpSocket(socketManager)
 {
 }
 
@@ -30,7 +29,8 @@ bool TcpClientSocket::Create()
 	_socket.set_option(asio::socket_base::receive_buffer_size(_recvBufferSize * 4), ec);
 	if (ec)
 	{
-		spdlog::error("TcpClientSocket::Create: failed to set receive buffer size: {}", ec.message());
+		spdlog::error(
+			"TcpClientSocket::Create: failed to set receive buffer size: {}", ec.message());
 		return false;
 	}
 
@@ -52,8 +52,8 @@ bool TcpClientSocket::Connect(const char* remoteAddress, uint16_t remotePort)
 	asio::ip::address ip = asio::ip::make_address(remoteAddress, ec);
 	if (ec)
 	{
-		spdlog::error("TcpClientSocket::Connect: invalid address {}: {}",
-			remoteAddress, ec.message());
+		spdlog::error(
+			"TcpClientSocket::Connect: invalid address {}: {}", remoteAddress, ec.message());
 		return false;
 	}
 
@@ -77,8 +77,8 @@ bool TcpClientSocket::Connect(const char* remoteAddress, uint16_t remotePort)
 
 	InitSocket();
 
-	_remoteIp		= ip.to_string();
-	_remoteIpCached	= true;
+	_remoteIp       = ip.to_string();
+	_remoteIpCached = true;
 
 	AsyncReceive();
 
@@ -100,8 +100,7 @@ void TcpClientSocket::Close()
 
 		// Wait until the send chain is complete.
 		// The send chain will trigger this again.
-		if (_sendInProgress
-			|| !_sendQueue.empty())
+		if (_sendInProgress || !_sendQueue.empty())
 			return;
 	}
 
@@ -112,12 +111,13 @@ void TcpClientSocket::Close()
 		if (threadPool == nullptr)
 			return;
 
-		asio::post(*threadPool, std::bind(&SocketManager::OnPostClientSocketClose, _socketManager, this));
+		asio::post(
+			*threadPool, std::bind(&SocketManager::OnPostClientSocketClose, _socketManager, this));
 	}
 	catch (const asio::system_error& ex)
 	{
-		spdlog::error("TcpClientSocket::Close: failed to post close for socketId={}: {}",
-			_socketId, ex.what());
+		spdlog::error("TcpClientSocket::Close: failed to post close for socketId={}: {}", _socketId,
+			ex.what());
 	}
 }
 

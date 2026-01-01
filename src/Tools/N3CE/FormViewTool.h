@@ -17,36 +17,39 @@
 class CFormViewTool : public CFormView
 {
 protected:
-	CFormViewTool();           // protected constructor used by dynamic creation
+	CFormViewTool(); // protected constructor used by dynamic creation
 	DECLARE_DYNCREATE(CFormViewTool)
 
-// Form Data
+					 // Form Data
 public:
 	//{{AFX_DATA(CFormViewTool)
-	enum { IDD = IDD_TOOL };
-	CListBox	m_ListSound1;
-	CListBox	m_ListSound0;
-	CComboBox	m_CBLOD;
+	enum
+	{
+		IDD = IDD_TOOL
+	};
+	CListBox m_ListSound1;
+	CListBox m_ListSound0;
+	CComboBox m_CBLOD;
 	//}}AFX_DATA
 
-// Attributes
+	// Attributes
 public:
-
-// Operations
+	// Operations
 public:
 	void UpdateAllInfo();
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CFormViewTool)
-	public:
+public:
 	virtual void OnInitialUpdate();
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 	virtual void OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 protected:
 	virtual ~CFormViewTool();
 #ifdef _DEBUG

@@ -13,30 +13,31 @@
 
 class CDlgPMeshCreateOption : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgPMeshCreateOption(CWnd* pParent = nullptr);   // standard constructor
+	CDlgPMeshCreateOption(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+													// Dialog Data
 	//{{AFX_DATA(CDlgPMeshCreateOption)
-	enum { IDD = IDD_PMESH_CREATE_OPTION };
-	BOOL	m_bTriangleLoss;
-	float	m_fWeight;
-	int		m_iTriangle;
-	int		m_iLoss;
+	enum
+	{
+		IDD = IDD_PMESH_CREATE_OPTION
+	};
+	BOOL m_bTriangleLoss;
+	float m_fWeight;
+	int m_iTriangle;
+	int m_iLoss;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgPMeshCreateOption)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgPMeshCreateOption)
 	virtual BOOL OnInitDialog();

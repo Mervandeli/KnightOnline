@@ -6,10 +6,11 @@ class File;
 class CWinCrypt
 {
 public:
-	constexpr const static TCHAR Provider[]	= MS_ENHANCED_PROV;
-	constexpr const static char Cipher[]	= "owsd9012%$1as!wpow1033b%!@%12";
+	constexpr const static TCHAR Provider[] = MS_ENHANCED_PROV;
+	constexpr const static char Cipher[]    = "owsd9012%$1as!wpow1033b%!@%12";
 
-	inline bool IsLoaded() const {
+	inline bool IsLoaded() const
+	{
 		return m_bIsLoaded;
 	}
 
@@ -20,8 +21,8 @@ public:
 	bool ReadFile(File& file, void* buffer, size_t bytesToRead, size_t* bytesRead = nullptr);
 
 protected:
-	bool		m_bIsLoaded;
-	HCRYPTPROV	m_hCryptProvider;
-	HCRYPTHASH	m_hCryptHash;
-	HCRYPTKEY	m_hCryptKey;
+	bool m_bIsLoaded;
+	HCRYPTPROV m_hCryptProvider;
+	HCRYPTHASH m_hCryptHash;
+	HCRYPTKEY m_hCryptKey;
 };

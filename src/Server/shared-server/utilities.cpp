@@ -1,13 +1,12 @@
 ﻿#include "pch.h"
 #include "utilities.h"
-#include <algorithm>	// std::clamp()
-#include <limits>		// INT_MAX
+#include <algorithm> // std::clamp()
+#include <limits>    // INT_MAX
 
 bool CheckGetVarString(int nLength, char* tBuf, const char* sBuf, int nSize, int& index)
 {
 	int nRet = GetVarString(tBuf, sBuf, nSize, index);
-	if (nRet <= 0
-		|| nRet > nLength)
+	if (nRet <= 0 || nRet > nLength)
 		return false;
 
 	return true;
@@ -80,7 +79,7 @@ void SetString(char* tBuf, const char* sBuf, int len, int& index)
 void SetVarString(char* tBuf, const char* sBuf, int len, int& index)
 {
 	*(tBuf + index) = (uint8_t) len;
-	index ++;
+	index++;
 
 	memcpy(tBuf + index, sBuf, len);
 	index += len;
@@ -157,21 +156,17 @@ int ParseSpace(char* tBuf, const char* sBuf)
 	int i = 0, index = 0;
 	bool flag = false;
 
-	while (sBuf[index] == ' '
-		|| sBuf[index] == '\t')
+	while (sBuf[index] == ' ' || sBuf[index] == '\t')
 		index++;
 
-	while (sBuf[index] != ' '
-		&& sBuf[index] != '\t'
-		&& sBuf[index] != (uint8_t) 0)
+	while (sBuf[index] != ' ' && sBuf[index] != '\t' && sBuf[index] != (uint8_t) 0)
 	{
 		tBuf[i++] = sBuf[index++];
-		flag = true;
+		flag      = true;
 	}
 	tBuf[i] = 0;
 
-	while (sBuf[index] == ' '
-		|| sBuf[index] == '\t')
+	while (sBuf[index] == ' ' || sBuf[index] == '\t')
 		index++;
 
 	if (!flag)
@@ -183,8 +178,8 @@ int ParseSpace(char* tBuf, const char* sBuf)
 int myrand_ai(int min, int max, bool bSame)
 {
 	static int nOld = 0;
-	int nRet = 0;
-	int nLoop = 10;
+	int nRet        = 0;
+	int nLoop       = 10;
 
 	if (min == max)
 		return min;
@@ -213,8 +208,8 @@ int myrand_generic(int min, int max)
 	if (min > max)
 		std::swap(min, max);
 
-	double gap = max - min + 1;
-	double rrr = static_cast<double>(RAND_MAX) / gap;
+	double gap      = max - min + 1;
+	double rrr      = static_cast<double>(RAND_MAX) / gap;
 
 	int rand_result = static_cast<int>(static_cast<double>(rand()) / rrr);
 	if (min > (INT_MAX - rand_result))

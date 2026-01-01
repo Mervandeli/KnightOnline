@@ -6,20 +6,20 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 CN3Transform::CN3Transform()
 {
 	m_dwType |= OBJ_TRANSFORM;
 
-	m_vPos.Set(0,0,0); // 위치, 스케일, 회전 벡터. 
-	m_vScale.Set(1,1,1);
+	m_vPos.Set(0, 0, 0); // 위치, 스케일, 회전 벡터.
+	m_vScale.Set(1, 1, 1);
 	m_qRot.Identity();
 	m_Matrix.Identity();
 
 	// 에니메이션 키
-	m_fFrmCur = 0;
+	m_fFrmCur   = 0;
 	m_fFrmWhole = 0;
 }
 
@@ -29,14 +29,14 @@ CN3Transform::~CN3Transform()
 
 void CN3Transform::Release()
 {
-	m_vPos.Set(0,0,0); // 위치, 스케일, 회전 벡터. 
-	m_vScale.Set(1,1,1);
+	m_vPos.Set(0, 0, 0); // 위치, 스케일, 회전 벡터.
+	m_vScale.Set(1, 1, 1);
 	m_qRot.Identity();
 
 	m_Matrix.Identity();
 
 	// 에니메이션 키
-	m_fFrmCur = 0;
+	m_fFrmCur   = 0;
 	m_fFrmWhole = 0;
 
 	m_KeyPos.Release();
@@ -50,7 +50,7 @@ bool CN3Transform::Load(File& file)
 {
 	CN3BaseFileAccess::Load(file);
 
-	file.Read(&m_vPos, sizeof(__Vector3)); // 위치, 스케일, 회전 벡터. 
+	file.Read(&m_vPos, sizeof(__Vector3)); // 위치, 스케일, 회전 벡터.
 	file.Read(&m_qRot, sizeof(__Quaternion));
 	file.Read(&m_vScale, sizeof(__Vector3));
 
@@ -59,12 +59,12 @@ bool CN3Transform::Load(File& file)
 	m_KeyRot.Load(file);
 	m_KeyScale.Load(file);
 
-	m_fFrmCur = 0;
-	m_fFrmWhole = 0;
+	m_fFrmCur       = 0;
+	m_fFrmWhole     = 0;
 
 	float fFrmWhole = 0;
 
-	fFrmWhole = m_KeyPos.Count() * m_KeyPos.SamplingRate() / 30.0f;
+	fFrmWhole       = m_KeyPos.Count() * m_KeyPos.SamplingRate() / 30.0f;
 	if (fFrmWhole > m_fFrmWhole)
 		m_fFrmWhole = fFrmWhole;
 
@@ -86,7 +86,7 @@ bool CN3Transform::Save(File& file)
 {
 	CN3BaseFileAccess::Save(file);
 
-	file.Write(&m_vPos, sizeof(__Vector3)); // 위치, 스케일, 회전 벡터. 
+	file.Write(&m_vPos, sizeof(__Vector3)); // 위치, 스케일, 회전 벡터.
 	file.Write(&m_qRot, sizeof(__Quaternion));
 	file.Write(&m_vScale, sizeof(__Vector3));
 
@@ -101,11 +101,13 @@ bool CN3Transform::Save(File& file)
 
 void CN3Transform::Tick(float fFrm)
 {
-	if(FRAME_SELFPLAY == fFrm)
+	if (FRAME_SELFPLAY == fFrm)
 	{
 		m_fFrmCur += s_fSecPerFrm;
-		if(m_fFrmCur < 0) m_fFrmCur = 0.0f;
-		if(m_fFrmCur >= m_fFrmWhole) m_fFrmCur = 0.0f;
+		if (m_fFrmCur < 0)
+			m_fFrmCur = 0.0f;
+		if (m_fFrmCur >= m_fFrmWhole)
+			m_fFrmCur = 0.0f;
 		fFrm = m_fFrmCur;
 	}
 	else
@@ -114,10 +116,12 @@ void CN3Transform::Tick(float fFrm)
 	}
 
 	bool bNdeedReCalcMatrix = this->TickAnimationKey(m_fFrmCur);
-	
-	if(m_dwType & OBJ_JOINT) return; // Joint 일 경우는 행렬을 계산하는 방법이 다르기 땜시 넘어간다..
 
-	if(bNdeedReCalcMatrix) this->ReCalcMatrix();
+	if (m_dwType & OBJ_JOINT)
+		return; // Joint 일 경우는 행렬을 계산하는 방법이 다르기 땜시 넘어간다..
+
+	if (bNdeedReCalcMatrix)
+		this->ReCalcMatrix();
 }
 
 void CN3Transform::ReCalcMatrix()
@@ -134,12 +138,16 @@ bool CN3Transform::TickAnimationKey(float fFrm)
 	int nKCP = m_KeyPos.Count();
 	int nKCR = m_KeyRot.Count();
 	int nKCS = m_KeyScale.Count();
-	if(nKCP <= 0 && nKCR <= 0 && nKCS <= 0) return false;
+	if (nKCP <= 0 && nKCR <= 0 && nKCS <= 0)
+		return false;
 
 	bool bNeedReCalcMatrix = false;
-	if(m_KeyPos.DataGet(fFrm, m_vPos) == true) bNeedReCalcMatrix = true;
-	if(m_KeyRot.DataGet(fFrm, m_qRot) == true) bNeedReCalcMatrix = true;
-	if(m_KeyScale.DataGet(fFrm, m_vScale) == true) bNeedReCalcMatrix = true;
+	if (m_KeyPos.DataGet(fFrm, m_vPos) == true)
+		bNeedReCalcMatrix = true;
+	if (m_KeyRot.DataGet(fFrm, m_qRot) == true)
+		bNeedReCalcMatrix = true;
+	if (m_KeyScale.DataGet(fFrm, m_vScale) == true)
+		bNeedReCalcMatrix = true;
 
 	return bNeedReCalcMatrix;
 }
@@ -150,19 +158,28 @@ void CN3Transform::Render(const __Matrix44* pMtxParent, float fUnitSize)
 	// 축 그리기..
 	static __Vector3 vAxis[9];
 	static bool bAxisCreated = false;
-	if(false == bAxisCreated)
+	if (false == bAxisCreated)
 	{
-		__Vector3 v0(0,0,0), v1(1,0,0), v2(0.8f,0.2f,0);
+		__Vector3 v0(0, 0, 0), v1(1, 0, 0), v2(0.8f, 0.2f, 0);
 		__Matrix44 mtxRot;
-		for(int i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++)
 		{
-			if(i == 0) { mtxRot.Identity(); } // X 축
-			else if(i == 1) { mtxRot.RotationZ(DegreesToRadians(90.0f)); } // Y 축
-			else if(i == 2) { mtxRot.RotationY(DegreesToRadians(-90.0f)); } // Z 축
-			
-			vAxis[i*3+0] = v0*mtxRot;
-			vAxis[i*3+1] = v1*mtxRot;
-			vAxis[i*3+2] = v2*mtxRot;
+			if (i == 0)
+			{
+				mtxRot.Identity();
+			} // X 축
+			else if (i == 1)
+			{
+				mtxRot.RotationZ(DegreesToRadians(90.0f));
+			} // Y 축
+			else if (i == 2)
+			{
+				mtxRot.RotationY(DegreesToRadians(-90.0f));
+			} // Z 축
+
+			vAxis[i * 3 + 0] = v0 * mtxRot;
+			vAxis[i * 3 + 1] = v1 * mtxRot;
+			vAxis[i * 3 + 2] = v2 * mtxRot;
 		}
 
 		bAxisCreated = true;
@@ -177,7 +194,7 @@ void CN3Transform::Render(const __Matrix44* pMtxParent, float fUnitSize)
 	CN3Base::RenderLines(&(vAxis[3]), 2, 0xff00ff00); // 선그리기..
 	CN3Base::RenderLines(&(vAxis[6]), 2, 0xff0000ff); // 선그리기..
 }
-#endif // end of _N3TOOL
+#endif                                                // end of _N3TOOL
 
 /*
 #if _DEBUG 

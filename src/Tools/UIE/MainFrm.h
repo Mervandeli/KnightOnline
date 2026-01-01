@@ -17,33 +17,33 @@ class CHierarchyView;
 class CPropertyView;
 class CMainFrame : public CFrameWnd
 {
-	
 protected: // create from serialization only
 	CMainFrame();
 	DECLARE_DYNCREATE(CMainFrame)
 
-// Attributes
+	// Attributes
 protected:
-	CSplitterWnd	m_wndSplitter;
-	CSplitterWnd	m_wndSplitterLeft;
-	HACCEL			m_hDefaultAccelTable;
-public:
-	CN3EngTool	m_Eng;
+	CSplitterWnd m_wndSplitter;
+	CSplitterWnd m_wndSplitterLeft;
+	HACCEL m_hDefaultAccelTable;
 
-// Operations
 public:
-	void	SetBasePath(LPCTSTR pszPath);
-	void	SetStatusText(LPCTSTR pszText);
-	void	EnableAccelerator(BOOL bEnable);
-// Overrides
+	CN3EngTool m_Eng;
+
+	// Operations
+public:
+	void SetBasePath(LPCTSTR pszPath);
+	void SetStatusText(LPCTSTR pszText);
+	void EnableAccelerator(BOOL bEnable);
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CMainFrame)
-	public:
+public:
 	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CMainFrame();
 	CUIEView* GetRightPane();
@@ -55,13 +55,13 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
-protected:  // control bar embedded members
-	CStatusBar  m_wndStatusBar;
-	CToolBar    m_wndToolBar;
-	CReBar      m_wndReBar;
-	CDlgBar      m_wndDlgBar;
+protected: // control bar embedded members
+	CStatusBar m_wndStatusBar;
+	CToolBar m_wndToolBar;
+	CReBar m_wndReBar;
+	CDlgBar m_wndDlgBar;
 
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CMainFrame)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

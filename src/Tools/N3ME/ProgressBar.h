@@ -12,33 +12,33 @@
 
 class CProgressBar : public CProgressCtrl
 {
-// Construction
+	// Construction
 public:
 	CProgressBar();
 
-// Attributes
+	// Attributes
 public:
 protected:
 	CString m_strMessage;
 	int m_nSize;
 	CRect m_Rect;
 
-// Operations
+	// Operations
 public:
-	BOOL Create(LPCTSTR strMessage, int nSize, int MaxValue);	
+	BOOL Create(LPCTSTR strMessage, int nSize, int MaxValue);
 	// nSize : progress bar의 가로 pixel 크기
 	// MaxValue : progress bar의 step의 최대값
 
-	CStatusBar* GetStatusBar();		// MainFrame에서 StatusBar 포인터 얻어오기
-	void Resize();					// 위치와 크기 조정
-	void Clear();					// 초기화
+	CStatusBar* GetStatusBar(); // MainFrame에서 StatusBar 포인터 얻어오기
+	void Resize();              // 위치와 크기 조정
+	void Clear();               // 초기화
 
-// Overrides
+								// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CProgressBar)
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CProgressBar();
 

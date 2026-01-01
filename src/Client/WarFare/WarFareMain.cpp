@@ -26,11 +26,7 @@
 HWND CreateMainWindow(HINSTANCE hInstance);
 LRESULT CALLBACK WndProcMain(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-int APIENTRY WinMain(
-	HINSTANCE hInstance,
-	HINSTANCE hPrevInstance,
-	LPSTR     lpCmdLine,
-	int       nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	// NOTE: get the current directory and make it known to CN3Base
 	char szPath[_MAX_PATH] = "";
@@ -46,31 +42,42 @@ int APIENTRY WinMain(
 
 	// NOTE: what is the texture quality?
 	CN3Base::s_Options.iTexLOD_Chr = ini.GetInt("Texture", "LOD_Chr", 0);
-	if(CN3Base::s_Options.iTexLOD_Chr < 0) CN3Base::s_Options.iTexLOD_Chr = 0;
-	if(CN3Base::s_Options.iTexLOD_Chr >= 2) CN3Base::s_Options.iTexLOD_Chr = 1;
-	
+	if (CN3Base::s_Options.iTexLOD_Chr < 0)
+		CN3Base::s_Options.iTexLOD_Chr = 0;
+	if (CN3Base::s_Options.iTexLOD_Chr >= 2)
+		CN3Base::s_Options.iTexLOD_Chr = 1;
+
 	// NOTE: what is the texture quality?
 	CN3Base::s_Options.iTexLOD_Shape = ini.GetInt("Texture", "LOD_Shape", 0);
-	if(CN3Base::s_Options.iTexLOD_Shape < 0) CN3Base::s_Options.iTexLOD_Shape = 0;
-	if(CN3Base::s_Options.iTexLOD_Shape >= 2) CN3Base::s_Options.iTexLOD_Shape = 1;
+	if (CN3Base::s_Options.iTexLOD_Shape < 0)
+		CN3Base::s_Options.iTexLOD_Shape = 0;
+	if (CN3Base::s_Options.iTexLOD_Shape >= 2)
+		CN3Base::s_Options.iTexLOD_Shape = 1;
 
 	// NOTE: what is the texture quality?
 	CN3Base::s_Options.iTexLOD_Terrain = ini.GetInt("Texture", "LOD_Terrain", 0);
-	if(CN3Base::s_Options.iTexLOD_Terrain < 0) CN3Base::s_Options.iTexLOD_Terrain = 0;
-	if(CN3Base::s_Options.iTexLOD_Terrain >= 2) CN3Base::s_Options.iTexLOD_Terrain = 1;
+	if (CN3Base::s_Options.iTexLOD_Terrain < 0)
+		CN3Base::s_Options.iTexLOD_Terrain = 0;
+	if (CN3Base::s_Options.iTexLOD_Terrain >= 2)
+		CN3Base::s_Options.iTexLOD_Terrain = 1;
 
 	// NOTE: should we use shadows?
-	CN3Base::s_Options.iUseShadow = ini.GetInt("Shadow", "Use", 1);
+	CN3Base::s_Options.iUseShadow  = ini.GetInt("Shadow", "Use", 1);
 
 	// NOTE: what is the screen resolution?
-	CN3Base::s_Options.iViewWidth = ini.GetInt("ViewPort", "Width", 1024);
+	CN3Base::s_Options.iViewWidth  = ini.GetInt("ViewPort", "Width", 1024);
 	CN3Base::s_Options.iViewHeight = ini.GetInt("ViewPort", "Height", 768);
-	
-	if(CN3Base::s_Options.iViewWidth == 1024) CN3Base::s_Options.iViewHeight = 768;
-	else if(1280 == CN3Base::s_Options.iViewWidth) CN3Base::s_Options.iViewHeight = 1024;
-	else if(1600 == CN3Base::s_Options.iViewWidth) CN3Base::s_Options.iViewHeight = 1200;
-	else if (1366 == CN3Base::s_Options.iViewWidth) CN3Base::s_Options.iViewHeight = 768;
-	else if(1920 == CN3Base::s_Options.iViewWidth) CN3Base::s_Options.iViewHeight = 1080;
+
+	if (CN3Base::s_Options.iViewWidth == 1024)
+		CN3Base::s_Options.iViewHeight = 768;
+	else if (1280 == CN3Base::s_Options.iViewWidth)
+		CN3Base::s_Options.iViewHeight = 1024;
+	else if (1600 == CN3Base::s_Options.iViewWidth)
+		CN3Base::s_Options.iViewHeight = 1200;
+	else if (1366 == CN3Base::s_Options.iViewWidth)
+		CN3Base::s_Options.iViewHeight = 768;
+	else if (1920 == CN3Base::s_Options.iViewWidth)
+		CN3Base::s_Options.iViewHeight = 1080;
 	/*
 	else {
 		CN3Base::s_Options.iViewWidth = 1024;
@@ -81,33 +88,34 @@ int APIENTRY WinMain(
 	// Officially this defaults to 16-bit, but this isn't as supported these days so we should
 	// just default to 32-bit to ensure compatibility with ChangeDisplaySettings().
 	CN3Base::s_Options.iViewColorDepth = ini.GetInt("ViewPort", "ColorDepth", 32);
-	if (CN3Base::s_Options.iViewColorDepth != 16
-		&& CN3Base::s_Options.iViewColorDepth != 32)
+	if (CN3Base::s_Options.iViewColorDepth != 16 && CN3Base::s_Options.iViewColorDepth != 32)
 		CN3Base::s_Options.iViewColorDepth = 32;
 
 	// NOTE: what is the viewport's draw distance?
 	CN3Base::s_Options.iViewDist = ini.GetInt("ViewPort", "Distance", 512);
-	if(CN3Base::s_Options.iViewDist < 256) CN3Base::s_Options.iViewDist = 256;
-	if(CN3Base::s_Options.iViewDist > 512) CN3Base::s_Options.iViewDist = 512;
+	if (CN3Base::s_Options.iViewDist < 256)
+		CN3Base::s_Options.iViewDist = 256;
+	if (CN3Base::s_Options.iViewDist > 512)
+		CN3Base::s_Options.iViewDist = 512;
 
 	// NOTE: what is the distance for sound events?
 	CN3Base::s_Options.iEffectSndDist = ini.GetInt("Sound", "Distance", 48);
-	if(CN3Base::s_Options.iEffectSndDist < 20) CN3Base::s_Options.iEffectSndDist = 20;
-	if(CN3Base::s_Options.iEffectSndDist > 48) CN3Base::s_Options.iEffectSndDist = 48;
+	if (CN3Base::s_Options.iEffectSndDist < 20)
+		CN3Base::s_Options.iEffectSndDist = 20;
+	if (CN3Base::s_Options.iEffectSndDist > 48)
+		CN3Base::s_Options.iEffectSndDist = 48;
 
 	// NOTE: is sound enabled?
-	CN3Base::s_Options.bSndBgmEnable = ini.GetBool("Sound", "Bgm", true);
+	CN3Base::s_Options.bSndBgmEnable    = ini.GetBool("Sound", "Bgm", true);
 	CN3Base::s_Options.bSndEffectEnable = ini.GetBool("Sound", "Effect", true);
-	CN3Base::s_Options.bSndEnable = (CN3Base::s_Options.bSndBgmEnable || CN3Base::s_Options.bSndEffectEnable);
+	CN3Base::s_Options.bSndEnable       = (CN3Base::s_Options.bSndBgmEnable || CN3Base::s_Options.bSndEffectEnable);
 
 	// NOTE: should we use the Windows cursor? If false, will use the software cursor (CGameCursor) instead.
-	CN3Base::s_Options.bWindowCursor = ini.GetBool("Cursor", "WindowCursor", true);
-																	   
+	CN3Base::s_Options.bWindowCursor    = ini.GetBool("Cursor", "WindowCursor", true);
+
 	// NOTE: should we show window full screen?
-	CN3Base::s_Options.bWindowMode = ini.GetBool(
-		"Screen",
-		"WindowMode",
-		// In debug builds, if not otherwise configured, we should just prefer to use windowed mode.
+	CN3Base::s_Options.bWindowMode      = ini.GetBool("Screen", "WindowMode",
+	// In debug builds, if not otherwise configured, we should just prefer to use windowed mode.
 #if defined(_DEBUG)
 		true
 #else
@@ -133,19 +141,17 @@ int APIENTRY WinMain(
 	CGameProcedure::s_bWindowed = true;
 
 	// allocate the static members
-	CGameProcedure::StaticMemberInit(
-		hInstance,
-		hWndMain);
+	CGameProcedure::StaticMemberInit(hInstance, hWndMain);
 
 	// set the game's current procedure to s_pProcLogIn
-	CGameProcedure::ProcActiveSet((CGameProcedure*)CGameProcedure::s_pProcLogIn);
+	CGameProcedure::ProcActiveSet((CGameProcedure*) CGameProcedure::s_pProcLogIn);
 
 #if _DEBUG
-	HACCEL hAccel = LoadAccelerators( nullptr, MAKEINTRESOURCE(IDR_MAIN_ACCELATOR) );
-	HDC hDC = GetDC(hWndMain);
+	HACCEL hAccel = LoadAccelerators(nullptr, MAKEINTRESOURCE(IDR_MAIN_ACCELATOR));
+	HDC hDC       = GetDC(hWndMain);
 #endif // #if _DEBUG
 
-	MSG msg = {};
+	MSG msg      = {};
 	BOOL bGotMsg = FALSE;
 
 	while (WM_QUIT != msg.message)
@@ -188,7 +194,7 @@ HWND CreateMainWindow(HINSTANCE hInstance)
 {
 	WNDCLASSEXA wc;
 
-	//  only register the window class once - use hInstance as a flag. 
+	//  only register the window class once - use hInstance as a flag.
 	wc.cbSize        = sizeof(WNDCLASSEXA);
 	wc.style         = 0;
 	wc.lpfnWndProc   = (WNDPROC) WndProcMain;
@@ -215,53 +221,37 @@ HWND CreateMainWindow(HINSTANCE hInstance)
 		style = WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_GROUP;
 
 		RECT rc;
-		rc.left = 0;
-		rc.right = CN3Base::s_Options.iViewWidth;
-		rc.top = 0;
+		rc.left   = 0;
+		rc.right  = CN3Base::s_Options.iViewWidth;
+		rc.top    = 0;
 		rc.bottom = CN3Base::s_Options.iViewHeight;
 
 		AdjustWindowRect(&rc, style, FALSE);
 
-		iViewWidth = rc.right - rc.left;
+		iViewWidth  = rc.right - rc.left;
 		iViewHeight = rc.bottom - rc.top;
 	}
 	else
 	{
-		style = WS_POPUP | WS_CLIPCHILDREN;
-		iViewWidth = CN3Base::s_Options.iViewWidth;
+		style       = WS_POPUP | WS_CLIPCHILDREN;
+		iViewWidth  = CN3Base::s_Options.iViewWidth;
 		iViewHeight = CN3Base::s_Options.iViewHeight;
 	}
 
-	return ::CreateWindowExA(
-		0,
-		wc.lpszClassName,
-		"Knight OnLine Client",
-		style,
-		0,
-		0,
-		iViewWidth,
-		iViewHeight,
-		0,
-		0,
-		hInstance,
-		nullptr);
+	return ::CreateWindowExA(0, wc.lpszClassName, "Knight OnLine Client", style, 0, 0, iViewWidth, iViewHeight, 0, 0, hInstance, nullptr);
 }
 
 /*
 	WndProcMain processes the messages for the main window
 */
-LRESULT CALLBACK WndProcMain(
-	HWND hWnd,
-	UINT message,
-	WPARAM wParam,
-	LPARAM lParam)
+LRESULT CALLBACK WndProcMain(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	switch(message)
+	switch (message)
 	{
 		case WM_COMMAND:
 		{
 			uint16_t wNotifyCode = HIWORD(wParam); // notification code
-			CN3UIEdit* pEdit = CN3UIEdit::GetFocusedEdit();
+			CN3UIEdit* pEdit     = CN3UIEdit::GetFocusedEdit();
 
 			if (wNotifyCode == EN_CHANGE && pEdit)
 			{
@@ -275,7 +265,8 @@ LRESULT CALLBACK WndProcMain(
 					CGameProcedure::SetGameCursor(CGameProcedure::s_hCursorNormal);
 				}
 			}
-		} break;
+		}
+		break;
 
 		case WM_SOCKETMSG:
 		{
@@ -283,29 +274,34 @@ LRESULT CALLBACK WndProcMain(
 			{
 				case FD_CONNECT:
 				{
-				  //TRACE("Socket connected..\n");
-				} break;
+					//TRACE("Socket connected..\n");
+				}
+				break;
 				case FD_CLOSE:
 				{
 					CGameProcedure::ReportServerConnectionClosed(true);
 					//TRACE("Socket closed..\n");
-				}  break;
+				}
+				break;
 				case FD_READ:
 				{
 					CGameProcedure::s_pSocket->Receive();
-				} break;
+				}
+				break;
 				default:
 				{
 					__ASSERT(0, "WM_SOCKETMSG: unknown socket flag.");
-				} break;
+				}
+				break;
 			}
-		} break;
+		}
+		break;
 
 		case WM_ACTIVATE:
 		{
-			int iActive = LOWORD(wParam);           // activation flag 
-			int iMinimized = (BOOL) HIWORD(wParam); // minimized flag 
-			HWND hwndPrevious = (HWND) lParam;      // window handle 
+			int iActive       = LOWORD(wParam);        // activation flag
+			int iMinimized    = (BOOL) HIWORD(wParam); // minimized flag
+			HWND hwndPrevious = (HWND) lParam;         // window handle
 
 			switch (iActive)
 			{
@@ -323,7 +319,7 @@ LRESULT CALLBACK WndProcMain(
 
 					CGameProcedure::s_bIsWindowInFocus = true;
 				}
-				return 1;
+					return 1;
 
 				case WA_INACTIVE:
 					CGameProcedure::s_bIsWindowInFocus = false;
@@ -335,14 +331,14 @@ LRESULT CALLBACK WndProcMain(
 					}
 					break;
 			}
-		} break;
+		}
+		break;
 
 		case WM_CLOSE:
 		case WM_DESTROY:
 		case WM_QUIT:
 		{
-			if (CGameProcedure::s_pProcActive != nullptr
-				&& CGameProcedure::s_pProcActive == CGameProcedure::s_pProcMain)
+			if (CGameProcedure::s_pProcActive != nullptr && CGameProcedure::s_pProcActive == CGameProcedure::s_pProcMain)
 			{
 				if (!_IsKeyDown(VK_MENU))
 				{
@@ -367,7 +363,8 @@ LRESULT CALLBACK WndProcMain(
 			CGameProcedure::s_pSocketSub->Disconnect();
 
 			PostQuitMessage(0);
-		} break;
+		}
+		break;
 
 		case WM_MOUSEWHEEL:
 		{
@@ -377,22 +374,19 @@ LRESULT CALLBACK WndProcMain(
 
 			short delta = GET_WHEEL_DELTA_WPARAM(wParam);
 
-			if (pUI != nullptr
-				&& pUI->IsVisible()
-				&& pUI->OnMouseWheelEvent(delta))
+			if (pUI != nullptr && pUI->IsVisible() && pUI->OnMouseWheelEvent(delta))
 				break;
 
 			if (CGameProcedure::s_pUIMgr != nullptr)
 				pUI = CGameProcedure::s_pUIMgr->GetFocusedUI();
 
-			if (pUI != nullptr
-				&& pUI->IsVisible()
-				&& pUI->OnMouseWheelEvent(delta))
+			if (pUI != nullptr && pUI->IsVisible() && pUI->OnMouseWheelEvent(delta))
 				break;
 
 			if (CGameProcedure::s_pProcActive == CGameProcedure::s_pProcMain)
 				CGameProcedure::s_pEng->CameraZoom(delta * 0.05f);
-		} break;
+		}
+		break;
 	}
 
 	return DefWindowProc(hWnd, message, wParam, lParam);

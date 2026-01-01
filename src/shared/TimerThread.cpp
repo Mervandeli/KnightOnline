@@ -3,8 +3,8 @@
 
 #include <spdlog/spdlog.h>
 
-TimerThread::TimerThread(std::chrono::milliseconds tickDelay, TickCallback_t&& tickCallback)
-	: Thread(), _tickDelay(tickDelay), _tickCallback(std::move(tickCallback))
+TimerThread::TimerThread(std::chrono::milliseconds tickDelay, TickCallback_t&& tickCallback) :
+	Thread(), _tickDelay(tickDelay), _tickCallback(std::move(tickCallback))
 {
 }
 

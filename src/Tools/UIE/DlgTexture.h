@@ -13,48 +13,53 @@
 class CTexViewer;
 class CDlgTexture : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgTexture(CWnd* pParent = nullptr);   // standard constructor
+	CDlgTexture(CWnd* pParent = nullptr); // standard constructor
 	virtual ~CDlgTexture();
 
-// Dialog Data
+										  // Dialog Data
 	//{{AFX_DATA(CDlgTexture)
-	enum { IDD = IDD_TEXTURE };
-	CComboBox	m_ImageType;
-	int		m_RadioEditMode;
+	enum
+	{
+		IDD = IDD_TEXTURE
+	};
+	CComboBox m_ImageType;
+	int m_RadioEditMode;
 	//}}AFX_DATA
 
-// Attributes
+	// Attributes
 public:
 protected:
-	CTexViewer*		m_pTexViewer;
-	int				m_iImageTypeCount;
-	char			m_szImageTypeNames[MAX_IMAGETYPE][_MAX_PATH];
-	HACCEL			m_hAccelTable;
-// Operations
+	CTexViewer* m_pTexViewer;
+	int m_iImageTypeCount;
+	char m_szImageTypeNames[MAX_IMAGETYPE][_MAX_PATH];
+	HACCEL m_hAccelTable;
+	// Operations
 public:
-	void	SetTexture(LPCTSTR pszFileName);
-	BOOL	GetSelectedUVRect(struct __FLOAT_RECT* pFRect) const;
-	void	SetSelectedUVRect(const struct __FLOAT_RECT* pFRect);	// 현재 선택된 UV좌표 넣기
-	CRect	GetSelectedRect() const;
-	void	SetImageTypes(int iCount, char** pszNames);
-	CRect	GetImageRect(int iIndex, __FLOAT_RECT* pUVRect = nullptr);
+	void SetTexture(LPCTSTR pszFileName);
+	BOOL GetSelectedUVRect(struct __FLOAT_RECT* pFRect) const;
+	void SetSelectedUVRect(const struct __FLOAT_RECT* pFRect); // 현재 선택된 UV좌표 넣기
+	CRect GetSelectedRect() const;
+	void SetImageTypes(int iCount, char** pszNames);
+	CRect GetImageRect(int iIndex, __FLOAT_RECT* pUVRect = nullptr);
+
 protected:
 	void Resize();
+
 public:
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgTexture)
-	public:
+public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgTexture)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -70,7 +75,7 @@ protected:
 	afx_msg void OnButtonAutoselectH();
 	afx_msg void OnButtonAutoselectV();
 	//}}AFX_MSG
-	afx_msg LRESULT	OnUpdateInfo(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnUpdateInfo(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 };
 

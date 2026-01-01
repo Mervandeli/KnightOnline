@@ -20,57 +20,55 @@
 
 class CMainFrame : public CFrameWnd
 {
-	
 protected: // create from serialization only
 	CMainFrame();
 	DECLARE_DYNCREATE(CMainFrame)
 
-// Attributes
+	// Attributes
 public:
-	CN3EngTool	m_Eng;
-	CN3Camera	m_Camera;
-	CN3Light	m_Light[2];
-	DWORD		m_dwBGColor;
+	CN3EngTool m_Eng;
+	CN3Camera m_Camera;
+	CN3Light m_Light[2];
+	DWORD m_dwBGColor;
 
-	std::list<class CDlgEditScript*>	m_pEditWndList;
-	class CN3FXBundle*				m_pCurrFX;
+	std::list<class CDlgEditScript*> m_pEditWndList;
+	class CN3FXBundle* m_pCurrFX;
 
-	std::list<class CDlgEditPartMesh*>		m_pEditPartMesh;
+	std::list<class CDlgEditPartMesh*> m_pEditPartMesh;
 	std::list<class CDlgEditPartBillBoard*> m_pEditPartBillBoard;
-	std::list<class CDlgEditPartParticle*>	m_pEditPartParticle;
-	std::list<class CDlgEditPartGround*>	m_pEditPartGround;
-	
-	std::list<class CDlgEditFxg*>			m_pEditGroup;
-	
-	CN3Shape	m_Chr;
-	bool		m_bRenderChr;
-	bool		m_bRenderGrid;
-	bool		m_bRenderAxis;
-	bool		m_bRenderFloor;
+	std::list<class CDlgEditPartParticle*> m_pEditPartParticle;
+	std::list<class CDlgEditPartGround*> m_pEditPartGround;
 
-	class CGround*	m_pGround;
-	
-// Operations
+	std::list<class CDlgEditFxg*> m_pEditGroup;
+
+	CN3Shape m_Chr;
+	bool m_bRenderChr;
+	bool m_bRenderGrid;
+	bool m_bRenderAxis;
+	bool m_bRenderFloor;
+
+	class CGround* m_pGround;
+
+	// Operations
 public:
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CMainFrame)
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
-	void	TickRender();
-	bool	IsDuplicated(CString& PathName);
-	int		GetPartType(CString& PathName);
+	void TickRender();
+	bool IsDuplicated(CString& PathName);
+	int GetPartType(CString& PathName);
 
-	void	DestroyGroup(CDlgEditFxg* pGroup);
-	void	DestroyBundle(CDlgEditScript* pBundle);
-	void	DestroyPartBillBoard(CDlgEditPartBillBoard* pPartMesh);
-	void	DestroyPartParticle(CDlgEditPartParticle* pPartParticle);
-	void	DestroyPartMesh(CDlgEditPartMesh* pPartMesh);
-	void	DestroyPartGround(CDlgEditPartGround* pPartGround);
+	void DestroyGroup(CDlgEditFxg* pGroup);
+	void DestroyBundle(CDlgEditScript* pBundle);
+	void DestroyPartBillBoard(CDlgEditPartBillBoard* pPartMesh);
+	void DestroyPartParticle(CDlgEditPartParticle* pPartParticle);
+	void DestroyPartMesh(CDlgEditPartMesh* pPartMesh);
+	void DestroyPartGround(CDlgEditPartGround* pPartGround);
 
 	virtual ~CMainFrame();
 #ifdef _DEBUG
@@ -78,13 +76,13 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
-protected:  // control bar embedded members
-	CStatusBar  m_wndStatusBar;
-	CToolBar    m_wndToolBar;
-	CReBar      m_wndReBar;
-	CDialogBar      m_wndDlgBar;
+protected: // control bar embedded members
+	CStatusBar m_wndStatusBar;
+	CToolBar m_wndToolBar;
+	CReBar m_wndReBar;
+	CDialogBar m_wndDlgBar;
 
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CMainFrame)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

@@ -11,7 +11,7 @@
 
 #include <N3Base/N3UIBase.h>
 
-class CUIHelp : public CN3UIBase  
+class CUIHelp : public CN3UIBase
 {
 public:
 	static constexpr int MAX_HELP_PAGE = 3;

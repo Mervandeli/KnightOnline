@@ -6,7 +6,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -15,19 +15,21 @@ static char THIS_FILE[]=__FILE__;
 
 CN3Skin::CN3Skin()
 {
-	m_dwType |= OBJ_SKIN;
+	m_dwType        |= OBJ_SKIN;
 
-	m_pSkinVertices = nullptr;
+	m_pSkinVertices  = nullptr;
 }
 
 CN3Skin::~CN3Skin()
 {
-	delete [] m_pSkinVertices; m_pSkinVertices = nullptr;
+	delete[] m_pSkinVertices;
+	m_pSkinVertices = nullptr;
 }
 
 void CN3Skin::Release()
 {
-	delete [] m_pSkinVertices; m_pSkinVertices = nullptr;
+	delete[] m_pSkinVertices;
+	m_pSkinVertices = nullptr;
 
 	CN3IMesh::Release();
 }
@@ -45,13 +47,13 @@ bool CN3Skin::Load(File& file)
 		// Skip the useless explicitly-32-bit pointers pnJoints & pfWeights.
 		file.Seek(8, SEEK_CUR);
 
-		pVtx->pnJoints = nullptr;
+		pVtx->pnJoints  = nullptr;
 		pVtx->pfWeights = nullptr;
 
-		int nAffect = pVtx->nAffect;
+		int nAffect     = pVtx->nAffect;
 		if (nAffect > 1)
 		{
-			pVtx->pnJoints = new int[nAffect];
+			pVtx->pnJoints  = new int[nAffect];
 			pVtx->pfWeights = new float[nAffect];
 
 			file.Read(pVtx->pnJoints, 4 * nAffect);
@@ -104,68 +106,76 @@ bool CN3Skin::Create(int nFC, int nVC, int nUVC)
 	if (!CN3IMesh::Create(nFC, nVC, nUVC))
 		return false;
 
-	delete [] m_pSkinVertices;
+	delete[] m_pSkinVertices;
 	m_pSkinVertices = new __VertexSkinned[nVC];
-	memset(m_pSkinVertices, 0, sizeof(__VertexSkinned)*nVC);
+	memset(m_pSkinVertices, 0, sizeof(__VertexSkinned) * nVC);
 
 	return true;
 }
 
 #ifdef _N3TOOL
-int CN3Skin::SortWeightsProc(const void *pArg1, const void *pArg2)
+int CN3Skin::SortWeightsProc(const void* pArg1, const void* pArg2)
 {
-	__Weight* pW1 = (__Weight*)pArg1;
-	__Weight* pW2 = (__Weight*)pArg2;
+	__Weight* pW1 = (__Weight*) pArg1;
+	__Weight* pW2 = (__Weight*) pArg2;
 
-	if(pW1->fWeight < pW2->fWeight) return 1;
-	else return -1;
+	if (pW1->fWeight < pW2->fWeight)
+		return 1;
+	else
+		return -1;
 }
 
 void CN3Skin::RecalcWeight()
 {
-	if (nullptr == m_pSkinVertices) return;
+	if (nullptr == m_pSkinVertices)
+		return;
 	int i, j;
-	for (i=0; i<m_nVC; ++i)
+	for (i = 0; i < m_nVC; ++i)
 	{
 		__VertexSkinned* pVtx = m_pSkinVertices + i;
-		if (1 >= pVtx->nAffect) continue;
+		if (1 >= pVtx->nAffect)
+			continue;
 		float fSum = 0;
-		for (j=0; j<pVtx->nAffect; ++j) fSum += pVtx->pfWeights[j];
-		for (j=0; j<pVtx->nAffect; ++j) pVtx->pfWeights[j] /= fSum;
+		for (j = 0; j < pVtx->nAffect; ++j)
+			fSum += pVtx->pfWeights[j];
+		for (j = 0; j < pVtx->nAffect; ++j)
+			pVtx->pfWeights[j] /= fSum;
 	}
 }
 
 #endif // end of _N3TOOL
 
-bool CN3Skin::CheckCollisionPrecisely(const __Vector3 &vPos, const __Vector3 &vDir, __Vector3 *pvPick)
+bool CN3Skin::CheckCollisionPrecisely(
+	const __Vector3& vPos, const __Vector3& vDir, __Vector3* pvPick)
 {
 	uint16_t* pwIs;
 	__VertexXyzNormal* pVs;
 	int nFC, nCI0, nCI1, nCI2;
 
-	pVs	 = Vertices();
+	pVs  = Vertices();
 	pwIs = VertexInices();
 
-	if(pVs == nullptr || pwIs == nullptr) return false;
+	if (pVs == nullptr || pwIs == nullptr)
+		return false;
 
 	nFC = FaceCount();
-	for(int j = 0; j < nFC; j++) // 각각의 Face 마다 충돌체크..
+	for (int j = 0; j < nFC; j++) // 각각의 Face 마다 충돌체크..
 	{
-		nCI0 = pwIs[j*3+0];
-		nCI1 = pwIs[j*3+1];
-		nCI2 = pwIs[j*3+2];
+		nCI0 = pwIs[j * 3 + 0];
+		nCI1 = pwIs[j * 3 + 1];
+		nCI2 = pwIs[j * 3 + 2];
 
-		if(false == ::_IntersectTriangle(vPos, vDir, pVs[nCI0], pVs[nCI1], pVs[nCI2])) continue;
-		
-		if(pvPick)
+		if (false == ::_IntersectTriangle(vPos, vDir, pVs[nCI0], pVs[nCI1], pVs[nCI2]))
+			continue;
+
+		if (pvPick)
 		{
 			float fT, fU, fV;
 			::_IntersectTriangle(vPos, vDir, pVs[nCI0], pVs[nCI1], pVs[nCI2], fT, fU, fV, pvPick);
-//			(*pvPick) *= m_Mtx;
+			//			(*pvPick) *= m_Mtx;
 		}
 		return true;
 	}
 
 	return false;
-
 }

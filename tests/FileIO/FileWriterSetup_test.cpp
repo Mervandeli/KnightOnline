@@ -13,12 +13,10 @@ protected:
 	void SetUp() override
 	{
 		static std::atomic<uint32_t> s_testCounter = 0;
-		static const time_t s_time = time(nullptr);
+		static const time_t s_time                 = time(nullptr);
 
-		std::string filename = "FileWriterSetupTest_"
-			+ std::to_string(s_time)
-			+ "_"
-			+ std::to_string(s_testCounter++) + ".tmp";
+		std::string filename = "FileWriterSetupTest_" + std::to_string(s_time) + "_"
+							   + std::to_string(s_testCounter++) + ".tmp";
 
 		_testFilePath = std::filesystem::temp_directory_path() / filename;
 	}

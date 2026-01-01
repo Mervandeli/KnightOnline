@@ -33,13 +33,13 @@ CUICmdEdit::~CUICmdEdit()
 
 bool CUICmdEdit::Load(File& file)
 {
-	if (!CN3UIBase::Load(file)) 
+	if (!CN3UIBase::Load(file))
 		return false;
-	
-	N3_VERIFY_UI_COMPONENT(m_pText_Title,	GetChildByID<CN3UIString>("Text_cmd"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Ok,		GetChildByID<CN3UIButton>("btn_ok"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel,	GetChildByID<CN3UIButton>("btn_cancel"));
-	N3_VERIFY_UI_COMPONENT(m_pEdit_Box,		GetChildByID<CN3UIEdit>("edit_cmd"));
+
+	N3_VERIFY_UI_COMPONENT(m_pText_Title, GetChildByID<CN3UIString>("Text_cmd"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Ok, GetChildByID<CN3UIButton>("btn_ok"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel, GetChildByID<CN3UIButton>("btn_cancel"));
+	N3_VERIFY_UI_COMPONENT(m_pEdit_Box, GetChildByID<CN3UIEdit>("edit_cmd"));
 
 	return true;
 }
@@ -50,7 +50,7 @@ bool CUICmdEdit::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 	{
 		if (pSender == m_pBtn_Ok)
 		{
-			m_szArg1 = m_pEdit_Box->GetString();
+			m_szArg1               = m_pEdit_Box->GetString();
 			std::string strTempCmd = "/" + m_pText_Title->GetString() + " " + m_szArg1;
 			CGameProcedure::s_pProcMain->ParseChattingCommand(strTempCmd);
 
@@ -76,7 +76,7 @@ void CUICmdEdit::Open(const std::string& msg)
 
 void CUICmdEdit::SetVisible(bool bVisible)
 {
-	if (bVisible == IsVisible()) 
+	if (bVisible == IsVisible())
 		return;
 
 	if (!bVisible)

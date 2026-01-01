@@ -5,9 +5,9 @@
 
 #include <shared/Thread.h>
 
-#include <functional>	// std::function<>
-#include <memory>		// std::shared_ptr<>, std::unique_Ptr<>
-#include <vector>		// std::vector<>
+#include <functional> // std::function<>
+#include <memory>     // std::shared_ptr<>, std::unique_Ptr<>
+#include <vector>     // std::vector<>
 
 /// \enum e_AudioQueueType
 /// \brief Type of operation queued for the audio thread.
@@ -49,10 +49,7 @@ public:
 	/// - e_AudioQueueType: the type of operation.
 	/// - shared_ptr<AudioHandle>: the handle affected by the operation.
 	/// - AudioCallback: optional callback function.
-	using QueueType = std::tuple<
-		e_AudioQueueType,
-		std::shared_ptr<AudioHandle>,
-		AudioCallback>;
+	using QueueType     = std::tuple<e_AudioQueueType, std::shared_ptr<AudioHandle>, AudioCallback>;
 
 	/// Constructs the audio thread object.
 	AudioThread();

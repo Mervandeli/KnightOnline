@@ -13,38 +13,41 @@
 
 class CDlg_River : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlg_River(CWnd* pParent = NULL);   // standard constructor
+	CDlg_River(CWnd* pParent = NULL); // standard constructor
 
-// Dialog Data
+									  // Dialog Data
 	//{{AFX_DATA(CDlg_River)
-	enum { IDD = IDD_RIVER };
-	CPropertyList	m_List;
+	enum
+	{
+		IDD = IDD_RIVER
+	};
+	CPropertyList m_List;
 	//}}AFX_DATA
 
-	D3DCOLOR	GetColor()
+	D3DCOLOR GetColor()
 	{
-		CPropertyItem *pItem = m_List.GetPropItem("Water Color");
+		CPropertyItem* pItem = m_List.GetPropItem("Water Color");
 		return pItem->D3DColorGet();
 	}
-	float		GetHeight()
+	float GetHeight()
 	{
-		CPropertyItem *pItem = m_List.GetPropItem("Height");
+		CPropertyItem* pItem = m_List.GetPropItem("Height");
 		return atof(pItem->m_curValue);
 	}
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlg_River)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 protected:
-	float		m_fHeight;
+	float m_fHeight;
 
 	// Generated message map functions
 	//{{AFX_MSG(CDlg_River)

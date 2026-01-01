@@ -24,22 +24,22 @@ static char THIS_FILE[] = __FILE__;
 
 CUILevelGuide::CUILevelGuide()
 {
-	m_pEdit_Level			= nullptr;
-	m_pText_Page			= nullptr;
-	m_pBtn_Check			= nullptr;
-	m_pText_Level			= nullptr;
-	m_pBtn_Up				= nullptr;
-	m_pBtn_Down				= nullptr;
-	m_pBtn_Cancel			= nullptr;
+	m_pEdit_Level  = nullptr;
+	m_pText_Page   = nullptr;
+	m_pBtn_Check   = nullptr;
+	m_pText_Level  = nullptr;
+	m_pBtn_Up      = nullptr;
+	m_pBtn_Down    = nullptr;
+	m_pBtn_Cancel  = nullptr;
 
-	m_iSearchLevel			= 0;
-	m_iPageNo				= 0;
+	m_iSearchLevel = 0;
+	m_iPageNo      = 0;
 
 	for (int i = 0; i < MAX_QUESTS_PER_PAGE; i++)
 	{
-		m_pScroll_Guide[i]	= nullptr;
-		m_pText_Guide[i]	= nullptr;
-		m_pText_Title[i]	= nullptr;
+		m_pScroll_Guide[i] = nullptr;
+		m_pText_Guide[i]   = nullptr;
+		m_pText_Title[i]   = nullptr;
 	}
 }
 
@@ -51,50 +51,50 @@ void CUILevelGuide::Release()
 {
 	CN3UIBase::Release();
 
-	m_pEdit_Level			= nullptr;
-	m_pText_Page			= nullptr;
-	m_pBtn_Check			= nullptr;
-	m_pText_Level			= nullptr;
-	m_pBtn_Up				= nullptr;
-	m_pBtn_Down				= nullptr;
-	m_pBtn_Cancel			= nullptr;
+	m_pEdit_Level  = nullptr;
+	m_pText_Page   = nullptr;
+	m_pBtn_Check   = nullptr;
+	m_pText_Level  = nullptr;
+	m_pBtn_Up      = nullptr;
+	m_pBtn_Down    = nullptr;
+	m_pBtn_Cancel  = nullptr;
 
-	m_iSearchLevel			= 0;
-	m_iPageNo				= 0;
+	m_iSearchLevel = 0;
+	m_iPageNo      = 0;
 
 	for (int i = 0; i < MAX_QUESTS_PER_PAGE; i++)
 	{
-		m_pScroll_Guide[i]	= nullptr;
-		m_pText_Guide[i]	= nullptr;
-		m_pText_Title[i]	= nullptr;
+		m_pScroll_Guide[i] = nullptr;
+		m_pText_Guide[i]   = nullptr;
+		m_pText_Title[i]   = nullptr;
 	}
 }
 
 bool CUILevelGuide::Load(File& file)
 {
-	if (!CN3UIBase::Load(file)) 
+	if (!CN3UIBase::Load(file))
 		return false;
 
 	std::string szID;
 
-	N3_VERIFY_UI_COMPONENT(m_pEdit_Level,			GetChildByID<CN3UIEdit>("edit_level"));
-	N3_VERIFY_UI_COMPONENT(m_pText_Page,			GetChildByID<CN3UIString>("text_page"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Check,			GetChildByID<CN3UIButton>("btn_check"));
-	N3_VERIFY_UI_COMPONENT(m_pText_Level,			GetChildByID<CN3UIString>("text_level"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Up,				GetChildByID<CN3UIButton>("btn_up"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Down,				GetChildByID<CN3UIButton>("btn_down"));
-	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel,			GetChildByID<CN3UIButton>("btn_cancel"));
+	N3_VERIFY_UI_COMPONENT(m_pEdit_Level, GetChildByID<CN3UIEdit>("edit_level"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Page, GetChildByID<CN3UIString>("text_page"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Check, GetChildByID<CN3UIButton>("btn_check"));
+	N3_VERIFY_UI_COMPONENT(m_pText_Level, GetChildByID<CN3UIString>("text_level"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Up, GetChildByID<CN3UIButton>("btn_up"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Down, GetChildByID<CN3UIButton>("btn_down"));
+	N3_VERIFY_UI_COMPONENT(m_pBtn_Cancel, GetChildByID<CN3UIButton>("btn_cancel"));
 
 	for (int i = 0; i < MAX_QUESTS_PER_PAGE; i++)
 	{
 		szID = "scroll_guide" + std::to_string(i);
-		N3_VERIFY_UI_COMPONENT(m_pScroll_Guide[i],	GetChildByID<CN3UIScrollBar>(szID));
+		N3_VERIFY_UI_COMPONENT(m_pScroll_Guide[i], GetChildByID<CN3UIScrollBar>(szID));
 
 		szID = "text_guide" + std::to_string(i);
-		N3_VERIFY_UI_COMPONENT(m_pText_Guide[i],	GetChildByID<CN3UIString>(szID));
+		N3_VERIFY_UI_COMPONENT(m_pText_Guide[i], GetChildByID<CN3UIString>(szID));
 
 		szID = "text_title" + std::to_string(i);
-		N3_VERIFY_UI_COMPONENT(m_pText_Title[i],	GetChildByID<CN3UIString>(szID));
+		N3_VERIFY_UI_COMPONENT(m_pText_Title[i], GetChildByID<CN3UIString>(szID));
 	}
 
 	return true;
@@ -107,15 +107,14 @@ void CUILevelGuide::SearchQuests()
 
 	const std::string& szSearchLevel = m_pEdit_Level->GetString();
 
-	int iSearchLevel = std::atoi(szSearchLevel.c_str());
+	int iSearchLevel                 = std::atoi(szSearchLevel.c_str());
 	if (iSearchLevel == 0)
 		return;
 
 	// NOTE: This officially only checks the one way.
 	if ((CGameBase::s_pPlayer->m_InfoBase.iLevel + MAX_SEARCH_LEVEL_RANGE) < iSearchLevel)
 	{
-		std::string szMsg = fmt::format_text_resource(IDS_QUEST_SEARCH_LEVEL_ERROR,
-			MAX_SEARCH_LEVEL_RANGE);
+		std::string szMsg = fmt::format_text_resource(IDS_QUEST_SEARCH_LEVEL_ERROR, MAX_SEARCH_LEVEL_RANGE);
 		CGameProcedure::MessageBoxPost(szMsg, "", MB_OK);
 
 		iSearchLevel = CGameBase::s_pPlayer->m_InfoBase.iLevel + MAX_SEARCH_LEVEL_RANGE;
@@ -158,12 +157,10 @@ void CUILevelGuide::SetPageNo(int iPageNo)
 	auto& questDataMap = CGameBase::s_pTbl_Help.GetMap();
 	for (const auto& [_, questData] : questDataMap)
 	{
-		if (iSearchLevel < questData.iMinLevel
-			|| iSearchLevel > questData.iMaxLevel)
+		if (iSearchLevel < questData.iMinLevel || iSearchLevel > questData.iMaxLevel)
 			continue;
 
-		if (questData.iReqClass == CLASS_REPRESENT_UNKNOWN
-			|| questData.iReqClass == eCR)
+		if (questData.iReqClass == CLASS_REPRESENT_UNKNOWN || questData.iReqClass == eCR)
 			eligibleQuests.push_back(&questData);
 	}
 
@@ -176,13 +173,13 @@ void CUILevelGuide::SetPageNo(int iPageNo)
 	if (iPageNo < 0)
 		iPageNo = 0;
 
-	m_iPageNo = iPageNo;
+	m_iPageNo         = iPageNo;
 
-	int iStartIndex = iPageNo * MAX_QUESTS_PER_PAGE;
+	int iStartIndex   = iPageNo * MAX_QUESTS_PER_PAGE;
 	int iVisibleIndex = 0;
 
 	// Skip straight to the first eligible quest for this page.
-	auto itr = eligibleQuests.begin();
+	auto itr          = eligibleQuests.begin();
 	std::advance(itr, iStartIndex);
 
 	// Attempt to display all 3, assuming 3 are present.
@@ -218,12 +215,11 @@ void CUILevelGuide::SetPageNo(int iPageNo)
 
 void CUILevelGuide::SetTopLine(CN3UIScrollBar* pScroll, CN3UIString* pTextGuide)
 {
-	if (pTextGuide == nullptr
-		|| pScroll == nullptr)
+	if (pTextGuide == nullptr || pScroll == nullptr)
 		return;
 
 	// total number of lines of text
-	const int iTotalLineCount = pTextGuide->GetLineCount();
+	const int iTotalLineCount   = pTextGuide->GetLineCount();
 
 	// max number of lines visible in text area
 	const int iVisibleLineCount = 4;
@@ -248,8 +244,7 @@ void CUILevelGuide::SetVisible(bool bVisible)
 	}
 	else
 	{
-		if (m_pEdit_Level != nullptr
-			&& m_pEdit_Level->HaveFocus())
+		if (m_pEdit_Level != nullptr && m_pEdit_Level->HaveFocus())
 			m_pEdit_Level->KillFocus();
 
 		CGameProcedure::s_pUIMgr->ReFocusUI();

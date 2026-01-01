@@ -17,29 +17,32 @@ public:
 	CN3UITrackBar();
 	~CN3UITrackBar() override;
 
-// Attributes
+	// Attributes
 public:
 	enum eIMAGE_TYPE
 	{
-		IMAGETYPE_BKGND = 0, IMAGETYPE_THUMB, NUM_IMAGETYPE
+		IMAGETYPE_BKGND = 0,
+		IMAGETYPE_THUMB,
+		NUM_IMAGETYPE
 	};
+
 protected:
-	CN3UIImage*		m_pBkGndImageRef;		// 배경 이미지 reference (메모리 할당은 children list로 관리)
-	CN3UIImage*		m_pThumbImageRef;		// 가운데 드레그 하여 옮길 수 있는 이미지 reference
+	CN3UIImage* m_pBkGndImageRef; // 배경 이미지 reference (메모리 할당은 children list로 관리)
+	CN3UIImage* m_pThumbImageRef; // 가운데 드레그 하여 옮길 수 있는 이미지 reference
 
-	int				m_iMaxPos;									// 최대
-	int				m_iMinPos;									// 최소
-	int 			m_iCurPos;									// 현재 값
-	int				m_iPageSize;								// page단위 이동할때 이동값
-// Operations
+	int m_iMaxPos;                // 최대
+	int m_iMinPos;                // 최소
+	int m_iCurPos;                // 현재 값
+	int m_iPageSize;              // page단위 이동할때 이동값
+								  // Operations
 public:
-	void		Release() override;
-	bool		Load(File& file) override;
-	void		SetRegion(const RECT& Rect) override;
-	uint32_t	MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
+	void Release() override;
+	bool Load(File& file) override;
+	void SetRegion(const RECT& Rect) override;
+	uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
 
-	void		SetRange(int iMin, int iMax);
-	void		SetCurrentPos(int iPos);
+	void SetRange(int iMin, int iMax);
+	void SetCurrentPos(int iPos);
 
 	void SetRangeMax(int iMax)
 	{
@@ -77,15 +80,16 @@ public:
 	}
 
 protected:
-	void			UpdateThumbPos();							// m_iCurPos를 계산하여 Thumb위치 다시 계산하여 바꾸기
-	void			UpDownThumbPos(int iDiff);					// Thumb위치를 아래 위로 iDiff pixel만큼 움직인 후 m_iCurPos 갱신하기
+	void UpdateThumbPos(); // m_iCurPos를 계산하여 Thumb위치 다시 계산하여 바꾸기
+	void UpDownThumbPos(
+		int iDiff);        // Thumb위치를 아래 위로 iDiff pixel만큼 움직인 후 m_iCurPos 갱신하기
 
 #ifdef _N3TOOL
-// tool에서 쓰이는 함수
+	// tool에서 쓰이는 함수
 public:
-	virtual void	operator = (const CN3UITrackBar& other);
-	void			CreateImages();			// 이미지 생성
-	void			DeleteBkImage();		// 배경이미지 삭제
+	virtual void operator=(const CN3UITrackBar& other);
+	void CreateImages();  // 이미지 생성
+	void DeleteBkImage(); // 배경이미지 삭제
 
 	CN3UIImage* GetBkGndImgRef() const
 	{

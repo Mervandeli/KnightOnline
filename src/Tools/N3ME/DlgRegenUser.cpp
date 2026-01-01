@@ -15,16 +15,13 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgRegenUser dialog
 
-
-CDlgRegenUser::CDlgRegenUser(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgRegenUser::IDD, pParent)
+CDlgRegenUser::CDlgRegenUser(CWnd* pParent /*=nullptr*/) : CDialog(CDlgRegenUser::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgRegenUser)
 	m_pRefRegenUser = nullptr;
-	m_PathName = _T("");
+	m_PathName      = _T("");
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgRegenUser::DoDataExchange(CDataExchange* pDX)
 {
@@ -35,86 +32,89 @@ void CDlgRegenUser::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgRegenUser, CDialog)
-	//{{AFX_MSG_MAP(CDlgRegenUser)
-	ON_BN_CLICKED(IDC_BTN_LOAD_PATHSET, OnBtnLoadPathset)
-	ON_BN_CLICKED(IDC_BTN_PATH_DELETE, OnBtnPathDelete)
-	ON_BN_CLICKED(IDC_BTN_SAVE_PATHSET, OnBtnSavePathset)
-	ON_LBN_SELCHANGE(IDC_LIST_REGENUSERREGION, OnSelchangeListRegenuserregion)
-	ON_LBN_DBLCLK(IDC_LIST_REGENUSERREGION, OnDblclkListRegenuserregion)
-	ON_BN_CLICKED(IDC_BTN_SAVE_AS, OnBtnSaveAs)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgRegenUser)
+ON_BN_CLICKED(IDC_BTN_LOAD_PATHSET, OnBtnLoadPathset)
+ON_BN_CLICKED(IDC_BTN_PATH_DELETE, OnBtnPathDelete)
+ON_BN_CLICKED(IDC_BTN_SAVE_PATHSET, OnBtnSavePathset)
+ON_LBN_SELCHANGE(IDC_LIST_REGENUSERREGION, OnSelchangeListRegenuserregion)
+ON_LBN_DBLCLK(IDC_LIST_REGENUSERREGION, OnDblclkListRegenuserregion)
+ON_BN_CLICKED(IDC_BTN_SAVE_AS, OnBtnSaveAs)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CDlgRegenUser message handlers
 
-void CDlgRegenUser::OnBtnLoadPathset() 
+void CDlgRegenUser::OnBtnLoadPathset()
 {
 	DWORD dwFlags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_HIDEREADONLY;
 	CFileDialog dlg(TRUE, "trur", nullptr, dwFlags, "trur파일(*.trur)|*.trur||", nullptr);
 
-	if(dlg.DoModal() == IDCANCEL) return;
+	if (dlg.DoModal() == IDCANCEL)
+		return;
 
 	m_PathName = dlg.GetPathName();
 
-	m_pRefRegenUser->LoadFromFile((LPCTSTR)m_PathName);
+	m_pRefRegenUser->LoadFromFile((LPCTSTR) m_PathName);
 	UpdateData(FALSE);
 }
 
-void CDlgRegenUser::OnBtnPathDelete() 
+void CDlgRegenUser::OnBtnPathDelete()
 {
 	int idx = m_LBRegion.GetCurSel();
-	if(idx<0) return;
+	if (idx < 0)
+		return;
 
 	m_LBRegion.SetItemDataPtr(idx, nullptr);
 	m_LBRegion.DeleteString(idx);
 	m_pRefRegenUser->DeleteSel();
 }
 
-void CDlgRegenUser::OnBtnSavePathset() 
+void CDlgRegenUser::OnBtnSavePathset()
 {
-	if(m_PathName.IsEmpty())
+	if (m_PathName.IsEmpty())
 	{
-		CFileDialog dlg(FALSE, "trur", "Noname", OFN_EXPLORER | OFN_LONGNAMES | OFN_OVERWRITEPROMPT, "trur파일(*.trur)|*.trur||");
+		CFileDialog dlg(FALSE, "trur", "Noname", OFN_EXPLORER | OFN_LONGNAMES | OFN_OVERWRITEPROMPT,
+			"trur파일(*.trur)|*.trur||");
 
-		if(dlg.DoModal()==IDOK)
+		if (dlg.DoModal() == IDOK)
 		{
 			m_PathName = dlg.GetPathName();
-			m_pRefRegenUser->SaveToFile((LPCTSTR)m_PathName);
+			m_pRefRegenUser->SaveToFile((LPCTSTR) m_PathName);
 			UpdateData(FALSE);
 		}
 	}
-	else m_pRefRegenUser->SaveToFile((LPCTSTR)m_PathName);	
+	else
+		m_pRefRegenUser->SaveToFile((LPCTSTR) m_PathName);
 }
 
-void CDlgRegenUser::OnSelchangeListRegenuserregion() 
+void CDlgRegenUser::OnSelchangeListRegenuserregion()
 {
 	int idx = m_LBRegion.GetCurSel();
-	if(idx<0) return;
+	if (idx < 0)
+		return;
 
-	VERTEXRECT* pVR = (VERTEXRECT*)m_LBRegion.GetItemDataPtr(idx);
+	VERTEXRECT* pVR                = (VERTEXRECT*) m_LBRegion.GetItemDataPtr(idx);
 	m_pRefRegenUser->m_vrSelRegion = pVR;
 	UpdateData(FALSE);
 }
 
-void CDlgRegenUser::OnDblclkListRegenuserregion() 
+void CDlgRegenUser::OnDblclkListRegenuserregion()
 {
 	// TODO: Add your control notification handler code here
-	
 }
 
-BOOL CDlgRegenUser::OnInitDialog() 
+BOOL CDlgRegenUser::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
 	m_LBRegion.ResetContent();
 	m_PathName.Empty();
 
-	UpdateData(FALSE);	
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+	UpdateData(FALSE);
+	return TRUE; // return TRUE unless you set the focus to a control
+				 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
 void CDlgRegenUser::PutRegion(VERTEXRECT* pVR)
@@ -129,18 +129,19 @@ void CDlgRegenUser::PutRegion(VERTEXRECT* pVR)
 
 	str.Format("(%d, %d) -> (%d, %d)", LB.x, LB.y, TR.x, TR.y);
 
-	int idx = m_LBRegion.AddString((LPCTSTR)str);
+	int idx = m_LBRegion.AddString((LPCTSTR) str);
 	m_LBRegion.SetItemDataPtr(idx, pVR);
 }
 
-void CDlgRegenUser::OnBtnSaveAs() 
+void CDlgRegenUser::OnBtnSaveAs()
 {
-	CFileDialog dlg(FALSE, "trur", "Noname", OFN_EXPLORER | OFN_LONGNAMES | OFN_OVERWRITEPROMPT, "trur파일(*.trur)|*.trur||");
+	CFileDialog dlg(FALSE, "trur", "Noname", OFN_EXPLORER | OFN_LONGNAMES | OFN_OVERWRITEPROMPT,
+		"trur파일(*.trur)|*.trur||");
 
-	if(dlg.DoModal()==IDOK)
+	if (dlg.DoModal() == IDOK)
 	{
 		m_PathName = dlg.GetPathName();
-		m_pRefRegenUser->SaveToFile((LPCTSTR)m_PathName);
+		m_pRefRegenUser->SaveToFile((LPCTSTR) m_PathName);
 	}
 
 	UpdateData(FALSE);

@@ -21,7 +21,6 @@ CFileName::CFileName(CString szFileName)
 
 CFileName::~CFileName()
 {
-
 }
 
 void CFileName::SetFileName(CString szFileName)
@@ -44,7 +43,7 @@ CString CFileName::GetFileName()
 	CString szFileName;
 
 	_splitpath(m_szFileName, m_szDrive, m_szDir, m_szFname, m_szExt);
-	szFileName = m_szFname;
+	szFileName  = m_szFname;
 	szFileName += m_szExt;
 
 	return szFileName;
@@ -65,7 +64,7 @@ CString CFileName::GetRoot()
 	CString szFileName;
 
 	_splitpath(m_szFileName, m_szDrive, m_szDir, m_szFname, m_szExt);
-	szFileName = m_szDrive;
+	szFileName  = m_szDrive;
 	szFileName += m_szDir;
 
 	return szFileName;
@@ -101,18 +100,14 @@ CString CFileName::GetFileTitle()
 ******************************************************************/
 CString CFileName::GetDescription()
 {
-	CString		szTypeName;
-	SHFILEINFO	sfi;
+	CString szTypeName;
+	SHFILEINFO sfi;
 
-	SHGetFileInfo(m_szFileName,
-                 0,
-                 &sfi, 
-                 sizeof(SHFILEINFO), 
-                 SHGFI_TYPENAME);
+	SHGetFileInfo(m_szFileName, 0, &sfi, sizeof(SHFILEINFO), SHGFI_TYPENAME);
 
-   szTypeName = sfi.szTypeName;
+	szTypeName = sfi.szTypeName;
 
-   return szTypeName;
+	return szTypeName;
 }
 
 /*****************************************************************
@@ -126,46 +121,31 @@ bool CFileName::Exist()
 {
 	WIN32_FIND_DATA fd;
 
-	CString	szFindPath=m_szFileName;
-	int nSlash = szFindPath.ReverseFind('\\');
+	CString szFindPath = m_szFileName;
+	int nSlash         = szFindPath.ReverseFind('\\');
 
-	if( nSlash == szFindPath.GetLength()-1)
+	if (nSlash == szFindPath.GetLength() - 1)
 	{
 		szFindPath = szFindPath.Left(nSlash);
 	}
 
-	HANDLE hFind = FindFirstFile( szFindPath, &fd );
+	HANDLE hFind = FindFirstFile(szFindPath, &fd);
 
-	if ( hFind != INVALID_HANDLE_VALUE )
+	if (hFind != INVALID_HANDLE_VALUE)
 	{
-		FindClose( hFind );
+		FindClose(hFind);
 	}
 
 	return hFind != INVALID_HANDLE_VALUE;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 LPITEMIDLIST CShellPidl::Next(LPCITEMIDLIST pidl)
 {
-   LPSTR lpMem=(LPSTR)pidl;
+	LPSTR lpMem  = (LPSTR) pidl;
 
-   lpMem+=pidl->mkid.cb;
+	lpMem       += pidl->mkid.cb;
 
-   return (LPITEMIDLIST)lpMem;
+	return (LPITEMIDLIST) lpMem;
 }
 
 /****************************************************************************
@@ -177,18 +157,18 @@ LPITEMIDLIST CShellPidl::Next(LPCITEMIDLIST pidl)
 ****************************************************************************/
 UINT CShellPidl::GetSize(LPCITEMIDLIST pidl)
 {
-    UINT cbTotal = 0;
-    if (pidl)
-    {
-        cbTotal += sizeof(pidl->mkid.cb);       // Null terminator
-        while (pidl->mkid.cb)
-        {
-            cbTotal += pidl->mkid.cb;
-            pidl = Next(pidl);
-        }
-    }
+	UINT cbTotal = 0;
+	if (pidl)
+	{
+		cbTotal += sizeof(pidl->mkid.cb); // Null terminator
+		while (pidl->mkid.cb)
+		{
+			cbTotal += pidl->mkid.cb;
+			pidl     = Next(pidl);
+		}
+	}
 
-    return cbTotal;
+	return cbTotal;
 }
 
 /****************************************************************************
@@ -200,23 +180,24 @@ UINT CShellPidl::GetSize(LPCITEMIDLIST pidl)
 ****************************************************************************/
 LPITEMIDLIST CShellPidl::CreatePidl(UINT cbSize)
 {
-    LPMALLOC lpMalloc;
-    HRESULT  hr;
-    LPITEMIDLIST pidl=nullptr;
+	LPMALLOC lpMalloc;
+	HRESULT hr;
+	LPITEMIDLIST pidl = nullptr;
 
-    hr=SHGetMalloc(&lpMalloc);
+	hr                = SHGetMalloc(&lpMalloc);
 
-    if (FAILED(hr))
-       return 0;
+	if (FAILED(hr))
+		return 0;
 
-    pidl=(LPITEMIDLIST)lpMalloc->Alloc(cbSize);
+	pidl = (LPITEMIDLIST) lpMalloc->Alloc(cbSize);
 
-    if (pidl)
-        memset(pidl, 0, cbSize);      // zero-init for external task   alloc
+	if (pidl)
+		memset(pidl, 0, cbSize); // zero-init for external task   alloc
 
-    if (lpMalloc) lpMalloc->Release();
+	if (lpMalloc)
+		lpMalloc->Release();
 
-    return pidl;
+	return pidl;
 }
 
 /****************************************************************************
@@ -228,25 +209,25 @@ LPITEMIDLIST CShellPidl::CreatePidl(UINT cbSize)
 ****************************************************************************/
 LPITEMIDLIST CShellPidl::ConcatPidls(LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2)
 {
-    LPITEMIDLIST pidlNew;
-    UINT cb1;
-    UINT cb2;
+	LPITEMIDLIST pidlNew;
+	UINT cb1;
+	UINT cb2;
 
-    if (pidl1)  //May be nullptr
-       cb1 = GetSize(pidl1) - sizeof(pidl1->mkid.cb);
-    else
-       cb1 = 0;
+	if (pidl1) //May be nullptr
+		cb1 = GetSize(pidl1) - sizeof(pidl1->mkid.cb);
+	else
+		cb1 = 0;
 
-    cb2 = GetSize(pidl2);
+	cb2     = GetSize(pidl2);
 
-    pidlNew = CreatePidl(cb1 + cb2);
-    if (pidlNew)
-    {
-        if (pidl1)
-           memcpy(pidlNew, pidl1, cb1);
-        memcpy(((LPSTR)pidlNew) + cb1, pidl2, cb2);
-    }
-    return pidlNew;
+	pidlNew = CreatePidl(cb1 + cb2);
+	if (pidlNew)
+	{
+		if (pidl1)
+			memcpy(pidlNew, pidl1, cb1);
+		memcpy(((LPSTR) pidlNew) + cb1, pidl2, cb2);
+	}
+	return pidlNew;
 }
 
 /****************************************************************************
@@ -258,12 +239,12 @@ LPITEMIDLIST CShellPidl::ConcatPidls(LPCITEMIDLIST pidl1, LPCITEMIDLIST pidl2)
 ****************************************************************************/
 LPITEMIDLIST CShellPidl::CopyITEMID(LPMALLOC lpMalloc, LPITEMIDLIST lpi)
 {
-   LPITEMIDLIST lpiTemp;
+	LPITEMIDLIST lpiTemp;
 
-   lpiTemp=(LPITEMIDLIST)lpMalloc->Alloc(lpi->mkid.cb+sizeof(lpi->mkid.cb));
-   CopyMemory((PVOID)lpiTemp, (CONST VOID *)lpi, lpi->mkid.cb+sizeof(lpi->mkid.cb));
+	lpiTemp = (LPITEMIDLIST) lpMalloc->Alloc(lpi->mkid.cb + sizeof(lpi->mkid.cb));
+	CopyMemory((PVOID) lpiTemp, (CONST VOID*) lpi, lpi->mkid.cb + sizeof(lpi->mkid.cb));
 
-   return lpiTemp;
+	return lpiTemp;
 }
 
 /****************************************************************************
@@ -274,51 +255,48 @@ LPITEMIDLIST CShellPidl::CopyITEMID(LPMALLOC lpMalloc, LPITEMIDLIST lpi)
 *    PURPOSE:  Gets the friendly name for the folder 
 *
 ****************************************************************************/
-BOOL CShellPidl::GetName(LPSHELLFOLDER lpsf,
-             LPITEMIDLIST  lpi,
-			 DWORD         dwFlags,
-             LPSTR         lpFriendlyName)
+BOOL CShellPidl::GetName(LPSHELLFOLDER lpsf, LPITEMIDLIST lpi, DWORD dwFlags, LPSTR lpFriendlyName)
 {
-   BOOL   bSuccess=TRUE;
-   STRRET str;
+	BOOL bSuccess = TRUE;
+	STRRET str;
 
-   if (NOERROR==lpsf->GetDisplayNameOf(lpi,dwFlags, &str))
-   {
-      switch (str.uType)
-      {
-         case STRRET_WSTR:
+	if (NOERROR == lpsf->GetDisplayNameOf(lpi, dwFlags, &str))
+	{
+		switch (str.uType)
+		{
+			case STRRET_WSTR:
 
-            WideCharToMultiByte(CP_ACP,                 // CodePage
-                                0,		               // dwFlags
-                                str.pOleStr,            // lpWideCharStr
-                                -1,                     // cchWideChar
-                                lpFriendlyName,         // lpMultiByteStr
-								MAX_PATH,
-                                //sizeof(lpFriendlyName), // cchMultiByte, wrong. sizeof on a pointer, psk, psk
-                                nullptr,                   // lpDefaultChar,
-                                nullptr);                  // lpUsedDefaultChar
+				WideCharToMultiByte(CP_ACP, // CodePage
+					0,                      // dwFlags
+					str.pOleStr,            // lpWideCharStr
+					-1,                     // cchWideChar
+					lpFriendlyName,         // lpMultiByteStr
+					MAX_PATH,
+					//sizeof(lpFriendlyName), // cchMultiByte, wrong. sizeof on a pointer, psk, psk
+					nullptr,  // lpDefaultChar,
+					nullptr); // lpUsedDefaultChar
 
-             break;
+				break;
 
-         case STRRET_OFFSET:
+			case STRRET_OFFSET:
 
-             lstrcpy(lpFriendlyName, (LPSTR)lpi+str.uOffset);
-             break;
+				lstrcpy(lpFriendlyName, (LPSTR) lpi + str.uOffset);
+				break;
 
-         case STRRET_CSTR:
-             
-             lstrcpy(lpFriendlyName, (LPSTR)str.cStr);
-             break;
+			case STRRET_CSTR:
 
-         default:
-             bSuccess = FALSE;
-             break;
-      }
-   }
-   else
-      bSuccess = FALSE;
+				lstrcpy(lpFriendlyName, (LPSTR) str.cStr);
+				break;
 
-   return bSuccess;
+			default:
+				bSuccess = FALSE;
+				break;
+		}
+	}
+	else
+		bSuccess = FALSE;
+
+	return bSuccess;
 }
 
 /****************************************************************************
@@ -330,41 +308,31 @@ BOOL CShellPidl::GetName(LPSHELLFOLDER lpsf,
 ****************************************************************************/
 LPITEMIDLIST CShellPidl::GetFullyQualPidl(LPSHELLFOLDER lpsf, LPITEMIDLIST lpi)
 {
-   char szBuff[MAX_PATH];
-   OLECHAR szOleChar[MAX_PATH];
-   LPSHELLFOLDER lpsfDeskTop;
-   LPITEMIDLIST  lpifq;
-   ULONG ulEaten, ulAttribs;
-   HRESULT hr;
+	char szBuff[MAX_PATH];
+	OLECHAR szOleChar[MAX_PATH];
+	LPSHELLFOLDER lpsfDeskTop;
+	LPITEMIDLIST lpifq;
+	ULONG ulEaten, ulAttribs;
+	HRESULT hr;
 
-   if (!GetName(lpsf, lpi, SHGDN_FORPARSING, szBuff))
-      return nullptr;
+	if (!GetName(lpsf, lpi, SHGDN_FORPARSING, szBuff))
+		return nullptr;
 
-   hr=SHGetDesktopFolder(&lpsfDeskTop);
+	hr = SHGetDesktopFolder(&lpsfDeskTop);
 
-   if (FAILED(hr))
-      return nullptr;
+	if (FAILED(hr))
+		return nullptr;
 
-   MultiByteToWideChar(CP_ACP,
-					   MB_PRECOMPOSED,
-					   szBuff,
-					   -1,
-					   szOleChar,
-					   sizeof(szOleChar));
+	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, szBuff, -1, szOleChar, sizeof(szOleChar));
 
-   hr=lpsfDeskTop->ParseDisplayName(nullptr,
-									nullptr,
-									szOleChar,
-									&ulEaten,
-									&lpifq,
-									&ulAttribs);
+	hr = lpsfDeskTop->ParseDisplayName(nullptr, nullptr, szOleChar, &ulEaten, &lpifq, &ulAttribs);
 
-   lpsfDeskTop->Release();
+	lpsfDeskTop->Release();
 
-   if (FAILED(hr))
-      return nullptr;
+	if (FAILED(hr))
+		return nullptr;
 
-   return lpifq;
+	return lpifq;
 }
 
 /****************************************************************************
@@ -387,74 +355,68 @@ LPITEMIDLIST CShellPidl::GetFullyQualPidl(LPSHELLFOLDER lpsf, LPITEMIDLIST lpi)
 *    Returns TRUE on success, FALSE on failure
 *
 ****************************************************************************/
-BOOL CShellPidl::DoTheMenuThing(HWND hwnd, LPSHELLFOLDER lpsfParent,
-     LPITEMIDLIST  lpi, LPPOINT lppt)
+BOOL CShellPidl::DoTheMenuThing(HWND hwnd, LPSHELLFOLDER lpsfParent, LPITEMIDLIST lpi, LPPOINT lppt)
 {
-    LPCONTEXTMENU lpcm;
-    HRESULT       hr;
-    char          szTemp[64];
-    CMINVOKECOMMANDINFO cmi;
-    DWORD               dwAttribs=0;
-    int                 idCmd;
-    HMENU               hMenu;
-    BOOL                bSuccess=TRUE;
+	LPCONTEXTMENU lpcm;
+	HRESULT hr;
+	char szTemp[64];
+	CMINVOKECOMMANDINFO cmi;
+	DWORD dwAttribs = 0;
+	int idCmd;
+	HMENU hMenu;
+	BOOL bSuccess = TRUE;
 
-    hr=lpsfParent->GetUIObjectOf(hwnd,
-        1,  //Number of objects to get attributes of
-        (const struct _ITEMIDLIST **)&lpi,
-        IID_IContextMenu,
-        0,
-        (LPVOID *)&lpcm);
-    if (SUCCEEDED(hr))  
-    {
-       hMenu = CreatePopupMenu();
+	hr            = lpsfParent->GetUIObjectOf(hwnd,
+				   1, //Number of objects to get attributes of
+				   (const struct _ITEMIDLIST**) &lpi, IID_IContextMenu, 0, (LPVOID*) &lpcm);
+	if (SUCCEEDED(hr))
+	{
+		hMenu = CreatePopupMenu();
 
-       if (hMenu)
-       {
-          hr=lpcm->QueryContextMenu(hMenu, 0, 1, 0x7fff, CMF_EXPLORE);
-          if (SUCCEEDED(hr))
-          {
-             idCmd=TrackPopupMenu(hMenu, 
-                TPM_LEFTALIGN | TPM_RETURNCMD | TPM_RIGHTBUTTON, 
-                lppt->x, lppt->y, 0, hwnd, nullptr);
+		if (hMenu)
+		{
+			hr = lpcm->QueryContextMenu(hMenu, 0, 1, 0x7fff, CMF_EXPLORE);
+			if (SUCCEEDED(hr))
+			{
+				idCmd = TrackPopupMenu(hMenu, TPM_LEFTALIGN | TPM_RETURNCMD | TPM_RIGHTBUTTON,
+					lppt->x, lppt->y, 0, hwnd, nullptr);
 
-             if (idCmd)
-             {
-                cmi.cbSize = sizeof(CMINVOKECOMMANDINFO);
-                cmi.fMask  = 0;
-                cmi.hwnd   = hwnd;
-                cmi.lpVerb = MAKEINTRESOURCE(idCmd-1);
-                cmi.lpParameters = nullptr;
-      	        cmi.lpDirectory  = nullptr;
-                cmi.nShow        = SW_SHOWNORMAL;
-                cmi.dwHotKey     = 0;
-                cmi.hIcon        = nullptr;
-                hr=lpcm->InvokeCommand(&cmi);
-                if (!SUCCEEDED(hr))  
-                {
-                   wsprintf(szTemp, "InvokeCommand failed. hr=%lx", hr);
-                   AfxMessageBox(szTemp);
-                }
-             }
+				if (idCmd)
+				{
+					cmi.cbSize       = sizeof(CMINVOKECOMMANDINFO);
+					cmi.fMask        = 0;
+					cmi.hwnd         = hwnd;
+					cmi.lpVerb       = MAKEINTRESOURCE(idCmd - 1);
+					cmi.lpParameters = nullptr;
+					cmi.lpDirectory  = nullptr;
+					cmi.nShow        = SW_SHOWNORMAL;
+					cmi.dwHotKey     = 0;
+					cmi.hIcon        = nullptr;
+					hr               = lpcm->InvokeCommand(&cmi);
+					if (!SUCCEEDED(hr))
+					{
+						wsprintf(szTemp, "InvokeCommand failed. hr=%lx", hr);
+						AfxMessageBox(szTemp);
+					}
+				}
+			}
+			else
+				bSuccess = FALSE;
 
-          }
-          else
-             bSuccess = FALSE;
+			DestroyMenu(hMenu);
+		}
+		else
+			bSuccess = FALSE;
 
-          DestroyMenu(hMenu);
-       }
-       else
-          bSuccess = FALSE;
-
-       lpcm->Release();
-    } 
-    else
-    {
-       wsprintf(szTemp, "GetUIObjectOf failed! hr=%lx", hr);
-       AfxMessageBox(szTemp );
-       bSuccess = FALSE;
-    }
-    return bSuccess;
+		lpcm->Release();
+	}
+	else
+	{
+		wsprintf(szTemp, "GetUIObjectOf failed! hr=%lx", hr);
+		AfxMessageBox(szTemp);
+		bSuccess = FALSE;
+	}
+	return bSuccess;
 }
 
 /****************************************************************************
@@ -473,27 +435,12 @@ BOOL CShellPidl::DoTheMenuThing(HWND hwnd, LPSHELLFOLDER lpsfParent,
 ****************************************************************************/
 int CShellPidl::GetItemIcon(LPITEMIDLIST lpi, UINT uFlags)
 {
-   SHFILEINFO    sfi;
+	SHFILEINFO sfi;
 
-   SHGetFileInfo((LPCSTR)lpi, 
-                 0,
-                 &sfi, 
-                 sizeof(SHFILEINFO), 
-                 uFlags);
+	SHGetFileInfo((LPCSTR) lpi, 0, &sfi, sizeof(SHFILEINFO), uFlags);
 
-   return sfi.iIcon;
+	return sfi.iIcon;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 CShellTree::CShellTree()
 {
@@ -503,10 +450,9 @@ CShellTree::~CShellTree()
 {
 }
 
-
 BEGIN_MESSAGE_MAP(CShellTree, CTreeCtrl)
-	//{{AFX_MSG_MAP(CShellTree)
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CShellTree)
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /****************************************************************************
@@ -516,39 +462,38 @@ END_MESSAGE_MAP()
 *    PURPOSE:  Processes the File.Fill/RefreshTree command
 *
 ****************************************************************************/
-void CShellTree::PopulateTree() 
+void CShellTree::PopulateTree()
 {
+	LPSHELLFOLDER lpsf = nullptr;
+	LPITEMIDLIST lpi   = nullptr;
+	HRESULT hr;
+	TV_SORTCB tvscb;
 
-    LPSHELLFOLDER lpsf=nullptr;
-    LPITEMIDLIST  lpi=nullptr;
-    HRESULT hr;
-    TV_SORTCB      tvscb;
-   
-    // Get a pointer to the desktop folder.
-    hr=SHGetDesktopFolder(&lpsf);
+	// Get a pointer to the desktop folder.
+	hr = SHGetDesktopFolder(&lpsf);
 
-    if (SUCCEEDED(hr))
-    {
-       // Initialize the tree view to be empty.
-       DeleteAllItems();
+	if (SUCCEEDED(hr))
+	{
+		// Initialize the tree view to be empty.
+		DeleteAllItems();
 
-       // Fill in the tree view from the root.
-       FillTreeView(lpsf, nullptr, TVI_ROOT);
-       //TunnelFillTree(lpsf, nullptr, TVI_ROOT);
-       // Release the folder pointer.
-       lpsf->Release();
-    }
-    tvscb.hParent     = TVI_ROOT;
-    tvscb.lParam      = 0;
-    tvscb.lpfnCompare = TreeViewCompareProc;
+		// Fill in the tree view from the root.
+		FillTreeView(lpsf, nullptr, TVI_ROOT);
+		//TunnelFillTree(lpsf, nullptr, TVI_ROOT);
+		// Release the folder pointer.
+		lpsf->Release();
+	}
+	tvscb.hParent     = TVI_ROOT;
+	tvscb.lParam      = 0;
+	tvscb.lpfnCompare = TreeViewCompareProc;
 
-    // Sort the items in the tree view
-	SortChildrenCB(&tvscb/*, FALSE*/);
-    
+	// Sort the items in the tree view
+	SortChildrenCB(&tvscb /*, FALSE*/);
+
 	HTREEITEM hItem;
 	hItem = GetRootItem();
-	Expand(hItem,TVE_EXPAND);
-	Select(GetRootItem(),TVGN_CARET);
+	Expand(hItem, TVE_EXPAND);
+	Select(GetRootItem(), TVGN_CARET);
 }
 
 /****************************************************************************
@@ -563,57 +508,54 @@ void CShellTree::PopulateTree()
 *				folderlocation
 *
 ****************************************************************************/
-void CShellTree::PopulateTree(int nFolder) 
+void CShellTree::PopulateTree(int nFolder)
 {
+	LPSHELLFOLDER lpsf = nullptr, lpsf2 = nullptr;
+	LPITEMIDLIST lpi = nullptr;
+	HRESULT hr;
+	TV_SORTCB tvscb;
 
-	LPSHELLFOLDER lpsf=nullptr,lpsf2=nullptr;
-    LPITEMIDLIST  lpi=nullptr;
-    HRESULT hr;
-    TV_SORTCB      tvscb;
-   
-    // Get a pointer to the desktop folder.
-	hr=SHGetDesktopFolder(&lpsf);
+	// Get a pointer to the desktop folder.
+	hr = SHGetDesktopFolder(&lpsf);
 
-    if (SUCCEEDED(hr))
-    {
-       // Initialize the tree view to be empty.
+	if (SUCCEEDED(hr))
+	{
+		// Initialize the tree view to be empty.
 		DeleteAllItems();
 
-		if (!SUCCEEDED(SHGetSpecialFolderLocation( 
-				m_hWnd, nFolder, &lpi))) 
-		{ 
-			lpi=nullptr;
-			FillTreeView(lpsf,nullptr,TVI_ROOT);
+		if (!SUCCEEDED(SHGetSpecialFolderLocation(m_hWnd, nFolder, &lpi)))
+		{
+			lpi = nullptr;
+			FillTreeView(lpsf, nullptr, TVI_ROOT);
 		}
 		else
 		{
-			hr=lpsf->BindToObject(lpi,
-                0, IID_IShellFolder,(LPVOID *)&lpsf2);
+			hr = lpsf->BindToObject(lpi, 0, IID_IShellFolder, (LPVOID*) &lpsf2);
 
-			if(SUCCEEDED(hr))
+			if (SUCCEEDED(hr))
 			{
 				// Fill in the tree view from the root.
 				FillTreeView(lpsf2, lpi, TVI_ROOT);
 				lpsf2->Release();
 			}
 			else
-				FillTreeView(lpsf,nullptr,TVI_ROOT);
+				FillTreeView(lpsf, nullptr, TVI_ROOT);
 		}
 
 		// Release the folder pointer.
 		lpsf->Release();
 	}
-    tvscb.hParent     = TVI_ROOT;
-    tvscb.lParam      = 0;
-    tvscb.lpfnCompare = TreeViewCompareProc;
+	tvscb.hParent     = TVI_ROOT;
+	tvscb.lParam      = 0;
+	tvscb.lpfnCompare = TreeViewCompareProc;
 
-    // Sort the items in the tree view
-	SortChildrenCB(&tvscb/*, FALSE*/);
-    
+	// Sort the items in the tree view
+	SortChildrenCB(&tvscb /*, FALSE*/);
+
 	HTREEITEM hItem;
 	hItem = GetRootItem();
-	Expand(hItem,TVE_EXPAND);
-	Select(GetRootItem(),TVGN_CARET);
+	Expand(hItem, TVE_EXPAND);
+	Select(GetRootItem(), TVGN_CARET);
 }
 
 /****************************************************************************
@@ -640,132 +582,130 @@ void CShellTree::PopulateTree(int nFolder)
 *    items in here if we wanted, but that's not the intent.
 *
 ****************************************************************************/
-void CShellTree::FillTreeView(LPSHELLFOLDER lpsf, LPITEMIDLIST  lpifq, HTREEITEM     hParent)
+void CShellTree::FillTreeView(LPSHELLFOLDER lpsf, LPITEMIDLIST lpifq, HTREEITEM hParent)
 {
-    TV_ITEM         tvi;                          // TreeView Item.
-    TV_INSERTSTRUCT tvins;                        // TreeView Insert Struct.
-    HTREEITEM       hPrev = nullptr;                 // Previous Item Added.
-    LPSHELLFOLDER   lpsf2=nullptr;
-    LPENUMIDLIST    lpe=nullptr;
-    LPITEMIDLIST    lpi=nullptr, lpiTemp=nullptr, lpifqThisItem=nullptr;
-    LPTVITEMDATA    lptvid=nullptr;
-    LPMALLOC        lpMalloc=nullptr;
-    ULONG           ulFetched;
-    UINT            uCount=0;
-    HRESULT         hr;
-    char            szBuff[256];
-    HWND            hwnd=::GetParent(m_hWnd);
+	TV_ITEM tvi;                   // TreeView Item.
+	TV_INSERTSTRUCT tvins;         // TreeView Insert Struct.
+	HTREEITEM hPrev     = nullptr; // Previous Item Added.
+	LPSHELLFOLDER lpsf2 = nullptr;
+	LPENUMIDLIST lpe    = nullptr;
+	LPITEMIDLIST lpi = nullptr, lpiTemp = nullptr, lpifqThisItem = nullptr;
+	LPTVITEMDATA lptvid = nullptr;
+	LPMALLOC lpMalloc   = nullptr;
+	ULONG ulFetched;
+	UINT uCount = 0;
+	HRESULT hr;
+	char szBuff[256];
+	HWND hwnd = ::GetParent(m_hWnd);
 
-    // Allocate a shell memory object. 
-    hr=::SHGetMalloc(&lpMalloc);
-    if (FAILED(hr))
-       return;
+	// Allocate a shell memory object.
+	hr        = ::SHGetMalloc(&lpMalloc);
+	if (FAILED(hr))
+		return;
 
-    if (SUCCEEDED(hr))
-    {
-        // Get the IEnumIDList object for the given folder.
-        hr=lpsf->EnumObjects(hwnd, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &lpe);
+	if (SUCCEEDED(hr))
+	{
+		// Get the IEnumIDList object for the given folder.
+		hr = lpsf->EnumObjects(hwnd, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, &lpe);
 
-        if (SUCCEEDED(hr))
-        {
-            // Enumerate throught the list of folder and non-folder objects.
-            while (S_OK==lpe->Next(1, &lpi, &ulFetched))
-            {
-                //Create a fully qualified path to the current item
-                //The SH* shell api's take a fully qualified path pidl,
-                //(see GetIcon above where I call SHGetFileInfo) whereas the
-                //interface methods take a relative path pidl.
-                ULONG ulAttrs = SFGAO_HASSUBFOLDER | SFGAO_FOLDER;
+		if (SUCCEEDED(hr))
+		{
+			// Enumerate throught the list of folder and non-folder objects.
+			while (S_OK == lpe->Next(1, &lpi, &ulFetched))
+			{
+				//Create a fully qualified path to the current item
+				//The SH* shell api's take a fully qualified path pidl,
+				//(see GetIcon above where I call SHGetFileInfo) whereas the
+				//interface methods take a relative path pidl.
+				ULONG ulAttrs = SFGAO_HASSUBFOLDER | SFGAO_FOLDER;
 
-                // Determine what type of object we have.
-                lpsf->GetAttributesOf(1, (const struct _ITEMIDLIST **)&lpi, &ulAttrs);
+				// Determine what type of object we have.
+				lpsf->GetAttributesOf(1, (const struct _ITEMIDLIST**) &lpi, &ulAttrs);
 
-                if (ulAttrs & (SFGAO_HASSUBFOLDER | SFGAO_FOLDER))
-                {
-                   //We need this next if statement so that we don't add things like
-                   //the MSN to our tree.  MSN is not a folder, but according to the
-                   //shell it has subfolders.
-                   if (ulAttrs & SFGAO_FOLDER)
-                   {
-                      tvi.mask= TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
+				if (ulAttrs & (SFGAO_HASSUBFOLDER | SFGAO_FOLDER))
+				{
+					//We need this next if statement so that we don't add things like
+					//the MSN to our tree.  MSN is not a folder, but according to the
+					//shell it has subfolders.
+					if (ulAttrs & SFGAO_FOLDER)
+					{
+						tvi.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 
-                      if (ulAttrs & SFGAO_HASSUBFOLDER)
-                      {
-                         //This item has sub-folders, so let's put the + in the TreeView.
-                         //The first time the user clicks on the item, we'll populate the
-                         //sub-folders.
-                         tvi.cChildren=1;
-                         tvi.mask |= TVIF_CHILDREN;
-                      }
-                        
-                      //OK, let's get some memory for our ITEMDATA struct
-                      lptvid = (LPTVITEMDATA)lpMalloc->Alloc(sizeof(TVITEMDATA));
-                      if (!lptvid)
-                         goto Done;  // Error - could not allocate memory.
-   
-                      //Now get the friendly name that we'll put in the treeview.
-                      if (!GetName(lpsf, lpi, SHGDN_NORMAL, szBuff))
-                         goto Done; // Error - could not get friendly name.
+						if (ulAttrs & SFGAO_HASSUBFOLDER)
+						{
+							//This item has sub-folders, so let's put the + in the TreeView.
+							//The first time the user clicks on the item, we'll populate the
+							//sub-folders.
+							tvi.cChildren  = 1;
+							tvi.mask      |= TVIF_CHILDREN;
+						}
 
-                      tvi.pszText    = szBuff;
-                      tvi.cchTextMax = MAX_PATH;
-    
-                      lpifqThisItem=ConcatPidls(lpifq, lpi);
-      
-                      //Now, make a copy of the ITEMIDLIST
-                      lptvid->lpi=CopyITEMID(lpMalloc, lpi);
-   
-                      GetNormalAndSelectedIcons(lpifqThisItem, &tvi);
-   
-                      lptvid->lpsfParent=lpsf;    //Store the parent folders SF
-                      lpsf->AddRef();
+						//OK, let's get some memory for our ITEMDATA struct
+						lptvid = (LPTVITEMDATA) lpMalloc->Alloc(sizeof(TVITEMDATA));
+						if (!lptvid)
+							goto Done; // Error - could not allocate memory.
 
-                      lptvid->lpifq=ConcatPidls(lpifq, lpi);
-   
-                      tvi.lParam = (LPARAM)lptvid;
-   
-                      // Populate the TreeVeiw Insert Struct
-                      // The item is the one filled above.
-                      // Insert it after the last item inserted at this level.
-                      // And indicate this is a root entry.
-                      tvins.item         = tvi;
-                      tvins.hInsertAfter = hPrev;
-                      tvins.hParent      = hParent;
-   
-                      // Add the item to the tree
-                      hPrev = InsertItem(&tvins);
-                   }
-                   // Free this items task allocator.
-                   lpMalloc->Free(lpifqThisItem);  
-                   lpifqThisItem=0;
-                }
+						//Now get the friendly name that we'll put in the treeview.
+						if (!GetName(lpsf, lpi, SHGDN_NORMAL, szBuff))
+							goto Done; // Error - could not get friendly name.
 
-                lpMalloc->Free(lpi);  //Free the pidl that the shell gave us.
-                lpi=0;
-            }
-        }
+						tvi.pszText    = szBuff;
+						tvi.cchTextMax = MAX_PATH;
 
-    }
-    else
-       return;
+						lpifqThisItem  = ConcatPidls(lpifq, lpi);
+
+						//Now, make a copy of the ITEMIDLIST
+						lptvid->lpi    = CopyITEMID(lpMalloc, lpi);
+
+						GetNormalAndSelectedIcons(lpifqThisItem, &tvi);
+
+						lptvid->lpsfParent = lpsf; //Store the parent folders SF
+						lpsf->AddRef();
+
+						lptvid->lpifq      = ConcatPidls(lpifq, lpi);
+
+						tvi.lParam         = (LPARAM) lptvid;
+
+						// Populate the TreeVeiw Insert Struct
+						// The item is the one filled above.
+						// Insert it after the last item inserted at this level.
+						// And indicate this is a root entry.
+						tvins.item         = tvi;
+						tvins.hInsertAfter = hPrev;
+						tvins.hParent      = hParent;
+
+						// Add the item to the tree
+						hPrev              = InsertItem(&tvins);
+					}
+					// Free this items task allocator.
+					lpMalloc->Free(lpifqThisItem);
+					lpifqThisItem = 0;
+				}
+
+				lpMalloc->Free(lpi); //Free the pidl that the shell gave us.
+				lpi = 0;
+			}
+		}
+	}
+	else
+		return;
 
 Done:
- 
-    if (lpe)  
-        lpe->Release();
 
-    //The following 2 if statements will only be TRUE if we got here on an
-    //error condition from the "goto" statement.  Otherwise, we free this memory
-    //at the end of the while loop above.
-    if (lpi && lpMalloc)           
-        lpMalloc->Free(lpi);
-    if (lpifqThisItem && lpMalloc) 
-        lpMalloc->Free(lpifqThisItem);  
+	if (lpe)
+		lpe->Release();
 
-    if (lpMalloc) 
-        lpMalloc->Release();
+	//The following 2 if statements will only be TRUE if we got here on an
+	//error condition from the "goto" statement.  Otherwise, we free this memory
+	//at the end of the while loop above.
+	if (lpi && lpMalloc)
+		lpMalloc->Free(lpi);
+	if (lpifqThisItem && lpMalloc)
+		lpMalloc->Free(lpifqThisItem);
+
+	if (lpMalloc)
+		lpMalloc->Release();
 }
-
 
 /****************************************************************************
 *
@@ -778,25 +718,18 @@ Done:
 *    lptvitem - Pointer to treeview item we are about to add to the tree.
 *
 ****************************************************************************/
-void CShellTree::GetNormalAndSelectedIcons(LPITEMIDLIST lpifq,
-                               LPTV_ITEM lptvitem)
+void CShellTree::GetNormalAndSelectedIcons(LPITEMIDLIST lpifq, LPTV_ITEM lptvitem)
 {
-   //Note that we don't check the return value here because if GetIcon()
-   //fails, then we're in big trouble...
+	//Note that we don't check the return value here because if GetIcon()
+	//fails, then we're in big trouble...
 
-   lptvitem->iImage = GetItemIcon(lpifq, SHGFI_PIDL | 
-                              SHGFI_SYSICONINDEX | 
-                              SHGFI_SMALLICON);
-   
-   lptvitem->iSelectedImage = GetItemIcon(lpifq, SHGFI_PIDL | 
-                                      SHGFI_SYSICONINDEX | 
-                                      SHGFI_SMALLICON |
-                                      SHGFI_OPENICON);
-   
-   return;
+	lptvitem->iImage = GetItemIcon(lpifq, SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
+
+	lptvitem->iSelectedImage = GetItemIcon(
+		lpifq, SHGFI_PIDL | SHGFI_SYSICONINDEX | SHGFI_SMALLICON | SHGFI_OPENICON);
+
+	return;
 }
-
-
 
 /****************************************************************************
 *
@@ -805,23 +738,19 @@ void CShellTree::GetNormalAndSelectedIcons(LPITEMIDLIST lpifq,
 *    PURPOSE:  Callback routine for sorting the tree 
 *
 ****************************************************************************/
-int CALLBACK CShellTree::TreeViewCompareProc(LPARAM lparam1, 
-    LPARAM lparam2, LPARAM lparamSort)
+int CALLBACK CShellTree::TreeViewCompareProc(LPARAM lparam1, LPARAM lparam2, LPARAM lparamSort)
 {
-    LPTVITEMDATA lptvid1=(LPTVITEMDATA)lparam1;
-    LPTVITEMDATA lptvid2=(LPTVITEMDATA)lparam2;
-    HRESULT   hr;
+	LPTVITEMDATA lptvid1 = (LPTVITEMDATA) lparam1;
+	LPTVITEMDATA lptvid2 = (LPTVITEMDATA) lparam2;
+	HRESULT hr;
 
-    hr = lptvid1->lpsfParent->CompareIDs(0,lptvid1->lpi,lptvid2->lpi);
+	hr = lptvid1->lpsfParent->CompareIDs(0, lptvid1->lpi, lptvid2->lpi);
 
-    if (FAILED(hr))
-       return 0;
+	if (FAILED(hr))
+		return 0;
 
-    return (short)SCODE_CODE(GetScode(hr));
+	return (short) SCODE_CODE(GetScode(hr));
 }
-
-
-
 
 /////////////////////////////////////////////////////////////////////////////
 // CShellTree message handlers
@@ -840,39 +769,36 @@ int CALLBACK CShellTree::TreeViewCompareProc(LPARAM lparam1,
 *	MESSAGEMAP:	TVN_ITEMEXPANDING
 *
 ****************************************************************************/
-void CShellTree::OnFolderExpanding(NMHDR* pNMHDR, LRESULT* pResult) 
+void CShellTree::OnFolderExpanding(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LPTVITEMDATA   lptvid;  //Long pointer to TreeView item data
-	HRESULT        hr;
-	LPSHELLFOLDER  lpsf2=nullptr;
-	static char    szBuff[MAX_PATH];
-	TV_SORTCB      tvscb;
+	LPTVITEMDATA lptvid; //Long pointer to TreeView item data
+	HRESULT hr;
+	LPSHELLFOLDER lpsf2 = nullptr;
+	static char szBuff[MAX_PATH];
+	TV_SORTCB tvscb;
 
-	NM_TREEVIEW* pnmtv = (NM_TREEVIEW*)pNMHDR;
+	NM_TREEVIEW* pnmtv = (NM_TREEVIEW*) pNMHDR;
 	// TODO: Add your control notification handler code here
-    if ((pnmtv->itemNew.state & TVIS_EXPANDEDONCE))
-         return;
-		
-    lptvid=(LPTVITEMDATA)pnmtv->itemNew.lParam;
-    if (lptvid)
-       {
-            hr=lptvid->lpsfParent->BindToObject(lptvid->lpi,
-                0, IID_IShellFolder,(LPVOID *)&lpsf2);
+	if ((pnmtv->itemNew.state & TVIS_EXPANDEDONCE))
+		return;
 
-            if (SUCCEEDED(hr))
-            {
-                FillTreeView(lpsf2,
-                       lptvid->lpifq,
-                       pnmtv->itemNew.hItem);
-            }
+	lptvid = (LPTVITEMDATA) pnmtv->itemNew.lParam;
+	if (lptvid)
+	{
+		hr = lptvid->lpsfParent->BindToObject(lptvid->lpi, 0, IID_IShellFolder, (LPVOID*) &lpsf2);
 
-            tvscb.hParent     = pnmtv->itemNew.hItem;
-            tvscb.lParam      = 0;
-            tvscb.lpfnCompare = TreeViewCompareProc;
+		if (SUCCEEDED(hr))
+		{
+			FillTreeView(lpsf2, lptvid->lpifq, pnmtv->itemNew.hItem);
+		}
 
-            SortChildrenCB(&tvscb /*, FALSE*/);
-    }	
-	
+		tvscb.hParent     = pnmtv->itemNew.hItem;
+		tvscb.lParam      = 0;
+		tvscb.lpfnCompare = TreeViewCompareProc;
+
+		SortChildrenCB(&tvscb /*, FALSE*/);
+	}
+
 	*pResult = 0;
 }
 
@@ -886,38 +812,38 @@ void CShellTree::OnFolderExpanding(NMHDR* pNMHDR, LRESULT* pResult)
 *	MESSAGEMAP:	NM_RCLICK;
 *
 ****************************************************************************/
-void CShellTree::GetContextMenu(NMHDR* pNMHDR, LRESULT* pResult) 
+void CShellTree::GetContextMenu(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	// TODO: Add your control notification handler code here
-	POINT			pt;
-	LPTVITEMDATA	lptvid;  //Long pointer to TreeView item data
-	LPSHELLFOLDER	lpsf2=nullptr;
-	static char		szBuff[MAX_PATH];
-	TV_HITTESTINFO	tvhti;
-	TV_ITEM			tvi;
+	POINT pt;
+	LPTVITEMDATA lptvid; //Long pointer to TreeView item data
+	LPSHELLFOLDER lpsf2 = nullptr;
+	static char szBuff[MAX_PATH];
+	TV_HITTESTINFO tvhti;
+	TV_ITEM tvi;
 
 	// TODO: Add your control notification handler code here
-	::GetCursorPos((LPPOINT)&pt);
+	::GetCursorPos((LPPOINT) &pt);
 	ScreenToClient(&pt);
-	tvhti.pt=pt;
-    HitTest(&tvhti);
-    SelectItem(tvhti.hItem);
-	if (tvhti.flags & (TVHT_ONITEMLABEL|TVHT_ONITEMICON))
+	tvhti.pt = pt;
+	HitTest(&tvhti);
+	SelectItem(tvhti.hItem);
+	if (tvhti.flags & (TVHT_ONITEMLABEL | TVHT_ONITEMICON))
 	{
 		ClientToScreen(&pt);
-		tvi.mask=TVIF_PARAM;
-		tvi.hItem=tvhti.hItem;
-		
-        if (!GetItem(&tvi)){
+		tvi.mask  = TVIF_PARAM;
+		tvi.hItem = tvhti.hItem;
+
+		if (!GetItem(&tvi))
+		{
 			return;
 		}
-		
-		lptvid=(LPTVITEMDATA)tvi.lParam;
-		
-		DoTheMenuThing(::GetParent(m_hWnd),
-		lptvid->lpsfParent, lptvid->lpi, &pt);
-	}	
-	
+
+		lptvid = (LPTVITEMDATA) tvi.lParam;
+
+		DoTheMenuThing(::GetParent(m_hWnd), lptvid->lpsfParent, lptvid->lpi, &pt);
+	}
+
 	*pResult = 0;
 }
 
@@ -934,62 +860,63 @@ void CShellTree::GetContextMenu(NMHDR* pNMHDR, LRESULT* pResult)
 *	MESSAGEMAP:	TVN_SELCHANGED
 *
 ****************************************************************************/
-BOOL CShellTree::OnFolderSelected(NMHDR* pNMHDR, LRESULT* pResult, CString &szFolderPath) 
+BOOL CShellTree::OnFolderSelected(NMHDR* pNMHDR, LRESULT* pResult, CString& szFolderPath)
 {
 	// TODO: Add your control notification handler code here
-	LPTVITEMDATA	lptvid;  //Long pointer to TreeView item data
-	LPSHELLFOLDER	lpsf2=nullptr;
-	static char		szBuff[MAX_PATH];
-	HRESULT			hr;
-	BOOL			bRet=false;
-	TV_SORTCB		tvscb;
-	HTREEITEM		hItem=nullptr;
+	LPTVITEMDATA lptvid; //Long pointer to TreeView item data
+	LPSHELLFOLDER lpsf2 = nullptr;
+	static char szBuff[MAX_PATH];
+	HRESULT hr;
+	BOOL bRet = false;
+	TV_SORTCB tvscb;
+	HTREEITEM hItem = nullptr;
 
-	if((hItem = GetSelectedItem()))
+	if ((hItem = GetSelectedItem()))
 	{
-		lptvid=(LPTVITEMDATA)GetItemData(hItem);
+		lptvid = (LPTVITEMDATA) GetItemData(hItem);
 
 		if (lptvid && lptvid->lpsfParent && lptvid->lpi)
 		{
-			hr=lptvid->lpsfParent->BindToObject(lptvid->lpi,
-					 0,IID_IShellFolder,(LPVOID *)&lpsf2);
+			hr = lptvid->lpsfParent->BindToObject(
+				lptvid->lpi, 0, IID_IShellFolder, (LPVOID*) &lpsf2);
 
 			if (SUCCEEDED(hr))
+			{
+				ULONG ulAttrs = SFGAO_FILESYSTEM;
+
+				// Determine what type of object we have.
+				lptvid->lpsfParent->GetAttributesOf(
+					1, (const struct _ITEMIDLIST**) &lptvid->lpi, &ulAttrs);
+
+				if (ulAttrs & (SFGAO_FILESYSTEM))
 				{
-					ULONG ulAttrs = SFGAO_FILESYSTEM;
-
-					// Determine what type of object we have.
-					lptvid->lpsfParent->GetAttributesOf(1, (const struct _ITEMIDLIST **)&lptvid->lpi, &ulAttrs);
-
-					if (ulAttrs & (SFGAO_FILESYSTEM))
+					if (SHGetPathFromIDList(lptvid->lpifq, szBuff))
 					{
-						if(SHGetPathFromIDList(lptvid->lpifq,szBuff)){
-							szFolderPath = szBuff;
-							bRet = true;
-						}
-					}
-					//non standard from here(NEW CODE)
-					NM_TREEVIEW* pnmtv = (NM_TREEVIEW*)pNMHDR;
-					if ((pnmtv->itemNew.cChildren == 1) && !(pnmtv->itemNew.state & TVIS_EXPANDEDONCE)){
-						FillTreeView(lpsf2,lptvid->lpifq,pnmtv->itemNew.hItem);
-
-						tvscb.hParent     = pnmtv->itemNew.hItem;
-						tvscb.lParam      = 0;
-						tvscb.lpfnCompare = TreeViewCompareProc;
-						SortChildrenCB(&tvscb);
-						
-						pnmtv->itemNew.state |= TVIS_EXPANDEDONCE;
-						pnmtv->itemNew.stateMask |= TVIS_EXPANDEDONCE;
-						pnmtv->itemNew.mask |= TVIF_STATE;
-						SetItem(&pnmtv->itemNew);
+						szFolderPath = szBuff;
+						bRet         = true;
 					}
 				}
+				//non standard from here(NEW CODE)
+				NM_TREEVIEW* pnmtv = (NM_TREEVIEW*) pNMHDR;
+				if ((pnmtv->itemNew.cChildren == 1) && !(pnmtv->itemNew.state & TVIS_EXPANDEDONCE))
+				{
+					FillTreeView(lpsf2, lptvid->lpifq, pnmtv->itemNew.hItem);
 
+					tvscb.hParent     = pnmtv->itemNew.hItem;
+					tvscb.lParam      = 0;
+					tvscb.lpfnCompare = TreeViewCompareProc;
+					SortChildrenCB(&tvscb);
+
+					pnmtv->itemNew.state     |= TVIS_EXPANDEDONCE;
+					pnmtv->itemNew.stateMask |= TVIS_EXPANDEDONCE;
+					pnmtv->itemNew.mask      |= TVIF_STATE;
+					SetItem(&pnmtv->itemNew);
+				}
+			}
 		}
-		if(lpsf2)
+		if (lpsf2)
 			lpsf2->Release();
-		
-	}	
+	}
 	*pResult = 0;
 	return bRet;
 }
@@ -1007,22 +934,22 @@ BOOL CShellTree::OnFolderSelected(NMHDR* pNMHDR, LRESULT* pResult, CString &szFo
 ****************************************************************************/
 void CShellTree::OnDeleteShellItem(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LPTVITEMDATA lptvid=nullptr;
+	LPTVITEMDATA lptvid = nullptr;
 	HRESULT hr;
 	LPMALLOC lpMalloc;
 
-	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
+	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*) pNMHDR;
 
 	//Let's free the memory for the TreeView item data...
-	hr=SHGetMalloc(&lpMalloc);
+	hr                       = SHGetMalloc(&lpMalloc);
 	if (FAILED(hr))
 		return;
-		
-	lptvid=(LPTVITEMDATA)pNMTreeView->itemOld.lParam;
+
+	lptvid = (LPTVITEMDATA) pNMTreeView->itemOld.lParam;
 	lptvid->lpsfParent->Release();
-	lpMalloc->Free(lptvid->lpi);  
-	lpMalloc->Free(lptvid->lpifq);  
-	lpMalloc->Free(lptvid);  
+	lpMalloc->Free(lptvid->lpi);
+	lpMalloc->Free(lptvid->lpifq);
+	lpMalloc->Free(lptvid);
 	lpMalloc->Release();
 }
 
@@ -1039,19 +966,15 @@ void CShellTree::OnDeleteShellItem(NMHDR* pNMHDR, LRESULT* pResult)
 void CShellTree::EnableImages()
 {
 	// Get the handle to the system image list, for our icons
-    HIMAGELIST  hImageList;
-    SHFILEINFO    sfi;
+	HIMAGELIST hImageList;
+	SHFILEINFO sfi;
 
-    hImageList = (HIMAGELIST)SHGetFileInfo((LPCSTR)"C:\\", 
-                                           0,
-                                           &sfi, 
-                                           sizeof(SHFILEINFO), 
-                                           SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
+	hImageList = (HIMAGELIST) SHGetFileInfo(
+		(LPCSTR) "C:\\", 0, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_SMALLICON);
 
-    // Attach ImageList to TreeView
-    if (hImageList)
-        ::SendMessage(m_hWnd, TVM_SETIMAGELIST, (WPARAM) TVSIL_NORMAL,
-            (LPARAM)hImageList);
+	// Attach ImageList to TreeView
+	if (hImageList)
+		::SendMessage(m_hWnd, TVM_SETIMAGELIST, (WPARAM) TVSIL_NORMAL, (LPARAM) hImageList);
 }
 
 /****************************************************************************
@@ -1066,42 +989,43 @@ void CShellTree::EnableImages()
 *	MESSAGEMAP:	NONE
 *
 ****************************************************************************/
-BOOL CShellTree::GetSelectedFolderPath(CString &szFolderPath)
+BOOL CShellTree::GetSelectedFolderPath(CString& szFolderPath)
 {
-	LPTVITEMDATA	lptvid;  //Long pointer to TreeView item data
-	LPSHELLFOLDER	lpsf2=nullptr;
-	static char		szBuff[MAX_PATH];
-	HTREEITEM		hItem=nullptr;
-	HRESULT			hr;
-	BOOL			bRet=false;
+	LPTVITEMDATA lptvid; //Long pointer to TreeView item data
+	LPSHELLFOLDER lpsf2 = nullptr;
+	static char szBuff[MAX_PATH];
+	HTREEITEM hItem = nullptr;
+	HRESULT hr;
+	BOOL bRet = false;
 
-	if((hItem = GetSelectedItem()))
+	if ((hItem = GetSelectedItem()))
 	{
-		lptvid=(LPTVITEMDATA)GetItemData(hItem);
+		lptvid = (LPTVITEMDATA) GetItemData(hItem);
 
 		if (lptvid && lptvid->lpsfParent && lptvid->lpi)
 		{
-			hr=lptvid->lpsfParent->BindToObject(lptvid->lpi,
-					 0,IID_IShellFolder,(LPVOID *)&lpsf2);
+			hr = lptvid->lpsfParent->BindToObject(
+				lptvid->lpi, 0, IID_IShellFolder, (LPVOID*) &lpsf2);
 
 			if (SUCCEEDED(hr))
+			{
+				ULONG ulAttrs = SFGAO_FILESYSTEM;
+
+				// Determine what type of object we have.
+				lptvid->lpsfParent->GetAttributesOf(
+					1, (const struct _ITEMIDLIST**) &lptvid->lpi, &ulAttrs);
+
+				if (ulAttrs & (SFGAO_FILESYSTEM))
 				{
-					ULONG ulAttrs = SFGAO_FILESYSTEM;
-
-					// Determine what type of object we have.
-					lptvid->lpsfParent->GetAttributesOf(1, (const struct _ITEMIDLIST **)&lptvid->lpi, &ulAttrs);
-
-					if (ulAttrs & (SFGAO_FILESYSTEM))
+					if (SHGetPathFromIDList(lptvid->lpifq, szBuff))
 					{
-						if(SHGetPathFromIDList(lptvid->lpifq,szBuff)){
-							szFolderPath = szBuff;
-							bRet = true;
-						}
+						szFolderPath = szBuff;
+						bRet         = true;
 					}
 				}
-
+			}
 		}
-		if(lpsf2)
+		if (lpsf2)
 			lpsf2->Release();
 	}
 	return bRet;
@@ -1119,10 +1043,10 @@ BOOL CShellTree::GetSelectedFolderPath(CString &szFolderPath)
 ****************************************************************************/
 LPSHELLFOLDER CShellTree::GetParentShellFolder(HTREEITEM folderNode)
 {
-	LPTVITEMDATA	lptvid;  //Long pointer to TreeView item data
+	LPTVITEMDATA lptvid; //Long pointer to TreeView item data
 
-	lptvid=(LPTVITEMDATA)GetItemData(folderNode);
-	if(lptvid)
+	lptvid = (LPTVITEMDATA) GetItemData(folderNode);
+	if (lptvid)
 		return lptvid->lpsfParent;
 	else
 		return nullptr;
@@ -1141,10 +1065,10 @@ LPSHELLFOLDER CShellTree::GetParentShellFolder(HTREEITEM folderNode)
 ****************************************************************************/
 LPITEMIDLIST CShellTree::GetRelativeIDLIST(HTREEITEM folderNode)
 {
-	LPTVITEMDATA	lptvid;  //Long pointer to TreeView item data
+	LPTVITEMDATA lptvid; //Long pointer to TreeView item data
 
-	lptvid=(LPTVITEMDATA)GetItemData(folderNode);
-	if(lptvid)
+	lptvid = (LPTVITEMDATA) GetItemData(folderNode);
+	if (lptvid)
 		return lptvid->lpifq;
 	else
 		return nullptr;
@@ -1163,10 +1087,10 @@ LPITEMIDLIST CShellTree::GetRelativeIDLIST(HTREEITEM folderNode)
 ****************************************************************************/
 LPITEMIDLIST CShellTree::GetFullyQualifiedID(HTREEITEM folderNode)
 {
-	LPTVITEMDATA	lptvid;  //Long pointer to TreeView item data
+	LPTVITEMDATA lptvid; //Long pointer to TreeView item data
 
-	lptvid=(LPTVITEMDATA)GetItemData(folderNode);
-	if(lptvid)
+	lptvid = (LPTVITEMDATA) GetItemData(folderNode);
+	if (lptvid)
 		return lptvid->lpifq;
 	else
 		return nullptr;
@@ -1185,52 +1109,51 @@ LPITEMIDLIST CShellTree::GetFullyQualifiedID(HTREEITEM folderNode)
 *				ok if you're using on local drives
 *
 ****************************************************************************/
-bool CShellTree::SearchTree(HTREEITEM treeNode,
-							CString szSearchName,
-							FindAttribs attr)
+bool CShellTree::SearchTree(HTREEITEM treeNode, CString szSearchName, FindAttribs attr)
 {
-	LPTVITEMDATA	lptvid;  //Long pointer to TreeView item data
-	LPSHELLFOLDER	lpsf2=nullptr;
-	char	drive[_MAX_DRIVE];
-	char	dir[_MAX_DIR];
-	char	fname[_MAX_FNAME];
-	char	ext[_MAX_EXT];
-	bool	bRet=false;
-	HRESULT	hr;
-	CString	szCompare;
+	LPTVITEMDATA lptvid; //Long pointer to TreeView item data
+	LPSHELLFOLDER lpsf2 = nullptr;
+	char drive[_MAX_DRIVE];
+	char dir[_MAX_DIR];
+	char fname[_MAX_FNAME];
+	char ext[_MAX_EXT];
+	bool bRet = false;
+	HRESULT hr;
+	CString szCompare;
 
 	szSearchName.MakeUpper();
-	while(treeNode && bRet==false)
+	while (treeNode && bRet == false)
 	{
-		lptvid=(LPTVITEMDATA)GetItemData(treeNode);
+		lptvid = (LPTVITEMDATA) GetItemData(treeNode);
 		if (lptvid && lptvid->lpsfParent && lptvid->lpi)
 		{
-			hr=lptvid->lpsfParent->BindToObject(lptvid->lpi,
-					 0,IID_IShellFolder,(LPVOID *)&lpsf2);
+			hr = lptvid->lpsfParent->BindToObject(
+				lptvid->lpi, 0, IID_IShellFolder, (LPVOID*) &lpsf2);
 			if (SUCCEEDED(hr))
 			{
 				ULONG ulAttrs = SFGAO_FILESYSTEM;
-				lptvid->lpsfParent->GetAttributesOf(1, (const struct _ITEMIDLIST **)&lptvid->lpi, &ulAttrs);
+				lptvid->lpsfParent->GetAttributesOf(
+					1, (const struct _ITEMIDLIST**) &lptvid->lpi, &ulAttrs);
 				if (ulAttrs & (SFGAO_FILESYSTEM))
 				{
-					if(SHGetPathFromIDList(lptvid->lpifq,szCompare.GetBuffer(MAX_PATH)))
+					if (SHGetPathFromIDList(lptvid->lpifq, szCompare.GetBuffer(MAX_PATH)))
 					{
-						switch(attr)
+						switch (attr)
 						{
-						case type_drive:
-							_splitpath(szCompare,drive,dir,fname,ext);
-							szCompare=drive;
-							break;
-						case type_folder:
-							szCompare = GetItemText(treeNode);
-							break;
+							case type_drive:
+								_splitpath(szCompare, drive, dir, fname, ext);
+								szCompare = drive;
+								break;
+							case type_folder:
+								szCompare = GetItemText(treeNode);
+								break;
 						}
 						szCompare.MakeUpper();
-						if(szCompare == szSearchName)
+						if (szCompare == szSearchName)
 						{
 							EnsureVisible(treeNode);
 							SelectItem(treeNode);
-							bRet=true;
+							bRet = true;
 						}
 					}
 				}
@@ -1262,39 +1185,39 @@ void CShellTree::TunnelTree(CString szFindPath)
 	char dir[_MAX_DIR];
 	char fname[_MAX_FNAME];
 	char ext[_MAX_EXT];
-	char delimiter[]="\\";
+	char delimiter[] = "\\";
 
 	CFileName checkPath(szFindPath);
-	if(!checkPath.Exist())
+	if (!checkPath.Exist())
 	{
-		MessageBox(szFindPath,"Folder not found",MB_ICONERROR);
+		MessageBox(szFindPath, "Folder not found", MB_ICONERROR);
 		return;
 	}
-		
-	if(szFindPath.ReverseFind('\\') != szFindPath.GetLength()-1)
+
+	if (szFindPath.ReverseFind('\\') != szFindPath.GetLength() - 1)
 	{
 		szFindPath += "\\";
 	}
 
-	_splitpath(szFindPath,drive,dir,fname,ext);
+	_splitpath(szFindPath, drive, dir, fname, ext);
 
 	//search the drive first
-	szPathHop=drive;
-	subNode=GetChildItem(subNode);
-	if(subNode)
+	szPathHop = drive;
+	subNode   = GetChildItem(subNode);
+	if (subNode)
 	{
-		if(SearchTree(subNode,szPathHop, CShellTree::type_drive))
+		if (SearchTree(subNode, szPathHop, CShellTree::type_drive))
 		{
 			//break down subfolders and search
-			char *p=strtok(dir,delimiter);
-			while(p)
+			char* p = strtok(dir, delimiter);
+			while (p)
 			{
 				subNode = GetSelectedItem();
 				subNode = GetChildItem(subNode);
-				if(SearchTree(subNode,p,CShellTree::type_folder))
-					p=strtok(nullptr,delimiter);
+				if (SearchTree(subNode, p, CShellTree::type_folder))
+					p = strtok(nullptr, delimiter);
 				else
-					p=nullptr;
+					p = nullptr;
 			}
 		}
 	}

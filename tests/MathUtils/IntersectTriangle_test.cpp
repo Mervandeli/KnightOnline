@@ -6,11 +6,11 @@ using test::ExpectVector3Near;
 TEST(IntersectTriangle, HitsTriangleFrontFace)
 {
 	const __Vector3 orig = { 0.0f, 0.0f, -5.0f };
-	const __Vector3 dir = { 0.0f, 0.0f, 1.0f };
+	const __Vector3 dir  = { 0.0f, 0.0f, 1.0f };
 
-	const __Vector3 v0 = { -1.0f, -1.0f, 0.0f };
-	const __Vector3 v1 = { 0.0f,  1.0f, 0.0f };
-	const __Vector3 v2 = { 1.0f, -1.0f, 0.0f };
+	const __Vector3 v0   = { -1.0f, -1.0f, 0.0f };
+	const __Vector3 v1   = { 0.0f, 1.0f, 0.0f };
+	const __Vector3 v2   = { 1.0f, -1.0f, 0.0f };
 
 	SCOPED_TRACE("IntersectTriangle::HitsTriangleFrontFace");
 
@@ -20,11 +20,11 @@ TEST(IntersectTriangle, HitsTriangleFrontFace)
 TEST(IntersectTriangle, MissesTriangle)
 {
 	const __Vector3 orig = { 5.0f, 5.0f, -5.0f };
-	const __Vector3 dir = { 0.0f, 0.0f, 1.0f };
+	const __Vector3 dir  = { 0.0f, 0.0f, 1.0f };
 
-	const __Vector3 v0 = { -1.0f, -1.0f, 0.0f };
-	const __Vector3 v1 = { 1.0f, -1.0f, 0.0f };
-	const __Vector3 v2 = { 0.0f,  1.0f, 0.0f };
+	const __Vector3 v0   = { -1.0f, -1.0f, 0.0f };
+	const __Vector3 v1   = { 1.0f, -1.0f, 0.0f };
+	const __Vector3 v2   = { 0.0f, 1.0f, 0.0f };
 
 	SCOPED_TRACE("IntersectTriangle::MissesTriangle");
 
@@ -34,11 +34,11 @@ TEST(IntersectTriangle, MissesTriangle)
 TEST(IntersectTriangle, RayParallelToTriangle)
 {
 	const __Vector3 orig = { 0.0f, 0.0f, 1.0f };
-	const __Vector3 dir = { 1.0f, 0.0f, 0.0f };
+	const __Vector3 dir  = { 1.0f, 0.0f, 0.0f };
 
-	const __Vector3 v0 = { -1.0f, -1.0f, 0.0f };
-	const __Vector3 v1 = { 1.0f, -1.0f, 0.0f };
-	const __Vector3 v2 = { 0.0f,  1.0f, 0.0f };
+	const __Vector3 v0   = { -1.0f, -1.0f, 0.0f };
+	const __Vector3 v1   = { 1.0f, -1.0f, 0.0f };
+	const __Vector3 v2   = { 0.0f, 1.0f, 0.0f };
 
 	SCOPED_TRACE("IntersectTriangle::RayParallelToTriangle");
 
@@ -48,11 +48,11 @@ TEST(IntersectTriangle, RayParallelToTriangle)
 TEST(IntersectTriangle, RayBehindTriangle)
 {
 	const __Vector3 orig = { 0.0f, 0.0f, 5.0f };
-	const __Vector3 dir = { 0.0f, 0.0f, 1.0f };
+	const __Vector3 dir  = { 0.0f, 0.0f, 1.0f };
 
-	const __Vector3 v0 = { -1.0f, -1.0f, 0.0f };
-	const __Vector3 v1 = { 1.0f, -1.0f, 0.0f };
-	const __Vector3 v2 = { 0.0f,  1.0f, 0.0f };
+	const __Vector3 v0   = { -1.0f, -1.0f, 0.0f };
+	const __Vector3 v1   = { 1.0f, -1.0f, 0.0f };
+	const __Vector3 v2   = { 0.0f, 1.0f, 0.0f };
 
 	SCOPED_TRACE("IntersectTriangle::RayBehindTriangle");
 
@@ -62,11 +62,11 @@ TEST(IntersectTriangle, RayBehindTriangle)
 TEST(IntersectTriangle, HitsTriangleAtVertex)
 {
 	const __Vector3 orig = { -1.0f, -1.0f, -5.0f };
-	const __Vector3 dir = { 0.0f, 0.0f, 1.0f };
+	const __Vector3 dir  = { 0.0f, 0.0f, 1.0f };
 
-	const __Vector3 v0 = { -1.0f, -1.0f, 0.0f };
-	const __Vector3 v1 = { 0.0f,  1.0f, 0.0f };
-	const __Vector3 v2 = { 1.0f, -1.0f, 0.0f };
+	const __Vector3 v0   = { -1.0f, -1.0f, 0.0f };
+	const __Vector3 v1   = { 0.0f, 1.0f, 0.0f };
+	const __Vector3 v2   = { 1.0f, -1.0f, 0.0f };
 
 	SCOPED_TRACE("IntersectTriangle::HitsTriangleAtVertex");
 
@@ -76,11 +76,11 @@ TEST(IntersectTriangle, HitsTriangleAtVertex)
 TEST(IntersectTriangle_WithColInfo, HitsTriangleFrontFace)
 {
 	const __Vector3 orig = { 0.0f, 0.0f, -5.0f };
-	const __Vector3 dir = { 0.0f, 0.0f, 1.0f };
+	const __Vector3 dir  = { 0.0f, 0.0f, 1.0f };
 
-	const __Vector3 v0 = { -1.0f, -1.0f, 0.0f };
-	const __Vector3 v1 = { 0.0f,  1.0f, 0.0f };
-	const __Vector3 v2 = { 1.0f, -1.0f, 0.0f };
+	const __Vector3 v0   = { -1.0f, -1.0f, 0.0f };
+	const __Vector3 v1   = { 0.0f, 1.0f, 0.0f };
+	const __Vector3 v2   = { 1.0f, -1.0f, 0.0f };
 
 	float t, u, v;
 	__Vector3 col;
@@ -99,11 +99,11 @@ TEST(IntersectTriangle_WithColInfo, HitsTriangleFrontFace)
 TEST(IntersectTriangle_WithColInfo, MissesTriangle)
 {
 	const __Vector3 orig = { 5.0f, 5.0f, -5.0f };
-	const __Vector3 dir = { 0.0f, 0.0f, 1.0f };
+	const __Vector3 dir  = { 0.0f, 0.0f, 1.0f };
 
-	const __Vector3 v0 = { -1.0f, -1.0f, 0.0f };
-	const __Vector3 v1 = { 0.0f,  1.0f, 0.0f };
-	const __Vector3 v2 = { 1.0f, -1.0f, 0.0f };
+	const __Vector3 v0   = { -1.0f, -1.0f, 0.0f };
+	const __Vector3 v1   = { 0.0f, 1.0f, 0.0f };
+	const __Vector3 v2   = { 1.0f, -1.0f, 0.0f };
 
 	float t = -FLT_MIN, u = -FLT_MIN, v = -FLT_MIN;
 	__Vector3 col = { -FLT_MIN, -FLT_MIN, -FLT_MIN };
@@ -117,11 +117,11 @@ TEST(IntersectTriangle_WithColInfo, MissesTriangle)
 TEST(IntersectTriangle_WithColInfo, RayParallelToTriangle)
 {
 	const __Vector3 orig = { 0.0f, 0.0f, 1.0f };
-	const __Vector3 dir = { 1.0f, 0.0f, 0.0f };
+	const __Vector3 dir  = { 1.0f, 0.0f, 0.0f };
 
-	const __Vector3 v0 = { -1.0f, -1.0f, 0.0f };
-	const __Vector3 v1 = { 0.0f,  1.0f, 0.0f };
-	const __Vector3 v2 = { 1.0f, -1.0f, 0.0f };
+	const __Vector3 v0   = { -1.0f, -1.0f, 0.0f };
+	const __Vector3 v1   = { 0.0f, 1.0f, 0.0f };
+	const __Vector3 v2   = { 1.0f, -1.0f, 0.0f };
 
 	float t, u, v;
 	__Vector3 col = { 0.0f, 0.0f, 0.0f };
@@ -134,11 +134,11 @@ TEST(IntersectTriangle_WithColInfo, RayParallelToTriangle)
 TEST(IntersectTriangle_WithColInfo, RayBehindTriangle)
 {
 	const __Vector3 orig = { 0.0f, 0.0f, 5.0f };
-	const __Vector3 dir = { 0.0f, 0.0f, 1.0f };
+	const __Vector3 dir  = { 0.0f, 0.0f, 1.0f };
 
-	const __Vector3 v0 = { -1.0f, -1.0f, 0.0f };
-	const __Vector3 v1 = { 0.0f,  1.0f, 0.0f };
-	const __Vector3 v2 = { 1.0f, -1.0f, 0.0f };
+	const __Vector3 v0   = { -1.0f, -1.0f, 0.0f };
+	const __Vector3 v1   = { 0.0f, 1.0f, 0.0f };
+	const __Vector3 v2   = { 1.0f, -1.0f, 0.0f };
 
 	float t = -FLT_MIN, u = -FLT_MIN, v = -FLT_MIN;
 	__Vector3 col = { -FLT_MIN, -FLT_MIN, -FLT_MIN };
@@ -152,11 +152,11 @@ TEST(IntersectTriangle_WithColInfo, RayBehindTriangle)
 TEST(IntersectTriangle_WithColInfo, HitsTriangleAtVertex)
 {
 	const __Vector3 orig = { -1.0f, -1.0f, -5.0f };
-	const __Vector3 dir = { 0.0f, 0.0f, 1.0f };
+	const __Vector3 dir  = { 0.0f, 0.0f, 1.0f };
 
-	const __Vector3 v0 = { -1.0f, -1.0f, 0.0f };
-	const __Vector3 v1 = { 0.0f,  1.0f, 0.0f };
-	const __Vector3 v2 = { 1.0f, -1.0f, 0.0f };
+	const __Vector3 v0   = { -1.0f, -1.0f, 0.0f };
+	const __Vector3 v1   = { 0.0f, 1.0f, 0.0f };
+	const __Vector3 v2   = { 1.0f, -1.0f, 0.0f };
 
 	float t, u, v;
 	__Vector3 col;
@@ -175,11 +175,11 @@ TEST(IntersectTriangle_WithColInfo, HitsTriangleAtVertex)
 TEST(IntersectTriangle_WithColInfo, RayHitsTriangleEdge)
 {
 	const __Vector3 orig = { 0.0f, -1.0f, -5.0f };
-	const __Vector3 dir = { 0.0f, 0.0f, 1.0f };
+	const __Vector3 dir  = { 0.0f, 0.0f, 1.0f };
 
-	const __Vector3 v0 = { -1.0f, -1.0f, 0.0f };
-	const __Vector3 v1 = { 0.0f,  1.0f, 0.0f };
-	const __Vector3 v2 = { 1.0f, -1.0f, 0.0f };
+	const __Vector3 v0   = { -1.0f, -1.0f, 0.0f };
+	const __Vector3 v1   = { 0.0f, 1.0f, 0.0f };
+	const __Vector3 v2   = { 1.0f, -1.0f, 0.0f };
 
 	float t, u, v;
 	__Vector3 col;

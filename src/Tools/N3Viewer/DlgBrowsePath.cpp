@@ -14,7 +14,7 @@ static char THIS_FILE[] = __FILE__;
 // CAboutDlg dialog used for App About
 //
 // This source is part of CShellTree - Selom Ofori
-// 
+//
 // Version: 1.02 (any previously unversioned copies are older/inferior
 //
 // This code is free for all to use. Mutatilate it as much as you want
@@ -24,14 +24,13 @@ static char THIS_FILE[] = __FILE__;
 // CDlgBrowsePath dialog
 //
 // This source is part of CShellTree - Selom Ofori
-// 
+//
 // Version: 1.02 (any previously unversioned copies are older/inferior
 //
 // This code is free for all to use. Mutatilate it as much as you want
 // See MFCENUM sample from microsoft
 
-CDlgBrowsePath::CDlgBrowsePath(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgBrowsePath::IDD, pParent)
+CDlgBrowsePath::CDlgBrowsePath(CWnd* pParent /*=nullptr*/) : CDialog(CDlgBrowsePath::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgBrowsePath)
 	//}}AFX_DATA_INIT
@@ -48,16 +47,16 @@ void CDlgBrowsePath::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CDlgBrowsePath, CDialog)
-	//{{AFX_MSG_MAP(CDlgBrowsePath)
-	ON_WM_PAINT()
-	ON_WM_QUERYDRAGICON()
-	ON_NOTIFY(TVN_ITEMEXPANDING, IDC_BROWSE_TREE, OnItemexpandingBrowseTree)
-	ON_NOTIFY(NM_RCLICK, IDC_BROWSE_TREE, OnRclickBrowseTree)
-	ON_NOTIFY(TVN_DELETEITEM, IDC_BROWSE_TREE, OnDeleteitemBrowseTree)
-	ON_BN_CLICKED(IDC_SYNCH_FOLDERS, OnSynchFolders)
-	ON_NOTIFY(TVN_SELCHANGED, IDC_BROWSE_TREE, OnSelchangedBrowseTree)
-	ON_WM_SYSCOMMAND()
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgBrowsePath)
+ON_WM_PAINT()
+ON_WM_QUERYDRAGICON()
+ON_NOTIFY(TVN_ITEMEXPANDING, IDC_BROWSE_TREE, OnItemexpandingBrowseTree)
+ON_NOTIFY(NM_RCLICK, IDC_BROWSE_TREE, OnRclickBrowseTree)
+ON_NOTIFY(TVN_DELETEITEM, IDC_BROWSE_TREE, OnDeleteitemBrowseTree)
+ON_BN_CLICKED(IDC_SYNCH_FOLDERS, OnSynchFolders)
+ON_NOTIFY(TVN_SELCHANGED, IDC_BROWSE_TREE, OnSelchangedBrowseTree)
+ON_WM_SYSCOMMAND()
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -74,13 +73,14 @@ BOOL CDlgBrowsePath::OnInitDialog()
 	CString szKey;
 	HKEY hKey;
 	DWORD dwKeyType = REG_SZ;
-	if(ERROR_SUCCESS == RegOpenKey(HKEY_CURRENT_USER, "Recenet used folder", &hKey))
+	if (ERROR_SUCCESS == RegOpenKey(HKEY_CURRENT_USER, "Recenet used folder", &hKey))
 	{
-		for(int i = 0; i < 10; i++)
+		for (int i = 0; i < 10; i++)
 		{
 			szKey.Format("Folder%.1d", i);
-			LONG success = RegQueryValueEx(hKey, szKey, nullptr, &dwKeyType, (BYTE*)szInitDir, &dwLength);
-			if(success == ERROR_SUCCESS && lstrlen(szInitDir) != 0)
+			LONG success = RegQueryValueEx(
+				hKey, szKey, nullptr, &dwKeyType, (BYTE*) szInitDir, &dwLength);
+			if (success == ERROR_SUCCESS && lstrlen(szInitDir) != 0)
 			{
 				m_CBPath.AddString(szInitDir);
 			}
@@ -89,22 +89,22 @@ BOOL CDlgBrowsePath::OnInitDialog()
 
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
-	SetIcon(m_hIcon, TRUE);			// Set big icon
-	SetIcon(m_hIcon, FALSE);		// Set small icon
-	
+	SetIcon(m_hIcon, TRUE);  // Set big icon
+	SetIcon(m_hIcon, FALSE); // Set small icon
+
 	// TODO: Add extra initialization here
-	m_TreeCtl = (CShellTree*)GetDlgItem(IDC_BROWSE_TREE);
+	m_TreeCtl = (CShellTree*) GetDlgItem(IDC_BROWSE_TREE);
 	m_TreeCtl->EnableImages();
 	m_TreeCtl->PopulateTree();
-	
-	return TRUE;  // return TRUE  unless you set the focus to a control
+
+	return TRUE; // return TRUE  unless you set the focus to a control
 }
 
 // If you add a minimize button to your dialog, you will need the code below
 //  to draw the icon.  For MFC applications using the document/view model,
 //  this is automatically done for you by the framework.
 
-void CDlgBrowsePath::OnPaint() 
+void CDlgBrowsePath::OnPaint()
 {
 	if (IsIconic())
 	{
@@ -136,42 +136,42 @@ HCURSOR CDlgBrowsePath::OnQueryDragIcon()
 	return (HCURSOR) m_hIcon;
 }
 
-void CDlgBrowsePath::OnItemexpandingBrowseTree(NMHDR* pNMHDR, LRESULT* pResult) 
+void CDlgBrowsePath::OnItemexpandingBrowseTree(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
+	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*) pNMHDR;
 	// TODO: Add your control notification handler code here
-	m_TreeCtl->OnFolderExpanding(pNMHDR,pResult);
+	m_TreeCtl->OnFolderExpanding(pNMHDR, pResult);
 	*pResult = 0;
 }
 
-void CDlgBrowsePath::OnSelchangedBrowseTree(NMHDR* pNMHDR, LRESULT* pResult) 
+void CDlgBrowsePath::OnSelchangedBrowseTree(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
+	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*) pNMHDR;
 	// TODO: Add your control notification handler code here
 	CString szPath;
-	if(m_TreeCtl->OnFolderSelected(pNMHDR,pResult,szPath))
+	if (m_TreeCtl->OnFolderSelected(pNMHDR, pResult, szPath))
 	{
 		m_CBPath.SetWindowText(szPath);
 	}
 	*pResult = 0;
 }
 
-void CDlgBrowsePath::OnRclickBrowseTree(NMHDR* pNMHDR, LRESULT* pResult) 
+void CDlgBrowsePath::OnRclickBrowseTree(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	// TODO: Add your control notification handler code here
-	m_TreeCtl->GetContextMenu(pNMHDR,pResult);
+	m_TreeCtl->GetContextMenu(pNMHDR, pResult);
 	*pResult = 0;
 }
 
-void CDlgBrowsePath::OnDeleteitemBrowseTree(NMHDR* pNMHDR, LRESULT* pResult) 
+void CDlgBrowsePath::OnDeleteitemBrowseTree(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
+	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*) pNMHDR;
 	// TODO: Add your control notification handler code here
-	m_TreeCtl->OnDeleteShellItem(pNMHDR,pResult);
+	m_TreeCtl->OnDeleteShellItem(pNMHDR, pResult);
 	*pResult = 0;
 }
 
-void CDlgBrowsePath::OnSynchFolders() 
+void CDlgBrowsePath::OnSynchFolders()
 {
 	// TODO: Add your control notification handler code here
 	CString szFindFolder;
@@ -179,11 +179,10 @@ void CDlgBrowsePath::OnSynchFolders()
 	m_TreeCtl->TunnelTree(szFindFolder);
 }
 
-
-void CDlgBrowsePath::OnOK() 
+void CDlgBrowsePath::OnOK()
 {
-	m_CBPath.GetWindowText(m_szPath); // 경로 기억..
-	if(m_szPath.GetLength() > 0)
+	m_CBPath.GetWindowText(m_szPath);       // 경로 기억..
+	if (m_szPath.GetLength() > 0)
 	{
 		m_CBPath.InsertString(0, m_szPath); // 경로 넣고...
 	}
@@ -193,21 +192,23 @@ void CDlgBrowsePath::OnOK()
 	CString szKey;
 	HKEY hKey;
 	DWORD dwKeyType = REG_SZ;
-	if(ERROR_SUCCESS == RegCreateKey(HKEY_CURRENT_USER, "Recenet used folder", &hKey))
+	if (ERROR_SUCCESS == RegCreateKey(HKEY_CURRENT_USER, "Recenet used folder", &hKey))
 	{
 		int nCBC = m_CBPath.GetCount();
-		if(nCBC > 10) nCBC = 10;
-		for(int i = 0; i < nCBC; i++)
+		if (nCBC > 10)
+			nCBC = 10;
+		for (int i = 0; i < nCBC; i++)
 		{
 			szKey.Format("Folder%.1d", i);
 			m_CBPath.GetLBText(i, szInitDir);
 			int nLength = m_CBPath.GetLBTextLen(i);
-			if(nLength > 0)
+			if (nLength > 0)
 			{
-				LONG success = RegSetValueEx(hKey, szKey, 0, dwKeyType, (CONST BYTE*)szInitDir, nLength);
+				LONG success = RegSetValueEx(
+					hKey, szKey, 0, dwKeyType, (CONST BYTE*) szInitDir, nLength);
 			}
 		}
 	}
-	
+
 	CDialog::OnOK();
 }

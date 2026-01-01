@@ -23,48 +23,63 @@ class CDlgSowSeed;
 class CMainFrame : public CFrameWnd
 {
 	friend class CDlgBar;
+
 protected: // create from serialization only
 	CMainFrame();
 	DECLARE_DYNCREATE(CMainFrame)
 
-// Attributes
+	// Attributes
 public:
-	CN3EngTool*		m_pEng;
-	CMapMng*		GetMapMng() const {return m_pMapMng;}
+	CN3EngTool* m_pEng;
+	CMapMng* GetMapMng() const
+	{
+		return m_pMapMng;
+	}
 
-	CDTexMng*		GetDTexMng() const {return m_pDTexMng;}
-	CDTexGroupMng*	GetDTexGroupMng() const {return m_pDTexGroupMng;}
+	CDTexMng* GetDTexMng() const
+	{
+		return m_pDTexMng;
+	}
+	CDTexGroupMng* GetDTexGroupMng() const
+	{
+		return m_pDTexGroupMng;
+	}
 
-	void			LoadDTexSet(CString FileName);
+	void LoadDTexSet(CString FileName);
+
 protected:
-	CMapMng*		m_pMapMng;
+	CMapMng* m_pMapMng;
 
-	CDTexMng*		m_pDTexMng;
-	CDTexGroupMng*	m_pDTexGroupMng;
-	
+	CDTexMng* m_pDTexMng;
+	CDTexGroupMng* m_pDTexGroupMng;
+
 public:
-	CString					m_DTexInfoFileName;
-	CDlgSowSeed*			m_pDlgSowSeed;
-	CDlgMapView*			m_pDlgMapView;
-	std::list<LPSEEDGROUP>	m_SeedGroupList;
-	char					m_SeedFileName[MAX_PATH];
+	CString m_DTexInfoFileName;
+	CDlgSowSeed* m_pDlgSowSeed;
+	CDlgMapView* m_pDlgMapView;
+	std::list<LPSEEDGROUP> m_SeedGroupList;
+	char m_SeedFileName[MAX_PATH];
 
-
-// Operations
+	// Operations
 public:
 protected:
-
 public:
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CMainFrame)
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
-	float	GetFP() { return (float)m_wndDlgBar.m_FP_Slider.GetPos(); }
-	int		GetTileRegion() { return m_wndDlgBar.m_TileRegion_Slider.GetPos(); }
+	float GetFP()
+	{
+		return (float) m_wndDlgBar.m_FP_Slider.GetPos();
+	}
+	int GetTileRegion()
+	{
+		return m_wndDlgBar.m_TileRegion_Slider.GetPos();
+	}
 	void UpdateTransformInfo();
 	virtual ~CMainFrame();
 #ifdef _DEBUG
@@ -72,14 +87,13 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
-protected:  // control bar embedded members
-	CStatusBar  m_wndStatusBar;
-	CToolBar    m_wndToolBar;
-	CReBar      m_wndReBar;
-	CDlgBar		m_wndDlgBar;
+protected: // control bar embedded members
+	CStatusBar m_wndStatusBar;
+	CToolBar m_wndToolBar;
+	CReBar m_wndReBar;
+	CDlgBar m_wndDlgBar;
 
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CMainFrame)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

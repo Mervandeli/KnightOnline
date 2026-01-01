@@ -18,43 +18,46 @@ class CDlgSceneGraph : public CDialog
 {
 public:
 	CN3Scene* m_pSceneRef;
-	BOOL	m_IsSourceObj;		// Display용이냐? (툴에서 오브젝트 목록)
+	BOOL m_IsSourceObj; // Display용이냐? (툴에서 오브젝트 목록)
 	CMapMng* m_pMapMng;
 
 	CImageList m_ImgList;
+
 protected:
 	void UpdateTreeItem(HTREEITEM hParent, CN3Base* pBase);
-	DWORD	m_dwFlag;	// 목록에 표시할 것들을 나타낸 플래그
+	DWORD m_dwFlag; // 목록에 표시할 것들을 나타낸 플래그
 
 public:
 	void SelectObject(HTREEITEM hItem, void* pItemData);
-	
+
 	void ExpandTree(HTREEITEM hItem);
 	void UpdateTree(CN3Scene* pScene);
 	// standard constructor
-	CDlgSceneGraph(CWnd* pParent = nullptr, DWORD dwFlag = 
-		OBJ_CAMERA|OBJ_LIGHT|OBJ_SHAPE|OBJ_CHARACTER|OBJ_MESH|OBJ_MESH_PROGRESSIVE|
-		OBJ_MESH_INDEXED|OBJ_JOINT|OBJ_SKIN);   
+	CDlgSceneGraph(CWnd* pParent = nullptr,
+		DWORD dwFlag             = OBJ_CAMERA | OBJ_LIGHT | OBJ_SHAPE | OBJ_CHARACTER | OBJ_MESH
+					   | OBJ_MESH_PROGRESSIVE | OBJ_MESH_INDEXED | OBJ_JOINT | OBJ_SKIN);
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgSceneGraph)
-	enum { IDD = IDD_SCENE_GRAPH };
-	CTreeCtrl	m_Tree;
+	enum
+	{
+		IDD = IDD_SCENE_GRAPH
+	};
+	CTreeCtrl m_Tree;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgSceneGraph)
-	public:
+public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgSceneGraph)
 	afx_msg void OnSelchangedTreeObj(NMHDR* pNMHDR, LRESULT* pResult);

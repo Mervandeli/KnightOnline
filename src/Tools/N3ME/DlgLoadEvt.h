@@ -12,28 +12,29 @@
 
 class CDlgLoadEvt : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgLoadEvt(CWnd* pParent = nullptr);   // standard constructor
+	CDlgLoadEvt(CWnd* pParent = nullptr); // standard constructor
 
-	CString	m_SelFileName;
-// Dialog Data
+	CString m_SelFileName;
+	// Dialog Data
 	//{{AFX_DATA(CDlgLoadEvt)
-	enum { IDD = IDD_LOAD_EVENT };
-	CListBox	m_EvtFileList;
+	enum
+	{
+		IDD = IDD_LOAD_EVENT
+	};
+	CListBox m_EvtFileList;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgLoadEvt)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgLoadEvt)
 	virtual BOOL OnInitDialog();

@@ -11,24 +11,24 @@
 
 #include <N3Base/N3UIBase.h>
 
-#define MAX_STRING_TALK		10
+#define MAX_STRING_TALK 10
 
 class Packet;
 class CUIQuestTalk : public CN3UIBase
 {
 protected:
-	CN3UIString*	m_pTextTalk;
-	CN3UIButton*	m_pBtnOk;
-	CN3UIButton*	m_pBtnClose;
-	CN3UIButton*	m_pBtnUpperEvent;
-	CN3UIButton*	m_pBtnNext;
-	CN3UIButton*	m_pBtnOkRight;
-	CN3UIButton*	m_pBtnPre;
+	CN3UIString* m_pTextTalk;
+	CN3UIButton* m_pBtnOk;
+	CN3UIButton* m_pBtnClose;
+	CN3UIButton* m_pBtnUpperEvent;
+	CN3UIButton* m_pBtnNext;
+	CN3UIButton* m_pBtnOkRight;
+	CN3UIButton* m_pBtnPre;
 	CN3UIScrollBar* m_pScrollBar;
 
-	std::string		m_szTalk[MAX_STRING_TALK];
-	int				m_iNumTalk;
-	int				m_iCurTalk;
+	std::string m_szTalk[MAX_STRING_TALK];
+	int m_iNumTalk;
+	int m_iCurTalk;
 
 public:
 	void Release() override;

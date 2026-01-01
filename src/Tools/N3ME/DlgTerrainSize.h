@@ -14,30 +14,31 @@
 
 class CDlgTerrainSize : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CDlgTerrainSize(CWnd* pParent = nullptr);   // standard constructor
+	CDlgTerrainSize(CWnd* pParent = nullptr); // standard constructor
 
-// Dialog Data
+											  // Dialog Data
 	//{{AFX_DATA(CDlgTerrainSize)
-	enum { IDD = IDD_TERRAINSIZE };
-	float	m_fSize;
+	enum
+	{
+		IDD = IDD_TERRAINSIZE
+	};
+	float m_fSize;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgTerrainSize)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgTerrainSize)
-		// NOTE: the ClassWizard will add member functions here
+	// NOTE: the ClassWizard will add member functions here
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

@@ -45,15 +45,15 @@ public:
 	void OrthoLH(float w, float h, float zn, float zf);
 	void PerspectiveFovLH(float fovy, float Aspect, float zn, float zf);
 
-	__Matrix44 operator * (const __Matrix44& mtx) const;
-	void operator *= (const __Matrix44& mtx);
-	void operator += (const __Vector3& v);
-	void operator -= (const __Vector3& v);
+	__Matrix44 operator*(const __Matrix44& mtx) const;
+	void operator*=(const __Matrix44& mtx);
+	void operator+=(const __Vector3& v);
+	void operator-=(const __Vector3& v);
 
-	__Matrix44 operator * (const __Quaternion& qRot) const;
-	void operator *= (const __Quaternion& qRot);
+	__Matrix44 operator*(const __Quaternion& qRot) const;
+	void operator*=(const __Quaternion& qRot);
 
-	void operator = (const __Quaternion& qt);
+	void operator=(const __Quaternion& qt);
 
 public:
 	float m[4][4];

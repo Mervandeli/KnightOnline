@@ -21,7 +21,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -30,33 +30,33 @@ static char THIS_FILE[]=__FILE__;
 
 CUIHotKeyDlg::CUIHotKeyDlg()
 {
-	m_iCurPage		= 0;
-	m_iSelectIndex	= -1;
-	m_iSelectPage	= -1;
+	m_iCurPage     = 0;
+	m_iSelectIndex = -1;
+	m_iSelectPage  = -1;
 
-	for( int i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++ )
-		for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
+	for (int i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++)
+		for (int j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
 			m_pMyHotkey[i][j] = nullptr;
 
-	for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
+	for (int j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
 	{
-		m_pCountStr[j] = nullptr;
+		m_pCountStr[j]   = nullptr;
 		m_pTooltipStr[j] = nullptr;
 	}
 }
 
 CUIHotKeyDlg::~CUIHotKeyDlg()
 {
-	Release();	
+	Release();
 }
 
 void CUIHotKeyDlg::Release()
 {
-	for( int i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++ )
+	for (int i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++)
 	{
-		for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
+		for (int j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
 		{
-			if ( m_pMyHotkey[i][j] != nullptr )
+			if (m_pMyHotkey[i][j] != nullptr)
 			{
 				delete m_pMyHotkey[i][j];
 				m_pMyHotkey[i][j] = nullptr;
@@ -64,28 +64,28 @@ void CUIHotKeyDlg::Release()
 		}
 	}
 
-	for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
+	for (int j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
 	{
-		m_pCountStr[j] = nullptr;
+		m_pCountStr[j]   = nullptr;
 		m_pTooltipStr[j] = nullptr;
 	}
 
-	m_iCurPage		= 0;
-	m_iSelectIndex	= -1;
-	m_iSelectPage	= -1;
+	m_iCurPage     = 0;
+	m_iSelectIndex = -1;
+	m_iSelectPage  = -1;
 
 	CN3UIBase::Release();
 }
 
 void CUIHotKeyDlg::ReleaseItem()
 {
-	for( int i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++ )
+	for (int i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++)
 	{
-		for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
+		for (int j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
 		{
-			if ( m_pMyHotkey[i][j] != nullptr )
+			if (m_pMyHotkey[i][j] != nullptr)
 			{
-				if ( m_pMyHotkey[i][j]->pUIIcon )
+				if (m_pMyHotkey[i][j]->pUIIcon)
 				{
 					RemoveChild(m_pMyHotkey[i][j]->pUIIcon);
 					m_pMyHotkey[i][j]->pUIIcon->Release();
@@ -105,14 +105,22 @@ void CUIHotKeyDlg::ReleaseItem()
 uint32_t CUIHotKeyDlg::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld)
 {
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
-	if ( !IsVisible() ) { dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);  return dwRet; }
+	if (!IsVisible())
+	{
+		dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);
+		return dwRet;
+	}
 	// 실제로 쓰진 않는다..
-	if (s_bWaitFromServer) { dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);  return dwRet; }
+	if (s_bWaitFromServer)
+	{
+		dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);
+		return dwRet;
+	}
 
 	// 드래그 되는 아이콘 갱신..
-	if ( GetState() == UI_STATE_ICON_MOVING ) 
+	if (GetState() == UI_STATE_ICON_MOVING)
 	{
-		if(CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo)
+		if (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo)
 		{
 			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
 			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
@@ -125,34 +133,34 @@ uint32_t CUIHotKeyDlg::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POI
 bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
 	//..
-	if(pSender->m_szID == "btn_up")
+	if (pSender->m_szID == "btn_up")
 		PageUp();
-	if(pSender->m_szID == "btn_down")
+	if (pSender->m_szID == "btn_down")
 		PageDown();
 
 	__IconItemSkill* spSkill;
 
 	uint32_t dwBitMask = 0x0f0f0000;
-	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
+	POINT ptCur        = CGameProcedure::s_pLocalInput->MouseGetPos();
 
 	switch (dwMsg & dwBitMask)
 	{
 		case UIMSG_ICON_DOWN_FIRST:
 			// Get Item..
-			spSkill = GetHighlightIconItem((CN3UIIcon* )pSender);
+			spSkill                                         = GetHighlightIconItem((CN3UIIcon*) pSender);
 
 			// Save Select Info..
-			CN3UIWndBase::s_sSkillSelectInfo.UIWnd = UIWND_HOTKEY;
-			CN3UIWndBase::s_sSkillSelectInfo.iOrder = GetAreaiOrder();
+			CN3UIWndBase::s_sSkillSelectInfo.UIWnd          = UIWND_HOTKEY;
+			CN3UIWndBase::s_sSkillSelectInfo.iOrder         = GetAreaiOrder();
 			CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = spSkill;
 
 			// Calc Move Rect Offset..
-			if ( !CalcMoveOffset() )
-				SetState(UI_STATE_COMMON_NONE);			
+			if (!CalcMoveOffset())
+				SetState(UI_STATE_COMMON_NONE);
 			break;
 
 		case UIMSG_ICON_DOWN:
-			if ( GetState()  == UI_STATE_ICON_MOVING )
+			if (GetState() == UI_STATE_ICON_MOVING)
 			{
 				CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetRegion(GetSampleRect());
 				CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->SetMoveRect(GetSampleRect());
@@ -161,13 +169,13 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 		case UIMSG_ICON_RUP:
 			// Hot Key 윈도우를 돌아 다니면서 검사..
-			if ( IsIn(ptCur.x, ptCur.y) )
+			if (IsIn(ptCur.x, ptCur.y))
 			{
 				int iOrder = GetAreaiOrder();
-				if(m_pMyHotkey[m_iCurPage][iOrder])
+				if (m_pMyHotkey[m_iCurPage][iOrder])
 				{
-					m_iSelectIndex	= iOrder;
-					m_iSelectPage	= m_iCurPage;
+					m_iSelectIndex = iOrder;
+					m_iSelectPage  = m_iCurPage;
 				}
 			}
 			SetState(UI_STATE_COMMON_NONE);
@@ -175,24 +183,24 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 		case UIMSG_ICON_UP:
 			// Hot Key 윈도우를 돌아 다니면서 검사..
-			if ( IsIn(ptCur.x, ptCur.y) )
+			if (IsIn(ptCur.x, ptCur.y))
 			{
 				int iOrder = GetAreaiOrder();
-				if ( CN3UIWndBase::s_sSkillSelectInfo.iOrder == iOrder )	// 실행..
+				if (CN3UIWndBase::s_sSkillSelectInfo.iOrder == iOrder) // 실행..
 				{
 					CN3UIArea* pArea;
 					pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iOrder);
-					if (pArea) 
+					if (pArea)
 					{
 						m_pMyHotkey[m_iCurPage][iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
 						m_pMyHotkey[m_iCurPage][iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
-					}	
+					}
 
 					DoOperate(m_pMyHotkey[m_iCurPage][iOrder]);
 				}
-				else	
+				else
 				{
-					if ( iOrder == -1 )
+					if (iOrder == -1)
 					{
 						// 리소스 Free..
 						spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
@@ -205,20 +213,20 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 						delete spSkill->pUIIcon;
 						spSkill->pUIIcon = nullptr;
 						delete spSkill;
-						spSkill = nullptr;
+						spSkill                                                          = nullptr;
 						m_pMyHotkey[m_iCurPage][CN3UIWndBase::s_sSkillSelectInfo.iOrder] = nullptr;
-						if(m_iCurPage == m_iSelectPage && CN3UIWndBase::s_sSkillSelectInfo.iOrder == m_iSelectIndex)
+						if (m_iCurPage == m_iSelectPage && CN3UIWndBase::s_sSkillSelectInfo.iOrder == m_iSelectIndex)
 						{
-							m_iSelectPage	= -1;
-							m_iSelectIndex	= -1;
+							m_iSelectPage  = -1;
+							m_iSelectIndex = -1;
 						}
 
 						CloseIconRegistry();
 					}
-					else	// 옮기기..
+					else // 옮기기..
 					{
 						// 기존 아이콘이 있다면..
-						if ( m_pMyHotkey[m_iCurPage][iOrder] )
+						if (m_pMyHotkey[m_iCurPage][iOrder])
 						{
 							// 기존 아이콘을 삭제한다..
 							spSkill = m_pMyHotkey[m_iCurPage][iOrder];
@@ -231,23 +239,23 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 							delete spSkill->pUIIcon;
 							spSkill->pUIIcon = nullptr;
 							delete spSkill;
-							spSkill = nullptr;
+							spSkill                         = nullptr;
 							m_pMyHotkey[m_iCurPage][iOrder] = nullptr;
 						}
 
-						spSkill = m_pMyHotkey[m_iCurPage][CN3UIWndBase::s_sSkillSelectInfo.iOrder];
+						spSkill                         = m_pMyHotkey[m_iCurPage][CN3UIWndBase::s_sSkillSelectInfo.iOrder];
 						m_pMyHotkey[m_iCurPage][iOrder] = spSkill;
 						m_pMyHotkey[m_iCurPage][CN3UIWndBase::s_sSkillSelectInfo.iOrder] = nullptr;
 
-						if(m_iCurPage == m_iSelectPage && CN3UIWndBase::s_sSkillSelectInfo.iOrder == m_iSelectIndex)
+						if (m_iCurPage == m_iSelectPage && CN3UIWndBase::s_sSkillSelectInfo.iOrder == m_iSelectIndex)
 						{
-							m_iSelectPage	= -1;
-							m_iSelectIndex	= -1;
+							m_iSelectPage  = -1;
+							m_iSelectIndex = -1;
 						}
 
 						CN3UIArea* pArea;
 						pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iOrder);
-						if (pArea) 
+						if (pArea)
 						{
 							m_pMyHotkey[m_iCurPage][iOrder]->pUIIcon->SetRegion(pArea->GetRegion());
 							m_pMyHotkey[m_iCurPage][iOrder]->pUIIcon->SetMoveRect(pArea->GetRegion());
@@ -257,7 +265,7 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					}
 				}
 			}
-			else		// 삭제..
+			else // 삭제..
 			{
 				// 리소스 Free..
 				spSkill = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
@@ -270,13 +278,13 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				delete spSkill->pUIIcon;
 				spSkill->pUIIcon = nullptr;
 				delete spSkill;
-				spSkill = nullptr;
+				spSkill                                                          = nullptr;
 				m_pMyHotkey[m_iCurPage][CN3UIWndBase::s_sSkillSelectInfo.iOrder] = nullptr;
 
-				if(m_iCurPage == m_iSelectPage && CN3UIWndBase::s_sSkillSelectInfo.iOrder == m_iSelectIndex)
+				if (m_iCurPage == m_iSelectPage && CN3UIWndBase::s_sSkillSelectInfo.iOrder == m_iSelectIndex)
 				{
-					m_iSelectPage	= -1;
-					m_iSelectIndex	= -1;
+					m_iSelectPage  = -1;
+					m_iSelectIndex = -1;
 				}
 
 				CloseIconRegistry();
@@ -294,32 +302,34 @@ bool CUIHotKeyDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 void CUIHotKeyDlg::Render()
 {
-	bool bTooltipRender = false;
+	bool bTooltipRender     = false;
 	__IconItemSkill* pSkill = nullptr;
 
-	if (!m_bVisible) return;	// 보이지 않으면 자식들을 render하지 않는다.
+	if (!m_bVisible)
+		return; // 보이지 않으면 자식들을 render하지 않는다.
 	DisableTooltipDisplay();
 	DisableCountStrDisplay();
 
-	for(UIListReverseItor itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
+	for (UIListReverseItor itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
 	{
 		CN3UIBase* pChild = (*itor);
-		if ( (GetState() == UI_STATE_ICON_MOVING) && (pChild->UIType() == UI_TYPE_ICON) && (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo) &&
-			((CN3UIIcon *)pChild == CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon) )	continue;
-			pChild->Render();
+		if ((GetState() == UI_STATE_ICON_MOVING) && (pChild->UIType() == UI_TYPE_ICON) && (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo)
+			&& ((CN3UIIcon*) pChild == CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon))
+			continue;
+		pChild->Render();
 	}
 
-	if ( (GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo) )
-		CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->Render();		
+	if ((GetState() == UI_STATE_ICON_MOVING) && (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo))
+		CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->pUIIcon->Render();
 
-	if(m_iCurPage == m_iSelectPage && m_pMyHotkey[m_iSelectPage][m_iSelectIndex])
+	if (m_iCurPage == m_iSelectPage && m_pMyHotkey[m_iSelectPage][m_iSelectIndex])
 	{
 		CN3UIIcon* pUIIcon = m_pMyHotkey[m_iSelectPage][m_iSelectIndex]->pUIIcon;
-		if(pUIIcon)
+		if (pUIIcon)
 			RenderSelectIcon(pUIIcon);
 	}
 
-	// 현재 페이지에서 
+	// 현재 페이지에서
 	CN3UIArea* pArea;
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
 
@@ -328,9 +338,8 @@ void CUIHotKeyDlg::Render()
 	{
 		if (m_pMyHotkey[m_iCurPage][k] != nullptr)
 		{
-			float fCooldown = CGameProcedure::s_pProcMain->m_pMagicSkillMng->GetCooldown(
-				m_pMyHotkey[m_iCurPage][k]->pSkill);
-			
+			float fCooldown = CGameProcedure::s_pProcMain->m_pMagicSkillMng->GetCooldown(m_pMyHotkey[m_iCurPage][k]->pSkill);
+
 			// not on cooldown
 			if (fCooldown < 0)
 			{
@@ -347,13 +356,13 @@ void CUIHotKeyDlg::Render()
 		}
 	}
 
-	for(k = 0; k < MAX_SKILL_IN_HOTKEY; k++ )
+	for (k = 0; k < MAX_SKILL_IN_HOTKEY; k++)
 	{
-		if (m_pMyHotkey[m_iCurPage][k] != nullptr) 
+		if (m_pMyHotkey[m_iCurPage][k] != nullptr)
 		{
 			pArea = nullptr;
 			pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, k);
-			if (pArea && pArea->IsIn(ptCur.x, ptCur.y)) 
+			if (pArea && pArea->IsIn(ptCur.x, ptCur.y))
 			{
 				bTooltipRender = true;
 				break;
@@ -370,13 +379,11 @@ void CUIHotKeyDlg::Render()
 void CUIHotKeyDlg::Open()
 {
 	SetVisible(true);
-
 }
 
 void CUIHotKeyDlg::Close()
 {
 	SetVisible(false);
-
 }
 
 void CUIHotKeyDlg::InitIconWnd(e_UIWND eWnd)
@@ -386,32 +393,32 @@ void CUIHotKeyDlg::InitIconWnd(e_UIWND eWnd)
 
 void CUIHotKeyDlg::InitIconUpdate()
 {
-	// Get Hotkey Data From Registry.. 
-	// First, Getting Hotkey Data Count.. 
+	// Get Hotkey Data From Registry..
+	// First, Getting Hotkey Data Count..
 
-	for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
+	for (int j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
 	{
 		m_pTooltipStr[j] = GetTooltipStrControl(j);
-		m_pCountStr[j] = GetCountStrControl(j);
+		m_pCountStr[j]   = GetCountStrControl(j);
 	}
 
 	int iHCount = 0;
-	if (!CGameProcedure::RegGetSetting("Count", &iHCount, sizeof(int)) )
+	if (!CGameProcedure::RegGetSetting("Count", &iHCount, sizeof(int)))
 		return;
 
-	if( (iHCount < 0) || (iHCount > 65) )
+	if ((iHCount < 0) || (iHCount > 65))
 		return;
 
 	int iSkillCount = 0;
 	CHotkeyData HD;
-//	uint32_t bitMask;
+	//	uint32_t bitMask;
 
 	while (iHCount--)
 	{
 		std::string str = "Data" + std::to_string(iSkillCount);
 		if (CGameProcedure::RegGetSetting(str.c_str(), &HD, sizeof(CHotkeyData)))
 		{
-			// Skill Tree Window가 아이디를 갖고 있지 않으면 continue.. 
+			// Skill Tree Window가 아이디를 갖고 있지 않으면 continue..
 			if ((HD.iID < UIITEM_TYPE_USABLE_ID_MIN) && (!CGameProcedure::s_pProcMain->m_pUISkillTreeDlg->HasIDSkill(HD.iID)))
 				continue;
 
@@ -420,25 +427,24 @@ void CUIHotKeyDlg::InitIconUpdate()
 				continue;
 
 			__IconItemSkill* spSkill = new __IconItemSkill();
-			spSkill->pSkill = pUSkill;
+			spSkill->pSkill          = pUSkill;
 
 			// 아이콘 이름 만들기.. ^^
-			spSkill->szIconFN = fmt::format("UI\\skillicon_{:02}_{}.dxt",
-				HD.iID % 100, HD.iID / 100);
+			spSkill->szIconFN        = fmt::format("UI\\skillicon_{:02}_{}.dxt", HD.iID % 100, HD.iID / 100);
 
 			// 아이콘 로드하기.. ^^
-			spSkill->pUIIcon = new CN3UIIcon;
+			spSkill->pUIIcon         = new CN3UIIcon;
 			spSkill->pUIIcon->Init(this);
 			spSkill->pUIIcon->SetTex(spSkill->szIconFN);
-			spSkill->pUIIcon->SetUVRect(0,0,1,1);
+			spSkill->pUIIcon->SetUVRect(0, 0, 1, 1);
 			spSkill->pUIIcon->SetUIType(UI_TYPE_ICON);
 			spSkill->pUIIcon->SetStyle(UISTYLE_ICON_SKILL);
 
 			SetHotKeyTooltip(spSkill);
 
 			CN3UIArea* pArea = nullptr;
-			pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, HD.column);
-			if ( pArea )
+			pArea            = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, HD.column);
+			if (pArea)
 			{
 				spSkill->pUIIcon->SetRegion(pArea->GetRegion());
 				spSkill->pUIIcon->SetMoveRect(pArea->GetRegion());
@@ -458,11 +464,11 @@ void CUIHotKeyDlg::UpdateDisableCheck()
 	int i, j;
 	uint32_t bitMask;
 
-	for( i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++ )
+	for (i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++)
 	{
-		for( j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
+		for (j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
 		{
-			if ( m_pMyHotkey[i][j] != nullptr )
+			if (m_pMyHotkey[i][j] != nullptr)
 			{
 				bitMask = UISTYLE_ICON_SKILL;
 				if (!CGameProcedure::s_pProcMain->m_pMagicSkillMng->CheckValidSkillMagic(m_pMyHotkey[i][j]->pSkill))
@@ -475,22 +481,22 @@ void CUIHotKeyDlg::UpdateDisableCheck()
 
 void CUIHotKeyDlg::CloseIconRegistry()
 {
-	// Save Hotkey Data to Registry.. 
-	// First, Saving Hotkey Data Count.. 
+	// Save Hotkey Data to Registry..
+	// First, Saving Hotkey Data Count..
 
 	int i, j;
 
 	int iHCount = 0;
-	for( i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++ )
+	for (i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++)
 	{
-		for( j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
+		for (j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
 		{
-			if ( m_pMyHotkey[i][j] != nullptr )
+			if (m_pMyHotkey[i][j] != nullptr)
 				iHCount++;
 		}
 	}
 
-	CGameProcedure::RegPutSetting("Count", &iHCount, sizeof(int) );
+	CGameProcedure::RegPutSetting("Count", &iHCount, sizeof(int));
 
 	int iSkillCount = 0;
 
@@ -512,10 +518,9 @@ void CUIHotKeyDlg::CloseIconRegistry()
 
 __IconItemSkill* CUIHotKeyDlg::GetHighlightIconItem(CN3UIIcon* pUIIcon)
 {
-	for( int k = 0; k < MAX_SKILL_IN_HOTKEY; k++ )
+	for (int k = 0; k < MAX_SKILL_IN_HOTKEY; k++)
 	{
-		if ( (m_pMyHotkey[m_iCurPage][k] != nullptr) && 
-			(m_pMyHotkey[m_iCurPage][k]->pUIIcon == pUIIcon) )
+		if ((m_pMyHotkey[m_iCurPage][k] != nullptr) && (m_pMyHotkey[m_iCurPage][k]->pUIIcon == pUIIcon))
 			return m_pMyHotkey[m_iCurPage][k];
 	}
 
@@ -524,13 +529,13 @@ __IconItemSkill* CUIHotKeyDlg::GetHighlightIconItem(CN3UIIcon* pUIIcon)
 
 void CUIHotKeyDlg::AllFactorClear()
 {
-	__IconItemSkill *spSkill = nullptr;
+	__IconItemSkill* spSkill = nullptr;
 
-	for( int i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++ )
+	for (int i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++)
 	{
-		for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
+		for (int j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
 		{
-			if ( m_pMyHotkey[i][j] != nullptr )
+			if (m_pMyHotkey[i][j] != nullptr)
 			{
 				// 리소스 Free..
 				spSkill = m_pMyHotkey[i][j];
@@ -543,7 +548,7 @@ void CUIHotKeyDlg::AllFactorClear()
 				delete spSkill->pUIIcon;
 				spSkill->pUIIcon = nullptr;
 				delete spSkill;
-				spSkill = nullptr;
+				spSkill           = nullptr;
 				m_pMyHotkey[i][j] = nullptr;
 			}
 		}
@@ -552,13 +557,13 @@ void CUIHotKeyDlg::AllFactorClear()
 	m_iCurPage = 0;
 }
 
-int	CUIHotKeyDlg::GetAreaiOrder()
+int CUIHotKeyDlg::GetAreaiOrder()
 {
 	// 먼저 Area를 검색한다..
 	CN3UIArea* pArea;
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
 
-	for( int i = 0; i < MAX_SKILL_IN_HOTKEY; i++ )
+	for (int i = 0; i < MAX_SKILL_IN_HOTKEY; i++)
 	{
 		pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, i);
 		if (pArea && pArea->IsIn(ptCur.x, ptCur.y))
@@ -574,8 +579,7 @@ bool CUIHotKeyDlg::IsSelectedSkillInRealIconArea()
 	for (int i = 0; i < MAX_SKILL_IN_HOTKEY; i++)
 	{
 		CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, i);
-		if (pArea == nullptr
-			|| !pArea->IsIn(ptCur.x, ptCur.y))
+		if (pArea == nullptr || !pArea->IsIn(ptCur.x, ptCur.y))
 			continue;
 
 		if (s_sSkillSelectInfo.pSkillDoneInfo == nullptr)
@@ -588,11 +592,11 @@ bool CUIHotKeyDlg::IsSelectedSkillInRealIconArea()
 	return false;
 }
 
-bool CUIHotKeyDlg::GetEmptySlotIndex(int &iIndex)
+bool CUIHotKeyDlg::GetEmptySlotIndex(int& iIndex)
 {
-	__IconItemSkill *spSkill = nullptr;
+	__IconItemSkill* spSkill = nullptr;
 
-	for( int i = 0; i < MAX_SKILL_IN_HOTKEY; i++ )
+	for (int i = 0; i < MAX_SKILL_IN_HOTKEY; i++)
 	{
 		if (!m_pMyHotkey[m_iCurPage][i])
 		{
@@ -606,7 +610,7 @@ bool CUIHotKeyDlg::GetEmptySlotIndex(int &iIndex)
 
 void CUIHotKeyDlg::SetReceiveSelectedSkill(int iIndex)
 {
-	__IconItemSkill *spSkill = nullptr;
+	__IconItemSkill* spSkill = nullptr;
 
 	if (m_pMyHotkey[m_iCurPage][iIndex] != nullptr)
 	{
@@ -621,15 +625,15 @@ void CUIHotKeyDlg::SetReceiveSelectedSkill(int iIndex)
 		delete spSkill->pUIIcon;
 		spSkill->pUIIcon = nullptr;
 		delete spSkill;
-		spSkill = nullptr;
+		spSkill                         = nullptr;
 		m_pMyHotkey[m_iCurPage][iIndex] = nullptr;
 	}
 
 	CN3UIArea* pArea;
-	pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iIndex);
+	pArea                                     = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iIndex);
 
-	// 그 다음에.. 그 자리에 
-	m_pMyHotkey[m_iCurPage][iIndex] = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
+	// 그 다음에.. 그 자리에
+	m_pMyHotkey[m_iCurPage][iIndex]           = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
 	m_pMyHotkey[m_iCurPage][iIndex]->szIconFN = CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo->szIconFN;
 	m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->SetRegion(pArea->GetRegion());
 	m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->SetMoveRect(pArea->GetRegion());
@@ -642,19 +646,21 @@ RECT CUIHotKeyDlg::GetSampleRect()
 {
 	RECT rect;
 	CN3UIArea* pArea;
-	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
-	pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, 0);
-	rect = pArea->GetRegion();
-	float fWidth = (float)(rect.right - rect.left);
-	float fHeight = (float)(rect.bottom - rect.top);
-	rect.left = ptCur.x - m_ptOffset.x;  rect.right  = rect.left + (int)fWidth;
-	rect.top  = ptCur.y - m_ptOffset.y;  rect.bottom = rect.top + (int)fHeight;
+	POINT ptCur   = CGameProcedure::s_pLocalInput->MouseGetPos();
+	pArea         = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, 0);
+	rect          = pArea->GetRegion();
+	float fWidth  = (float) (rect.right - rect.left);
+	float fHeight = (float) (rect.bottom - rect.top);
+	rect.left     = ptCur.x - m_ptOffset.x;
+	rect.right    = rect.left + (int) fWidth;
+	rect.top      = ptCur.y - m_ptOffset.y;
+	rect.bottom   = rect.top + (int) fHeight;
 	return rect;
 }
 
 void CUIHotKeyDlg::PageUp()
 {
-	if ( m_iCurPage <= 0 )
+	if (m_iCurPage <= 0)
 		return;
 
 	SetHotKeyPage(--m_iCurPage);
@@ -662,7 +668,7 @@ void CUIHotKeyDlg::PageUp()
 
 void CUIHotKeyDlg::PageDown()
 {
-	if ( m_iCurPage >= (MAX_SKILL_HOTKEY_PAGE-1) )
+	if (m_iCurPage >= (MAX_SKILL_HOTKEY_PAGE - 1))
 		return;
 
 	SetHotKeyPage(++m_iCurPage);
@@ -671,19 +677,19 @@ void CUIHotKeyDlg::PageDown()
 void CUIHotKeyDlg::SetHotKeyPage(int iPageNum)
 {
 	int i, j;
-	
-	for( i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++ )
+
+	for (i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++)
 	{
-		if ( i != iPageNum )
+		if (i != iPageNum)
 		{
-			for( j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
-				if ( m_pMyHotkey[i][j] != nullptr )
+			for (j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
+				if (m_pMyHotkey[i][j] != nullptr)
 					m_pMyHotkey[i][j]->pUIIcon->SetVisible(false);
 		}
 		else
 		{
-			for( j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
-				if ( m_pMyHotkey[i][j] != nullptr )
+			for (j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
+				if (m_pMyHotkey[i][j] != nullptr)
 					m_pMyHotkey[i][j]->pUIIcon->SetVisible(true);
 		}
 	}
@@ -696,10 +702,11 @@ bool CUIHotKeyDlg::CalcMoveOffset()
 	RECT rect;
 	CN3UIArea* pArea;
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
-	int iOrder = GetAreaiOrder();
-	if ( iOrder == -1 ) return false;
-	pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iOrder);
-	rect = pArea->GetRegion();
+	int iOrder  = GetAreaiOrder();
+	if (iOrder == -1)
+		return false;
+	pArea        = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iOrder);
+	rect         = pArea->GetRegion();
 	m_ptOffset.x = ptCur.x - rect.left;
 	m_ptOffset.y = ptCur.y - rect.top;
 	return true;
@@ -707,9 +714,10 @@ bool CUIHotKeyDlg::CalcMoveOffset()
 
 void CUIHotKeyDlg::EffectTriggerByHotKey(int iIndex)
 {
-	if(iIndex < 0 || iIndex >= 8) return;
+	if (iIndex < 0 || iIndex >= 8)
+		return;
 
-	if ( m_pMyHotkey[m_iCurPage][iIndex] && m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->IsVisible() )
+	if (m_pMyHotkey[m_iCurPage][iIndex] && m_pMyHotkey[m_iCurPage][iIndex]->pUIIcon->IsVisible())
 	{
 		DoOperate(m_pMyHotkey[m_iCurPage][iIndex]);
 	}
@@ -720,9 +728,9 @@ void CUIHotKeyDlg::DoOperate(__IconItemSkill* pSkill)
 	if (pSkill == nullptr)
 		return;
 
-	// 메시지 박스 출력..	
+	// 메시지 박스 출력..
 	// std::string buff = fmt::format("{} 스킬이 사용되었습니다.", pSkill->pSkill->szName);
-	// CGameProcedure::s_pProcMain->MsgOutput(buff, 0xffffff00);			
+	// CGameProcedure::s_pProcMain->MsgOutput(buff, 0xffffff00);
 
 	int iIDTarget = CGameBase::s_pPlayer->m_iIDTarget;
 	CGameProcedure::s_pProcMain->m_pMagicSkillMng->MsgSend_MagicProcess(iIDTarget, pSkill->pSkill);
@@ -732,11 +740,11 @@ void CUIHotKeyDlg::ClassChangeHotkeyFlush()
 {
 	__IconItemSkill* spSkill;
 
-	for( int i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++ )
+	for (int i = 0; i < MAX_SKILL_HOTKEY_PAGE; i++)
 	{
-		for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
+		for (int j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
 		{
-			if ( m_pMyHotkey[i][j] != nullptr )
+			if (m_pMyHotkey[i][j] != nullptr)
 			{
 				// 리소스 Free..
 				spSkill = m_pMyHotkey[i][j];
@@ -749,7 +757,7 @@ void CUIHotKeyDlg::ClassChangeHotkeyFlush()
 				delete spSkill->pUIIcon;
 				spSkill->pUIIcon = nullptr;
 				delete spSkill;
-				spSkill = nullptr;
+				spSkill           = nullptr;
 				m_pMyHotkey[i][j] = nullptr;
 			}
 		}
@@ -758,7 +766,7 @@ void CUIHotKeyDlg::ClassChangeHotkeyFlush()
 
 CN3UIString* CUIHotKeyDlg::GetTooltipStrControl(int iIndex)
 {
-	std::string str = std::to_string(iIndex + 10);
+	std::string str   = std::to_string(iIndex + 10);
 	CN3UIString* pStr = nullptr;
 	N3_VERIFY_UI_COMPONENT(pStr, GetChildByID<CN3UIString>(str));
 	return pStr;
@@ -766,7 +774,7 @@ CN3UIString* CUIHotKeyDlg::GetTooltipStrControl(int iIndex)
 
 CN3UIString* CUIHotKeyDlg::GetCountStrControl(int iIndex)
 {
-	std::string str = std::to_string(iIndex);
+	std::string str   = std::to_string(iIndex);
 	CN3UIString* pStr = nullptr;
 	N3_VERIFY_UI_COMPONENT(pStr, GetChildByID<CN3UIString>(str));
 	return pStr;
@@ -777,7 +785,7 @@ void CUIHotKeyDlg::DisplayTooltipStr(__IconItemSkill* spSkill)
 	int iIndex = GetTooltipCurPageIndex(spSkill);
 	if (iIndex != -1)
 	{
-		if (!m_pTooltipStr[iIndex]->IsVisible())	
+		if (!m_pTooltipStr[iIndex]->IsVisible())
 			m_pTooltipStr[iIndex]->SetVisible(true);
 
 		m_pTooltipStr[iIndex]->SetString(spSkill->pSkill->szName);
@@ -787,9 +795,9 @@ void CUIHotKeyDlg::DisplayTooltipStr(__IconItemSkill* spSkill)
 
 void CUIHotKeyDlg::DisableTooltipDisplay()
 {
-	for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
+	for (int j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
 	{
-		if (m_pTooltipStr[j])	
+		if (m_pTooltipStr[j])
 			m_pTooltipStr[j]->SetVisible(false);
 	}
 }
@@ -799,30 +807,28 @@ void CUIHotKeyDlg::DisplayCountStr(__IconItemSkill* spSkill)
 	int iIndex = GetCountCurPageIndex(spSkill);
 	if (iIndex != -1)
 	{
-		if (!m_pCountStr[iIndex]->IsVisible())	
+		if (!m_pCountStr[iIndex]->IsVisible())
 			m_pCountStr[iIndex]->SetVisible(true);
 
-		m_pCountStr[iIndex]->SetStringAsInt(
-			CGameProcedure::s_pProcMain->m_pUIInventory->GetCountInInvByID(spSkill->pSkill->dwExhaustItem));
+		m_pCountStr[iIndex]->SetStringAsInt(CGameProcedure::s_pProcMain->m_pUIInventory->GetCountInInvByID(spSkill->pSkill->dwExhaustItem));
 		m_pCountStr[iIndex]->Render();
 	}
 }
 
 void CUIHotKeyDlg::DisableCountStrDisplay()
 {
-	for( int j = 0; j < MAX_SKILL_IN_HOTKEY; j++ )
+	for (int j = 0; j < MAX_SKILL_IN_HOTKEY; j++)
 	{
-		if (m_pCountStr[j])	
+		if (m_pCountStr[j])
 			m_pCountStr[j]->SetVisible(false);
 	}
 }
 
 int CUIHotKeyDlg::GetTooltipCurPageIndex(__IconItemSkill* pSkill)
 {
-	for( int k = 0; k < MAX_SKILL_IN_HOTKEY; k++ )
+	for (int k = 0; k < MAX_SKILL_IN_HOTKEY; k++)
 	{
-		if ( (m_pMyHotkey[m_iCurPage][k] != nullptr) && 
-			(m_pMyHotkey[m_iCurPage][k] == pSkill) )
+		if ((m_pMyHotkey[m_iCurPage][k] != nullptr) && (m_pMyHotkey[m_iCurPage][k] == pSkill))
 			return k;
 	}
 
@@ -831,7 +837,7 @@ int CUIHotKeyDlg::GetTooltipCurPageIndex(__IconItemSkill* pSkill)
 
 int CUIHotKeyDlg::GetCountCurPageIndex(__IconItemSkill* spSkill)
 {
-	if(spSkill->pSkill->dwExhaustItem <= 0)
+	if (spSkill->pSkill->dwExhaustItem <= 0)
 		return -1;
 
 	return GetTooltipCurPageIndex(spSkill);
@@ -841,30 +847,30 @@ bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 {
 	bool bFound = false;
 	// 내가 가졌던 아이콘이 아니면..
-	if ( CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd != UIWND_INVENTORY )
+	if (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd != UIWND_INVENTORY)
 		return false;
 	else
 	{
 		CN3UIArea* pArea = nullptr;
 
 		int iOrder;
-		for( int i = 0; i < ITEM_SLOT_COUNT; i++ )
+		for (int i = 0; i < ITEM_SLOT_COUNT; i++)
 		{
 			pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, i);
-			if ( pArea && pArea->IsIn(ptCur.x, ptCur.y) )
+			if (pArea && pArea->IsIn(ptCur.x, ptCur.y))
 			{
 				bFound = true;
 				iOrder = i;
 				break;
 			}
 		}
-		if ( !bFound )
+		if (!bFound)
 			return false;
 
-		__IconItemSkill* spSkill, *spItem;
+		__IconItemSkill *spSkill, *spItem;
 
 		// 기존 아이콘이 있다면..
-		if ( m_pMyHotkey[m_iCurPage][iOrder] )
+		if (m_pMyHotkey[m_iCurPage][iOrder])
 		{
 			// 기존 아이콘을 삭제한다..
 			spSkill = m_pMyHotkey[m_iCurPage][iOrder];
@@ -877,28 +883,30 @@ bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 			delete spSkill->pUIIcon;
 			spSkill->pUIIcon = nullptr;
 			delete spSkill;
-			spSkill = nullptr;
+			spSkill                         = nullptr;
 			m_pMyHotkey[m_iCurPage][iOrder] = nullptr;
 		}
 
-		spItem = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect;
+		spItem                     = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect;
 
 		__TABLE_UPC_SKILL* pUSkill = CGameBase::s_pTbl_Skill.Find(spItem->pItemBasic->dwEffectID1);
-		if ( pUSkill == nullptr ) return false;
-		if ( pUSkill->dwID < UIITEM_TYPE_USABLE_ID_MIN) return false;
+		if (pUSkill == nullptr)
+			return false;
+		if (pUSkill->dwID < UIITEM_TYPE_USABLE_ID_MIN)
+			return false;
 
-		spSkill = new __IconItemSkill();
-		spSkill->pSkill = pUSkill;
+		spSkill           = new __IconItemSkill();
+		spSkill->pSkill   = pUSkill;
 
 		// 아이콘 이름 만들기.. ^^
-		spSkill->szIconFN = fmt::format("UI\\skillicon_{:02}_{}.dxt",
-			spItem->pItemBasic->dwEffectID1 % 100, spItem->pItemBasic->dwEffectID1 / 100);
+		spSkill->szIconFN = fmt::format(
+			"UI\\skillicon_{:02}_{}.dxt", spItem->pItemBasic->dwEffectID1 % 100, spItem->pItemBasic->dwEffectID1 / 100);
 
 		// 아이콘 로드하기.. ^^
 		spSkill->pUIIcon = new CN3UIIcon;
 		spSkill->pUIIcon->Init(this);
 		spSkill->pUIIcon->SetTex(spSkill->szIconFN);
-		spSkill->pUIIcon->SetUVRect(0,0,1.0f, 1.0f);
+		spSkill->pUIIcon->SetUVRect(0, 0, 1.0f, 1.0f);
 		spSkill->pUIIcon->SetUIType(UI_TYPE_ICON);
 		spSkill->pUIIcon->SetStyle(UISTYLE_ICON_SKILL);
 
@@ -909,7 +917,7 @@ bool CUIHotKeyDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 			bitMask |= UISTYLE_DISABLE_SKILL;
 		spSkill->pUIIcon->SetStyle(bitMask);
 
-		if ( pArea )
+		if (pArea)
 		{
 			spSkill->pUIIcon->SetRegion(pArea->GetRegion());
 			spSkill->pUIIcon->SetMoveRect(pArea->GetRegion());
@@ -928,7 +936,7 @@ bool CUIHotKeyDlg::SetReceiveSelectedItem(int iIndex)
 	if (CN3UIWndBase::s_sSelectedIconInfo.UIWndSelect.UIWnd != UIWND_INVENTORY)
 		return false;
 
-	__IconItemSkill* spItem = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect;
+	__IconItemSkill* spItem    = CN3UIWndBase::s_sSelectedIconInfo.pItemSelect;
 
 	__TABLE_UPC_SKILL* pUSkill = CGameBase::s_pTbl_Skill.Find(spItem->pItemBasic->dwEffectID1);
 	if (pUSkill == nullptr)
@@ -941,11 +949,11 @@ bool CUIHotKeyDlg::SetReceiveSelectedItem(int iIndex)
 		return false;
 
 	__IconItemSkill* spSkill = new __IconItemSkill();
-	spSkill->pSkill = pUSkill;
+	spSkill->pSkill          = pUSkill;
 
 	// Create the icon name
-	spSkill->szIconFN = fmt::format("UI\\skillicon_{:02}_{}.dxt",
-		spItem->pItemBasic->dwEffectID1 % 100, spItem->pItemBasic->dwEffectID1 / 100);
+	spSkill->szIconFN        = fmt::format(
+        "UI\\skillicon_{:02}_{}.dxt", spItem->pItemBasic->dwEffectID1 % 100, spItem->pItemBasic->dwEffectID1 / 100);
 
 	// load icon
 	spSkill->pUIIcon = new CN3UIIcon();
@@ -962,7 +970,7 @@ bool CUIHotKeyDlg::SetReceiveSelectedItem(int iIndex)
 	spSkill->pUIIcon->SetStyle(bitMask);
 
 	CN3UIArea* pArea = nullptr;
-	pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iIndex);
+	pArea            = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_HOTKEY, iIndex);
 
 	if (pArea != nullptr)
 	{
@@ -978,13 +986,16 @@ bool CUIHotKeyDlg::SetReceiveSelectedItem(int iIndex)
 
 bool CUIHotKeyDlg::EffectTriggerByMouse()
 {
-	if(m_iSelectIndex < 0 || m_iSelectIndex >= 8) return false;
-	if(m_iSelectPage < 0 || m_iSelectPage >= 8) return false;
+	if (m_iSelectIndex < 0 || m_iSelectIndex >= 8)
+		return false;
+	if (m_iSelectPage < 0 || m_iSelectPage >= 8)
+		return false;
 
-	if ( m_pMyHotkey[m_iSelectPage][m_iSelectIndex] )
+	if (m_pMyHotkey[m_iSelectPage][m_iSelectIndex])
 	{
 		int iIDTarget = CGameBase::s_pPlayer->m_iIDTarget;
-		return CGameProcedure::s_pProcMain->m_pMagicSkillMng->MsgSend_MagicProcess(iIDTarget, m_pMyHotkey[m_iSelectPage][m_iSelectIndex]->pSkill);
+		return CGameProcedure::s_pProcMain->m_pMagicSkillMng->MsgSend_MagicProcess(
+			iIDTarget, m_pMyHotkey[m_iSelectPage][m_iSelectIndex]->pSkill);
 	}
 
 	return false;
@@ -992,15 +1003,16 @@ bool CUIHotKeyDlg::EffectTriggerByMouse()
 
 void CUIHotKeyDlg::RenderSelectIcon(CN3UIIcon* pUIIcon)
 {
-	if(!pUIIcon) return;
+	if (!pUIIcon)
+		return;
 
 	RECT rc = pUIIcon->GetRegion(); // 선택 표시
 
 	__VertexTransformedColor vLines[5];
-	vLines[0].Set((float)rc.left, (float)rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
-	vLines[1].Set((float)rc.right, (float)rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
-	vLines[2].Set((float)rc.right, (float)rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
-	vLines[3].Set((float)rc.left, (float)rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+	vLines[0].Set((float) rc.left, (float) rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+	vLines[1].Set((float) rc.right, (float) rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+	vLines[2].Set((float) rc.right, (float) rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
+	vLines[3].Set((float) rc.left, (float) rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
 	vLines[4] = vLines[0];
 
 	DWORD dwZ, dwFog, dwAlpha, dwCOP, dwCA1, dwSrcBlend, dwDestBlend, dwVertexShader, dwAOP, dwAA1;
@@ -1027,7 +1039,7 @@ void CUIHotKeyDlg::RenderSelectIcon(CN3UIIcon* pUIIcon)
 
 	CN3Base::s_lpD3DDev->SetFVF(FVF_TRANSFORMEDCOLOR);
 	CN3Base::s_lpD3DDev->DrawPrimitiveUP(D3DPT_LINESTRIP, 4, vLines, sizeof(__VertexTransformedColor));
-	
+
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, dwZ);
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, dwFog);
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlpha);
@@ -1047,20 +1059,18 @@ void CUIHotKeyDlg::RenderCooldown(const __IconItemSkill* pSkill, float fCooldown
 
 	constexpr D3DCOLOR Color = D3DCOLOR_ARGB(0x80, 0xFF, 0x00, 0x00);
 
-	const RECT rc = pSkill->pUIIcon->GetRegion();
+	const RECT rc            = pSkill->pUIIcon->GetRegion();
 
-	const float centerX = static_cast<float>(rc.left + rc.right) / 2;
-	const float centerY = static_cast<float>(rc.top + rc.bottom) / 2;
+	const float centerX      = static_cast<float>(rc.left + rc.right) / 2;
+	const float centerY      = static_cast<float>(rc.top + rc.bottom) / 2;
 
-	const float halfWidth = static_cast<float>(centerX - rc.left);
-	const float halfHeight = static_cast<float>(centerY - rc.top);
+	const float halfWidth    = static_cast<float>(centerX - rc.left);
+	const float halfHeight   = static_cast<float>(centerY - rc.top);
 
-	const float radius = std::sqrtf(
-		std::pow(halfWidth, 2.0f)
-		+ std::pow(halfHeight, 2.0f));
+	const float radius       = std::sqrtf(std::pow(halfWidth, 2.0f) + std::pow(halfHeight, 2.0f));
 
-	float progress = 0.0f;
-	
+	float progress           = 0.0f;
+
 	if (pSkill->pSkill->iReCastTime > 0)
 	{
 		progress = (fCooldown / (static_cast<float>(pSkill->pSkill->iReCastTime) / 10.0f));
@@ -1068,7 +1078,7 @@ void CUIHotKeyDlg::RenderCooldown(const __IconItemSkill* pSkill, float fCooldown
 	}
 
 	// arbitrary number of segments. this might be too many for such a small icon.
-	const int segments = 64;
+	const int segments           = 64;
 	const int segmentCountToDraw = static_cast<int>((segments * progress));
 
 	std::vector<__VertexTransformedColor> vertices;
@@ -1078,7 +1088,7 @@ void CUIHotKeyDlg::RenderCooldown(const __IconItemSkill* pSkill, float fCooldown
 	vertices.emplace_back(centerX, centerY, UI_DEFAULT_Z, UI_DEFAULT_RHW, Color);
 
 	const float fullCircle = __PI * 2.0f;
-	const float maxAngle = fullCircle * progress;
+	const float maxAngle   = fullCircle * progress;
 	const float startAngle = -__PI / 2.0f; // 12 o'clock
 
 	std::vector<__VertexTransformedColor> arcVertices;
@@ -1087,8 +1097,8 @@ void CUIHotKeyDlg::RenderCooldown(const __IconItemSkill* pSkill, float fCooldown
 	for (int i = 0; i <= segmentCountToDraw; i++)
 	{
 		float angle = startAngle - maxAngle * (static_cast<float>(i) / segmentCountToDraw);
-		float x = centerX + cosf(angle) * radius;
-		float y = centerY + sinf(angle) * radius;
+		float x     = centerX + cosf(angle) * radius;
+		float y     = centerY + sinf(angle) * radius;
 		arcVertices.emplace_back(x, y, UI_DEFAULT_Z, UI_DEFAULT_RHW, Color);
 	}
 
@@ -1131,7 +1141,8 @@ void CUIHotKeyDlg::RenderCooldown(const __IconItemSkill* pSkill, float fCooldown
 
 	CN3Base::s_lpD3DDev->SetFVF(FVF_TRANSFORMED);
 	// CN3Base::s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	CN3Base::s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, static_cast<UINT>(vertices.size()) - 2, &vertices[0], sizeof(__VertexTransformedColor));
+	CN3Base::s_lpD3DDev->DrawPrimitiveUP(
+		D3DPT_TRIANGLEFAN, static_cast<UINT>(vertices.size()) - 2, &vertices[0], sizeof(__VertexTransformedColor));
 
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, dwZ);
 	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, dwFog);
@@ -1149,16 +1160,17 @@ void CUIHotKeyDlg::RenderCooldown(const __IconItemSkill* pSkill, float fCooldown
 //this_ui_add_start
 bool CUIHotKeyDlg::OnKeyPress(int iKey)
 {
-	switch(iKey)
+	switch (iKey)
 	{
-	case DIK_ESCAPE:
-		{	//hotkey가 포커스 잡혀있을때는 다른 ui를 닫을수 없으므로 DIK_ESCAPE가 들어오면 포커스를 다시잡고
+		case DIK_ESCAPE:
+		{ //hotkey가 포커스 잡혀있을때는 다른 ui를 닫을수 없으므로 DIK_ESCAPE가 들어오면 포커스를 다시잡고
 			//열려있는 다른 유아이를 닫아준다.
-			CGameProcedure::s_pUIMgr->ReFocusUI();//this_ui
+			CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
 			CN3UIBase* pFocus = CGameProcedure::s_pUIMgr->GetFocusedUI();
-			if(pFocus && pFocus != this) pFocus->OnKeyPress(iKey);
+			if (pFocus && pFocus != this)
+				pFocus->OnKeyPress(iKey);
 		}
-		return true;
+			return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);
@@ -1167,9 +1179,7 @@ bool CUIHotKeyDlg::OnKeyPress(int iKey)
 
 void CUIHotKeyDlg::SetHotKeyTooltip(__IconItemSkill* spSkill)
 {
-	if (spSkill == nullptr
-		|| spSkill->pSkill == nullptr
-		|| spSkill->pUIIcon == nullptr)
+	if (spSkill == nullptr || spSkill->pSkill == nullptr || spSkill->pUIIcon == nullptr)
 		return;
 
 	std::string szTooltip = fmt::format("[{}] {}", spSkill->pSkill->szName, spSkill->pSkill->szDesc);

@@ -17,26 +17,22 @@ bool FileReader::OpenExisting(const std::filesystem::path& path)
 	Close();
 
 	// Open and map the given file into memory for reading.
-	auto handleResult = llfio::mapped_file(
-		{},
-		path.native(),
-		llfio::handle::mode::read,
-		llfio::handle::creation::open_existing,
-		llfio::handle::caching::all,
+	auto handleResult = llfio::mapped_file({}, path.native(), llfio::handle::mode::read,
+		llfio::handle::creation::open_existing, llfio::handle::caching::all,
 		llfio::handle::flag::none);
 	if (!handleResult)
 		return false;
 
 	_mappedFileHandle = std::move(std::move(handleResult).value());
-	_address = _mappedFileHandle.address();
-	_path = path;
-	_open = true;
+	_address          = _mappedFileHandle.address();
+	_path             = path;
+	_open             = true;
 
 	// Internally the size is always fetched on load (as we don't supply a size) and is what's reserved.
 	// If we can get away with it, this approach is very cheap, but we should just be careful.
 	// The next best way to get this is _mappedFileHandle.underlying_file_maximum_extent(), but
 	// we'd rather not use a second syscall unless we absolutely have to.
-	_size = static_cast<uint64_t>(_mappedFileHandle.capacity());
+	_size             = static_cast<uint64_t>(_mappedFileHandle.capacity());
 
 	return true;
 }
@@ -69,7 +65,7 @@ bool FileReader::Read(void* buffer, size_t bytesToRead, size_t* bytesRead /*= nu
 
 	// If we're trying to read more than is available, we should still
 	// attempt the read, copying only what's actually available.
-	const size_t bytesToCopy = std::min(bytesToRead, remainingBytes);
+	const size_t bytesToCopy    = std::min(bytesToRead, remainingBytes);
 
 	// Read operations can only be considered successful if we actually
 	// manage to read at least 1 byte.
@@ -91,7 +87,8 @@ bool FileReader::Read(void* buffer, size_t bytesToRead, size_t* bytesRead /*= nu
 	return true;
 }
 
-bool FileReader::Write(const void* /*buffer*/, size_t /*bytesToWrite*/, size_t* /*bytesWritten = nullptr*/)
+bool FileReader::Write(
+	const void* /*buffer*/, size_t /*bytesToWrite*/, size_t* /*bytesWritten = nullptr*/)
 {
 	// Write operations are not supported in a FileReader.
 	return false;
@@ -153,10 +150,10 @@ bool FileReader::Close()
 
 	(void) _mappedFileHandle.close();
 
-	_size = 0;
-	_offset = 0;
+	_size    = 0;
+	_offset  = 0;
 	_address = nullptr;
-	_open = false;
+	_open    = false;
 	return true;
 }
 

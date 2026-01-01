@@ -15,42 +15,43 @@
 class CMapMng;
 class CDlgBase : public CDialog
 {
-// Construction
+	// Construction
 public:
 	void UpdateInfo();
-	CDlgBase(CMapMng* pMapMng, CWnd* pParent = nullptr);   // standard constructor
+	CDlgBase(CMapMng* pMapMng, CWnd* pParent = nullptr); // standard constructor
 
 	CMapMng* m_pMapMng;
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CDlgBase)
-	enum { IDD = IDD_BASE };
-	CPropertyList	m_LPMaterial;
-	CPropertyList	m_LPLight;
-	CPropertyList	m_LPCamera;
-	CComboBox	m_CBShapePart; // Shape Part Number	
-	CComboBox	m_CBChrPart; // Character Part Number
-	CComboBox	m_CBChrLOD; // Character LOD Number
-	CComboBox	m_CBChrPlug; // Chraracter Plug Number
-	CPropertyList	m_LPTransform;
-	CPropertyList	m_LPShape;
-	CPropertyList	m_LPChr;
-	CPropertyList	m_LPCPart;
-	CPropertyList	m_LPCPlug;
+	enum
+	{
+		IDD = IDD_BASE
+	};
+	CPropertyList m_LPMaterial;
+	CPropertyList m_LPLight;
+	CPropertyList m_LPCamera;
+	CComboBox m_CBShapePart; // Shape Part Number
+	CComboBox m_CBChrPart;   // Character Part Number
+	CComboBox m_CBChrLOD;    // Character LOD Number
+	CComboBox m_CBChrPlug;   // Chraracter Plug Number
+	CPropertyList m_LPTransform;
+	CPropertyList m_LPShape;
+	CPropertyList m_LPChr;
+	CPropertyList m_LPCPart;
+	CPropertyList m_LPCPlug;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgBase)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 protected:
-
 	// Generated message map functions
 	//{{AFX_MSG(CDlgBase)
 	virtual BOOL OnInitDialog();

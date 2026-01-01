@@ -15,11 +15,11 @@
 class CGameCursor : public CN3UIBase
 {
 private:
-	class		CN3UIImage* m_pImageCursor[CURSOR_COUNT];
-	bool		m_bCursorLocked;
-	e_Cursor	m_ePrevGameCursor;
-	e_Cursor	m_eCurGameCursor;
-	HCURSOR		m_hCursor;
+	class CN3UIImage* m_pImageCursor[CURSOR_COUNT];
+	bool m_bCursorLocked;
+	e_Cursor m_ePrevGameCursor;
+	e_Cursor m_eCurGameCursor;
+	HCURSOR m_hCursor;
 
 public:
 	void Tick() override;

@@ -13,7 +13,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -24,7 +24,7 @@ static char THIS_FILE[]=__FILE__;
 CDTexGroupMng::CDTexGroupMng()
 {
 	m_pGroupView = nullptr;
-	m_pMainFrm = nullptr;
+	m_pMainFrm   = nullptr;
 
 	memset(&m_SelectedDTex, 0, sizeof(m_SelectedDTex));
 	memset(&m_SelectedDTexTile, 0, sizeof(m_SelectedDTexTile));
@@ -43,7 +43,6 @@ CDTexGroupMng::~CDTexGroupMng()
 		delete pDTG;
 }
 
-
 //
 //	Init..
 //
@@ -51,16 +50,15 @@ void CDTexGroupMng::Init(CWnd* pWndParent)
 {
 	Release();
 
-	m_pMainFrm = (CMainFrame*)pWndParent;
+	m_pMainFrm   = (CMainFrame*) pWndParent;
 
 	m_pGroupView = new CDlgDTexGroupView;
 	m_pGroupView->Create(IDD_DTEX_GROUP);
 	m_pGroupView->ShowWindow(FALSE);
 	m_pGroupView->SetGroupMng(this);
-	
+
 	SetGroupID("NONE", 0);
 }
-
 
 //
 //	Release..
@@ -79,19 +77,17 @@ void CDTexGroupMng::Release()
 	m_Groups.clear();
 }
 
-
 //
 //
 //
 int CDTexGroupMng::GetBrushSize()
 {
-	if(m_pGroupView)
+	if (m_pGroupView)
 	{
 		return m_pGroupView->m_SliderBrushSize.GetPos();
 	}
 	return 0;
 }
-
 
 //
 //	SetGroup..
@@ -114,16 +110,16 @@ void CDTexGroupMng::SetGroup(const char* pName)
 	wsprintf(pGroup->m_Name, pName);
 
 	//새로운 idx를 지정하기 위해서 일단 정렬을 하자..
-	auto it = m_Groups.begin();
-	int iSize = static_cast<int>(m_Groups.size());
+	auto it       = m_Groups.begin();
+	int iSize     = static_cast<int>(m_Groups.size());
 	int* ArrayIdx = new int[iSize];
 	for (int i = 0; i < iSize; i++, it++)
 	{
 		CDTexGroup* pDTG = *it;
-		ArrayIdx[i] = pDTG->m_ID;
+		ArrayIdx[i]      = pDTG->m_ID;
 	}
 
-	qsort( ArrayIdx, iSize, sizeof(int), this->CompareIdx );
+	qsort(ArrayIdx, iSize, sizeof(int), this->CompareIdx);
 
 	int idx = 0;
 	for (int i = 0; i < iSize; i++)
@@ -134,11 +130,10 @@ void CDTexGroupMng::SetGroup(const char* pName)
 	delete ArrayIdx;
 
 	pGroup->m_ID = idx;
-	
+
 	m_Groups.push_back(pGroup);
 	m_pGroupView->AddGroup(pGroup);
 }
-
 
 //
 //	SetGroupID..
@@ -147,31 +142,31 @@ void CDTexGroupMng::SetGroup(const char* pName)
 void CDTexGroupMng::SetGroupID(const char* pName, int id)
 {
 	CDTexGroup* pGroup = new CDTexGroup;
-	
+
 	pGroup->Init();
 
 	wsprintf(pGroup->m_Name, pName);
 	pGroup->m_ID = id;
-	
-	m_Groups.push_back(pGroup);
-	m_pGroupView->AddGroup(pGroup);	
-}
 
+	m_Groups.push_back(pGroup);
+	m_pGroupView->AddGroup(pGroup);
+}
 
 //
 //	qsort를 위해 정렬하는 함수...
 //
-int CDTexGroupMng::CompareIdx( const void *arg1, const void *arg2 )
+int CDTexGroupMng::CompareIdx(const void* arg1, const void* arg2)
 {
-	int a,b;
-	a = (*((int*)arg1));
-	b = (*((int*)arg2));
+	int a, b;
+	a = (*((int*) arg1));
+	b = (*((int*) arg2));
 
-	if(a<b) return -1;
-	if(a==b) return 0;
+	if (a < b)
+		return -1;
+	if (a == b)
+		return 0;
 	return 1;
 }
-
 
 //
 //	그룹 지우기..
@@ -194,7 +189,6 @@ void CDTexGroupMng::DelGroup(int ID)
 		}
 	}
 }
-
 
 //
 //	그룹안에 타일 넣기..
@@ -243,9 +237,9 @@ void CDTexGroupMng::DelTileByDTexID(int DTexID)
 //
 int CDTexGroupMng::GetID2Index(int id)
 {
-	auto it = m_Groups.begin();
+	auto it    = m_Groups.begin();
 	auto itEnd = m_Groups.end();
-	int i = 0;
+	int i      = 0;
 	for (; it != itEnd; ++it, ++i)
 	{
 		CDTexGroup* pDTG = *it;
@@ -260,8 +254,7 @@ int CDTexGroupMng::GetID2Index(int id)
 //
 int CDTexGroupMng::GetIndex2ID(int idx)
 {
-	if (idx < 0
-		|| idx >= static_cast<int>(m_Groups.size()))
+	if (idx < 0 || idx >= static_cast<int>(m_Groups.size()))
 		return 0;
 
 	auto it = m_Groups.begin();
@@ -270,10 +263,9 @@ int CDTexGroupMng::GetIndex2ID(int idx)
 	CDTexGroup* pDTG = *it;
 	if (pDTG != nullptr)
 		return pDTG->m_ID;
-	
+
 	return 0;
 }
-
 
 //
 //
@@ -298,7 +290,7 @@ __DTexTileAttr CDTexGroupMng::GetTileAttr(int groupID, int attr)
 		size_t attrCount = pGroup->m_Attributes[attr].size();
 		if (attrCount != 0)
 		{
-			size_t AttrIdx = static_cast<size_t>(rand()) % attrCount;
+			size_t AttrIdx     = static_cast<size_t>(rand()) % attrCount;
 			it_DTexTileAttr it = pGroup->m_Attributes[attr].begin();
 			std::advance(it, AttrIdx);
 			DTileAttr = *(*it);
@@ -314,7 +306,7 @@ __DTexTileAttr CDTexGroupMng::GetTileAttr(int groupID, int attr)
 __DTexTileAttr CDTexGroupMng::GetTileAttrManuel(int groupID, int attr, int AttrIdx)
 {
 	__DTexTileAttr DTileAttr;
-	DTileAttr.TexID = -1;
+	DTileAttr.TexID    = -1;
 
 	CDTexGroup* pGroup = nullptr;
 	for (CDTexGroup* pDTG : m_Groups)
@@ -352,31 +344,40 @@ char* CDTexGroupMng::GetGroupName(int id)
 //
 bool CDTexGroupMng::LoadFromFile(CString RealFileName)
 {
- 	Init(m_pMainFrm);
+	Init(m_pMainFrm);
 	SetCurrentDirectory(CN3Base::s_szPath.c_str());
 
 	char szDTexInfoFileName[_MAX_PATH];
-	sprintf(szDTexInfoFileName,"dtex\\%s.tgx", (LPCTSTR)RealFileName);
+	sprintf(szDTexInfoFileName, "dtex\\%s.tgx", (LPCTSTR) RealFileName);
 
 	FILE* stream = fopen(szDTexInfoFileName, "r");
-	if(stream)
+	if (stream)
 	{
 		int iCount;
 		int result = fscanf(stream, "NumGroup = %d\n", &iCount);
-		if(EOF == result) { MessageBox(::GetActiveWindow(), szDTexInfoFileName, "Invalid DTex Info File...", MB_OK); return false; }
+		if (EOF == result)
+		{
+			MessageBox(::GetActiveWindow(), szDTexInfoFileName, "Invalid DTex Info File...", MB_OK);
+			return false;
+		}
 
 		CProgressBar ProgressBar;
-		ProgressBar.Create("Load TileGroup Info..", 50,  iCount);
+		ProgressBar.Create("Load TileGroup Info..", 50, iCount);
 
 		int i;
 		int id;
 		char szDTexGroupName[40];
-		for(i=0; i<iCount; i++)
+		for (i = 0; i < iCount; i++)
 		{
 			result = fscanf(stream, "%s %d\n", szDTexGroupName, &id);
 			//result = fscanf(stream, "%s", szDTexGroupName);
 			//result = fscanf(stream, "%d\n", &id);
-			if(EOF == result) { MessageBox(::GetActiveWindow(), szDTexInfoFileName, "Invalid DTex Info File...", MB_OK); return false; }
+			if (EOF == result)
+			{
+				MessageBox(
+					::GetActiveWindow(), szDTexInfoFileName, "Invalid DTex Info File...", MB_OK);
+				return false;
+			}
 
 			ProgressBar.StepIt();
 
@@ -389,7 +390,6 @@ bool CDTexGroupMng::LoadFromFile(CString RealFileName)
 	return false;
 }
 
-
 //
 //
 //
@@ -400,7 +400,7 @@ bool CDTexGroupMng::SaveToFile(CString RealFileName)
 	CreateDirectory("dtex", nullptr);
 
 	char szDTexInfoFileName[_MAX_PATH];
-	sprintf(szDTexInfoFileName,"dtex\\%s.tgx", (LPCTSTR)RealFileName);
+	sprintf(szDTexInfoFileName, "dtex\\%s.tgx", (LPCTSTR) RealFileName);
 
 	FILE* stream = fopen(szDTexInfoFileName, "w");
 	if (stream == nullptr)

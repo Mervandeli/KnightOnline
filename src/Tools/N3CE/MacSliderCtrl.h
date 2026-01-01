@@ -13,13 +13,13 @@
 // Feel free to modifiy and/or distribute this file, but
 // do not remove this header.
 //
-// I would appreciate a notification of any bugs discovered or 
+// I would appreciate a notification of any bugs discovered or
 // improvements that could be made.
 //
 // This file is provided "as is" with no expressed or implied warranty.
 //
 //	History:
-//		PMM	12/21/1999		Initial implementation.		
+//		PMM	12/21/1999		Initial implementation.
 
 /////////////////////////////////////////////////////////////////////////////
 // CMacSliderCtrl window
@@ -30,6 +30,7 @@ class CMacSliderCtrl : public CSliderCtrl
 {
 protected:
 	__AnimData m_AnimData;
+
 public:
 	void SetAnimationData(const __AnimData& Data);
 	void CalcRectToFill(const RECT& rcWhole, RECT& rc, float fValue);
@@ -37,18 +38,13 @@ public:
 	float GetCurrentFrame();
 	void SetCurrentFrame(float fFrm);
 
-
-
-
-
-// Construction
+	// Construction
 public:
 	CMacSliderCtrl();
 
-// Attributes
+	// Attributes
 public:
-
-// Operations
+	// Operations
 public:
 	void SetChannelColor(COLORREF crColor);
 	COLORREF GetChannelColor();
@@ -57,12 +53,12 @@ public:
 	void SetSelectionColor(COLORREF crColor);
 	COLORREF GetSelectionColor();
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CMacSliderCtrl)
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CMacSliderCtrl();
 
@@ -77,9 +73,9 @@ private:
 	COLORREF LightenColor(const COLORREF crColor, BYTE byIncreaseVal);
 	COLORREF DarkenColor(const COLORREF crColor, BYTE byReduceVal);
 
-	void DrawHorizontalThumb(CDC* pDC, const CRect &rect);
-	void DrawVerticalThumb(CDC* pDC, const CRect &rect);
-	void DrawChannel(CDC* pDC, const CRect &rect, BOOL bHoriz);
+	void DrawHorizontalThumb(CDC* pDC, const CRect& rect);
+	void DrawVerticalThumb(CDC* pDC, const CRect& rect);
+	void DrawChannel(CDC* pDC, const CRect& rect, BOOL bHoriz);
 	void DeletePens();
 	void CreatePens();
 	CPen m_penThumb;

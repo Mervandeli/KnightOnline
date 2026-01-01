@@ -15,11 +15,11 @@ static char THIS_FILE[] = __FILE__;
 // COptionApp
 
 BEGIN_MESSAGE_MAP(COptionApp, CWinApp)
-	//{{AFX_MSG_MAP(COptionApp)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-		//    DO NOT EDIT what you see in these blocks of generated code!
-	//}}AFX_MSG
-	ON_COMMAND(ID_HELP, CWinApp::OnHelp)
+//{{AFX_MSG_MAP(COptionApp)
+// NOTE - the ClassWizard will add and remove mapping macros here.
+//    DO NOT EDIT what you see in these blocks of generated code!
+//}}AFX_MSG
+ON_COMMAND(ID_HELP, CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ BOOL COptionApp::InitInstance()
 	AfxEnableControlContainer();
 
 	COptionDlg dlg;
-	m_pMainWnd = &dlg;
+	m_pMainWnd        = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
 	{

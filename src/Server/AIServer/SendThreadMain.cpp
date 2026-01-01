@@ -5,8 +5,8 @@
 
 #include <spdlog/spdlog.h>
 
-SendThreadMain::SendThreadMain(AISocketManager* socketManager)
-	: _socketManager(socketManager), _nextRoundRobinSocketId(0)
+SendThreadMain::SendThreadMain(AISocketManager* socketManager) :
+	_socketManager(socketManager), _nextRoundRobinSocketId(0)
 {
 }
 
@@ -43,8 +43,8 @@ void SendThreadMain::thread_loop()
 	{
 		// Wait until we're shutting down
 		return !_canTick
-			// Or there's something in the queue
-			|| !_insertionQueue.empty();
+			   // Or there's something in the queue
+			   || !_insertionQueue.empty();
 	};
 
 	while (_canTick)
@@ -76,12 +76,13 @@ void SendThreadMain::tick(std::queue<_SEND_DATA*>& processingQueue)
 	{
 		_SEND_DATA* sendData = processingQueue.front();
 
-		bool sent = false;
-		for (int checkedSockets = 0; checkedSockets < socketCount; ++checkedSockets, ++_nextRoundRobinSocketId)
+		bool sent            = false;
+		for (int checkedSockets = 0; checkedSockets < socketCount;
+			++checkedSockets, ++_nextRoundRobinSocketId)
 		{
 			_nextRoundRobinSocketId %= socketCount;
 
-			int socketId = _nextRoundRobinSocketId;
+			int socketId             = _nextRoundRobinSocketId;
 			++_nextRoundRobinSocketId;
 
 			CGameSocket* gameSocket = _socketManager->GetServerSocketUnchecked(socketId);
@@ -91,8 +92,8 @@ void SendThreadMain::tick(std::queue<_SEND_DATA*>& processingQueue)
 			int ret = gameSocket->Send(sendData->pBuf, sendData->sLength);
 			if (ret <= 0)
 			{
-				spdlog::warn(
-					"SendThreadMain::tick: send failed, trying next - ret={} opcode={:02X} packetSize={} socketId={}",
+				spdlog::warn("SendThreadMain::tick: send failed, trying next - ret={} "
+							 "opcode={:02X} packetSize={} socketId={}",
 					ret, sendData->pBuf[0], sendData->sLength, socketId);
 				continue;
 			}
@@ -104,7 +105,8 @@ void SendThreadMain::tick(std::queue<_SEND_DATA*>& processingQueue)
 
 		if (!sent)
 		{
-			spdlog::error("SendThreadMain::tick: send failed, skipped packet - opcode={:02X} packetSize={}",
+			spdlog::error(
+				"SendThreadMain::tick: send failed, skipped packet - opcode={:02X} packetSize={}",
 				sendData->pBuf[0], sendData->sLength);
 		}
 

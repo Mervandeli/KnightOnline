@@ -9,8 +9,8 @@ constexpr int SMQ_ERROR_RANGE = 10000;
 
 enum e_SharedMemQueueError
 {
-	SMQ_OK			= 1,
-	SMQ_FULL		= SMQ_ERROR_RANGE,
+	SMQ_OK   = 1,
+	SMQ_FULL = SMQ_ERROR_RANGE,
 	SMQ_EMPTY,
 	SMQ_PKTSIZEOVER,
 	SMQ_GENERIC_ERROR
@@ -20,8 +20,8 @@ struct message_queue_impl;
 class SharedMemoryQueue
 {
 public:
-	static constexpr uint32_t MAX_MSG_SIZE	= 512;
-	static constexpr uint32_t MAX_NUM_MSG	= 4096;
+	static constexpr uint32_t MAX_MSG_SIZE = 512;
+	static constexpr uint32_t MAX_NUM_MSG  = 4096;
 
 	bool IsOpen() const
 	{

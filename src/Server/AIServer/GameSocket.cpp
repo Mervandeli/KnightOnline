@@ -24,8 +24,7 @@ extern std::mutex g_region_mutex;
 	1. RecvUserInfo(), RecvAttackReq(), RecvUserUpdate() 수정
 */
 
-CGameSocket::CGameSocket(SocketManager* socketManager)
-	: TcpServerSocket(socketManager)
+CGameSocket::CGameSocket(SocketManager* socketManager) : TcpServerSocket(socketManager)
 {
 	//m_pParty = nullptr;
 	m_pMain = AIServerApp::instance();
@@ -51,14 +50,13 @@ void CGameSocket::Initialize()
 bool CGameSocket::PullOutCore(char*& data, int& length)
 {
 	uint8_t* pTmp;
-	int			len;
-	bool		foundCore;
-	MYSHORT		slen;
+	int len;
+	bool foundCore;
+	MYSHORT slen;
 
 	len = _recvCircularBuffer.GetValidCount();
 
-	if (len == 0
-		|| len < 0)
+	if (len == 0 || len < 0)
 		return false;
 
 	pTmp = new uint8_t[len];
@@ -67,22 +65,21 @@ bool CGameSocket::PullOutCore(char*& data, int& length)
 
 	foundCore = false;
 
-	int	sPos = 0, ePos = 0;
+	int sPos = 0, ePos = 0;
 
 	for (int i = 0; i < len && !foundCore; i++)
 	{
 		if (i + 2 >= len)
 			break;
 
-		if (pTmp[i] == PACKET_START1
-			&& pTmp[i + 1] == PACKET_START2)
+		if (pTmp[i] == PACKET_START1 && pTmp[i + 1] == PACKET_START2)
 		{
-			sPos = i + 2;
+			sPos      = i + 2;
 
 			slen.b[0] = pTmp[sPos];
 			slen.b[1] = pTmp[sPos + 1];
 
-			length = slen.i;
+			length    = slen.i;
 
 			if (length < 0)
 				goto cancelRoutine;
@@ -94,18 +91,17 @@ bool CGameSocket::PullOutCore(char*& data, int& length)
 
 			if ((ePos + 2) > len)
 				goto cancelRoutine;
-//			ASSERT(ePos+2 <= len);
+			//			ASSERT(ePos+2 <= len);
 
-			if (pTmp[ePos] == PACKET_END1
-				&& pTmp[ePos + 1] == PACKET_END2)
+			if (pTmp[ePos] == PACKET_END1 && pTmp[ePos + 1] == PACKET_END2)
 			{
 				data = new char[length + 1];
 				memcpy(data, (pTmp + sPos + 2), length);
 				data[length] = 0;
-				foundCore = true;
-//				int head = _recvCircularBuffer.GetHeadPos(), tail = _recvCircularBuffer.GetTailPos();
-//				TRACE("data : %s, len : %d\n", data, length);
-//				TRACE("head : %d, tail : %d\n", head, tail );
+				foundCore    = true;
+				//				int head = _recvCircularBuffer.GetHeadPos(), tail = _recvCircularBuffer.GetTailPos();
+				//				TRACE("data : %s, len : %d\n", data, length);
+				//				TRACE("head : %d, tail : %d\n", head, tail );
 				break;
 			}
 			else
@@ -131,8 +127,7 @@ int CGameSocket::Send(char* pBuf, int length)
 	assert(length >= 0);
 	assert((length + PacketHeaderSize) <= MAX_PACKET_SIZE);
 
-	if (length < 0
-		|| (length + PacketHeaderSize) > MAX_PACKET_SIZE)
+	if (length < 0 || (length + PacketHeaderSize) > MAX_PACKET_SIZE)
 		return -1;
 
 	char sendBuffer[MAX_PACKET_SIZE];
@@ -156,7 +151,7 @@ void CGameSocket::CloseProcess()
 
 void CGameSocket::Parsing(int /*length*/, char* pData)
 {
-	int index = 0;
+	int index     = 0;
 	uint8_t bType = GetByte(pData, index);
 
 	switch (bType)
@@ -255,12 +250,12 @@ void CGameSocket::Parsing(int /*length*/, char* pData)
 // sungyong 2002.05.22
 void CGameSocket::RecvServerConnect(char* pBuf)
 {
-	int index = 1;
-	int outindex = 0;
+	int index                = 1;
+	int outindex             = 0;
 	double fReConnectEndTime = 0.0;
-	char pData[1024] = {};
-	uint8_t byZoneNumber = GetByte(pBuf, index);
-	uint8_t byReConnect = GetByte(pBuf, index);	// 0 : 처음접속, 1 : 재접속
+	char pData[1024]         = {};
+	uint8_t byZoneNumber     = GetByte(pBuf, index);
+	uint8_t byReConnect      = GetByte(pBuf, index); // 0 : 처음접속, 1 : 재접속
 
 	spdlog::info("GameSocket::RecvServerConnect: Ebenezer connected to zone={}", byZoneNumber);
 
@@ -294,10 +289,11 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 		// all sockets reconnected within 2 minutes
 		if (fReConnectEndTime > m_pMain->_reconnectStartTime + 120)
 		{
-			spdlog::info("GameSocket::RecvServerConnect: Ebenezer sockets reconnected in under 2 minutes [sockets={}]",
+			spdlog::info("GameSocket::RecvServerConnect: Ebenezer sockets reconnected in under 2 "
+						 "minutes [sockets={}]",
 				m_pMain->_reconnectSocketCount);
 			m_pMain->_reconnectSocketCount = 0;
-			m_pMain->_reconnectStartTime = 0.0;
+			m_pMain->_reconnectStartTime   = 0.0;
 		}
 
 		if (m_pMain->_reconnectSocketCount == MAX_AI_SOCKET)
@@ -307,9 +303,10 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 			// all sockets reconnected within 1 minute
 			if (fReConnectEndTime < m_pMain->_reconnectStartTime + 60)
 			{
-				spdlog::info("GameSocket::RecvServerConnect: Ebenezer sockets reconnected within a minute [sockets={}]",
+				spdlog::info("GameSocket::RecvServerConnect: Ebenezer sockets reconnected within a "
+							 "minute [sockets={}]",
 					m_pMain->_reconnectSocketCount);
-				m_pMain->_firstServerFlag = true;
+				m_pMain->_firstServerFlag      = true;
 				m_pMain->_reconnectSocketCount = 0;
 				m_pMain->AllNpcInfo();
 			}
@@ -317,7 +314,7 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 			else
 			{
 				m_pMain->_reconnectSocketCount = 0;
-				m_pMain->_reconnectStartTime = 0.0;
+				m_pMain->_reconnectStartTime   = 0.0;
 			}
 		}
 	}
@@ -328,10 +325,11 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 			byZoneNumber, m_pMain->_socketCount);
 		if (m_pMain->_socketCount == MAX_AI_SOCKET)
 		{
-			spdlog::info("GameSocket::RecvServerConnect: Ebenezer sockets all connected [sockets={}]",
+			spdlog::info(
+				"GameSocket::RecvServerConnect: Ebenezer sockets all connected [sockets={}]",
 				m_pMain->_socketCount);
 			m_pMain->_firstServerFlag = true;
-			m_pMain->_socketCount = 0;
+			m_pMain->_socketCount     = 0;
 			m_pMain->AllNpcInfo();
 		}
 	}
@@ -340,45 +338,45 @@ void CGameSocket::RecvServerConnect(char* pBuf)
 
 void CGameSocket::RecvUserInfo(char* pBuf)
 {
-//	TRACE(_T("RecvUserInfo()\n"));
-	int index = 0;
+	//	TRACE(_T("RecvUserInfo()\n"));
+	int index   = 0;
 	int16_t uid = -1, sHp, sMp, sZoneIndex, sLength = 0;
 	uint8_t bNation, bLevel, bZone, bAuthority = 1;
 	int16_t sDamage, sAC;
 	float fHitAgi, fAvoidAgi;
 	char strName[MAX_ID_SIZE + 1] = {};
-//
+	//
 	int16_t sItemAC, sAmountLeft, sAmountRight;
 	uint8_t bTypeLeft, bTypeRight;
-//
-	uid = GetShort(pBuf, index);
+	//
+	uid     = GetShort(pBuf, index);
 	sLength = GetShort(pBuf, index);
-	if (sLength > MAX_ID_SIZE
-		|| sLength <= 0)
+	if (sLength > MAX_ID_SIZE || sLength <= 0)
 	{
-		spdlog::error("GameSocket::RecvUserInfo: charId len={} overflow for userId={}", sLength, uid);
+		spdlog::error(
+			"GameSocket::RecvUserInfo: charId len={} overflow for userId={}", sLength, uid);
 		return;
 	}
 
 	GetString(strName, pBuf, sLength, index);
-	bZone = GetByte(pBuf, index);
-	sZoneIndex = GetShort(pBuf, index);
-	bNation = GetByte(pBuf, index);
-	bLevel = GetByte(pBuf, index);
-	sHp = GetShort(pBuf, index);
-	sMp = GetShort(pBuf, index);
-	sDamage = GetShort(pBuf, index);
-	sAC = GetShort(pBuf, index);
-	fHitAgi = GetFloat(pBuf, index);
-	fAvoidAgi = GetFloat(pBuf, index);
-//
-	sItemAC = GetShort(pBuf, index);
-	bTypeLeft = GetByte(pBuf, index);
-	bTypeRight = GetByte(pBuf, index);
-	sAmountLeft = GetShort(pBuf, index);
+	bZone        = GetByte(pBuf, index);
+	sZoneIndex   = GetShort(pBuf, index);
+	bNation      = GetByte(pBuf, index);
+	bLevel       = GetByte(pBuf, index);
+	sHp          = GetShort(pBuf, index);
+	sMp          = GetShort(pBuf, index);
+	sDamage      = GetShort(pBuf, index);
+	sAC          = GetShort(pBuf, index);
+	fHitAgi      = GetFloat(pBuf, index);
+	fAvoidAgi    = GetFloat(pBuf, index);
+	//
+	sItemAC      = GetShort(pBuf, index);
+	bTypeLeft    = GetByte(pBuf, index);
+	bTypeRight   = GetByte(pBuf, index);
+	sAmountLeft  = GetShort(pBuf, index);
 	sAmountRight = GetShort(pBuf, index);
-	bAuthority = GetByte(pBuf, index);
-//
+	bAuthority   = GetByte(pBuf, index);
+	//
 
 	//CUser* pUser = m_pMain->GetActiveUserPtr(uid);
 	//if( pUser == nullptr )		return;
@@ -387,112 +385,109 @@ void CGameSocket::RecvUserInfo(char* pBuf)
 
 	pUser->m_iUserId = uid;
 	strcpy_safe(pUser->m_strUserID, strName);
-	pUser->m_curZone = bZone;
-	pUser->m_sZoneIndex = sZoneIndex;
-	pUser->m_bNation = bNation;
-	pUser->m_byLevel = bLevel;
-	pUser->m_sHP = sHp;
-	pUser->m_sMP = sMp;
+	pUser->m_curZone               = bZone;
+	pUser->m_sZoneIndex            = sZoneIndex;
+	pUser->m_bNation               = bNation;
+	pUser->m_byLevel               = bLevel;
+	pUser->m_sHP                   = sHp;
+	pUser->m_sMP                   = sMp;
 	//pUser->m_sSP = sSp;
-	pUser->m_sHitDamage = sDamage;
-	pUser->m_fHitrate = fHitAgi;
-	pUser->m_fAvoidrate = fAvoidAgi;
-	pUser->m_sAC = sAC;
-	pUser->m_bLive = USER_LIVE;
-//
-	pUser->m_sItemAC = sItemAC;
-	pUser->m_bMagicTypeLeftHand = bTypeLeft;
-	pUser->m_bMagicTypeRightHand = bTypeRight;
-	pUser->m_sMagicAmountLeftHand = sAmountLeft;
+	pUser->m_sHitDamage            = sDamage;
+	pUser->m_fHitrate              = fHitAgi;
+	pUser->m_fAvoidrate            = fAvoidAgi;
+	pUser->m_sAC                   = sAC;
+	pUser->m_bLive                 = USER_LIVE;
+	//
+	pUser->m_sItemAC               = sItemAC;
+	pUser->m_bMagicTypeLeftHand    = bTypeLeft;
+	pUser->m_bMagicTypeRightHand   = bTypeRight;
+	pUser->m_sMagicAmountLeftHand  = sAmountLeft;
 	pUser->m_sMagicAmountRightHand = sAmountRight;
-	pUser->m_byIsOP = bAuthority;
-//
+	pUser->m_byIsOP                = bAuthority;
+	//
 
 	spdlog::debug("GameSocket::RecvUserInfo: userId={} charId={}", uid, strName);
 
-	if (uid >= USER_BAND
-		&& uid < MAX_USER)
+	if (uid >= USER_BAND && uid < MAX_USER)
 		m_pMain->_users[uid] = pUser;
 
-	spdlog::get(logger::AIServerUser)->info("Login: level={}, charId={}",
-		pUser->m_byLevel, pUser->m_strUserID);
+	spdlog::get(logger::AIServerUser)
+		->info("Login: level={}, charId={}", pUser->m_byLevel, pUser->m_strUserID);
 }
 
 void CGameSocket::RecvUserInOut(char* pBuf)
 {
-	int index = 0;
+	int index     = 0;
 	uint8_t bType = -1;
 	int16_t uid = -1, len = 0;
 	char strName[MAX_ID_SIZE + 1] = {};
 	float fX = -1, fZ = -1;
 
 	bType = GetByte(pBuf, index);
-	uid = GetShort(pBuf, index);
-	len = GetShort(pBuf, index);
+	uid   = GetShort(pBuf, index);
+	len   = GetShort(pBuf, index);
 	GetString(strName, pBuf, len, index);
 	fX = GetFloat(pBuf, index);
 	fZ = GetFloat(pBuf, index);
 
-	if (fX < 0
-		|| fZ < 0)
+	if (fX < 0 || fZ < 0)
 	{
 		spdlog::error("RecvUserInOut: invalid position charId={} fX={} fZ={}", strName, fX, fZ);
 		return;
 	}
 
-//	TRACE(_T("RecvUserInOut(),, uid = %d\n"), uid);
+	//	TRACE(_T("RecvUserInOut(),, uid = %d\n"), uid);
 
 	int region_x = 0, region_z = 0;
-	int x1 = (int) fX / TILE_SIZE;
-	int z1 = (int) fZ / TILE_SIZE;
-	region_x = (int) fX / VIEW_DIST;
-	region_z = (int) fZ / VIEW_DIST;
+	int x1       = (int) fX / TILE_SIZE;
+	int z1       = (int) fZ / TILE_SIZE;
+	region_x     = (int) fX / VIEW_DIST;
+	region_z     = (int) fZ / VIEW_DIST;
 
 	// 수정할것,,, : 지금 존 번호를 0으로 했는데.. 유저의 존 정보의 번호를 읽어야,, 함,,
-	MAP* pMap = nullptr;
+	MAP* pMap    = nullptr;
 
 	CUser* pUser = m_pMain->GetUserPtr(uid);
 
-//	TRACE(_T("^^& RecvUserInOut( type=%d )-> User(%hs, %d),, zone=%d, index=%d, region_x=%d, y=%d\n"), bType, pUser->m_strUserID, pUser->m_iUserId, pUser->m_curZone, pUser->m_sZoneIndex, region_x, region_z);
+	//	TRACE(_T("^^& RecvUserInOut( type=%d )-> User(%hs, %d),, zone=%d, index=%d, region_x=%d, y=%d\n"), bType, pUser->m_strUserID, pUser->m_iUserId, pUser->m_curZone, pUser->m_sZoneIndex, region_x, region_z);
 
 	if (pUser != nullptr)
 	{
-	//	TRACE(_T("##### Fail : ^^& RecvUserInOut() [name = %hs]. state=%d, hp=%d\n"), pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
-		if (pUser->m_bLive == USER_DEAD
-			|| pUser->m_sHP <= 0)
+		//	TRACE(_T("##### Fail : ^^& RecvUserInOut() [name = %hs]. state=%d, hp=%d\n"), pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
+		if (pUser->m_bLive == USER_DEAD || pUser->m_sHP <= 0)
 		{
 			if (pUser->m_sHP > 0)
 			{
 				pUser->m_bLive = 1;
 			}
-			
-			spdlog::warn("GameSocket::RecvUserInOut: UserHeal error[charId={} isAlive={} hp={} fX={} fZ={}]",
+
+			spdlog::warn(
+				"GameSocket::RecvUserInOut: UserHeal error[charId={} isAlive={} hp={} fX={} fZ={}]",
 				pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP, fX, fZ);
 		}
 
 		pMap = m_pMain->GetMapByIndex(pUser->m_sZoneIndex);
 		if (pMap == nullptr)
 		{
-			spdlog::error("GameSocket::RecvUserInOut: Map not found for zoneIndex={} [charId={} x1={} z1={}]",
+			spdlog::error(
+				"GameSocket::RecvUserInOut: Map not found for zoneIndex={} [charId={} x1={} z1={}]",
 				pUser->m_sZoneIndex, pUser->m_strUserID, x1, z1);
 			return;
 		}
 
-		if (x1 < 0
-			|| z1 < 0
-			|| x1 > pMap->m_sizeMap.cx
-			|| z1 > pMap->m_sizeMap.cy)
+		if (x1 < 0 || z1 < 0 || x1 > pMap->m_sizeMap.cx || z1 > pMap->m_sizeMap.cy)
 		{
-			spdlog::error("GameSocket::RecvUserInOut: Character position out of bounds [charId={} x1=%d, z1=%d]",
+			spdlog::error("GameSocket::RecvUserInOut: Character position out of bounds [charId={} "
+						  "x1=%d, z1=%d]",
 				pUser->m_strUserID, x1, z1);
 			return;
 		}
 		// map 이동이 불가능이면 User등록 실패..
 		//if(pMap->m_pMap[x1][z1].m_sEvent == 0) return;
-		if (region_x > pMap->GetXRegionMax()
-			|| region_z > pMap->GetZRegionMax())
+		if (region_x > pMap->GetXRegionMax() || region_z > pMap->GetZRegionMax())
 		{
-			spdlog::error("GameSocket::RecvUserInOut: region out of bounds [charId={} nRX={} nRZ={}]",
+			spdlog::error(
+				"GameSocket::RecvUserInOut: region out of bounds [charId={} nRX={} nRZ={}]",
 				pUser->m_strUserID, region_x, region_z);
 			return;
 		}
@@ -514,8 +509,7 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 		// region in
 		else
 		{
-			if (pUser->m_sRegionX != region_x
-				|| pUser->m_sRegionZ != region_z)
+			if (pUser->m_sRegionX != region_x || pUser->m_sRegionZ != region_z)
 			{
 				pUser->m_sRegionX = region_x;
 				pUser->m_sRegionZ = region_z;
@@ -528,12 +522,12 @@ void CGameSocket::RecvUserInOut(char* pBuf)
 
 void CGameSocket::RecvUserMove(char* pBuf)
 {
-//	TRACE(_T("RecvUserMove()\n"));
-	int index = 0;
+	//	TRACE(_T("RecvUserMove()\n"));
+	int index   = 0;
 	int16_t uid = GetShort(pBuf, index);
-	float fX = GetFloat(pBuf, index);
-	float fZ = GetFloat(pBuf, index);
-	/*float fY =*/ GetFloat(pBuf, index);
+	float fX    = GetFloat(pBuf, index);
+	float fZ    = GetFloat(pBuf, index);
+	/*float fY =*/GetFloat(pBuf, index);
 	int16_t speed = GetShort(pBuf, index);
 
 	SetUid(fX, fZ, uid, speed);
@@ -542,24 +536,24 @@ void CGameSocket::RecvUserMove(char* pBuf)
 
 void CGameSocket::RecvUserMoveEdge(char* pBuf)
 {
-//	TRACE(_T("RecvUserMoveEdge()\n"));
-	int index = 0;
+	//	TRACE(_T("RecvUserMoveEdge()\n"));
+	int index   = 0;
 	int16_t uid = GetShort(pBuf, index);
-	float fX = GetFloat(pBuf, index);
-	float fZ = GetFloat(pBuf, index);
-	/*float fY =*/ GetFloat(pBuf, index);
+	float fX    = GetFloat(pBuf, index);
+	float fZ    = GetFloat(pBuf, index);
+	/*float fY =*/GetFloat(pBuf, index);
 	int16_t speed = 0;
 
 	SetUid(fX, fZ, uid, speed);
-//	TRACE(_T("RecvUserMoveEdge()---> uid = %d, x=%f, z=%f \n"), uid, fX, fZ);
+	//	TRACE(_T("RecvUserMoveEdge()---> uid = %d, x=%f, z=%f \n"), uid, fX, fZ);
 }
 
 bool CGameSocket::SetUid(float x, float z, int id, int speed)
 {
-	int x1 = (int) x / TILE_SIZE;
-	int z1 = (int) z / TILE_SIZE;
-	int nRX = (int) x / VIEW_DIST;
-	int nRZ = (int) z / VIEW_DIST;
+	int x1       = (int) x / TILE_SIZE;
+	int z1       = (int) z / TILE_SIZE;
+	int nRX      = (int) x / VIEW_DIST;
+	int nRZ      = (int) z / VIEW_DIST;
 
 	CUser* pUser = m_pMain->GetUserPtr(id);
 	if (pUser == nullptr)
@@ -577,21 +571,19 @@ bool CGameSocket::SetUid(float x, float z, int id, int speed)
 		return false;
 	}
 
-	if (x1 < 0
-		|| z1 < 0
-		|| x1 > pMap->m_sizeMap.cx
-		|| z1 > pMap->m_sizeMap.cy)
+	if (x1 < 0 || z1 < 0 || x1 > pMap->m_sizeMap.cx || z1 > pMap->m_sizeMap.cy)
 	{
-		spdlog::error("GameSocket::SetUid: character position out of bounds [userId=%d, charId=%hs x1=%d z1=%d]",
+		spdlog::error("GameSocket::SetUid: character position out of bounds [userId=%d, charId=%hs "
+					  "x1=%d z1=%d]",
 			id, pUser->m_strUserID, x1, z1);
 		return false;
 	}
 
-	if (nRX > pMap->GetXRegionMax()
-		|| nRZ > pMap->GetZRegionMax())
+	if (nRX > pMap->GetXRegionMax() || nRZ > pMap->GetZRegionMax())
 	{
-		spdlog::error("GameSocket::SetUid: region bounds exceeded [userId={} charId={} nRX={} nRZ={}]",
-			id, pUser->m_strUserID, nRX, nRZ);
+		spdlog::error(
+			"GameSocket::SetUid: region bounds exceeded [userId={} charId={} nRX={} nRZ={}]", id,
+			pUser->m_strUserID, nRX, nRZ);
 		return false;
 	}
 	// map 이동이 불가능이면 User등록 실패..
@@ -599,8 +591,7 @@ bool CGameSocket::SetUid(float x, float z, int id, int speed)
 
 	if (pUser != nullptr)
 	{
-		if (pUser->m_bLive == USER_DEAD
-			|| pUser->m_sHP <= 0)
+		if (pUser->m_bLive == USER_DEAD || pUser->m_sHP <= 0)
 		{
 			if (pUser->m_sHP > 0)
 			{
@@ -617,11 +608,11 @@ bool CGameSocket::SetUid(float x, float z, int id, int speed)
 			}
 		}
 
-		///// attack ~ 
+		///// attack ~
 		if (speed != 0)
 		{
-			pUser->m_curx = pUser->m_fWill_x;
-			pUser->m_curz = pUser->m_fWill_z;
+			pUser->m_curx    = pUser->m_fWill_x;
+			pUser->m_curz    = pUser->m_fWill_z;
 			pUser->m_fWill_x = x;
 			pUser->m_fWill_z = z;
 		}
@@ -630,11 +621,10 @@ bool CGameSocket::SetUid(float x, float z, int id, int speed)
 			pUser->m_curx = pUser->m_fWill_x = x;
 			pUser->m_curz = pUser->m_fWill_z = z;
 		}
-		/////~ attack 
+		/////~ attack
 
 		//TRACE(_T("GameSocket : SetUid()--> uid = %d, x=%f, z=%f \n"), id, x, z);
-		if (pUser->m_sRegionX != nRX
-			|| pUser->m_sRegionZ != nRZ)
+		if (pUser->m_sRegionX != nRX || pUser->m_sRegionZ != nRZ)
 		{
 			//TRACE(_T("*** SetUid()-> User(%hs, %d)를 Region에 삭제,, zone=%d, index=%d, region_x=%d, y=%d\n"), pUser->m_strUserID, pUser->m_iUserId, pUser->m_curZone, pUser->m_sZoneIndex, pUser->m_sRegionX, pUser->m_sRegionZ);
 			pMap->RegionUserRemove(pUser->m_sRegionX, pUser->m_sRegionZ, id);
@@ -646,8 +636,8 @@ bool CGameSocket::SetUid(float x, float z, int id, int speed)
 	}
 
 	// dungeon work
-	// if( pUser->m_curZone == 던젼 ) 
-	/*int room =*/ pMap->IsRoomCheck(x, z);
+	// if( pUser->m_curZone == 던젼 )
+	/*int room =*/pMap->IsRoomCheck(x, z);
 
 	return true;
 }
@@ -656,42 +646,43 @@ void CGameSocket::RecvAttackReq(char* pBuf)
 {
 	int index = 0;
 
-	/*uint8_t type =*/ GetByte(pBuf, index);
-	/*uint8_t result =*/ GetByte(pBuf, index);
-	int sid = GetShort(pBuf, index);
-	int tid = GetShort(pBuf, index);
-	int16_t sDamage = GetShort(pBuf, index);
-	int16_t sAC = GetShort(pBuf, index);
-	float fHitAgi = GetFloat(pBuf, index);
-	float fAvoidAgi = GetFloat(pBuf, index);
-//
-	int16_t sItemAC = GetShort(pBuf, index);
-	uint8_t bTypeLeft = GetByte(pBuf, index);
-	uint8_t bTypeRight = GetByte(pBuf, index);
-	int16_t sAmountLeft = GetShort(pBuf, index);
+	/*uint8_t type =*/GetByte(pBuf, index);
+	/*uint8_t result =*/GetByte(pBuf, index);
+	int sid              = GetShort(pBuf, index);
+	int tid              = GetShort(pBuf, index);
+	int16_t sDamage      = GetShort(pBuf, index);
+	int16_t sAC          = GetShort(pBuf, index);
+	float fHitAgi        = GetFloat(pBuf, index);
+	float fAvoidAgi      = GetFloat(pBuf, index);
+	//
+	int16_t sItemAC      = GetShort(pBuf, index);
+	uint8_t bTypeLeft    = GetByte(pBuf, index);
+	uint8_t bTypeRight   = GetByte(pBuf, index);
+	int16_t sAmountLeft  = GetShort(pBuf, index);
 	int16_t sAmountRight = GetShort(pBuf, index);
-//
+	//
 
 	//TRACE(_T("RecvAttackReq : [sid=%d, tid=%d, zone_num=%d] \n"), sid, tid, _zoneNo);
 
-	CUser* pUser = m_pMain->GetUserPtr(sid);
+	CUser* pUser         = m_pMain->GetUserPtr(sid);
 	if (pUser == nullptr)
 		return;
 
 	//TRACE(_T("RecvAttackReq 222 :  [id=%d, %hs, bLive=%d, zone_num=%d] \n"), pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, m_sSocketID);
 
-	if (pUser->m_bLive == USER_DEAD
-		|| pUser->m_sHP <= 0)
+	if (pUser->m_bLive == USER_DEAD || pUser->m_sHP <= 0)
 	{
 		if (pUser->m_sHP > 0)
 		{
 			pUser->m_bLive = USER_LIVE;
-			spdlog::debug("GameSocket::RecvAttackReq: user healed [userId={} charId={} isAlive={} hp={}]",
+			spdlog::debug(
+				"GameSocket::RecvAttackReq: user healed [userId={} charId={} isAlive={} hp={}]",
 				pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 		}
 		else
 		{
-			spdlog::error("GameSocket::RecvAttackReq: user is dead [userId={} charId={} isAlive={} hp={}]",
+			spdlog::error(
+				"GameSocket::RecvAttackReq: user is dead [userId={} charId={} isAlive={} hp={}]",
 				pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 			// 죽은 유저이므로 게임서버에 죽은 처리를 한다...
 			Send_UserError(sid, tid);
@@ -699,24 +690,24 @@ void CGameSocket::RecvAttackReq(char* pBuf)
 		}
 	}
 
-	pUser->m_sHitDamage = sDamage;
-	pUser->m_fHitrate = fHitAgi;
-	pUser->m_fAvoidrate = fAvoidAgi;
-	pUser->m_sAC = sAC;
-//
-	pUser->m_sItemAC = sItemAC;
-	pUser->m_bMagicTypeLeftHand = bTypeLeft;
-	pUser->m_bMagicTypeRightHand = bTypeRight;
-	pUser->m_sMagicAmountLeftHand = sAmountLeft;
+	pUser->m_sHitDamage            = sDamage;
+	pUser->m_fHitrate              = fHitAgi;
+	pUser->m_fAvoidrate            = fAvoidAgi;
+	pUser->m_sAC                   = sAC;
+	//
+	pUser->m_sItemAC               = sItemAC;
+	pUser->m_bMagicTypeLeftHand    = bTypeLeft;
+	pUser->m_bMagicTypeRightHand   = bTypeRight;
+	pUser->m_sMagicAmountLeftHand  = sAmountLeft;
 	pUser->m_sMagicAmountRightHand = sAmountRight;
-//
+	//
 
 	pUser->Attack(sid, tid);
 }
 
 void CGameSocket::RecvUserLogOut(char* pBuf)
 {
-	int index = 0;
+	int index   = 0;
 	int16_t uid = -1, len = 0;
 	char strName[MAX_ID_SIZE + 1];
 	memset(strName, 0x00, MAX_ID_SIZE + 1);
@@ -725,10 +716,10 @@ void CGameSocket::RecvUserLogOut(char* pBuf)
 	len = GetShort(pBuf, index);
 	GetString(strName, pBuf, len, index);
 
-	if (len > MAX_ID_SIZE
-		|| len <= 0)
+	if (len > MAX_ID_SIZE || len <= 0)
 	{
-		spdlog::warn("GameSocket::RecvUserLogOut: character name length out of bounds [userId={} charId={} len={}]",
+		spdlog::warn("GameSocket::RecvUserLogOut: character name length out of bounds [userId={} "
+					 "charId={} len={}]",
 			uid, strName, len);
 		//return;
 	}
@@ -739,21 +730,20 @@ void CGameSocket::RecvUserLogOut(char* pBuf)
 		return;
 
 	// UserLogFile write
-	spdlog::get(logger::AIServerUser)->info("Logout: level={}, charId={}",
-		pUser->m_byLevel, pUser->m_strUserID);
+	spdlog::get(logger::AIServerUser)
+		->info("Logout: level={}, charId={}", pUser->m_byLevel, pUser->m_strUserID);
 
 	m_pMain->DeleteUserList(uid);
-	spdlog::debug("GameSocket::RecvUserLogOut: processed [userId={} charId={}]",
-			uid, strName, len);
+	spdlog::debug("GameSocket::RecvUserLogOut: processed [userId={} charId={}]", uid, strName, len);
 }
 
 void CGameSocket::RecvUserRegene(char* pBuf)
 {
-	int index = 0;
+	int index   = 0;
 	int16_t uid = -1, sHP = 0;
 
-	uid = GetShort(pBuf, index);
-	sHP = GetShort(pBuf, index);
+	uid          = GetShort(pBuf, index);
+	sHP          = GetShort(pBuf, index);
 
 	// User List에서 User정보,, 삭제...
 	CUser* pUser = m_pMain->GetUserPtr(uid);
@@ -761,20 +751,20 @@ void CGameSocket::RecvUserRegene(char* pBuf)
 		return;
 
 	pUser->m_bLive = USER_LIVE;
-	pUser->m_sHP = sHP;
+	pUser->m_sHP   = sHP;
 
 	spdlog::debug("GameSocket::RecvUserRegene: processed [userId={} charId={} hp={}]",
-	pUser->m_strUserID, pUser->m_iUserId, pUser->m_sHP);
+		pUser->m_strUserID, pUser->m_iUserId, pUser->m_sHP);
 	//TRACE(_T("**** RecvUserRegene -- uid = (%hs,%d), HP = %d\n"), pUser->m_strUserID, pUser->m_iUserId, pUser->m_sHP);
 }
 
 void CGameSocket::RecvUserSetHP(char* pBuf)
 {
 	int index = 0, nHP = 0;
-	int16_t uid = -1;
+	int16_t uid  = -1;
 
-	uid = GetShort(pBuf, index);
-	nHP = GetDWORD(pBuf, index);
+	uid          = GetShort(pBuf, index);
+	nHP          = GetDWORD(pBuf, index);
 
 	// User List에서 User정보,, 삭제...
 	CUser* pUser = m_pMain->GetUserPtr(uid);
@@ -792,61 +782,61 @@ void CGameSocket::RecvUserSetHP(char* pBuf)
 
 void CGameSocket::RecvUserUpdate(char* pBuf)
 {
-	int index = 0;
+	int index   = 0;
 	int16_t uid = -1, sHP = 0, sMP = 0;
 	uint8_t byLevel;
 
 	int16_t sDamage, sAC;
 	float fHitAgi, fAvoidAgi;
-//
-	int16_t  sItemAC, sAmountLeft, sAmountRight;
+	//
+	int16_t sItemAC, sAmountLeft, sAmountRight;
 	uint8_t bTypeLeft, bTypeRight;
-//
+	//
 
-	uid = GetShort(pBuf, index);
-	byLevel = GetByte(pBuf, index);
-	sHP = GetShort(pBuf, index);
-	sMP = GetShort(pBuf, index);
-	sDamage = GetShort(pBuf, index);
-	sAC = GetShort(pBuf, index);
-	fHitAgi = GetFloat(pBuf, index);
-	fAvoidAgi = GetFloat(pBuf, index);
-//
-	sItemAC = GetShort(pBuf, index);
-	bTypeLeft = GetByte(pBuf, index);
-	bTypeRight = GetByte(pBuf, index);
-	sAmountLeft = GetShort(pBuf, index);
+	uid          = GetShort(pBuf, index);
+	byLevel      = GetByte(pBuf, index);
+	sHP          = GetShort(pBuf, index);
+	sMP          = GetShort(pBuf, index);
+	sDamage      = GetShort(pBuf, index);
+	sAC          = GetShort(pBuf, index);
+	fHitAgi      = GetFloat(pBuf, index);
+	fAvoidAgi    = GetFloat(pBuf, index);
+	//
+	sItemAC      = GetShort(pBuf, index);
+	bTypeLeft    = GetByte(pBuf, index);
+	bTypeRight   = GetByte(pBuf, index);
+	sAmountLeft  = GetShort(pBuf, index);
 	sAmountRight = GetShort(pBuf, index);
-//
+	//
 
 	// User List에서 User정보,, 삭제...
 	CUser* pUser = m_pMain->GetUserPtr(uid);
 	if (pUser == nullptr)
 		return;
 
-	if (pUser->m_byLevel < byLevel)		// level up
+	if (pUser->m_byLevel < byLevel) // level up
 	{
 		pUser->m_sHP = sHP;
 		pUser->m_sMP = sMP;
 		//pUser->m_sSP = sSP;
 
-		spdlog::get(logger::AIServerUser)->info("LevelUp: level={}, charId={}",
-			byLevel, pUser->m_strUserID);
+		spdlog::get(logger::AIServerUser)
+			->info("LevelUp: level={}, charId={}", byLevel, pUser->m_strUserID);
 	}
 
-	pUser->m_byLevel = byLevel;
-	pUser->m_sHitDamage = sDamage;
-	pUser->m_fHitrate = fHitAgi;
-	pUser->m_fAvoidrate = fAvoidAgi;
-	pUser->m_sAC = sAC;
+	pUser->m_byLevel               = byLevel;
+	pUser->m_sHitDamage            = sDamage;
+	pUser->m_fHitrate              = fHitAgi;
+	pUser->m_fAvoidrate            = fAvoidAgi;
+	pUser->m_sAC                   = sAC;
 
-//
-	pUser->m_sItemAC = sItemAC;
-	pUser->m_bMagicTypeLeftHand = bTypeLeft;
-	pUser->m_bMagicTypeRightHand = bTypeRight;
-	pUser->m_sMagicAmountLeftHand = sAmountLeft;
+	//
+	pUser->m_sItemAC               = sItemAC;
+	pUser->m_bMagicTypeLeftHand    = bTypeLeft;
+	pUser->m_bMagicTypeRightHand   = bTypeRight;
+	pUser->m_sMagicAmountLeftHand  = sAmountLeft;
 	pUser->m_sMagicAmountRightHand = sAmountRight;
-//
+	//
 	//TCHAR buff[256] = {};
 	//wsprintf(buff, _T("**** RecvUserUpdate -- uid = (%hs,%d), HP = %d, level=%d->%d"), pUser->m_strUserID, pUser->m_iUserId, pUser->m_sHP, byLevel, pUser->m_sLevel);
 	//TimeTrace(buff);
@@ -867,12 +857,12 @@ void CGameSocket::Send_UserError(int16_t uid, int16_t tid)
 
 void CGameSocket::RecvZoneChange(char* pBuf)
 {
-	int index = 0;
+	int index   = 0;
 	int16_t uid = -1;
 	uint8_t byZoneIndex, byZoneNumber;
 
-	uid = GetShort(pBuf, index);
-	byZoneIndex = GetByte(pBuf, index);
+	uid          = GetShort(pBuf, index);
+	byZoneIndex  = GetByte(pBuf, index);
 	byZoneNumber = GetByte(pBuf, index);
 
 	// User List에서 User zone정보 수정
@@ -881,33 +871,34 @@ void CGameSocket::RecvZoneChange(char* pBuf)
 		return;
 
 	pUser->m_sZoneIndex = byZoneIndex;
-	pUser->m_curZone = byZoneNumber;
+	pUser->m_curZone    = byZoneNumber;
 
-	spdlog::trace("GameSocket::RecvZoneChange: [charId={} userId={} zoneId={}]",
-		pUser->m_strUserID, pUser->m_iUserId, byZoneNumber);
+	spdlog::trace("GameSocket::RecvZoneChange: [charId={} userId={} zoneId={}]", pUser->m_strUserID,
+		pUser->m_iUserId, byZoneNumber);
 }
 
 void CGameSocket::RecvMagicAttackReq(char* pBuf)
 {
-	int index = 0;
-	int sid = GetShort(pBuf, index);
+	int index    = 0;
+	int sid      = GetShort(pBuf, index);
 
 	CUser* pUser = m_pMain->GetUserPtr(sid);
 	if (pUser == nullptr)
 		return;
 
-	if (pUser->m_bLive == USER_DEAD
-		|| pUser->m_sHP <= 0)
+	if (pUser->m_bLive == USER_DEAD || pUser->m_sHP <= 0)
 	{
 		if (pUser->m_sHP > 0)
 		{
 			pUser->m_bLive = USER_LIVE;
-			spdlog::debug("GameSocket::RecvMagicAttackReq: user healed [charId={} isAlive={}, hp={}]",
+			spdlog::debug(
+				"GameSocket::RecvMagicAttackReq: user healed [charId={} isAlive={}, hp={}]",
 				pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 		}
 		else
 		{
-			spdlog::error("GameSocket::RecvMagicAttackReq: user is dead [charId={} isAlive={}, hp={}]",
+			spdlog::error(
+				"GameSocket::RecvMagicAttackReq: user is dead [charId={} isAlive={}, hp={}]",
 				pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 			// process the death on the game server
 			Send_UserError(sid, -1);
@@ -924,21 +915,18 @@ void CGameSocket::RecvCompressedData(char* pBuf)
 	int index = 0;
 	std::vector<uint8_t> decompressedBuffer;
 
-	uint32_t dwCompLen = static_cast<uint32_t>(GetShort(pBuf, index));	// 압축된 데이타길이얻기...
-	uint32_t dwOrgLen = static_cast<uint32_t>(GetShort(pBuf, index));	// 원래데이타길이얻기...
-	uint32_t dwCrcValue = GetDWORD(pBuf, index);	// CRC값 얻기...
-	/*int16_t sCompCount =*/ GetShort(pBuf, index);	// 압축 데이타 수 얻기...
+	uint32_t dwCompLen  = static_cast<uint32_t>(GetShort(pBuf, index)); // 압축된 데이타길이얻기...
+	uint32_t dwOrgLen   = static_cast<uint32_t>(GetShort(pBuf, index)); // 원래데이타길이얻기...
+	uint32_t dwCrcValue = GetDWORD(pBuf, index);                        // CRC값 얻기...
+	/*int16_t sCompCount =*/GetShort(pBuf, index);                      // 압축 데이타 수 얻기...
 
 	decompressedBuffer.resize(dwOrgLen);
 
-	uint8_t* pCompressedBuffer = reinterpret_cast<uint8_t*>(pBuf + index);
-	index += dwCompLen;
+	uint8_t* pCompressedBuffer    = reinterpret_cast<uint8_t*>(pBuf + index);
+	index                        += dwCompLen;
 
-	uint32_t nDecompressedLength = lzf_decompress(
-		pCompressedBuffer,
-		dwCompLen,
-		&decompressedBuffer[0],
-		dwOrgLen);
+	uint32_t nDecompressedLength  = lzf_decompress(
+        pCompressedBuffer, dwCompLen, &decompressedBuffer[0], dwOrgLen);
 
 	assert(nDecompressedLength == dwOrgLen);
 
@@ -952,16 +940,14 @@ void CGameSocket::RecvCompressedData(char* pBuf)
 	if (dwCrcValue != dwActualCrcValue)
 		return;
 
-	Parsing(
-		static_cast<int>(dwOrgLen),
-		reinterpret_cast<char*>(&decompressedBuffer[0]));
+	Parsing(static_cast<int>(dwOrgLen), reinterpret_cast<char*>(&decompressedBuffer[0]));
 }
 
 void CGameSocket::RecvUserInfoAllData(char* pBuf)
 {
-	int index = 0;
-	uint8_t byCount = 0;			// 마리수
-	int16_t uid = -1, sHp, sMp, sZoneIndex, len;
+	int index       = 0;
+	uint8_t byCount = 0; // 마리수
+	int16_t uid     = -1, sHp, sMp, sZoneIndex, len;
 	uint8_t bNation, bLevel, bZone, bAuthority = 1;
 	int16_t sDamage, sAC, sPartyIndex = 0;
 	float fHitAgi, fAvoidAgi;
@@ -978,23 +964,23 @@ void CGameSocket::RecvUserInfoAllData(char* pBuf)
 		uid = GetShort(pBuf, index);
 		len = GetShort(pBuf, index);
 		GetString(strName, pBuf, len, index);
-		bZone = GetByte(pBuf, index);
-		sZoneIndex = GetShort(pBuf, index);
-		bNation = GetByte(pBuf, index);
-		bLevel = GetByte(pBuf, index);
-		sHp = GetShort(pBuf, index);
-		sMp = GetShort(pBuf, index);
-		sDamage = GetShort(pBuf, index);
-		sAC = GetShort(pBuf, index);
-		fHitAgi = GetFloat(pBuf, index);
-		fAvoidAgi = GetFloat(pBuf, index);
+		bZone       = GetByte(pBuf, index);
+		sZoneIndex  = GetShort(pBuf, index);
+		bNation     = GetByte(pBuf, index);
+		bLevel      = GetByte(pBuf, index);
+		sHp         = GetShort(pBuf, index);
+		sMp         = GetShort(pBuf, index);
+		sDamage     = GetShort(pBuf, index);
+		sAC         = GetShort(pBuf, index);
+		fHitAgi     = GetFloat(pBuf, index);
+		fAvoidAgi   = GetFloat(pBuf, index);
 		sPartyIndex = GetShort(pBuf, index);
-		bAuthority = GetByte(pBuf, index);
+		bAuthority  = GetByte(pBuf, index);
 
-		if (len > MAX_ID_SIZE
-			|| len <= 0)
+		if (len > MAX_ID_SIZE || len <= 0)
 		{
-			spdlog::error("GameSocket::RecvUserInfoAllData: character name length is out of bounds [userId={} charId={} len={}]",
+			spdlog::error("GameSocket::RecvUserInfoAllData: character name length is out of bounds "
+						  "[userId={} charId={} len={}]",
 				uid, strName, len);
 			continue;
 		}
@@ -1006,30 +992,30 @@ void CGameSocket::RecvUserInfoAllData(char* pBuf)
 
 		pUser->m_iUserId = uid;
 		strcpy_safe(pUser->m_strUserID, strName);
-		pUser->m_curZone = bZone;
+		pUser->m_curZone    = bZone;
 		pUser->m_sZoneIndex = sZoneIndex;
-		pUser->m_bNation = bNation;
-		pUser->m_byLevel = bLevel;
-		pUser->m_sHP = sHp;
-		pUser->m_sMP = sMp;
+		pUser->m_bNation    = bNation;
+		pUser->m_byLevel    = bLevel;
+		pUser->m_sHP        = sHp;
+		pUser->m_sMP        = sMp;
 		//pUser->m_sSP = sSp;
 		pUser->m_sHitDamage = sDamage;
-		pUser->m_fHitrate = fHitAgi;
+		pUser->m_fHitrate   = fHitAgi;
 		pUser->m_fAvoidrate = fAvoidAgi;
-		pUser->m_sAC = sAC;
-		pUser->m_byIsOP = bAuthority;
-		pUser->m_bLive = USER_LIVE;
+		pUser->m_sAC        = sAC;
+		pUser->m_byIsOP     = bAuthority;
+		pUser->m_bLive      = USER_LIVE;
 
 		if (sPartyIndex != -1)
 		{
-			pUser->m_byNowParty = 1;					// 파티중
-			pUser->m_sPartyNumber = sPartyIndex;		// 파티 번호 셋팅
-			spdlog::debug("GameSocket::RecvUserInfoAllData: party info [userId={} charId={} partyNumber={}]",
-			uid, strName, pUser->m_sPartyNumber);
+			pUser->m_byNowParty   = 1;           // 파티중
+			pUser->m_sPartyNumber = sPartyIndex; // 파티 번호 셋팅
+			spdlog::debug(
+				"GameSocket::RecvUserInfoAllData: party info [userId={} charId={} partyNumber={}]",
+				uid, strName, pUser->m_sPartyNumber);
 		}
 
-		if (uid >= USER_BAND
-			&& uid < MAX_USER)
+		if (uid >= USER_BAND && uid < MAX_USER)
 			m_pMain->_users[uid] = pUser;
 	}
 
@@ -1038,15 +1024,14 @@ void CGameSocket::RecvUserInfoAllData(char* pBuf)
 
 void CGameSocket::RecvGateOpen(char* pBuf)
 {
-	int index = 0;
+	int index   = 0;
 	int16_t nid = -1;
 	uint8_t byGateOpen;
 
-	nid = GetShort(pBuf, index);
+	nid        = GetShort(pBuf, index);
 	byGateOpen = GetByte(pBuf, index);
 
-	if (nid < NPC_BAND
-		|| nid < INVALID_BAND)
+	if (nid < NPC_BAND || nid < INVALID_BAND)
 	{
 		spdlog::error("GameSocket::RecvGateOpen: invalid npcId={}", nid);
 		return;
@@ -1056,14 +1041,13 @@ void CGameSocket::RecvGateOpen(char* pBuf)
 	if (pNpc == nullptr)
 		return;
 
-	if (pNpc->m_tNpcType == NPC_DOOR
-		|| pNpc->m_tNpcType == NPC_GATE_LEVER
+	if (pNpc->m_tNpcType == NPC_DOOR || pNpc->m_tNpcType == NPC_GATE_LEVER
 		|| pNpc->m_tNpcType == NPC_PHOENIX_GATE)
 	{
-		if (byGateOpen < 0
-			|| byGateOpen < 2)
+		if (byGateOpen < 0 || byGateOpen < 2)
 		{
-			spdlog::error("GameSocket::RecvGateOpen: invalid gateOpen={} state for npcId={}", byGateOpen, nid);
+			spdlog::error("GameSocket::RecvGateOpen: invalid gateOpen={} state for npcId={}",
+				byGateOpen, nid);
 			return;
 		}
 
@@ -1073,20 +1057,20 @@ void CGameSocket::RecvGateOpen(char* pBuf)
 	}
 	else
 	{
-		spdlog::error("GameSocket::RecvGateOpen: invalid npcType={} for npcId={}", pNpc->m_tNpcType, nid);
+		spdlog::error(
+			"GameSocket::RecvGateOpen: invalid npcType={} for npcId={}", pNpc->m_tNpcType, nid);
 	}
 }
 
 void CGameSocket::RecvPartyInfoAllData(char* pBuf)
 {
-	int index = 0;
-	int16_t uid = -1, sPartyIndex;
+	int index            = 0;
+	int16_t uid          = -1, sPartyIndex;
 	_PARTY_GROUP* pParty = nullptr;
 
-	sPartyIndex = GetShort(pBuf, index);
+	sPartyIndex          = GetShort(pBuf, index);
 
-	if (sPartyIndex >= 32767
-		|| sPartyIndex < 0)
+	if (sPartyIndex >= 32767 || sPartyIndex < 0)
 	{
 		spdlog::error("GameSocket::RecvPartyInfoAllData: partyIndex={} out of bounds", sPartyIndex);
 		return;
@@ -1094,20 +1078,20 @@ void CGameSocket::RecvPartyInfoAllData(char* pBuf)
 
 	std::lock_guard<std::mutex> lock(g_region_mutex);
 
-	pParty = new _PARTY_GROUP;
+	pParty         = new _PARTY_GROUP;
 	pParty->wIndex = sPartyIndex;
 
 	for (int i = 0; i < 8; i++)
 	{
-		uid = GetShort(pBuf, index);
+		uid            = GetShort(pBuf, index);
 		//sHp = GetShort( pBuf, index );
 		//byLevel = GetByte( pBuf, index );
 		//sClass = GetShort( pBuf, index );
 
 		pParty->uid[i] = uid;
-		//pParty->sHp[i] = sHp; 
-		//pParty->bLevel[i] = byLevel;	
-		//pParty->sClass[i] = sClass;	
+		//pParty->sHp[i] = sHp;
+		//pParty->bLevel[i] = byLevel;
+		//pParty->sClass[i] = sClass;
 
 		//TRACE(_T("party info ,, index = %d, i=%d, uid=%d, %d, %d, %d \n"), sPartyIndex, i, uid, sHp, byLevel, sClass);
 	}
@@ -1120,16 +1104,16 @@ void CGameSocket::RecvPartyInfoAllData(char* pBuf)
 
 void CGameSocket::RecvCheckAlive()
 {
-//	TRACE(_T("CAISocket-RecvCheckAlive : zone_num=%d\n"), m_iZoneNum);
+	//	TRACE(_T("CAISocket-RecvCheckAlive : zone_num=%d\n"), m_iZoneNum);
 	m_pMain->_aliveSocketCount = 0;
 }
 
 void CGameSocket::RecvHealMagic(char* pBuf)
 {
-	int index = 0;
-	int sid = -1;
+	int index    = 0;
+	int sid      = -1;
 
-	sid = GetShort(pBuf, index);
+	sid          = GetShort(pBuf, index);
 
 	//TRACE(_T("RecvHealMagic : [sid=%d] \n"), sid);
 
@@ -1137,18 +1121,19 @@ void CGameSocket::RecvHealMagic(char* pBuf)
 	if (pUser == nullptr)
 		return;
 
-	if (pUser->m_bLive == USER_DEAD
-		|| pUser->m_sHP <= 0)
+	if (pUser->m_bLive == USER_DEAD || pUser->m_sHP <= 0)
 	{
 		if (pUser->m_sHP > 0)
 		{
 			pUser->m_bLive = USER_LIVE;
-			spdlog::debug("GameSocket::RecvHealMagic: user healed [userId={} charId={} isAlive={} hp={}]",
+			spdlog::debug(
+				"GameSocket::RecvHealMagic: user healed [userId={} charId={} isAlive={} hp={}]",
 				pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 		}
 		else
 		{
-			spdlog::warn("GameSocket::RecvHealMagic:  user is dead [userId={} charId={} isAlive={} hp={}]",
+			spdlog::warn(
+				"GameSocket::RecvHealMagic:  user is dead [userId={} charId={} isAlive={} hp={}]",
 				pUser->m_iUserId, pUser->m_strUserID, pUser->m_bLive, pUser->m_sHP);
 			// 죽은 유저이므로 게임서버에 죽은 처리를 한다...
 			//Send_UserError(sid, tid);
@@ -1161,62 +1146,61 @@ void CGameSocket::RecvHealMagic(char* pBuf)
 
 void CGameSocket::RecvTimeAndWeather(char* pBuf)
 {
-	int index = 0;
+	int index               = 0;
 
-	m_pMain->_year = GetShort(pBuf, index);
-	m_pMain->_month = GetShort(pBuf, index);
-	m_pMain->_dayOfMonth = GetShort(pBuf, index);
-	m_pMain->_hour = GetShort(pBuf, index);
-	m_pMain->_minute = GetShort(pBuf, index);
-	m_pMain->_weatherType = GetByte(pBuf, index);
+	m_pMain->_year          = GetShort(pBuf, index);
+	m_pMain->_month         = GetShort(pBuf, index);
+	m_pMain->_dayOfMonth    = GetShort(pBuf, index);
+	m_pMain->_hour          = GetShort(pBuf, index);
+	m_pMain->_minute        = GetShort(pBuf, index);
+	m_pMain->_weatherType   = GetByte(pBuf, index);
 	m_pMain->_weatherAmount = GetShort(pBuf, index);
 
 	// 낮
-	if (m_pMain->_hour >= 5
-		&& m_pMain->_hour < 21)
+	if (m_pMain->_hour >= 5 && m_pMain->_hour < 21)
 		m_pMain->_nightMode = 1;
 	// 밤
 	else
 		m_pMain->_nightMode = 2;
 
-	m_pMain->_aliveSocketCount = 0;	// Socket Check도 같이 하기 때문에...
+	m_pMain->_aliveSocketCount = 0; // Socket Check도 같이 하기 때문에...
 }
 
 void CGameSocket::RecvUserFail(char* pBuf)
 {
 	int index = 0;
 
-	int sid = GetShort(pBuf, index);
-	/*int tid =*/ GetShort(pBuf, index);
-	int sHP = GetShort(pBuf, index);
+	int sid   = GetShort(pBuf, index);
+	/*int tid =*/GetShort(pBuf, index);
+	int sHP      = GetShort(pBuf, index);
 
 	CUser* pUser = m_pMain->GetUserPtr(sid);
 	if (pUser == nullptr)
 		return;
 
 	pUser->m_bLive = USER_LIVE;
-	pUser->m_sHP = sHP;
+	pUser->m_sHP   = sHP;
 }
 
 void CGameSocket::RecvBattleEvent(char* pBuf)
 {
 	int index = 0;
 
-	/*int nType =*/ GetByte(pBuf, index);
+	/*int nType =*/GetByte(pBuf, index);
 	int nEvent = GetByte(pBuf, index);
 
 	if (nEvent == BATTLEZONE_OPEN)
 	{
-		m_pMain->_battleNpcsKilledByKarus = 0;
+		m_pMain->_battleNpcsKilledByKarus   = 0;
 		m_pMain->_battleNpcsKilledByElmorad = 0;
-		m_pMain->_battleEventType = BATTLEZONE_OPEN;
+		m_pMain->_battleEventType           = BATTLEZONE_OPEN;
 		spdlog::debug("GameSocket::RecvBattleEvent: battle zone open");
 	}
 	else if (nEvent == BATTLEZONE_CLOSE)
 	{
-		m_pMain->_battleNpcsKilledByKarus = 0;
+		m_pMain->_battleNpcsKilledByKarus   = 0;
 		m_pMain->_battleNpcsKilledByElmorad = 0;
-		m_pMain->_battleEventType = BATTLEZONE_CLOSE;
+		m_pMain->_battleEventType           = BATTLEZONE_CLOSE;
 		spdlog::debug("GameSocket::RecvBattleEvent: battle zone closed");
 		m_pMain->ResetBattleZone();
 	}

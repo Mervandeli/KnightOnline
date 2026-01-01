@@ -26,8 +26,7 @@ BOOL CTblEditorDoc::OnNewDocument()
 	return TRUE;
 }
 
-BOOL CTblEditorDoc::OnOpenDocument(
-	LPCTSTR lpszPathName)
+BOOL CTblEditorDoc::OnOpenDocument(LPCTSTR lpszPathName)
 {
 	m_Tbl.Release();
 	ClearPathName();
@@ -46,8 +45,7 @@ BOOL CTblEditorDoc::OnOpenDocument(
 	return TRUE;
 }
 
-BOOL CTblEditorDoc::OnSaveDocument(
-	LPCTSTR lpszPathName)
+BOOL CTblEditorDoc::OnSaveDocument(LPCTSTR lpszPathName)
 {
 	// TODO: Have the list memory backed, so we're not relying on fetching data
 	// from the list -- we're just modifying & saving the data directly.
@@ -56,8 +54,7 @@ BOOL CTblEditorDoc::OnSaveDocument(
 	if (pos == nullptr)
 		return FALSE;
 
-	CTblEditorView* pView
-		= static_cast<CTblEditorView*>(GetNextView(pos));
+	CTblEditorView* pView = static_cast<CTblEditorView*>(GetNextView(pos));
 	if (pView == nullptr)
 		return FALSE;
 
@@ -67,9 +64,7 @@ BOOL CTblEditorDoc::OnSaveDocument(
 	return TRUE;
 }
 
-BOOL CTblEditorDoc::DoSave(
-	LPCTSTR lpszPathName,
-	BOOL bReplace /*= TRUE*/)
+BOOL CTblEditorDoc::DoSave(LPCTSTR lpszPathName, BOOL bReplace /*= TRUE*/)
 {
 	if (!IsLoaded())
 		return FALSE;

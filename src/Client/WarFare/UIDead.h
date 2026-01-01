@@ -15,10 +15,10 @@
 class CUIDead : public CN3UIBase
 {
 protected:
-	class CN3UIString*		m_pTextAlive;
-	class CN3UIString*		m_pTextTown;
-	CUIMessageBox			m_MsgBox;
-	bool					m_bProcessing;
+	class CN3UIString* m_pTextAlive;
+	class CN3UIString* m_pTextTown;
+	CUIMessageBox m_MsgBox;
+	bool m_bProcessing;
 
 public:
 	CUIDead();
@@ -28,8 +28,8 @@ public:
 	void MsgRecv_Revival(Packet& pkt);
 	void MsgSend_Revival(uint8_t byType);
 	void CallBackProc(int iID, uint32_t dwFlag) override;
-	uint32_t MouseProc(uint32_t dwFlags, const POINT &ptCur, const POINT &ptOld) override;
-	bool ReceiveMessage(CN3UIBase *pSender, uint32_t dwMsg) override;
+	uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
+	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
 	bool Load(File& file) override;
 };
 

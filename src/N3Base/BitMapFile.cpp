@@ -10,7 +10,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #endif
 
 CBitMapFile::CBitMapFile()
@@ -51,38 +51,41 @@ bool CBitMapFile::Load(File& file)
 
 	// 픽셀당 비트 수 확인
 	uint16_t wBitCount = m_bmInfoHeader.biBitCount;
-	if (24 != wBitCount || m_bmInfoHeader.biWidth <= 0 || m_bmInfoHeader.biHeight <= 0)		// 24비트 bmp가 아니면 return해 버린다.
+	if (24 != wBitCount || m_bmInfoHeader.biWidth <= 0
+		|| m_bmInfoHeader.biHeight <= 0) // 24비트 bmp가 아니면 return해 버린다.
 	{
-		MessageBox(::GetActiveWindow(), "원본 bitmap이 너비, 높이에 이상이 있거나 24bit파일이 아닙니다.", "error", MB_OK);
+		MessageBox(::GetActiveWindow(),
+			"원본 bitmap이 너비, 높이에 이상이 있거나 24bit파일이 아닙니다.", "error", MB_OK);
 		return false;
 	}
 
 	// 실제 이미지의 메모리상에 잡힌 가로 길이 (24bit)
-	int iRealWidth = ((int)((m_bmInfoHeader.biWidth*3 + 3)/4))*4;	
+	int iRealWidth = ((int) ((m_bmInfoHeader.biWidth * 3 + 3) / 4)) * 4;
 
 	// 새로 만들 이미지 메모리 할당
-	int iDIBSize = iRealWidth * m_bmInfoHeader.biHeight;
+	int iDIBSize   = iRealWidth * m_bmInfoHeader.biHeight;
 
-	if ((m_pPixels = ::GlobalAlloc(GMEM_FIXED | GMEM_ZEROINIT, iDIBSize )) == nullptr )
+	if ((m_pPixels = ::GlobalAlloc(GMEM_FIXED | GMEM_ZEROINIT, iDIBSize)) == nullptr)
 	{
 		MessageBox(::GetActiveWindow(), "메모리를 할당하지 못했습니다.", "error", MB_OK);
 		return false;
 	}
 
 	// 픽셀을 읽는다..
-	for(int y = m_bmInfoHeader.biHeight - 1; y >= 0; y--) // 비트맵은 위아래가 거꾸로 있다..
-		file.Read((uint8_t*)m_pPixels + y * iRealWidth, iRealWidth);
+	for (int y = m_bmInfoHeader.biHeight - 1; y >= 0; y--) // 비트맵은 위아래가 거꾸로 있다..
+		file.Read((uint8_t*) m_pPixels + y * iRealWidth, iRealWidth);
 
 	return true;
 }
 
 void* CBitMapFile::Pixels(int x, int y)
 {
-	if(24 != m_bmInfoHeader.biBitCount) return nullptr;
+	if (24 != m_bmInfoHeader.biBitCount)
+		return nullptr;
 
-	int nPitch = this->Pitch();
+	int nPitch     = this->Pitch();
 	int nPixelSize = 3;
-	return (char*)m_pPixels + y * nPitch + x * nPixelSize;
+	return (char*) m_pPixels + y * nPitch + x * nPixelSize;
 }
 
 bool CBitMapFile::Save(File& file)
@@ -97,8 +100,8 @@ bool CBitMapFile::Save(File& file)
 	int iRealWidth = this->Pitch();
 
 	// 픽셀을 저장한다...
-	for(int y = m_bmInfoHeader.biHeight - 1; y >= 0; y--) // 비트맵은 위아래가 거꾸로 있다..
-		file.Write((uint8_t*)m_pPixels + y * iRealWidth, iRealWidth);
+	for (int y = m_bmInfoHeader.biHeight - 1; y >= 0; y--) // 비트맵은 위아래가 거꾸로 있다..
+		file.Write((uint8_t*) m_pPixels + y * iRealWidth, iRealWidth);
 
 	return true;
 }
@@ -126,12 +129,13 @@ bool CBitMapFile::SaveRectToFile(const std::string& szFN, RECT rc)
 	if (rc.bottom > m_bmInfoHeader.biHeight)
 		rc.bottom = m_bmInfoHeader.biHeight;
 
-	int nWidth = rc.right - rc.left;
+	int nWidth  = rc.right - rc.left;
 	int nHeight = rc.bottom - rc.top;
 
 	if (nWidth <= 0 || nHeight <= 0)
 	{
-		MessageBox(::GetActiveWindow(), "가로 세로가 0이하인 bitmap으로 저장할수 없습니다.", "error", MB_OK);
+		MessageBox(::GetActiveWindow(), "가로 세로가 0이하인 bitmap으로 저장할수 없습니다.",
+			"error", MB_OK);
 		return false;
 	}
 
@@ -145,22 +149,22 @@ bool CBitMapFile::SaveRectToFile(const std::string& szFN, RECT rc)
 	}
 
 	// 실제 이미지의 메모리상에 잡힌 가로 길이 (24bit)
-	int iRealWidthDest = ((int) ((nWidth * 3 + 3) / 4)) * 4;
-	int iDestDIBSize = sizeof(BITMAPINFOHEADER) + iRealWidthDest * nHeight;
+	int iRealWidthDest                = ((int) ((nWidth * 3 + 3) / 4)) * 4;
+	int iDestDIBSize                  = sizeof(BITMAPINFOHEADER) + iRealWidthDest * nHeight;
 
 	// 새로 만들 이미지 file header 정보 채우기
-	BITMAPFILEHEADER bmfHeaderDest = m_bmfHeader;
-	bmfHeaderDest.bfType = 0x4D42; // "BM"
-	bmfHeaderDest.bfSize = sizeof(bmfHeaderDest) + iDestDIBSize;
-	bmfHeaderDest.bfOffBits = sizeof(bmfHeaderDest) + sizeof(BITMAPINFOHEADER);
+	BITMAPFILEHEADER bmfHeaderDest    = m_bmfHeader;
+	bmfHeaderDest.bfType              = 0x4D42; // "BM"
+	bmfHeaderDest.bfSize              = sizeof(bmfHeaderDest) + iDestDIBSize;
+	bmfHeaderDest.bfOffBits           = sizeof(bmfHeaderDest) + sizeof(BITMAPINFOHEADER);
 
 	// 새로 만들 이미지 bitmap info header 정보 채우기
 	BITMAPINFOHEADER bmInfoHeaderDest = m_bmInfoHeader;
-	bmInfoHeaderDest.biSize = sizeof(bmInfoHeaderDest);
-	bmInfoHeaderDest.biWidth = nWidth;
-	bmInfoHeaderDest.biHeight = nHeight;
-	bmInfoHeaderDest.biPlanes = 1;
-	bmInfoHeaderDest.biSizeImage = iRealWidthDest * nHeight;
+	bmInfoHeaderDest.biSize           = sizeof(bmInfoHeaderDest);
+	bmInfoHeaderDest.biWidth          = nWidth;
+	bmInfoHeaderDest.biHeight         = nHeight;
+	bmInfoHeaderDest.biPlanes         = 1;
+	bmInfoHeaderDest.biSizeImage      = iRealWidthDest * nHeight;
 
 	// 파일 헤더 쓰기
 	file.Write(&bmfHeaderDest, sizeof(bmfHeaderDest));
@@ -205,15 +209,17 @@ bool CBitMapFile::SaveToFile(const char* pszFN)
 
 bool CBitMapFile::Create(int nWidth, int nHeight, int nBPP)
 {
-	if(nWidth <= 0 || nHeight <= 0) return false;
+	if (nWidth <= 0 || nHeight <= 0)
+		return false;
 	this->Release(); // 일단 다 해제하고..
 
-	if(24 != nBPP) return FALSE;
+	if (24 != nBPP)
+		return FALSE;
 
-	int iRealWidth = ((nWidth*3 + 3)/4)*4; // 실제 이미지의 메모리상에 잡힌 가로 길이 (24bit)
-	int iDIBSize = iRealWidth * nHeight; // 새로 만들 이미지 메모리 할당
+	int iRealWidth = ((nWidth * 3 + 3) / 4) * 4; // 실제 이미지의 메모리상에 잡힌 가로 길이 (24bit)
+	int iDIBSize   = iRealWidth * nHeight;       // 새로 만들 이미지 메모리 할당
 
-	if ((m_pPixels = ::GlobalAlloc(GMEM_FIXED | GMEM_ZEROINIT, iDIBSize )) == nullptr )
+	if ((m_pPixels = ::GlobalAlloc(GMEM_FIXED | GMEM_ZEROINIT, iDIBSize)) == nullptr)
 	{
 		MessageBox(::GetActiveWindow(), "메모리를 할당하지 못했습니다.", "error", MB_OK);
 		return false;
@@ -222,16 +228,16 @@ bool CBitMapFile::Create(int nWidth, int nHeight, int nBPP)
 	memset(m_pPixels, 0, iDIBSize);
 
 	// 새로 만들 이미지 file header 정보 채우기
-	m_bmfHeader.bfType = 0x4D42; // "BM"
-	m_bmfHeader.bfSize = sizeof(m_bmfHeader) + iDIBSize;
-	m_bmfHeader.bfOffBits = sizeof(m_bmfHeader) + sizeof(BITMAPINFOHEADER);
+	m_bmfHeader.bfType         = 0x4D42; // "BM"
+	m_bmfHeader.bfSize         = sizeof(m_bmfHeader) + iDIBSize;
+	m_bmfHeader.bfOffBits      = sizeof(m_bmfHeader) + sizeof(BITMAPINFOHEADER);
 
 	// 새로 만들 이미지 bitmap info header 정보 채우기
-	m_bmInfoHeader.biSize = sizeof(m_bmInfoHeader);
-	m_bmInfoHeader.biWidth = nWidth;
-	m_bmInfoHeader.biHeight = nHeight;
-	m_bmInfoHeader.biBitCount = nBPP;
-	m_bmInfoHeader.biPlanes = 1;
+	m_bmInfoHeader.biSize      = sizeof(m_bmInfoHeader);
+	m_bmInfoHeader.biWidth     = nWidth;
+	m_bmInfoHeader.biHeight    = nHeight;
+	m_bmInfoHeader.biBitCount  = nBPP;
+	m_bmInfoHeader.biPlanes    = 1;
 	m_bmInfoHeader.biSizeImage = iRealWidth * nHeight;
 
 	return true;

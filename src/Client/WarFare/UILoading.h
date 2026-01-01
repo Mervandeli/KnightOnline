@@ -14,9 +14,9 @@
 class CUILoading : public CN3UIBase
 {
 protected:
-	CN3UIString*	m_pText_Version;
-	CN3UIString*	m_pText_Info;
-	CN3UIProgress*	m_pProgress_Loading;
+	CN3UIString* m_pText_Version;
+	CN3UIString* m_pText_Info;
+	CN3UIProgress* m_pProgress_Loading;
 
 public:
 	bool Load(File& file) override;

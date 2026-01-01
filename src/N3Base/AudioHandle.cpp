@@ -10,18 +10,18 @@
 
 AudioHandle::AudioHandle()
 {
-	HandleType		= AUDIO_HANDLE_UNKNOWN;
-	IsManaged		= false;
-	StartedPlaying	= false;
-	FinishedPlaying	= false;
-	SourceId		= INVALID_AUDIO_SOURCE_ID;
+	HandleType      = AUDIO_HANDLE_UNKNOWN;
+	IsManaged       = false;
+	StartedPlaying  = false;
+	FinishedPlaying = false;
+	SourceId        = INVALID_AUDIO_SOURCE_ID;
 
-	State			= SNDSTATE_INITIAL;
+	State           = SNDSTATE_INITIAL;
 
-	FadeInTime		= 0.0f;
-	FadeOutTime		= 0.0f;
-	StartDelayTime	= 0.0f;
-	Timer			= 0.0f;
+	FadeInTime      = 0.0f;
+	FadeOutTime     = 0.0f;
+	StartDelayTime  = 0.0f;
+	Timer           = 0.0f;
 }
 
 AudioHandle::~AudioHandle()
@@ -45,7 +45,7 @@ std::shared_ptr<BufferedAudioHandle> BufferedAudioHandle::Create(std::shared_ptr
 	}
 
 	handle->SourceId = sourceId;
-	handle->Asset = std::move(asset);
+	handle->Asset    = std::move(asset);
 	return handle;
 }
 
@@ -98,7 +98,8 @@ std::shared_ptr<StreamedAudioHandle> StreamedAudioHandle::Create(std::shared_ptr
 			return nullptr;
 		}
 
-		err = mpg123_format(handle->Mp3Handle, asset->SampleRate, MPG123_STEREO, MPG123_ENC_SIGNED_16);
+		err = mpg123_format(
+			handle->Mp3Handle, asset->SampleRate, MPG123_STEREO, MPG123_ENC_SIGNED_16);
 		assert(err == MPG123_OK);
 
 		if (err != MPG123_OK)
@@ -107,7 +108,8 @@ std::shared_ptr<StreamedAudioHandle> StreamedAudioHandle::Create(std::shared_ptr
 			return nullptr;
 		}
 
-		err = mpg123_replace_reader_handle(handle->Mp3Handle, mpg123_filereader_read, mpg123_filereader_seek, mpg123_filereader_cleanup);
+		err = mpg123_replace_reader_handle(handle->Mp3Handle, mpg123_filereader_read,
+			mpg123_filereader_seek, mpg123_filereader_cleanup);
 		assert(err == MPG123_OK);
 
 		if (err != MPG123_OK)
@@ -117,9 +119,9 @@ std::shared_ptr<StreamedAudioHandle> StreamedAudioHandle::Create(std::shared_ptr
 		}
 
 		// Position the reader handle at the start of the file.
-		handle->FileReaderHandle.File	= streamedAudioAsset->File.get();
-		handle->FileReaderHandle.Offset	= 0;
-	
+		handle->FileReaderHandle.File   = streamedAudioAsset->File.get();
+		handle->FileReaderHandle.Offset = 0;
+
 		err = mpg123_open_handle(handle->Mp3Handle, &handle->FileReaderHandle);
 		assert(err == MPG123_OK);
 
@@ -141,9 +143,10 @@ std::shared_ptr<StreamedAudioHandle> StreamedAudioHandle::Create(std::shared_ptr
 		}
 
 		// Position the reader handle at the beginning of the data buffer.
-		handle->FileReaderHandle.File	= streamedAudioAsset->File.get();
-		handle->FileReaderHandle.Offset	= streamedAudioAsset->PcmDataBuffer
-			- static_cast<const uint8_t*>(streamedAudioAsset->File->Memory());
+		handle->FileReaderHandle.File   = streamedAudioAsset->File.get();
+		handle->FileReaderHandle.Offset = streamedAudioAsset->PcmDataBuffer
+										  - static_cast<const uint8_t*>(
+											  streamedAudioAsset->File->Memory());
 	}
 	else
 	{
@@ -151,8 +154,8 @@ std::shared_ptr<StreamedAudioHandle> StreamedAudioHandle::Create(std::shared_ptr
 		return nullptr;
 	}
 
-	handle->SourceId		= sourceId;
-	handle->Asset			= std::move(asset);
+	handle->SourceId = sourceId;
+	handle->Asset    = std::move(asset);
 
 	return handle;
 }
@@ -181,10 +184,10 @@ BufferedAudioHandle::~BufferedAudioHandle()
 
 StreamedAudioHandle::StreamedAudioHandle()
 {
-	HandleType			= AUDIO_HANDLE_STREAMED;
-	Mp3Handle			= nullptr;
-	BuffersAllocated	= false;
-	FinishedDecoding	= false;
+	HandleType       = AUDIO_HANDLE_STREAMED;
+	Mp3Handle        = nullptr;
+	BuffersAllocated = false;
+	FinishedDecoding = false;
 
 	BufferIds.reserve(MAX_AUDIO_STREAM_BUFFER_COUNT);
 }
@@ -202,7 +205,8 @@ void StreamedAudioHandle::RewindFrame()
 	}
 	else if (asset->DecoderType == AUDIO_DECODER_PCM)
 	{
-		FileReaderHandle.Offset = asset->PcmDataBuffer - static_cast<const uint8_t*>(asset->File->Memory());
+		FileReaderHandle.Offset = asset->PcmDataBuffer
+								  - static_cast<const uint8_t*>(asset->File->Memory());
 	}
 	else
 	{

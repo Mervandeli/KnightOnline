@@ -18,7 +18,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -28,19 +28,18 @@ static char THIS_FILE[]=__FILE__;
 
 CUIClassChange::CUIClassChange()
 {
-	m_pBtn_Ok		= nullptr;
-	m_pBtn_Cancel	= nullptr;
-	m_pBtn_Class	= nullptr;
+	m_pBtn_Ok       = nullptr;
+	m_pBtn_Cancel   = nullptr;
+	m_pBtn_Class    = nullptr;
 
-	m_pText_Warning	= nullptr;
-	m_pText_Info	= nullptr;
-	m_pText_Title	= nullptr;
-	m_pText_Message	= nullptr;
+	m_pText_Warning = nullptr;
+	m_pText_Info    = nullptr;
+	m_pText_Title   = nullptr;
+	m_pText_Message = nullptr;
 }
 
 CUIClassChange::~CUIClassChange()
 {
-
 }
 
 bool CUIClassChange::Load(File& file)
@@ -63,13 +62,13 @@ void CUIClassChange::Open(int iCode)
 {
 	SetVisible(true);
 
-	__InfoPlayerBase*	pInfoBase = &CGameBase::s_pPlayer->m_InfoBase;
-	__InfoPlayerMySelf*	pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
+	__InfoPlayerBase* pInfoBase  = &CGameBase::s_pPlayer->m_InfoBase;
+	__InfoPlayerMySelf* pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
 
 	std::string szSuccess, szNotYet, szAlready, szItemInSlot;
-	szSuccess = fmt::format_text_resource(IDS_CLASS_CHANGE_SUCCESS);
-	szNotYet = fmt::format_text_resource(IDS_CLASS_CHANGE_NOT_YET);
-	szAlready = fmt::format_text_resource(IDS_CLASS_CHANGE_ALREADY);
+	szSuccess    = fmt::format_text_resource(IDS_CLASS_CHANGE_SUCCESS);
+	szNotYet     = fmt::format_text_resource(IDS_CLASS_CHANGE_NOT_YET);
+	szAlready    = fmt::format_text_resource(IDS_CLASS_CHANGE_ALREADY);
 	szItemInSlot = fmt::format_text_resource(IDS_MSG_HASITEMINSLOT);
 
 	m_pBtn_Ok->SetVisible(false);
@@ -82,7 +81,7 @@ void CUIClassChange::Open(int iCode)
 
 	std::string szClassTmp;
 
-	switch ( iCode )
+	switch (iCode)
 	{
 		case N3_SP_CLASS_CHANGE_SUCCESS:
 			m_pText_Message->SetString(szSuccess);
@@ -92,31 +91,39 @@ void CUIClassChange::Open(int iCode)
 			m_pText_Info->SetVisible(true);
 
 			m_eClass = pInfoBase->eClass;
-			switch ( pInfoBase->eClass )
+			switch (pInfoBase->eClass)
 			{
 				case CLASS_KA_WARRIOR:
-					CGameBase::GetTextByClass(CLASS_KA_BERSERKER, szClassTmp); m_pText_Info->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_BERSERKER, szClassTmp);
+					m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_KA_ROGUE:
-					CGameBase::GetTextByClass(CLASS_KA_HUNTER, szClassTmp); m_pText_Info->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_HUNTER, szClassTmp);
+					m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_KA_WIZARD:
-					CGameBase::GetTextByClass(CLASS_KA_SORCERER, szClassTmp); m_pText_Info->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_SORCERER, szClassTmp);
+					m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_KA_PRIEST:
-					CGameBase::GetTextByClass(CLASS_KA_SHAMAN, szClassTmp); m_pText_Info->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_KA_SHAMAN, szClassTmp);
+					m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_EL_WARRIOR:
-					CGameBase::GetTextByClass(CLASS_EL_BLADE, szClassTmp); m_pText_Info->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_BLADE, szClassTmp);
+					m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_EL_ROGUE:
-					CGameBase::GetTextByClass(CLASS_EL_RANGER, szClassTmp); m_pText_Info->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_RANGER, szClassTmp);
+					m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_EL_WIZARD:
-					CGameBase::GetTextByClass(CLASS_EL_MAGE, szClassTmp); m_pText_Info->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_MAGE, szClassTmp);
+					m_pText_Info->SetString(szClassTmp);
 					break;
 				case CLASS_EL_PRIEST:
-					CGameBase::GetTextByClass(CLASS_EL_CLERIC, szClassTmp); m_pText_Info->SetString(szClassTmp);
+					CGameBase::GetTextByClass(CLASS_EL_CLERIC, szClassTmp);
+					m_pText_Info->SetString(szClassTmp);
 					break;
 			}
 			break;
@@ -140,13 +147,12 @@ void CUIClassChange::Open(int iCode)
 
 bool CUIClassChange::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-	__InfoPlayerBase*	pInfoBase = &(CGameBase::s_pPlayer->m_InfoBase);
-	__InfoPlayerMySelf*	pInfoExt = &(CGameBase::s_pPlayer->m_InfoExt);
+	__InfoPlayerBase* pInfoBase  = &(CGameBase::s_pPlayer->m_InfoBase);
+	__InfoPlayerMySelf* pInfoExt = &(CGameBase::s_pPlayer->m_InfoExt);
 
-	if (dwMsg == UIMSG_BUTTON_CLICK)					
+	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
-		if (pSender == m_pBtn_Ok
-			|| pSender == m_pBtn_Cancel)
+		if (pSender == m_pBtn_Ok || pSender == m_pBtn_Cancel)
 		{
 			Close();
 		}
@@ -207,10 +213,10 @@ void CUIClassChange::Close()
 
 void CUIClassChange::RestorePrevClass()
 {
-	__InfoPlayerBase*	pInfoBase = &CGameBase::s_pPlayer->m_InfoBase;
-	__InfoPlayerMySelf*	pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
+	__InfoPlayerBase* pInfoBase  = &CGameBase::s_pPlayer->m_InfoBase;
+	__InfoPlayerMySelf* pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
 
-	pInfoBase->eClass = m_eClass;
+	pInfoBase->eClass            = m_eClass;
 	CGameProcedure::s_pProcMain->m_pUISkillTreeDlg->InitIconUpdate();
 
 	CGameProcedure::s_pProcMain->m_pUIVar->UpdateAllStates(pInfoBase, pInfoExt); // 상태창 수치를 모두 적용

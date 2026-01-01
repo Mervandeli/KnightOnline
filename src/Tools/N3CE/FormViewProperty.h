@@ -28,52 +28,56 @@ public:
 	HTREEITEM m_hTI_Plugs;
 	HTREEITEM m_hTI_FXPlug;
 
-	CImageList m_ImgList;	// 0:Position, 1:Rotation, 2:Scale 3:Camera, 4:Light, 5:Texture, 6:Shape, 7:Shape_Part
-							// 8:Character, 9:Joint, 10:Character_Part, 11:Character_Plug, 12:Progressive_Mesh, 13:IndexedMesh, 14:Terrain, 15:Normal_Mesh
+	CImageList
+		m_ImgList; // 0:Position, 1:Rotation, 2:Scale 3:Camera, 4:Light, 5:Texture, 6:Shape, 7:Shape_Part
+	// 8:Character, 9:Joint, 10:Character_Part, 11:Character_Plug, 12:Progressive_Mesh, 13:IndexedMesh, 14:Terrain, 15:Normal_Mesh
 
 public:
 	void UpdateWindowPos();
 	void UpdateInfo();
 
 protected:
-	CFormViewProperty();           // protected constructor used by dynamic creation
+	CFormViewProperty(); // protected constructor used by dynamic creation
 	DECLARE_DYNCREATE(CFormViewProperty)
 
-// Form Data
+						 // Form Data
 public:
 	//{{AFX_DATA(CFormViewProperty)
-	enum { IDD = IDD_CHR_PROPERTY };
-	CTreeCtrl		m_TreeChr;
-	CPropertyList	m_LPMtl;
-	CPropertyList	m_LPPlug;
-	CPropertyList	m_LPFXPlugPart;
+	enum
+	{
+		IDD = IDD_CHR_PROPERTY
+	};
+	CTreeCtrl m_TreeChr;
+	CPropertyList m_LPMtl;
+	CPropertyList m_LPPlug;
+	CPropertyList m_LPFXPlugPart;
 	//}}AFX_DATA
 
-// Attributes
+	// Attributes
 public:
-
-// Operations
+	// Operations
 public:
 	void SelectJointNode(HTREEITEM hItemParent, CN3Joint* pJoint);
 	void UpdateJointItem(HTREEITEM hItem, CN3Joint* pJoint, int& iNumber);
 	CN3CEDoc* GetDocument();
-	int		GetSelectedNode();
-	void	SelectNode(int nNodeIndex);
+	int GetSelectedNode();
+	void SelectNode(int nNodeIndex);
 	CN3Base* GetSelectedObject();
 	void UpdateAllInfo();
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CFormViewProperty)
-	public:
+public:
 	virtual void OnInitialUpdate();
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
 	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	virtual void OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 protected:
 	virtual ~CFormViewProperty();
 #ifdef _DEBUG
@@ -111,9 +115,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-#ifndef _DEBUG  // debug version in FormViewAnimation.cpp
+#ifndef _DEBUG // debug version in FormViewAnimation.cpp
 inline CN3CEDoc* CFormViewProperty::GetDocument()
-   { return (CN3CEDoc*)m_pDocument; }
+{
+	return (CN3CEDoc*) m_pDocument;
+}
 #endif
 /////////////////////////////////////////////////////////////////////////////
 

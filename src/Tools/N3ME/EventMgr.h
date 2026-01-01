@@ -19,13 +19,13 @@ class CDlgEditEvent;
 class CEventMgr : public CN3Base
 {
 public:
-	std::list<CEventCell*>	m_pEvents;
-	CEventCell*				m_pCurrEvent;
-	int						m_MapSize;
-	short**					m_ppEvent;
-	CMapMng*				m_pRefMapMng;
-	bool					m_bActive;					// 이기능이 활성화 되어 있는지...1:활성화, 0:비활성화..
-	CDlgEditEvent*			m_pDlgEventList;
+	std::list<CEventCell*> m_pEvents;
+	CEventCell* m_pCurrEvent;
+	int m_MapSize;
+	short** m_ppEvent;
+	CMapMng* m_pRefMapMng;
+	bool m_bActive; // 이기능이 활성화 되어 있는지...1:활성화, 0:비활성화..
+	CDlgEditEvent* m_pDlgEventList;
 
 public:
 	bool MakeGameFile(File& file, int iSize);
@@ -41,8 +41,8 @@ public:
 	void SetActive(bool active);
 	void Render();
 
-	virtual bool	Load(File& file);
-	virtual bool	Save(File& file);
+	virtual bool Load(File& file);
+	virtual bool Save(File& file);
 
 	CEventMgr();
 	~CEventMgr() override;

@@ -39,10 +39,10 @@ public:
 	DECLARE_MESSAGE_MAP()
 
 protected:
-	CTblListCtrl	m_ListCtrl;
-	int				m_iStringCodePage;
+	CTblListCtrl m_ListCtrl;
+	int m_iStringCodePage;
 
 	// for editing
-	int				m_iEditItem;
-	int				m_iEditSubItem;
+	int m_iEditItem;
+	int m_iEditSubItem;
 };

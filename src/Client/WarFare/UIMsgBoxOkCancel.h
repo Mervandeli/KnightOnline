@@ -14,8 +14,8 @@
 class CUIMsgBoxOkCancel : public CN3UIBase
 {
 public:
-	static constexpr int CALLBACK_OK		= 1;
-	static constexpr int CALLBACK_CANCEL	= 2;
+	static constexpr int CALLBACK_OK     = 1;
+	static constexpr int CALLBACK_CANCEL = 2;
 
 	CUIMsgBoxOkCancel();
 	~CUIMsgBoxOkCancel() override;

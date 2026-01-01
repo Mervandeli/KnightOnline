@@ -33,7 +33,7 @@ bool CN3TableBaseImpl::LoadFromFile(const std::string& szFN)
 	std::error_code ec;
 
 	// 파일 암호화 풀기.. .. 임시 파일에다 쓴다음 ..
-	std::string szFNTmp = szFN + ".tmp";
+	std::string szFNTmp      = szFN + ".tmp";
 	size_t encryptedFileSize = static_cast<size_t>(encryptedFile.Size());
 	if (encryptedFileSize == 0)
 	{
@@ -45,35 +45,35 @@ bool CN3TableBaseImpl::LoadFromFile(const std::string& szFN)
 	// 원래 파일을 읽고..
 	uint8_t* pDatas = new uint8_t[encryptedFileSize];
 	encryptedFile.Read(pDatas, encryptedFileSize); // 암호화된 데이터 읽고..
-	encryptedFile.Close(); // 원래 파일 닫고
+	encryptedFile.Close();                         // 원래 파일 닫고
 
-// 테이블 만드는 툴에서 쓰는 키와 같은 키..
-	uint16_t key_r = 0x0816;
+												   // 테이블 만드는 툴에서 쓰는 키와 같은 키..
+	uint16_t key_r  = 0x0816;
 	uint16_t key_c1 = 0x6081;
 	uint16_t key_c2 = 0x1608;
 
-//uint8_t Encrypt(uint8_t plain)
-//{
-//	uint8_t cipher;
-//	cipher = (plain ^ (key_r>>8));
-//	key_r = (cipher + key_r) * key_c1 + key_c2;
-//	return cipher;
-//}
+	//uint8_t Encrypt(uint8_t plain)
+	//{
+	//	uint8_t cipher;
+	//	cipher = (plain ^ (key_r>>8));
+	//	key_r = (cipher + key_r) * key_c1 + key_c2;
+	//	return cipher;
+	//}
 
-//uint8_t Decrypt(uint8_t cipher)
-//{
-//	uint8_t plain;
-//	plain = (cipher ^ (m_r>>8));
-//	m_r = (cipher + m_r) * m_c1 + m_c2;
-//	return plain;
-//}
+	//uint8_t Decrypt(uint8_t cipher)
+	//{
+	//	uint8_t plain;
+	//	plain = (cipher ^ (m_r>>8));
+	//	m_r = (cipher + m_r) * m_c1 + m_c2;
+	//	return plain;
+	//}
 
 	// 암호화 풀고..
 	for (uint32_t i = 0; i < encryptedFileSize; i++)
 	{
 		uint8_t byData = (pDatas[i] ^ (key_r >> 8));
-		key_r = (pDatas[i] + key_r) * key_c1 + key_c2;
-		pDatas[i] = byData;
+		key_r          = (pDatas[i] + key_r) * key_c1 + key_c2;
+		pDatas[i]      = byData;
 	}
 
 	// TODO: Rather than write to file to read it back again, we should just read it from a memory stream.
@@ -150,7 +150,7 @@ bool CN3TableBaseImpl::ReadData(File& file, DATA_TYPE DataType, void* pData)
 		{
 			std::string& szString = *((std::string*) pData);
 
-			int iStrLen = 0;
+			int iStrLen           = 0;
 			file.Read(&iStrLen, sizeof(iStrLen));
 
 			szString.clear();

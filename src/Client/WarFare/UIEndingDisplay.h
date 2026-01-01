@@ -14,8 +14,8 @@
 class CUIEndingDisplay : public CN3UIBase
 {
 public:
-	void	Render();
-	void	Release();
+	void Render();
+	void Release();
 
 	CUIEndingDisplay();
 	virtual ~CUIEndingDisplay();

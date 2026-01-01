@@ -21,9 +21,10 @@ public: // create from serialization only
 	CMainFrame();
 	virtual ~CMainFrame();
 
-	BOOL BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool bSaveToDXT = false, D3DFORMAT fmtDXT = D3DFMT_DXT1);
+	BOOL BMPCutter(LPCTSTR lpszFileName, int iWidth, int iHeight, bool bSaveToDXT = false,
+		D3DFORMAT fmtDXT = D3DFMT_DXT1);
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CMainFrame)
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
@@ -37,11 +38,11 @@ protected:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
-protected:  // control bar embedded members
-	CStatusBar  m_wndStatusBar;
-	CToolBar    m_wndToolBar;
+protected: // control bar embedded members
+	CStatusBar m_wndStatusBar;
+	CToolBar m_wndToolBar;
 
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CMainFrame)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

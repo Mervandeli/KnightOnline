@@ -21,8 +21,8 @@ protected: // create from serialization only
 	DECLARE_DYNCREATE(CUIEDoc)
 
 protected:
-	CN3UIBase	m_RootUI;		// 이 것에 child(tool에서 만드는 모든 control)들을 붙이면 된다.
-	std::list<CN3UIBase*>	m_SelectedUIs;
+	CN3UIBase m_RootUI; // 이 것에 child(tool에서 만드는 모든 control)들을 붙이면 된다.
+	std::list<CN3UIBase*> m_SelectedUIs;
 
 public:
 	CN3UIBase* GetRootUI()
@@ -37,8 +37,7 @@ public:
 
 	CN3UIBase* GetSelectedUI(int iIndex = 0)
 	{
-		if (iIndex < 0
-			|| iIndex >= static_cast<int>(m_SelectedUIs.size()))
+		if (iIndex < 0 || iIndex >= static_cast<int>(m_SelectedUIs.size()))
 			return nullptr;
 
 		auto it = m_SelectedUIs.begin();
@@ -46,20 +45,20 @@ public:
 		return *it;
 	}
 
-	void		SetSelectedUI(CN3UIBase* pUI);
+	void SetSelectedUI(CN3UIBase* pUI);
 
 protected:
-	void		Release();		// Document 변수 초기화
-	BOOL		SetImageInfos(CN3UIImage* pUI);	// image정보 넣는 루틴
-	BOOL		SetStringInfos(CN3UIString* pUI);	// string
-	BOOL		SetTrackBarInfos(CN3UITrackBar* pUI);	// track bar
-	BOOL		SetButtonInfos(CN3UIButton* pUI);		// button
+	void Release();                            // Document 변수 초기화
+	BOOL SetImageInfos(CN3UIImage* pUI);       // image정보 넣는 루틴
+	BOOL SetStringInfos(CN3UIString* pUI);     // string
+	BOOL SetTrackBarInfos(CN3UITrackBar* pUI); // track bar
+	BOOL SetButtonInfos(CN3UIButton* pUI);     // button
 
 public:
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CUIEDoc)
-	public:
+public:
 	virtual BOOL OnNewDocument();
 	virtual void Serialize(CArchive& ar);
 	virtual BOOL OnOpenDocument(LPCTSTR lpszPathName);
@@ -67,7 +66,7 @@ public:
 	virtual void OnCloseDocument();
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CUIEDoc();
 #ifdef _DEBUG
@@ -76,8 +75,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CUIEDoc)
 	afx_msg void OnFileExport();

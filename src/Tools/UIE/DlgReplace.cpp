@@ -14,16 +14,13 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CDlgReplace dialog
 
-
-CDlgReplace::CDlgReplace(CWnd* pParent /*=nullptr*/)
-	: CDialog(CDlgReplace::IDD, pParent)
+CDlgReplace::CDlgReplace(CWnd* pParent /*=nullptr*/) : CDialog(CDlgReplace::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CDlgReplace)
-	m_strFind = _T("");
+	m_strFind    = _T("");
 	m_strReplace = _T("");
 	//}}AFX_DATA_INIT
 }
-
 
 void CDlgReplace::DoDataExchange(CDataExchange* pDX)
 {
@@ -34,11 +31,10 @@ void CDlgReplace::DoDataExchange(CDataExchange* pDX)
 	//}}AFX_DATA_MAP
 }
 
-
 BEGIN_MESSAGE_MAP(CDlgReplace, CDialog)
-	//{{AFX_MSG_MAP(CDlgReplace)
-		// NOTE: the ClassWizard will add message map macros here
-	//}}AFX_MSG_MAP
+//{{AFX_MSG_MAP(CDlgReplace)
+// NOTE: the ClassWizard will add message map macros here
+//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////

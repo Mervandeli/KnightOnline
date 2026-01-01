@@ -14,8 +14,8 @@
 
 extern bool g_serverdown_flag;
 
-OperationMessage::OperationMessage(EbenezerApp* main, CUser* srcUser)
-	: _main(main), _srcUser(srcUser)
+OperationMessage::OperationMessage(EbenezerApp* main, CUser* srcUser) :
+	_main(main), _srcUser(srcUser)
 {
 }
 
@@ -407,14 +407,14 @@ bool OperationMessage::Process(const std::string_view command)
 	{
 		if (_srcUser != nullptr)
 		{
-			spdlog::warn(
-				"OperationMessage::Process: argument could not be parsed from GM [charId={} command='{}' exception='{}']",
+			spdlog::warn("OperationMessage::Process: argument could not be parsed from GM "
+						 "[charId={} command='{}' exception='{}']",
 				_srcUser->m_pUserData->m_id, _command, ex.what());
 		}
 		else
 		{
-			spdlog::warn(
-				"OperationMessage::Process: argument could not be parsed from server [command='{}' exception='{}']",
+			spdlog::warn("OperationMessage::Process: argument could not be parsed from server "
+						 "[command='{}' exception='{}']",
 				_command, ex.what());
 		}
 	}
@@ -422,14 +422,14 @@ bool OperationMessage::Process(const std::string_view command)
 	{
 		if (_srcUser != nullptr)
 		{
-			spdlog::warn(
-				"OperationMessage::Process: parsed argument out of range from GM [charId={} command='{}' exception='{}']",
+			spdlog::warn("OperationMessage::Process: parsed argument out of range from GM "
+						 "[charId={} command='{}' exception='{}']",
 				_srcUser->m_pUserData->m_id, _command, ex.what());
 		}
 		else
 		{
-			spdlog::warn(
-				"OperationMessage::Process: parsed argument out of range from server [command='{}' exception='{}']",
+			spdlog::warn("OperationMessage::Process: parsed argument out of range from server "
+						 "[command='{}' exception='{}']",
 				_command, ex.what());
 		}
 	}
@@ -578,7 +578,7 @@ void OperationMessage::UnDiscount()
 
 void OperationMessage::Santa()
 {
-	_main->m_bySanta = 1;		// Make Motherfucking Santa Claus FLY!!!
+	_main->m_bySanta = 1; // Make Motherfucking Santa Claus FLY!!!
 }
 
 void OperationMessage::Angel()
@@ -588,7 +588,7 @@ void OperationMessage::Angel()
 
 void OperationMessage::OffSanta()
 {
-	_main->m_bySanta = 0;		// SHOOT DOWN Motherfucking Santa Claus!!!
+	_main->m_bySanta = 0; // SHOOT DOWN Motherfucking Santa Claus!!!
 }
 
 void OperationMessage::LimitBattle()
@@ -611,13 +611,12 @@ void OperationMessage::OffSummonBlock()
 void OperationMessage::ZoneChange()
 {
 	// Requires a user.
-	if (_srcUser == nullptr
-		|| GetArgCount() < 1)
+	if (_srcUser == nullptr || GetArgCount() < 1)
 		return;
 
 	int zoneId = ParseInt(0);
-	float x = _srcUser->m_pUserData->m_curx;
-	float z = _srcUser->m_pUserData->m_curz;
+	float x    = _srcUser->m_pUserData->m_curx;
+	float z    = _srcUser->m_pUserData->m_curz;
 
 	if (GetArgCount() >= 3)
 	{
@@ -853,15 +852,15 @@ void OperationMessage::OffPermanent()
 	_main->m_bPermanentChatMode = false;
 	_main->m_bPermanentChatFlag = false;
 
-	char sendBuff[1024] = {};
-	int sendIndex = 0;
+	char sendBuff[1024]         = {};
+	int sendIndex               = 0;
 
 	SetByte(sendBuff, WIZ_CHAT, sendIndex);
 	SetByte(sendBuff, END_PERMANENT_CHAT, sendIndex);
 
-	SetByte(sendBuff, 0x01, sendIndex);		// nation
-	SetShort(sendBuff, -1, sendIndex);		// sid
-	SetByte(sendBuff, 0, sendIndex);		// sender name length
+	SetByte(sendBuff, 0x01, sendIndex); // nation
+	SetShort(sendBuff, -1, sendIndex);  // sid
+	SetByte(sendBuff, 0, sendIndex);    // sender name length
 	SetString2(sendBuff, "", sendIndex);
 	_main->Send_All(sendBuff, sendIndex);
 
@@ -872,8 +871,7 @@ void OperationMessage::OffPermanent()
 
 	for (const auto& [_, pInfo] : _main->m_ServerArray)
 	{
-		if (pInfo != nullptr
-			&& pInfo->sServerNo != _main->m_nServerNo)
+		if (pInfo != nullptr && pInfo->sServerNo != _main->m_nServerNo)
 			_main->m_pUdpSocket->SendUDPPacket(pInfo->strServerIP, sendBuff, sendIndex);
 	}
 }

@@ -5,15 +5,21 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
-class CBackgroundUtil  
+class CBackgroundUtil
 {
 public:
 	BOOL SetBitmap(UINT uResourceID = 0);
 	CBackgroundUtil();
 	virtual ~CBackgroundUtil();
 
-	int BMPWidth() { return m_nBmpWidth; }
-	int BMPHeight() { return m_nBmpHeight; }
+	int BMPWidth()
+	{
+		return m_nBmpWidth;
+	}
+	int BMPHeight()
+	{
+		return m_nBmpHeight;
+	}
 
 protected:
 	BOOL TileBitmap(CDC* pDC, CRect rc);

@@ -11,10 +11,8 @@
 
 COrderMessage::COrderMessage()
 {
-
 }
 
 COrderMessage::~COrderMessage()
 {
-
 }

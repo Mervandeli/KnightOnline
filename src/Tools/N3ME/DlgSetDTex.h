@@ -14,35 +14,36 @@ class CN3Texture;
 class CDlgSetDTex : public CDialog
 {
 public:
-	float					m_fTexSurfaceSize;
-	CN3Texture*				m_pTex;
+	float m_fTexSurfaceSize;
+	CN3Texture* m_pTex;
 	LPDIRECT3DVERTEXBUFFER9 m_pTexVB;
 	LPDIRECT3DVERTEXBUFFER9 m_pGridVB;
-		
-// Construction
+
+	// Construction
 public:
-	CDlgSetDTex(CWnd* pParent = nullptr);   // standard constructor
-	
-// Dialog Data
+	CDlgSetDTex(CWnd* pParent = nullptr); // standard constructor
+
+										  // Dialog Data
 	//{{AFX_DATA(CDlgSetDTex)
-	enum { IDD = IDD_SETDETAILTEXTURE };
-	CListBox	m_GroupList;
-	CComboBox	m_FileList;
-	CString	m_szCurrAttr;
-	CString	m_TileSetName;
+	enum
+	{
+		IDD = IDD_SETDETAILTEXTURE
+	};
+	CListBox m_GroupList;
+	CComboBox m_FileList;
+	CString m_szCurrAttr;
+	CString m_TileSetName;
 	//}}AFX_DATA
 
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDlgSetDTex)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
+													 // Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CDlgSetDTex)
 	virtual BOOL OnInitDialog();

@@ -9,34 +9,33 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-
 class CSkyViewerView : public CView
 {
 protected: // create from serialization only
 	CSkyViewerView();
 	DECLARE_DYNCREATE(CSkyViewerView)
 
-// Attributes
+	// Attributes
 public:
 	class CSkyViewerDoc* GetDocument();
 
-// Operations
+	// Operations
 public:
-
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CSkyViewerView)
-	public:
-	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
+public:
+	virtual void OnDraw(CDC* pDC); // overridden to draw this view
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	protected:
+
+protected:
 	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
 	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
 	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CSkyViewerView();
 #ifdef _DEBUG
@@ -45,8 +44,7 @@ public:
 #endif
 
 protected:
-
-// Generated message map functions
+	// Generated message map functions
 protected:
 	//{{AFX_MSG(CSkyViewerView)
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
@@ -56,9 +54,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-#ifndef _DEBUG  // debug version in SkyViewerView.cpp
+#ifndef _DEBUG // debug version in SkyViewerView.cpp
 inline CSkyViewerDoc* CSkyViewerView::GetDocument()
-   { return (CSkyViewerDoc*)m_pDocument; }
+{
+	return (CSkyViewerDoc*) m_pDocument;
+}
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

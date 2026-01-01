@@ -21,21 +21,21 @@ EVENT::~EVENT()
 
 bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 {
-	uintmax_t	length, count;
-	uint8_t		byte;
-	char		buf[4096];
-	char		first[1024];
-	char		temp[1024];
-	int			index = 0;
-	int			t_index = 0;
-	int			event_num = -1;
+	uintmax_t length, count;
+	uint8_t byte;
+	char buf[4096];
+	char first[1024];
+	char temp[1024];
+	int index             = 0;
+	int t_index           = 0;
+	int event_num         = -1;
 
-	EVENT_DATA* newData = nullptr;
+	EVENT_DATA* newData   = nullptr;
 	EVENT_DATA* eventData = nullptr;
 	std::error_code ec;
 
-	std::filesystem::path questPath = questsDir;
-	questPath /= std::to_string(zone) + ".evt";
+	std::filesystem::path questPath  = questsDir;
+	questPath                       /= std::to_string(zone) + ".evt";
 
 	// Doesn't exist but this isn't a problem; we don't expect it to exist.
 	if (!std::filesystem::exists(questPath))
@@ -45,7 +45,7 @@ bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 	// NOTE: Requires the file to exist.
 	questPath = std::filesystem::canonical(questPath);
 
-	length = std::filesystem::file_size(questPath, ec);
+	length    = std::filesystem::file_size(questPath, ec);
 	if (ec)
 		return false;
 
@@ -62,19 +62,17 @@ bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 	std::string filename(filenameUtf8.begin(), filenameUtf8.end());
 
 	int lineNumber = 0;
-	count = 0;
+	count          = 0;
 
 	while (count < length)
 	{
 		file.read(reinterpret_cast<char*>(&byte), 1);
 		++count;
 
-		if ((char) byte != '\r'
-			&& (char) byte != '\n')
+		if ((char) byte != '\r' && (char) byte != '\n')
 			buf[index++] = byte;
 
-		if ((char) byte == '\n'
-			|| count == length)
+		if ((char) byte == '\n' || count == length)
 		{
 			++lineNumber;
 
@@ -83,11 +81,10 @@ bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 
 			buf[index] = (uint8_t) 0;
 
-			t_index = 0;
+			t_index    = 0;
 
 			// 주석에 대한 처리
-			if (buf[t_index] == ';'
-				|| buf[t_index] == '/')
+			if (buf[t_index] == ';' || buf[t_index] == '/')
 			{
 				index = 0;
 				continue;
@@ -95,11 +92,11 @@ bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 
 			t_index += ParseSpace(first, buf + t_index);
 
-//			if (0 == strcmp(first, "QUEST"))
+			//			if (0 == strcmp(first, "QUEST"))
 			if (0 == strcmp(first, "EVENT"))
 			{
-				t_index += ParseSpace(temp, buf + t_index);
-				event_num = atoi(temp);
+				t_index   += ParseSpace(temp, buf + t_index);
+				event_num  = atoi(temp);
 
 				if (newData != nullptr)
 				{
@@ -113,7 +110,7 @@ bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 					goto cancel_event_load;
 				}
 
-				eventData = new EVENT_DATA;
+				eventData             = new EVENT_DATA;
 				eventData->m_EventNum = event_num;
 				if (!m_arEvent.PutData(eventData->m_EventNum, eventData))
 				{
@@ -149,8 +146,8 @@ bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 			}
 			else if (isalnum(first[0]))
 			{
-				spdlog::warn("EVENT::LoadEvent({}): unhandled opcode '{}' ({}:{})",
-					zone, first, filename, lineNumber);
+				spdlog::warn("EVENT::LoadEvent({}): unhandled opcode '{}' ({}:{})", zone, first,
+					filename, lineNumber);
 			}
 			index = 0;
 		}
