@@ -36,9 +36,6 @@
   <Import Project="$(PropsDir)db-library.props" />
   <Import Project="$(PropsDir)server.props" />
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup>
-    <OutDir>..\bin\$(Configuration)\</OutDir>
-  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -193,7 +190,7 @@
     <Image Include="res\VersionManager.ico" />
   </ItemGroup>
   <PropertyGroup Label="Debugger defaults">
-    <LocalDebuggerWorkingDirectory>$(RootDir)Server\bin\$(Configuration)\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutputPath)\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
