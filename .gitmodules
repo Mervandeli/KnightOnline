@@ -2,8 +2,8 @@
 	path = deps/dx9sdk
 	url = https://github.com/Open-KO/microsoft-directx-sdk
 	shallow = true
-[submodule "Client/Data"]
-	path = Client/Data
+[submodule "assets/Client"]
+	path = assets/Client
 	url = https://github.com/Open-KO/ko-client-assets
 	branch = openko-1298
 	shallow = true
