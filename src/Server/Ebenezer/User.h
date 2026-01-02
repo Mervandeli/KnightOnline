@@ -307,6 +307,7 @@ public:
 	bool GateLeverObjectEvent(int16_t objectindex, int16_t nid);
 	bool GateObjectEvent(int16_t objectindex, int16_t nid);
 	bool BindObjectEvent(int16_t objectindex, int16_t nid);
+	void SendAnvilRequest(int16_t nid);
 	void InitType3();
 	bool GetWarpList(int warp_group);
 	void ServerChangeOk(char* pBuf);

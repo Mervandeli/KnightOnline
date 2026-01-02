@@ -9877,6 +9877,31 @@ bool CUser::WarpListObjectEvent(int16_t objectindex, int16_t /*nid*/)
 	return true;
 }
 
+void CUser::SendAnvilRequest(int16_t nid)
+{
+	// We cannot use warp gates when invading.
+	if (m_pUserData->m_bZone != ZONE_MORADON)
+		return;
+
+	CNpc* pNpc = m_pMain->m_NpcMap.GetData(nid);
+	if (pNpc == nullptr || pNpc->m_tNpcType != NPC_ANVIL)
+		return;
+
+	// Check distance to anvil
+	float distance = sqrtf(powf(m_pUserData->m_curx - pNpc->m_fCurX, 2.0f)
+						   + powf(m_pUserData->m_curz - pNpc->m_fCurZ, 2.0f));
+
+	if (distance > 11.0f) // Max interaction distance
+		return;
+
+	int send_index = 0;
+	char send_buff[2] {};
+
+	SetByte(send_buff, WIZ_ITEM_UPGRADE, send_index);
+	SetByte(send_buff, ITEM_UPGRADE_REQ, send_index);
+	Send(send_buff, send_index);
+}
+
 void CUser::ObjectEvent(char* pBuf)
 {
 	int index = 0, objectindex = 0, send_index = 0, nid = 0;
@@ -9901,38 +9926,42 @@ void CUser::ObjectEvent(char* pBuf)
 	switch (pEvent->sType)
 	{
 		// Bind Point
-		case 0:
+		case OBJECT_TYPE_BIND:
 
 		// Destory Bind Point
-		case 7:
+		case OBJECT_TYPE_REMOVE_BIND:
 			if (!BindObjectEvent(objectindex, nid))
 				goto fail_return;
 			break;
 
 		// Gate Object : 사용치 않음 : 2002.12.23
-		case 1:
-		case 2:
+		case OBJECT_TYPE_GATE:
+		case OBJECT_TYPE_DOOR_TOPDOWN:
 			//if (!GateObjectEvent(objectindex, nid))
 			//	goto fail_return;
 			break;
 
 		// Gate lever Object
-		case 3:
+		case OBJECT_TYPE_GATE_LEVER:
 			if (!GateLeverObjectEvent(objectindex, nid))
 				goto fail_return;
 			break;
 
 		// Flag Lever Object
-		case 4:
+		case OBJECT_TYPE_FLAG:
 			if (!FlagObjectEvent(objectindex, nid))
 				goto fail_return;
 			break;
 
 		// Warp List
-		case 5:
+		case OBJECT_TYPE_WARP_GATE:
 			if (!WarpListObjectEvent(objectindex, nid))
 				goto fail_return;
 			break;
+		// Anvil
+		case OBJECT_TYPE_ANVIL:
+			SendAnvilRequest(nid);
+			return;
 	}
 	return;
 
