@@ -12553,23 +12553,15 @@ fail_return:
 
 void CUser::ItemUpgradeProcess(char* pBuf)
 {
-	// ItemUpgrade
-	if (*pBuf == ITEM_UPGRADE_PROCESS)
-	{
-		ItemUpgrade(pBuf, ITEM_UPGRADE_PROCESS);
-	}
-	// AccessorieUpgrade
-	else if (*pBuf == ITEM_UPGRADE_ACCESSORIES)
-	{
-		ItemUpgrade(pBuf, ITEM_UPGRADE_ACCESSORIES);
-	}
-}
-
-void CUser::ItemUpgrade(char* /*pBuf*/, uint8_t nUpgradeType)
-{
-	int8_t result  = ITEM_UPGRADE_ERROR_NO_MATCH;
-	int send_index = 0;
+	int8_t result = ITEM_UPGRADE_ERROR_NO_MATCH;
+	int index = 0, send_index = 0;
 	char send_buff[128] {};
+
+	uint16_t npcId;
+	int originItemId;
+	uint8_t originPos, upgradeType;
+	uint8_t materialPos[9] {};
+	int materialId[9] {};
 
 	// Check if the user is trading
 	if (m_sExchangeUser != -1)
@@ -12578,9 +12570,20 @@ void CUser::ItemUpgrade(char* /*pBuf*/, uint8_t nUpgradeType)
 		goto fail_return;
 	}
 
+	upgradeType  = GetByte(pBuf, index);
+	npcId        = GetShort(pBuf, index);
+	originItemId = GetDWORD(pBuf, index);
+	originPos    = GetByte(pBuf, index);
+
+	for (int i = 0; i < 9; i++)
+	{
+		materialId[i]  = GetDWORD(pBuf, index);
+		materialPos[i] = GetByte(pBuf, index);
+	}
+
 fail_return:
 	SetByte(send_buff, WIZ_ITEM_UPGRADE, send_index);
-	SetByte(send_buff, nUpgradeType, send_index);
+	SetByte(send_buff, upgradeType, send_index);
 	SetByte(send_buff, result, send_index);
 	Send(send_buff, send_index);
 }

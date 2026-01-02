@@ -249,7 +249,6 @@ public:
 	void LogCoupon(int itemid, int count);
 	void RecvEditBox(char* pBuf);
 	void ItemUpgradeProcess(char* pBuf);
-	void ItemUpgrade(char* pBuf, uint8_t nUpgradeType);
 	bool CheckCouponUsed() const;
 	bool CheckRandom(int16_t percent) const;
 	void OpenEditBox(int message, int event);
