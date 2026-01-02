@@ -517,6 +517,15 @@ enum e_ItemUpgradeOpcode
 	ITEM_BIFROST_EXCHANGE    = 5,
 };
 
+enum e_ItemUpgradeResult
+{
+	ITEM_UPGRADE_ERROR_FAILED     = 0,
+	ITEM_UPGRADE_ERROR_SUCCEEDED  = 1,
+	ITEM_UPGRADE_ERROR_TRADING    = 2,
+	ITEM_UPGRADE_ERROR_NEED_COINS = 3,
+	ITEM_UPGRADE_ERROR_NO_MATCH   = 4,
+};
+
 ////////////////////////////////////////////////////////////////
 // Party BBS subpacket define
 ////////////////////////////////////////////////////////////////
