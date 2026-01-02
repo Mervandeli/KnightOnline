@@ -298,6 +298,13 @@ bool EbenezerApp::OnStart()
 		return false;
 	}
 
+	spdlog::info("EbenezerApp::OnInitDialog: loading ITEM_UPGRADE table");
+	if (!LoadItemUpgradeTable())
+	{
+		spdlog::error("EbenezerApp::OnInitDialog: failed to cache ITEM_UPGRADE table, closing");
+		return false;
+	}
+
 	spdlog::info("EbenezerApp::OnInitDialog: loading MAGIC table");
 	if (!LoadMagicTable())
 	{
@@ -940,6 +947,18 @@ bool EbenezerApp::LoadItemTable()
 		return false;
 	}
 
+	return true;
+}
+
+bool EbenezerApp::LoadItemUpgradeTable()
+{
+	recordset_loader::STLMap loader(m_ItemUpgradeTableMap);
+	if (!loader.Load_ForbidEmpty())
+	{
+		spdlog::error(
+			"EbenezerApp::LoadItemUpgradeTable: load failed - {}", loader.GetError().Message);
+		return false;
+	}
 	return true;
 }
 

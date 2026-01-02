@@ -29,6 +29,7 @@ typedef std::vector<C3DMap*> ZoneArray;
 typedef std::vector<model::LevelUp*> LevelUpTableArray;
 typedef CSTLMap<model::Coefficient> CoefficientTableMap;
 typedef CSTLMap<model::Item> ItemTableMap;
+typedef CSTLMap<model::ItemUpgrade> ItemUpgradeTableMap;
 typedef CSTLMap<model::Magic> MagicTableMap;
 typedef CSTLMap<model::MagicType1> MagicType1TableMap;
 typedef CSTLMap<model::MagicType2> MagicType2TableMap;
@@ -143,6 +144,7 @@ public:
 	bool LoadCoefficientTable();
 	bool LoadMagicTable();
 	bool LoadItemTable();
+	bool LoadItemUpgradeTable();
 	bool MapFileLoad();
 	void UserAcceptThread();
 	// sungyong 2001.11.06
@@ -207,6 +209,7 @@ public:
 	NpcMap m_NpcMap;
 	ZoneArray m_ZoneArray;
 	ItemTableMap m_ItemTableMap;
+	ItemUpgradeTableMap m_ItemUpgradeTableMap;
 	MagicTableMap m_MagicTableMap;
 	MagicType1TableMap m_MagicType1TableMap;
 	MagicType2TableMap m_MagicType2TableMap;
