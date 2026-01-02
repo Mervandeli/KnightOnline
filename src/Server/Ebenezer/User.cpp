@@ -717,6 +717,10 @@ void CUser::Parsing(int len, char* pData)
 		case WIZ_EDIT_BOX:
 			RecvEditBox(pData + index);
 			break;
+
+		case WIZ_ITEM_UPGRADE:
+			ItemUpgradeProcess(pData + index);
+			break;
 	}
 
 	currentTime = TimeGet();
@@ -12545,6 +12549,40 @@ void CUser::RecvEditBox(char* pBuf)
 fail_return:
 	m_iEditBoxEvent = -1;
 	memset(m_strCouponId, 0, sizeof(m_strCouponId));
+}
+
+void CUser::ItemUpgradeProcess(char* pBuf)
+{
+	// ItemUpgrade
+	if (*pBuf == ITEM_UPGRADE_PROCESS)
+	{
+		ItemUpgrade(pBuf, ITEM_UPGRADE_PROCESS);
+	}
+	// AccessorieUpgrade
+	else if (*pBuf == ITEM_UPGRADE_ACCESSORIES)
+	{
+		ItemUpgrade(pBuf, ITEM_UPGRADE_ACCESSORIES);
+	}
+}
+
+void CUser::ItemUpgrade(char* /*pBuf*/, uint8_t nUpgradeType)
+{
+	int8_t result  = ITEM_UPGRADE_ERROR_NO_MATCH;
+	int send_index = 0;
+	char send_buff[128] {};
+
+	// Check if the user is trading
+	if (m_sExchangeUser != -1)
+	{
+		result = ITEM_UPGRADE_ERROR_TRADING;
+		goto fail_return;
+	}
+
+fail_return:
+	SetByte(send_buff, WIZ_ITEM_UPGRADE, send_index);
+	SetByte(send_buff, nUpgradeType, send_index);
+	SetByte(send_buff, result, send_index);
+	Send(send_buff, send_index);
 }
 
 bool CUser::CheckCouponUsed() const
