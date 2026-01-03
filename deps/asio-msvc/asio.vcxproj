@@ -26,12 +26,10 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{31A619E1-4EB1-4F00-800D-22E68D8AB651}</ProjectGuid>
     <RootNamespace>asio</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="..\..\props\platform_root.props" />
   <PropertyGroup Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <OutDir>$(StaticLibDir)</OutDir>
     <TargetName>asio</TargetName>
@@ -54,6 +52,7 @@
       <LanguageStandard>stdcpp23</LanguageStandard>
       <PreprocessorDefinitions>ASIO_SEPARATE_COMPILATION;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(ProjectDir)..\asio\asio\include;</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
