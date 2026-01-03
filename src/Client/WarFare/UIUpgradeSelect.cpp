@@ -39,13 +39,6 @@ bool CUIUpgradeSelect::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 	{
 		if (pSender == m_pBtn_Upgrade_1)
 		{
-<<<<<<< HEAD:Client/WarFare/UIUpgradeSelect.cpp
-
-=======
-#if 1
-			CGameProcedure::MessageBoxPost("CUIItemUpgrade needs to be implemented.", "Not implemented", MB_OK);
-#else
->>>>>>> master:src/Client/WarFare/UIUpgradeSelect.cpp
 			CUIItemUpgrade* pUIItemUpgrade = CGameProcedure::s_pProcMain->m_pUIItemUpgrade;
 			if (pUIItemUpgrade != nullptr)
 			{

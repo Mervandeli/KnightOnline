@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 #include "IconItemSkill.h"
-#include "N3UIWndBase.h"
 #include "GameDef.h"
+#include "N3UIWndBase.h"
 
 uint32_t __IconItemSkill::GetItemID() const
 {
@@ -51,7 +51,6 @@ bool __IconItemSkill::IsStackable() const
 {
 	if (pItemBasic == nullptr)
 		return false;
-	
-	return pItemBasic->byContable == UIITEM_TYPE_COUNTABLE
-		|| pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL;
+
+	return pItemBasic->byContable == UIITEM_TYPE_COUNTABLE || pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL;
 }

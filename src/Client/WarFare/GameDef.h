@@ -441,6 +441,13 @@ enum e_ItemClass
 	ITEM_CLASS_UNKNOWN       = 0xffffffff
 }; //
 
+enum e_ItemEffect2
+{
+	ITEM_EFFECT2_RING_UPGRADE_REQ = 253,
+	ITEM_EFFECT2_RENTAL_SCROLL    = 254,
+	ITEM_EFFECT2_ITEM_UPGRADE_REQ = 255
+};
+
 enum e_ItemGrade
 {
 	ITEM_GRADE_LOW_CLASS    = 1,

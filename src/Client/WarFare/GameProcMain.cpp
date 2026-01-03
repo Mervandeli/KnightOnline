@@ -111,41 +111,6 @@ CGameProcMain::CGameProcMain() // r기본 생성자.. 각 변수의 역활은 �
 	m_pUIChatDlg            = new CUIChat();
 	m_pUIChatDlg2           = new CUIChat2();
 	m_pUIStateBarAndMiniMap = new CUIStateBar();
-<<<<<<< HEAD:Client/WarFare/GameProcMain.cpp
-	m_pUIVar = new CUIVarious();
-	m_pUICmd = new CUICmd();
-	m_pUITargetBar = new CUITargetBar();
-	m_pUIExitMenu = new CUIExitMenu();
-	m_pUIHelp = new CUIHelp();
-	m_pUINotice = new CUINotice();
-	m_pUIClassChange = new CUIClassChange();
-	m_pUINpcEvent = new CUINPCEvent();
-	m_pUIRepairTooltip = new CUIRepairTooltipDlg();
-	m_pUIDroppedItemDlg = new CUIDroppedItemDlg();
-	m_pUITransactionDlg = new CUITransactionDlg();
-	m_pUIInventory = new CUIInventory();
-	m_pUIPartyOrForce = new CUIPartyOrForce();
-	m_pUISkillTreeDlg = new CUISkillTreeDlg();
-	m_pUICmdList = new CUICmdList();
-	m_pUICmdEdit = new CUICmdEdit();
-	m_pUIHotKeyDlg = new CUIHotKeyDlg();
-	m_pUIKnightsOp = new CUIKnightsOperation();			// 기사단 리스트 보기, 가입, 등...
-	m_pUIPartyBBS = new CUIPartyBBS(); // 파티 지원 시스템 게시판??..
-	m_pUIWareHouseDlg = new CUIWareHouseDlg();
-	m_pUINpcChange = new CUINPCChangeEvent();	
-	m_pUIWarp = new CUIWarp();
-	m_pUIInn = new CUIInn();
-	m_pUICreateClanName = new CUICreateClanName();
-	m_pUITradeBBS = new CUITradeSellBBS();
-	m_pUITradeBBSSelector = new CUITradeBBSSelector();	
-	m_pUITradeBBSEdit = new CUITradeBBSEditDlg();
-	m_pUIQuestMenu = new CUIQuestMenu();
-	m_pUIQuestTalk = new CUIQuestTalk();
-	m_pUIDead = new CUIDead();
-	m_pUIUpgradeSelect = new CUIUpgradeSelect();
-	m_pUIItemUpgrade = new CUIItemUpgrade();
-	m_pUILevelGuide = new CUILevelGuide();
-=======
 	m_pUIVar                = new CUIVarious();
 	m_pUICmd                = new CUICmd();
 	m_pUITargetBar          = new CUITargetBar();
@@ -177,8 +142,8 @@ CGameProcMain::CGameProcMain() // r기본 생성자.. 각 변수의 역활은 �
 	m_pUIQuestTalk          = new CUIQuestTalk();
 	m_pUIDead               = new CUIDead();
 	m_pUIUpgradeSelect      = new CUIUpgradeSelect();
+	m_pUIItemUpgrade        = new CUIItemUpgrade();
 	m_pUILevelGuide         = new CUILevelGuide();
->>>>>>> master:src/Client/WarFare/GameProcMain.cpp
 
 	m_pSubProcPerTrade      = new CSubProcPerTrade();
 	m_pMagicSkillMng        = new CMagicSkillMng(this);
@@ -5733,26 +5698,6 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 				szMsg = fmt::format_text_resource(IDS_BIND_POINT_FAILED);
 			MsgOutput(szMsg, 0xff00ff00);
 		}
-<<<<<<< HEAD:Client/WarFare/GameProcMain.cpp
-	}
-	else if (iType == OBJECT_TYPE_WARP_POINT)
-	{
-		std::string szMsg;
-		if (iResult == 0)
-			szMsg = fmt::format_text_resource(IDS_WARP_WRONG_GATE);
-		MsgOutput(szMsg, 0xff00ff00);
-	}
-	else if (iType == OBJECT_TYPE_ANVIL)
-	{
-		/*
-		if (iResult == 0) // anvil object failed animation	
-		if (iResult == 1) // anvil object succeeded animation
-		*/
-	}
-	else
-	{
-		__ASSERT(0, "Unknown Object Event");
-=======
 		break;
 
 		case OBJECT_TYPE_DOOR_LEFTRIGHT:
@@ -5820,6 +5765,13 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 					{
 						bShouldBeRotate = false; // 돌려야 하는지??
 					}
+					else if (OBJECT_TYPE_ANVIL == iType)
+					{
+						/*
+						if (iResult == 0) // anvil object failed animation	
+						if (iResult == 1) // anvil object succeeded animation
+						*/
+					}
 
 					if (0x01 == iActivate)
 					{
@@ -5859,7 +5811,6 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 
 		default:
 			__ASSERT(0, "Unknown Object Event");
->>>>>>> master:src/Client/WarFare/GameProcMain.cpp
 	}
 }
 
@@ -8124,8 +8075,10 @@ void CGameProcMain::MsgRecv_ItemUpgrade(Packet& pkt)
 			break;
 
 		case ITEM_UPGRADE_PROCESS:
+#if 0 // TODO
 			if (m_pUIItemUpgrade != nullptr)
 				m_pUIItemUpgrade->MsgRecv_ItemUpgrade(pkt);
+#endif
 			break;
 
 		case ITEM_UPGRADE_ACCESSORIES:
