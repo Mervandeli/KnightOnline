@@ -78,7 +78,7 @@ private:
 	e_UIWND_DISTRICT GetWndDistrict() const;
 	bool HandleInventoryIconRightClick(__IconItemSkill* spItem);
 	bool OnKeyPress(int iKey) override;
-	bool Load(HANDLE hFile) override;
+	bool Load(File& file) override;
 
 	uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
 	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;

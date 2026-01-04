@@ -641,9 +641,9 @@ void CUIItemUpgrade::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFo
 }
 
 // Loads the UI from file and initializes all required UI components.
-bool CUIItemUpgrade::Load(HANDLE hFile)
+bool CUIItemUpgrade::Load(File& file)
 {
-	if (!CN3UIBase::Load(hFile))
+	if (!CN3BaseFileAccess::Load(file))
 		return false;
 
 	std::string szID;
