@@ -10034,80 +10034,77 @@ void CUser::SendAnvilRequest(int16_t nid)
 
 void CUser::ObjectEvent(char* pBuf)
 {
-	int index = 0, objectindex = 0, sendIndex = 0, nid = 0;
+	int index = 0, objectindex = 0, nid = 0;
 	uint8_t objectType    = 0;
 	C3DMap* pMap          = nullptr;
 	_OBJECT_EVENT* pEvent = nullptr;
-	char sendBuffer[128] {};
 
-	objectindex = GetShort(pBuf, index);
-	nid         = GetShort(pBuf, index);
+	objectindex           = GetShort(pBuf, index);
+	nid                   = GetShort(pBuf, index);
 
-	pMap        = m_pMain->GetMapByIndex(m_iZoneIndex);
+	pMap                  = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
-		goto fail_return;
+		return;
 
 	pEvent = pMap->GetObjectEvent(objectindex);
 	if (pEvent == nullptr)
-		goto fail_return;
+	{
+		SendObjectEventFailed(objectType);
+		return;
+	}
 
 	objectType = static_cast<uint8_t>(pEvent->sType);
 
 	switch (pEvent->sType)
 	{
-		// Bind Point
 		case OBJECT_TYPE_BIND:
-
-		// Destory Bind Point
 		case OBJECT_TYPE_REMOVE_BIND:
 			if (!BindObjectEvent(objectindex, nid))
-				goto fail_return;
+				SendObjectEventFailed(objectType);
 			break;
 
-		// Gate Object : 사용치 않음 : 2002.12.23
 		case OBJECT_TYPE_GATE:
 		case OBJECT_TYPE_DOOR_TOPDOWN:
 			//if (!GateObjectEvent(objectindex, nid))
-			//	goto fail_return;
+			// SendObjectEventFailed(objectType);
 			break;
 
-		// Gate lever Object
 		case OBJECT_TYPE_GATE_LEVER:
 			if (!GateLeverObjectEvent(objectindex, nid))
-				goto fail_return;
+				SendObjectEventFailed(objectType);
 			break;
 
-		// Flag Lever Object
+		// Flag lever
 		case OBJECT_TYPE_FLAG:
 			if (!FlagObjectEvent(objectindex, nid))
-				goto fail_return;
+				SendObjectEventFailed(objectType);
 			break;
 
-		// Warp List
 		case OBJECT_TYPE_WARP_GATE:
 			if (!WarpListObjectEvent(objectindex, nid))
-				goto fail_return;
+				SendObjectEventFailed(objectType);
 			break;
-		// Anvil
+
 		case OBJECT_TYPE_ANVIL:
 			SendAnvilRequest(nid);
-			return;
+			break;
 
 		default:
 			spdlog::error("User::ObjectEvent: Unhandled object type {} [objectIndex={} npcId={} "
 						  "accountName={} characterName={}]",
 				pEvent->sType, objectindex, nid, m_strAccountID, m_pUserData->m_id);
-#ifndef _DEBUG
-			Close();
-#endif
-			goto fail_return;
+			SendObjectEventFailed(objectType);
+			break;
 	}
-	return;
+}
 
-fail_return:
+void CUser::SendObjectEventFailed(uint8_t objectType, uint8_t errorCode /*= 0*/)
+{
+	int sendIndex = 0;
+	char sendBuffer[8] {};
 	SetByte(sendBuffer, WIZ_OBJECT_EVENT, sendIndex);
 	SetByte(sendBuffer, objectType, sendIndex);
-	SetByte(sendBuffer, 0, sendIndex);
+	SetByte(sendBuffer, errorCode, sendIndex);
 	Send(sendBuffer, sendIndex);
 }
 
