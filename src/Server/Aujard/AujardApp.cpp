@@ -26,10 +26,6 @@ namespace model = aujard_model;
 AujardApp::AujardApp(logger::Logger& logger) :
 	AppThread(logger), LoggerSendQueue(MAX_SMQ_SEND_QUEUE_RETRY_COUNT)
 {
-	_sendPacketCount                                = 0;
-	_packetCount                                    = 0;
-	_recvPacketCount                                = 0;
-
 	db::ConnectionManager::DefaultConnectionTimeout = DB_PROCESS_TIMEOUT;
 	db::ConnectionManager::Create();
 
@@ -217,7 +213,8 @@ bool AujardApp::InitSharedMemory()
 
 	for (int i = 0; i < MAX_USER; i++)
 	{
-		_USER_DATA* pUser = reinterpret_cast<_USER_DATA*>(memory + i * ALLOCATED_USER_DATA_BLOCK);
+		_USER_DATA* pUser = reinterpret_cast<_USER_DATA*>(
+			memory + static_cast<ptrdiff_t>(i * ALLOCATED_USER_DATA_BLOCK));
 		_dbAgent.UserData.push_back(pUser);
 	}
 
@@ -239,9 +236,9 @@ bool AujardApp::LoadItemTable()
 void AujardApp::SelectCharacter(const char* buffer)
 {
 	int index = 0, userId = -1, sendIndex = 0, idLen1 = 0, idLen2 = 0, tempUserId = -1,
-		packetIndex    = 0;
-	uint8_t init       = 0x01;
-	char sendBuff[256] = {}, accountId[MAX_ID_SIZE + 1] = {}, charId[MAX_ID_SIZE + 1] = {};
+		packetIndex = 0;
+	uint8_t init    = 0x01;
+	char sendBuffer[256] {}, accountId[MAX_ID_SIZE + 1] {}, charId[MAX_ID_SIZE + 1] {};
 
 	_USER_DATA* user = nullptr;
 
@@ -258,35 +255,36 @@ void AujardApp::SelectCharacter(const char* buffer)
 
 	_recvPacketCount++; // packet count
 
-	if (userId < 0 || userId >= MAX_USER)
-		goto fail_return;
-
-	if (strlen(accountId) == 0)
-		goto fail_return;
-
-	if (strlen(charId) == 0)
-		goto fail_return;
-
-	if (GetUserPtr(charId, tempUserId) != nullptr)
+	if (userId < 0 || userId >= MAX_USER || strlen(accountId) == 0 || strlen(charId) == 0)
 	{
-		SetShort(sendBuff, tempUserId, sendIndex);
-		SetShort(sendBuff, idLen1, sendIndex);
-		SetString(sendBuff, accountId, idLen1, sendIndex);
-		SetShort(sendBuff, idLen2, sendIndex);
-		SetString(sendBuff, charId, idLen2, sendIndex);
-		UserLogOut(sendBuff);
+		SendSelectCharacterFailed(userId);
 		return;
 	}
 
-	if (!_dbAgent.LoadUserData(accountId, charId, userId))
-		goto fail_return;
+	if (GetUserPtr(charId, tempUserId) != nullptr)
+	{
+		SetShort(sendBuffer, tempUserId, sendIndex);
+		SetShort(sendBuffer, idLen1, sendIndex);
+		SetString(sendBuffer, accountId, idLen1, sendIndex);
+		SetShort(sendBuffer, idLen2, sendIndex);
+		SetString(sendBuffer, charId, idLen2, sendIndex);
+		UserLogOut(sendBuffer);
+		return;
+	}
 
-	if (!_dbAgent.LoadWarehouseData(accountId, userId))
-		goto fail_return;
+	if (!_dbAgent.LoadUserData(accountId, charId, userId)
+		|| !_dbAgent.LoadWarehouseData(accountId, userId))
+	{
+		SendSelectCharacterFailed(userId);
+		return;
+	}
 
 	user = _dbAgent.UserData[userId];
 	if (user == nullptr)
-		goto fail_return;
+	{
+		SendSelectCharacterFailed(userId);
+		return;
+	}
 
 	if (strcpy_safe(user->m_Accountid, accountId) != 0)
 	{
@@ -296,35 +294,36 @@ void AujardApp::SelectCharacter(const char* buffer)
 		// if this exposes any problems we'll have to decide how to handle it then
 	}
 
-	SetByte(sendBuff, WIZ_SEL_CHAR, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, 0x01, sendIndex);
-	SetByte(sendBuff, init, sendIndex);
+	SetByte(sendBuffer, WIZ_SEL_CHAR, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
+	SetByte(sendBuffer, 0x01, sendIndex);
+	SetByte(sendBuffer, init, sendIndex);
 
 	_packetCount++;
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
 	{
 		spdlog::error("AujardApp::SelectCharacter: Packet Drop: WIZ_SEL_CHAR");
 		return;
 	}
 
 	++_sendPacketCount;
-	return;
+}
 
-fail_return:
-	sendIndex = 0;
-	SetByte(sendBuff, WIZ_SEL_CHAR, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, 0x00, sendIndex);
-
-	LoggerSendQueue.PutData(sendBuff, sendIndex);
+void AujardApp::SendSelectCharacterFailed(int sessionId)
+{
+	char sendBuffer[8] {};
+	int sendIndex = 0;
+	SetByte(sendBuffer, WIZ_SEL_CHAR, sendIndex);
+	SetShort(sendBuffer, sessionId, sendIndex);
+	SetByte(sendBuffer, 0, sendIndex);
+	LoggerSendQueue.PutData(sendBuffer, sendIndex);
 }
 
 void AujardApp::UserLogOut(const char* buffer)
 {
 	int index = 0, userId = -1, accountIdLen = 0, charIdLen = 0, sendIndex = 0;
-	char charId[MAX_ID_SIZE + 1] = {}, accountId[MAX_ID_SIZE + 1] = {}, sendBuff[256] = {};
+	char charId[MAX_ID_SIZE + 1] {}, accountId[MAX_ID_SIZE + 1] {}, sendBuffer[256] {};
 
 	userId       = GetShort(buffer, index);
 	accountIdLen = GetShort(buffer, index);
@@ -340,10 +339,10 @@ void AujardApp::UserLogOut(const char* buffer)
 
 	HandleUserLogout(userId, UPDATE_LOGOUT);
 
-	SetByte(sendBuff, WIZ_LOGOUT, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
+	SetByte(sendBuffer, WIZ_LOGOUT, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
 		spdlog::error("AujardApp::UserLogOut: Packet Drop: WIZ_LOGOUT");
 }
 
@@ -475,10 +474,8 @@ bool AujardApp::HandleUserUpdate(int userId, const _USER_DATA& user, uint8_t sav
 
 void AujardApp::AccountLogIn(const char* buffer)
 {
-	int index = 0, userId = -1, accountIdLen = 0, passwordLen = 0, sendIndex = 0;
-	int nation                      = -1;
-
-	char accountId[MAX_ID_SIZE + 1] = {}, password[MAX_PW_SIZE + 1] = {}, sendBuff[256] = {};
+	int index = 0, userId = -1, accountIdLen = 0, passwordLen = 0, sendIndex = 0, nation = -1;
+	char accountId[MAX_ID_SIZE + 1] {}, password[MAX_PW_SIZE + 1] {}, sendBuffer[256] {};
 
 	userId       = GetShort(buffer, index);
 	accountIdLen = GetShort(buffer, index);
@@ -488,19 +485,18 @@ void AujardApp::AccountLogIn(const char* buffer)
 
 	nation = _dbAgent.AccountLogInReq(accountId, password);
 
-	SetByte(sendBuff, WIZ_LOGIN, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, nation, sendIndex);
+	SetByte(sendBuffer, WIZ_LOGIN, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
+	SetByte(sendBuffer, nation, sendIndex);
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
 		spdlog::error("AujardApp::AccountLogIn: Packet Drop: WIZ_LOGIN");
 }
 
 void AujardApp::SelectNation(const char* buffer)
 {
-	int index = 0, userId = -1, accountIdLen = 0, sendIndex = 0;
-	int nation                      = -1;
-	char accountId[MAX_ID_SIZE + 1] = {}, sendBuff[256] = {};
+	int index = 0, userId = -1, accountIdLen = 0, sendIndex = 0, nation = -1;
+	char accountId[MAX_ID_SIZE + 1] {}, sendBuffer[256] {};
 
 	userId       = GetShort(buffer, index);
 	accountIdLen = GetShort(buffer, index);
@@ -509,15 +505,15 @@ void AujardApp::SelectNation(const char* buffer)
 
 	bool result = _dbAgent.NationSelect(accountId, nation);
 
-	SetByte(sendBuff, WIZ_SEL_NATION, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
+	SetByte(sendBuffer, WIZ_SEL_NATION, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
 
 	if (result)
-		SetByte(sendBuff, nation, sendIndex);
+		SetByte(sendBuffer, nation, sendIndex);
 	else
-		SetByte(sendBuff, 0x00, sendIndex);
+		SetByte(sendBuffer, 0x00, sendIndex);
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
 		spdlog::error("AujardApp::SelectNation: Packet Drop: WIZ_SEL_NATION");
 }
 
@@ -526,7 +522,7 @@ void AujardApp::CreateNewChar(const char* buffer)
 	int index = 0, userId = -1, accountIdLen = 0, charIdLen = 0, sendIndex = 0, result = 0,
 		charIndex = 0, race = 0, Class = 0, hair = 0, face = 0, str = 0, sta = 0, dex = 0,
 		intel = 0, cha = 0;
-	char accountId[MAX_ID_SIZE + 1] = {}, charId[MAX_ID_SIZE + 1] = {}, sendBuff[256] = {};
+	char accountId[MAX_ID_SIZE + 1] {}, charId[MAX_ID_SIZE + 1] {}, sendBuffer[256] {};
 
 	userId       = GetShort(buffer, index);
 	accountIdLen = GetShort(buffer, index);
@@ -547,11 +543,11 @@ void AujardApp::CreateNewChar(const char* buffer)
 	result = _dbAgent.CreateNewChar(
 		accountId, charIndex, charId, race, Class, hair, face, str, sta, dex, intel, cha);
 
-	SetByte(sendBuff, WIZ_NEW_CHAR, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, result, sendIndex);
+	SetByte(sendBuffer, WIZ_NEW_CHAR, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
+	SetByte(sendBuffer, result, sendIndex);
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
 		spdlog::error("AujardApp::CreateNewChar: Packet Drop: WIZ_NEW_CHAR");
 }
 
@@ -559,11 +555,11 @@ void AujardApp::DeleteChar(const char* buffer)
 {
 	int index = 0, userId = -1, accountIdLen = 0, charIdLen = 0, sendIndex = 0, result = 0,
 		charIndex = 0, socNoLen = 0;
-	char accountId[MAX_ID_SIZE + 1] = {}, charId[MAX_ID_SIZE + 1] = {}, socNo[15] = {},
-								 sendBuff[256] = {};
+	char accountId[MAX_ID_SIZE + 1] {}, charId[MAX_ID_SIZE + 1] {}, socNo[15] {},
+		sendBuffer[256] {};
 
-	userId                                     = GetShort(buffer, index);
-	accountIdLen                               = GetShort(buffer, index);
+	userId       = GetShort(buffer, index);
+	accountIdLen = GetShort(buffer, index);
 	GetString(accountId, buffer, accountIdLen, index);
 	charIndex = GetByte(buffer, index);
 	charIdLen = GetShort(buffer, index);
@@ -576,27 +572,26 @@ void AujardApp::DeleteChar(const char* buffer)
 
 	spdlog::trace("AujardApp::DeleteChar: [charId={}, socNo={}]", charId, socNo);
 
-	SetByte(sendBuff, WIZ_DEL_CHAR, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, result, sendIndex);
+	SetByte(sendBuffer, WIZ_DEL_CHAR, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
+	SetByte(sendBuffer, result, sendIndex);
 	if (result > 0)
-		SetByte(sendBuff, charIndex, sendIndex);
+		SetByte(sendBuffer, charIndex, sendIndex);
 	else
-		SetByte(sendBuff, 0xFF, sendIndex);
+		SetByte(sendBuffer, 0xFF, sendIndex);
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
 		spdlog::error("AujardApp::DeleteChar: Packet Drop: WIZ_DEL_CHAR");
 }
 
 void AujardApp::AllCharInfoReq(const char* buffer)
 {
 	int index = 0, userId = 0, accountIdLen = 0, sendIndex = 0, charBuffIndex = 0;
-	char accountId[MAX_ID_SIZE + 1] = {}, sendBuff[1024] = {}, charBuff[1024] = {},
-								 charId1[MAX_ID_SIZE + 1] = {}, charId2[MAX_ID_SIZE + 1] = {},
-								 charId3[MAX_ID_SIZE + 1] = {};
+	char accountId[MAX_ID_SIZE + 1] {}, sendBuffer[1024] {}, charBuff[1024] {};
+	char charId1[MAX_ID_SIZE + 1] {}, charId2[MAX_ID_SIZE + 1] {}, charId3[MAX_ID_SIZE + 1] {};
 
-	userId                                                = GetShort(buffer, index);
-	accountIdLen                                          = GetShort(buffer, index);
+	userId       = GetShort(buffer, index);
+	accountIdLen = GetShort(buffer, index);
 	GetString(accountId, buffer, accountIdLen, index);
 
 	SetByte(charBuff, 0x01, charBuffIndex); // result
@@ -606,12 +601,12 @@ void AujardApp::AllCharInfoReq(const char* buffer)
 	_dbAgent.LoadCharInfo(charId2, charBuff, charBuffIndex);
 	_dbAgent.LoadCharInfo(charId3, charBuff, charBuffIndex);
 
-	SetByte(sendBuff, WIZ_ALLCHAR_INFO_REQ, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
-	SetShort(sendBuff, charBuffIndex, sendIndex);
-	SetString(sendBuff, charBuff, charBuffIndex, sendIndex);
+	SetByte(sendBuffer, WIZ_ALLCHAR_INFO_REQ, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
+	SetShort(sendBuffer, charBuffIndex, sendIndex);
+	SetString(sendBuffer, charBuff, charBuffIndex, sendIndex);
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
 		spdlog::error("AujardApp::AllCharInfoReq: Packet Drop: WIZ_ALLCHAR_INFO_REQ");
 }
 
@@ -681,7 +676,7 @@ void AujardApp::ConCurrentUserCount()
 void AujardApp::UserDataSave(const char* buffer)
 {
 	int index = 0, userId = -1, accountIdLen = 0, charIdLen = 0;
-	char accountId[MAX_ID_SIZE + 1] = {}, charId[MAX_ID_SIZE + 1] = {};
+	char accountId[MAX_ID_SIZE + 1] {}, charId[MAX_ID_SIZE + 1] {};
 
 	userId       = GetShort(buffer, index);
 	accountIdLen = GetShort(buffer, index);
@@ -728,44 +723,44 @@ void AujardApp::KnightsPacket(const char* buffer)
 	uint8_t command = GetByte(buffer, index);
 	switch (command)
 	{
-		case KNIGHTS_CREATE:
+		case DB_KNIGHTS_CREATE:
 			CreateKnights(buffer + index);
 			break;
 
-		case KNIGHTS_JOIN:
+		case DB_KNIGHTS_JOIN:
 			JoinKnights(buffer + index);
 			break;
 
-		case KNIGHTS_WITHDRAW:
+		case DB_KNIGHTS_WITHDRAW:
 			WithdrawKnights(buffer + index);
 			break;
 
-		case KNIGHTS_REMOVE:
-		case KNIGHTS_ADMIT:
-		case KNIGHTS_REJECT:
-		case KNIGHTS_CHIEF:
-		case KNIGHTS_VICECHIEF:
-		case KNIGHTS_OFFICER:
-		case KNIGHTS_PUNISH:
+		case DB_KNIGHTS_REMOVE:
+		case DB_KNIGHTS_ADMIT:
+		case DB_KNIGHTS_REJECT:
+		case DB_KNIGHTS_CHIEF:
+		case DB_KNIGHTS_VICECHIEF:
+		case DB_KNIGHTS_OFFICER:
+		case DB_KNIGHTS_PUNISH:
 			ModifyKnightsMember(buffer + index, command);
 			break;
 
-		case KNIGHTS_DESTROY:
+		case DB_KNIGHTS_DESTROY:
 			DestroyKnights(buffer + index);
 			break;
 
-		case KNIGHTS_MEMBER_REQ:
+		case DB_KNIGHTS_MEMBER_REQ:
 			AllKnightsMember(buffer + index);
 			break;
 
-		case KNIGHTS_STASH:
+		case DB_KNIGHTS_STASH:
 			break;
 
-		case KNIGHTS_LIST_REQ:
+		case DB_KNIGHTS_LIST_REQ:
 			KnightsList(buffer + index);
 			break;
 
-		case KNIGHTS_ALLLIST_REQ:
+		case DB_KNIGHTS_ALLLIST_REQ:
 			nation = GetByte(buffer, index);
 			_dbAgent.LoadKnightsAllList(nation);
 			break;
@@ -781,7 +776,7 @@ void AujardApp::CreateKnights(const char* buffer)
 {
 	int index = 0, sendIndex = 0, nameLen = 0, chiefNameLen = 0, knightsId = 0, userId = -1,
 		nation = 0, result = 0, community = 0;
-	char knightsName[MAX_ID_SIZE + 1] = {}, chiefName[MAX_ID_SIZE + 1] = {}, sendBuff[256] = {};
+	char knightsName[MAX_ID_SIZE + 1] {}, chiefName[MAX_ID_SIZE + 1] {}, sendBuffer[256] {};
 
 	userId    = GetShort(buffer, index);
 	community = GetByte(buffer, index);
@@ -800,29 +795,29 @@ void AujardApp::CreateKnights(const char* buffer)
 	spdlog::trace(
 		"AujardApp::CreateKnights: userId={}, knightsId={}, result={}", userId, knightsId, result);
 
-	SetByte(sendBuff, KNIGHTS_CREATE, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, result, sendIndex);
-	SetByte(sendBuff, community, sendIndex);
-	SetShort(sendBuff, knightsId, sendIndex);
-	SetByte(sendBuff, nation, sendIndex);
-	SetShort(sendBuff, nameLen, sendIndex);
-	SetString(sendBuff, knightsName, nameLen, sendIndex);
-	SetShort(sendBuff, chiefNameLen, sendIndex);
-	SetString(sendBuff, chiefName, chiefNameLen, sendIndex);
+	SetByte(sendBuffer, DB_KNIGHTS_CREATE, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
+	SetByte(sendBuffer, result, sendIndex);
+	SetByte(sendBuffer, community, sendIndex);
+	SetShort(sendBuffer, knightsId, sendIndex);
+	SetByte(sendBuffer, nation, sendIndex);
+	SetShort(sendBuffer, nameLen, sendIndex);
+	SetString(sendBuffer, knightsName, nameLen, sendIndex);
+	SetShort(sendBuffer, chiefNameLen, sendIndex);
+	SetString(sendBuffer, chiefName, chiefNameLen, sendIndex);
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
-		spdlog::error("AujardApp::CreateKnights: Packet Drop: KNIGHTS_CREATE");
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
+		spdlog::error("AujardApp::CreateKnights: Packet Drop: DB_KNIGHTS_CREATE");
 }
 
 void AujardApp::JoinKnights(const char* buffer)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1;
-	uint8_t result     = 0;
-	char sendBuff[256] = {};
+	uint8_t result = 0;
+	char sendBuffer[256] {};
 
-	userId             = GetShort(buffer, index);
-	knightsId          = GetShort(buffer, index);
+	userId    = GetShort(buffer, index);
+	knightsId = GetShort(buffer, index);
 
 	if (userId < 0 || userId >= MAX_USER)
 		return;
@@ -831,28 +826,28 @@ void AujardApp::JoinKnights(const char* buffer)
 	if (pUser == nullptr)
 		return;
 
-	result = _dbAgent.UpdateKnights(KNIGHTS_JOIN, pUser->m_id, knightsId, 0);
+	result = _dbAgent.UpdateKnights(DB_KNIGHTS_JOIN, pUser->m_id, knightsId, 0);
 
 	spdlog::trace("AujardApp::JoinKnights: userId={}, charId={}, knightsId={}, result={}", userId,
 		pUser->m_id, knightsId, result);
 
-	SetByte(sendBuff, KNIGHTS_JOIN, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, result, sendIndex);
-	SetShort(sendBuff, knightsId, sendIndex);
+	SetByte(sendBuffer, DB_KNIGHTS_JOIN, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
+	SetByte(sendBuffer, result, sendIndex);
+	SetShort(sendBuffer, knightsId, sendIndex);
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
-		spdlog::error("AujardApp::JoinKnights: Packet Drop: KNIGHTS_JOIN");
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
+		spdlog::error("AujardApp::JoinKnights: Packet Drop: DB_KNIGHTS_JOIN");
 }
 
 void AujardApp::WithdrawKnights(const char* buffer)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1;
-	uint8_t result     = 0;
-	char sendBuff[256] = {};
+	uint8_t result = 0;
+	char sendBuffer[256] {};
 
-	userId             = GetShort(buffer, index);
-	knightsId          = GetShort(buffer, index);
+	userId    = GetShort(buffer, index);
+	knightsId = GetShort(buffer, index);
 
 	if (userId < 0 || userId >= MAX_USER)
 		return;
@@ -861,24 +856,24 @@ void AujardApp::WithdrawKnights(const char* buffer)
 	if (pUser == nullptr)
 		return;
 
-	result = _dbAgent.UpdateKnights(KNIGHTS_WITHDRAW, pUser->m_id, knightsId, 0);
+	result = _dbAgent.UpdateKnights(DB_KNIGHTS_WITHDRAW, pUser->m_id, knightsId, 0);
 	spdlog::trace("AujardApp::WithdrawKnights: userId={}, knightsId={}, result={}", userId,
 		knightsId, result);
 
-	SetByte(sendBuff, KNIGHTS_WITHDRAW, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, result, sendIndex);
-	SetShort(sendBuff, knightsId, sendIndex);
+	SetByte(sendBuffer, DB_KNIGHTS_WITHDRAW, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
+	SetByte(sendBuffer, result, sendIndex);
+	SetShort(sendBuffer, knightsId, sendIndex);
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
-		spdlog::error("AujardApp::WithdrawKnights: Packet Drop: KNIGHTS_WITHDRAW");
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
+		spdlog::error("AujardApp::WithdrawKnights: Packet Drop: DB_KNIGHTS_WITHDRAW");
 }
 
 void AujardApp::ModifyKnightsMember(const char* buffer, uint8_t command)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1, charIdLen = 0, removeFlag = 0;
-	uint8_t result     = 0;
-	char sendBuff[256] = {}, charId[MAX_ID_SIZE + 1] = {};
+	uint8_t result = 0;
+	char sendBuffer[256] {}, charId[MAX_ID_SIZE + 1] {};
 
 	userId    = GetShort(buffer, index);
 	knightsId = GetShort(buffer, index);
@@ -889,7 +884,7 @@ void AujardApp::ModifyKnightsMember(const char* buffer, uint8_t command)
 	if (userId < 0 || userId >= MAX_USER)
 		return;
 
-	/*	if( remove_flag == 0 && command == KNIGHTS_REMOVE )	{		// 없는 유저 추방시에는 디비에서만 처리한다
+	/*	if( remove_flag == 0 && command == DB_KNIGHTS_REMOVE )	{		// 없는 유저 추방시에는 디비에서만 처리한다
 		result = m_DBAgent.UpdateKnights( command, userid, knightindex, remove_flag );
 		TRACE(_T("ModifyKnights - command=%d, nid=%d, index=%d, result=%d \n"), command, uid, knightindex, result);
 		return;
@@ -899,40 +894,40 @@ void AujardApp::ModifyKnightsMember(const char* buffer, uint8_t command)
 	spdlog::trace("AujardApp::ModifyKnights: command={}, userId={}, knightsId={}, result={}",
 		command, userId, knightsId, result);
 
-	//SetByte(sendBuff, WIZ_KNIGHTS_PROCESS, sendBuff);
-	SetByte(sendBuff, command, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, result, sendIndex);
-	SetShort(sendBuff, knightsId, sendIndex);
-	SetShort(sendBuff, charIdLen, sendIndex);
-	SetString(sendBuff, charId, charIdLen, sendIndex);
-	SetByte(sendBuff, removeFlag, sendIndex);
+	//SetByte(sendBuffer, WIZ_KNIGHTS_PROCESS, sendBuffer);
+	SetByte(sendBuffer, command, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
+	SetByte(sendBuffer, result, sendIndex);
+	SetShort(sendBuffer, knightsId, sendIndex);
+	SetShort(sendBuffer, charIdLen, sendIndex);
+	SetString(sendBuffer, charId, charIdLen, sendIndex);
+	SetByte(sendBuffer, removeFlag, sendIndex);
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
 	{
 		std::string cmdStr;
 		switch (command)
 		{
-			case KNIGHTS_REMOVE:
-				cmdStr = "KNIGHTS_REMOVE";
+			case DB_KNIGHTS_REMOVE:
+				cmdStr = "DB_KNIGHTS_REMOVE";
 				break;
-			case KNIGHTS_ADMIT:
-				cmdStr = "KNIGHTS_ADMIT";
+			case DB_KNIGHTS_ADMIT:
+				cmdStr = "DB_KNIGHTS_ADMIT";
 				break;
-			case KNIGHTS_REJECT:
-				cmdStr = "KNIGHTS_REJECT";
+			case DB_KNIGHTS_REJECT:
+				cmdStr = "DB_KNIGHTS_REJECT";
 				break;
-			case KNIGHTS_CHIEF:
-				cmdStr = "KNIGHTS_CHIEF";
+			case DB_KNIGHTS_CHIEF:
+				cmdStr = "DB_KNIGHTS_CHIEF";
 				break;
-			case KNIGHTS_VICECHIEF:
-				cmdStr = "KNIGHTS_VICECHIEF";
+			case DB_KNIGHTS_VICECHIEF:
+				cmdStr = "DB_KNIGHTS_VICECHIEF";
 				break;
-			case KNIGHTS_OFFICER:
-				cmdStr = "KNIGHTS_OFFICER";
+			case DB_KNIGHTS_OFFICER:
+				cmdStr = "DB_KNIGHTS_OFFICER";
 				break;
-			case KNIGHTS_PUNISH:
-				cmdStr = "KNIGHTS_PUNISH";
+			case DB_KNIGHTS_PUNISH:
+				cmdStr = "DB_KNIGHTS_PUNISH";
 				break;
 			default:
 				cmdStr = "ModifyKnightsMember";
@@ -945,11 +940,11 @@ void AujardApp::ModifyKnightsMember(const char* buffer, uint8_t command)
 void AujardApp::DestroyKnights(const char* buffer)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1;
-	uint8_t result     = 0;
-	char sendBuff[256] = {};
+	uint8_t result = 0;
+	char sendBuffer[256] {};
 
-	userId             = GetShort(buffer, index);
-	knightsId          = GetShort(buffer, index);
+	userId    = GetShort(buffer, index);
+	knightsId = GetShort(buffer, index);
 	if (userId < 0 || userId >= MAX_USER)
 		return;
 
@@ -957,19 +952,19 @@ void AujardApp::DestroyKnights(const char* buffer)
 	spdlog::trace(
 		"AujardApp::DestroyKnights: userId={}, knightsId={}, result={}", userId, knightsId, result);
 
-	SetByte(sendBuff, KNIGHTS_DESTROY, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, result, sendIndex);
-	SetShort(sendBuff, knightsId, sendIndex);
+	SetByte(sendBuffer, DB_KNIGHTS_DESTROY, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
+	SetByte(sendBuffer, result, sendIndex);
+	SetShort(sendBuffer, knightsId, sendIndex);
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
-		spdlog::error("AujardApp::DestroyKnights: Packet Drop: KNIGHTS_DESTROY");
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
+		spdlog::error("AujardApp::DestroyKnights: Packet Drop: DB_KNIGHTS_DESTROY");
 }
 
 void AujardApp::AllKnightsMember(const char* buffer)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1, dbIndex = 0, count = 0;
-	char sendBuff[2048] = {}, dbBuff[2048] = {};
+	char sendBuffer[2048] {}, dbBuff[2048] {};
 
 	userId    = GetShort(buffer, index);
 	knightsId = GetShort(buffer, index);
@@ -983,22 +978,22 @@ void AujardApp::AllKnightsMember(const char* buffer)
 	count = _dbAgent.LoadKnightsAllMembers(knightsId, 0, dbBuff, dbIndex);
 	//count = m_DBAgent.LoadKnightsAllMembers( knightindex, page*10, temp_buff, buff_index );
 
-	SetByte(sendBuff, KNIGHTS_MEMBER_REQ, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, 0x00, sendIndex);         // Success
-	SetShort(sendBuff, 4 + dbIndex, sendIndex); // total packet size -> int16_t(*3) + buff_index
-	//SetShort( send_buff, page, send_index );
-	SetShort(sendBuff, count, sendIndex);
-	SetString(sendBuff, dbBuff, dbIndex, sendIndex);
+	SetByte(sendBuffer, DB_KNIGHTS_MEMBER_REQ, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
+	SetByte(sendBuffer, 0x00, sendIndex);         // Success
+	SetShort(sendBuffer, 4 + dbIndex, sendIndex); // total packet size -> int16_t(*3) + buff_index
+	//SetShort( send_buff, page, sendIndex );
+	SetShort(sendBuffer, count, sendIndex);
+	SetString(sendBuffer, dbBuff, dbIndex, sendIndex);
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
-		spdlog::error("AujardApp::AllKnightsMember: Packet Drop: KNIGHTS_MEMBER_REQ");
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
+		spdlog::error("AujardApp::AllKnightsMember: Packet Drop: DB_KNIGHTS_MEMBER_REQ");
 }
 
 void AujardApp::KnightsList(const char* buffer)
 {
 	int index = 0, sendIndex = 0, knightsId = 0, userId = -1, dbIndex = 0;
-	char sendBuff[256] = {}, dbBuff[256] = {};
+	char sendBuffer[256] {}, dbBuff[256] {};
 
 	userId    = GetShort(buffer, index);
 	knightsId = GetShort(buffer, index);
@@ -1007,21 +1002,21 @@ void AujardApp::KnightsList(const char* buffer)
 
 	_dbAgent.LoadKnightsInfo(knightsId, dbBuff, dbIndex);
 
-	SetByte(sendBuff, KNIGHTS_LIST_REQ, sendIndex);
-	SetShort(sendBuff, userId, sendIndex);
-	SetByte(sendBuff, 0x00, sendIndex);
-	SetString(sendBuff, dbBuff, dbIndex, sendIndex);
+	SetByte(sendBuffer, DB_KNIGHTS_LIST_REQ, sendIndex);
+	SetShort(sendBuffer, userId, sendIndex);
+	SetByte(sendBuffer, 0x00, sendIndex);
+	SetString(sendBuffer, dbBuff, dbIndex, sendIndex);
 
-	if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
-		spdlog::error("AujardApp::KnightsList: Packet Drop: KNIGHTS_LIST_REQ");
+	if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
+		spdlog::error("AujardApp::KnightsList: Packet Drop: DB_KNIGHTS_LIST_REQ");
 }
 
 void AujardApp::SetLogInInfo(const char* buffer)
 {
 	int index = 0, accountIdLen = 0, charIdLen = 0, serverId = 0, serverIpLen = 0, clientIpLen = 0,
 		userId = -1, sendIndex = 0;
-	char accountId[MAX_ID_SIZE + 1] = {}, serverIp[20] = {}, clientIp[20] = {},
-								 charId[MAX_ID_SIZE + 1] = {}, sendBuff[256] = {};
+	char accountId[MAX_ID_SIZE + 1] {}, serverIp[20] {}, clientIp[20] {};
+	char charId[MAX_ID_SIZE + 1] {}, sendBuffer[256] {};
 
 	userId       = GetShort(buffer, index);
 	accountIdLen = GetShort(buffer, index);
@@ -1039,11 +1034,11 @@ void AujardApp::SetLogInInfo(const char* buffer)
 
 	if (!_dbAgent.SetLogInInfo(accountId, charId, serverIp, serverId, clientIp, init))
 	{
-		SetByte(sendBuff, WIZ_LOGIN_INFO, sendIndex);
-		SetShort(sendBuff, userId, sendIndex);
-		SetByte(sendBuff, 0x00, sendIndex); // FAIL
+		SetByte(sendBuffer, WIZ_LOGIN_INFO, sendIndex);
+		SetShort(sendBuffer, userId, sendIndex);
+		SetByte(sendBuffer, 0x00, sendIndex); // FAIL
 
-		if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
+		if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
 		{
 			spdlog::error("AujardApp::SetLoginInfo: Packet Drop: WIZ_LOGIN_INFO [accountId={}, "
 						  "charId={}, init={}]",
@@ -1055,9 +1050,9 @@ void AujardApp::SetLogInInfo(const char* buffer)
 void AujardApp::UserKickOut(const char* buffer)
 {
 	int index = 0, accountIdLen = 0;
-	char accountId[MAX_ID_SIZE + 1] = {};
+	char accountId[MAX_ID_SIZE + 1] {};
 
-	accountIdLen                    = GetShort(buffer, index);
+	accountIdLen = GetShort(buffer, index);
 	GetString(accountId, buffer, accountIdLen, index);
 
 	_dbAgent.AccountLogout(accountId);
@@ -1072,11 +1067,11 @@ void AujardApp::WritePacketLog()
 void AujardApp::BattleEventResult(const char* data)
 {
 	int _type = 0, result = 0, charIdLen = 0, index = 0;
-	char charId[MAX_ID_SIZE + 1] = {};
+	char charId[MAX_ID_SIZE + 1] {};
 
-	_type                        = GetByte(data, index);
-	result                       = GetByte(data, index);
-	charIdLen                    = GetByte(data, index);
+	_type     = GetByte(data, index);
+	result    = GetByte(data, index);
+	charIdLen = GetByte(data, index);
 	if (charIdLen > 0 && charIdLen < MAX_ID_SIZE + 1)
 	{
 		GetString(charId, data, charIdLen, index);
@@ -1090,8 +1085,8 @@ void AujardApp::BattleEventResult(const char* data)
 void AujardApp::CouponEvent(const char* data)
 {
 	int index = 0, sendIndex = 0;
-	char strAccountName[MAX_ID_SIZE + 1] = {}, strCharName[MAX_ID_SIZE + 1] = {},
-									  strCouponID[MAX_ID_SIZE + 1] = {}, sendBuff[256] = {};
+	char strAccountName[MAX_ID_SIZE + 1] {}, strCharName[MAX_ID_SIZE + 1] {};
+	char strCouponID[MAX_ID_SIZE + 1] {}, sendBuffer[256] {};
 
 	int nType = GetByte(data, index);
 	if (nType == CHECK_COUPON_EVENT)
@@ -1106,15 +1101,15 @@ void AujardApp::CouponEvent(const char* data)
 		// int nResult = _dbAgent.CheckCouponEvent(strAccountName);
 		int nResult     = 0;
 
-		SetByte(sendBuff, DB_COUPON_EVENT, sendIndex);
-		SetShort(sendBuff, nSid, sendIndex);
-		SetByte(sendBuff, nResult, sendIndex);
-		SetDWORD(sendBuff, nEventNum, sendIndex);
+		SetByte(sendBuffer, DB_COUPON_EVENT, sendIndex);
+		SetShort(sendBuffer, nSid, sendIndex);
+		SetByte(sendBuffer, nResult, sendIndex);
+		SetDWORD(sendBuffer, nEventNum, sendIndex);
 		// 비러머글 대사문 >.<
-		SetDWORD(sendBuff, nMessageNum, sendIndex);
+		SetDWORD(sendBuffer, nMessageNum, sendIndex);
 		//
 
-		if (LoggerSendQueue.PutData(sendBuff, sendIndex) != SMQ_OK)
+		if (LoggerSendQueue.PutData(sendBuffer, sendIndex) != SMQ_OK)
 			spdlog::error("AujardApp::CouponEvent: Packet Drop: DB_COUPON_EVENT");
 	}
 	else if (nType == UPDATE_COUPON_EVENT)

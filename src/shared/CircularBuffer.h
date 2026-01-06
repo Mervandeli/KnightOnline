@@ -118,11 +118,11 @@ inline void CCircularBuffer::BufferResize()
 
 inline CircularBufferSpan CCircularBuffer::PutData(char* pData, int len, bool resize /*= true*/)
 {
-	CircularBufferSpan span = {};
+	CircularBufferSpan span {};
 
 	if (len <= 0)
 	{
-		spdlog::error("CCircularBuffer::PutData len is <= 0");
+		spdlog::error("CircularBuffer::PutData len is <= 0");
 		return span;
 	}
 

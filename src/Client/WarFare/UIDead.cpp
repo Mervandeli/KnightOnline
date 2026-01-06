@@ -19,23 +19,15 @@
 #include <N3Base/N3UITooltip.h>
 #include <N3Base/N3UIString.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
+constexpr int CHILD_UI_REVIVE_MSG          = 1;
+constexpr int CHILD_UI_LACK_LIVE_STONE_MSG = 2;
+constexpr int CHILD_UI_LOW_LEVEL           = 3;
 
-#define CHILD_UI_REVIVE_MSG          1
-#define CHILD_UI_LACK_LIVE_STONE_MSG 2
-#define CHILD_UI_LOW_LEVEL           3
+constexpr int TIMES_LIFE_STONE             = 3;
+constexpr int LIFE_STONE_INDEX             = 379006000;
 
-#define TIMES_LIFE_STONE             3
-#define LIFE_STONE_INDEX             379006000
-
-#define REVIVAL_TYPE_RETURN_TOWN     1
-#define REVIVAL_TYPE_LIFE_STONE      2
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+constexpr int REVIVAL_TYPE_RETURN_TOWN     = 1;
+constexpr int REVIVAL_TYPE_LIFE_STONE      = 2;
 
 CUIDead::CUIDead()
 {
@@ -210,19 +202,11 @@ uint32_t CUIDead::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& p
 
 void CUIDead::CallBackProc(int iID, uint32_t dwFlag)
 {
-	//TRACE("OnButton ID:%d Btn %d\n",iID, dwFlag);
-
 	if (iID == CHILD_UI_REVIVE_MSG)
 	{
 		// OK
 		if (dwFlag == 1)
 			MsgSend_Revival(REVIVAL_TYPE_LIFE_STONE);
-	}
-	else if (iID == CHILD_UI_LACK_LIVE_STONE_MSG)
-	{
-	}
-	else if (iID == CHILD_UI_LOW_LEVEL)
-	{
 	}
 }
 
@@ -244,7 +228,6 @@ void CUIDead::MsgSend_Revival(uint8_t byType)
 
 	CLogWriter::Write("Send Regeneration");
 	CGameBase::s_pPlayer->m_iSendRegeneration = 2;    // 한번 보내면 다시 죽을때까지 안보내는 플래그
-	//TRACE("보냄 - 다시 살아나기\n");
 
 	m_bProcessing                             = true;
 }
@@ -269,8 +252,6 @@ void CUIDead::MsgRecv_Revival(Packet& pkt)
 
 	// 한번 보내면 다시 죽을때까지 안보내는 플래그
 	CGameBase::s_pPlayer->m_fTimeAfterDeath   = 0;
-
-	// TRACE("받음 - 다시 살아나기(%.1f, %.1f)\n", vPosPlayer.x, vPosPlayer.z);
 
 	// 마법 & 효과 초기화..
 	if (CGameProcedure::s_pProcMain->m_pUIStateBarAndMiniMap != nullptr)

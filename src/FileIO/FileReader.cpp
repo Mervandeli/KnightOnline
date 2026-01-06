@@ -1,14 +1,13 @@
 ﻿#include "FileReader.h"
 
 #include <cassert>
+#include <cstdio>  // SEEK_SET, SEEK_CUR, SEEK_END
 #include <cstring> // std::memcpy()
-#include <stdio.h> // SEEK_SET, SEEK_CUR, SEEK_END
 
 namespace llfio = LLFIO_V2_NAMESPACE;
 
 FileReader::FileReader()
 {
-	_address = nullptr;
 }
 
 bool FileReader::OpenExisting(const std::filesystem::path& path)

@@ -7,15 +7,6 @@
 #include "GameProcedure.h"
 #include "UIManager.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIMessageBoxManager::CUIMessageBoxManager()
 {
 	m_pMsgBoxLatestRef = nullptr;
@@ -23,7 +14,7 @@ CUIMessageBoxManager::CUIMessageBoxManager()
 
 CUIMessageBoxManager::~CUIMessageBoxManager()
 {
-	Release();
+	CUIMessageBoxManager::Release();
 }
 
 int CUIMessageBoxManager::GetCount() const
@@ -151,23 +142,26 @@ void CUIMessageBoxManager::MessageBoxCloseAll()
 uint32_t CUIMessageBoxManager::MouseProcAndTick(uint32_t& dwFlags, const POINT& ptCur, const POINT& ptOld)
 {
 	uint32_t dwRet = 0;
-	CUIMessageBox* pMB;
 
-	if (m_pMsgBoxLatestRef && m_pMsgBoxLatestRef->IsVisible())
+	if (m_pMsgBoxLatestRef != nullptr && m_pMsgBoxLatestRef->IsVisible())
 	{
 		dwRet = m_pMsgBoxLatestRef->MouseProc(dwFlags, ptCur, ptOld);
 		if (dwRet != UI_MOUSEPROC_NONE)
 			dwFlags = 0;
-		if (m_pMsgBoxLatestRef)
+
+		// NOTE: This seems redundant, but MouseProc() can cause it to be reset.
+		if (m_pMsgBoxLatestRef != nullptr)
 			m_pMsgBoxLatestRef->Tick();
 	}
 
-	it_UBM it = m_UBMs.begin(), it_e = m_UBMs.end();
-	for (; it != it_e; it++)
+	for (auto& [_, pMB] : m_UBMs)
 	{
-		pMB = it->second;
-		if (false == pMB->IsVisible())
+		if (pMB == nullptr)
 			continue;
+
+		if (!pMB->IsVisible())
+			continue;
+
 		if (m_pMsgBoxLatestRef == pMB)
 			continue;
 

@@ -6,15 +6,6 @@
 #include "N3UITrackBar.h"
 #include "N3UIImage.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3UITrackBar::CN3UITrackBar()
 {
 	m_eType          = UI_TYPE_TRACKBAR;
@@ -305,8 +296,11 @@ void CN3UITrackBar::UpDownThumbPos(int iDiff)
 }
 
 #ifdef _N3TOOL
-void CN3UITrackBar::operator=(const CN3UITrackBar& other)
+CN3UITrackBar& CN3UITrackBar::operator=(const CN3UITrackBar& other)
 {
+	if (this == &other)
+		return *this;
+
 	CN3UIBase::operator=(other);
 
 	m_iMaxPos   = other.m_iMaxPos;   // 최대
@@ -320,6 +314,7 @@ void CN3UITrackBar::operator=(const CN3UITrackBar& other)
 		CN3UIBase* pChild = (*itor);
 		if (UI_TYPE_IMAGE != pChild->UIType())
 			continue; // image만 골라내기
+
 		int iImageType = (int) (pChild->GetReserved());
 		if (IMAGETYPE_BKGND == iImageType)
 		{
@@ -330,6 +325,8 @@ void CN3UITrackBar::operator=(const CN3UITrackBar& other)
 			m_pThumbImageRef = (CN3UIImage*) pChild;
 		}
 	}
+
+	return *this;
 }
 
 void CN3UITrackBar::CreateImages()

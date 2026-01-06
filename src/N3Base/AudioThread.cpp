@@ -30,13 +30,13 @@ void AudioThread::thread_loop()
 	_decoderThread     = std::make_unique<AudioDecoderThread>();
 	_decoderThread->start();
 
-	while (_canTick)
+	while (CanTick())
 	{
 		{
-			std::unique_lock<std::mutex> lock(_mutex);
-			std::cv_status status = _cv.wait_for(lock, 20ms);
+			std::unique_lock<std::mutex> lock(ThreadMutex());
+			std::cv_status status = ThreadCondition().wait_for(lock, 20ms);
 
-			if (!_canTick)
+			if (!CanTick())
 				break;
 
 			// Ignore spurious wakeups
@@ -115,7 +115,7 @@ void AudioThread::Add(std::shared_ptr<AudioHandle> handle)
 	// This avoids the gap between processing where it might not quite be in the map yet.
 	handle->IsManaged.store(true);
 
-	std::lock_guard<std::mutex> lock(_mutex);
+	std::lock_guard<std::mutex> lock(ThreadMutex());
 	_pendingQueue.push_back(std::make_tuple(AUDIO_QUEUE_ADD, std::move(handle), nullptr));
 }
 
@@ -131,7 +131,7 @@ void AudioThread::QueueCallback(std::shared_ptr<AudioHandle> handle, AudioCallba
 	if (handle->SourceId == INVALID_AUDIO_SOURCE_ID)
 		return;
 
-	std::lock_guard<std::mutex> lock(_mutex);
+	std::lock_guard<std::mutex> lock(ThreadMutex());
 	_pendingQueue.push_back(
 		std::make_tuple(AUDIO_QUEUE_CALLBACK, std::move(handle), std::move(callback)));
 }
@@ -148,7 +148,7 @@ void AudioThread::Remove(std::shared_ptr<AudioHandle> handle)
 	if (handle->SourceId == INVALID_AUDIO_SOURCE_ID)
 		return;
 
-	std::lock_guard<std::mutex> lock(_mutex);
+	std::lock_guard<std::mutex> lock(ThreadMutex());
 	_pendingQueue.push_back(std::make_tuple(AUDIO_QUEUE_REMOVE, std::move(handle), nullptr));
 }
 
@@ -214,7 +214,7 @@ void AudioThread::reset(std::shared_ptr<AudioHandle>& handle, bool alreadyManage
 			_decoderThread->Add(std::move(streamedAudioHandle));
 
 			// Force an initial tick to push our decoded data before play is triggered.
-			AudioDecodedChunk tmpDecodedChunk = {};
+			AudioDecodedChunk tmpDecodedChunk {};
 			tick_decoder(handle, tmpDecodedChunk);
 		}
 	}

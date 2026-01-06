@@ -12,7 +12,6 @@ class CNpcMagicProcess
 public:
 	AIServerApp* m_pMain;
 	CNpc* m_pSrcNpc;
-	uint8_t m_bMagicState;
 
 public:
 	CNpcMagicProcess();
@@ -31,7 +30,10 @@ public:
 	void ExecuteType1(
 		int magicid, int tid, int data1, int data2, int data3); // sequence => type1 or type2
 
-	model::Magic* IsAvailable(int magicid, int tid, uint8_t type);
+	void SendMagicAttackResult(uint8_t opcode, int magicId, int sourceId, int targetId, int data1,
+		int data2, int data3, int data4 = 0, int data5 = 0, int data6 = 0, int data7 = 0);
+
+	model::Magic* IsAvailable(int magicid, int tid);
 	void MagicPacket(char* pBuf, int len);
 };
 

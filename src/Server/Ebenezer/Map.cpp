@@ -9,7 +9,7 @@
 #include <Ebenezer/binder/EbenezerBinder.h>
 #include <FileIO/File.h>
 
-#include <float.h>
+#include <cfloat>
 #include <istream>
 
 using namespace db;
@@ -18,19 +18,6 @@ extern std::recursive_mutex g_region_mutex;
 
 C3DMap::C3DMap()
 {
-	m_nMapSize    = 0;
-	m_fUnitDist   = 0.0f;
-	m_fHeight     = nullptr;
-
-	m_nXRegion    = 0;
-	m_nZRegion    = 0;
-
-	m_ppRegion    = nullptr;
-	m_nZoneNumber = 0;
-	m_bType       = 0;
-	m_wBundle     = 1;
-	m_sMaxUser    = 150; // Max user in Battlezone!!!
-	m_pMain       = nullptr;
 }
 
 C3DMap::~C3DMap()
@@ -246,14 +233,13 @@ void C3DMap::LoadTerrain(File& fs)
 
 float C3DMap::GetHeight(float x, float y, float z)
 {
-	int iX, iZ;
+	int iX = 0, iZ = 0;
+	float fYTerrain = 0.0f, h1 = 0.0f, h2 = 0.0f, h3 = 0.0f, dX = 0.0f, dZ = 0.0f;
+
 	iX = (int) (x / m_fUnitDist);
 	iZ = (int) (z / m_fUnitDist);
 	//assert( iX, iZ가 범위내에 있는 값인지 체크하기);
 
-	float fYTerrain;
-	float h1, h2, h3;
-	float dX, dZ;
 	dX = (x - iX * m_fUnitDist) / m_fUnitDist;
 	dZ = (z - iZ * m_fUnitDist) / m_fUnitDist;
 
@@ -460,7 +446,7 @@ void C3DMap::RegionNpcRemove(int rx, int rz, int nid)
 bool C3DMap::CheckEvent(float x, float z, CUser* pUser)
 {
 	CGameEvent* pEvent = nullptr;
-	int iX, iZ, event_index = 0;
+	int iX = 0, iZ = 0, event_index = 0;
 
 	iX = (int) (x / m_fUnitDist);
 	iZ = (int) (z / m_fUnitDist);
@@ -482,7 +468,7 @@ bool C3DMap::CheckEvent(float x, float z, CUser* pUser)
 			&& m_pMain->m_byBattleOpen != SNOW_BATTLE)
 			return false;
 
-		if (pUser->m_pUserData->m_bNation == KARUS && pEvent->m_iExec[0] == ZONE_BATTLE)
+		if (pUser->m_pUserData->m_bNation == NATION_KARUS && pEvent->m_iExec[0] == ZONE_BATTLE)
 		{
 			if (m_pMain->m_sKarusCount > MAX_BATTLE_ZONE_USERS)
 			{
@@ -491,7 +477,8 @@ bool C3DMap::CheckEvent(float x, float z, CUser* pUser)
 				return false;
 			}
 		}
-		else if (pUser->m_pUserData->m_bNation == ELMORAD && pEvent->m_iExec[0] == ZONE_BATTLE)
+		else if (pUser->m_pUserData->m_bNation == NATION_ELMORAD
+				 && pEvent->m_iExec[0] == ZONE_BATTLE)
 		{
 			if (m_pMain->m_sElmoradCount > MAX_BATTLE_ZONE_USERS)
 			{
@@ -519,7 +506,7 @@ bool C3DMap::LoadEvent()
 		{
 			do
 			{
-				ModelType row = {};
+				ModelType row {};
 				recordset.get_ref(row);
 
 				if (row.ZoneNumber != m_nZoneNumber)

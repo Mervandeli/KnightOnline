@@ -39,6 +39,9 @@
 
 #pragma once
 
+// This is third party code which was written for C. We can ignore it.
+// NOLINTBEGIN
+
 #define LZF_MARGIN  128
 #define LZF_VERSION 0x0105 /* 1.5, API version */
 #define AVOID_ERRNO 1
@@ -162,14 +165,14 @@ typedef unsigned int u16;
 * it works ;)
 */
 #ifndef FRST
-#define FRST(p)    (((p[0]) << 8) | p[1])
-#define NEXT(v, p) (((v) << 8) | p[2])
+#define FRST(p)    ((((p)[0]) << 8) | (p)[1])
+#define NEXT(v, p) (((v) << 8) | (p)[2])
 #if ULTRA_FAST
-#define IDX(h) (((h >> (3 * 8 - HLOG)) - h) & (HSIZE - 1))
+#define IDX(h) ((((h) >> (3 * 8 - HLOG)) - (h)) & (HSIZE - 1))
 #elif VERY_FAST
-#define IDX(h) (((h >> (3 * 8 - HLOG)) - h * 5) & (HSIZE - 1))
+#define IDX(h) ((((h) >> (3 * 8 - HLOG)) - (h) * 5) & (HSIZE - 1))
 #else
-#define IDX(h) ((((h ^ (h << 5)) >> (3 * 8 - HLOG)) - h * 5) & (HSIZE - 1))
+#define IDX(h) (((((h) ^ ((h) << 5)) >> (3 * 8 - HLOG)) - (h) * 5) & (HSIZE - 1))
 #endif
 #endif
 /*
@@ -183,8 +186,8 @@ typedef unsigned int u16;
 
 #if 0
 /* original lzv-like hash function, much worse and thus slower */
-#define FRST(p)    (p[0] << 5) ^ p[1]
-#define NEXT(v, p) ((v) << 5) ^ p[2]
+#define FRST(p)    ((p)[0] << 5) ^ (p)[1]
+#define NEXT(v, p) ((v) << 5) ^ (p)[2]
 #define IDX(h)     ((h) & (HSIZE - 1))
 #endif
 
@@ -248,5 +251,7 @@ unsigned int lzf_compress(
 
 unsigned int lzf_decompress(
 	const void* const in_data, unsigned int in_len, void* out_data, unsigned int out_len);
+
+// NOLINTEND
 
 #endif // SHARED_LZF_H

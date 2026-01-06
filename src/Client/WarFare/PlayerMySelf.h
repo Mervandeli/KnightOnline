@@ -5,9 +5,7 @@
 #if !defined(AFX_PLAYERMGR_H__036554E3_CDCC_4B13_97B2_34C5D4D63E8C__INCLUDED_)
 #define AFX_PLAYERMGR_H__036554E3_CDCC_4B13_97B2_34C5D4D63E8C__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <list>
 #include "PlayerBase.h"
@@ -20,8 +18,6 @@ protected:
 
 	/// \brief the last time an attack/skill message was sent to the server
 	float m_fAttackTimeRecent;
-
-	__Vector3 m_vCollisionOffsets[3]; // 허리 부분 2개의 충돌 체크 + 머리 부분 1개의 충돌 체크..
 
 public:
 	__InfoPlayerMySelf m_InfoExt;
@@ -46,19 +42,23 @@ public:
 	int m_iMoveTarget;               // 타겟 아이디
 	__Vector3 m_vTargetPos;          // 이동할 지점 위치
 	void SetMoveTargetID(int iID);
-	void SetMoveTargetPos(__Vector3 vPos);
+	void SetMoveTargetPos(const __Vector3& vPos);
 
 public:
 	void TargetOrPosMove();
-	void Stun(float fTime);                        // 일정한 시간동안 기절 시키기.
-	void StunRelease();                            // 기절 풀기..
+	void Stun(float fTime); // 일정한 시간동안 기절 시키기.
+	void StunRelease();     // 기절 풀기..
 
-	float MoveSpeedCalculationAndCheckCollision(); // 속도를 구하고 그 속도로 충돌 체크를 한다. 리턴값이 0 이면 충돌이다..
+	// 속도를 구하고 그 속도로 충돌 체크를 한다. 리턴값이 0 이면 충돌이다..
+	float MoveSpeedCalculationAndCheckCollision();
 
-	void InitFace();                               // 갖고 있는 정보로 얼굴을 초기화 한다..
-	void InitHair();                               // 갖고 있는 정보로 머리카락을 초기화 한다..
-	void KnightsInfoSet(int iID, const std::string& szName, int iGrade, int iRank);
-	void SetSoundAndInitFont(uint32_t dwFontFlag = 0UL);
+	// 갖고 있는 정보로 얼굴을 초기화 한다..
+	void InitFace() override;
+
+	// 갖고 있는 정보로 머리카락을 초기화 한다..
+	void InitHair() override;
+	void KnightsInfoSet(int iID, const std::string& szName, int iGrade, int iRank) override;
+	void SetSoundAndInitFont(uint32_t dwFontFlag = 0U) override;
 
 	float AttackableDistance(CPlayerBase* pTarget);
 	float DistanceExceptRadius(CPlayerBase* pTarget);
@@ -68,18 +68,21 @@ public:
 	/// \param bMeasureAngle does the target need to be in front of the attacker?
 	/// \returns true if attack would be valid, false otherwise
 	bool IsAttackableTarget(CPlayerBase* pTarget, bool bMeasureAngle = true); // 공격 가능한 범위에 있는지..
-	bool IsRunning()
+
+	bool IsRunning() const
 	{
 		return m_bRunning;
 	}
-	bool CheckCollision(); // 움직이는 처리와 충돌체크를 한다. 충돌되는게 있으면 움직이지 않는다.
-	//..
-	bool InitChr(__TABLE_PLAYER_LOOKS* pTblUPC);
-	CN3CPart* PartSet(e_PartPosition ePos, const std::string& szFN, __TABLE_ITEM_BASIC* pItemBasic, __TABLE_ITEM_EXT* pItemExt);
-	CN3CPlugBase* PlugSet(e_PlugPosition ePos, const std::string& szFN, __TABLE_ITEM_BASIC* pItemBasic, __TABLE_ITEM_EXT* pItemExt);
 
-	void Tick();
-	void Render(float fSunAngle);
+	bool CheckCollision(); // 움직이는 처리와 충돌체크를 한다. 충돌되는게 있으면 움직이지 않는다.
+
+	bool InitChr(__TABLE_PLAYER_LOOKS* pTblUPC) override;
+	CN3CPart* PartSet(e_PartPosition ePos, const std::string& szFN, __TABLE_ITEM_BASIC* pItemBasic, __TABLE_ITEM_EXT* pItemExt) override;
+	CN3CPlugBase* PlugSet(
+		e_PlugPosition ePos, const std::string& szFN, __TABLE_ITEM_BASIC* pItemBasic, __TABLE_ITEM_EXT* pItemExt) override;
+
+	void Tick() override;
+	void Render(float fSunAngle) override;
 
 	__Vector3 NextPos(float fTimeAfter);
 	void RotAdd(const float fRotRadianPerSec); // y 축을 기준으로 초당 회전하는 속도를 넣어준다.
@@ -96,9 +99,9 @@ public:
 
 	bool HasWeaponEquipped() const;
 
-	void Release();
+	void Release() override;
 	CPlayerMySelf();
-	virtual ~CPlayerMySelf();
+	~CPlayerMySelf() override;
 };
 
 #endif // !defined(AFX_PLAYERMGR_H__036554E3_CDCC_4B13_97B2_34C5D4D63E8C__INCLUDED_)

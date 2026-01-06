@@ -12,15 +12,6 @@
 #include <N3Base/N3ShapeMgr.h>
 #include <N3Base/N3SndObj.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CPlayerNPC::CPlayerNPC()
 {
 	m_ePlayerType    = PLAYER_NPC;  // Player Type ... Base, NPC, OTher, MySelf
@@ -91,12 +82,12 @@ void CPlayerNPC::Tick()
 		}
 
 		float fYTerrain = ACT_WORLD->GetHeightWithTerrain(vPos.x, vPos.z); // 지면의 높이값..
-		float fYMesh    = ACT_WORLD->GetHeightNearstPosWithShape(vPos, 1.0f); // 충돌 체크 오브젝트의 높이값..
+		float fYMesh    = ACT_WORLD->GetHeightNearstPosWithShape(vPos);    // 충돌 체크 오브젝트의 높이값..
 		if (fYMesh != -FLT_MAX && fYMesh > fYTerrain && fYMesh < m_fYNext + 1.0f)
-			m_fYNext = fYMesh;                                                // 올라갈수 있는 오브젝트이고 높이값이 지면보다 높으면.
+			m_fYNext = fYMesh;                                             // 올라갈수 있는 오브젝트이고 높이값이 지면보다 높으면.
 		else
 			m_fYNext = fYTerrain;
-		this->PositionSet(vPos, false);                                       // 위치 최종 적용..
+		this->PositionSet(vPos, false);                                    // 위치 최종 적용..
 	}
 
 	// 공격 중이거나 스킬 사용중이면..
@@ -116,29 +107,24 @@ void CPlayerNPC::MoveTo(float fPosX, float fPosY, float fPosZ, float fSpeed, int
 		return; // 오브젝트 형식이면 움직일수가 없다..
 
 	// iMoveMode : 현재 움직이는 상태.. 0 -정지 1 움직임시작 2 - 1초마다 한번 연속움직임..
-	if (0 == iMoveMode)
-	{
-	}
-	else if (iMoveMode) // 움직임 시작.. // 계속 움직임
-	{
-		m_fMoveSpeedPerSec = fSpeed;
-		__Vector3 vPos     = m_Chr.Pos();
-		vPos.y             = 0;
-		__Vector3 vPosS(fPosX, 0, fPosZ);
+	if (iMoveMode == 0)
+		return;
 
-		if (fSpeed)
-			m_fMoveSpeedPerSec *= ((vPosS - vPos).Magnitude() / (fSpeed * PACKET_INTERVAL_MOVE))
-								  * 0.85f; // 속도보간.. 동기화때문에 그런다.. 약간 줄여주는 이유는 멈칫하는걸 방지하기 위해서이다..
-		else
-			m_fMoveSpeedPerSec = ((vPosS - vPos).Magnitude() / (fSpeed * PACKET_INTERVAL_MOVE))
-								 * 0.85f;  // 속도보간.. 동기화때문에 그런다.. 약간 줄여주는 이유는 멈칫하는걸 방지하기 위해서이다..
-		if (fSpeed < 0)
-			m_fMoveSpeedPerSec *= -1.0f;   // 뒤로 간다..
-	}
+	m_fMoveSpeedPerSec = fSpeed;
+
+	__Vector3 vPos     = m_Chr.Pos();
+	vPos.y             = 0;
+
+	__Vector3 vPosS(fPosX, 0, fPosZ);
+
+	if (fSpeed)
+		m_fMoveSpeedPerSec *= ((vPosS - vPos).Magnitude() / (fSpeed * PACKET_INTERVAL_MOVE))
+							  * 0.85f; // 속도보간.. 동기화때문에 그런다.. 약간 줄여주는 이유는 멈칫하는걸 방지하기 위해서이다..
 	else
-	{
-		//		__ASSERT(0, "Invalid Move Mode");
-	}
+		m_fMoveSpeedPerSec = ((vPosS - vPos).Magnitude() / (fSpeed * PACKET_INTERVAL_MOVE))
+							 * 0.85f;  // 속도보간.. 동기화때문에 그런다.. 약간 줄여주는 이유는 멈칫하는걸 방지하기 위해서이다..
+	if (fSpeed < 0)
+		m_fMoveSpeedPerSec *= -1.0f;   // 뒤로 간다..
 }
 
 void CPlayerNPC::SetSoundAndInitFont(uint32_t dwFontFlag)

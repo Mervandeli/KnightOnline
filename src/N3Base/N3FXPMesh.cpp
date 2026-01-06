@@ -6,15 +6,6 @@
 #include "N3FXPMesh.h"
 #include "N3PMesh.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3FXPMesh::CN3FXPMesh()
 {
 	m_fRadius        = 0.0f;
@@ -26,7 +17,7 @@ CN3FXPMesh::CN3FXPMesh()
 
 CN3FXPMesh::~CN3FXPMesh()
 {
-	Release();
+	CN3FXPMesh::Release();
 }
 
 HRESULT CN3FXPMesh::Create(int iNumVertices, int iNumIndices)
@@ -51,25 +42,21 @@ HRESULT CN3FXPMesh::Create(int iNumVertices, int iNumIndices)
 	}
 
 	if (m_iMaxNumVertices > 0)
-	{
 		m_pVertices = new __VertexT1[m_iMaxNumVertices];
-	}
+
 	if (m_iMaxNumIndices > 0)
-	{
 		m_pIndices = new uint16_t[m_iMaxNumIndices];
-	}
+
 	if (m_iMaxNumVertices > 0)
-	{
 		m_pColorVertices = new __VertexXyzColorT1[m_iMaxNumVertices];
-	}
 
 	return S_OK;
 }
 
-void CN3FXPMesh::operator=(const CN3FXPMesh& fxPMesh)
+CN3FXPMesh& CN3FXPMesh::operator=(const CN3FXPMesh& fxPMesh)
 {
 	if (this == &fxPMesh)
-		return;
+		return *this;
 
 	Release();
 
@@ -90,28 +77,41 @@ void CN3FXPMesh::operator=(const CN3FXPMesh& fxPMesh)
 
 	Create(m_iMaxNumVertices, m_iMaxNumIndices);
 
-	memcpy(
-		m_pColorVertices, fxPMesh.m_pColorVertices, sizeof(__VertexXyzColorT1) * m_iMaxNumVertices);
-	memcpy(m_pIndices, fxPMesh.m_pIndices, sizeof(uint16_t) * m_iMaxNumIndices);
-
-	if (m_iNumCollapses > 0)
+	if (m_pColorVertices != nullptr && fxPMesh.m_pColorVertices != nullptr)
 	{
-		m_pCollapses = new __EdgeCollapse
-			[m_iNumCollapses
-				+ 1]; // +1을 한 이유 : PMeshInstance::SplitOne() 함수에서 부득이하게 포인터가 경계선을 가르키게 해야 하는 경우가 있어서.
+		memcpy(m_pColorVertices, fxPMesh.m_pColorVertices,
+			sizeof(__VertexXyzColorT1) * m_iMaxNumVertices);
+	}
+
+	if (m_pIndices != nullptr && fxPMesh.m_pIndices != nullptr)
+		memcpy(m_pIndices, fxPMesh.m_pIndices, sizeof(uint16_t) * m_iMaxNumIndices);
+
+	if (m_iNumCollapses > 0 && fxPMesh.m_pCollapses != nullptr)
+	{
+		// +1을 한 이유 : PMeshInstance::SplitOne() 함수에서 부득이하게 포인터가 경계선을 가르키게 해야 하는 경우가 있어서.
+		m_pCollapses = new __EdgeCollapse[m_iNumCollapses + 1];
 		memcpy(m_pCollapses, fxPMesh.m_pCollapses, sizeof(__EdgeCollapse) * (m_iMaxNumIndices + 1));
 	}
 
-	m_pLODCtrlValues = new __LODCtrlValue[m_iLODCtrlValueCount];
-	memcpy(
-		m_pLODCtrlValues, fxPMesh.m_pLODCtrlValues, sizeof(__LODCtrlValue) * m_iLODCtrlValueCount);
+	if (fxPMesh.m_pLODCtrlValues != nullptr)
+	{
+		m_pLODCtrlValues = new __LODCtrlValue[m_iLODCtrlValueCount];
+		memcpy(m_pLODCtrlValues, fxPMesh.m_pLODCtrlValues,
+			sizeof(__LODCtrlValue) * m_iLODCtrlValueCount);
+	}
 
-	m_pAllIndexChanges = new int[m_iTotalIndexChanges];
-	memcpy(m_pAllIndexChanges, fxPMesh.m_pAllIndexChanges, sizeof(int) * m_iTotalIndexChanges);
+	if (fxPMesh.m_pAllIndexChanges != nullptr)
+	{
+		m_pAllIndexChanges = new int[m_iTotalIndexChanges];
+		memcpy(m_pAllIndexChanges, fxPMesh.m_pAllIndexChanges, sizeof(int) * m_iTotalIndexChanges);
+	}
+
+	return *this;
 }
 
 bool CN3FXPMesh::Load(File& file)
 {
+	// NOLINTNEXTLINE(bugprone-parent-virtual-call)
 	CN3BaseFileAccess::Load(file);
 
 	file.Read(&m_iNumCollapses, sizeof(m_iNumCollapses));
@@ -220,7 +220,7 @@ void CN3FXPMesh::Render()
 		int iPC = m_iMaxNumIndices / 3;
 
 		int iLC = iPC / iPCToRender;
-		int i;
+		int i   = 0;
 		for (i = 0; i < iLC; ++i)
 		{
 			s_lpD3DDev->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, m_iMaxNumVertices,

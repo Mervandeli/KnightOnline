@@ -161,9 +161,6 @@
     <ClInclude Include="EbenezerSocketManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\shared\_USER_DATA.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="EbenezerReadQueueThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -174,6 +171,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EbenezerLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared-server\_USER_DATA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

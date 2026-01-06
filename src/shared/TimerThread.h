@@ -18,6 +18,7 @@ public:
 protected:
 	void thread_loop() override;
 
+private:
 	std::chrono::milliseconds _tickDelay;
 	TickCallback_t _tickCallback;
 };

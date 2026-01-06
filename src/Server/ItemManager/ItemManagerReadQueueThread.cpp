@@ -22,5 +22,10 @@ void ItemManagerReadQueueThread::process_packet(const char* buffer, int /*len*/)
 		case WIZ_DATASAVE:
 			appInstance->ExpLogWrite(buffer + index);
 			break;
+
+		default:
+			spdlog::error(
+				"ItemManagerReadQueueThread::process_packet: Unhandled opcode {:02X}", command);
+			break;
 	}
 }

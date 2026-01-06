@@ -6,22 +6,12 @@
 #include "UICmd.h"
 #include "GameProcMain.h"
 #include "PlayerOtherMgr.h"
-#include "PlayerMyself.h"
+#include "PlayerMySelf.h"
 #include "UITransactionDlg.h"
 #include "UIManager.h"
 #include "text_resources.h"
 
 #include <N3Base/N3UIButton.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CUICmd::CUICmd()
 {
@@ -99,12 +89,7 @@ bool CUICmd::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			//			this->SetVisibleOptButtons(false);
 		}
 
-		else if (pSender == m_pBtn_Act_Walk)
-		{
-			CGameProcedure::s_pProcMain->CommandToggleWalkRun();
-		}
-
-		else if (pSender == m_pBtn_Act_Run)
+		else if (pSender == m_pBtn_Act_Walk || pSender == m_pBtn_Act_Run)
 		{
 			CGameProcedure::s_pProcMain->CommandToggleWalkRun();
 		}
@@ -141,13 +126,12 @@ bool CUICmd::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 			// 국가 체크
 			if (pUPC != nullptr && !CGameBase::s_pPlayer->IsHostileTarget(pUPC))
-				CGameProcedure::s_pProcMain->MsgSend_PartyOrForceCreate(0, pUPC->IDString()); // 파티 초대하기..
+				CGameProcedure::s_pProcMain->MsgSend_PartyOrForceCreate(pUPC->IDString()); // 파티 초대하기..
 		}
 
 		else if (pSender == m_pBtn_Party_Disband)
 		{
-			CGameProcMain* pMain   = CGameProcedure::s_pProcMain;
-			CPlayerMySelf* pPlayer = CGameBase::s_pPlayer;
+			CGameProcMain* pMain = CGameProcedure::s_pProcMain;
 
 			bool bIAmLeader = false, bIAmMemberOfParty = false;
 			int iMemberIndex     = -1;
@@ -256,17 +240,15 @@ void CUICmd::UpdatePartyButtons(bool bIAmLeader, bool bIAmMemberOfParty, int iMe
 
 bool CUICmd::OnKeyPress(int iKey)
 {
-	switch (iKey)
+	// hotkey가 포커스 잡혀있을때는 다른 ui를 닫을수 없으므로 DIK_ESCAPE가 들어오면 포커스를 다시잡고
+	if (iKey == DIK_ESCAPE)
 	{
-		case DIK_ESCAPE:
-		{ //hotkey가 포커스 잡혀있을때는 다른 ui를 닫을수 없으므로 DIK_ESCAPE가 들어오면 포커스를 다시잡고
-			//열려있는 다른 유아이를 닫아준다.
-			CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
-			CN3UIBase* pFocus = CGameProcedure::s_pUIMgr->GetFocusedUI();
-			if (pFocus != nullptr && pFocus != this)
-				pFocus->OnKeyPress(iKey);
-		}
-			return true;
+		// 열려있는 다른 유아이를 닫아준다.
+		CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
+		CN3UIBase* pFocus = CGameProcedure::s_pUIMgr->GetFocusedUI();
+		if (pFocus != nullptr && pFocus != this)
+			pFocus->OnKeyPress(iKey);
+		return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

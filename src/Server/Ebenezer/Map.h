@@ -28,14 +28,14 @@ private:
 	EventArray m_EventArray;
 	CN3ShapeMgr m_N3ShapeMgr;
 
-	float** m_fHeight;
+	float** m_fHeight = nullptr;
 
-	int m_nXRegion;
-	int m_nZRegion;
+	int m_nXRegion    = -1;
+	int m_nZRegion    = -1;
 
 public:
-	int m_nMapSize;    // Grid Unit ex) 4m
-	float m_fUnitDist; // i Grid Distance
+	int m_nMapSize    = 0;    // Grid Unit ex) 4m
+	float m_fUnitDist = 0.0f; // i Grid Distance
 
 	void LoadWarpList(File& fs);
 	void LoadRegeneEvent(File& fs);
@@ -79,23 +79,25 @@ public:
 	C3DMap();
 	virtual ~C3DMap();
 
-	int m_nServerNo;
-	int m_nZoneNumber;
-	float m_fInitX;
-	float m_fInitZ;
-	float m_fInitY;
-	uint8_t
-		m_bType; // Zone Type : 1 -> common zone,  2 -> battle zone, 3 -> 24 hour open battle zone
-	int16_t m_sMaxUser;
+	int m_nServerNo      = 0;
+	int m_nZoneNumber    = 0;
+	float m_fInitX       = 0.0f;
+	float m_fInitZ       = 0.0f;
+	float m_fInitY       = 0.0f;
 
-	CRegion** m_ppRegion;
-	int16_t** m_ppnEvent;
+	// Zone Type : 1 -> common zone,  2 -> battle zone, 3 -> 24 hour open battle zone
+	uint8_t m_bType      = 0;
+
+	int16_t m_sMaxUser   = 150; // Max user in Battlezone!!!
+
+	CRegion** m_ppRegion = nullptr;
+	int16_t** m_ppnEvent = nullptr;
 
 	WarpArray m_WarpArray;
 
-	EbenezerApp* m_pMain;
+	EbenezerApp* m_pMain = nullptr;
 
-	uint32_t m_wBundle; // Zone Item Max Count
+	uint32_t m_wBundle   = 1; // Zone Item Max Count
 };
 
-#endif                  // SERVER_EBENEZER_MAP_H
+#endif                        // SERVER_EBENEZER_MAP_H

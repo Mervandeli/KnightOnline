@@ -23,12 +23,12 @@ public:
 		return static_cast<VersionManagerApp*>(s_instance);
 	}
 
-	const char* FtpUrl() const
+	const std::string& FtpUrl() const
 	{
 		return _ftpUrl;
 	}
 
-	const char* FtpPath() const
+	const std::string& FtpPath() const
 	{
 		return _ftpPath;
 	}
@@ -39,7 +39,7 @@ public:
 	}
 
 	VersionManagerApp(logger::Logger& logger);
-	~VersionManagerApp();
+	~VersionManagerApp() override;
 	bool LoadVersionList();
 
 	SocketManager _socketManager;
@@ -63,10 +63,10 @@ protected:
 	bool OnStart() override;
 
 protected:
-	char _ftpUrl[256];
-	char _ftpPath[256];
+	std::string _ftpUrl;
+	std::string _ftpPath;
 
-	int _lastVersion;
+	int _lastVersion = 0;
 
 	std::unique_ptr<TimerThread> _dbPoolCheckThread;
 };

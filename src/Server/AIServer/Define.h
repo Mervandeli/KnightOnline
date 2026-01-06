@@ -18,53 +18,49 @@ constexpr int USER_DAMAGE_OVERRIDE_TEST_MODE  = 10'000;
 //
 //	Defines About Communication
 //
-#define AI_KARUS_SOCKET_PORT  10020
-#define AI_ELMO_SOCKET_PORT   10030
-#define AI_BATTLE_SOCKET_PORT 10040
-#define USER_SOCKET_PORT      10000
-#define MAX_USER              3000
-#define MAX_SOCKET            100
-#define MAX_AI_SOCKET         10 // sungyong 2002.05.22
-#define CLIENT_SOCKSIZE       10
-#define MAX_PATH_LINE         100
+constexpr int AI_KARUS_SOCKET_PORT            = 10020;
+constexpr int AI_ELMO_SOCKET_PORT             = 10030;
+constexpr int AI_BATTLE_SOCKET_PORT           = 10040;
+constexpr int USER_SOCKET_PORT                = 10000;
+constexpr int MAX_USER                        = 3000;
+constexpr int MAX_SOCKET                      = 100;
+constexpr int MAX_AI_SOCKET                   = 10; // sungyong 2002.05.22
+constexpr int CLIENT_SOCKSIZE                 = 10;
+constexpr int MAX_PATH_LINE                   = 100;
 
-#define NOW_TEST_MODE         0
+constexpr int NOW_TEST_MODE                   = 0;
 
-#define MAX_WEAPON_NAME_SIZE  40
-#define MAX_ITEM              28
-#define VIEW_DIST             48 // 가시거리
+constexpr int MAX_WEAPON_NAME_SIZE            = 40;
+constexpr int MAX_ITEM                        = 28;
+constexpr int VIEW_DIST                       = 48; // 가시거리
 
 ///////////////// NATION ///////////////////////////////////
 //
-#define UNIFY_ZONE            0
-#define KARUS_ZONE            1
-#define ELMORAD_ZONE          2
-#define BATTLE_ZONE           3
+constexpr int UNIFY_ZONE                      = 0;
+constexpr int KARUS_ZONE                      = 1;
+constexpr int ELMORAD_ZONE                    = 2;
+constexpr int BATTLE_ZONE                     = 3;
 
 // Npc InOut
-#define NPC_IN                1
-#define NPC_OUT               2
+constexpr int NPC_IN                          = 1;
+constexpr int NPC_OUT                         = 2;
 
 ////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////
-#define TILE_SIZE             4
-#define CELL_SIZE             4
-
-#define SKILL_NUM             5
+constexpr int TILE_SIZE                       = 4;
+constexpr int CELL_SIZE                       = 4;
 
 ////////////////////////////////////////////////////////////
 // Socket Define
 ////////////////////////////////////////////////////////////
-#define SOCKET_BUFF_SIZE      (1024 * 32)
-#define MAX_PACKET_SIZE       (1024 * 8)
+constexpr int SOCKET_BUFF_SIZE                = (1024 * 32);
+constexpr int MAX_PACKET_SIZE                 = (1024 * 8);
 
-#define COMPARE(x, min, max)  ((x >= min) && (x < max))
-
-#define PACKET_START1         0xAA
-#define PACKET_START2         0x55
-#define PACKET_END1           0x55
-#define PACKET_END2           0xAA
+constexpr uint8_t PACKET_START1               = 0xAA;
+constexpr uint8_t PACKET_START2               = 0x55;
+constexpr uint8_t PACKET_END1                 = 0x55;
+constexpr uint8_t PACKET_END2                 = 0xAA;
 ////////////////////////////////////////////////////////////
 
 typedef union
@@ -93,13 +89,23 @@ struct _NpcMovePosition
 
 struct _OBJECT_EVENT
 {
-	int sBelong; // 소속
-	int16_t
-		sIndex; // 100 번대 - 카루스 바인드 포인트 | 200 번대 엘모라드 바인드 포인트 | 1100 번대 - 카루스 성문들 1200 - 엘모라드 성문들
-	int16_t sType; // 0 - 바인드 포인트.. 1 - 좌우로 열리는 성문 2 - 상하로 열리는 성문 3 - 레버
-	int16_t sControlNpcID; // 조종할 NPC ID (조종할 Object Index)
-	int16_t sStatus;       // status
-	float fPosX;           // 위치값
+	// 소속
+	int sBelong;
+
+	// 100 번대 - 카루스 바인드 포인트 | 200 번대 엘모라드 바인드 포인트 | 1100 번대 - 카루스 성문들 1200 - 엘모라드 성문들
+	int16_t sIndex;
+
+	// 0 - 바인드 포인트.. 1 - 좌우로 열리는 성문 2 - 상하로 열리는 성문 3 - 레버
+	int16_t sType;
+
+	// 조종할 NPC ID (조종할 Object Index)
+	int16_t sControlNpcID;
+
+	// status
+	int16_t sStatus;
+
+	// 위치값
+	float fPosX;
 	float fPosY;
 	float fPosZ;
 };
@@ -107,156 +113,139 @@ struct _OBJECT_EVENT
 //
 //	About USER
 //
-#define USER_DEAD                0x00
-#define USER_LIVE                0x01
+enum e_UserState : uint8_t
+{
+	USER_DEAD = 0,
+	USER_LIVE = 1
+};
 
 //
 //	About USER Log define
 //
-#define USER_LOGIN               0x01
-#define USER_LOGOUT              0x02
-#define USER_LEVEL_UP            0x03
+enum e_UserLogType : uint8_t
+{
+	USER_LOGIN    = 1,
+	USER_LOGOUT   = 2,
+	USER_LEVEL_UP = 3
+};
 
 //
 //	About NPC
 //
-#define NPC_NUM                  20
-#define MAX_DUNGEON_BOSS_MONSTER 20
-
-#define NPC_DEAD                 0x00
-#define NPC_LIVE                 0x01
-#define NPC_ATTACKING            0x02
-#define NPC_ATTACKED             0x03
-#define NPC_ESCAPE               0x04
-#define NPC_STANDING             0x05
-#define NPC_MOVING               0x06
-#define NPC_TRACING              0x07
-#define NPC_FIGHTING             0x08
-#define NPC_STRATEGY             0x09
-#define NPC_BACK                 0x0A
-#define NPC_SLEEPING             0x0B
-#define NPC_FAINTING             0x0C
-#define NPC_HEALING              0x0D
-
-#define NPC_MAX_MOVE_RANGE       100
+constexpr int NPC_NUM                  = 20;
+constexpr int MAX_DUNGEON_BOSS_MONSTER = 20;
+constexpr int NPC_MAX_MOVE_RANGE       = 100;
 
 //
 //	About Map Object
 //
-#define USER_BAND                0     // Map 위에 유저가 있다.
-#define NPC_BAND                 10000 // Map 위에 NPC(몹포함)가 있다.
-#define INVALID_BAND             20000 // 잘못된 ID BAND
+constexpr int USER_BAND                = 0;     // Map 위에 유저가 있다.
+constexpr int NPC_BAND                 = 10000; // Map 위에 NPC(몹포함)가 있다.
+constexpr int INVALID_BAND             = 20000; // 잘못된 ID BAND
 
 //
 //	To Who ???
 //
-#define SEND_ME                  0x01
-#define SEND_REGION              0x02
-#define SEND_ALL                 0x03
-#define SEND_ZONE                0x04
-
-//
-//	State Value
-//
-#define STATE_ACCEPTED           0x01
-#define STATE_CONNECTED          0x02
-#define STATE_DISCONNECTED       0x03
-#define STATE_GAMESTARTED        0x04
-#define STATE_INITED             0x05
-#define STATE_LOGOUT             0x06
-#define STATE_GAMERESTART        0x07
-
-//
-//  Item
-//
-#define TYPE_MONEY               0
-#define TYPE_ITEM                1
-
-////////////////////////////////////////////////////////////
-// Durability Type
-#define ATTACK                   0x01
-#define DEFENCE                  0x02
-////////////////////////////////////////////////////////////
+enum e_SendTarget : uint8_t
+{
+	SEND_ME     = 0x01,
+	SEND_REGION = 0x02,
+	SEND_ALL    = 0x03,
+	SEND_ZONE   = 0x04
+};
 
 // 타격비별 성공률 //
-#define GREAT_SUCCESS            0x01 // 대성공
-#define SUCCESS                  0x02 // 성공
-#define NORMAL                   0x03 // 보통
-#define FAIL                     0x04 // 실패
+enum e_SuccessType : uint8_t
+{
+	GREAT_SUCCESS = 0x01, // 대성공
+	SUCCESS       = 0x02, // 성공
+	NORMAL        = 0x03, // 보통
+	FAIL          = 0x04  // 실패
+};
 
-#define DIR_DOWN                 0    // 각 보고있는 방향을 정의한다.
-#define DIR_DOWNLEFT             1
-#define DIR_LEFT                 2
-#define DIR_UPLEFT               3
-#define DIR_UP                   4
-#define DIR_UPRIGHT              5
-#define DIR_RIGHT                6
-#define DIR_DOWNRIGHT            7
+// 각 보고있는 방향을 정의한다.
+enum e_Direction : uint8_t
+{
+	DIR_DOWN      = 0,
+	DIR_DOWNLEFT  = 1,
+	DIR_LEFT      = 2,
+	DIR_UPLEFT    = 3,
+	DIR_UP        = 4,
+	DIR_UPRIGHT   = 5,
+	DIR_RIGHT     = 6,
+	DIR_DOWNRIGHT = 7
+};
 
-////////////////////////////////////////////////////////////
-// Magic State
-#define NONE                     0x01
-#define CASTING                  0x02
-////////////////////////////////////////////////////////////
-
-#define MORAL_SELF               1  // 나 자신..
-#define MORAL_FRIEND_WITHME      2  // 나를 포함한 우리편(국가) 중 하나 ..
-#define MORAL_FRIEND_EXCEPTME    3  // 나를 뺀 우리편 중 하나
-#define MORAL_PARTY              4  // 나를 포함한 우리파티 중 하나..
-#define MORAL_NPC                5  // NPC중 하나.
-#define MORAL_PARTY_ALL          6  // 나를 호함한 파티 모두..
-#define MORAL_ENEMY              7  // 울편을 제외한 모든 적중 하나(NPC포함)
-#define MORAL_ALL                8  // 겜상에 존재하는 모든 것중 하나.
-#define MORAL_AREA_ENEMY         10 // 지역에 포함된 적
-#define MORAL_AREA_FRIEND        11 // 지역에 포함된 우리편
-#define MORAL_AREA_ALL           12 // 지역에 포함된 모두
-#define MORAL_SELF_AREA          13 // 나를 중심으로 한 지역
-
-////////////////////////////////////////////////////////////////
-// Magic Packet sub define
-////////////////////////////////////////////////////////////////
-#define MAGIC_CASTING            0x01
-#define MAGIC_FLYING             0x02
-#define MAGIC_EFFECTING          0x03
-#define MAGIC_FAIL               0x04
-#define MAGIC_TYPE4_END          0x05 // For type 4 durational spells.
+enum e_Moral : uint8_t
+{
+	MORAL_SELF            = 1,  // 나 자신..
+	MORAL_FRIEND_WITHME   = 2,  // 나를 포함한 우리편(국가) 중 하나 ..
+	MORAL_FRIEND_EXCEPTME = 3,  // 나를 뺀 우리편 중 하나
+	MORAL_PARTY           = 4,  // 나를 포함한 우리파티 중 하나..
+	MORAL_NPC             = 5,  // NPC중 하나.
+	MORAL_PARTY_ALL       = 6,  // 나를 호함한 파티 모두..
+	MORAL_ENEMY           = 7,  // 울편을 제외한 모든 적중 하나(NPC포함)
+	MORAL_ALL             = 8,  // 겜상에 존재하는 모든 것중 하나.
+	MORAL_AREA_ENEMY      = 10, // 지역에 포함된 적
+	MORAL_AREA_FRIEND     = 11, // 지역에 포함된 우리편
+	MORAL_AREA_ALL        = 12, // 지역에 포함된 모두
+	MORAL_SELF_AREA       = 13  // 나를 중심으로 한 지역
+};
 
 // Attack Type
-#define DIRECT_ATTACK            0
-#define LONG_ATTACK              1
-#define MAGIC_ATTACK             2
-#define DURATION_ATTACK          3
+enum e_AttackType : uint8_t
+{
+	DIRECT_ATTACK   = 0,
+	LONG_ATTACK     = 1,
+	MAGIC_ATTACK    = 2,
+	DURATION_ATTACK = 3
+};
 
-#define GATE_OPEN                1
-#define GATE_CLOSE               0
+enum e_GateStatus : uint8_t
+{
+	GATE_CLOSE = 0,
+	GATE_OPEN  = 1
+};
 
-#define NORMAL_OBJECT            0
-#define SPECIAL_OBJECT           1
+enum e_SpecialObjectType : uint8_t
+{
+	NORMAL_OBJECT  = 0,
+	SPECIAL_OBJECT = 1
+};
 
 // Battlezone Announcement
-#define BATTLEZONE_OPEN          0x00
-#define BATTLEZONE_CLOSE         0x01
-#define DECLARE_WINNER           0x02
-#define DECLARE_BAN              0x03
+enum e_BattleZoneNoticeType : uint8_t
+{
+	BATTLEZONE_OPEN  = 0x00,
+	BATTLEZONE_CLOSE = 0x01,
+	DECLARE_WINNER   = 0x02,
+	DECLARE_BAN      = 0x03
+};
 
 ////////////////////////////////////////////////////////////////
 // magic define
 ////////////////////////////////////////////////////////////////
-#define NONE_R                   0
-#define FIRE_R                   1
-#define COLD_R                   2
-#define LIGHTNING_R              3
-#define MAGIC_R                  4
-#define DISEASE_R                5
-#define POISON_R                 6
-#define LIGHT_R                  7
-#define DARKNESS_R               8
+enum e_ResistanceType : uint8_t
+{
+	NONE_R      = 0,
+	FIRE_R      = 1,
+	COLD_R      = 2,
+	LIGHTNING_R = 3,
+	MAGIC_R     = 4,
+	DISEASE_R   = 5,
+	POISON_R    = 6,
+	LIGHT_R     = 7,
+	DARKNESS_R  = 8
+};
 
 ////////////////////////////////////////////////////////////////
 // Type 3 Attribute define
 ////////////////////////////////////////////////////////////////
-#define ATTRIBUTE_FIRE           1
-#define ATTRIBUTE_ICE            2
-#define ATTRIBUTE_LIGHTNING      3
+enum e_AttributeType : uint8_t
+{
+	ATTRIBUTE_FIRE      = 1,
+	ATTRIBUTE_ICE       = 2,
+	ATTRIBUTE_LIGHTNING = 3
+};
 
 #endif // SERVER_AISERVER_DEFINE_H

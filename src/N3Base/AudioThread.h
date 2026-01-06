@@ -13,7 +13,7 @@
 /// \brief Type of operation queued for the audio thread.
 ///
 /// Used internally by \ref AudioThread to manage audio handles and callbacks.
-enum e_AudioQueueType
+enum e_AudioQueueType : uint8_t
 {
 	/// Add a handle to the audio thread for playback and decoding.
 	AUDIO_QUEUE_ADD = 0,

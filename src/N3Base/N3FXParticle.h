@@ -5,10 +5,11 @@
 #ifndef __N3FXPARTICLE_H__
 #define __N3FXPARTICLE_H__
 
-#include "N3Base.h"
-//#include "N3FXDef.h"
-class CN3FXPartParticles;
+#pragma once
 
+#include "N3Base.h"
+
+class CN3FXPartParticles;
 class CN3FXParticle : public CN3Base
 {
 public:
@@ -41,7 +42,7 @@ public:
 
 	//생성자 소멸자..
 	CN3FXParticle();
-	virtual ~CN3FXParticle();
+	~CN3FXParticle() override;
 };
 
 #endif // #ifndef __N3FXPARTICLE_H__

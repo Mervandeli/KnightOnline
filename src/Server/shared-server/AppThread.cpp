@@ -137,7 +137,7 @@ int AppThread::thread_loop_ftxui(CIni& iniFile)
 	auto input  = Input(&inputText, "Enter command...");
 
 	input      |= CatchEvent(
-        [&](Event event)
+        [&](const Event& event)
         {
             if (event == Event::Return && isServerLoaded)
             {
@@ -282,10 +282,10 @@ int AppThread::thread_loop_ftxui(CIni& iniFile)
 		shutdown(false);
 	}
 
-	while (_canTick)
+	while (CanTick())
 	{
-		std::unique_lock<std::mutex> lock(_mutex);
-		_cv.wait(lock);
+		std::unique_lock<std::mutex> lock(ThreadMutex());
+		ThreadCondition().wait(lock);
 	}
 
 	screen.Exit();
@@ -309,10 +309,10 @@ int AppThread::thread_loop_fallback(CIni& iniFile)
 		shutdown(false);
 	}
 
-	while (_canTick)
+	while (CanTick())
 	{
-		std::unique_lock<std::mutex> lock(_mutex);
-		_cv.wait(lock);
+		std::unique_lock<std::mutex> lock(ThreadMutex());
+		ThreadCondition().wait(lock);
 	}
 
 	return exitCode;
@@ -404,6 +404,7 @@ void AppThread::catchInterruptSignals()
 void AppThread::signalHandler(int signalNumber)
 {
 	spdlog::info("AppThread::signalHandler: Caught {}", signalNumber);
+
 	switch (signalNumber)
 	{
 		case SIGINT:
@@ -415,6 +416,9 @@ void AppThread::signalHandler(int signalNumber)
 				s_instance->shutdown(false);
 				s_shutdown = true;
 			}
+			break;
+
+		default:
 			break;
 	}
 

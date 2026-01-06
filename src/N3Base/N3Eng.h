@@ -1,7 +1,8 @@
 ﻿#ifndef __N3ENG_H_
 #define __N3ENG_H_
 
-#include "ddraw.h"
+#pragma once
+
 #include "N3Base.h"
 #include "N3BaseFileAccess.h"
 
@@ -31,10 +32,9 @@ protected:
 
 public:
 	LPDIRECT3D9 m_lpD3D;
-	LPDIRECTDRAW m_lpDD;
 
 public:
-	void Release();
+	void Release() override;
 	void SetViewPort(RECT& pRC);
 	static void SetDefaultEnvironment();
 	void LookAt(const __Vector3& vEye, const __Vector3& vAt, const __Vector3& vUp);
@@ -54,8 +54,8 @@ public:
 		D3DFORMAT* pDepthStencilFormat);
 
 public:
-	CN3Eng(void);
-	virtual ~CN3Eng(void);
+	CN3Eng();
+	~CN3Eng() override;
 };
 
 #endif

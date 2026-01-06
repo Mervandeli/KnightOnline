@@ -6,15 +6,6 @@
 #include "N3UIArea.h"
 #include "N3UIEdit.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3UIArea::CN3UIArea()
 {
 	m_eType     = UI_TYPE_AREA;
@@ -46,7 +37,7 @@ bool CN3UIArea::Load(File& file)
 
 #ifndef _REPENT
 	// 추가사항이 있으면 이곳에 추가하기
-	int iAreaType;
+	int iAreaType = 0;
 	file.Read(&iAreaType, sizeof(int)); // click 영역
 	m_eAreaType = (eUI_AREA_TYPE) iAreaType;
 #endif
@@ -101,12 +92,17 @@ bool CN3UIArea::Save(File& file)
 	return true;
 }
 
-void CN3UIArea::operator=(const CN3UIArea& other)
+CN3UIArea& CN3UIArea::operator=(const CN3UIArea& other)
 {
+	if (this == &other)
+		return *this;
+
 	CN3UIBase::operator=(other);
 #ifndef _REPENT
 	m_eAreaType = other.m_eAreaType;
 #endif
+
+	return *this;
 }
 #endif
 

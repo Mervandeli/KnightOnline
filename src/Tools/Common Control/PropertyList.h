@@ -1,9 +1,7 @@
 ﻿#if !defined(AFX_PROPERTYLIST_H__74205380_1B56_11D4_BC48_00105AA2186F__INCLUDED_)
 #define AFX_PROPERTYLIST_H__74205380_1B56_11D4_BC48_00105AA2186F__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif                // _MSC_VER > 1000
 
 #include <afxwin.h>   // MFC core and standard components
 #include <afxext.h>   // MFC extensions

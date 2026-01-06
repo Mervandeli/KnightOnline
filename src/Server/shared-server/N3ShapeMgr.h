@@ -5,14 +5,20 @@
 
 #include "My_3DStruct.h"
 
-constexpr int CELL_MAIN_DIVIDE = 4;              // 메인셀은 4 X 4 의 서브셀로 나뉜다..
-constexpr int CELL_SUB_SIZE    = 4;              // 4 Meter 가 서브셀의 사이즈이다..
-constexpr int CELL_MAIN_SIZE   = CELL_MAIN_DIVIDE
-							   * CELL_SUB_SIZE;  // 메인셀 크기는 서브셀갯수 X 서브셀 크기이다.
-constexpr int MAX_CELL_MAIN = 4096
-							  / CELL_MAIN_SIZE;  // 메인셀의 최대 갯수는 지형크기 / 메인셀크기 이다.
-constexpr int MAX_CELL_SUB = MAX_CELL_MAIN
-							 * CELL_MAIN_DIVIDE; // 서브셀 최대 갯수는 메인셀 * 메인셀나눔수 이다.
+// 메인셀은 4 X 4 의 서브셀로 나뉜다..
+constexpr int CELL_MAIN_DIVIDE = 4;
+
+// 4 Meter 가 서브셀의 사이즈이다..
+constexpr int CELL_SUB_SIZE    = 4;
+
+// 메인셀 크기는 서브셀갯수 X 서브셀 크기이다.
+constexpr int CELL_MAIN_SIZE   = CELL_MAIN_DIVIDE * CELL_SUB_SIZE;
+
+// 메인셀의 최대 갯수는 지형크기 / 메인셀크기 이다.
+constexpr int MAX_CELL_MAIN    = 4096 / CELL_MAIN_SIZE;
+
+// 서브셀 최대 갯수는 메인셀 * 메인셀나눔수 이다.
+constexpr int MAX_CELL_SUB     = MAX_CELL_MAIN * CELL_MAIN_DIVIDE;
 
 class File;
 class CN3ShapeMgr
@@ -21,11 +27,13 @@ public:
 	// 하위 셀 데이터
 	struct __CellSub
 	{
-		int nCCPolyCount; // Collision Check Polygon Count
-		uint32_t*
-			pdwCCVertIndices; // Collision Check Polygon Vertex Indices - wCCPolyCount * 3 만큼 생성된다.
+		// Collision Check Polygon Count
+		int nCCPolyCount           = 0;
 
-		__CellSub();
+		// Collision Check Polygon Vertex Indices - wCCPolyCount * 3 만큼 생성된다.
+		uint32_t* pdwCCVertIndices = nullptr;
+
+		__CellSub()                = default;
 		void Load(File& fs);
 		~__CellSub();
 	};
@@ -33,22 +41,26 @@ public:
 	// 기본 셀 데이터
 	struct __CellMain
 	{
-		int nShapeCount;          // Shape Count;
-		uint16_t* pwShapeIndices; // Shape Indices
-		__CellSub SubCells[CELL_MAIN_DIVIDE][CELL_MAIN_DIVIDE];
+		int nShapeCount                                        = 0;
+		uint16_t* pwShapeIndices                               = nullptr;
+		__CellSub SubCells[CELL_MAIN_DIVIDE][CELL_MAIN_DIVIDE] = {};
 
-		__CellMain();
+		__CellMain()                                           = default;
 		void Load(File& fs);
 		~__CellMain();
 	};
 
-	__Vector3* m_pvCollisions;
+	__Vector3* m_pvCollisions = nullptr;
 
 protected:
-	float m_fMapWidth;  // 맵 너비.. 미터 단위
-	float m_fMapLength; // 맵 길이.. 미터 단위
-	int m_nCollisionFaceCount;
-	__CellMain* m_pCells[MAX_CELL_MAIN][MAX_CELL_MAIN];
+	// 맵 너비.. 미터 단위
+	float m_fMapWidth                                  = 0.0f;
+
+	// 맵 길이.. 미터 단위
+	float m_fMapLength                                 = 0.0f;
+
+	int m_nCollisionFaceCount                          = 0;
+	__CellMain* m_pCells[MAX_CELL_MAIN][MAX_CELL_MAIN] = {};
 
 public:
 	void SubCell(const __Vector3& vPos, __CellSub** ppSubCell);

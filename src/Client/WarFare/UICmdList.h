@@ -5,15 +5,13 @@
 #if !defined(AFX_UICmdList_H)
 #define AFX_UICmdList_H
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <N3Base/N3UIBase.h>
 
 #include <unordered_map>
 
-enum e_ChatCmd
+enum e_ChatCmd : uint8_t
 {
 	// Private
 	CMD_WHISPER,
@@ -106,7 +104,7 @@ enum e_ChatCmd
 	CMD_REWARD,
 
 	CMD_COUNT,
-	CMD_UNKNOWN = 0xffffffff
+	CMD_UNKNOWN
 };
 
 class CUICmdEdit;

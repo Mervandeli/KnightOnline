@@ -5,15 +5,6 @@
 #include "N3TransformCollision.h"
 #include "N3VMesh.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3TransformCollision::CN3TransformCollision()
 {
 	m_dwType  |= OBJ_TRANSFORM_COLLISION;
@@ -136,13 +127,13 @@ void CN3TransformCollision::ClimbMeshSet(const std::string& szFN)
 }
 
 int CN3TransformCollision::CheckCollisionPrecisely(
-	bool bIgnoreBoxCheck, int ixScreen, int iyScreen, __Vector3* pVCol, __Vector3* pVNormal)
+	bool /*bIgnoreBoxCheck*/, int ixScreen, int iyScreen, __Vector3* pVCol, __Vector3* pVNormal)
 {
 	__Vector3 vPos, vDir; // 2D 좌표를 3D 좌표로 바꾸고..
 	::_Convert2D_To_3DCoordinate(ixScreen, iyScreen, s_CameraData.mtxView,
 		s_CameraData.mtxProjection, s_CameraData.vp.Width, s_CameraData.vp.Height, vPos, vDir);
 
-	if (false == m_pMeshCollision->Pick(m_Matrix, vPos, vDir, pVCol, pVNormal))
+	if (!m_pMeshCollision->Pick(m_Matrix, vPos, vDir, pVCol, pVNormal))
 		return -1;
 	else
 		return 0;

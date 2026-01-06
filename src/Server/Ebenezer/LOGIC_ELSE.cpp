@@ -28,11 +28,11 @@ void LOGIC_ELSE::Init()
 void LOGIC_ELSE::Parse_and(const char* line, const std::string& filename, int lineNumber)
 {
 	int index = 0, argsToParse = 0;
-	char temp[1024];
+	char temp[1024] {};
 
-	index         += ParseSpace(temp, line + index);
+	ParseSpace(temp, line, index);
 
-	size_t opcode  = hashing::djb2::hash(std::string_view(temp));
+	size_t opcode = hashing::djb2::hash(std::string_view(temp));
 	switch (opcode)
 	{
 		// A CHECK_UNDER_WEIGHT
@@ -253,14 +253,8 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::string& filename, int li
 
 		// A CHECK_BEEF_ROAST_KARUS_VICTORY
 		case "CHECK_BEEF_ROAST_KARUS_VICTORY"_djb2:
-			argsToParse = 1; // officially it always parses 1 even though it doesn't use it
-			break;
-
 		// A CHECK_BEEF_ROAST_ELMORAD_VICTORY
 		case "CHECK_BEEF_ROAST_ELMORAD_VICTORY"_djb2:
-			argsToParse = 1; // officially it always parses 1 even though it doesn't use it
-			break;
-
 		// A CHECK_BEEF_ROAST_NO_VICTORY
 		case "CHECK_BEEF_ROAST_NO_VICTORY"_djb2:
 			argsToParse = 1; // officially it always parses 1 even though it doesn't use it
@@ -275,8 +269,8 @@ void LOGIC_ELSE::Parse_and(const char* line, const std::string& filename, int li
 	assert(argsToParse >= 0 && argsToParse <= MAX_LOGIC_ELSE_INT);
 	for (int i = 0; i < argsToParse; i++)
 	{
-		index             += ParseSpace(temp, line + index);
-		m_LogicElseInt[i]  = atoi(temp);
+		ParseSpace(temp, line, index);
+		m_LogicElseInt[i] = atoi(temp);
 	}
 
 	m_bAnd = true;

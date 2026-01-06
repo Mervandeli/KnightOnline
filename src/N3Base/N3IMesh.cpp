@@ -4,15 +4,6 @@
 #include "StdAfxBase.h"
 #include "N3IMesh.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 __VertexT1 CN3IMesh::s_Vertices[MAX_IMESH_BUFFER];
 __VertexT2 CN3IMesh::s_Vertices2[MAX_IMESH_BUFFER];
 
@@ -28,7 +19,12 @@ CN3IMesh::CN3IMesh()
 	m_nVC = m_nUVC = 0;
 	m_pVertices    = nullptr;
 	m_pfUVs        = nullptr;
-	//	m_lpVB = nullptr;
+	m_vMin         = {};
+	m_vMax         = {};
+
+#ifdef _N3GAME
+	m_pVertexT1 = nullptr;
+#endif
 }
 
 CN3IMesh::~CN3IMesh()
@@ -84,10 +80,9 @@ bool CN3IMesh::Create(int nFC, int nVC, int nUVC)
 			"CN3IMesh::Create - Too many faces. (more than 32768) ({})", m_szFileName);
 #endif
 
-	m_nFC       = nFC;
-	m_nVC       = nVC;
-	m_pVertices = new __VertexXyzNormal[nVC];
-	memset(m_pVertices, 0, sizeof(__VertexXyzNormal) * nVC);
+	m_nFC          = nFC;
+	m_nVC          = nVC;
+	m_pVertices    = new __VertexXyzNormal[nVC] {};
 	m_pwVtxIndices = new uint16_t[nFC * 3];
 	memset(m_pwVtxIndices, 0, 2 * nFC * 3); // uint16_t
 

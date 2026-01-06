@@ -11,11 +11,6 @@
 #include "N3FXPartBillBoard.h"
 #include "N3FXPlug.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 const float CHR_LOD_CALCULATION_VALUES[MAX_CHR_LOD_DELTA][MAX_CHR_LOD] = {
 	//	{ 6.0f, 18.0f, 32.0f, 128.0f },
 	//	{ 4.0f, 12.0f, 21.0f, 85.0f },
@@ -189,7 +184,7 @@ void CN3CPart::Render(int nLOD)
 	CN3Base::s_RenderInfo.nChr_Polygon += m_pSkinsRef->m_Skins[nLOD].FaceCount();
 #endif
 
-	DWORD dwAlpha, dwFog, dwCull;
+	DWORD dwAlpha = 0, dwFog = 0, dwCull = 0;
 	if (m_Mtl.nRenderFlags & RF_ALPHABLENDING) // Alpha 사용
 	{
 		s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
@@ -1044,12 +1039,11 @@ void CN3CPlug::RenderFX(const __Matrix44& mtxParent, const __Matrix44& mtxJoint)
 // CN3cPlug_Cloak Codes Start here
 CN3CPlug_Cloak::CN3CPlug_Cloak()
 {
-	CN3CPlugBase::CN3CPlugBase();
 }
 
 CN3CPlug_Cloak::~CN3CPlug_Cloak()
 {
-	Release();
+	CN3CPlug_Cloak::Release();
 }
 
 void CN3CPlug_Cloak::Release()
@@ -1115,7 +1109,7 @@ CN3Chr::CN3Chr()
 	//	m_pSkinCollision = nullptr;
 	m_fAniSpeedDelta  = 1.0f; // 에니메이션 속도 조정 변수 1 이보통, 더 크면 빨라진다..
 
-	this->Release();
+	CN3Chr::Release();
 }
 
 CN3Chr::~CN3Chr()
@@ -1742,17 +1736,14 @@ void CN3Chr::TickPlugs(float fLOD)
 			{
 				pPlug->m_bRenderTrace = true;
 
-				int iJTmp             = 0;
-				float fFrmTmp         = fFrmCur;
+				D3DCOLOR crTraceU = 0, crTraceL = 0;
 				__Vector3 vTrace0, vTrace1;
-				D3DCOLOR crTraceU = pPlug->m_crTrace;
-				D3DCOLOR crTraceL = pPlug->m_crTrace;
+				float fFrmTmp = 0.0f;
 
-				for (int j = 0, k = pPlug->m_nTraceStep; j < pPlug->m_nTraceStep;
-					j++, k--) // 폴리곤을 만든다..
+				// 폴리곤을 만든다..
+				for (int j = 0, k = pPlug->m_nTraceStep; j < pPlug->m_nTraceStep; j++, k--)
 				{
 					fFrmTmp = fFrmCur - (j * 0.2f);
-					iJTmp   = 0;
 					if (fFrmTmp < pAniData->fFrmStart)
 						fFrmTmp = pAniData->fFrmStart;
 
@@ -1915,15 +1906,16 @@ void CN3Chr::BuildMesh()
 {
 	if (m_nLOD < 0 || m_nLOD >= MAX_CHR_LOD)
 		return;
+
 	if (m_MtxJoints.empty() || m_MtxInverses.empty())
 		return;
+
 	__ASSERT(m_pRootJointRef, "Joint pointer is NULL!");
 
-	float fWeight = 0;
-	int nJIndex = 0, nAffect = 0;
+	int nJIndex         = 0;
 
-	__Matrix44* pMtxJs  = &(m_MtxJoints[0]);
-	__Matrix44* pMtxJIs = &(m_MtxInverses[0]);
+	__Matrix44* pMtxJs  = &m_MtxJoints[0];
+	__Matrix44* pMtxJIs = &m_MtxInverses[0];
 
 	for (CN3CPart* pPart : m_Parts)
 	{
@@ -2016,10 +2008,7 @@ void CN3Chr::BuildMesh(int nLOD)
 		return;
 	__ASSERT(m_pRootJointRef, "Joint pointer is NULL!");
 
-	float fWeight = 0;
-	int nJIndex = 0, nAffect = 0;
-
-	CN3IMesh* pIMesh    = nullptr;
+	int nJIndex         = 0;
 
 	__Matrix44* pMtxJs  = &m_MtxJoints[0];
 	__Matrix44* pMtxJIs = &m_MtxInverses[0];
@@ -2080,7 +2069,6 @@ void CN3Chr::Init()
 	m_MtxJoints.assign(iJC, mtxTmp);
 	m_MtxInverses.assign(iJC, mtxTmp);
 
-	int nJI = 0;
 	m_pRootJointRef->Tick(0);     // 초기에 관절 위치 계산..
 	for (int i = 0; i < iJC; i++) // 관절 갯수 만큼 각 관절의 참조 포인터와 역행렬을 얻어놓는다..
 	{
@@ -2090,7 +2078,7 @@ void CN3Chr::Init()
 		m_MtxJoints[i]   = m_JointRefs[i]->m_Matrix;
 	}
 
-	this->RemakePlugTracePolygons();
+	RemakePlugTracePolygons();
 
 	// 충돌 체크를 위한 폴리곤.. 크기에 맞게 변환..
 	if (m_pMeshCollision == nullptr)
@@ -2110,16 +2098,14 @@ void CN3Chr::RegenerateCollisionMesh()
 void CN3Chr::JointSet(const std::string& szFN)
 {
 	bool bNeedInit = false;
-	if (nullptr == m_pRootJointRef)
-		bNeedInit = true;
-	else if (m_pRootJointRef && m_pRootJointRef->FileName() != szFN)
+	if (m_pRootJointRef == nullptr || m_pRootJointRef->FileName() != szFN)
 		bNeedInit = true; // 파일 이름이 달라야 지우고 새로 한다..
 
 	if (bNeedInit)
 	{
 		s_MngJoint.Delete(&m_pRootJointRef);
 		m_pRootJointRef = s_MngJoint.Get(szFN);
-		this->Init(); // 초기화...
+		Init(); // 초기화...
 	}
 }
 
@@ -2193,6 +2179,13 @@ CN3CPlug* CN3Chr::PlugSet(int iIndex, const std::string& szFN)
 	RemakePlugTracePolygons();
 
 	return m_Plugs[iIndex];
+}
+
+CN3CPlug* CN3Chr::PlugAdd()
+{
+	CN3CPlug* pPlug = new CN3CPlug();
+	m_Plugs.push_back(pPlug);
+	return pPlug;
 }
 
 void CN3Chr::PlugAlloc(int iCount)
@@ -2444,7 +2437,6 @@ int CN3Chr::CheckCollisionPrecisely(const __Vector3& vPos, const __Vector3& vDir
 	TickJoints(); // 조인트 행렬들 계산...
 	BuildMesh(m_nLOD);
 
-	__Vector3 vPos2 = vPos, vDir2 = vDir;
 	int iPC = static_cast<int>(m_Parts.size());
 	for (int i = 0; i < iPC; i++)
 	{
@@ -2452,10 +2444,10 @@ int CN3Chr::CheckCollisionPrecisely(const __Vector3& vPos, const __Vector3& vDir
 		if (pSkin == nullptr)
 			continue;
 
-		if (pSkin->CheckCollisionPrecisely(vPos2, vDir2, pvPick))
+		if (pSkin->CheckCollisionPrecisely(vPos, vDir, pvPick))
 		{
-			if (pvPick)
-				(*pvPick) *= m_Matrix;
+			if (pvPick != nullptr)
+				*pvPick *= m_Matrix;
 			return i;
 		}
 	}

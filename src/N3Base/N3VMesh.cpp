@@ -5,15 +5,6 @@
 #include "N3VMesh.h"
 #include "N3IMesh.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3VMesh::CN3VMesh()
 {
 	m_dwType    |= OBJ_MESH_VECTOR3;
@@ -61,7 +52,7 @@ bool CN3VMesh::Load(File& file)
 {
 	CN3BaseFileAccess::Load(file);
 
-	int nVC;
+	int nVC = 0, nIC = 0;
 	file.Read(&nVC, 4);      // 점갯수 읽기..
 	if (nVC > 0)
 	{
@@ -69,7 +60,6 @@ bool CN3VMesh::Load(File& file)
 		file.Read(m_pVertices, nVC * sizeof(__Vector3));
 	}
 
-	int nIC;
 	file.Read(&nIC, 4);   // Index Count..
 	if (nIC > 0)
 	{
@@ -114,17 +104,21 @@ void CN3VMesh::CreateVertices(int nVC)
 		delete[] m_pVertices;
 
 	m_pVertices = nullptr;
+	m_nVC       = 0;
 
 	if (nVC > 32768)
 	{
-		m_pVertices = (__Vector3*) (::GlobalAlloc(GMEM_FIXED, nVC * sizeof(__Vector3)));
+		m_pVertices = (__Vector3*) (::GlobalAlloc(
+			GMEM_FIXED | GMEM_ZEROINIT, nVC * sizeof(__Vector3)));
 	}
 	else
 	{
-		m_pVertices = new __Vector3[nVC];
+		m_pVertices = new __Vector3[nVC] {};
 	}
 
-	memset(m_pVertices, 0, nVC * sizeof(__Vector3)); // Vertex Buffer 생성
+	if (m_pVertices == nullptr)
+		return;
+
 	m_nVC = nVC;
 }
 
@@ -203,10 +197,10 @@ void CN3VMesh::Render(D3DCOLOR crLine)
 	if (m_nVC <= 0)
 		return;
 
-	DWORD dwLight, dwShade;
+	DWORD dwLight = 0, dwShade = 0;
 	s_lpD3DDev->GetRenderState(D3DRS_LIGHTING, &dwLight);
 	s_lpD3DDev->GetRenderState(D3DRS_FILLMODE, &dwShade);
-	if (dwLight)
+	if (dwLight != 0)
 		s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, FALSE);
 	if (D3DFILL_WIREFRAME != dwShade)
 		s_lpD3DDev->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
@@ -216,8 +210,8 @@ void CN3VMesh::Render(D3DCOLOR crLine)
 	s_lpD3DDev->SetTexture(0, nullptr);
 	s_lpD3DDev->SetFVF(FVF_CV);
 
-	__VertexColor vTs[3];
-	if (m_nIC)
+	__VertexColor vTs[3] {};
+	if (m_nIC > 0)
 	{
 		int nFC = m_nIC / 3;
 		for (int i = 0; i < nFC; i++)
@@ -242,8 +236,9 @@ void CN3VMesh::Render(D3DCOLOR crLine)
 		}
 	}
 
-	if (dwLight)
+	if (dwLight != 0)
 		s_lpD3DDev->SetRenderState(D3DRS_LIGHTING, dwLight);
+
 	if (D3DFILL_WIREFRAME != dwShade)
 		s_lpD3DDev->SetRenderState(D3DRS_FILLMODE, dwShade);
 }
@@ -306,7 +301,7 @@ bool CN3VMesh::CheckCollision(const __Matrix44& MtxWorld, const __Vector3& v0, c
 	else
 		nFC = m_nVC / 3;
 
-	int nCI0, nCI1, nCI2; // Collision polygon index
+	int nCI0 = 0, nCI1 = 0, nCI2 = 0; // Collision polygon index
 	for (int i = 0; i < nFC; i++)
 	{
 		if (m_nIC > 0)
@@ -354,7 +349,7 @@ bool CN3VMesh::CheckCollision(const __Matrix44& MtxWorld, const __Vector3& v0, c
 
 	//두점이 충돌메시 안에 있는 경우..by lynus..
 	__Vector3 tmpNormal;
-	float d;
+	float d = 0.0f;
 	for (int i = 0; i < nFC; i++)
 	{
 		if (m_nIC > 0)
@@ -402,7 +397,7 @@ bool CN3VMesh::Pick(const __Matrix44& MtxWorld, const __Vector3& vPos, const __V
 	else
 		nFC = m_nVC / 3;
 
-	int nCI0, nCI1, nCI2; // Collision polygon index
+	int nCI0 = 0, nCI1 = 0, nCI2 = 0; // Collision polygon index
 	for (int i = 0; i < nFC; i++)
 	{
 		if (m_nIC > 0)
@@ -418,27 +413,26 @@ bool CN3VMesh::Pick(const __Matrix44& MtxWorld, const __Vector3& vPos, const __V
 			nCI2 = i * 3 + 2;
 		}
 
-		if (false
-			== ::_IntersectTriangle(
+		if (!::_IntersectTriangle(
 				vPos2, vDir2, m_pVertices[nCI0], m_pVertices[nCI1], m_pVertices[nCI2]))
 			continue;
 
 		// 충돌이다..
-		if (pVCol)
+		if (pVCol != nullptr)
 		{
-			float fT, fU, fV;
+			float fT = 0.0f, fU = 0.0f, fV = 0.0f;
 			::_IntersectTriangle(vPos2, vDir2, m_pVertices[nCI0], m_pVertices[nCI1],
 				m_pVertices[nCI2], fT, fU, fV, pVCol);
-			(*pVCol) *= MtxWorld;
+			*pVCol *= MtxWorld;
 		}
 
 		// 법선 벡터 구하기..
-		if (pVNormal)
+		if (pVNormal != nullptr)
 		{
-			(*pVNormal).Cross(
+			pVNormal->Cross(
 				m_pVertices[nCI1] - m_pVertices[nCI0], m_pVertices[nCI2] - m_pVertices[nCI1]);
 			(*pVNormal) *= mtxRot;
-			(*pVNormal).Normalize();
+			pVNormal->Normalize();
 		}
 
 		return true;
@@ -494,7 +488,7 @@ void CN3VMesh::PartialColRender(int iCount, int* piIndices)
 	if (m_nVC <= 0)
 		return;
 
-	DWORD dwLight, dwShade;
+	DWORD dwLight = 0, dwShade = 0;
 	s_lpD3DDev->GetRenderState(D3DRS_LIGHTING, &dwLight);
 	s_lpD3DDev->GetRenderState(D3DRS_FILLMODE, &dwShade);
 	if (dwLight)
@@ -507,8 +501,8 @@ void CN3VMesh::PartialColRender(int iCount, int* piIndices)
 	s_lpD3DDev->SetTexture(0, nullptr);
 	s_lpD3DDev->SetFVF(FVF_CV);
 
-	__VertexColor vTs[3];
-	if (iCount)
+	__VertexColor vTs[3] {};
+	if (iCount > 0)
 	{
 		int nFC = iCount / 3;
 		for (int i = 0; i < nFC; i++)

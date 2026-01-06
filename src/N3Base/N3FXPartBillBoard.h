@@ -5,6 +5,8 @@
 #ifndef __N3FXPARTBILLBOARD_H__
 #define __N3FXPARTBILLBOARD_H__
 
+#pragma once
+
 #include "N3FXPartBase.h"
 
 class CN3FXPartBillBoard : public CN3FXPartBase
@@ -54,8 +56,8 @@ protected:
 protected:
 	void CreateVB();
 	bool IsDead() override;
-	__Vector3 Rotate2AbsolutePos(__Vector3 vRelativePos);
-	float CameraDist();
+	__Vector3 Rotate2AbsolutePos(const __Vector3& vRelativePos) const;
+	float CameraDist() const;
 
 public:
 	void Init() override;           // 각종 변수들을 처음 로딩한 상태로 초기화...

@@ -14,16 +14,6 @@
 #include <N3Base/N3UIList.h>
 #include <N3Base/N3UIScrollBar.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIKnightsOperation::CUIKnightsOperation()
 {
 	m_iPageCur          = 0;
@@ -101,18 +91,6 @@ bool CUIKnightsOperation::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 				this->MsgSend_KnightsList(m_iPageCur);
 			}
 		}
-		else if (pSender == m_pBtn_Up)
-		{
-			m_iPageCur--;
-			if (m_iPageCur < 0)
-			{
-				m_iPageCur = 0;
-			}
-			else
-			{
-				this->MsgSend_KnightsList(m_iPageCur);
-			}
-		}
 		else if (pSender == m_pBtn_Close)
 		{
 			this->Close();
@@ -134,12 +112,6 @@ bool CUIKnightsOperation::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		{
 			std::string szMsg = fmt::format_text_resource(IDS_KNIGHTS_WITHDRAW_CONFIRM);
 			CGameProcedure::MessageBoxPost(szMsg, "", MB_YESNO, BEHAVIOR_KNIGHTS_WITHDRAW); // 기사단 탈퇴 물어보기..
-		}
-	}
-	else if (dwMsg == UIMSG_LIST_SELCHANGE)
-	{
-		if (pSender == m_pList_Knights)
-		{
 		}
 	}
 
@@ -246,10 +218,11 @@ void CUIKnightsOperation::Close()
 
 bool CUIKnightsOperation::MsgRecv_KnightsList(Packet& pkt)
 {
-	m_iPageCur = pkt.read<int16_t>();
-	int iKC    = pkt.read<int16_t>();
-	int iID, iNameLength, iMemberCount, iPoint;
 	std::string szName, szChiefName;
+	int iID = 0, iNameLength = 0, iMemberCount = 0, iPoint = 0, iKC = 0;
+
+	m_iPageCur = pkt.read<int16_t>();
+	iKC        = pkt.read<int16_t>();
 	for (int i = 0; i < iKC; i++)
 	{
 		iID         = pkt.read<int16_t>();
@@ -260,10 +233,11 @@ bool CUIKnightsOperation::MsgRecv_KnightsList(Packet& pkt)
 		pkt.readString(szChiefName, iNameLength);
 		iPoint = pkt.read<uint32_t>();
 
-		this->KnightsListAdd(iID, szName, szChiefName, iMemberCount, iPoint); // UI 에 추가..
+		KnightsListAdd(iID, szName, szChiefName, iMemberCount, iPoint); // UI 에 추가..
 	}
-	this->KnightsListUpdate();                                                // List 에 다 넣었으면 UI Update!!
-	this->EnableKnightsUIs(true);                                             // Disable 된 버튼들 Enable 시킨다.
+
+	KnightsListUpdate();                                                // List 에 다 넣었으면 UI Update!!
+	EnableKnightsUIs(true);                                             // Disable 된 버튼들 Enable 시킨다.
 
 	return true;
 }

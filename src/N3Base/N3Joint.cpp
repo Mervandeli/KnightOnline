@@ -5,15 +5,6 @@
 #include "N3Joint.h"
 #include "N3Mesh.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3Joint::CN3Joint()
 {
 	m_dwType |= OBJ_JOINT;
@@ -389,7 +380,7 @@ void CN3Joint::ReCalcMatrix()
 
 void CN3Joint::MatricesGet(__Matrix44* pMtxs, int& nJointIndex)
 {
-	memcpy(&pMtxs[nJointIndex], &m_Matrix, sizeof(__Matrix44));
+	pMtxs[nJointIndex] = m_Matrix;
 	nJointIndex++;
 
 	for (CN3Joint* pChild : m_Children)
@@ -400,9 +391,8 @@ void CN3Joint::ReCalcMatrixBlended(float fFrm0, float fFrm1, float fWeight0)
 {
 	//	__ASSERT(1.0f == (fWeight0 + fWeight1));
 
-	static __Vector3 v1, v2;
-	static __Quaternion qt1, qt2;
-	int nKC = 0, nFrm0 = (int) fFrm0, nFrm1 = (int) fFrm1;
+	__Vector3 v1, v2;
+	__Quaternion qt1, qt2;
 	float fWeight1 = 1.0f - fWeight0;
 
 	bool bHaveKey1 = m_KeyPos.DataGet(fFrm0, v1);

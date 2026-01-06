@@ -6,15 +6,6 @@
 #include "N3FXParticle.h"
 #include "N3FXPartParticles.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3FXParticle::CN3FXParticle()
 {
 	m_fLife      = 0.0f;
@@ -40,12 +31,10 @@ CN3FXParticle::CN3FXParticle()
 	m_fDropY = m_fDropVel = 0.0f;
 
 	m_pVB                 = nullptr;
-	/*
-	m_pVB = new __VertexXyzColorT1[NUM_VERTEX_PARTICLE];
-	m_pVB[0].Set(0,0,0,0xffffffff, 0.0f, -1.0f);
-	m_pVB[1].Set(0,0,0,0xffffffff, 2.0f, 1.0f);
-	m_pVB[2].Set(0,0,0,0xffffffff, 0.0f, 1.0f);	
-	*/
+
+	m_vWdPos              = {};
+	m_iID                 = 0;
+	m_iNumTex             = 0;
 }
 
 CN3FXParticle::~CN3FXParticle()

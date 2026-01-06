@@ -5,14 +5,12 @@
 #if !defined(AFX_UIMESSAGEBOX_H__943941D4_06D0_40A0_BEF2_DA3A27406EDC__INCLUDED_)
 #define AFX_UIMESSAGEBOX_H__943941D4_06D0_40A0_BEF2_DA3A27406EDC__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <N3Base/N3UIBase.h>
 #include "GameDef.h"
 
-#define MB_CANCEL 0x00000006L
+constexpr int MB_CANCEL = 6;
 
 class CUIMessageBox : public CN3UIBase
 {

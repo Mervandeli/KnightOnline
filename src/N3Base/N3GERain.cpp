@@ -5,15 +5,6 @@
 #include "StdAfxBase.h"
 #include "N3GERain.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3GERain::CN3GERain()
 {
 	m_dwEffectType = GETYPE_RAIN;
@@ -34,7 +25,7 @@ void CN3GERain::Release()
 
 void CN3GERain::Tick()
 {
-	if (m_bActive == FALSE || m_iVC <= 0 || m_pVB == nullptr)
+	if (!m_bActive || m_iVC <= 0 || m_pVB == nullptr)
 		return;
 
 	CN3GlobalEffect::Tick();
@@ -66,15 +57,14 @@ void CN3GERain::Tick()
 	if (iActiveCount <= 0)
 		return;
 
-	int i;
-
-	__VertexXyzColor* pVertices;
-	HRESULT hr = m_pVB->Lock(0, 0, (void**) &pVertices, D3DLOCK_NOSYSLOCK);
+	__VertexXyzColor* pVertices = nullptr;
+	HRESULT hr                  = m_pVB->Lock(0, 0, (void**) &pVertices, D3DLOCK_NOSYSLOCK);
 	if (FAILED(hr))
 		return;
 
 	__Vector3 vN = m_vVelocity;
 	vN.Normalize();
+
 	__Vector3 vAdd          = m_vVelocity * s_fSecPerFrm;
 	__Vector3 vAddLength    = vN * m_fRainLength;
 
@@ -82,7 +72,7 @@ void CN3GERain::Tick()
 	const float fHalfHeight = m_fHeight / 2.0f;
 	const float fCurY       = s_CameraData.vEye.y;
 
-	for (i = 0; i < iActiveCount; ++i)
+	for (int i = 0; i < iActiveCount; i++)
 	{
 		// tail 위치 결정하기
 		__VertexXyzColor* pVTail  = pVertices + i * 2 + 0;
@@ -123,12 +113,13 @@ void CN3GERain::Tick()
 		pVHead->y = pVTail->y + vAddLength.y;
 		pVHead->z = pVTail->z + vAddLength.z;
 	}
+
 	m_pVB->Unlock();
 }
 
 void CN3GERain::Render(__Vector3& vPos)
 {
-	if (m_bActive == FALSE || m_iVC <= 0 || m_pVB == nullptr)
+	if (!m_bActive || m_iVC <= 0 || m_pVB == nullptr)
 		return;
 
 	CN3GlobalEffect::Render(vPos);
@@ -158,11 +149,12 @@ void CN3GERain::Render(__Vector3& vPos)
 				iActiveCount = 0;
 		}
 	}
+
 	if (iActiveCount <= 0)
 		return;
 
 	// 이전 render state 저장
-	DWORD dwColorVertex, dwLighting, dwAlphaBlend, dwSrcAlpha, dwDestAlpha;
+	DWORD dwColorVertex = 0, dwLighting = 0, dwAlphaBlend = 0, dwSrcAlpha = 0, dwDestAlpha = 0;
 	s_lpD3DDev->GetRenderState(D3DRS_COLORVERTEX, &dwColorVertex);
 	s_lpD3DDev->GetRenderState(D3DRS_LIGHTING, &dwLighting);
 	s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlphaBlend);
@@ -231,19 +223,21 @@ void CN3GERain::Create(float fDensity, float fWidth, float fHeight, float fRainL
 
 	if (FAILED(hr))
 		return;
-	__VertexXyzColor* pVertices;
-	hr = m_pVB->Lock(
-		0, iRainCount * 2 * sizeof(__VertexXyzColor), (void**) &pVertices, D3DLOCK_NOSYSLOCK);
+
+	__VertexXyzColor* pVertices = nullptr;
+	hr                          = m_pVB->Lock(
+        0, iRainCount * 2 * sizeof(__VertexXyzColor), (void**) &pVertices, D3DLOCK_NOSYSLOCK);
 	if (FAILED(hr))
 		return;
 
-	const uint32_t dwColorA = 0x00bfbfbf, // 꼬리
-		dwColorB            = 0x80bfbfbf; // 머리
-	int i;
-	__Vector3 vN = vVelocity;
+	const uint32_t dwColorA = 0x00bfbfbf; // 꼬리
+	const uint32_t dwColorB = 0x80bfbfbf; // 머리
+
+	__Vector3 vN            = vVelocity;
 	vN.Normalize();
+
 	__Vector3 vAdd = vN * fRainLength;
-	for (i = 0; i < iRainCount; ++i)
+	for (int i = 0; i < iRainCount; ++i)
 	{
 		pVertices[i * 2 + 0].Set(fWidth * (rand() % 10000 - 5000) / 10000.f,
 			fHeight * (rand() % 10000 - 5000) / 10000.f, fWidth * (rand() % 10000 - 5000) / 10000.f,

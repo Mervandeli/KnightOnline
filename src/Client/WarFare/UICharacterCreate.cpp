@@ -15,23 +15,15 @@
 #include <N3Base/N3UIEdit.h>
 #include <N3Base/N3UITooltip.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUICharacterCreate::CUICharacterCreate()
 {
 	memset(m_pBtn_Races, 0, sizeof(m_pBtn_Races));
 	memset(m_pBtn_Classes, 0, sizeof(m_pBtn_Classes));
 	memset(m_pImg_Disable_Classes, 0, sizeof(m_pImg_Disable_Classes));
 	memset(m_pStr_Stats, 0, sizeof(m_pStr_Stats));
+	memset(m_pStr_Stat_Labels, 0, sizeof(m_pStr_Stat_Labels));
 	memset(m_pArea_Stats, 0, sizeof(m_pArea_Stats));
+
 	m_pStr_Desc       = nullptr;
 	m_pStr_Bonus      = nullptr;
 
@@ -41,6 +33,7 @@ CUICharacterCreate::CUICharacterCreate()
 	m_pBtn_Hair_Right = nullptr;
 
 	m_pArea_Character = nullptr;
+	m_pEdit_Name      = nullptr;
 
 	m_iBonusPoint = m_iMaxBonusPoint = 0;
 }
@@ -57,6 +50,7 @@ void CUICharacterCreate::Release()
 	memset(m_pBtn_Classes, 0, sizeof(m_pBtn_Classes));
 	memset(m_pImg_Disable_Classes, 0, sizeof(m_pImg_Disable_Classes));
 	memset(m_pStr_Stats, 0, sizeof(m_pStr_Stats));
+	memset(m_pStr_Stat_Labels, 0, sizeof(m_pStr_Stat_Labels));
 	memset(m_pArea_Stats, 0, sizeof(m_pArea_Stats));
 
 	m_pStr_Desc       = nullptr;
@@ -68,28 +62,29 @@ void CUICharacterCreate::Release()
 	m_pBtn_Hair_Right = nullptr;
 
 	m_pArea_Character = nullptr;
+	m_pEdit_Name      = nullptr;
 
 	m_iBonusPoint = m_iMaxBonusPoint = 0;
 }
 
 bool CUICharacterCreate::Load(File& file)
 {
-	CN3UIBase::Load(file);
+	if (!CN3UIBase::Load(file))
+		return false;
 
 	// 캐릭터 초기화..
-	__InfoPlayerBase* pInfoBase  = &(CGameBase::s_pPlayer->m_InfoBase);
-	__InfoPlayerMySelf* pInfoExt = &(CGameBase::s_pPlayer->m_InfoExt);
+	__InfoPlayerBase* pInfoBase = &CGameBase::s_pPlayer->m_InfoBase;
 
-	pInfoBase->eRace             = RACE_UNKNOWN;
-	pInfoBase->eClass            = CLASS_UNKNOWN;
+	pInfoBase->eRace            = RACE_UNKNOWN;
+	pInfoBase->eClass           = CLASS_UNKNOWN;
 
 	N3_VERIFY_UI_COMPONENT(m_pEdit_Name, GetChildByID<CN3UIEdit>("edit_name"));
-	if (m_pEdit_Name)
+	if (m_pEdit_Name != nullptr)
 		m_pEdit_Name->SetString("");
 
 	N3_VERIFY_UI_COMPONENT(m_pStr_Desc, GetChildByID<CN3UIString>("text_desc"));
 	e_Nation eNation = pInfoBase->eNation;
-	if (m_pStr_Desc)
+	if (m_pStr_Desc != nullptr)
 	{
 		if (NATION_KARUS == eNation)
 		{
@@ -484,26 +479,24 @@ bool CUICharacterCreate::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 void CUICharacterCreate::Reset()
 {
-	__InfoPlayerBase* pInfoBase  = &(CGameBase::s_pPlayer->m_InfoBase);
-	__InfoPlayerMySelf* pInfoExt = &(CGameBase::s_pPlayer->m_InfoExt);
-
-	if (m_pArea_Character)
+	if (m_pArea_Character != nullptr)
 		CGameProcedure::s_pProcCharacterCreate->m_rcChr = m_pArea_Character->GetRegion();
 
 	for (int i = 0; i < MAX_CLASS_SELECT; i++)
 	{
-		if (m_pImg_Disable_Classes[i])
+		if (m_pImg_Disable_Classes[i] != nullptr)
 			m_pImg_Disable_Classes[i]->SetVisible(true);
-		if (m_pBtn_Classes[i])
+
+		if (m_pBtn_Classes[i] != nullptr)
 			m_pBtn_Classes[i]->SetVisible(false);
 	}
 
-	this->UpdateStats();
+	UpdateStats();
 }
 
 void CUICharacterCreate::UpdateStats()
 {
-	__InfoPlayerMySelf* pInfoExt = &(CGameBase::s_pPlayer->m_InfoExt);
+	__InfoPlayerMySelf* pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
 	int iStats[MAX_STATS]        = { pInfoExt->iStrength, pInfoExt->iStamina, pInfoExt->iDexterity, pInfoExt->iIntelligence,
 			   pInfoExt->iMagicAttak };
 
@@ -646,23 +639,29 @@ void CUICharacterCreate::UpdateClassButtons(e_Class eClass)
 			bVisibles[0] = true; // 힘
 			bVisibles[1] = true; // 체력
 			break;
+
 		case CLASS_EL_ROGUE:
 		case CLASS_KA_ROGUE:
 			eUIStates[1] = UI_STATE_BUTTON_DOWN;
 			bVisibles[1] = true; // 힘  changed main stats focus str to dex ([0] to [1] index)
 			bVisibles[2] = true; // 민첩
 			break;
+
 		case CLASS_EL_WIZARD:
 		case CLASS_KA_WIZARD:
 			eUIStates[2] = UI_STATE_BUTTON_DOWN;
 			bVisibles[3] = true; // 지능
 			bVisibles[4] = true; // 마력
 			break;
+
 		case CLASS_EL_PRIEST:
 		case CLASS_KA_PRIEST:
 			eUIStates[3] = UI_STATE_BUTTON_DOWN;
 			bVisibles[0] = true; // 힘
 			bVisibles[3] = true; // 지능
+			break;
+
+		default:
 			break;
 	}
 

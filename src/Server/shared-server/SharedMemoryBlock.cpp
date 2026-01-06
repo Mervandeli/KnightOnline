@@ -19,7 +19,6 @@ struct shared_memory_object_impl : public shared_memory_object
 
 SharedMemoryBlock::SharedMemoryBlock()
 {
-	_created = false;
 }
 
 char* SharedMemoryBlock::OpenOrCreate(const std::string& name, uint32_t totalSize)

@@ -5,14 +5,10 @@
 #if !defined(AFX_UIPERTRADEDLG_H__8C9B06AA_B16D_4135_B198_4AB3C6B09FEA__INCLUDED_)
 #define AFX_UIPERTRADEDLG_H__8C9B06AA_B16D_4135_B198_4AB3C6B09FEA__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "GameDef.h"
 #include "N3UIWndBase.h"
-
-//////////////////////////////////////////////////////////////////////
 
 class CSubProcPerTrade;
 class CUIPerTradeDlg : public CN3UIWndBase
@@ -43,26 +39,26 @@ protected:
 
 public:
 	CUIPerTradeDlg();
-	virtual ~CUIPerTradeDlg();
-	void Release();
+	~CUIPerTradeDlg() override;
+	void Release() override;
 
-	virtual uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld);
-	virtual bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg);
-	void Render();
+	uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
+	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
+	void Render() override;
 	void LeavePerTradeState();
 	void EnterPerTradeState();
 
-	void InitIconWnd(e_UIWND eWnd);
-	void InitIconUpdate();
+	void InitIconWnd(e_UIWND eWnd) override;
+	void InitIconUpdate() override;
 
-	__IconItemSkill* GetHighlightIconItem(CN3UIIcon* pUIIcon);
+	__IconItemSkill* GetHighlightIconItem(CN3UIIcon* pUIIcon) override;
 
-	void IconRestore();
+	void IconRestore() override;
 
-	bool ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur);
+	bool ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur) override;
 
-	void CancelIconDrop(__IconItemSkill* spItem);
-	void AcceptIconDrop(__IconItemSkill* spItem);
+	void CancelIconDrop(__IconItemSkill* spItem) override;
+	void AcceptIconDrop(__IconItemSkill* spItem) override;
 
 	void SendToServerItemAddMsg(byte pos, int itemID, int iCount);
 

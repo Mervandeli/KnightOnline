@@ -5,15 +5,6 @@
 #include "StdAfxBase.h"
 #include "N3FXPMeshInstance.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3FXPMeshInstance::CN3FXPMeshInstance()
 {
 	m_pFXPMesh       = nullptr;
@@ -66,16 +57,11 @@ CN3FXPMeshInstance::~CN3FXPMeshInstance()
 
 void CN3FXPMeshInstance::Release()
 {
-	if (m_pColorVertices)
-	{
-		delete[] m_pColorVertices;
-		m_pColorVertices = nullptr;
-	}
-	if (m_pIndices)
-	{
-		delete[] m_pIndices;
-		m_pIndices = nullptr;
-	}
+	delete[] m_pColorVertices;
+	m_pColorVertices = nullptr;
+
+	delete[] m_pIndices;
+	m_pIndices = nullptr;
 
 	s_MngFXPMesh.Delete(&m_pFXPMesh); //레퍼런스 카운트를 줄이기 위해
 
@@ -104,11 +90,7 @@ bool CN3FXPMeshInstance::Create(CN3FXPMesh* pN3FXPMesh)
 	int iMaxNumVertices = m_pFXPMesh->GetMaxNumVertices();
 	if (iMaxNumVertices > 0)
 	{
-		if (m_pColorVertices)
-		{
-			delete[] m_pColorVertices;
-			m_pColorVertices = nullptr;
-		}
+		delete[] m_pColorVertices;
 		m_pColorVertices = new __VertexXyzColorT1[iMaxNumVertices];
 		__ASSERT(m_pColorVertices, "Failed to create Vertex buffer");
 		CopyMemory(m_pColorVertices, m_pFXPMesh->m_pColorVertices,
@@ -120,11 +102,7 @@ bool CN3FXPMeshInstance::Create(CN3FXPMesh* pN3FXPMesh)
 	int iMaxNumIndices = m_pFXPMesh->GetMaxNumIndices();
 	if (iMaxNumIndices > 0)
 	{
-		if (m_pIndices)
-		{
-			delete[] m_pIndices;
-			m_pIndices = nullptr;
-		}
+		delete[] m_pIndices;
 		m_pIndices = new uint16_t[m_pFXPMesh->m_iMaxNumIndices];
 		__ASSERT(m_pIndices, "Failed to create index buffer");
 		CopyMemory(
@@ -143,12 +121,13 @@ bool CN3FXPMeshInstance::Create(CN3FXPMesh* pN3FXPMesh)
 
 bool CN3FXPMeshInstance::Create(const std::string& szFN)
 {
-	if (m_pFXPMesh && m_pFXPMesh->FileName() == szFN)
+	if (m_pFXPMesh != nullptr && m_pFXPMesh->FileName() == szFN)
 		return true; // 파일 이름이 같으면 새로 만들지 않고 리턴하자
-	this->Release();
+
+	CN3FXPMeshInstance::Release();
 
 	CN3FXPMesh* pN3FXPMesh = s_MngFXPMesh.Get(szFN);
-	return this->Create(pN3FXPMesh);
+	return Create(pN3FXPMesh);
 }
 
 void CN3FXPMeshInstance::SetLODByNumVertices(int iNumVertices)
@@ -157,34 +136,32 @@ void CN3FXPMeshInstance::SetLODByNumVertices(int iNumVertices)
 		return;
 
 	int iDiff = iNumVertices - m_iNumVertices;
-
 	if (iDiff == 0)
-	{
 		return;
-	}
-	else if (iDiff > 0)
+
+	if (iDiff > 0)
 	{
 		while (iNumVertices > m_iNumVertices)
 		{
 			if (m_pCollapseUpTo->NumVerticesToLose + m_iNumVertices > iNumVertices)
 				break; // 깜박임 방지 코드..
-			if (SplitOne() == false)
+
+			if (!SplitOne())
 				break;
 		}
 	}
 	else if (iDiff < 0)
 	{
-		iDiff = -iDiff;
 		while (iNumVertices < m_iNumVertices)
 		{
-			if (CollapseOne() == false)
+			if (!CollapseOne())
 				break;
 		}
 	}
 
 	while (m_pCollapseUpTo->bShouldCollapse)
 	{
-		if (SplitOne() == false)
+		if (!SplitOne())
 			break;
 	}
 }
@@ -319,8 +296,8 @@ void CN3FXPMeshInstance::Render()
 		int iPC = m_iNumIndices / 3;
 
 		int iLC = iPC / iPCToRender;
-		int i;
-		for (i = 0; i < iLC; ++i)
+		int i   = 0;
+		for (; i < iLC; ++i)
 		{
 			s_lpD3DDev->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, m_iNumVertices, iPCToRender,
 				m_pIndices + i * iPCToRender * 3, D3DFMT_INDEX16, m_pColorVertices,
@@ -354,8 +331,8 @@ void CN3FXPMeshInstance::RenderTwoUV()
 		int iPC = m_iNumIndices / 3;
 
 		int iLC = iPC / iPCToRender;
-		int i;
-		for (i = 0; i < iLC; ++i)
+		int i   = 0;
+		for (; i < iLC; ++i)
 		{
 			s_lpD3DDev->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, m_iNumVertices, iPCToRender,
 				m_pIndices + i * iPCToRender * 3, D3DFMT_INDEX16, m_pFXPMesh->m_pVertices2,

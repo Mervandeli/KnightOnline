@@ -7,15 +7,6 @@
 #include "N3UIString.h"
 #include "N3UIStatic.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3UITooltip::CN3UITooltip()
 {
 	m_eType      = UI_TYPE_TOOLTIP;
@@ -23,7 +14,7 @@ CN3UITooltip::CN3UITooltip()
 	m_fHoverTime = 0.0f;
 	m_bVisible   = false;
 	m_bSetText   = false;
-	memset(&m_ptCursor, 0, sizeof(m_ptCursor));
+	m_ptCursor   = {};
 }
 
 CN3UITooltip::~CN3UITooltip()
@@ -32,12 +23,12 @@ CN3UITooltip::~CN3UITooltip()
 
 void CN3UITooltip::Release()
 {
-	CN3UIBase::Release();
+	CN3UIStatic::Release();
 
 	m_fHoverTime = 0.0f;
 	m_bVisible   = false;
 	m_bSetText   = false;
-	memset(&m_ptCursor, 0, sizeof(m_ptCursor));
+	m_ptCursor   = {};
 }
 
 void CN3UITooltip::Render()
@@ -52,7 +43,7 @@ void CN3UITooltip::Render()
 	// 이미지가 없으면 디폴트로 그려주자
 	else
 	{
-		__VertexTransformedColor pVB[8];
+		__VertexTransformedColor pVB[8] {};
 
 		constexpr WORD pIB[16]            = { 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4 };
 		constexpr D3DCOLOR BkColor        = 0x80000000;
@@ -120,16 +111,16 @@ void CN3UITooltip::SetText(const std::string& szText, D3DCOLOR crTooltip)
 
 	m_pBuffOutRef->ClearOnlyStringBuffer();
 
-	SIZE size = {};
+	SIZE size {};
 	if (m_pBuffOutRef->GetTextExtent(szText, iStrLen, &size))
 	{
 		int iRealWidth = m_pBuffOutRef->GetStringRealWidth(szText);
 		if (size.cx < iRealWidth)
 			size.cx = iRealWidth;
 
-		bool offsetString = false;
+		bool offsetString   = false;
 
-		DWORD dwNewStyle;
+		uint32_t dwNewStyle = 0;
 		if (szText.find('\n') != std::string::npos)
 		{
 			dwNewStyle = UISTYLE_STRING_ALIGNLEFT | UISTYLE_STRING_ALIGNTOP;
@@ -234,6 +225,7 @@ uint32_t CN3UITooltip::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POI
 		m_ptCursor = ptCur;
 	}
 
+	// NOLINTNEXTLINE(bugprone-parent-virtual-call)
 	dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);
 	return dwRet;
 }

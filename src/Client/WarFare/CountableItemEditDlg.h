@@ -5,13 +5,9 @@
 #if !defined(AFX_COUNTABLEITEMEDITDLG_H__55E83755_6471_4A3D_84D7_857B0FF88833__INCLUDED_)
 #define AFX_COUNTABLEITEMEDITDLG_H__55E83755_6471_4A3D_84D7_857B0FF88833__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3UIWndBase.h"
-
-//////////////////////////////////////////////////////////////////////
 
 class CCountableItemEditDlg : public CN3UIBase
 {
@@ -37,7 +33,7 @@ public:
 	void SetQuantity(int iQuantity); // "edit_trade" Edit Control 에서 정수값을 문자열로 세팅한다..
 
 	CCountableItemEditDlg();
-	virtual ~CCountableItemEditDlg();
+	~CCountableItemEditDlg() override;
 
 	void Release() override;
 	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;

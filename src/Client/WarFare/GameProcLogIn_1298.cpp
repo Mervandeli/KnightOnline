@@ -3,7 +3,7 @@
 #if !defined(LOGIN_SCENE_VERSION) || LOGIN_SCENE_VERSION == 1298
 #include "GameProcLogIn_1298.h"
 #include "GameEng.h"
-#include "UILogIn_1298.h"
+#include "UILogin_1298.h"
 #include "PlayerMySelf.h"
 #include "UIManager.h"
 #include "LocalInput.h"
@@ -16,16 +16,7 @@
 
 #include <ctime>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 using __GameServerInfo = CUILogIn_1298::__GameServerInfo;
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CGameProcLogIn_1298::CGameProcLogIn_1298()
 {
@@ -87,17 +78,17 @@ void CGameProcLogIn_1298::Init()
 	s_pUIMgr->SetFocusedUI(m_pUILogIn);
 
 	// Socket connection..
-	char szIniPath[_MAX_PATH] = {};
+	char szIniPath[_MAX_PATH] {};
 	lstrcpy(szIniPath, CN3Base::PathGet().c_str());
 	lstrcat(szIniPath, "Server.Ini");
 
-	char szRegistrationSite[_MAX_PATH] = {};
+	char szRegistrationSite[_MAX_PATH] {};
 	GetPrivateProfileString("Join", "Registration site", "", szRegistrationSite, _MAX_PATH, szIniPath);
 	m_szRegistrationSite = szRegistrationSite;
 
 	int iServerCount     = GetPrivateProfileInt("Server", "Count", 0, szIniPath);
 
-	char szIPs[256][32]  = {};
+	char szIPs[256][32] {};
 	for (int i = 0; i < iServerCount; i++)
 	{
 		std::string key = fmt::format("IP{}", i);
@@ -180,7 +171,7 @@ void CGameProcLogIn_1298::Render()
 	D3DVIEWPORT9 vp;
 	s_lpD3DDev->GetViewport(&vp);
 
-	DWORD dwZWrite;
+	DWORD dwZWrite = 0;
 	s_lpD3DDev->GetRenderState(D3DRS_ZWRITEENABLE, &dwZWrite);
 	s_lpD3DDev->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
@@ -282,7 +273,6 @@ void CGameProcLogIn_1298::MsgRecv_AccountLogIn(int iCmd, Packet& pkt)
 {
 	// Recv - b1 (0: Failure, 1: Success, 2: ID Not Found, 3: Incorrect Password,
 	// 4: Server Under Maintenance)
-
 	int iResult = pkt.read<uint8_t>();
 
 	// Connection successful
@@ -333,26 +323,30 @@ void CGameProcLogIn_1298::MsgRecv_AccountLogIn(int iCmd, Packet& pkt)
 		{
 			std::string szIP;
 			pkt.readString(szIP, iLen);
+
 			uint32_t dwPort = pkt.read<int16_t>();
 
-			CAPISocket socketTmp;
-			s_bNeedReportConnectionClosed = false; // 서버접속이 끊어진걸 보고해야 하는지..
-			if (0 == socketTmp.Connect(s_hWndBase, szIP.c_str(), dwPort))
+			auto socketTmp  = std::make_unique<CAPISocket>();
+			if (socketTmp != nullptr)
 			{
-				// 로그인 서버에서 받은 겜서버 주소로 접속해서 짤르라고 꼰지른다.
-				int iOffset2 = 0;
-				uint8_t Buff[32];
-				CAPISocket::MP_AddByte(Buff, iOffset2, WIZ_KICKOUT);   // Recv s1, str1(IP) s1(port) | Send s1, str1(ID)
-				CAPISocket::MP_AddShort(Buff, iOffset2, (int16_t) s_szAccount.size());
-				CAPISocket::MP_AddString(Buff, iOffset2, s_szAccount); // Recv s1, str1(IP) s1(port) | Send s1, str1(ID)
+				s_bNeedReportConnectionClosed = false; // 서버접속이 끊어진걸 보고해야 하는지..
+				if (0 == socketTmp->Connect(s_hWndBase, szIP, dwPort))
+				{
+					// 로그인 서버에서 받은 겜서버 주소로 접속해서 짤르라고 꼰지른다.
+					int iOffset2 = 0;
+					uint8_t Buff[32];
+					CAPISocket::MP_AddByte(Buff, iOffset2, WIZ_KICKOUT);   // Recv s1, str1(IP) s1(port) | Send s1, str1(ID)
+					CAPISocket::MP_AddShort(Buff, iOffset2, (int16_t) s_szAccount.size());
+					CAPISocket::MP_AddString(Buff, iOffset2, s_szAccount); // Recv s1, str1(IP) s1(port) | Send s1, str1(ID)
 
-				socketTmp.Send(Buff, iOffset2);
-				socketTmp.Disconnect();                                // 짜른다..
+					socketTmp->Send(Buff, iOffset2);
+					socketTmp->Disconnect();                               // 짜른다..
+				}
+				s_bNeedReportConnectionClosed = true;                      // 서버접속이 끊어진걸 보고해야 하는지..
 			}
-			s_bNeedReportConnectionClosed = true;                      // 서버접속이 끊어진걸 보고해야 하는지..
 
-			std::string szMsg             = fmt::format_text_resource(IDS_LOGIN_ERR_ALREADY_CONNECTED_ACCOUNT);
-			std::string szTmp             = fmt::format_text_resource(IDS_CONNECT_FAIL);
+			std::string szMsg = fmt::format_text_resource(IDS_LOGIN_ERR_ALREADY_CONNECTED_ACCOUNT);
+			std::string szTmp = fmt::format_text_resource(IDS_CONNECT_FAIL);
 			MessageBoxPost(szMsg, szTmp, MB_OK); // 다시 접속 할거냐고 물어본다.
 		}
 	}
@@ -444,6 +438,9 @@ bool CGameProcLogIn_1298::ProcessPacket(Packet& pkt)
 		case LS_NEWS:
 			MsgRecv_News(pkt);
 			return true;
+
+		default:
+			break;
 	}
 
 	return false;
@@ -458,19 +455,18 @@ void CGameProcLogIn_1298::ConnectToGameServer() // 고른 게임 서버에 접�
 	if (!m_pUILogIn->ServerInfoGetCur(GSI))
 		return; // 서버를 고른다음..
 
-	const char* ip                = GSI.szIP.c_str();
 	int port                      = SOCKET_PORT_GAME;
 
-	s_bNeedReportConnectionClosed = false;                                    // 서버접속이 끊어진걸 보고해야 하는지..
-	int iErr                      = s_pSocket->Connect(s_hWndBase, ip, port); // 게임서버 소켓 연결
-	s_bNeedReportConnectionClosed = true;                                     // 서버접속이 끊어진걸 보고해야 하는지..
+	s_bNeedReportConnectionClosed = false;                                          // 서버접속이 끊어진걸 보고해야 하는지..
+	int iErr                      = s_pSocket->Connect(s_hWndBase, GSI.szIP, port); // 게임서버 소켓 연결
+	s_bNeedReportConnectionClosed = true;                                           // 서버접속이 끊어진걸 보고해야 하는지..
 
 	if (iErr != 0)
 	{
 #if defined(_DEBUG)
 		std::string errorMessage = fmt::format("{}:{} (errorCode: {})\n"
 											   "From config: Version.ini (server)",
-			ip, port, iErr);
+			GSI.szIP, port, iErr);
 		MessageBoxPost(errorMessage, "Failed to connect to game server", MB_OK);
 #else
 		ReportServerConnectionFailed(GSI.szName, iErr, false);

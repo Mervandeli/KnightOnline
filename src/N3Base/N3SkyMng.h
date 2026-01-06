@@ -5,20 +5,25 @@
 #if !defined(AFX_N3SKYMNG_H__30DC78FB_6563_43BD_841E_B90928E850CD__INCLUDED_)
 #define AFX_N3SKYMNG_H__30DC78FB_6563_43BD_841E_B90928E850CD__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3BaseFileAccess.h"
 #include <vector>
 
-const float TIME_REAL_PER_GAME =
-	10.0f; // 실제 시간과 game시간의 비율(현재 게임은 실제 시간보다 열배 빨리 돌아간다..)
-const float TIME_GAME_PER_REAL = 1.0f / TIME_REAL_PER_GAME; // game시간과 실제 시간의 비율
-#define CONVERT_SEC(h, m, s) ((h) * 3600 + (m) * 60 + (s))
+// 실제 시간과 game시간의 비율(현재 게임은 실제 시간보다 열배 빨리 돌아간다..)
+constexpr float TIME_REAL_PER_GAME = 10.0f;
+
+// game시간과 실제 시간의 비율
+constexpr float TIME_GAME_PER_REAL = 1.0f / TIME_REAL_PER_GAME;
+
+constexpr int CONVERT_SEC(int h, int m, int s)
+{
+	return ((h * 3600) + (m * 60)) + s;
+}
 
 // 시간 관리
-enum eSKY_DAYCHANGE
+// NOLINTNEXTLINE(performance-enum-size): used by the file format, must be this size
+enum eSKY_DAYCHANGE : int32_t
 {
 	SDC_SKYCOLOR = 0, // 하늘색
 	SDC_FOGCOLOR,     // 안개색
@@ -37,7 +42,7 @@ enum eSKY_DAYCHANGE
 
 	NUM_SKYDAYCHANGE,
 
-	SDC_UNKNOWN = 0xffffffff
+	SDC_UNKNOWN = -1
 };
 
 struct __SKY_DAYCHANGE
@@ -51,7 +56,7 @@ struct __SKY_DAYCHANGE
 
 	void Init()
 	{
-		szName        = "";
+		szName.clear();
 		eSkyDayChange = SDC_UNKNOWN;
 		dwWhen = dwParam1 = dwParam2 = 0;
 		fHowLong                     = 0;
@@ -113,60 +118,65 @@ struct __SKY_DAYCHANGE
 	}
 };
 
-const int MAX_GAME_LIGHT = 3;
+constexpr int MAX_GAME_LIGHT = 3;
 
 class CN3SkyMng : public CN3BaseFileAccess
 {
 public:
 	CN3SkyMng();
-	virtual ~CN3SkyMng();
+	~CN3SkyMng() override;
+
 	// Attributes
 public:
-	enum eSKY_WEATHER
+	enum eSKY_WEATHER : uint8_t
 	{
 		SW_CLEAR = 1, // 맑음
 		SW_RAINY,     // 비
 		SW_SNOW
-	}; // 눈
+	};
+
 protected:
-	class CN3Sky* m_pSky;
-	class CN3Moon* m_pMoon;
-	class CN3Sun* m_pSun;
-	class CN3Cloud* m_pCloud;
-	class CN3Star* m_pStar;
-	class CN3ColorChange* m_pLightColorDiffuses[MAX_GAME_LIGHT];
-	class CN3ColorChange* m_pLightColorAmbients[MAX_GAME_LIGHT];
+	class CN3Sky* m_pSky                                        = nullptr;
+	class CN3Moon* m_pMoon                                      = nullptr;
+	class CN3Sun* m_pSun                                        = nullptr;
+	class CN3Cloud* m_pCloud                                    = nullptr;
+	class CN3Star* m_pStar                                      = nullptr;
+	class CN3ColorChange* m_pLightColorDiffuses[MAX_GAME_LIGHT] = {};
+	class CN3ColorChange* m_pLightColorAmbients[MAX_GAME_LIGHT] = {};
 
 	std::vector<__SKY_DAYCHANGE> m_DayChanges;     // 정보입력후에 qsort하자
-	int m_iDayChangeCurPos;
+	int m_iDayChangeCurPos = 0;
 
 	std::vector<__SKY_DAYCHANGE> m_WeatherChanges; // 정보입력후에 qsort하자
-	int m_iWeatherChangeCurPos;
+	int m_iWeatherChangeCurPos = 0;
 
-	uint32_t
-		m_dwCheckTick; // 서버에서 시간을 받을때의 윈도우TickCount(실시간) (게임시간으로 24시에 다시 설정하기도 한다.)
-	uint32_t m_dwCheckGameTime; // 서버에서 내려받은 시간(게임 시간 초단위) 0 ~ (24*60*60)
-	eSKY_WEATHER m_eWeather;
+	// 서버에서 시간을 받을때의 윈도우TickCount(실시간) (게임시간으로 24시에 다시 설정하기도 한다.)
+	uint32_t m_dwCheckTick     = 0;
 
-	int m_iYear;
-	int m_iMonth;
-	int m_iDay;
+	// 서버에서 내려받은 시간(게임 시간 초단위) 0 ~ (24*60*60)
+	uint32_t m_dwCheckGameTime = 0;
 
-	int m_iHourFix;      // 해,달 방향 고정시 시간으로 나타내는 방향.
+	eSKY_WEATHER m_eWeather    = SW_CLEAR;
 
-	float m_fCellSize;   // 내부 셀 크기
-	POINT m_CurCellPos;  // 현재 내부셀 좌표
-	__Vector3 m_vPos[9]; // 주변 셀 9칸의 중심좌표들
+	int m_iYear                = 0;
+	int m_iMonth               = 0;
+	int m_iDay                 = 0;
+
+	int m_iHourFix             = 0;    // 해,달 방향 고정시 시간으로 나타내는 방향.
+
+	float m_fCellSize          = 0.0f; // 내부 셀 크기
+	POINT m_CurCellPos         = {};   // 현재 내부셀 좌표
+	__Vector3 m_vPos[9]        = {};   // 주변 셀 9칸의 중심좌표들
 
 	// 효과들..
-	class CN3GERain* m_pGERain; // 비
-	class CN3GESnow* m_pGESnow; // 눈
-#ifdef _N3GAME                  // 게임이 아닌 툴에서는 필요없다...
-	class CN3SndObj* m_pSnd_Weather_Rain;
-	class CN3SndObj* m_pSnd_Weather_Snow;
-#endif                          // #ifdef _N3GAME
+	class CN3GERain* m_pGERain = nullptr; // 비
+	class CN3GESnow* m_pGESnow = nullptr; // 눈
+#ifdef _N3GAME                            // 게임이 아닌 툴에서는 필요없다...
+	class CN3SndObj* m_pSnd_Weather_Rain = nullptr;
+	class CN3SndObj* m_pSnd_Weather_Snow = nullptr;
+#endif                                    // #ifdef _N3GAME
 
-								// Operations
+										  // Operations
 public:
 #ifdef _N3TOOL
 	void InitToDefaultHardCoding();
@@ -248,8 +258,10 @@ protected:
 	int GetLatestChange(eSKY_DAYCHANGE eSDC,
 		int iPos); // m_pDayChangeQueues에서 지정된 위치(iPos) 이전의 가장 최근에 변화하는 위치 얻어오기
 	void ChangeSky(__SKY_DAYCHANGE* pSDC, float fTakeTime);
-	int GetDayChangePos_AfterNSec(
-		uint32_t dwCurGameTime, float fSec); // 실시간 N초 후에 DayChangeQueue의 위치 구하기
+
+	// 실시간 N초 후에 DayChangeQueue의 위치 구하기
+	int GetDayChangePos_AfterNSec(uint32_t dwCurGameTime, float fSec) const;
+
 	static int CompareTime(const void* pArg1, const void* pArg2);
 };
 

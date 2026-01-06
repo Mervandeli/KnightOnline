@@ -25,7 +25,7 @@
 
 #include <AIServer/binder/AIServerBinder.h>
 
-#include <math.h>
+#include <cmath>
 
 using namespace std::chrono_literals;
 using namespace db;
@@ -35,23 +35,7 @@ std::mutex g_region_mutex;
 
 AIServerApp::AIServerApp(AIServerLogger& logger) : AppThread(logger)
 {
-	_year                      = 0;
-	_month                     = 0;
-	_dayOfMonth                = 0;
-	_hour                      = 0;
-	_minute                    = 0;
-	_weatherType               = 0;
-	_weatherAmount             = 0;
-	_nightMode                 = 1;
-	_serverZoneType            = KARUS_ZONE;
-	_battleEventType           = BATTLEZONE_CLOSE;
-	_battleNpcsKilledByKarus   = 0;
-	_battleNpcsKilledByElmorad = 0;
-	_zoneEventThread           = nullptr;
-	_testMode                  = 0;
-
-	for (int i = 0; i < MAX_USER; i++)
-		_users[i] = nullptr;
+	memset(_compressedPacketBuffer, 0, sizeof(_compressedPacketBuffer));
 
 	ConnectionManager::Create();
 
@@ -165,6 +149,9 @@ bool AIServerApp::OnStart()
 
 	// Server start message
 	spdlog::info("AIServerApp::OnStart: starting...");
+
+	_itemLogger = spdlog::get(std::string(logger::AIServerItem));
+	_userLogger = spdlog::get(std::string(logger::AIServerUser));
 
 	//----------------------------------------------------------------------
 	//	DB part initialize
@@ -780,7 +767,7 @@ bool AIServerApp::LoadNpcPosTable(std::vector<model::NpcPos*>& rows)
 
 						for (int l = 0; l < row->PathPointCount; l++)
 						{
-							char szX[5] = {}, szZ[5] = {};
+							char szX[5] {}, szZ[5] {};
 							GetString(szX, path.c_str(), 4, index);
 							GetString(szZ, path.c_str(), 4, index);
 							pNpc->m_PathList.pPattenPos[l].x = atoi(szX);
@@ -940,7 +927,7 @@ bool AIServerApp::MapFileLoad()
 		{
 			do
 			{
-				ModelType row = {};
+				ModelType row {};
 				recordset.get_ref(row);
 
 				std::filesystem::path mapPath = _mapDir / row.Name;
@@ -1008,13 +995,13 @@ bool AIServerApp::MapFileLoad()
 void AIServerApp::AllNpcInfo()
 {
 	// server alive check
-	CNpc* pNpc     = nullptr;
-	int nZone      = 0;
-	int size       = _npcMap.GetSize();
+	CNpc* pNpc    = nullptr;
+	int nZone     = 0;
+	int size      = _npcMap.GetSize();
 
-	int send_index = 0;
+	int sendIndex = 0;
 	int count = 0, send_count = 0, send_tot = 0;
-	char send_buff[2048] = {};
+	char sendBuffer[2048] {};
 
 	for (MAP* pMap : _zones)
 	{
@@ -1023,19 +1010,19 @@ void AIServerApp::AllNpcInfo()
 
 		nZone = pMap->m_nZoneNumber;
 
-		memset(send_buff, 0, sizeof(send_buff));
-		send_index = 0;
-		SetByte(send_buff, AG_SERVER_INFO, send_index);
-		SetByte(send_buff, SERVER_INFO_START, send_index);
-		SetByte(send_buff, nZone, send_index);
-		Send(send_buff, send_index, nZone);
+		memset(sendBuffer, 0, sizeof(sendBuffer));
+		sendIndex = 0;
+		SetByte(sendBuffer, AG_SERVER_INFO, sendIndex);
+		SetByte(sendBuffer, SERVER_INFO_START, sendIndex);
+		SetByte(sendBuffer, nZone, sendIndex);
+		Send(sendBuffer, sendIndex, nZone);
 
-		send_index             = 2;
+		sendIndex              = 2;
 		count                  = 0;
 		send_count             = 0;
 		_compressedPacketCount = 0;
 		_compressedPacketIndex = 0;
-		memset(send_buff, 0, sizeof(send_buff));
+		memset(sendBuffer, 0, sizeof(sendBuffer));
 
 		spdlog::debug("AIServerApp::AllNpcInfo: start for zoneIndex={}", nZone);
 
@@ -1051,26 +1038,26 @@ void AIServerApp::AllNpcInfo()
 			if (pNpc->m_sCurZone != nZone)
 				continue;
 
-			pNpc->SendNpcInfoAll(send_buff, send_index, count);
+			pNpc->SendNpcInfoAll(sendBuffer, sendIndex, count);
 			count++;
 
 			if (count == NPC_NUM)
 			{
-				SetByte(send_buff, NPC_INFO_ALL, send_count);
-				SetByte(send_buff, (uint8_t) count, send_count);
+				SetByte(sendBuffer, NPC_INFO_ALL, send_count);
+				SetByte(sendBuffer, (uint8_t) count, send_count);
 				_compressedPacketCount++;
-				//memcpy(_compressedPacketBuffer+_compressedPacketIndex, send_buff, send_index);
+				//memcpy(_compressedPacketBuffer+_compressedPacketIndex, sendBuffer, sendIndex);
 				memset(_compressedPacketBuffer, 0, sizeof(_compressedPacketBuffer));
-				memcpy(_compressedPacketBuffer, send_buff, send_index);
-				_compressedPacketIndex = send_index;
+				memcpy(_compressedPacketBuffer, sendBuffer, sendIndex);
+				_compressedPacketIndex = sendIndex;
 				SendCompressedData(nZone);
-				send_index = 2;
+				sendIndex  = 2;
 				send_count = 0;
 				count      = 0;
 				send_tot++;
 				spdlog::trace("AIServerApp::AllNpcInfo: send_count={}, count={}, zone={}", send_tot,
 					count, nZone);
-				memset(send_buff, 0, sizeof(send_buff));
+				memset(sendBuffer, 0, sizeof(sendBuffer));
 				std::this_thread::sleep_for(50ms);
 			}
 		}
@@ -1079,22 +1066,22 @@ void AIServerApp::AllNpcInfo()
 		if (count != 0 && count < NPC_NUM)
 		{
 			send_count = 0;
-			SetByte(send_buff, NPC_INFO_ALL, send_count);
-			SetByte(send_buff, (uint8_t) count, send_count);
-			Send(send_buff, send_index, nZone);
+			SetByte(sendBuffer, NPC_INFO_ALL, send_count);
+			SetByte(sendBuffer, (uint8_t) count, send_count);
+			Send(sendBuffer, sendIndex, nZone);
 			send_tot++;
 			spdlog::trace("AIServerApp::AllNpcInfo: send_count={}, count={}, zone={}", send_tot,
 				count, nZone);
 			std::this_thread::sleep_for(50ms);
 		}
 
-		send_index = 0;
-		memset(send_buff, 0, sizeof(send_buff));
-		SetByte(send_buff, AG_SERVER_INFO, send_index);
-		SetByte(send_buff, SERVER_INFO_END, send_index);
-		SetByte(send_buff, nZone, send_index);
-		SetShort(send_buff, (int16_t) _totalNpcCount, send_index);
-		Send(send_buff, send_index, nZone);
+		sendIndex = 0;
+		memset(sendBuffer, 0, sizeof(sendBuffer));
+		SetByte(sendBuffer, AG_SERVER_INFO, sendIndex);
+		SetByte(sendBuffer, SERVER_INFO_END, sendIndex);
+		SetByte(sendBuffer, nZone, sendIndex);
+		SetShort(sendBuffer, (int16_t) _totalNpcCount, sendIndex);
+		Send(sendBuffer, sendIndex, nZone);
 
 		spdlog::debug("AIServerApp::AllNpcInfo: end for zoneId={}", nZone);
 	}
@@ -1142,10 +1129,10 @@ CUser* AIServerApp::GetUserPtr(int nid)
 // sungyong 2002.05.23
 void AIServerApp::CheckAliveTest()
 {
-	int send_index      = 0;
-	char send_buff[256] = {};
+	int sendIndex = 0;
+	char sendBuffer[256] {};
 
-	SetByte(send_buff, AG_CHECK_ALIVE_REQ, send_index);
+	SetByte(sendBuffer, AG_CHECK_ALIVE_REQ, sendIndex);
 
 	CGameSocket* pSocket = nullptr;
 	int size = 0, count = 0;
@@ -1156,7 +1143,7 @@ void AIServerApp::CheckAliveTest()
 		if (pSocket == nullptr)
 			continue;
 
-		size = pSocket->Send(send_buff, send_index);
+		size = pSocket->Send(sendBuffer, sendIndex);
 		if (size > 0)
 		{
 			if (++_aliveSocketCount == MAX_AI_SOCKET)
@@ -1237,14 +1224,15 @@ void AIServerApp::SendCompressedData(int nZone)
 		return;
 	}
 
-	int send_index             = 0;
-	char send_buff[32000]      = {};
-	uint8_t comp_buff[32000]   = {};
+	int sendIndex              = 0;
 	unsigned int comp_data_len = 0;
 	uint32_t crc_value         = 0;
 
-	comp_data_len              = lzf_compress(
-        _compressedPacketBuffer, _compressedPacketIndex, comp_buff, sizeof(comp_buff));
+	char sendBuffer[32000] {};
+	uint8_t comp_buff[32000] {};
+
+	comp_data_len = lzf_compress(
+		_compressedPacketBuffer, _compressedPacketIndex, comp_buff, sizeof(comp_buff));
 
 	assert(comp_data_len != 0 && comp_data_len <= sizeof(comp_buff));
 
@@ -1256,14 +1244,14 @@ void AIServerApp::SendCompressedData(int nZone)
 
 	crc_value = crc32(reinterpret_cast<uint8_t*>(_compressedPacketBuffer), _compressedPacketIndex);
 
-	SetByte(send_buff, AG_COMPRESSED_DATA, send_index);
-	SetShort(send_buff, (int16_t) comp_data_len, send_index);
-	SetShort(send_buff, (int16_t) _compressedPacketIndex, send_index);
-	SetDWORD(send_buff, crc_value, send_index);
-	SetShort(send_buff, (int16_t) _compressedPacketCount, send_index);
-	SetString(send_buff, reinterpret_cast<const char*>(comp_buff), comp_data_len, send_index);
+	SetByte(sendBuffer, AG_COMPRESSED_DATA, sendIndex);
+	SetShort(sendBuffer, (int16_t) comp_data_len, sendIndex);
+	SetShort(sendBuffer, (int16_t) _compressedPacketIndex, sendIndex);
+	SetDWORD(sendBuffer, crc_value, sendIndex);
+	SetShort(sendBuffer, (int16_t) _compressedPacketCount, sendIndex);
+	SetString(sendBuffer, reinterpret_cast<const char*>(comp_buff), comp_data_len, sendIndex);
 
-	Send(send_buff, send_index, nZone);
+	Send(sendBuffer, sendIndex, nZone);
 
 	_compressedPacketCount = 0;
 	_compressedPacketIndex = 0;
@@ -1303,10 +1291,10 @@ void AIServerApp::SyncTest()
 {
 	spdlog::info("AIServerApp::SyncTest: begin");
 
-	int send_index      = 0;
-	char send_buff[256] = {};
+	int sendIndex = 0;
+	char sendBuffer[256] {};
 
-	SetByte(send_buff, AG_CHECK_ALIVE_REQ, send_index);
+	SetByte(sendBuffer, AG_CHECK_ALIVE_REQ, sendIndex);
 
 	CGameSocket* pSocket = nullptr;
 	int size = 0, socketCount = _socketManager.GetServerSocketCount();
@@ -1317,7 +1305,7 @@ void AIServerApp::SyncTest()
 		if (pSocket == nullptr)
 			continue;
 
-		size = pSocket->Send(send_buff, send_index);
+		size = pSocket->Send(sendBuffer, sendIndex);
 
 		spdlog::info("AIServerApp::SyncTest: size={}, zoneNo={}", size, pSocket->_zoneNo);
 	}
@@ -1604,7 +1592,7 @@ bool AIServerApp::LoadConfig(CIni& iniFile)
 
 	// Resolve the path to strip the relative references (to be nice).
 	if (std::filesystem::exists(_mapDir, ec))
-		_mapDir = std::filesystem::canonical(_mapDir);
+		_mapDir = std::filesystem::canonical(_mapDir, ec);
 
 	// EVT directory supplied from command-line.
 	// Replace it in the config -- but only if it's not explicitly been set already.
@@ -1639,21 +1627,21 @@ bool AIServerApp::LoadConfig(CIni& iniFile)
 
 	// Resolve the path to strip the relative references (to be nice).
 	if (std::filesystem::exists(_eventDir, ec))
-		_eventDir = std::filesystem::canonical(_eventDir);
+		_eventDir = std::filesystem::canonical(_eventDir, ec);
 
 	return true;
 }
 
 void AIServerApp::SendSystemMsg(const std::string_view msg, int zone, int type, int who)
 {
-	int send_index = 0;
-	char buff[256] = {};
+	int sendIndex = 0;
+	char buff[256] {};
 
-	SetByte(buff, AG_SYSTEM_MSG, send_index);
-	SetByte(buff, type, send_index); // 채팅형식
-	SetShort(buff, who, send_index); // 누구에게
-	SetString2(buff, msg, send_index);
-	Send(buff, send_index, zone);
+	SetByte(buff, AG_SYSTEM_MSG, sendIndex);
+	SetByte(buff, type, sendIndex); // 채팅형식
+	SetShort(buff, who, sendIndex); // 누구에게
+	SetString2(buff, msg, sendIndex);
+	Send(buff, sendIndex, zone);
 
 	spdlog::info(
 		"AIServerApp::SendSystemMsg: zoneId={} type={} who={} msg={}", zone, type, who, msg);

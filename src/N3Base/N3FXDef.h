@@ -8,13 +8,19 @@
 #ifndef __N3FXDEF_H__
 #define __N3FXDEF_H__
 
+#pragma once
+
 #include "N3Base.h"
 #include "My_3DStruct.h"
 
-constexpr int MAX_FX_PART_V0      = 8;  // V0
-constexpr int MAX_FX_PART_V1_ORIG = 16; // V1 originally, before they changed it
-constexpr int
-	MAX_FX_PART_V1 = 26; // V1(+) after it was changed - no version change to identify this change
+// V0
+constexpr int MAX_FX_PART_V0      = 8;
+
+// V1 originally, before they changed it
+constexpr int MAX_FX_PART_V1_ORIG = 16;
+
+// V1(+) after it was changed - no version change to identify this change
+constexpr int MAX_FX_PART_V1      = 26;
 
 // TODO: Fix this. The UI is just hardcoded for 16 (which got later updated to 26 without a version change).
 constexpr int MAX_FX_PART_TOOL    = MAX_FX_PART_V1_ORIG;
@@ -26,7 +32,9 @@ constexpr int NUM_VERTEX_PARTICLE = 4;  // 파티클 하나에 들어가는 점�
 constexpr int NUM_VERTEX_BOTTOM   = 10; //
 constexpr int NUM_KEY_COLOR       = 100;
 
-enum e_FXPartType // 이펙트 스타일...매쉬를 이용한 건지, 파티클을 이용한 건지..등등..
+// 이펙트 스타일...매쉬를 이용한 건지, 파티클을 이용한 건지..등등..
+// NOLINTNEXTLINE(performance-enum-size): used by the file format (albeit indirectly), must be this size
+enum e_FXPartType : int32_t
 {
 	FX_PART_TYPE_NONE        = 0,
 	FX_PART_TYPE_PARTICLE    = 1, //'particle'
@@ -35,7 +43,8 @@ enum e_FXPartType // 이펙트 스타일...매쉬를 이용한 건지, 파티클
 	FX_PART_TYPE_BOTTOMBOARD = 4  //'bottomboard'
 };
 
-enum e_FXPartState                //파트의 상태..
+// 파트의 상태..
+enum e_FXPartState : uint8_t
 {
 	FX_PART_STATE_DEAD  = 0,
 	FX_PART_STATE_DYING = 1,
@@ -43,14 +52,16 @@ enum e_FXPartState                //파트의 상태..
 	FX_PART_STATE_READY = 3
 };
 
-enum e_FXBundleState //번들의 상태..
+// 번들의 상태..
+enum e_FXBundleState : uint8_t
 {
 	FX_BUNDLE_STATE_DEAD  = 0,
 	FX_BUNDLE_STATE_DYING = 1,
 	FX_BUNDLE_STATE_LIVE  = 2
 };
 
-enum e_FXBundleAct //번들이 어케 동작하는지..
+// 번들이 어케 동작하는지..
+enum e_FXBundleAct : int8_t
 {
 	FX_BUNDLE_MOVE_DIR_FIXEDTARGET          = 0,
 	FX_BUNDLE_MOVE_DIR_FLEXABLETARGET       = 1,
@@ -58,15 +69,16 @@ enum e_FXBundleAct //번들이 어케 동작하는지..
 	FX_BUNDLE_MOVE_CURVE_FIXEDTARGET        = 3,
 	FX_BUNDLE_MOVE_DIR_SLOW                 = 4,
 	FX_BUNDLE_REGION_POISON                 = 5,
-	FX_BUNDLE_MOVE_NONE                     = 0xffffffff
+	FX_BUNDLE_MOVE_NONE                     = -1
 };
 
-//
-enum e_FXPartParticleEmitType              // 이펙트 파트가 어떤 모양으로 전개되는지...
+// 이펙트 파트가 어떤 모양으로 전개되는지...
+// NOLINTNEXTLINE(performance-enum-size): used by the file format (albeit indirectly), must be this size
+enum e_FXPartParticleEmitType : uint32_t
 {
-	FX_PART_PARTICLE_EMIT_TYPE_NORMAL = 0, //'normal'
-	FX_PART_PARTICLE_EMIT_TYPE_SPREAD = 1, //'spread'
-	FX_PART_PARTICLE_EMIT_TYPE_GATHER = 2, //'gather'
+	FX_PART_PARTICLE_EMIT_TYPE_NORMAL = 0,
+	FX_PART_PARTICLE_EMIT_TYPE_SPREAD = 1,
+	FX_PART_PARTICLE_EMIT_TYPE_GATHER = 2
 };
 
 //

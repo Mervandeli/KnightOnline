@@ -5,9 +5,7 @@
 #if !defined(AFX_D3DENGINETEST_H__4DE7DD27_A9BC_43C5_9D67_E99031ED38B5__INCLUDED_)
 #define AFX_D3DENGINETEST_H__4DE7DD27_A9BC_43C5_9D67_E99031ED38B5__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3Eng.h"
 
@@ -34,18 +32,22 @@ struct __EXPORT_OPTION
 	BOOL bExportCamera;   // 카메라 데이터를 갖고 있다.
 	BOOL bExportLight;    // 라이트 데이터를 갖고 있다.
 	BOOL bExportGeometry; // 지오메트리 데이터를 갖고 있다.
-	BOOL
-		bExportDummy; // 도우미 오브젝트(??? - 실제 겜에서는 필요없고 개발시에만 필요한 오브젝트를 말한다)데이터를 갖고 있다.
-	BOOL
-		bExportCharacter; // 도우미 오브젝트(??? - 실제 겜에서는 필요없고 개발시에만 필요한 오브젝트를 말한다)데이터를 갖고 있다.
 
-	BOOL bExportSelectedOnly;     // 선택된 것만 ???
+	// 도우미 오브젝트(??? - 실제 겜에서는 필요없고 개발시에만 필요한 오브젝트를 말한다)데이터를 갖고 있다.
+	BOOL bExportDummy;
 
-	BOOL bGenerateFileName;       // 파일 이름을 0_0000_00_0 포맷으로 바꾼다..??
-	BOOL bGenerateSmoothNormal;   // 부드럽게 보이도록 법선 벡터들을 재 계산한다.
-								  //	BOOL bGenerateProgressiveMesh; // Progressive Mesh 생성
-	BOOL
-		bGenerateHalfSizeTexture; // 텍스처 파일을 자동으로 최적화 시켜서 생성 Direct3D 의 포맷에 맞게 2의 제곱수 단위로 맞추어서 "OBM" 비트맵 파일로 저장.
+	// 도우미 오브젝트(??? - 실제 겜에서는 필요없고 개발시에만 필요한 오브젝트를 말한다)데이터를 갖고 있다.
+	BOOL bExportCharacter;
+
+	BOOL bExportSelectedOnly;   // 선택된 것만 ???
+
+	BOOL bGenerateFileName;     // 파일 이름을 0_0000_00_0 포맷으로 바꾼다..??
+	BOOL bGenerateSmoothNormal; // 부드럽게 보이도록 법선 벡터들을 재 계산한다.
+
+	//	BOOL bGenerateProgressiveMesh; // Progressive Mesh 생성
+
+	// 텍스처 파일을 자동으로 최적화 시켜서 생성 Direct3D 의 포맷에 맞게 2의 제곱수 단위로 맞추어서 "OBM" 비트맵 파일로 저장.
+	BOOL bGenerateHalfSizeTexture;
 	BOOL bGenerateCompressedTexture; // Texture 압축 사용
 
 	char szSubDir[_MAX_DIR];         // export 할때 저장하는 sub폴더를 지정해준다.

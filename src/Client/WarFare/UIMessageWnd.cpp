@@ -11,23 +11,14 @@
 #include <N3Base/N3UIString.h>
 #include <N3Base/N3UIScrollBar.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIMessageWnd::CUIMessageWnd()
 {
-	m_pChatOut       = nullptr;
-	m_pScrollbar     = nullptr;
-	m_pBtn_Fold      = nullptr;
-	m_iChatLineCount = 0;
-	m_ppUILines      = nullptr;
-	ZeroMemory(&m_rcChatOutRegion, sizeof(m_rcChatOutRegion));
+	m_pChatOut        = nullptr;
+	m_pScrollbar      = nullptr;
+	m_pBtn_Fold       = nullptr;
+	m_iChatLineCount  = 0;
+	m_ppUILines       = nullptr;
+	m_rcChatOutRegion = {};
 }
 
 CUIMessageWnd::~CUIMessageWnd()
@@ -177,27 +168,24 @@ bool CUIMessageWnd::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 void CUIMessageWnd::CreateLines()
 {
-	int i;
-	if (m_ppUILines)
+	if (m_ppUILines != nullptr)
 	{
-		for (i = 0; i < m_iChatLineCount; ++i)
+		for (int i = 0; i < m_iChatLineCount; ++i)
 		{
-			if (m_ppUILines[i])
-			{
-				delete m_ppUILines[i];
-				m_ppUILines[i] = nullptr;
-			}
+			delete m_ppUILines[i];
+			m_ppUILines[i] = nullptr;
 		}
+
 		delete[] m_ppUILines;
 		m_ppUILines = nullptr;
 	}
-	SIZE size;
-	if (m_pChatOut && m_pChatOut->GetTextExtent("가", lstrlen("가"), &size) && size.cy > 0)
-	{
+
+	SIZE size {};
+	if (m_pChatOut != nullptr && m_pChatOut->GetTextExtent("가", lstrlen("가"), &size) && size.cy > 0)
 		m_iChatLineCount = (m_rcChatOutRegion.bottom - m_rcChatOutRegion.top) / size.cy;
-	}
 	else
 		return;
+
 	const std::string& szFontName = m_pChatOut->GetFontName();
 	uint32_t dwFontHeight         = m_pChatOut->GetFontHeight();
 	uint32_t dwFontFlag           = m_pChatOut->GetFontFlags();
@@ -206,7 +194,7 @@ void CUIMessageWnd::CreateLines()
 		return;
 
 	m_ppUILines = new CN3UIString*[m_iChatLineCount];
-	for (i = 0; i < m_iChatLineCount; ++i)
+	for (int i = 0; i < m_iChatLineCount; ++i)
 	{
 		RECT rc;
 		SetRect(&rc, m_rcChatOutRegion.left, m_rcChatOutRegion.top + (i * size.cy), m_rcChatOutRegion.right,
@@ -313,8 +301,7 @@ void CUIMessageWnd::AddLineBuffer(const std::string& szString, D3DCOLOR color)
 			pLineInfo->color = color;
 			if ((iCount - iLineStart) > 0)
 			{
-				int iLineLength = iCount - iLineStart + 1;
-				std::string szLine;
+				int iLineLength   = iCount - iLineStart + 1;
 				pLineInfo->szChat = szString.substr(iLineStart, iLineLength);
 			} // 연속된 \n일 경우 pszLine = nullptr이 될 수 있다.
 
@@ -382,17 +369,16 @@ void CUIMessageWnd::SetTopLine(int iTopLine)
 	else if (iTopLine > iLineBufferSize)
 		iTopLine = iLineBufferSize;
 
-	int i;
 	// 앞줄서부터 차례로 임시버퍼에 저장하고 string 길이 측정
-	__ChatInfo** ppLineInfos = new __ChatInfo*[m_iChatLineCount];
-	memset(ppLineInfos, 0, sizeof(__ChatInfo*) * m_iChatLineCount);
+	__ChatInfo** ppLineInfos = new __ChatInfo* [m_iChatLineCount] {};
 
-	int iCurLine = 0;
-	for (i = 0; i < m_iChatLineCount; ++i)
+	int i = 0, iCurLine = 0;
+	for (; i < m_iChatLineCount; ++i)
 	{
 		iCurLine = iTopLine + i;
 		if (iLineBufferSize <= iCurLine)
 			break;
+
 		ppLineInfos[i] = m_LineBuffer[iCurLine];
 	}
 
@@ -403,16 +389,17 @@ void CUIMessageWnd::SetTopLine(int iTopLine)
 	for (i = 0; i < iRealLine; ++i)
 	{
 		++iRealLineCount;
-		if (nullptr == m_ppUILines[i])
+		if (m_ppUILines[i] == nullptr)
 			continue;
+
 		m_ppUILines[i]->SetColor(ppLineInfos[i]->color);
 		m_ppUILines[i]->SetString(ppLineInfos[i]->szChat);
 	}
+
 	for (i = iRealLineCount; i < m_iChatLineCount; ++i)
 	{
-		if (nullptr == m_ppUILines[i])
-			continue;
-		m_ppUILines[i]->SetString(""); // 나머지는 빈칸 만들기
+		if (m_ppUILines[i] != nullptr)
+			m_ppUILines[i]->SetString(""); // 나머지는 빈칸 만들기
 	}
 	delete[] ppLineInfos;
 }
@@ -423,9 +410,7 @@ void CUIMessageWnd::RecalcLineBuffer() // 채팅창 사이즈가 변했을때 �
 	ChatListItor itor;
 	for (itor = m_LineBuffer.begin(); m_LineBuffer.end() != itor; ++itor)
 	{
-		__ChatInfo* pLineBuff = (*itor);
-		if (pLineBuff)
-			delete pLineBuff;
+		delete *itor;
 	}
 	m_LineBuffer.clear();
 
@@ -470,17 +455,15 @@ void CUIMessageWnd::SetRegion(const RECT& Rect)
 
 bool CUIMessageWnd::OnKeyPress(int iKey)
 {
-	switch (iKey)
+	// hotkey가 포커스 잡혀있을때는 다른 ui를 닫을수 없으므로 DIK_ESCAPE가 들어오면 포커스를 다시잡고
+	if (iKey == DIK_ESCAPE)
 	{
-		case DIK_ESCAPE:
-		{ //hotkey가 포커스 잡혀있을때는 다른 ui를 닫을수 없으므로 DIK_ESCAPE가 들어오면 포커스를 다시잡고
-			//열려있는 다른 유아이를 닫아준다.
-			CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
-			CN3UIBase* pFocus = CGameProcedure::s_pUIMgr->GetFocusedUI();
-			if (pFocus && pFocus != this)
-				pFocus->OnKeyPress(iKey);
-		}
-			return true;
+		// 열려있는 다른 유아이를 닫아준다.
+		CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
+		CN3UIBase* pFocus = CGameProcedure::s_pUIMgr->GetFocusedUI();
+		if (pFocus != nullptr && pFocus != this)
+			pFocus->OnKeyPress(iKey);
+		return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

@@ -2,6 +2,16 @@
 #include "IconItemSkill.h"
 #include "GameDef.h"
 
+__IconItemSkill::__IconItemSkill()
+{
+	pItemBasic  = nullptr;
+	pItemExt    = nullptr;
+	iCount      = 0;
+	iDurability = 0;
+	pSkill      = nullptr;
+	pUIIcon     = nullptr;
+}
+
 int __IconItemSkill::GetBuyPrice() const
 {
 	if (pItemBasic == nullptr || pItemExt == nullptr)

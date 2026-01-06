@@ -13,126 +13,34 @@
 #include <N3Base/N3ShapeExtra.h>
 #include <N3Base/N3SndObj.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-static const __Vector3 s_vLightOffset = __Vector3(10.0f, 40.0f, 30.0f);
+static const __Vector3 s_vLightOffset = { 10.0f, 40.0f, 30.0f };
 CN3SndObj* CPlayerBase::m_pSnd_MyMove = nullptr;
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CPlayerBase::CPlayerBase()
 {
-	m_ePlayerType = PLAYER_BASE;     // Player Type ... Base, NPC, OTher, MySelf
-
 	m_Chr.PartAlloc(PART_POS_COUNT); // 기본적으로 파트와 플러그 세팅..
 	m_Chr.PlugAlloc(PLUG_POS_COUNT);
 
 	m_Chr.PosSet(__Vector3(0.0f, 0.0f, 0.0f));
 
-	m_pLooksRef = nullptr;                                   // 기본적인 모습과 기본 정보 참조 테이블
-	memset(m_pItemPlugBasics, 0, sizeof(m_pItemPlugBasics)); // 캐릭터에 붙은 무기들..
-	memset(m_pItemPlugExts, 0, sizeof(m_pItemPlugExts));
-	memset(m_pItemPartBasics, 0, sizeof(m_pItemPartBasics)); // 캐릭터에 붙은 갑옷들..
-	memset(m_pItemPartExts, 0, sizeof(m_pItemPartExts));     // 캐릭터에 붙은 갑옷들..
+	m_Chr.m_nJointPartStarts[0] = 1;  // 상체 - 에니메이션을 분리해 처리하는데... 조인트 인덱스이다.
+	m_Chr.m_nJointPartEnds[0]   = 15; // 상체
 
-	m_iIDTarget                 = -1;
-	m_iMagicAni                 = 0;
-	m_bGuardSuccess             = false;                                      // 방어에 성공했는지에 대한 플래그..
-	m_bVisible                  = true;                                       // 보이는지??
+	m_Chr.m_nJointPartStarts[1] = 16; // 하체
+	m_Chr.m_nJointPartEnds[1]   = 23; // 하체
 
-	m_iDroppedItemID            = 0;                                          // 죽은후 떨어트린 아이템
-
-	m_Chr.m_nJointPartStarts[0] = 1;                                          // 상체 - 에니메이션을 분리해 처리하는데... 조인트 인덱스이다.
-	m_Chr.m_nJointPartEnds[0]   = 15;                                         // 상체
-
-	m_Chr.m_nJointPartStarts[1] = 16;                                         // 하체
-	m_Chr.m_nJointPartEnds[1]   = 23;                                         // 하체
-
-	m_cvDuration.a = m_cvDuration.r = m_cvDuration.g = m_cvDuration.b = 1.0f; // 지속 컬러 값
-	m_fDurationColorTimeCur                                           = 0;    // 현재 시간..
-	m_fDurationColorTime                                              = 0;    // 지속시간..
-
-	m_fFlickeringFactor                                               = 1.0f; // 깜박거림 알파 값 1.0 이면 깜박이지 않는다....
-	m_fFlickeringTime                                                 = 0;    // 깜박거림 시간..
-
-	m_fTimeAfterDeath = 0;                 // 죽는 모션을 취하는 타이머 - 5초정도면 적당한가?? 그전에 공격을 받으면 바로 죽는다.
-
-	m_eStateNext = m_eState = PSA_BASIC;
-	m_eStateMove            = PSM_STOP;    // 첨에 정지..
-	m_eStateDying           = PSD_UNKNOWN; // 죽을때 방법
-	m_fTimeDying            = 0;           // 죽는 모션 취할때 지난 시간..
-
-	m_fRotRadianPerSec      = DegreesToRadians(270.0f); // 초당 회전 라디안값
-	m_fMoveSpeedPerSec      = 0;    // 초당 움직임 값.. 이값은 기본값이고 상태(걷기, 달리기, 뒤로, 저주등) 에 따라 가감해서 쓴다..
-	m_fYawCur               = 0;    // 현재 회전값..
-	m_fYawToReach           = 0;
-
-	m_fGravityCur           = 0;    // 중력값..
-	m_fYNext                = 0;    // 오브젝트 혹은 지형의 충돌 체크에 따른 높이값..
-
-	m_fScaleToSet           = 1.0f; // 점차 스케일 값변화..
-	m_fScalePrev            = 1.0f;
-
-	m_pSnd_Move             = nullptr;
-	m_pSnd_Attack_0         = nullptr;
-	//	m_pSnd_Attack_1 = nullptr;
-	m_pSnd_Struck_0         = nullptr;
-	//	m_pSnd_Struck_1 = nullptr;
-	m_pSnd_Breathe_0        = nullptr;
-	//	m_pSnd_Breathe_1 = nullptr;
-	m_pSnd_Blow             = nullptr;
-	m_bSoundAllSet          = false;
-
-	m_InfoBase.Init();           // 첨엔 종족값을 모른다..
-
-	m_pShapeExtraRef  = nullptr; // 이 NPC 가 성문이나 집등 오브젝트의 형태이면 이 포인터를 세팅해서 쓴,다..
-
-	m_fCastFreezeTime = 0.0f;
-	m_fAttackDelta    = 1.0f;    // 스킬이나 마법에 의해 변하는 공격 속도.. 1.0 이 기본이고 클수록 더 빨리 공격한다.
-	m_fMoveDelta      = 1.0f;    // 스킬이나 마법에 의해 변하는 이동 속도 1.0 이 기본이고 클수록 더 빨리 움직인다.
-
-	m_vDirDying.Set(0, 0, 1);    // 죽을때 밀리는 방향..
-
-	// 그림자 초기화
-	//	By : Ecli666 ( On 2002-03-29 오후 4:23:36 )
-	/*
-	m_pTexShadow = nullptr;
-	m_pTexShadow = s_MngTex.Get("Chr\\Shadow_Character.tga"); 
-	m_vShadows[0].Set(-0.7f, 0, 0.7f, 0, 0);
-	m_vShadows[1].Set( 0.7f, 0, 0.7f, 1, 0);
-	m_vShadows[2].Set( 0.7f, 0,-0.7f, 1, 1);
-	m_vShadows[3].Set(-0.7f, 0,-0.7f, 0, 1);
-*/
-	//	~(By Ecli666 On 2002-03-29 오후 4:23:36 )
-
-	// 폰트 초기화... // 정보 표시용 폰트와 풍선용은 따로 생성한다..
-	m_pIDFont           = nullptr;
-	m_pClanFont         = nullptr;
-	m_pInfoFont         = nullptr;
-	m_pBalloonFont      = nullptr;
-	m_fTimeBalloon      = 0;
-
-	m_bAnimationChanged = false; // 큐에 넣은 에니메이션이 변하는 순간만 세팅된다..
+	m_InfoBase.Init();                // 첨엔 종족값을 모른다..
 
 	m_pvVertex[0].Set(-SHADOW_PLANE_SIZE, 0.0f, SHADOW_PLANE_SIZE, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f);
 	m_pvVertex[1].Set(SHADOW_PLANE_SIZE, 0.0f, SHADOW_PLANE_SIZE, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f);
 	m_pvVertex[2].Set(SHADOW_PLANE_SIZE, 0.0f, -SHADOW_PLANE_SIZE, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f);
 	m_pvVertex[3].Set(-SHADOW_PLANE_SIZE, 0.0f, -SHADOW_PLANE_SIZE, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f);
 
-	uint16_t* pIdx = m_pIndex;
-
-	// 아랫면.
-	*pIdx++        = 0;
-	*pIdx++        = 1;
-	*pIdx++        = 3;
-	*pIdx++        = 2;
-	*pIdx++        = 3;
-	*pIdx++        = 1;
+	const uint16_t index[] = { //
+		// Bottom
+		0, 1, 3, 2, 3, 1
+	};
+	memcpy(m_pIndex, index, sizeof(m_pIndex));
 
 	m_N3Tex.Create(SHADOW_SIZE, SHADOW_SIZE, D3DFMT_A4R4G4B4, 0);
 }
@@ -387,7 +295,7 @@ void CPlayerBase::IDSet(int iID, const std::string& szID, D3DCOLOR crID)
 #endif
 }
 
-void CPlayerBase::KnightsInfoSet(int iID, const std::string& szName, int iGrade, int iRank)
+void CPlayerBase::KnightsInfoSet(int iID, const std::string& /*szName*/, int iGrade, int iRank)
 {
 	std::string szPlug;
 	if (iGrade > 0 && iGrade <= 5)
@@ -410,81 +318,6 @@ void CPlayerBase::KnightsInfoSet(int iID, const std::string& szName, int iGrade,
 
 	static_cast<CN3CPlug*>(pPlug)->InitFX(szFXMain, szFXTail, 0xffffffff);
 }
-
-/*
-void CPlayerBase::RenderShadow()
-{
-//	By : Ecli666 ( On 2002-03-29 오후 4:22:59 )
-/*
-	LPDIRECT3DTEXTURE8 lpTex = nullptr;
-	if(m_pTexShadow) lpTex = m_pTexShadow->Get();
-
-	__AlphaPrimitive* pAP = s_AlphaMgr.Add();
-	if(pAP)
-	{
-		pAP->bUseVB				= FALSE;
-		pAP->dwBlendDest		= D3DBLEND_INVSRCALPHA;
-		pAP->dwBlendSrc			= D3DBLEND_SRCALPHA;
-		pAP->dwFVF				= FVF_XYZT1;
-		pAP->nPrimitiveCount	= 2;
-		pAP->ePrimitiveType		= D3DPT_TRIANGLEFAN;
-		pAP->dwPrimitiveSize	= sizeof(__VertexXyzT1);
-		pAP->fCameraDistance	= (s_CameraData.vEye - m_Chr.m_Matrix.Pos()).Magnitude();
-		pAP->lpTex				= lpTex;
-		pAP->nRenderFlags		= RF_NOTZWRITE;
-		pAP->nVertexCount		= 4;
-	//	pAP->MtxWorld			= &m_Matrix;
-		pAP->pVertices			= m_vShadows;
-		pAP->pwIndices			= nullptr;
-
-		pAP->MtxWorld.Identity();
-		pAP->MtxWorld.PosSet(m_Chr.m_Matrix.Pos());
-		pAP->MtxWorld.m[3][1] = 0.05f;
-	}
-
-	for(int i = 0; i < 4; i++)
-		m_vShadows[i].y = s_pTerrain->GetHeight(pAP->MtxWorld.m[3][0] + m_vShadows[i].x, pAP->MtxWorld.m[3][2] + m_vShadows[i].z);
-
-	return; // 렌더링 안하지롱.
-*/
-
-//	~(By Ecli666 On 2002-03-29 오후 4:22:59 )
-
-/*
-	// 그림자 렌더링.
-	// backup
-	uint32_t dwAlpha;
-	s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
-
-	// render state 세팅
-	if(FALSE == dwAlpha) s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-	s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-
-	// texture state 세팅 (alpha)
-	LPDIRECT3DTEXTURE8 lpTex = m_pTexShadow->Get();
-	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	s_lpD3DDev->SetTexture(0, lpTex);
-	
-	static __Matrix44 mtx;
-	mtx.Identity();
-	mtx.PosSet(m_Chr.m_Matrix.Pos());
-	mtx.m[3][0] += 0.1f;
-	mtx.m[3][1] = 0.05f;
-	mtx.m[3][2] -= 0.1f;
-	s_lpD3DDev->SetTransform(D3DTS_WORLD, mtx.toD3D());
-	s_lpD3DDev->SetFVF(FVF_XYZT1);
-
-	for(int i = 0; i < 4; i++)
-		m_vShadows[i].y = s_pTerrain->GetHeight(mtx.m[3][0] + m_vShadows[i].x, mtx.m[3][2] + m_vShadows[i].z);
-	
-	s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, m_vShadows, sizeof(__VertexXyzT1));
-
-	// restore
-	if(FALSE == dwAlpha) s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlpha);
-
-}*/
 
 void CPlayerBase::RenderChrInRect(CN3Chr* pChr, const RECT& Rect)
 {
@@ -563,7 +396,7 @@ void CPlayerBase::RenderChrInRect(CN3Chr* pChr, const RECT& Rect)
 	s_lpD3DDev->SetTransform(D3DTS_PROJECTION, mtxProj.toD3D());
 
 	// backup render state
-	DWORD dwFog, dwZEnable; //, dwLighting;
+	DWORD dwFog = 0, dwZEnable = 0; //, dwLighting;
 	s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &dwZEnable);
 	//	s_lpD3DDev->GetRenderState( D3DRS_LIGHTING, &dwLighting );	// lighting은 외부에서 조정할 수 있게 하자.
 	s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
@@ -716,7 +549,6 @@ void CPlayerBase::TickAnimation()
 			e_Ani eAniToSet = m_AnimationDeque[0];     // 데크에서 하나 빼오고..
 			m_AnimationDeque.pop_front();
 			m_Chr.AniCurSet(eAniToSet);
-			//			TRACE("      Animation : %d\n", eAniToSet);
 		}
 	}
 }
@@ -942,9 +774,9 @@ void CPlayerBase::Render(float fSunAngle)
 		}
 	}
 
-	if (fFactorToApply != 0)                                                              // 투명도가 적용되야 한다면..
+	if (fFactorToApply != 0) // 투명도가 적용되야 한다면..
 	{
-		DWORD dwAlphaBlend, dwAlphaOP, dwAlphaArg1, dwTexFactor, dwSrcBlend, dwDestBlend; // , dwZEnable;
+		DWORD dwAlphaBlend = 0, dwAlphaOP = 0, dwAlphaArg1 = 0, dwTexFactor = 0, dwSrcBlend = 0, dwDestBlend = 0; // , dwZEnable;
 
 		// backup state
 		s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlphaBlend);
@@ -994,7 +826,7 @@ void CPlayerBase::Render(float fSunAngle)
 		m_Chr.CollisionMesh()->Render(0xffff0000);
 	}
 
-	__Vector3 vLine[3];
+	__Vector3 vLine[3] {};
 	vLine[0]    = m_Chr.Pos();
 	vLine[0].y += 1.3f;
 	vLine[1]    = m_vPosFromServer;
@@ -1025,9 +857,9 @@ void CPlayerBase::Render(float fSunAngle)
 			pt.y            -= size.cy + 5;
 			D3DCOLOR crFont  = m_pIDFont->GetFontColor();
 
-			m_pIDFont->DrawText(pt.x - (size.cx / 2) - 1.0f, pt.y - 1.0f, 0xff000000, 0);
-			m_pIDFont->DrawText(pt.x - (size.cx / 2) + 1.0f, pt.y + 1.0f, 0xff000000, 0);
-			m_pIDFont->DrawText(pt.x - (size.cx / 2) + 0.0f, pt.y + 0.0f, crFont, 0);
+			m_pIDFont->DrawText(pt.x - (size.cx / 2.0f) - 1.0f, pt.y - 1.0f, 0xff000000, 0);
+			m_pIDFont->DrawText(pt.x - (size.cx / 2.0f) + 1.0f, pt.y + 1.0f, 0xff000000, 0);
+			m_pIDFont->DrawText(pt.x - (size.cx / 2.0f) + 0.0f, pt.y + 0.0f, crFont, 0);
 
 			//Knight & clan 렌더링..
 			if (m_pClanFont && m_pClanFont->IsSetText())
@@ -1035,9 +867,9 @@ void CPlayerBase::Render(float fSunAngle)
 				size    = m_pClanFont->GetSize();
 				pt.y   -= size.cy + 5;
 				crFont  = m_pClanFont->GetFontColor();
-				m_pClanFont->DrawText(pt.x - (size.cx / 2) - 1.0f, pt.y - 1.0f, 0xff000000, 0);
-				m_pClanFont->DrawText(pt.x - (size.cx / 2) + 1.0f, pt.y + 1.0f, 0xff000000, 0);
-				m_pClanFont->DrawText(pt.x - (size.cx / 2) + 0.0f, pt.y + 0.0f, crFont, 0);
+				m_pClanFont->DrawText(pt.x - (size.cx / 2.0f) - 1.0f, pt.y - 1.0f, 0xff000000, 0);
+				m_pClanFont->DrawText(pt.x - (size.cx / 2.0f) + 1.0f, pt.y + 1.0f, 0xff000000, 0);
+				m_pClanFont->DrawText(pt.x - (size.cx / 2.0f) + 0.0f, pt.y + 0.0f, crFont, 0);
 			}
 
 			// 파티 모집...
@@ -1046,9 +878,9 @@ void CPlayerBase::Render(float fSunAngle)
 				size    = m_pInfoFont->GetSize();
 				pt.y   -= size.cy + 5;
 				crFont  = m_pInfoFont->GetFontColor();
-				m_pInfoFont->DrawText(pt.x - (size.cx / 2) - 1.0f, pt.y - 1.0f, 0xff000000, 0);
-				m_pInfoFont->DrawText(pt.x - (size.cx / 2) + 1.0f, pt.y + 1.0f, 0xff000000, 0);
-				m_pInfoFont->DrawText(pt.x - (size.cx / 2) + 0.0f, pt.y + 0.0f, crFont, 0);
+				m_pInfoFont->DrawText(pt.x - (size.cx / 2.0f) - 1.0f, pt.y - 1.0f, 0xff000000, 0);
+				m_pInfoFont->DrawText(pt.x - (size.cx / 2.0f) + 1.0f, pt.y + 1.0f, 0xff000000, 0);
+				m_pInfoFont->DrawText(pt.x - (size.cx / 2.0f) + 0.0f, pt.y + 0.0f, crFont, 0);
 			}
 
 			// 풍선 메시지..
@@ -1064,15 +896,15 @@ void CPlayerBase::Render(float fSunAngle)
 
 				size  = m_pBalloonFont->GetSize();
 				pt.y -= size.cy + 5;
-				m_pBalloonFont->DrawText(pt.x - (size.cx / 2) - 1.0f, pt.y - 1.0f, 0xff000000, 0);
-				m_pBalloonFont->DrawText(pt.x - (size.cx / 2) + 1.0f, pt.y + 1.0f, 0xff000000, 0);
-				m_pBalloonFont->DrawText(pt.x - (size.cx / 2) + 0.0f, pt.y + 0.0f, crFont, D3DFONT_BOLD);
+				m_pBalloonFont->DrawText(pt.x - (size.cx / 2.0f) - 1.0f, pt.y - 1.0f, 0xff000000, 0);
+				m_pBalloonFont->DrawText(pt.x - (size.cx / 2.0f) + 1.0f, pt.y + 1.0f, 0xff000000, 0);
+				m_pBalloonFont->DrawText(pt.x - (size.cx / 2.0f) + 0.0f, pt.y + 0.0f, crFont, D3DFONT_BOLD);
 			}
 		}
 	}
 }
 
-__Vector3 CPlayerBase::HeadPosition()
+__Vector3 CPlayerBase::HeadPosition() const
 {
 	__Vector3 vHead  = m_Chr.Pos();
 	vHead.y         += m_Chr.Height();
@@ -1080,31 +912,23 @@ __Vector3 CPlayerBase::HeadPosition()
 	return vHead;
 }
 
-float CPlayerBase::Height()
+float CPlayerBase::Height() const
 {
-	if (m_pShapeExtraRef)
-	{
+	if (m_pShapeExtraRef != nullptr)
 		return (m_pShapeExtraRef->Max().y - m_pShapeExtraRef->Min().y) * m_pShapeExtraRef->Scale().y;
-	}
-	else
-	{
-		return m_Chr.Height();
-	}
+
+	return m_Chr.Height();
 }
 
-float CPlayerBase::Radius()
+float CPlayerBase::Radius() const
 {
-	if (m_pShapeExtraRef)
-	{
+	if (m_pShapeExtraRef != nullptr)
 		return m_pShapeExtraRef->Radius();
-	}
-	else
-	{
-		return m_Chr.Radius();
-	}
+
+	return m_Chr.Radius();
 }
 
-__Vector3 CPlayerBase::Direction()
+__Vector3 CPlayerBase::Direction() const
 {
 	__Vector3 vDir(0, 0, 1);
 	__Matrix44 mtxRot  = m_Chr.Rot();
@@ -1143,15 +967,6 @@ bool CPlayerBase::Action(e_StateAction eState, bool bLooping, CPlayerBase* pTarg
 		if (FALSE == sTableAction[m_eState][eState])
 			return false;
 	}
-
-	//	if(m_szName == "알라딘")
-	//	{
-	//		bool bBReak = true;
-	//		std::string szSt1 = "??";
-	//		if(PSA_BASIC == m_eState) szSt1 = "보통";
-	//		else if(PSA_SPELLMAGIC == m_eState) szSt1 = "매직쇼~";
-	//		TRACE("%s(%.1f) - %s\n", m_szName.c_str(), CN3Base::TimeGet(), szSt1.c_str());
-	//	}
 
 	bool bNPC                    = (RACE_NPC == m_InfoBase.eRace ? true : false);
 	bool bNeedUpperAnimationOnly = false; // 몸 전체에 에니메이션을 적요하는가... -1 : 전체, 0 : 하체 1 : 상체
@@ -1362,14 +1177,7 @@ void CPlayerBase::ActionDying(e_StateDying eSD, const __Vector3& vDir)
 	m_vDirDying   = vDir;           // 죽을때 밀리는 방향..
 
 	e_Ani eAni    = ANI_DEAD_NEATLY;
-	if (eSD == PSD_KEEP_POSITION)
-	{
-		if (RACE_NPC == m_InfoBase.eRace)
-			eAni = ANI_NPC_DEAD0;   // NPC 일경우
-		else
-			eAni = ANI_DEAD_NEATLY; // 플레이어 일경우..
-	}
-	else if (eSD == PSD_DISJOINT)
+	if (eSD == PSD_DISJOINT)
 	{
 		if (RACE_NPC == m_InfoBase.eRace)
 			eAni = ANI_NPC_DEAD1;      // NPC 일경우
@@ -1569,14 +1377,14 @@ bool CPlayerBase::ProcessAttack(CPlayerBase* pTarget)
 	return bAttackSuccess;
 }
 
-bool CPlayerBase::TryWeaponElementEffect(e_PlugPosition plugPosition, const CPlayerBase& target, __Vector3 collisionPosition)
+bool CPlayerBase::TryWeaponElementEffect(e_PlugPosition plugPosition, const CPlayerBase& target, const __Vector3& collisionPosition)
 {
 	bool affected = false;
+
 	// only process for weapons
 	if (plugPosition != PLUG_POS_LEFTHAND && plugPosition != PLUG_POS_RIGHTHAND)
-	{
 		return affected;
-	}
+
 	int iFXID = -1;
 	if ((m_pItemPlugExts[plugPosition]->byMagicOrRare == ITEM_ATTRIB_UNIQUE && m_pItemPlugExts[plugPosition]->byDamageFire > 0)
 		|| m_pItemPlugExts[plugPosition]->byDamageFire >= LIMIT_FX_DAMAGE)
@@ -1804,10 +1612,7 @@ e_Ani CPlayerBase::JudgeAnimationDying()
 
 e_Ani CPlayerBase::JudgetAnimationSpellMagic()
 {
-	if (RACE_NPC == m_InfoBase.eRace)
-		return (e_Ani) (m_iMagicAni); // NPC 일경우
-	else
-		return (e_Ani) (m_iMagicAni); // 플레이어 일경우..
+	return (e_Ani) (m_iMagicAni);
 }
 
 bool CPlayerBase::CheckCollisionByBox(const __Vector3& v0, const __Vector3& v1, __Vector3* pVCol, __Vector3* pVNormal)
@@ -2288,7 +2093,7 @@ void CPlayerBase::AnimationAdd(e_Ani eAni, bool bImmediately)
 	}
 }
 
-const __Matrix44 CPlayerBase::CalcShadowMtxBasicPlane(__Vector3 vOffs)
+const __Matrix44 CPlayerBase::CalcShadowMtxBasicPlane(const __Vector3& vOffs)
 {
 	__Matrix44 mtx;
 	mtx.Identity();
@@ -2316,17 +2121,17 @@ void CPlayerBase::RenderShadow(float fAngle)
 	if (iLODTemp >= MAX_CHR_LOD)
 		return;
 
-	__Matrix44 mV, mVvar, mVBack, mtxRotX, mtxRotZ;
+	__Matrix44 mV, mVBack, mtxRotX, mtxRotZ;
 	mV.Identity();
 	__Vector3 vPosBack, vNom;
-	CN3Base::s_lpD3DDev->GetTransform(D3DTS_WORLD, (_D3DMATRIX*) &mVBack);
+	CN3Base::s_lpD3DDev->GetTransform(D3DTS_WORLD, mVBack.toD3D());
 	vPosBack = m_Chr.m_Matrix.Pos();
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, mV.toD3D());
 	ACT_WORLD->GetNormalWithTerrain(vPosBack.x, vPosBack.z, vNom);
 	vNom.Normalize();
 
 	mV.PosSet(0.0f, 0.0f, 0.0f);
-	float fXRad, fZRad;
+	float fXRad = 0.0f, fZRad = 0.0f;
 	fZRad = asin(vNom.z);
 	mtxRotZ.RotationX(fZRad);
 	fXRad = asin(-vNom.x);
@@ -2336,7 +2141,6 @@ void CPlayerBase::RenderShadow(float fAngle)
 	vPosBack.y += 0.1f;
 
 	mV.PosSet(vPosBack);
-	mVvar = mV;
 
 	for (int i = 0; i < SHADOW_SIZE; i++)
 		m_bitset[i].Resize(SHADOW_SIZE);
@@ -2381,6 +2185,7 @@ void CPlayerBase::RenderShadow(float fAngle)
 			fAngle  = 3.14f - fAngle;
 		}
 	}
+
 	float fAngleDeg = RadiansToDegrees(fAngle);
 
 	float zVal      = s_vLightOffset.Magnitude();
@@ -2407,9 +2212,7 @@ void CPlayerBase::RenderShadow(float fAngle)
 
 	iPC = m_Chr.PlugCount();
 	for (int i = 0; i < iPC; i++)
-	{
-		CalcPlug(m_Chr.Plug(i), m_Chr.MatrixGet(m_Chr.Plug(i)->m_nJointIndex), mVvar, vLP);
-	}
+		CalcPlug(m_Chr.Plug(i), m_Chr.MatrixGet(m_Chr.Plug(i)->m_nJointIndex), vLP);
 
 	// 렌더링하기 전에 스케일을 줄인다..
 	if (fScale > 6.6f)
@@ -2435,7 +2238,7 @@ void CPlayerBase::RenderShadow(float fAngle)
 	D3DLOCKED_RECT LR;
 	if (!m_N3Tex.Get())
 		return;
-	HRESULT hr = m_N3Tex.Get()->LockRect(0, &LR, 0, 0);
+	HRESULT hr = m_N3Tex.Get()->LockRect(0, &LR, nullptr, 0);
 	if (hr != D3D_OK)
 		return;
 
@@ -2455,9 +2258,10 @@ void CPlayerBase::RenderShadow(float fAngle)
 
 	m_N3Tex.Get()->UnlockRect(0);
 
-	DWORD dwAlpha, dwFog, dwCull, dwColorVertex, dwMaterial, dwZWrite, dwColorOp0, dwColorArg01, dwColorArg02, dwColorOp1, dwColorArg11,
-		dwColorArg12, dwAlphaOp0, dwAlphaArg01, dwAlphaArg02, dwAlphaOp1, dwAlphaArg11, dwAlphaArg12, dwSrcBlend, dwDestBlend, dwBlendOp,
-		dwMagFilter0, dwMinFilter0, dwMagFilter1, dwMinFilter1;
+	DWORD dwAlpha = 0, dwFog = 0, dwCull = 0, dwColorVertex = 0, dwMaterial = 0, dwZWrite = 0, dwColorOp0 = 0, dwColorArg01 = 0,
+		  dwColorArg02 = 0, dwColorOp1 = 0, dwColorArg11 = 0, dwColorArg12 = 0, dwAlphaOp0 = 0, dwAlphaArg01 = 0, dwAlphaArg02 = 0,
+		  dwAlphaOp1 = 0, dwAlphaArg11 = 0, dwAlphaArg12 = 0, dwSrcBlend = 0, dwDestBlend = 0, dwBlendOp = 0, dwMagFilter0 = 0,
+		  dwMinFilter0 = 0, dwMagFilter1 = 0, dwMinFilter1 = 0;
 
 	CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
 	CN3Base::s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
@@ -2558,7 +2362,7 @@ void CPlayerBase::RenderShadow(float fAngle)
 	CN3Base::s_lpD3DDev->SetTransform(D3DTS_WORLD, (_D3DMATRIX*) &mVBack);
 }
 
-void CPlayerBase::CalcPart(CN3CPart* pPart, int nLOD, __Vector3 vDir)
+void CPlayerBase::CalcPart(CN3CPart* pPart, int nLOD, const __Vector3& vDir)
 {
 	if (nullptr == pPart)
 		return;
@@ -2576,26 +2380,29 @@ void CPlayerBase::CalcPart(CN3CPart* pPart, int nLOD, __Vector3 vDir)
 	if (iTotalCount < 0 || iTotalCount > 10000)
 		return;
 
-	__Vector3 vec, A, B, C, vPick;
 	CN3Skin* part00           = pPart->Skin(nLOD);
 	__VertexXyzNormal* pVDest = part00->m_pVertices;
-	float t, u, v, fx, fz;
+	if (pVDest == nullptr)
+		return;
+
+	__Vector3 vec {}, vPick {};
+	float t = 0.0f, u = 0.0f, v = 0.0f, fx = 0.0f, fz = 0.0f;
 
 	for (int i = 0; i < iTotalCount; i++)
 	{
-		if (pVDest)
+		const auto& vtx  = pVDest[i];
+		vec              = { vtx.x, vtx.y, vtx.z };
+		vec             *= m_Chr.m_Matrix;
+		//vec.x = vec.x*m_Chr.m_Matrix.m[0][0] + vec.y*m_Chr.m_Matrix.m[1][0] + vec.z*m_Chr.m_Matrix.m[2][0] + m_Chr.m_Matrix.m[3][0];
+		//vec.y = vec.x*m_Chr.m_Matrix.m[0][1] + vec.y*m_Chr.m_Matrix.m[1][1] + vec.z*m_Chr.m_Matrix.m[2][1] + m_Chr.m_Matrix.m[3][1];
+		//vec.z = vec.x*m_Chr.m_Matrix.m[0][2] + vec.y*m_Chr.m_Matrix.m[1][2] + vec.z*m_Chr.m_Matrix.m[2][2] + m_Chr.m_Matrix.m[3][2];
+
+		int iX = 0, iZ = 0;
+
 		{
-			vec  = pVDest[i];
-			vec *= m_Chr.m_Matrix;
-			//vec.x = vec.x*m_Chr.m_Matrix.m[0][0] + vec.y*m_Chr.m_Matrix.m[1][0] + vec.z*m_Chr.m_Matrix.m[2][0] + m_Chr.m_Matrix.m[3][0];
-			//vec.y = vec.x*m_Chr.m_Matrix.m[0][1] + vec.y*m_Chr.m_Matrix.m[1][1] + vec.z*m_Chr.m_Matrix.m[2][1] + m_Chr.m_Matrix.m[3][1];
-			//vec.z = vec.x*m_Chr.m_Matrix.m[0][2] + vec.y*m_Chr.m_Matrix.m[1][2] + vec.z*m_Chr.m_Matrix.m[2][2] + m_Chr.m_Matrix.m[3][2];
-
-			int iX, iZ;
-
-			A = m_vTVertex[m_pIndex[0]];
-			B = m_vTVertex[m_pIndex[1]];
-			C = m_vTVertex[m_pIndex[2]];
+			const __VertexT1& A = m_vTVertex[m_pIndex[0]];
+			const __VertexT1& B = m_vTVertex[m_pIndex[1]];
+			const __VertexT1& C = m_vTVertex[m_pIndex[2]];
 			if (::_IntersectTriangle(vec, vDir, A, B, C, t, u, v, &vPick))
 			{
 				fx = (vPick.x - C.x) / (SHADOW_PLANE_SIZE * 2.0f * m_fShaScale);
@@ -2605,10 +2412,12 @@ void CPlayerBase::CalcPart(CN3CPart* pPart, int nLOD, __Vector3 vDir)
 				if ((iX > 0) && (iX < SHADOW_SIZE) && (iZ > 0) && (iZ < SHADOW_SIZE))
 					m_bitset[iZ].Set(iX);
 			}
+		}
 
-			A = m_vTVertex[m_pIndex[3]];
-			B = m_vTVertex[m_pIndex[4]];
-			C = m_vTVertex[m_pIndex[5]];
+		{
+			const __VertexT1& A = m_vTVertex[m_pIndex[3]];
+			const __VertexT1& B = m_vTVertex[m_pIndex[4]];
+			const __VertexT1& C = m_vTVertex[m_pIndex[5]];
 			if (::_IntersectTriangle(vec, vDir, A, B, C, t, u, v, &vPick))
 			{
 				fx = (vPick.x - B.x) / (SHADOW_PLANE_SIZE * 2.0f * m_fShaScale);
@@ -2622,10 +2431,11 @@ void CPlayerBase::CalcPart(CN3CPart* pPart, int nLOD, __Vector3 vDir)
 	}
 }
 
-void CPlayerBase::CalcPlug(CN3CPlugBase* pPlug, const __Matrix44* pmtxJoint, __Matrix44& mtxMV, __Vector3 vDir)
+void CPlayerBase::CalcPlug(CN3CPlugBase* pPlug, const __Matrix44* pmtxJoint, const __Vector3& vDir)
 {
 	if (nullptr == pPlug || nullptr == pPlug->PMeshInst())
 		return;
+
 	if (pPlug->PMeshInst()->GetNumVertices() <= 0)
 		return;
 
@@ -2634,7 +2444,7 @@ void CPlayerBase::CalcPlug(CN3CPlugBase* pPlug, const __Matrix44* pmtxJoint, __M
 	CN3Base::s_RenderInfo.nChr_Plug_Polygon += pPlug->PMeshInst()->GetNumIndices() / 3; // Rendering Information Update...
 #endif
 
-	static __Matrix44 mtx, mtxBack;
+	__Matrix44 mtx;
 	mtx              = pPlug->m_Matrix;
 	mtx             *= (*pmtxJoint);
 	mtx             *= m_Chr.m_Matrix;
@@ -2643,24 +2453,25 @@ void CPlayerBase::CalcPlug(CN3CPlugBase* pPlug, const __Matrix44* pmtxJoint, __M
 	if (iTotalCount < 0 || iTotalCount > 10000)
 		return;
 
-	__Vector3 vec, A, B, C, vPick;
-	float t, u, v, fx, fz;
+	__Vector3 vPick {};
+	float t = 0.0f, u = 0.0f, v = 0.0f, fx = 0.0f, fz = 0.0f;
 
-	__VertexT1* pVerT1 = nullptr;
-	pVerT1             = pPlug->PMeshInst()->GetVertices();
+	__VertexT1* pVerT1 = pPlug->PMeshInst()->GetVertices();
+	if (pVerT1 == nullptr)
+		return;
 
 	for (int i = 0; i < iTotalCount; i++)
 	{
-		if (pVerT1)
+		const auto& vtx  = pVerT1[i];
+		__Vector3 vec    = { vtx.x, vtx.y, vtx.z };
+		vec             *= mtx;
+
+		int iX = 0, iZ = 0;
+
 		{
-			vec  = pVerT1[i];
-			vec *= mtx;
-
-			int iX, iZ;
-
-			A = m_vTVertex[m_pIndex[0]];
-			B = m_vTVertex[m_pIndex[1]];
-			C = m_vTVertex[m_pIndex[2]];
+			const __VertexT1& A = m_vTVertex[m_pIndex[0]];
+			const __VertexT1& B = m_vTVertex[m_pIndex[1]];
+			const __VertexT1& C = m_vTVertex[m_pIndex[2]];
 			if (::_IntersectTriangle(vec, vDir, A, B, C, t, u, v, &vPick))
 			{
 				fx = (vPick.x - C.x) / (SHADOW_PLANE_SIZE * 2.0f * m_fShaScale);
@@ -2670,10 +2481,12 @@ void CPlayerBase::CalcPlug(CN3CPlugBase* pPlug, const __Matrix44* pmtxJoint, __M
 				if ((iX > 0) && (iX < SHADOW_SIZE) && (iZ > 0) && (iZ < SHADOW_SIZE))
 					m_bitset[iZ].Set(iX);
 			}
+		}
 
-			A = m_vTVertex[m_pIndex[3]];
-			B = m_vTVertex[m_pIndex[4]];
-			C = m_vTVertex[m_pIndex[5]];
+		{
+			const __VertexT1& A = m_vTVertex[m_pIndex[3]];
+			const __VertexT1& B = m_vTVertex[m_pIndex[4]];
+			const __VertexT1& C = m_vTVertex[m_pIndex[5]];
 			if (::_IntersectTriangle(vec, vDir, A, B, C, t, u, v, &vPick))
 			{
 				fx = (vPick.x - B.x) / (SHADOW_PLANE_SIZE * 2.0f * m_fShaScale);
@@ -2687,7 +2500,7 @@ void CPlayerBase::CalcPlug(CN3CPlugBase* pPlug, const __Matrix44* pmtxJoint, __M
 	}
 }
 
-__Vector3 CPlayerBase::Max()
+__Vector3 CPlayerBase::Max() const
 {
 	if (m_pShapeExtraRef != nullptr)
 		return m_pShapeExtraRef->Max();
@@ -2695,7 +2508,7 @@ __Vector3 CPlayerBase::Max()
 	return m_Chr.Max();
 }
 
-__Vector3 CPlayerBase::Min()
+__Vector3 CPlayerBase::Min() const
 {
 	if (m_pShapeExtraRef != nullptr)
 		return m_pShapeExtraRef->Min();
@@ -2703,7 +2516,7 @@ __Vector3 CPlayerBase::Min()
 	return m_Chr.Min();
 }
 
-__Vector3 CPlayerBase::Center()
+__Vector3 CPlayerBase::Center() const
 {
 	__Vector3 vCenter;
 
@@ -2815,14 +2628,6 @@ bool CPlayerBase::IsHostileTarget(const CPlayerBase* rhs) const
 			return true;
 
 		case ZONE_ABILITY_SIEGE_DISABLED:
-			if (rhs->PlayerType() == PLAYER_NPC && rhs->Nation() != NATION_NOTSELECTED)
-				return false;
-
-			if (m_InfoBase.iKnightsID > 0 && rhs->m_InfoBase.iKnightsID == m_InfoBase.iKnightsID)
-				return false;
-
-			return true;
-
 		case ZONE_ABILITY_CAITHAROS_ARENA:
 			if (rhs->PlayerType() == PLAYER_NPC && rhs->Nation() != NATION_NOTSELECTED)
 				return false;

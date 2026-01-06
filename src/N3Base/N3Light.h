@@ -5,9 +5,7 @@
 #if !defined(AFX_N3ILight_h__INCLUDED_)
 #define AFX_N3ILight_h__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3Transform.h"
 
@@ -113,18 +111,18 @@ public:
 		m_Data.Direction = { fx, fy, fz };
 	}
 
-	void PosSet(const __Vector3& vPos)
+	void PosSet(const __Vector3& vPos) override
 	{
 		PosSet(vPos.x, vPos.y, vPos.z);
 	}
 
-	void PosSet(float fx, float fy, float fz)
+	void PosSet(float fx, float fy, float fz) override
 	{
 		m_Data.Position = m_vPos = { fx, fy, fz };
 	}
 
-	void Apply();                           // 세팅된 라이트값을 실제 D3DDevice 에 적용
-	void Tick(float fFrm = FRAME_SELFPLAY); // 라이트값만 세팅한다..
+	void Apply();                                    // 세팅된 라이트값을 실제 D3DDevice 에 적용
+	void Tick(float fFrm = FRAME_SELFPLAY) override; // 라이트값만 세팅한다..
 
 	bool Load(File& file) override;
 #ifdef _N3TOOL

@@ -11,11 +11,6 @@
 
 #include <FileIO/FileReader.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 static inline uint32_t GetTextureSize(const D3DSURFACE_DESC& sd)
 {
 	uint32_t nTexSize = sd.Width * sd.Height;
@@ -80,7 +75,7 @@ bool CN3Texture::Create(int nWidth, int nHeight, D3DFORMAT Format, BOOL bGenerat
 
 	if (s_dwTextureCaps & TEX_CAPS_POW2) // 2 의 승수만 된다면..
 	{
-		int nW, nH;
+		int nW = 0, nH = 0;
 		for (nW = 1; nW <= nWidth; nW *= 2)
 			;
 		nW /= 2;
@@ -379,13 +374,12 @@ bool CN3Texture::Load(File& file)
 					int iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
 					for (int i = 0; i < m_iLOD; i++, iWTmp /= 2, iHTmp /= 2)
 					{
+						// DXT1 형식은 16비트 포맷에 비해 1/4 로 압축..
 						if (D3DFMT_DXT1 == HeaderOrg.Format)
-							iSkipSize += iWTmp * iHTmp
-										 / 2; // DXT1 형식은 16비트 포맷에 비해 1/4 로 압축..
+							iSkipSize += iWTmp * iHTmp / 2;
+						// DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축..
 						else
-							iSkipSize +=
-								iWTmp
-								* iHTmp; // DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축..
+							iSkipSize += iWTmp * iHTmp;
 					}
 
 					file.Seek(iSkipSize, SEEK_CUR); // 건너뛰고.
@@ -440,12 +434,12 @@ bool CN3Texture::Load(File& file)
 				int iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
 				for (; iWTmp >= 4 && iHTmp >= 4; iWTmp /= 2, iHTmp /= 2)
 				{
+					// DXT1 형식은 16비트 포맷에 비해 1/4 로 압축..
 					if (D3DFMT_DXT1 == HeaderOrg.Format)
-						iSkipSize += iWTmp * iHTmp
-									 / 2;     // DXT1 형식은 16비트 포맷에 비해 1/4 로 압축..
+						iSkipSize += iWTmp * iHTmp / 2;
+					// DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축..
 					else
-						iSkipSize += iWTmp
-									 * iHTmp; // DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축..
+						iSkipSize += iWTmp * iHTmp;
 				}
 
 				file.Seek(iSkipSize, SEEK_CUR); // 건너뛰고.
@@ -456,9 +450,9 @@ bool CN3Texture::Load(File& file)
 				iSkipSize = 0;
 				if (m_iLOD > 0)
 				{
+					// 피치에 너비를 나눈게 픽셀의 크기라 생각한다...
 					for (int i = 0; i < m_iLOD; i++, iWTmp /= 2, iHTmp /= 2)
-						iSkipSize += iWTmp * iHTmp
-									 * 2; // 피치에 너비를 나눈게 픽셀의 크기라 생각한다...
+						iSkipSize += iWTmp * iHTmp * 2;
 				}
 
 				// 비디오 카드 지원 텍스처 크기가 작을경우 건너뛰기..
@@ -487,11 +481,15 @@ bool CN3Texture::Load(File& file)
 			{
 				// 압축 데이터 건너뛰기..
 				int iWTmp = HeaderOrg.nWidth, iHTmp = HeaderOrg.nHeight, iSkipSize = 0;
+				// DXT1 형식은 16비트 포맷에 비해 1/4 로 압축..
 				if (D3DFMT_DXT1 == HeaderOrg.Format)
-					iSkipSize = iWTmp * iHTmp / 2; // DXT1 형식은 16비트 포맷에 비해 1/4 로 압축..
+					iSkipSize = iWTmp * iHTmp / 2;
+				// DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축..
 				else
-					iSkipSize = iWTmp
-								* iHTmp; // DXT2 ~ DXT5 형식은 16비트 포맷에 비해 1/2 로 압축..
+					iSkipSize = iWTmp * iHTmp;
+
+				if (iSkipSize != 0)
+					file.Seek(iSkipSize, SEEK_CUR); // 건너뛰고.
 			}
 		}
 	}
@@ -614,7 +612,7 @@ bool CN3Texture::SkipFileHandle(File& file)
 			if (D3DFMT_DXT1 == HeaderOrg.Format)
 				iSkipSize += HeaderOrg.nWidth * HeaderOrg.nHeight / 2;
 			else
-				iSkipSize += iSkipSize += HeaderOrg.nWidth * HeaderOrg.nHeight;
+				iSkipSize += HeaderOrg.nWidth * HeaderOrg.nHeight;
 
 			// 텍스처 압축안되는 비디오 카드를 위한 여분의 데이터 건너뛰기..
 			iSkipSize += HeaderOrg.nWidth * HeaderOrg.nHeight * 2;

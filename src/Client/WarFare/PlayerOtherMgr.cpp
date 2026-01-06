@@ -8,15 +8,6 @@
 #include <N3Base/DFont.h>
 #include <N3Base/N3ShapeExtra.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CPlayerOtherMgr::CPlayerOtherMgr()
 {
 	m_iChrCountToRender = 0; // 렌더링되는 캐릭 카운트
@@ -751,9 +742,7 @@ CPlayerNPC* CPlayerOtherMgr::PickAllPrecisely(int ixScreen, int iyScreen, int& i
 		if (pNPC->LODLevel() < 0 || pNPC->LODLevel() >= MAX_CHR_LOD)
 			continue; // Level Of Detail 이 없는건 지나간다.
 
-		CN3VMesh* pvMesh = nullptr;
-		__Matrix44* pMtx = nullptr;
-		if (pNPC->m_pShapeExtraRef && pNPC->m_pShapeExtraRef->m_bVisible)
+		if (pNPC->m_pShapeExtraRef != nullptr && pNPC->m_pShapeExtraRef->m_bVisible)
 		{
 			iIDResult = pNPC->IDNumber();
 			return pNPC;

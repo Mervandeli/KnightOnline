@@ -1,5 +1,8 @@
 ﻿#include "lzf.h"
 #include <cstddef>
+#include <cstdint>
+
+// NOLINTBEGIN
 
 unsigned int lzf_compress(
 	const void* const in_data, unsigned int in_len, void* out_data, unsigned int out_len
@@ -10,7 +13,7 @@ unsigned int lzf_compress(
 )
 {
 #if !LZF_STATE_ARG
-	LZF_STATE htab;
+	thread_local LZF_STATE htab;
 #endif
 	const u8** hslot;
 	const u8* ip     = (u8*) in_data;
@@ -60,6 +63,7 @@ unsigned int lzf_compress(
 #if INIT_HTAB
 			&& ref < ip /* the next test will actually take care of this, but this is faster */
 #endif
+			// NOLINTNEXTLINE(bugprone-assignment-in-if-condition)
 			&& (off = ip - ref - 1) < MAX_OFF && ip + 4 < in_end && ref > (u8*) in_data
 #if STRICT_ALIGN
 			&& ref[0] == ip[0] && ref[1] == ip[1] && ref[2] == ip[2]
@@ -276,7 +280,7 @@ unsigned int lzf_decompress(
 		{
 			unsigned int len = ctrl >> 5;
 
-			u8* ref          = op - ((ctrl & 0x1f) << 8) - 1;
+			u8* ref          = op - static_cast<intptr_t>((ctrl & 0x1f) << 8) - 1;
 
 #if CHECK_INPUT
 			if (ip >= in_end)
@@ -328,3 +332,5 @@ unsigned int lzf_decompress(
 
 	return static_cast<unsigned int>(op - (u8*) out_data);
 }
+
+// NOLINTEND

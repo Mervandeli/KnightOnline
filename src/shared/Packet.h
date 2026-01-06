@@ -28,7 +28,8 @@ public:
 
 	uint8_t GetOpcode() const
 	{
-		return size() == 0 ? 0 : _storage[0];
+		const auto& buffer = storage();
+		return buffer.empty() ? 0 : buffer[0];
 	}
 
 	//! Clear packet and set opcode all in one mighty blow

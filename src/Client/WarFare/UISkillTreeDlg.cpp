@@ -20,124 +20,114 @@
 #include <N3Base/N3UIString.h>
 #include <N3Base/N3SndObj.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUISkillTreeDlg::CUISkillTreeDlg()
 {
-	m_bOpenningNow  = false; // 열리고 있다..
-	m_bClosingNow   = false; // 닫히고 있다..
-	m_fMoveDelta    = 0.0f;  // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
+	m_bOpenningNow     = false; // 열리고 있다..
+	m_bClosingNow      = false; // 닫히고 있다..
+	m_fMoveDelta       = 0.0f;  // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
 
-	m_iRBtnDownOffs = -1;
+	m_iRBtnDownOffs    = -1;
 
-	int i, j, k;
+	m_iCurKindOf       = 0;
+	m_iCurSkillPage    = 0;
 
-	m_iCurKindOf    = 0;
-	m_iCurSkillPage = 0;
+	m_pStr_skill_item0 = nullptr;
+	m_pStr_skill_item1 = nullptr;
+	m_pStr_skill_item2 = nullptr;
+	m_pStr_skill_point = nullptr;
+	m_pStr_skill_mp    = nullptr;
+	m_pStr_info        = nullptr;
 
-	for (i = 0; i < MAX_SKILL_FROM_SERVER; i++)
+	for (int i = 0; i < MAX_SKILL_FROM_SERVER; i++)
 		m_iSkillInfo[i] = 0;
 
-	for (i = 0; i < MAX_SKILL_KIND_OF; i++)
-		for (j = 0; j < MAX_SKILL_PAGE_NUM; j++)
-			for (k = 0; k < MAX_SKILL_IN_PAGE; k++)
+	for (int i = 0; i < MAX_SKILL_KIND_OF; i++)
+	{
+		for (int j = 0; j < MAX_SKILL_PAGE_NUM; j++)
+		{
+			for (int k = 0; k < MAX_SKILL_IN_PAGE; k++)
 				m_pMySkillTree[i][j][k] = nullptr;
+		}
+	}
 
-	CN3UIWndBase::s_sSkillSelectInfo.UIWnd          = UIWND_HOTKEY;
-	CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = nullptr;
+	s_sSkillSelectInfo.UIWnd          = UIWND_HOTKEY;
+	s_sSkillSelectInfo.pSkillDoneInfo = nullptr;
 }
 
 CUISkillTreeDlg::~CUISkillTreeDlg()
 {
-	Release();
-	/*	int i, j, k;
-
-	for( i = 0; i < MAX_SKILL_KIND_OF; i++ )
-		for( j = 0; j < MAX_SKILL_PAGE_NUM; j++ )
-			for( k = 0; k < MAX_SKILL_IN_PAGE; k++ )
-				if ( m_pMySkillTree[i][j][k] != nullptr )
-				{
-					delete m_pMySkillTree[i][j][k];
-					m_pMySkillTree[i][j][k] = nullptr;
-				}
-
-	if ( (CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo != nullptr) && (CN3UIWndBase::s_sSkillSelectInfo.UIWnd == UIWND_SKILL_TREE) )
-	{
-		delete CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
-		CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = nullptr;
-	}*/
+	CUISkillTreeDlg::Release();
 }
 
 void CUISkillTreeDlg::Release()
 {
-	CN3UIBase::Release();
+	CN3UIWndBase::Release();
 
 	m_bOpenningNow = false; // 열리고 있다..
 	m_bClosingNow  = false; // 닫히고 있다..
 	m_fMoveDelta   = 0.0f;  // 부드럽게 열리고 닫히게 만들기 위해서 현재위치 계산에 부동소수점을 쓴다..
 
-	int i, j, k;
-
-	for (i = 0; i < MAX_SKILL_KIND_OF; i++)
+	for (int i = 0; i < MAX_SKILL_KIND_OF; i++)
 	{
-		for (j = 0; j < MAX_SKILL_PAGE_NUM; j++)
+		for (int j = 0; j < MAX_SKILL_PAGE_NUM; j++)
 		{
-			for (k = 0; k < MAX_SKILL_IN_PAGE; k++)
+			for (int k = 0; k < MAX_SKILL_IN_PAGE; k++)
 			{
-				if (m_pMySkillTree[i][j][k] != nullptr)
-				{
-					delete m_pMySkillTree[i][j][k];
-					m_pMySkillTree[i][j][k] = nullptr;
-				}
+				delete m_pMySkillTree[i][j][k];
+				m_pMySkillTree[i][j][k] = nullptr;
 			}
 		}
 	}
 
-	if ((CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo != nullptr) && (CN3UIWndBase::s_sSkillSelectInfo.UIWnd == UIWND_SKILL_TREE))
+	m_pStr_skill_item0 = nullptr;
+	m_pStr_skill_item1 = nullptr;
+	m_pStr_skill_item2 = nullptr;
+	m_pStr_skill_point = nullptr;
+	m_pStr_skill_mp    = nullptr;
+	m_pStr_info        = nullptr;
+
+	if (s_sSkillSelectInfo.pSkillDoneInfo != nullptr && s_sSkillSelectInfo.UIWnd == UIWND_SKILL_TREE)
 	{
-		delete CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo;
-		CN3UIWndBase::s_sSkillSelectInfo.pSkillDoneInfo = nullptr;
+		delete s_sSkillSelectInfo.pSkillDoneInfo;
+		s_sSkillSelectInfo.pSkillDoneInfo = nullptr;
 	}
 }
 
-bool CUISkillTreeDlg::HasIDSkill(int iID)
+bool CUISkillTreeDlg::HasIDSkill(int iID) const
 {
-	int i, j, k;
-
-	for (i = 0; i < MAX_SKILL_KIND_OF; i++)
-		for (j = 0; j < MAX_SKILL_PAGE_NUM; j++)
-			for (k = 0; k < MAX_SKILL_IN_PAGE; k++)
-				if (m_pMySkillTree[i][j][k] != nullptr)
-				{
-					if (m_pMySkillTree[i][j][k]->pSkill->dwID == iID)
-						return true;
-				}
+	for (int i = 0; i < MAX_SKILL_KIND_OF; i++)
+	{
+		for (int j = 0; j < MAX_SKILL_PAGE_NUM; j++)
+		{
+			for (int k = 0; k < MAX_SKILL_IN_PAGE; k++)
+			{
+				if (m_pMySkillTree[i][j][k] != nullptr && m_pMySkillTree[i][j][k]->pSkill->dwID == iID)
+					return true;
+			}
+		}
+	}
 
 	return false;
 }
 
 void CUISkillTreeDlg::UpdateDisableCheck()
 {
-	int i, j, k;
-	uint32_t bitMask;
+	for (int i = 0; i < MAX_SKILL_KIND_OF; i++)
+	{
+		for (int j = 0; j < MAX_SKILL_PAGE_NUM; j++)
+		{
+			for (int k = 0; k < MAX_SKILL_IN_PAGE; k++)
+			{
+				if (m_pMySkillTree[i][j][k] == nullptr)
+					continue;
 
-	for (i = 0; i < MAX_SKILL_KIND_OF; i++)
-		for (j = 0; j < MAX_SKILL_PAGE_NUM; j++)
-			for (k = 0; k < MAX_SKILL_IN_PAGE; k++)
-				if (m_pMySkillTree[i][j][k] != nullptr)
-				{
-					bitMask = UISTYLE_ICON_SKILL;
-					if (!CGameProcedure::s_pProcMain->m_pMagicSkillMng->CheckValidSkillMagic(m_pMySkillTree[i][j][k]->pSkill))
-						bitMask |= UISTYLE_DISABLE_SKILL;
-					m_pMySkillTree[i][j][k]->pUIIcon->SetStyle(bitMask);
-				}
+				uint32_t bitMask = UISTYLE_ICON_SKILL;
+				if (!CGameProcedure::s_pProcMain->m_pMagicSkillMng->CheckValidSkillMagic(m_pMySkillTree[i][j][k]->pSkill))
+					bitMask |= UISTYLE_DISABLE_SKILL;
+				m_pMySkillTree[i][j][k]->pUIIcon->SetStyle(bitMask);
+			}
+		}
+	}
 }
 
 void CUISkillTreeDlg::Tick()
@@ -195,14 +185,11 @@ void CUISkillTreeDlg::Tick()
 uint32_t CUISkillTreeDlg::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld)
 {
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
-	if (!IsVisible())
+	if (!IsVisible()
+		// 실제로 쓰진 않는다..
+		|| s_bWaitFromServer)
 	{
-		dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);
-		return dwRet;
-	}
-	// 실제로 쓰진 않는다..
-	if (s_bWaitFromServer)
-	{
+		// NOLINTNEXTLINE(bugprone-parent-virtual-call)
 		dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);
 		return dwRet;
 	}
@@ -222,14 +209,16 @@ uint32_t CUISkillTreeDlg::MouseProc(uint32_t dwFlags, const POINT& ptCur, const 
 
 int CUISkillTreeDlg::GetIndexInArea(POINT pt)
 {
-	CN3UIArea* pArea;
-	RECT rect;
+	CN3UIArea* pArea = nullptr;
+	RECT rect {};
 
 	for (int i = 0; i < MAX_SKILL_IN_PAGE; i++)
 	{
-		pArea = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_TREE, i);
-		rect  = pArea->GetRegion();
+		pArea = GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_TREE, i);
+		if (pArea == nullptr)
+			continue;
 
+		rect = pArea->GetRegion();
 		if ((pt.x >= rect.left) && (pt.x <= rect.right) && (pt.y >= rect.top) && (pt.y <= rect.bottom))
 			return i;
 	}
@@ -287,21 +276,14 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			SetPageInIconRegion(4, 0);
 	}
 
-// Temp Define
-#define FAIL_CODE                       \
-	{                                   \
-		SetState(UI_STATE_COMMON_NONE); \
-		return false;                   \
-	}
-
-	__IconItemSkill *spSkill, *spSkillCopy;
+	__IconItemSkill *spSkill = nullptr, *spSkillCopy = nullptr;
 
 	uint32_t dwLBitMask = 0x000f0000;
 	uint32_t dwRBitMask = 0x0f000000;
 	uint32_t dwBitMask  = dwLBitMask | dwRBitMask;
 
 	POINT ptCur         = CGameProcedure::s_pLocalInput->MouseGetPos();
-	uint32_t bitMask;
+	uint32_t bitMask    = 0;
 
 	switch (dwMsg & dwBitMask)
 	{
@@ -316,12 +298,12 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			{
 				// 들어갈 자리가 있는지 검사..
 				CUIHotKeyDlg* pDlg = CGameProcedure::s_pProcMain->m_pUIHotKeyDlg;
-				int iIndex;
+				int iIndex         = -1;
 				if (pDlg->GetEmptySlotIndex(iIndex))
 				{
 					// Get Item..
 					spSkill = GetHighlightIconItem((CN3UIIcon*) pSender);
-					if (CheckSkillCanBeUse(spSkill->pSkill))
+					if (IsSkillUsable(spSkill->pSkill))
 					{
 						spSkillCopy           = new __IconItemSkill();
 						spSkillCopy->pSkill   = spSkill->pSkill;
@@ -444,6 +426,9 @@ bool CUISkillTreeDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		case UIMSG_ICON_DBLCLK:
 			SetState(UI_STATE_COMMON_NONE);
 			break;
+
+		default:
+			break;
 	}
 
 	return false;
@@ -467,14 +452,14 @@ void CUISkillTreeDlg::PageRight()
 
 void CUISkillTreeDlg::PointPushUpButton(int iValue)
 {
-	int iCurKindOfBackup, iCurSkillPageBackup;
+	int iCurKindOfBackup = 0, iCurSkillPageBackup = 0;
 	iCurKindOfBackup    = m_iCurKindOf;
 	iCurSkillPageBackup = m_iCurSkillPage;
 
-	int iSkillExtra; // 스킬창의 값..
-	int iSkillPoint;
+	// 스킬창의 값..
+	int iSkillExtra = 0, iSkillPoint = 0;
 	std::string str;
-	CN3UIString *pStrName, *pStrName2;
+	CN3UIString *pStrName = nullptr, *pStrName2 = nullptr;
 	N3_VERIFY_UI_COMPONENT(pStrName, GetChildByID<CN3UIString>("string_skillpoint"));
 	str         = pStrName->GetString();
 	iSkillExtra = atoi(str.c_str());
@@ -516,6 +501,9 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 							return;
 						}
 						break;
+
+						default:
+							break;
 					}
 					break;
 
@@ -532,11 +520,20 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 							return;
 						}
 						break;
+
+						default:
+							break;
 					}
+					break;
+
+				default:
 					break;
 			}
 		}
 		break;
+
+		default:
+			break;
 	}
 
 	if (iValue == 8)
@@ -556,6 +553,9 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 						return;
 					}
 					break;
+
+					default:
+						break;
 				}
 				break;
 
@@ -572,7 +572,13 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 						return;
 					}
 					break;
+
+					default:
+						break;
 				}
+				break;
+
+			default:
 				break;
 		}
 	}
@@ -676,7 +682,13 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 		case 8:
 			N3_VERIFY_UI_COMPONENT(pStrName2, GetChildByID<CN3UIString>("string_7"));
 			break;
+
+		default:
+			break;
 	}
+
+	if (pStrName2 == nullptr)
+		return;
 
 	str         = pStrName2->GetString();
 	iSkillPoint = atoi(str.c_str());
@@ -701,45 +713,48 @@ void CUISkillTreeDlg::PointPushUpButton(int iValue)
 	pStrName->SetStringAsInt(iSkillExtra);
 	m_iSkillInfo[0] = iSkillExtra;
 
-	//TRACE("Send to Server Skill point up index %d\n", iValue);
-
 	iSkillPoint++;
 	pStrName2->SetStringAsInt(iSkillPoint);
+
 	switch (iValue)
 	{
 		case 1:
 			m_iSkillInfo[1] = iSkillPoint;
 			break;
+
 		case 2:
 			m_iSkillInfo[2] = iSkillPoint;
 			break;
+
 		case 3:
 			m_iSkillInfo[3] = iSkillPoint;
 			break;
+
 		case 4:
 			m_iSkillInfo[4] = iSkillPoint;
 			break;
+
 		case 5:
 			m_iSkillInfo[5] = iSkillPoint;
+			InitIconUpdate(); // 스킬 아이콘 업데이트..
 			break;
+
 		case 6:
 			m_iSkillInfo[6] = iSkillPoint;
+			InitIconUpdate(); // 스킬 아이콘 업데이트..
 			break;
+
 		case 7:
 			m_iSkillInfo[7] = iSkillPoint;
+			InitIconUpdate(); // 스킬 아이콘 업데이트..
 			break;
+
 		case 8:
 			m_iSkillInfo[8] = iSkillPoint;
+			InitIconUpdate(); // 스킬 아이콘 업데이트..
 			break;
-	}
 
-	switch (iValue) // 스킬 아이콘 업데이트..
-	{
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-			InitIconUpdate();
+		default:
 			break;
 	}
 
@@ -786,12 +801,7 @@ void CUISkillTreeDlg::Render()
 
 void CUISkillTreeDlg::CheckButtonTooltipRenderEnable()
 {
-#define IN_RECT(a, b) ((a.left < b.x) && (a.right > b.x) && (a.top < b.y) && (a.bottom > b.y))
-
-	RECT rect[MAX_SKILL_KIND_OF];
-	memset(rect, 0, sizeof(RECT) * MAX_SKILL_KIND_OF);
-
-	rect[SKILL_DEF_BASIC] = GetChildByID<CN3UIButton>("btn_public")->GetClickRect();
+	RECT rect[MAX_SKILL_KIND_OF] = {};
 
 	switch (CGameBase::s_pPlayer->m_InfoBase.eNation)
 	{
@@ -801,19 +811,22 @@ void CUISkillTreeDlg::CheckButtonTooltipRenderEnable()
 			rect[SKILL_DEF_SPECIAL2] = GetChildByID<CN3UIButton>("btn_blade2")->GetClickRect();
 			rect[SKILL_DEF_SPECIAL3] = GetChildByID<CN3UIButton>("btn_master")->GetClickRect();
 			break;
+
 		case NATION_KARUS:
 			rect[SKILL_DEF_SPECIAL0] = GetChildByID<CN3UIButton>("btn_berserker0")->GetClickRect();
 			rect[SKILL_DEF_SPECIAL1] = GetChildByID<CN3UIButton>("btn_berserker1")->GetClickRect();
 			rect[SKILL_DEF_SPECIAL2] = GetChildByID<CN3UIButton>("btn_berserker2")->GetClickRect();
 			rect[SKILL_DEF_SPECIAL3] = GetChildByID<CN3UIButton>("btn_master")->GetClickRect();
 			break;
+
+		default:
+			break;
 	}
 
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
-
 	for (int i = 0; i < MAX_SKILL_KIND_OF; i++)
 	{
-		if (IN_RECT(rect[i], ptCur))
+		if (ptCur.x > rect[i].left && ptCur.x < rect[i].right && ptCur.y > rect[i].top && ptCur.y < rect[i].bottom)
 			ButtonTooltipRender(i);
 	}
 }
@@ -863,6 +876,9 @@ void CUISkillTreeDlg::ButtonTooltipRender(int iIndex)
 				case CLASS_KA_NECROMANCER:
 					szStr = fmt::format_text_resource(IDS_SKILL_INFO_MAGE0);
 					break;
+
+				default:
+					break;
 			}
 			break;
 
@@ -896,6 +912,9 @@ void CUISkillTreeDlg::ButtonTooltipRender(int iIndex)
 				case CLASS_KA_SORCERER:
 				case CLASS_KA_NECROMANCER:
 					szStr = fmt::format_text_resource(IDS_SKILL_INFO_MAGE1);
+					break;
+
+				default:
 					break;
 			}
 			break;
@@ -931,6 +950,9 @@ void CUISkillTreeDlg::ButtonTooltipRender(int iIndex)
 				case CLASS_KA_NECROMANCER:
 					szStr = fmt::format_text_resource(IDS_SKILL_INFO_MAGE2);
 					break;
+
+				default:
+					break;
 			}
 			break;
 
@@ -957,7 +979,13 @@ void CUISkillTreeDlg::ButtonTooltipRender(int iIndex)
 				case CLASS_KA_NECROMANCER:
 					szStr = fmt::format_text_resource(IDS_SKILL_INFO_MAGE3);
 					break;
+
+				default:
+					break;
 			}
+			break;
+
+		default:
 			break;
 	}
 
@@ -1113,6 +1141,9 @@ void CUISkillTreeDlg::TooltipRenderEnable(__IconItemSkill* spSkill)
 		case ITEM_ID_MASTER_SCROLL_PRIEST:
 			consumedItemID = ITEM_ID_STONE_OF_PRIEST;
 			break;
+
+		default:
+			break;
 	}
 
 	if (consumedItemID != 0)
@@ -1163,31 +1194,37 @@ void CUISkillTreeDlg::InitIconWnd(e_UIWND eWnd)
 
 void CUISkillTreeDlg::InitIconUpdate()
 {
-	int j, k, iDivide;
+	int iDivide                = 0;
 	__TABLE_UPC_SKILL* pUSkill = nullptr;
 
 	// 기존 아이콘 모두 클리어..
 	for (int i = 0; i < MAX_SKILL_KIND_OF; i++)
-		for (j = 0; j < MAX_SKILL_PAGE_NUM; j++)
-			for (k = 0; k < MAX_SKILL_IN_PAGE; k++)
-				if (m_pMySkillTree[i][j][k] != nullptr)
-				{
-					__IconItemSkill* spSkill = m_pMySkillTree[i][j][k];
+	{
+		for (int j = 0; j < MAX_SKILL_PAGE_NUM; j++)
+		{
+			for (int k = 0; k < MAX_SKILL_IN_PAGE; k++)
+			{
+				if (m_pMySkillTree[i][j][k] == nullptr)
+					continue;
 
-					// 매니저에서 제거..
-					RemoveChild(spSkill->pUIIcon);
+				__IconItemSkill* spSkill = m_pMySkillTree[i][j][k];
 
-					// 리소스 제거..
-					spSkill->pUIIcon->Release();
-					delete spSkill->pUIIcon;
-					spSkill->pUIIcon = nullptr;
-					delete spSkill;
-					spSkill                 = nullptr;
-					m_pMySkillTree[i][j][k] = nullptr;
-				}
+				// 매니저에서 제거..
+				RemoveChild(spSkill->pUIIcon);
+
+				// 리소스 제거..
+				spSkill->pUIIcon->Release();
+				delete spSkill->pUIIcon;
+				spSkill->pUIIcon = nullptr;
+				delete spSkill;
+				spSkill                 = nullptr;
+				m_pMySkillTree[i][j][k] = nullptr;
+			}
+		}
+	}
 
 	// 아이디 = 직업 코드*1000 + 001부터.. (직업 코드+1)*100 + 001까지..
-	int iSkillIDFirst, iSkillIndexFirst, iSkillIndexLast, iModulo;
+	int iSkillIDFirst = 0, iSkillIndexFirst = 0, iSkillIndexLast = 0, iModulo = 0;
 	iSkillIDFirst   = CGameBase::s_pPlayer->m_InfoBase.eClass * 1000 + 1;
 	iSkillIndexLast = CGameBase::s_pTbl_Skill.GetSize();
 
@@ -1256,6 +1293,9 @@ void CUISkillTreeDlg::InitIconUpdate()
 					AddSkillToPage(pUSkill, 4);
 				else
 					AddSkillToPage(pUSkill, 4, false);
+				break;
+
+			default:
 				break;
 		}
 	}
@@ -1430,6 +1470,9 @@ void CUISkillTreeDlg::ButtonVisibleStateSet()
 			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_master"));
 			ASSET_0;
 			break;
+
+		default:
+			break;
 	}
 
 	if (m_iCurKindOf == 0)
@@ -1599,39 +1642,44 @@ void CUISkillTreeDlg::ButtonVisibleStateSet()
 			N3_VERIFY_UI_COMPONENT(pButton, GetChildByID<CN3UIButton>("btn_master"));
 			ASSET_4;
 			break;
+
+		default:
+			break;
 	}
 }
 
-void CUISkillTreeDlg::AddSkillToPage(__TABLE_UPC_SKILL* pUSkill, int iOffset, bool bHasLevelToUse)
+std::optional<std::pair<int, int>> CUISkillTreeDlg::FindSlotForSkill(const __TABLE_UPC_SKILL* pUSkill, int iCategoryOffset /*= 0*/) const
 {
-	int i, j;
-	bool bFound = false;
-
-	// Check if the same ID exists for m_pMySkillTree[iOffset]
-	for (i = 0; i < MAX_SKILL_PAGE_NUM; i++)
-		for (j = 0; j < MAX_SKILL_IN_PAGE; j++)
+	// Find an existing skill icon to replace
+	for (int i = 0; i < MAX_SKILL_PAGE_NUM; i++)
+	{
+		for (int j = 0; j < MAX_SKILL_IN_PAGE; j++)
 		{
-			if (m_pMySkillTree[iOffset][i][j] != nullptr)
-			{
-				if (m_pMySkillTree[iOffset][i][j]->pSkill->dwID == pUSkill->dwID)
-					goto stop;
-			}
+			if (m_pMySkillTree[iCategoryOffset][i][j] != nullptr && m_pMySkillTree[iCategoryOffset][i][j]->pSkill->dwID == pUSkill->dwID)
+				return std::make_pair(i, j);
 		}
+	}
 
-	// Check if skill can be placed in m_pMySkillTree[iOffset]
-	for (i = 0; i < MAX_SKILL_PAGE_NUM; i++)
-		for (j = 0; j < MAX_SKILL_IN_PAGE; j++)
+	// No existing skill icon exists, find an empty slot.
+	for (int i = 0; i < MAX_SKILL_PAGE_NUM; i++)
+	{
+		for (int j = 0; j < MAX_SKILL_IN_PAGE; j++)
 		{
-			if (m_pMySkillTree[iOffset][i][j] == nullptr)
-			{
-				bFound = true;
-				goto stop;
-			}
+			if (m_pMySkillTree[iCategoryOffset][i][j] == nullptr)
+				return std::make_pair(i, j);
 		}
+	}
 
-stop:
-	if (!bFound)
+	return std::nullopt;
+}
+
+void CUISkillTreeDlg::AddSkillToPage(__TABLE_UPC_SKILL* pUSkill, int iCategoryOffset, bool bHasLevelToUse)
+{
+	auto slot = FindSlotForSkill(pUSkill, iCategoryOffset);
+	if (!slot.has_value())
 		return;
+
+	auto [i, j]              = slot.value();
 
 	__IconItemSkill* spSkill = new __IconItemSkill();
 	spSkill->pSkill          = pUSkill;
@@ -1650,39 +1698,41 @@ stop:
 	spSkill->pUIIcon->SetUIType(UI_TYPE_ICON);
 	spSkill->pUIIcon->SetStyle(UISTYLE_ICON_SKILL);
 
-	CN3UIArea* pArea = nullptr;
-	pArea            = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_TREE, j);
-	if (pArea)
+	CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_TREE, j);
+	if (pArea != nullptr)
 	{
 		spSkill->pUIIcon->SetRegion(pArea->GetRegion());
 		spSkill->pUIIcon->SetMoveRect(pArea->GetRegion());
 	}
 
 	// 아이콘 정보 저장..
-	m_pMySkillTree[iOffset][i][j] = spSkill;
+	m_pMySkillTree[iCategoryOffset][i][j] = spSkill;
 }
 
-bool CUISkillTreeDlg::CheckSkillCanBeUse(__TABLE_UPC_SKILL* pUSkill)
+bool CUISkillTreeDlg::IsSkillUsable(const __TABLE_UPC_SKILL* pUSkill) const
 {
 	int iModulo = pUSkill->iNeedSkill % 10;
 	switch (iModulo)
 	{
 		case 0: // Basic Skills..
 			return pUSkill->iNeedLevel <= CGameBase::s_pPlayer->m_InfoBase.iLevel;
-			break;
+
 		case 5: // First Skill Tab..
 			return pUSkill->iNeedLevel <= m_iSkillInfo[5];
-			break;
+
 		case 6: // Second Skill Tab..
 			return pUSkill->iNeedLevel <= m_iSkillInfo[6];
-			break;
+
 		case 7: // Third Skill Tab..
 			return pUSkill->iNeedLevel <= m_iSkillInfo[7];
-			break;
+
 		case 8: // Master Skill Tab..
 			return pUSkill->iNeedLevel <= m_iSkillInfo[8];
+
+		default:
 			break;
 	}
+
 	return false;
 }
 
@@ -1758,11 +1808,12 @@ int CUISkillTreeDlg::GetSkilliOrder(__IconItemSkill* spSkill)
 
 RECT CUISkillTreeDlg::GetSampleRect()
 {
-	RECT rect;
-	CN3UIArea* pArea;
+	CN3UIArea* pArea = GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_TREE, 0);
+	if (pArea == nullptr)
+		return {};
+
 	POINT ptCur    = CGameProcedure::s_pLocalInput->MouseGetPos();
-	pArea          = CN3UIWndBase::GetChildAreaByiOrder(UI_AREA_TYPE_SKILL_TREE, 0);
-	rect           = pArea->GetRegion();
+	RECT rect      = pArea->GetRegion();
 	float fWidth   = (float) (rect.right - rect.left);
 	float fHeight  = (float) (rect.bottom - rect.top);
 	fWidth        *= 0.5f;
@@ -1782,26 +1833,26 @@ void CUISkillTreeDlg::SetPageInIconRegion(int iKindOf, int iPageNum) // 아이�
 	m_iCurKindOf    = iKindOf;
 	m_iCurSkillPage = iPageNum;
 
-	int i, j, k;
-
-	for (i = 0; i < MAX_SKILL_KIND_OF; i++)
+	for (int i = 0; i < MAX_SKILL_KIND_OF; i++)
 	{
 		if (i != iKindOf)
 		{
-			for (j = 0; j < MAX_SKILL_PAGE_NUM; j++)
-				for (k = 0; k < MAX_SKILL_IN_PAGE; k++)
+			for (int j = 0; j < MAX_SKILL_PAGE_NUM; j++)
+			{
+				for (int k = 0; k < MAX_SKILL_IN_PAGE; k++)
 				{
 					if (m_pMySkillTree[i][j][k] != nullptr)
 						m_pMySkillTree[i][j][k]->pUIIcon->SetVisible(false);
 				}
+			}
 		}
 		else
 		{
-			for (j = 0; j < MAX_SKILL_PAGE_NUM; j++)
+			for (int j = 0; j < MAX_SKILL_PAGE_NUM; j++)
 			{
 				if (j != iPageNum)
 				{
-					for (k = 0; k < MAX_SKILL_IN_PAGE; k++)
+					for (int k = 0; k < MAX_SKILL_IN_PAGE; k++)
 					{
 						if (m_pMySkillTree[i][j][k] != nullptr)
 							m_pMySkillTree[i][j][k]->pUIIcon->SetVisible(false);
@@ -1809,7 +1860,7 @@ void CUISkillTreeDlg::SetPageInIconRegion(int iKindOf, int iPageNum) // 아이�
 				}
 				else
 				{
-					for (k = 0; k < MAX_SKILL_IN_PAGE; k++)
+					for (int k = 0; k < MAX_SKILL_IN_PAGE; k++)
 					{
 						if (m_pMySkillTree[i][j][k] != nullptr)
 							m_pMySkillTree[i][j][k]->pUIIcon->SetVisible(true);
@@ -1820,10 +1871,10 @@ void CUISkillTreeDlg::SetPageInIconRegion(int iKindOf, int iPageNum) // 아이�
 	}
 
 	// 아이콘 설명 문자열 업데이트.. 현재 스킬 종류와 현재 스킬 페이지중 아이콘이 보이면 String보이게.. 아니면 안보이게..
-	CN3UIString* pStrName;
+	CN3UIString* pStrName = nullptr;
 	std::string str;
 
-	for (k = 0; k < MAX_SKILL_IN_PAGE; k++)
+	for (int k = 0; k < MAX_SKILL_IN_PAGE; k++)
 	{
 		if (m_pMySkillTree[m_iCurKindOf][m_iCurSkillPage][k] != nullptr)
 		{
@@ -1929,6 +1980,9 @@ void CUISkillTreeDlg::SetPageInCharRegion()
 				case CLASS_KA_DARKPRIEST:
 					AllClearImageByName("Shadow Knight", true, "shaman");
 					break;
+
+				default:
+					break;
 			}
 			break;
 
@@ -1982,7 +2036,14 @@ void CUISkillTreeDlg::SetPageInCharRegion()
 				case CLASS_EL_DRUID:
 					AllClearImageByName("Paladin", true, "cleric");
 					break;
+
+				default:
+					break;
 			}
+			break;
+
+		default:
+			break;
 	}
 
 	CN3UIBase* pImgMaster = GetChildByID("img_master");
@@ -2037,13 +2098,18 @@ bool CUISkillTreeDlg::OnKeyPress(int iKey)
 		case DIK_PRIOR:
 			PageLeft();
 			return true;
+
 		case DIK_NEXT:
 			PageRight();
 			return true;
+
 		case DIK_ESCAPE:
 			if (!m_bClosingNow)
-				this->Close();
+				Close();
 			return true;
+
+		default:
+			break;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

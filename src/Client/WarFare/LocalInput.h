@@ -1,29 +1,31 @@
 ﻿#ifndef _LocalInput_H_
 #define _LocalInput_H_
 
-#include <DInput.h>
+#pragma once
+
+#include <dinput.h>
 
 #include <N3Base/My_3DStruct.h>
 
-const int DK_NONE         = 0;
-const int DK_RELEASE      = 1;
-const int DK_PRESS        = 2;
-const int DK_REPEAT       = 4;
-const int NUMDIKEYS       = 256;
+constexpr int DK_NONE         = 0;
+constexpr int DK_RELEASE      = 1;
+constexpr int DK_PRESS        = 2;
+constexpr int DK_REPEAT       = 4;
+constexpr int NUMDIKEYS       = 256;
 
 // 마우스 플래그 - 한개 이상의 플래그가 OR 연산으로 조합되어 있다..
-const int MOUSE_LBCLICK   = 0x1;
-const int MOUSE_LBCLICKED = 0x2;
-const int MOUSE_LBDOWN    = 0x4;
-const int MOUSE_MBCLICK   = 0x8;
-const int MOUSE_MBCLICKED = 0x10;
-const int MOUSE_MBDOWN    = 0x20;
-const int MOUSE_RBCLICK   = 0x40;
-const int MOUSE_RBCLICKED = 0x80;
-const int MOUSE_RBDOWN    = 0x100;
-const int MOUSE_LBDBLCLK  = 0x200;
-const int MOUSE_MBDBLCLK  = 0x400;
-const int MOUSE_RBDBLCLK  = 0x800;
+constexpr int MOUSE_LBCLICK   = 0x1;
+constexpr int MOUSE_LBCLICKED = 0x2;
+constexpr int MOUSE_LBDOWN    = 0x4;
+constexpr int MOUSE_MBCLICK   = 0x8;
+constexpr int MOUSE_MBCLICKED = 0x10;
+constexpr int MOUSE_MBDOWN    = 0x20;
+constexpr int MOUSE_RBCLICK   = 0x40;
+constexpr int MOUSE_RBCLICKED = 0x80;
+constexpr int MOUSE_RBDOWN    = 0x100;
+constexpr int MOUSE_LBDBLCLK  = 0x200;
+constexpr int MOUSE_MBDBLCLK  = 0x400;
+constexpr int MOUSE_RBDBLCLK  = 0x800;
 
 //////////////////////////////////////////////////////////////////////////////////
 // CLocalInput is a class wrapper for DirectInput and contains functions to receive
@@ -41,9 +43,6 @@ protected:
 
 	HWND m_hWnd;
 
-	//	BOOL m_bMouse;
-	//	BOOL m_bKeyboard;
-
 	int m_nMouseFlag, m_nMouseFlagOld; // 마우스 버튼 눌림 플래그
 	uint32_t m_dwTickLBDown;           // 마우스 왼쪽 버튼 더블 클릭 감지용
 	uint32_t m_dwTickRBDown;           // 마우스 오른쪽 버튼 더블 클릭 감지용
@@ -55,7 +54,6 @@ protected:
 	RECT m_rcMBDrag;                   // 드래그 영역
 	RECT m_rcRBDrag;                   // 드래그 영역
 
-	RECT m_rcMLimit;                   // 마우스 움직임 제한 영역
 	uint8_t m_byCurKeys[NUMDIKEYS];    // 현재 키 상태
 	uint8_t m_byOldKeys[NUMDIKEYS];    // 직전 키 상태
 	BOOL m_bKeyPresses[NUMDIKEYS];     // 키를 누른 순간인지
@@ -65,7 +63,8 @@ protected:
 	uint32_t m_dwTickKeyPress[NUMDIKEYS];
 
 public:
-	void KeyboardClearInput(int iIndex = -1) // 키보드 입력을 무효화 시킨다.. 기본값은 몽땅 무효화이다..
+	// 키보드 입력을 무효화 시킨다.. 기본값은 몽땅 무효화이다..
+	void KeyboardClearInput(int iIndex = -1)
 	{
 		if (-1 == iIndex)
 		{
@@ -79,79 +78,95 @@ public:
 			m_byCurKeys[iIndex] = m_byOldKeys[iIndex] = m_bKeyPresses[iIndex] = m_bKeyPresseds[iIndex] = 0;
 		}
 	}
-	BOOL IsNoKeyDown()
+
+	BOOL IsNoKeyDown() const
 	{
 		return m_bNoKeyDown;
 	}
-	BOOL IsKeyDown(int iIndex)
+
+	// 키보드가 눌려있는지... "DInput.h" 에 정의 되어 있는 DIK_???? 스캔코드를 참조..
+	BOOL IsKeyDown(int iIndex) const
 	{
 		if (iIndex < 0 || iIndex >= NUMDIKEYS)
 			return FALSE;
+
 		return m_byCurKeys[iIndex];
-	} // 키보드가 눌려있는지... "DInput.h" 에 정의 되어 있는 DIK_???? 스캔코드를 참조..
-	BOOL IsKeyPress(int iIndex)
+	}
+
+	// 키보드를 누르는 순간... "DInput.h" 에 정의 되어 있는 DIK_???? 스캔코드를 참조..
+	BOOL IsKeyPress(int iIndex) const
 	{
 		if (iIndex < 0 || iIndex >= NUMDIKEYS)
 			return FALSE;
+
 		return m_bKeyPresses[iIndex];
-	} // 키보드를 누르는 순간... "DInput.h" 에 정의 되어 있는 DIK_???? 스캔코드를 참조..
-	BOOL IsKeyPressed(int iIndex)
+	}
+
+	// 키보드를 누르고나서 떼는 순간... "DInput.h" 에 정의 되어 있는 DIK_???? 스캔코드를 참조..
+	BOOL IsKeyPressed(int iIndex) const
 	{
 		if (iIndex < 0 || iIndex >= NUMDIKEYS)
 			return FALSE;
+
 		return m_bKeyPresseds[iIndex];
-	} // 키보드를 누르고나서 떼는 순간... "DInput.h" 에 정의 되어 있는 DIK_???? 스캔코드를 참조..
+	}
 
 	BOOL Init(HINSTANCE hInst, HWND hWnd);
 
-	void Tick(void);
+	void Tick();
 	void KeyboardFlushData();
-	void MouseSetLimits(int x1, int y1, int x2, int y2);
 	void SetActiveDevices(BOOL bKeyboard);
 	void MouseSetPos(int x, int y);
 
 	BOOL KeyboardGetKeyState(int nDIKey); // 최근 눌려진 키 검사..
 
-	const POINT MouseGetPos()
+	POINT MouseGetPos() const
 	{
 		return m_ptCurMouse;
 	}
-	const POINT MouseGetPosOld()
+
+	POINT MouseGetPosOld() const
 	{
 		return m_ptOldMouse;
 	}
 
-	RECT MouseGetLBDragRect()
+	RECT MouseGetLBDragRect() const
 	{
 		return m_rcLBDrag;
 	}
-	RECT MouseGetMBDragRect()
+
+	RECT MouseGetMBDragRect() const
 	{
 		return m_rcMBDrag;
 	}
-	RECT MouseGetRBDragRect()
+
+	RECT MouseGetRBDragRect() const
 	{
 		return m_rcRBDrag;
 	}
 
-	int MouseGetFlag()
+	// Mouse Flag 의 or 연산으로 조합되어 있다.
+	int MouseGetFlag() const
 	{
 		return m_nMouseFlag;
-	} // Mouse Flag 의 or 연산으로 조합되어 있다.
-	int MouseGetFlagOld()
+	}
+
+	int MouseGetFlagOld() const
 	{
 		return m_nMouseFlagOld;
 	}
+
+	// 특정한 Mouse Flag 제거
 	void MouseRemoveFlag(int nFlag = -1)
 	{
 		if (-1 == nFlag)
 			m_nMouseFlag = m_nMouseFlagOld = 0;
 		else
 			m_nMouseFlag &= (~nFlag);
-	} // 특정한 Mouse Flag 제거
+	}
 
-	CLocalInput(void);
-	~CLocalInput(void);
+	CLocalInput();
+	~CLocalInput();
 };
 
 #endif // end of _LocalInput_H_

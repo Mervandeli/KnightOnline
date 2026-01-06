@@ -5,19 +5,18 @@
 #if !defined(AFX_N3RIVER_H__D0171C53_F631_4EC3_9D42_B4B754093FAC__INCLUDED_)
 #define AFX_N3RIVER_H__D0171C53_F631_4EC3_9D42_B4B754093FAC__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <N3Base/N3Base.h>
+#include <vector>
 
-#define MAX_RIVER_TEX 32
+constexpr int MAX_RIVER_TEX = 32;
 
 class CN3River : public CN3Base // CN3RiverPatch를 관리하는 클래스
 {
 public:
 	CN3River();
-	virtual ~CN3River();
+	~CN3River() override;
 
 	struct __VertexRiver
 	{
@@ -29,7 +28,7 @@ public:
 		void Set(float sx, float sy, float sz, float snx, float sny, float snz, D3DCOLOR scolor, float su, float sv, float su2, float sv2)
 		{
 			x = sx, y = sy, z = sz;
-			nx = snx, y = sny, z = sny;
+			nx = snx, y = sny, z = snz;
 			color = scolor;
 			u = su, v = sv;
 			u2 = su2, v2 = sv2;
@@ -58,27 +57,27 @@ public:
 
 		_RIVER_INFO()
 		{
-			pVertices  = nullptr;
-			pwIndex    = nullptr;
-			pDiff      = nullptr;
-			m_pTexWave = nullptr;
+			iVC          = 0;
+			iIC          = 0;
+			pVertices    = nullptr;
+			pwIndex      = nullptr;
+			pDiff        = nullptr;
+			m_bTick2Rand = FALSE;
+			m_vCenterPo  = {};
+			m_fRadius    = 0.0f;
+			m_pTexWave   = nullptr;
 		}
+
 		~_RIVER_INFO()
 		{
-			if (pVertices)
-				delete[] pVertices, pVertices = nullptr;
-			if (pwIndex)
-				delete[] pwIndex, pwIndex = nullptr;
-			if (pDiff)
-				delete[] pDiff, pDiff = nullptr;
-			m_pTexWave = nullptr;
+			delete[] pVertices;
+			delete[] pwIndex;
+			delete[] pDiff;
 		}
 	};
 
 protected:
-	_RIVER_INFO* m_pRiverInfo;
-	int m_iRiverCount;
-
+	std::vector<_RIVER_INFO> m_Rivers;
 	CN3Texture* m_pTexRiver[MAX_RIVER_TEX];
 
 	float m_fTexIndex;

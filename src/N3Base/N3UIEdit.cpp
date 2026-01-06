@@ -13,18 +13,13 @@
 #include "N3SndObj.h"
 #include <imm.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-const float CARET_FLICKERING_TIME = 0.4f;
+constexpr float CARET_FLICKERING_TIME = 0.4f;
 
 //HWND CN3UIEdit::s_hWndParent = nullptr;
-HWND CN3UIEdit::s_hWndEdit        = nullptr;
-HWND CN3UIEdit::s_hWndParent      = nullptr;
-WNDPROC CN3UIEdit::s_lpfnEditProc = nullptr;
-char CN3UIEdit::s_szBuffTmp[512]  = "";
+HWND CN3UIEdit::s_hWndEdit            = nullptr;
+HWND CN3UIEdit::s_hWndParent          = nullptr;
+WNDPROC CN3UIEdit::s_lpfnEditProc     = nullptr;
+char CN3UIEdit::s_szBuffTmp[512]      = "";
 
 //////////////////////////////////////////////////////////////////////
 // CN3UIEdit::CN3Caret
@@ -36,7 +31,9 @@ CN3UIEdit::CN3Caret::CN3Caret()
 	m_bVisible         = FALSE;
 	m_fFlickerTimePrev = CN3Base::TimeGet(); // 깜박이기 위한 시간..
 	m_bFlickerStatus   = true;
+	m_iSize            = 0;
 }
+
 CN3UIEdit::CN3Caret::~CN3Caret()
 {
 }
@@ -109,6 +106,8 @@ BOOL CN3UIEdit::CreateEditWindow(HWND hParent, RECT rect)
 	s_hWndEdit = CreateWindow("EDIT", "EditWindow", WS_CHILD | WS_TABSTOP | ES_LEFT | ES_WANTRETURN,
 		rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, hParent, nullptr,
 		nullptr, nullptr);
+
+	// NOLINTNEXTLINE(performance-no-int-to-ptr)
 	s_lpfnEditProc = (WNDPROC) SetWindowLongPtr(
 		s_hWndEdit, GWLP_WNDPROC, (LONG_PTR) CN3UIEdit::EditWndProc);
 
@@ -140,268 +139,52 @@ LRESULT APIENTRY CN3UIEdit::EditWndProc(HWND hWnd, uint16_t Message, WPARAM wPar
 		case WM_KEYDOWN:
 			if (wParam == VK_RETURN)
 			{
-				if (s_pFocusedEdit && s_pFocusedEdit->GetParent())
-				{
+				if (s_pFocusedEdit != nullptr && s_pFocusedEdit->GetParent() != nullptr)
 					s_pFocusedEdit->GetParent()->ReceiveMessage(s_pFocusedEdit, UIMSG_EDIT_RETURN);
-				}
+
 				return 0;
 			}
 
-			(CallWindowProc(s_lpfnEditProc, hWnd, Message, wParam, lParam));
-			if (s_pFocusedEdit)
+			CallWindowProc(s_lpfnEditProc, hWnd, Message, wParam, lParam);
+			if (s_pFocusedEdit != nullptr)
 				CN3UIEdit::UpdateCaretPosFromEditCtrl();
+
 			return 0;
-			//break;
 
 		case WM_CHAR:
-			if (s_pFocusedEdit)
+			if (s_pFocusedEdit != nullptr)
 				CN3UIEdit::UpdateCaretPosFromEditCtrl();
-			if (wParam == VK_RETURN)
-				return 0;
-			if (wParam == VK_TAB)
+
+			if (wParam == VK_RETURN || wParam == VK_TAB)
 				return 0;
 			break;
+
 		case WM_INPUTLANGCHANGE:
 		{
-			POINT ptPos;
-			ptPos.x = 0;
-			ptPos.y = 0;
+			POINT ptPos = { 0, 0 };
 			SetImeStatus(ptPos, true);
 		}
 		break;
+
 		case WM_IME_ENDCOMPOSITION:
 		{
-			POINT ptPos;
-			ptPos.x = -1000;
-			ptPos.y = -1000;
+			POINT ptPos = { -1000, -1000 };
 			SetImeStatus(ptPos, false);
 		}
 		break;
+
 		case WM_IME_STARTCOMPOSITION:
 		{
-			POINT ptPos;
-			ptPos.x = 0;
-			ptPos.y = 0;
+			POINT ptPos = { 0, 0 };
 			SetImeStatus(ptPos, true);
 		}
 		break;
-	} // switch
 
-	/*
-	switch(Message)
-	{
-	case WM_IME_CHAR:
-		{
-			int iiii = 0;
-		}
-		break;
-	case WM_IME_COMPOSITION:
-		{
-			int iiii = 0;
-		}
-		break;
-	case WM_IME_COMPOSITIONFULL:
-		{
-			int iiii = 0;
-		}
-		break;
-	case WM_IME_CONTROL:
-		{
-			int iiii = 0;
-			uint32_t dwCmd = wParam;
-			switch(dwCmd)
-			{
-			case IMC_GETCANDIDATEPOS: 
-				iiii = 0;
-				break;
-			case IMC_OPENSTATUSWINDOW:
-				iiii = 0;
-				break;
-			case IMC_GETCOMPOSITIONFONT:
-				iiii = 0;
-				break;
-			case IMC_SETCANDIDATEPOS :
-				iiii = 0;
-				break;
-			case IMC_GETCOMPOSITIONWINDOW:
-				iiii = 0;
-				break;
-			case IMC_SETCOMPOSITIONFONT :
-				iiii = 0;
-				break;
-//			case IMC_GETCONVERSIONMODE:
-//				iiii = 0;
-//				break;
-			case IMC_SETCOMPOSITIONWINDOW :
-				iiii = 0;
-				break;
-//			case IMC_GETOPENSTATUS:
-//				iiii = 0;
-//				break;
-//			case IMC_SETCONVERSIONMODE :
-//				iiii = 0;
-//				break;
-//			case IMC_GETSENTENCEMODE:
-//				iiii = 0;
-//				break;
-//			case IMC_SETOPENSTATUS :
-//				iiii = 0;
-//				break;
-			case IMC_GETSTATUSWINDOWPOS:
-				iiii = 0;
-				break;
-//			case IMC_SETSENTENCEMODE :
-//				iiii = 0;
-//				break;
-			case IMC_CLOSESTATUSWINDOW:
-				iiii = 0;
-				break;
-			case IMC_SETSTATUSWINDOWPOS :
-				iiii = 0;
-				break;
-			}
-		}
-		break;
-	case WM_IME_ENDCOMPOSITION:
-		{
-			int iiii = 0;
-		}
-		break;
-	case WM_IME_KEYDOWN:
-		{
-			int iiii = 0;
-		}
-		break;
-	case WM_IME_KEYUP:
-		{
-			int iiii = 0;
-		}
-		break;
-	case WM_IME_NOTIFY:
-		{
-			int iiii = 0;
-
-			switch(wParam)
-			{
-			case IMN_CHANGECANDIDATE:
-				{
-					int iiii = 0;
-					break;
-				}
-			case IMN_SETCANDIDATEPOS:
-				{
-					int iiii = 0;
-					break;
-				}
-			case IMN_CLOSECANDIDATE:
-				{
-					int iiii = 0;
-					break;
-				}
-			case IMN_SETCOMPOSITIONFONT:
-				{
-					int iiii = 0;
-					break;
-				}
-			case IMN_CLOSESTATUSWINDOW:
-				{
-					int iiii = 0;
-					break;
-				}
-			case IMN_SETCOMPOSITIONWINDOW:
-				{
-					int iiii = 0;
-					
-					COMPOSITIONFORM CompForm;
-					CompForm.dwStyle = CFS_RECT;
-					int msg2 = (UINT) WM_IME_CONTROL;
-					WPARAM wParam2 = (WPARAM) IMC_GETCOMPOSITIONWINDOW;
-					WPARAM lParam2 = (LPARAM) &CompForm;
-					SendMessage(hWnd, msg2, wParam2, lParam2);
-
-					break;
-				}
-			case IMN_GUIDELINE:
-				{
-					int iiii = 0;
-					break;
-				}
-			case IMN_SETCONVERSIONMODE:
-				{
-					int iiii = 0;
-					break;
-				}
-			case IMN_OPENCANDIDATE:
-				{
-					int iiii = 0;
-					break;
-				}
-			case IMN_SETOPENSTATUS:
-				{
-					int iiii = 0;
-					break;
-				}
-			case IMN_OPENSTATUSWINDOW:
-				{
-					int iiii = 0;
-					break;
-				}
-			case IMN_SETSENTENCEMODE:
-				{
-					int iiii = 0;
-					break;
-				}
-			case IMN_PRIVATE:
-				{
-					int iiii = 0;
-
-					CANDIDATEFORM cf;
-					cf.dwStyle = CFS_RECT;
-					iiii = ::SendMessage(hWnd, WM_IME_CONTROL, IMC_GETCANDIDATEPOS, (LPARAM)(&cf));
-
-					LOGFONT lf;
-					iiii = ::SendMessage(hWnd, WM_IME_CONTROL, IMC_GETCOMPOSITIONFONT, (LPARAM)(&lf));
-
-					iiii = 0;
-
-
-
-					break;
-				}
-			case IMN_SETSTATUSWINDOWPOS:
-				{
-					int iiii = 0;
-					break;
-				}
-			}
-
-//			CANDIDATEFORM form;
-//			form.dwIndex = 0;
-//			form.dwStyle = CFS_EXCLUDE;
-//			this->SendMessage(0x0288, 0x0002, (LPARAM)(&form));
-//			iiii = -1;
-//			this->SendMessage(WM_IME_REQUEST, IMR_CANDIDATEWINDOW, &form);
-		}
-		break;
-	case WM_IME_SELECT:
-		{
-			int iiii = 0;
-		}
-		break;
-	case WM_IME_SETCONTEXT:
-		{
-			int iiii = 0;
-		}
-		break;
-	case WM_IME_STARTCOMPOSITION:
-		{
-			int iiii = 0;
-		}
-		break;
+		default:
+			break;
 	}
-*/
 
-	return (CallWindowProc(s_lpfnEditProc, hWnd, Message, wParam, lParam));
+	return CallWindowProc(s_lpfnEditProc, hWnd, Message, wParam, lParam);
 }
 
 CN3UIEdit::CN3Caret CN3UIEdit::s_Caret;
@@ -411,7 +194,7 @@ CN3UIEdit::CN3UIEdit()
 	m_eType       = UI_TYPE_EDIT;
 	m_nCaretPos   = 0;
 	m_iCompLength = 0;
-	m_iMaxStrLen  = 0x7fffffff;
+	m_iMaxStrLen  = DEFAULT_MAX_LENGTH;
 	KillFocus();
 	m_pSnd_Typing = nullptr;
 }
@@ -419,18 +202,18 @@ CN3UIEdit::CN3UIEdit()
 CN3UIEdit::~CN3UIEdit()
 {
 	KillFocus();
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Typing);
+	s_SndMgr.ReleaseObj(&m_pSnd_Typing);
 }
 
 void CN3UIEdit::Release()
 {
-	CN3UIBase::Release();
+	CN3UIStatic::Release();
 	m_nCaretPos   = 0;
 	m_iCompLength = 0;
-	m_iMaxStrLen  = 0x7fffffff;
+	m_iMaxStrLen  = DEFAULT_MAX_LENGTH;
 	KillFocus();
-	m_szPassword = "";
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Typing);
+	m_szPassword.clear();
+	s_SndMgr.ReleaseObj(&m_pSnd_Typing);
 }
 
 void CN3UIEdit::Render()
@@ -520,20 +303,30 @@ uint32_t CN3UIEdit::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
 	if (!m_bVisible)
 		return dwRet;
-	if (dwFlags & UI_MOUSE_LBCLICK && IsIn(ptCur.x, ptCur.y)) // 영역 안에서 왼쪽 버튼이 눌렸으면
+
+	// 영역 안에서 왼쪽 버튼이 눌렸으면
+	if (dwFlags & UI_MOUSE_LBCLICK && IsIn(ptCur.x, ptCur.y))
 	{
-		SetFocus();                                           // 나에게 포커스를 준다.
+		// 나에게 포커스를 준다.
+		SetFocus();
 		dwRet |= (UI_MOUSEPROC_DONESOMETHING | UI_MOUSEPROC_INREGION);
 		return dwRet;
 	}
+
+	// NOLINTNEXTLINE(bugprone-parent-virtual-call)
 	dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);
 	return dwRet;
 }
 
 void CN3UIEdit::SetCaretPos(size_t nPos)
 {
+	if (m_pBuffOutRef == nullptr)
+		return;
+
+	// 최대 길이보다 길경우 작게 세팅
 	if (nPos > m_iMaxStrLen)
-		nPos = m_iMaxStrLen; // 최대 길이보다 길경우 작게 세팅
+		nPos = m_iMaxStrLen;
+
 	m_nCaretPos               = nPos;
 
 	const std::string& szBuff = m_pBuffOutRef->GetString();
@@ -714,10 +507,15 @@ bool CN3UIEdit::Load(File& file)
 }
 
 #ifdef _N3TOOL
-void CN3UIEdit::operator=(const CN3UIEdit& other)
+CN3UIEdit& CN3UIEdit::operator=(const CN3UIEdit& other)
 {
+	if (this == &other)
+		return *this;
+
 	CN3UIStatic::operator=(other);
 	SetSndTyping(other.GetSndFName_Typing());
+
+	return *this;
 }
 
 bool CN3UIEdit::Save(File& file)
@@ -786,7 +584,6 @@ void CN3UIEdit::UpdateCaretPosFromEditCtrl()
 */
 	LRESULT lResult = ::SendMessage(s_hWndEdit, EM_GETSEL, 0, 0);
 	int iCaret      = LOWORD(lResult);
-	int iCTmp2      = HIWORD(lResult);
 	s_pFocusedEdit->SetCaretPos(iCaret);
 }
 

@@ -5,7 +5,7 @@
 
 #include <shared-server/STLMap.h>
 
-#define MAX_CHECK_EVENT 5
+constexpr int MAX_CHECK_EVENT = 5;
 
 typedef CSTLMap<int> mapNpcArray;
 

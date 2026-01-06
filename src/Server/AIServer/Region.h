@@ -14,12 +14,9 @@ typedef CSTLMap<int> ZoneNpcArray;
 class CRegion
 {
 public:
-	ZoneUserArray m_RegionUserArray;
-	ZoneNpcArray m_RegionNpcArray;
-	uint8_t m_byMoving; // move : 1, not moving : 0
-
-protected:
-	int m_nIndex;
+	ZoneUserArray m_RegionUserArray = {};
+	ZoneNpcArray m_RegionNpcArray   = {};
+	uint8_t m_byMoving              = 0; // move : 1, not moving : 0
 };
 
-#endif // SERVER_AISERVER_REGION_H
+#endif                                   // SERVER_AISERVER_REGION_H

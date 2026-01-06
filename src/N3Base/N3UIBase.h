@@ -5,9 +5,7 @@
 #if !defined(AFX_N3UI_H__5F1578F8_8476_4647_8C53_E22A5F6184FE__INCLUDED_)
 #define AFX_N3UI_H__5F1578F8_8476_4647_8C53_E22A5F6184FE__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3BaseFileAccess.h"
 #include "N3UIDef.h"
@@ -15,10 +13,11 @@
 #include <set>
 #include <string>
 
-#define N3_VERIFY_UI_COMPONENT(varName, lookupResult)         \
-	{                                                         \
-		varName = lookupResult;                               \
-		__ASSERT(varName != nullptr, "NULL UI Component!!!"); \
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define N3_VERIFY_UI_COMPONENT(varName, lookupResult)           \
+	{                                                           \
+		(varName) = (lookupResult);                             \
+		__ASSERT((varName) != nullptr, "NULL UI Component!!!"); \
 	}
 
 class CN3UIBase;
@@ -97,17 +96,18 @@ protected:
 	uint32_t m_dwStyle;               // style
 	uint32_t m_dwReserved;            // 기타 임시로 넣고 싶은 정보를 넣으면 된다.
 
-	RECT
-		m_rcRegion; // UI - screen coordinates (screen : main window client area) 중의 : 부모에 대한 상대좌표가 아니다.
-	RECT
-		m_rcMovable; // UI를 드래그 하여 움직이게 할 수 있는 영역 - (screen : main window client area)           ~~~~~~~
+	// UI - screen coordinates (screen : main window client area) 중의 : 부모에 대한 상대좌표가 아니다.
+	RECT m_rcRegion;
+
+	// UI를 드래그 하여 움직이게 할 수 있는 영역 - (screen : main window client area)           ~~~~~~~
+	RECT m_rcMovable;
 
 	bool m_bVisible;          // 화면에 보이는가 (부모가 보이지 않으면 자식들은 render 하지 않는다.)
 	CN3SndObj* m_pSnd_OpenUI; // UI가 화면에 보이는 순간 내는 소리
 	CN3SndObj* m_pSnd_CloseUI; // UI가 화면에서 사라지는 순간 내는 소리
 
-	static CN3UIEdit*
-		s_pFocusedEdit; // 현재 포커스를 가지고 있는 Edit, nullptr이면 아무도 포커스를 가지고 있지 않다.
+	// 현재 포커스를 가지고 있는 Edit, nullptr이면 아무도 포커스를 가지고 있지 않다.
+	static CN3UIEdit* s_pFocusedEdit;
 
 public:
 	CN3UIBase();
@@ -115,52 +115,62 @@ public:
 
 	// Attributes
 public:
-	void PrintChildIDs();
 	eUI_TYPE UIType() const
 	{
 		return m_eType;
 	}
+
 	eUI_STATE GetState() const
 	{
 		return m_eState;
 	}
+
 	bool IsVisible() const
 	{
 		return m_bVisible;
 	}
+
 	RECT GetRegion() const
 	{
 		return m_rcRegion;
 	}
+
 	void SetMoveRect(const RECT& Rect)
 	{
 		m_rcMovable = Rect;
 	}
-	RECT GetMoveRect()
+
+	RECT GetMoveRect() const
 	{
 		return m_rcMovable;
 	}
+
 	void SetReserved(uint32_t dwReserved)
 	{
 		m_dwReserved = dwReserved;
 	}
+
 	uint32_t GetReserved() const
 	{
 		return m_dwReserved;
 	}
+
 	CN3UIBase* GetParent() const
 	{
 		return m_pParent;
 	}
+
 	static CN3UIEdit* GetFocusedEdit()
 	{
 		return s_pFocusedEdit;
 	}
+
 	static CN3UITooltip* GetTooltipCtrl()
 	{
 		return s_pTooltipCtrl;
 	}
-	uint32_t GetStyle()
+
+	uint32_t GetStyle() const
 	{
 		return m_dwStyle;
 	}
@@ -173,30 +183,38 @@ public:
 	void SetUIType(eUI_TYPE eUIType)
 	{
 		m_eType = eUIType;
-	} // by ecli666 툴에 기능 넣기 귀찮아서.. ^^
+	}
+
 	// Operations
 public:
 	bool IsIn(int x, int y);
+
 	void AddChild(CN3UIBase* pChild)
 	{
 		m_Children.push_front(pChild);
 	}
+
 	void RemoveChild(
 		CN3UIBase* pChild); // 자식 리스트에서 포인터만 없어지고 실제로 delete 되지는 않는다.
 	void SetParent(CN3UIBase* pParent); // 부모를 바꾼다.
-	int GetWidth()
+
+	int GetWidth() const
 	{
 		return m_rcRegion.right - m_rcRegion.left;
 	}
-	int GetHeight()
+
+	int GetHeight() const
 	{
 		return m_rcRegion.bottom - m_rcRegion.top;
 	}
+
 	POINT GetPos() const;
-	virtual void SetPos(int x,
-		int y); // 위치 지정(chilren의 위치도 같이 바꾸어준다.) 내부적으로 MoveOffset함수를 부른다.
-	void
-	SetPosCenter(); // 화면 정가운데로 맞추어준다..(chilren의 위치도 같이 바꾸어준다.) 내부적으로 MoveOffset함수를 부른다.
+
+	// 위치 지정(chilren의 위치도 같이 바꾸어준다.) 내부적으로 MoveOffset함수를 부른다.
+	virtual void SetPos(int x, int y);
+
+	// 화면 정가운데로 맞추어준다..(chilren의 위치도 같이 바꾸어준다.) 내부적으로 MoveOffset함수를 부른다.
+	void SetPosCenter();
 
 	// Find first control matching the specified ID.
 	CN3UIBase* GetChildByID(const std::string_view szID) const;
@@ -207,44 +225,53 @@ public:
 	template <typename T>
 	T* GetChildByID(const std::string_view szID) const;
 
+	// 영역 지정
 	virtual void SetRegion(const RECT& pRect)
 	{
 		m_rcRegion = pRect;
-	} // 영역 지정
-	virtual BOOL MoveOffset(
-		int iOffsetX, int iOffsetY); // offset만큼 이동해준다.(region, children, move rect 이동)
+	}
+
+	// offset만큼 이동해준다.(region, children, move rect 이동)
+	virtual BOOL MoveOffset(int iOffsetX, int iOffsetY);
 	virtual void SetSize(int iWidth, int iHeight); // 크기 지정
+
 	virtual void SetState(eUI_STATE eState)
 	{
 		m_eState = eState;
 	}
+
+	// style지정
 	virtual void SetStyle(uint32_t dwStyle)
 	{
 		m_dwStyle = dwStyle;
-	} // style지정
-	virtual void SetVisible(bool bVisible);
+	}
 
+	virtual void SetVisible(bool bVisible);
 	virtual void SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false);
 
 	virtual void CallBackProc(int iID, uint32_t dwFlag);
 	virtual void ShowWindow(int iID = -1, CN3UIBase* pParent = nullptr);
 	bool Load(File& file) override;
-	virtual bool ReceiveMessage(
-		CN3UIBase* pSender, uint32_t dwMsg); // 메시지를 받는다.. 보낸놈, msg
+
+	// 메시지를 받는다.. 보낸놈, msg
+	virtual bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg);
 	virtual uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld);
 	virtual void Tick();
 	virtual void Render();
 	void Release() override; // 자식 포인터까지 delete 한다..
 	virtual void Init(CN3UIBase* pParent);
-	virtual bool OnKeyPress(int iKey)
+
+	virtual bool OnKeyPress(int /*iKey*/)
 	{
 		return false;
 	}
-	virtual bool OnKeyPressed(int iKey)
+
+	virtual bool OnKeyPressed(int /*iKey*/)
 	{
 		return false;
 	}
-	virtual bool OnMouseWheelEvent(short delta)
+
+	virtual bool OnMouseWheelEvent(short /*delta*/)
 	{
 		return false;
 	}
@@ -267,7 +294,7 @@ public:
 		return *it;
 	}
 
-	virtual void operator=(const CN3UIBase& other);
+	CN3UIBase& operator=(const CN3UIBase& other);
 
 protected:
 #ifdef _N3TOOL
@@ -287,11 +314,7 @@ public:
 	bool MoveToHighest(CN3UIBase* pChild);
 
 	void ArrangeZOrder();
-	RECT GetMoveRect() const
-	{
-		return m_rcMovable;
-	}
-	//void			SetMoveRect(RECT rc) {m_rcMovable = rc;}
+
 	void SetSndOpen(const std::string& strFileName);
 	void SetSndClose(const std::string& strFileName);
 	std::string GetSndFName_OpenUI() const;

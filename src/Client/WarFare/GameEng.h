@@ -5,9 +5,7 @@
 #if !defined(AFX_GAMEENG_H__5422B19E_D43E_4252_B79B_69323824F3F9__INCLUDED_)
 #define AFX_GAMEENG_H__5422B19E_D43E_4252_B79B_69323824F3F9__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <N3Base/N3Eng.h>
 #include <list>
@@ -16,14 +14,14 @@ typedef std::list<class CN3Light*>::iterator it_Light;
 typedef std::list<class CN3Camera*>::iterator it_Camera;
 
 // 카메라 시점
-enum e_ViewPoint
+enum e_ViewPoint : int8_t
 {
 	VP_BACKWARD     = 0, // 플레이어 등 뒤에서 바라본 모습 1.5인칭
 	VP_FIRST_PERSON = 1, // 일인칭
 	VP_FOWARD       = 2, // 플레이어 앞에서 바라봄..
 	VP_THIRD_PERSON = 3, // 삼인칭 모드 .. 마우스도 동작함..
-	VP_UNKNOWN      = 0xffffffff
-}; // 개발을 위해 카메라만 빠르게....
+	VP_UNKNOWN      = -1 // 개발을 위해 카메라만 빠르게....
+};
 
 const float CAMERA_MOVE_SPEED = 5.0f;
 
@@ -129,7 +127,7 @@ public:
 	void ApplyCameraAndLight();           // 카메라와 라이트에 세팅된 값 적용. 라이트는 해의 각도에 따라 다르게 한다.
 
 	CGameEng();
-	virtual ~CGameEng();
+	~CGameEng() override;
 };
 
 /*

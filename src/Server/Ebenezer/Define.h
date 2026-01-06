@@ -38,7 +38,7 @@ constexpr int MAX_CURRENT_EVENT     = 20;
 
 // 지금 쓰이는것만 정의 해 놨습니다.
 // logic관련 define
-enum e_LogicCheck
+enum e_LogicCheck : uint8_t
 {
 	LOGIC_CHECK_NONE                        = 0x00,
 	LOGIC_CHECK_UNDER_WEIGHT                = 0x01,
@@ -99,7 +99,7 @@ enum e_LogicCheck
 };
 
 // 실행관련 define
-enum e_Exec
+enum e_Exec : uint8_t
 {
 	EXEC_NONE                         = 0x00,
 	EXEC_SAY                          = 0x01,
@@ -183,97 +183,122 @@ constexpr int REMOTE_PURCHASE_PRICE = 5000;
 constexpr int BBS_CHECK_TIME        = 36000;
 
 ///////////////// NATION ///////////////////////////////////
-#define UNIFY_NATION                   0
-#define KARUS                          1
-#define ELMORAD                        2
-#define BATTLE                         3
+enum e_Nation : uint8_t
+{
+	NATION_KARUS   = 1,
+	NATION_ELMORAD = 2
+};
 
-#define BATTLE_ZONE                    101
+enum e_ServerZoneType : uint8_t
+{
+	SERVER_ZONE_UNIFY   = 0,
+	SERVER_ZONE_KARUS   = 1,
+	SERVER_ZONE_ELMORAD = 2,
+	SERVER_ZONE_BATTLE  = 3
+};
 
 ////////////////////////////////////////////////////////////
 
 // Attack Type
-#define DIRECT_ATTACK                  0
-#define LONG_ATTACK                    1
-#define MAGIC_ATTACK                   2
-#define DURATION_ATTACK                3
+enum e_AttackType : uint8_t
+{
+	DIRECT_ATTACK   = 0,
+	LONG_ATTACK     = 1,
+	MAGIC_ATTACK    = 2,
+	DURATION_ATTACK = 3
+};
 
 ////////////////// ETC Define //////////////////////////////
 // UserInOut //
-#define USER_IN                        0X01
-#define USER_OUT                       0X02
-#define USER_REGENE                    0X03 // Userin하고 같은것인데 효과를 주기위해서.. 분리(게임시작, 리젠. 소환시)
-#define USER_WARP                      0X04
-#define USER_SUMMON                    0X05
-#define NPC_IN                         0X01
-#define NPC_OUT                        0X02
+enum e_UserInOutType : uint8_t
+{
+	USER_IN     = 1,
+	USER_OUT    = 2,
+	// Userin하고 같은것인데 효과를 주기위해서.. 분리(게임시작, 리젠. 소환시)
+	USER_REGENE = 3,
+	USER_WARP   = 4,
+	USER_SUMMON = 5
+};
+
+enum e_NpcInOutType : uint8_t
+{
+	NPC_IN  = 1,
+	NPC_OUT = 2
+};
 
 ////////////////// Resurrection related ////////////////////
-#define BLINK_TIME                     10
-#define CLAN_SUMMON_TIME               180
+constexpr int BLINK_TIME        = 10;
+constexpr int CLAN_SUMMON_TIME  = 180;
 ////////////////////////////////////////////////////////////
 
 // Socket Define
 ////////////////////////////////////////////////////////////
-#define SOCKET_BUFF_SIZE               (1024 * 16)
-#define MAX_PACKET_SIZE                (1024 * 8)
-#define REGION_BUFF_SIZE               (1024 * 16)
+constexpr int SOCKET_BUFF_SIZE  = (1024 * 16);
+constexpr int MAX_PACKET_SIZE   = (1024 * 8);
+constexpr int REGION_BUFF_SIZE  = (1024 * 16);
 
-#define PACKET_START1                  0XAA
-#define PACKET_START2                  0X55
-#define PACKET_END1                    0X55
-#define PACKET_END2                    0XAA
+constexpr uint8_t PACKET_START1 = 0xAA;
+constexpr uint8_t PACKET_START2 = 0x55;
+constexpr uint8_t PACKET_END1   = 0x55;
+constexpr uint8_t PACKET_END2   = 0xAA;
 ////////////////////////////////////////////////////////////
 
 // ==================================================================
 //	About Map Object
 // ==================================================================
-#define USER_BAND                      0     // Map 위에 유저가 있다.
-#define NPC_BAND                       10000 // Map 위에 NPC(몹포함)가 있다.
-#define INVALID_BAND                   30000 // 잘못된 ID BAND
-
-#define EVENT_MONSTER                  20    // Event monster 총 수
+constexpr int USER_BAND         = 0;     // Map 위에 유저가 있다.
+constexpr int NPC_BAND          = 10000; // Map 위에 NPC(몹포함)가 있다.
+constexpr int INVALID_BAND      = 30000; // 잘못된 ID BAND
 
 ///////////////// snow event define //////////////////////////////
-#define SNOW_EVENT_MONEY               2000
-#define SNOW_EVENT_SKILL               490043
+constexpr int SNOW_EVENT_MONEY  = 2000;
+constexpr int SNOW_EVENT_SKILL  = 490043;
 
 //////////////////////////////////////////////////////////////////
 // DEFINE Shared Memory Queue
 //////////////////////////////////////////////////////////////////
 
-// DEFINE Shared Memory Costumizing
+// DEFINE Shared Memory Customisation
+constexpr char SMQ_LOGGERSEND[] = "KNIGHT_SEND";
+constexpr char SMQ_LOGGERRECV[] = "KNIGHT_RECV";
 
-#define SMQ_LOGGERSEND                 "KNIGHT_SEND"
-#define SMQ_LOGGERRECV                 "KNIGHT_RECV"
+constexpr char SMQ_ITEMLOGGER[] = "ITEMLOG_SEND";
 
-#define SMQ_ITEMLOGGER                 "ITEMLOG_SEND"
-
-// Reply packet define...
-
-#define SEND_ME                        0x01
-#define SEND_REGION                    0x02
-#define SEND_ALL                       0x03
-#define SEND_ZONE                      0x04
+//
+//	To Who ???
+//
+enum e_SendTarget : uint8_t
+{
+	SEND_ME     = 0x01,
+	SEND_REGION = 0x02,
+	SEND_ALL    = 0x03,
+	SEND_ZONE   = 0x04
+};
 
 // Battlezone Announcement
-#define BATTLEZONE_OPEN                0x00
-#define BATTLEZONE_CLOSE               0x01
-#define DECLARE_WINNER                 0x02
-#define DECLARE_LOSER                  0x03
-#define DECLARE_BAN                    0x04
-#define KARUS_CAPTAIN_NOTIFY           0x05
-#define ELMORAD_CAPTAIN_NOTIFY         0x06
-#define KARUS_CAPTAIN_DEPRIVE_NOTIFY   0x07
-#define ELMORAD_CAPTAIN_DEPRIVE_NOTIFY 0x08
-#define SNOW_BATTLEZONE_OPEN           0x09
+enum e_BattleZoneNoticeType : uint8_t
+{
+	BATTLEZONE_OPEN                = 0x00,
+	BATTLEZONE_CLOSE               = 0x01,
+	DECLARE_WINNER                 = 0x02,
+	DECLARE_LOSER                  = 0x03,
+	DECLARE_BAN                    = 0x04,
+	KARUS_CAPTAIN_NOTIFY           = 0x05,
+	ELMORAD_CAPTAIN_NOTIFY         = 0x06,
+	KARUS_CAPTAIN_DEPRIVE_NOTIFY   = 0x07,
+	ELMORAD_CAPTAIN_DEPRIVE_NOTIFY = 0x08,
+	SNOW_BATTLEZONE_OPEN           = 0x09,
+};
 
 // Battle define
-#define NO_BATTLE                      0
-#define NATION_BATTLE                  1
-#define SNOW_BATTLE                    2
+enum e_BattleType : uint8_t
+{
+	NO_BATTLE     = 0,
+	NATION_BATTLE = 1,
+	SNOW_BATTLE   = 2
+};
 
-#define MAX_BATTLE_ZONE_USERS          150
+constexpr int MAX_BATTLE_ZONE_USERS = 150;
 
 //////////////////////////////////////////////////////////////////
 
@@ -292,14 +317,8 @@ typedef union
 
 struct _REGION_BUFFER
 {
-	int iLength;
-	char pDataBuff[REGION_BUFF_SIZE];
-
-	_REGION_BUFFER()
-	{
-		iLength = 0;
-		memset(pDataBuff, 0, sizeof(pDataBuff));
-	}
+	int iLength = 0;
+	char pDataBuff[REGION_BUFF_SIZE] {};
 };
 
 #endif // SERVER_EBENEZER_DEFINE_H

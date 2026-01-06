@@ -8,12 +8,10 @@ namespace ftxui
 {
 static Color spdlog_level_to_fxtui_color(spdlog::level::level_enum level);
 
-sink_mt::sink_mt()
+sink_mt::sink_mt() :
+	_screen(nullptr), _useConsoleSink(true), _storeLogBuffer(true),
+	_backlogSize(DEFAULT_BACKLOG_SIZE)
 {
-	_screen         = nullptr;
-	_useConsoleSink = true;
-	_storeLogBuffer = true;
-	_backlogSize    = DEFAULT_BACKLOG_SIZE;
 }
 
 void sink_mt::set_screen(ScreenInteractive* screen)

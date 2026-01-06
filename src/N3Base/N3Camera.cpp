@@ -4,14 +4,6 @@
 #include "StdAfxBase.h"
 #include "N3Camera.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 CN3Camera::CN3Camera()
 {
 	m_dwType |= OBJ_CAMERA;
@@ -407,8 +399,9 @@ void CN3Camera::Apply()
 {
 	s_lpD3DDev->SetTransform(D3DTS_VIEW, m_Data.mtxView.toD3D());
 	s_lpD3DDev->SetTransform(
-		D3DTS_PROJECTION, m_Data.mtxProjection.toD3D());             // Projection Matrix Setting
-	memcpy(&(CN3Base::s_CameraData), &m_Data, sizeof(__CameraData)); // Static Data Update...
+		D3DTS_PROJECTION, m_Data.mtxProjection.toD3D()); // Projection Matrix Setting
+
+	s_CameraData = m_Data;                               // Static Data Update...
 
 	// 안개 색깔 맞추기..
 	s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, m_bFogUse);

@@ -175,7 +175,7 @@ void CUIExitMenu::ReturnToCharacterSelection()
 	CGameProcedure::s_pSocket->Disconnect();
 	Sleep(4000);
 
-	CGameProcedure::s_pSocket->Connect(s_hWndBase, szIP.c_str(), dwPort);
+	CGameProcedure::s_pSocket->Connect(s_hWndBase, szIP, dwPort);
 	CGameProcedure::s_bNeedReportConnectionClosed = true;
 	CGameProcedure::s_bIsRestarting               = true;
 	CGameProcedure::ProcActiveSet((CGameProcedure*) CGameProcedure::s_pProcCharacterSelect);

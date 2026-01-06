@@ -5,14 +5,12 @@
 #if !defined(AFX_UITRANSACTIONDLG_H__42671245_FF4F_42FC_AF7B_DACEDA8734B7__INCLUDED_)
 #define AFX_UITRANSACTIONDLG_H__42671245_FF4F_42FC_AF7B_DACEDA8734B7__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "GameDef.h"
 #include "N3UIWndBase.h"
 
-enum e_NpcTrade
+enum e_NpcTrade : uint8_t
 {
 	UI_BLACKSMITH = 1,
 	UI_STORE,

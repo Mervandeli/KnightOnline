@@ -69,9 +69,9 @@ COptionDlg::COptionDlg(CWnd* pParent /*=nullptr*/) : CDialog(COptionDlg::IDD, pP
 	//{{AFX_DATA_INIT(COptionDlg)
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_hIcon  = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
-	m_Option.InitDefault(); // 옵션 초기화
+	m_Option = {}; // 옵션 초기화
 }
 
 void COptionDlg::DoDataExchange(CDataExchange* pDX)
@@ -121,14 +121,15 @@ constexpr Resolution MIN_RESOLUTION = { 1024, 768 };
  */
 void COptionDlg::LoadSupportedResolutions()
 {
-	// Get the primary monitor
-	DISPLAY_DEVICE device    = {};
-	device.cb                = sizeof(DISPLAY_DEVICE);
-
 	// We point to the device name instead of copying it / using it directly
 	// that way if we don't find a primary monitor, we pass nullptr as the first param into EnumDisplaySettings.
 	TCHAR* primaryDeviceName = nullptr;
 	int deviceNumber         = 0;
+
+	// Get the primary monitor
+	DISPLAY_DEVICE device {};
+	device.cb = sizeof(DISPLAY_DEVICE);
+
 	while (EnumDisplayDevices(nullptr, deviceNumber, &device, EDD_GET_DEVICE_INTERFACE_NAME))
 	{
 		if (device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE)
@@ -153,8 +154,8 @@ void COptionDlg::LoadSupportedResolutions()
 	std::set<Resolution, decltype(cmp)> loadedResolutions(cmp);
 
 	// Discover resolution settings
-	DEVMODE devmode = {};
-	devmode.dmSize  = sizeof(DEVMODE);
+	DEVMODE devmode {};
+	devmode.dmSize = sizeof(DEVMODE);
 	for (int iModeNum = 0; EnumDisplaySettings(primaryDeviceName, iModeNum, &devmode); iModeNum++)
 	{
 		// Only support 32-bit resolutions.
@@ -204,7 +205,7 @@ BOOL COptionDlg::OnInitDialog()
 	if (pSysMenu != nullptr)
 	{
 		CString strAboutMenu;
-		strAboutMenu.LoadString(IDS_ABOUTBOX);
+		(void) strAboutMenu.LoadString(IDS_ABOUTBOX);
 		if (!strAboutMenu.IsEmpty())
 		{
 			pSysMenu->AppendMenu(MF_SEPARATOR);
@@ -241,7 +242,7 @@ BOOL COptionDlg::OnInitDialog()
 	iAdd = m_CB_ColorDepth.AddString(_T("32 Bit"));
 	m_CB_ColorDepth.SetItemData(iAdd, 32);
 
-	TCHAR szBuff[_MAX_PATH] = {};
+	TCHAR szBuff[_MAX_PATH] {};
 	GetCurrentDirectory(_countof(szBuff), szBuff);
 
 	m_szInstalledPath       = szBuff;
@@ -549,7 +550,7 @@ void COptionDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 void COptionDlg::OnBVersion()
 {
 	CString szMsg;
-	szMsg.LoadString(IDS_CONFIRM_WRITE_REGISRY);
+	(void) szMsg.LoadString(IDS_CONFIRM_WRITE_REGISRY);
 
 	// 한번 물어본다..
 	if (IDNO == MessageBox(szMsg, _T(""), MB_YESNO))

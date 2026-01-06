@@ -20,6 +20,16 @@ public:
 		return _isShutdown;
 	}
 
+	std::mutex& ThreadMutex() const
+	{
+		return _mutex;
+	}
+
+	std::condition_variable& ThreadCondition()
+	{
+		return _cv;
+	}
+
 	Thread();
 	virtual void start();
 	virtual void shutdown(bool waitForShutdown = true);
@@ -34,8 +44,8 @@ protected:
 	{
 	}
 
-protected:
-	std::mutex _mutex;
+private:
+	mutable std::mutex _mutex;
 	std::condition_variable _cv;
 	std::thread _thread;
 	bool _canTick;

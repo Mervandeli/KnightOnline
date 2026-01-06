@@ -7,15 +7,6 @@
 #include "N3PMesh.h"
 #include "N3PMeshInstance.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3Mesh::CN3Mesh()
 {
 	m_dwType |= OBJ_MESH;
@@ -162,25 +153,28 @@ void CN3Mesh::Create(int nVC, int nIC)
 	{
 #ifdef _N3GAME
 		if (nVC > 32768)
+		{
 			CLogWriter::Write(
 				"CN3Mesh::Create - Too many vertices. (more than 32768) ({})", m_szFileName);
+		}
 #endif
-		if (m_pVertices)
-			this->ReleaseVertices();
-		m_pVertices = new __VertexT1[nVC];
-		memset(m_pVertices, 0, nVC * sizeof(__VertexT1)); // Vertex Buffer 생성
-		m_nVC = nVC;
+		if (m_pVertices != nullptr)
+			ReleaseVertices();
+		m_pVertices = new __VertexT1[nVC] {};
+		m_nVC       = nVC;
 	}
 
 	if (nIC > 0) // Mesh 로딩에 성공하고, 인덱스가 있으면..
 	{
 #ifdef _N3GAME
 		if (nIC > 32768)
+		{
 			CLogWriter::Write(
 				"CN3Mesh::Create - Too many indices. (more than 32768) ({})", m_szFileName);
+		}
 #endif
 		if (m_psnIndices)
-			this->ReleaseIndices();
+			ReleaseIndices();
 		m_psnIndices = new uint16_t[nIC];
 		memset(m_psnIndices, 0, nIC * 2); // Index Buffer 생성
 		m_nIC = nIC;
@@ -221,11 +215,9 @@ void CN3Mesh::Create_Cube(const __Vector3& vMin, const __Vector3& vMax)
 {
 	this->Create(36, 0);
 
-	__Vector3 vPs[6];
+	__Vector3 vPs[6] {};
 	__Vector3 vN;
-	float fTUVs[6][2] = { 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
-
-	int i             = 0;
+	float fTUVs[6][2] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 0 }, { 1, 1 }, { 0, 1 } };
 
 	// z 축 음의 면
 	vN.Set(0, 0, -1);
@@ -235,7 +227,7 @@ void CN3Mesh::Create_Cube(const __Vector3& vMin, const __Vector3& vMax)
 	vPs[3] = vPs[0];
 	vPs[4] = vPs[2];
 	vPs[5].Set(vMin.x, vMin.y, vMin.z);
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 		m_pVertices[0 + i].Set(vPs[i], vN, fTUVs[i][0], fTUVs[i][1]);
 
 	// x 축 양의 면
@@ -246,7 +238,7 @@ void CN3Mesh::Create_Cube(const __Vector3& vMin, const __Vector3& vMax)
 	vPs[3] = vPs[0];
 	vPs[4] = vPs[2];
 	vPs[5].Set(vMax.x, vMin.y, vMin.z);
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 		m_pVertices[6 + i].Set(vPs[i], vN, fTUVs[i][0], fTUVs[i][1]);
 
 	// z 축 양의 면
@@ -257,7 +249,7 @@ void CN3Mesh::Create_Cube(const __Vector3& vMin, const __Vector3& vMax)
 	vPs[3] = vPs[0];
 	vPs[4] = vPs[2];
 	vPs[5].Set(vMax.x, vMin.y, vMax.z);
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 		m_pVertices[12 + i].Set(vPs[i], vN, fTUVs[i][0], fTUVs[i][1]);
 
 	// x 축 음의 면
@@ -268,7 +260,7 @@ void CN3Mesh::Create_Cube(const __Vector3& vMin, const __Vector3& vMax)
 	vPs[3] = vPs[0];
 	vPs[4] = vPs[2];
 	vPs[5].Set(vMin.x, vMin.y, vMax.z);
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 		m_pVertices[18 + i].Set(vPs[i], vN, fTUVs[i][0], fTUVs[i][1]);
 
 	// y 축 양의 면
@@ -279,7 +271,7 @@ void CN3Mesh::Create_Cube(const __Vector3& vMin, const __Vector3& vMax)
 	vPs[3] = vPs[0];
 	vPs[4] = vPs[2];
 	vPs[5].Set(vMin.x, vMax.y, vMin.z);
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 		m_pVertices[24 + i].Set(vPs[i], vN, fTUVs[i][0], fTUVs[i][1]);
 
 	// y 축 음의 면
@@ -290,16 +282,16 @@ void CN3Mesh::Create_Cube(const __Vector3& vMin, const __Vector3& vMax)
 	vPs[3] = vPs[0];
 	vPs[4] = vPs[2];
 	vPs[5].Set(vMin.x, vMin.y, vMax.z);
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 		m_pVertices[30 + i].Set(vPs[i], vN, fTUVs[i][0], fTUVs[i][1]);
 
-	this->FindMinMax();
+	FindMinMax();
 }
 
 #ifdef _N3TOOL
 void CN3Mesh::Create_Axis(float fLength)
 {
-	this->Create(12, 0);
+	Create(12, 0);
 
 	this->FindMinMax();
 
@@ -357,7 +349,10 @@ bool CN3Mesh::Import(CN3PMesh* pPMesh)
 	// vertex index buffer 복사
 	__VertexT1* pVertices = PMeshInstance.GetVertices();
 	uint16_t* pIndices    = PMeshInstance.GetIndices();
-	memcpy(m_pVertices, pVertices, sizeof(__VertexT1) * m_nVC);
+
+	for (int i = 0; i < m_nVC; i++)
+		m_pVertices[i] = pVertices[i];
+
 	memcpy(m_psnIndices, pIndices, sizeof(uint16_t) * m_nIC);
 
 	m_szName = pPMesh->m_szName; // 이름..

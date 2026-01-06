@@ -10,7 +10,7 @@
 #include "LocalInput.h"
 #include "APISocket.h"
 #include "N3FXMgr.h"
-#include "PlayerMyself.h"
+#include "PlayerMySelf.h"
 #include "GameProcLogIn.h"
 #include "GameProcNationSelect.h"
 #include "GameProcCharacterCreate.h"
@@ -37,16 +37,11 @@
 #include <N3Base/N3SndObj.h>
 #include <N3Base/N3FXBundle.h>
 
-#include <N3Base/BitmapFile.h>
+#include <N3Base/BitMapFile.h>
 
 #include <JpegFile/JpegFile.h>
 
 #include <shared/lzf.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 CN3SndObj* CGameProcedure::s_pSnd_BGM                            = nullptr; // 메인 배경음악 포인터..
 CLocalInput* CGameProcedure::s_pLocalInput                       = nullptr; // 마우스와 키보드 입력 객체 .. Direct Input 을 썼다.
@@ -125,7 +120,7 @@ void CGameProcedure::StaticMemberInit(HINSTANCE hInstance, HWND hWndMain)
 
 	if (s_Options.bWindowMode)
 	{
-		DEVMODE dm = {};
+		DEVMODE dm {};
 		EnumDisplaySettings(nullptr, ENUM_REGISTRY_SETTINGS, &dm);
 		if (dm.dmBitsPerPel != (DWORD) s_Options.iViewColorDepth)
 		{
@@ -139,7 +134,7 @@ void CGameProcedure::StaticMemberInit(HINSTANCE hInstance, HWND hWndMain)
 	}
 	else
 	{
-		DEVMODE dm      = {};
+		DEVMODE dm {};
 		dm.dmSize       = sizeof(DEVMODE);
 		dm.dmPelsWidth  = s_Options.iViewWidth;
 		dm.dmPelsHeight = s_Options.iViewHeight;
@@ -204,9 +199,7 @@ void CGameProcedure::StaticMemberInit(HINSTANCE hInstance, HWND hWndMain)
 	__TABLE_UI_RESRC* pTblUI = s_pTbl_UI.Find(NATION_ELMORAD); // 기본은 엘모라드 UI 로 한다..
 	if (pTblUI == nullptr)
 	{
-		printf("ERROR: UI table is NULL.\n");
-		system("pause");
-		//Sleep(1000 * 5);
+		CLogWriter::Write("UI resources not found for {}", static_cast<int>(NATION_ELMORAD));
 		exit(-1);
 	}
 
@@ -238,14 +231,14 @@ void CGameProcedure::StaticMemberRelease()
 	// 기본값 쓰기..
 	if (s_pPlayer)
 	{
-		int iRun = s_pPlayer->IsRunning();                  // 이동 모드가 뛰는 상태였으면
-		CGameProcedure::RegPutSetting("UserRun", &iRun, 4); // 걷기, 뛰기 상태 기록..
+		int iRun = s_pPlayer->IsRunning();                            // 이동 모드가 뛰는 상태였으면
+		CGameProcedure::RegPutSetting("UserRun", &iRun, sizeof(int)); // 걷기, 뛰기 상태 기록..
 	}
 
 	if (s_pEng)
 	{
-		e_ViewPoint eVP = s_pEng->ViewPoint();
-		CGameProcedure::RegPutSetting("CameraMode", &eVP, 4); // 카메라 상태 기록
+		int iVP = s_pEng->ViewPoint();
+		CGameProcedure::RegPutSetting("CameraMode", &iVP, sizeof(int)); // 카메라 상태 기록
 	}
 	// 기본값 쓰기..
 	////////////////////////////////////////////////////////////
@@ -270,7 +263,7 @@ void CGameProcedure::StaticMemberRelease()
 
 	if (s_Options.bWindowMode)
 	{
-		DEVMODE dm = {};
+		DEVMODE dm {};
 		::EnumDisplaySettings(nullptr, ENUM_REGISTRY_SETTINGS, &dm);
 
 		if (dm.dmBitsPerPel != (DWORD) s_Options.iViewColorDepth)
@@ -282,7 +275,7 @@ void CGameProcedure::StaticMemberRelease()
 	}
 	else
 	{
-		DEVMODE dm = {};
+		DEVMODE dm {};
 		::EnumDisplaySettings(nullptr, ENUM_REGISTRY_SETTINGS, &dm);
 
 		if (dm.dmPelsWidth != (DWORD) s_Options.iViewWidth || dm.dmPelsHeight != (DWORD) s_Options.iViewHeight
@@ -461,7 +454,7 @@ bool CGameProcedure::CaptureScreenAndSaveToFile(const std::string& szFN)
 
 	CJpegFile file;
 
-	RECT wndRect = {};
+	RECT wndRect {};
 	GetWindowRect(s_hWndBase, &wndRect);
 
 	HANDLE hDIB = file.CopyScreenToDIB(&wndRect);
@@ -529,7 +522,7 @@ void CGameProcedure::MessageBoxClose(int iMsgBoxIndex)
 
 bool CGameProcedure::RegPutSetting(const char* ValueName, void* pValueData, long length)
 {
-	HKEY hKey;
+	HKEY hKey = nullptr;
 
 	if (RegOpenKey(HKEY_CURRENT_USER, GetStrRegKeySetting().c_str(), &hKey) != ERROR_SUCCESS)
 	{
@@ -564,11 +557,9 @@ bool CGameProcedure::RegPutSetting(const char* ValueName, void* pValueData, long
 
 bool CGameProcedure::RegGetSetting(const char* ValueName, void* pValueData, long length)
 {
-	HKEY hKey;
-	DWORD Type;
-	DWORD len;
-
-	len = length;
+	HKEY hKey  = nullptr;
+	DWORD Type = 0;
+	DWORD len  = length;
 
 	if (RegOpenKey(HKEY_CURRENT_USER, GetStrRegKeySetting().c_str(), &hKey) != ERROR_SUCCESS)
 	{
@@ -599,7 +590,7 @@ void CGameProcedure::UIPostData_Write(const std::string& szKey, CN3UIBase* pUI)
 		return;
 
 	__WndInfo WI;
-	lstrcpyn(WI.szName, szKey.c_str(), 16);
+	(void) lstrcpyn(WI.szName, szKey.c_str(), 16);
 	WI.bVisible   = pUI->IsVisible();
 	WI.ptPosition = pUI->GetPos();
 
@@ -724,57 +715,61 @@ bool CGameProcedure::ProcessPacket(Packet& pkt)
 	switch (iCmd)                   // 커멘드에 다라서 분기..
 	{
 		case WIZ_COMPRESS_PACKET:
-			this->MsgRecv_CompressedPacket(pkt);
+			MsgRecv_CompressedPacket(pkt);
 			return true;
 
-		case WIZ_VERSION_CHECK:              // 암호화도 같이 받는다..
-			this->MsgRecv_VersionCheck(pkt); // virtual
+		case WIZ_VERSION_CHECK:        // 암호화도 같이 받는다..
+			MsgRecv_VersionCheck(pkt); // virtual
 			return true;
 
 		case WIZ_LOGIN:
-			this->MsgRecv_GameServerLogIn(pkt);
+			MsgRecv_GameServerLogIn(pkt);
 			return true;
 
 		case WIZ_SERVER_CHANGE: // 서버 바꾸기 메시지..
-		{
-			// 다른 존 서버로 다시 접속한다.
-			int iLen = 0;
-			std::string szName, szIP;
-			//			iLen = pkt.read<int16_t>(); // 서버 이름
-			//			pkt.readString(szName, iLen);
-			iLen = pkt.read<int16_t>(); // 서버 IP
-			pkt.readString(szIP, iLen);
-			uint32_t dwPort                = pkt.read<int16_t>();
-			s_pPlayer->m_InfoExt.iZoneInit = pkt.read<uint8_t>();
-			s_pPlayer->m_InfoExt.iZoneCur  = pkt.read<uint8_t>();
-			int iVictoryNation             = pkt.read<uint8_t>();
-			CGameProcedure::LoadingUIChange(iVictoryNation);
-
-			s_bNeedReportConnectionClosed = false;                              // 서버접속이 끊어진걸 보고해야 하는지..
-			s_pSocket->Disconnect();                                            // 끊고...
-			Sleep(2000);                                                        // 2초 딜레이.. 서버가 처리할 시간을 준다.
-			int iErr                      = s_pSocket->Connect(s_hWndBase, szIP.c_str(), dwPort);
-			s_bNeedReportConnectionClosed = true;                               // 서버접속이 끊어진걸 보고해야 하는지..
-
-			if (iErr)
-				this->ReportServerConnectionFailed("Current Zone", iErr, true); // 서버 접속 오류.. Exit.
-			else
-			{
-				// 버전체크를 보내면.. 응답으로 버전과 암호화 키가 온다.
-				// 메인 프로시저의 경우 Character_Select 를 보내고 로그인일경우 GameServer_LogIn 을 보낸다.
-				this->MsgSend_VersionCheck();
-			}
-		}
+			MsgRecv_ServerChange(pkt);
 			return true;
 
 		case WIZ_SEL_CHAR:
-		{
-			this->MsgRecv_CharacterSelect(pkt); // virtual
-		}
+			MsgRecv_CharacterSelect(pkt); // virtual
 			return true;
+
+		default:
+			break;
 	}
 
 	return false;
+}
+
+void CGameProcedure::MsgRecv_ServerChange(Packet& pkt)
+{
+	// 다른 존 서버로 다시 접속한다.
+	int iLen = 0;
+	std::string szIP;
+	iLen = pkt.read<int16_t>(); // 서버 IP
+	pkt.readString(szIP, iLen);
+	uint32_t dwPort                = pkt.read<int16_t>();
+	s_pPlayer->m_InfoExt.iZoneInit = pkt.read<uint8_t>();
+	s_pPlayer->m_InfoExt.iZoneCur  = pkt.read<uint8_t>();
+	int iVictoryNation             = pkt.read<uint8_t>();
+	CGameProcedure::LoadingUIChange(iVictoryNation);
+
+	s_bNeedReportConnectionClosed = false; // 서버접속이 끊어진걸 보고해야 하는지..
+	s_pSocket->Disconnect();               // 끊고...
+	Sleep(2000);                           // 2초 딜레이.. 서버가 처리할 시간을 준다.
+	int iErr                      = s_pSocket->Connect(s_hWndBase, szIP, dwPort);
+	s_bNeedReportConnectionClosed = true;  // 서버접속이 끊어진걸 보고해야 하는지..
+
+	if (iErr)
+	{
+		ReportServerConnectionFailed("Current Zone", iErr, true); // 서버 접속 오류.. Exit.
+	}
+	else
+	{
+		// 버전체크를 보내면.. 응답으로 버전과 암호화 키가 온다.
+		// 메인 프로시저의 경우 Character_Select 를 보내고 로그인일경우 GameServer_LogIn 을 보낸다.
+		MsgSend_VersionCheck();
+	}
 }
 
 void CGameProcedure::ReportServerConnectionFailed(const std::string& szServerName, int iErrCode, bool bNeedQuitGame)
@@ -958,15 +953,11 @@ bool CGameProcedure::MsgRecv_CharacterSelect(Packet& pkt) // virtual
 		int iVictoryNation = pkt.read<uint8_t>();
 		CGameProcedure::LoadingUIChange(iVictoryNation);
 
-		int iZonePrev;
-		if (N3FORMAT_VER_DEFAULT & N3FORMAT_VER_1264)
-		{
-			iZonePrev = s_pPlayer->m_InfoExt.iZoneCur = 10 * iZoneCur;
-		}
-		else
-		{
-			iZonePrev = s_pPlayer->m_InfoExt.iZoneCur = iZoneCur;
-		}
+		int iZonePrev = s_pPlayer->m_InfoExt.iZoneCur;
+		if (N3FORMAT_VER_DEFAULT >= N3FORMAT_VER_1264)
+			iZoneCur *= 10;
+
+		s_pPlayer->m_InfoExt.iZoneCur = iZoneCur;
 		s_pPlayer->PositionSet(__Vector3(fX, fY, fZ), true);
 
 		CLogWriter::Write("MsgRecv_CharacterSelect - name({}) zone({} -> {})", s_pPlayer->m_InfoBase.szID, iZonePrev, iZoneCur);
@@ -1099,6 +1090,5 @@ void CGameProcedure::LoadingUIChange(int iVictoryNation)
 			break;
 	}
 
-	//TRACE("Loading UIF : %s\n", szLoading.c_str());
 	s_pUILoading->LoadFromFile(szLoading); // 기본적인 로딩 바 만들기..
 }

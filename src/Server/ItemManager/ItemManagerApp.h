@@ -9,6 +9,8 @@
 #include <shared-server/SharedMemoryQueue.h>
 #include <shared/TimerThread.h>
 
+#include <spdlog/spdlog.h>
+
 class ItemManagerLogger;
 class ReadQueueThread;
 class ItemManagerApp : public AppThread
@@ -19,6 +21,9 @@ public:
 private:
 	std::unique_ptr<ReadQueueThread> _readQueueThread;
 	std::unique_ptr<TimerThread> _smqOpenThread;
+
+	std::shared_ptr<spdlog::logger> _itemLogger;
+	std::shared_ptr<spdlog::logger> _expLogger;
 
 public:
 	static ItemManagerApp* instance()

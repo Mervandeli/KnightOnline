@@ -5,9 +5,7 @@
 #if !defined(AFX_N3JPEGFILE_H__680B8929_B03D_45EF_8986_51561B4BDC79__INCLUDED_)
 #define AFX_N3JPEGFILE_H__680B8929_B03D_45EF_8986_51561B4BDC79__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <JpegFile/JpegFile.h>
 
@@ -20,7 +18,7 @@ private:
 
 public:
 	void DrawImage(HDC hDC);
-	BOOL LoadJpegFile(std::string csJpeg);
+	BOOL LoadJpegFile(const std::string& csJpeg);
 	UINT GetWidth()
 	{
 		return m_uiWidth;

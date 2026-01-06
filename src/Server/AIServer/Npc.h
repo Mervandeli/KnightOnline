@@ -10,30 +10,30 @@
 
 #include <shared-server/My_3DStruct.h>
 
-#define MAX_MAP_SIZE         10000
-#define MAX_PATH_SIZE        100
+constexpr int MAX_MAP_SIZE         = 10000;
+constexpr int MAX_PATH_SIZE        = 100;
 
-#define NPC_MAX_USER_LIST    5
+constexpr int NPC_MAX_USER_LIST    = 5;
 
-#define NPC_ATTACK_SHOUT     0
-#define NPC_SUBTYPE_LONG_MON 1
+constexpr int NPC_ATTACK_SHOUT     = 0;
+constexpr int NPC_SUBTYPE_LONG_MON = 1;
 
-#define NPC_TRACING_STEP     100
+constexpr int NPC_TRACING_STEP     = 100;
 
-#define NPC_HAVE_USER_LIST   5
-#define NPC_HAVE_ITEM_LIST   6
-#define NPC_PATTEN_LIST      5
-#define NPC_PATH_LIST        50
-#define NPC_MAX_PATH_LIST    100
-#define NPC_EXP_RANGE        50
-#define NPC_EXP_PERSENT      50
+constexpr int NPC_HAVE_USER_LIST   = 5;
+constexpr int NPC_HAVE_ITEM_LIST   = 6;
+constexpr int NPC_PATTEN_LIST      = 5;
+constexpr int NPC_PATH_LIST        = 50;
+constexpr int NPC_MAX_PATH_LIST    = 100;
+constexpr int NPC_EXP_RANGE        = 50;
+constexpr int NPC_EXP_PERSENT      = 50;
 
-#define NPC_SECFORMETER_MOVE 4
-#define NPC_SECFORMETER_RUN  4
-#define NPC_VIEW_RANGE       100
+constexpr int NPC_SECFORMETER_MOVE = 4;
+constexpr int NPC_SECFORMETER_RUN  = 4;
+constexpr int NPC_VIEW_RANGE       = 100;
 
-#define MAX_MAGIC_TYPE3      20
-#define MAX_MAGIC_TYPE4      9
+constexpr int MAX_MAGIC_TYPE3      = 20;
+constexpr int MAX_MAGIC_TYPE4      = 9;
 
 struct _NpcSkillList
 {
@@ -151,14 +151,26 @@ public:
 	float m_nInitY;           // 처음 생성된 위치 Y
 	float m_nInitZ;           // 처음 생성된 위치 Z
 
-	int16_t m_sCurZone;       // Current Zone;
-	float m_fCurX;            // Current X Pos;
-	float m_fCurY;            // Current Y Pos;
-	float m_fCurZ;            // Current Z Pos;
+	// Current Zone;
+	int16_t m_sCurZone;
 
-	float m_fPrevX;           // Prev X Pos;
-	float m_fPrevY;           // Prev Y Pos;
-	float m_fPrevZ;           // Prev Z Pos;
+	// Current X Pos;
+	float m_fCurX;
+
+	// Current Y Pos;
+	float m_fCurY;
+
+	// Current Z Pos;
+	float m_fCurZ;
+
+	// Prev X Pos;
+	float m_fPrevX;
+
+	// Prev Y Pos;
+	float m_fPrevY;
+
+	// Prev Z Pos;
+	float m_fPrevZ;
 
 	//
 	//	PathFind Info
@@ -168,7 +180,8 @@ public:
 	int16_t m_max_x;
 	int16_t m_max_y;
 
-	int m_pMap[MAX_MAP_SIZE]; // 2차원 -> 1차원 배열로 x * sizey + y
+	// 2차원 -> 1차원 배열로 x * sizey + y
+	int m_pMap[MAX_MAP_SIZE];
 
 	_SIZE m_vMapSize;
 
@@ -180,79 +193,172 @@ public:
 	CPathFind m_vPathFind;
 	_PathNode* m_pPath;
 
-	int m_nInitMinX; // 초기위치
+	// 초기위치
+	int m_nInitMinX;
 	int m_nInitMinY;
 	int m_nInitMaxX;
 	int m_nInitMaxY;
 
-	// NPC Class, Skill
-	//_NpcSkillList	m_NpcSkill[SKILL_NUM];	// NPC 가 가지고 있는 스킬
-	//uint8_t			m_tWeaponClass;			// NPC 의 무기 클래스
-
 	// 지속 마법 관련..
-	double m_fHPChangeTime;                    // Hp 회복율
-	double m_fFaintingTime;                    // 기절해 있는 시간..
-	_MagicType3 m_MagicType3[MAX_MAGIC_TYPE3]; // HP 관련된 마법..
-	_MagicType4 m_MagicType4[MAX_MAGIC_TYPE4]; // 능력치 관련된 마법..
+
+	// Hp 회복율
+	double m_fHPChangeTime;
+
+	// 기절해 있는 시간..
+	double m_fFaintingTime;
+
+	// HP 관련된 마법..
+	_MagicType3 m_MagicType3[MAX_MAGIC_TYPE3];
+
+	// 능력치 관련된 마법..
+	_MagicType4 m_MagicType4[MAX_MAGIC_TYPE4];
 
 	//----------------------------------------------------------------
 	//	MONSTER DB 쪽에 있는 변수들
 	//----------------------------------------------------------------
-	int16_t m_sSid;           // MONSTER(NPC) Serial ID
-	std::string m_strName;    // MONSTER(NPC) Name
-	int16_t m_sPid;           // MONSTER(NPC) Picture ID
-	int16_t m_sSize;          // 캐릭터의 비율(100 퍼센트 기준)
-	int m_iWeapon_1;          // 착용 무기
-	int m_iWeapon_2;          // 착용 무기
-	uint8_t m_byGroup;        // 소속집단(국가 개념)
-	uint8_t m_byActType;      // 행동패턴
-	uint8_t m_byRank;         // 작위
-	uint8_t m_byTitle;        // 지위
-	int m_iSellingGroup;      // 아이템 그룹(물건매매 담당 NPC의 경우만)
-	int16_t m_sLevel;         // level
-	int m_iExp;               // 경험치
-	int m_iLoyalty;           // loyalty
-	int m_iMaxHP;             // 최대 HP
-	int16_t m_sMaxMP;         // 최대 MP
-	int16_t m_sAttack;        // 공격값(지금 사용하지 않음..)
-	int16_t m_sDefense;       // 방어값
-	int16_t m_sHitRate;       // 공격민첩
-	int16_t m_sEvadeRate;     // 방어민첩
-	int16_t m_sDamage;        // 기본 데미지 - 공격값
-	int16_t m_sAttackDelay;   // 공격딜레이
-	int16_t m_sSpeed;         // 이동속도
-	float m_fSpeed_1;         // 기본 이동 타입		(1초에 갈 수 있는 거리)
-	float m_fSpeed_2;         // 뛰는 이동 타입..		(1초에 갈 수 있는 거리)
-	int16_t m_sStandTime;     // 서있는 시간
-	int m_iMagic1;            // 사용마법 1 (공격)
-	int m_iMagic2;            // 사용마법 2 (지역)
-	int m_iMagic3;            // 사용마법 3 (능력치, 힐링)
-	int16_t m_sFireR;         // 화염 저항력
-	int16_t m_sColdR;         // 냉기 저항력
-	int16_t m_sLightningR;    // 전기 저항력
-	int16_t m_sMagicR;        // 마법 저항력
-	int16_t m_sDiseaseR;      // 저주 저항력
-	int16_t m_sPoisonR;       // 독 저항력
-	int16_t m_sLightR;        // 빛 저항력
-	float m_fBulk;            // 몬스터의 크기 (실제 비율)
-	uint8_t m_bySearchRange;  // 적 탐지 범위
-	uint8_t m_byAttackRange;  // 사정거리
-	uint8_t m_byTracingRange; // 추격 거리
 
-	uint8_t m_tNpcType;       // NPC Type
-							  // 0 : Normal Monster
-							  // 1 : NPC
+	// MONSTER(NPC) Serial ID
+	int16_t m_sSid;
 
-	int16_t m_byFamilyType;   // 몹들사이에서 가족관계를 결정한다.
-	uint8_t
-		m_byMoneyType; // Event몬스터일 경우 돈을 많이 주는 것, (0:루팅, 1:루팅을 하지 않고 바로 나눠갖는다)
+	// MONSTER(NPC) Name
+	std::string m_strName;
 
-	int m_iMoney; // 떨어지는 돈
-	int m_iItem;  // 떨어지는 아이템
-	//uint8_t	m_byMemory;		// 공격 타입
+	// MONSTER(NPC) Picture ID
+	int16_t m_sPid;
 
-	int m_iHP;     // 현재 HP
-	int16_t m_sMP; // 현재 MP
+	// 캐릭터의 비율(100 퍼센트 기준)
+	int16_t m_sSize;
+
+	// 착용 무기
+	int m_iWeapon_1;
+
+	// 착용 무기
+	int m_iWeapon_2;
+
+	// 소속집단(국가 개념)
+	uint8_t m_byGroup;
+
+	// 행동패턴
+	uint8_t m_byActType;
+
+	// 작위
+	uint8_t m_byRank;
+
+	// 지위
+	uint8_t m_byTitle;
+
+	// 아이템 그룹(물건매매 담당 NPC의 경우만)
+	int m_iSellingGroup;
+
+	// level
+	int16_t m_sLevel;
+
+	// 경험치
+	int m_iExp;
+
+	// loyalty
+	int m_iLoyalty;
+
+	// 최대 HP
+	int m_iMaxHP;
+
+	// 최대 MP
+	int16_t m_sMaxMP;
+
+	// 공격값(지금 사용하지 않음..)
+	int16_t m_sAttack;
+
+	// 방어값
+	int16_t m_sDefense;
+
+	// 공격민첩
+	int16_t m_sHitRate;
+
+	// 방어민첩
+	int16_t m_sEvadeRate;
+
+	// 기본 데미지 - 공격값
+	int16_t m_sDamage;
+
+	// 공격딜레이
+	int16_t m_sAttackDelay;
+
+	// 이동속도
+	int16_t m_sSpeed;
+
+	// 기본 이동 타입		(1초에 갈 수 있는 거리)
+	float m_fSpeed_1;
+
+	// 뛰는 이동 타입..		(1초에 갈 수 있는 거리)
+	float m_fSpeed_2;
+
+	// 서있는 시간
+	int16_t m_sStandTime;
+
+	// 사용마법 1 (공격)
+	int m_iMagic1;
+
+	// 사용마법 2 (지역)
+	int m_iMagic2;
+
+	// 사용마법 3 (능력치, 힐링)
+	int m_iMagic3;
+
+	// 화염 저항력
+	int16_t m_sFireR;
+
+	// 냉기 저항력
+	int16_t m_sColdR;
+
+	// 전기 저항력
+	int16_t m_sLightningR;
+
+	// 마법 저항력
+	int16_t m_sMagicR;
+
+	// 저주 저항력
+	int16_t m_sDiseaseR;
+
+	// 독 저항력
+	int16_t m_sPoisonR;
+
+	// 빛 저항력
+	int16_t m_sLightR;
+
+	// 몬스터의 크기 (실제 비율)
+	float m_fBulk;
+
+	// 적 탐지 범위
+	uint8_t m_bySearchRange;
+
+	// 사정거리
+	uint8_t m_byAttackRange;
+
+	// 추격 거리
+	uint8_t m_byTracingRange;
+
+	// NPC Type
+	// 0 : Normal Monster
+	// 1 : NPC
+	uint8_t m_tNpcType;
+
+	// 몹들사이에서 가족관계를 결정한다.
+	int16_t m_byFamilyType;
+
+	// Event몬스터일 경우 돈을 많이 주는 것, (0:루팅, 1:루팅을 하지 않고 바로 나눠갖는다)
+	uint8_t m_byMoneyType;
+
+	// 떨어지는 돈
+	int m_iMoney;
+
+	// 떨어지는 아이템
+	int m_iItem;
+
+	// 현재 HP
+	int m_iHP;
+
+	// 현재 MP
+	int16_t m_sMP;
 
 	/// \brief Distance that can be traveled per second
 	float m_fSecForMetor;
@@ -260,28 +366,53 @@ public:
 	//----------------------------------------------------------------
 	//	MONSTER AI에 관련된 변수들
 	//----------------------------------------------------------------
-	uint8_t m_tNpcLongType;    // 공격 거리 : 원거리(1), 근거리(0), 직.간접(2)
-	uint8_t m_tNpcAttType;     // 공격 성향 : 선공(1), 후공(0)
-	uint8_t m_tNpcOldAttType;  // 공격 성향 : 선공(1), 후공(0) (활동영역 제어)
-	uint8_t m_tNpcGroupType;   // 군집을 형성하냐(1), 안하냐?(0)
-	uint8_t m_byNpcEndAttType; // 마지막까지 싸우면(1), 그렇지 않으면(0)
-	//	uint8_t	m_tNpcTraceType;		// 끝까지 따라간다(1), 시야에서 없어지면 그만(0)
-	uint8_t m_byAttackPos; // User의 어느 부분에서 공격하느지를 판단(8방향)
-	uint8_t m_byBattlePos; // 어떤 진형을 선택할 것인지를 판단..
-	uint8_t
-		m_byWhatAttackType; // 공격 타입 : Normal(0), 근.장거리마법(1), 독(2), 힐링(3), 지역마법만(4), 1+4번 마법(5)
-	uint8_t m_byGateOpen;         // 성문일 경우에.. 사용... Gate Npc Status -> 1 : open 0 : close
-	uint8_t m_byMaxDamagedNation; // 나를 죽인 유저의 국가를 저장.. (1:카루스, 2:엘모라드)
-	uint8_t m_byObjectType;       // 보통은 0, object타입(성문, 레버)은 1
-	uint8_t m_byDungeonFamily;    // 던젼에서 같은 패밀리 묶음 (같은 방)
-	uint8_t m_bySpecialType;      // 몬스터의 형태가 변하는지를 판단(0:변하지 않음, 1:변하는 몬스터,
-								  // 2:죽는경우 조정하는 몬스터(대장몬스터 죽을경우 성문이 열림),
+
+	// 공격 거리 : 원거리(1), 근거리(0), 직.간접(2)
+	uint8_t m_tNpcLongType;
+
+	// 공격 성향 : 선공(1), 후공(0)
+	uint8_t m_tNpcAttType;
+
+	// 공격 성향 : 선공(1), 후공(0) (활동영역 제어)
+	uint8_t m_tNpcOldAttType;
+
+	// 군집을 형성하냐(1), 안하냐?(0)
+	uint8_t m_tNpcGroupType;
+
+	// 마지막까지 싸우면(1), 그렇지 않으면(0)
+	uint8_t m_byNpcEndAttType;
+
+	// User의 어느 부분에서 공격하느지를 판단(8방향)
+	uint8_t m_byAttackPos;
+
+	// 어떤 진형을 선택할 것인지를 판단..
+	uint8_t m_byBattlePos;
+
+	// 공격 타입 : Normal(0), 근.장거리마법(1), 독(2), 힐링(3), 지역마법만(4), 1+4번 마법(5)
+	uint8_t m_byWhatAttackType;
+
+	// 성문일 경우에.. 사용... Gate Npc Status -> 1 : open 0 : close
+	uint8_t m_byGateOpen;
+
+	// 나를 죽인 유저의 국가를 저장.. (1:카루스, 2:엘모라드)
+	uint8_t m_byMaxDamagedNation;
+
+	// 보통은 0, object타입(성문, 레버)은 1
+	uint8_t m_byObjectType;
+
+	// 던젼에서 같은 패밀리 묶음 (같은 방)
+	uint8_t m_byDungeonFamily;
+
+	// 몬스터의 형태가 변하는지를 판단(0:변하지 않음, 1:변하는 몬스터,
+	// 2:죽는경우 조정하는 몬스터(대장몬스터 죽을경우 성문이 열림),
 	// 3:대장몬스터의 죽음과 관련이 있는 몬스터(대장몬스터가 죽으면 관계되는 몬스터는 같이 죽도록)
 	// 4:변하면서 죽는경우 조정하는 몬스터 (m_sControlSid)
 	// 5:처음에 죽었있다가 출현하는 몬스터,,
 	// 6:일정시간이 지난 후에 행동하는 몬스터,,
 	// 100:죽었을때 데미지를 많이 입힌 유저를 기록해 주세여
-	uint8_t m_byTrapNumber; // 던젼에서 트랩의 번호,,
+	uint8_t m_bySpecialType;
+	// 던젼에서 트랩의 번호,,
+	uint8_t m_byTrapNumber;
 
 	/// \brief change state, one of:
 	/// 0: normal state
@@ -297,20 +428,32 @@ public:
 	/// 2: does not respawn
 	uint8_t m_byRegenType;
 
-	uint8_t m_byDeadType;  // 0:살아 있는 경우, 100:전쟁이벤트중 죽은 경우
-	int16_t m_sChangeSid;  // 변하는 몬스터의 Sid번호..
-	int16_t m_sControlSid; // 조정하는 몬스터의 Sid번호..
+	// 0:살아 있는 경우, 100:전쟁이벤트중 죽은 경우
+	uint8_t m_byDeadType;
+
+	// 변하는 몬스터의 Sid번호..
+	int16_t m_sChangeSid;
+
+	// 조정하는 몬스터의 Sid번호..
+	int16_t m_sControlSid;
 
 	//----------------------------------------------------------------
 	//	MONSTER_POS DB 쪽에 있는 변수들
 	//----------------------------------------------------------------
-	int m_Delay;         // 다음 상태로 전이되기 까지의 시간
-	double m_fDelayTime; // Npc Thread체크 타임...
+
+	// 다음 상태로 전이되기 까지의 시간
+	int m_Delay;
+
+	// Npc Thread체크 타임...
+	double m_fDelayTime;
 
 	uint8_t m_byType;
-	int m_sRegenTime;    // NPC 재생시간
+	// NPC 재생시간
 
-	int m_nLimitMinX;    // 활동 영역
+	int m_sRegenTime;
+
+	// 활동 영역
+	int m_nLimitMinX;
 	int m_nLimitMinZ;
 	int m_nLimitMaxX;
 	int m_nLimitMaxZ;
@@ -324,31 +467,50 @@ public:
 	/// \brief Distance that can be traveled per second (actual distance sent to the client)
 	float m_fSecForRealMoveMetor;
 
-	uint8_t m_byDirection; // NPC의 방향
+	// NPC의 방향
+	uint8_t m_byDirection;
 
-	bool m_bPathFlag;      // 패스 파인드 실행여부 체크 변수..
+	// 패스 파인드 실행여부 체크 변수..
+	bool m_bPathFlag;
 
 	//----------------------------------------------------------------
 	//	NPC 이동 관련
 	//----------------------------------------------------------------
-	_NpcPosition m_pPoint[MAX_PATH_LINE]; // 이동시 참고 좌표
+
+	// 이동시 참고 좌표
+	_NpcPosition m_pPoint[MAX_PATH_LINE];
 
 	int16_t m_iAniFrameIndex;
 	int16_t m_iAniFrameCount;
-	uint8_t m_byPathCount;  // 패스를 따라 이동하는 몬스터 끼리 겹치지 않도록,,
-	uint8_t m_byResetFlag;  // 추적공격시 패스파인딩을 다시 할것인지,, 말것인지를 판단..
-	uint8_t m_byActionFlag; // 행동변화 플래그 ( 0 : 행동변화 없음, 1 : 공격에서 추격)
 
-	int16_t m_iRegion_X;    // 현재의 region - x pos
-	int16_t m_iRegion_Z;    // 현재의 region - z pos
-	int16_t m_iFind_X[4];   // find enemy에서 찾을 Region검사영역
+	// 패스를 따라 이동하는 몬스터 끼리 겹치지 않도록,,
+	uint8_t m_byPathCount;
+
+	// 추적공격시 패스파인딩을 다시 할것인지,, 말것인지를 판단..
+	uint8_t m_byResetFlag;
+
+	// 행동변화 플래그 ( 0 : 행동변화 없음, 1 : 공격에서 추격)
+	uint8_t m_byActionFlag;
+
+	// 현재의 region - x pos
+	int16_t m_iRegion_X;
+
+	// 현재의 region - z pos
+	int16_t m_iRegion_Z;
+
+	// find enemy에서 찾을 Region검사영역
+	int16_t m_iFind_X[4];
 	int16_t m_iFind_Y[4];
 
-	float m_fOldSpeed_1;    // 기본 이동 타입		(1초에 갈 수 있는 거리)
-	float m_fOldSpeed_2;    // 뛰는 이동 타입..		(1초에 갈 수 있는 거리)
+	// 기본 이동 타입		(1초에 갈 수 있는 거리)
+	float m_fOldSpeed_1;
+
+	// 뛰는 이동 타입..		(1초에 갈 수 있는 거리)
+	float m_fOldSpeed_2;
 
 	// test
-	int16_t m_sThreadNumber; // 자신이 속한 스레드의 번호
+	// 자신이 속한 스레드의 번호
+	int16_t m_sThreadNumber;
 
 public:
 	CNpc();
@@ -372,6 +534,8 @@ public:
 	void FindFriendRegion(int x, int z, MAP* pMap, _TargetHealer* pHealer, int type = 0);
 	//void  FindFriendRegion(int x, int z, MAP* pMap, int type=0);
 	bool IsCloseTarget(CUser* pUser, int nRange);
+	void SendMagicAttackResult(uint8_t opcode, int magicId, int targetId, int data1 = 0,
+		int data2 = 0, int data3 = 0, int data4 = 0, int data5 = 0, int data6 = 0, int data7 = 0);
 	int SendDead(int type = 1);                                         // Npc Dead
 	void SendExpToUserList();                                           // User 경험치 분배..
 	bool SetDamage(
@@ -447,21 +611,26 @@ public:
 	int GetDir(float x1, float z1, float x2, float z2);
 	void NpcMoveEnd();
 
-	__Vector3 GetDirection(__Vector3 vStart, __Vector3 vEnd);
+	__Vector3 GetDirection(const __Vector3& vStart, const __Vector3& vEnd);
+
 	// GetVectorPosition : vOrig->vDest방향으로 vOrig에서 fDis거리만큼 떨어진 좌표를 리턴
-	__Vector3 GetVectorPosition(__Vector3 vOrig, __Vector3 vDest, float fDis);
+	__Vector3 GetVectorPosition(const __Vector3& vOrig, const __Vector3& vDest, float fDis);
+
 	// CalcAdaptivePosition : vPosDest->vPosOrig방향으로 vPosDest에서 fDis거리만큼 떨어진 좌표를 리턴
-	__Vector3 CalcAdaptivePosition(__Vector3 vPosOrig, __Vector3 vPosDest, float fAttackDistance);
-	__Vector3 ComputeDestPos(__Vector3 vCur, float fDegree, float fDegreeOffset, float fDistance);
+	__Vector3 CalcAdaptivePosition(
+		const __Vector3& vPosOrig, const __Vector3& vPosDest, float fAttackDistance);
+
+	__Vector3 ComputeDestPos(
+		const __Vector3& vCur, float fDegree, float fDegreeOffset, float fDistance);
+
 	void Yaw2D(float fDirX, float fDirZ, float& fYawResult);
-	float GetDistance(__Vector3 vOrig, __Vector3 vDest);
+	float GetDistance(const __Vector3& vOrig, const __Vector3& vDest);
 	int PathFind(_POINT start, _POINT end, float fDistance);
 	bool GetUserInView(); // Npc의 가시 거리안에 User가 있는지를 판단
 	bool GetUserInViewRange(int x, int z);
 	void MoveAttack();
 	void HpChange();
 	void MSpChange(int type, int amount);
-	void ItemWoreOut(int type, int damage);
 	int ItemProdution(int item_number) const;
 	int GetItemGrade(int item_grade) const;
 	int GetItemCodeNumber(int level, int item_type) const;

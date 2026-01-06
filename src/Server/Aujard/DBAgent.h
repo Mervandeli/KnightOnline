@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef SERVER_AUJARD_DBAGENT_H
+#define SERVER_AUJARD_DBAGENT_H
+
+#pragma once
 
 #include <memory>
 
@@ -17,9 +20,9 @@ public:
 	/// \returns true if update successful, otherwise false
 	bool UpdateBattleEvent(const char* charId, int nation);
 
-	/// \brief loads knights ranking data by nation to handle KNIGHTS_ALLLIST_REQ
+	/// \brief loads knights ranking data by nation to handle DB_KNIGHTS_ALLLIST_REQ
 	/// \param nation 1 = karus, 2 = elmorad, 3 = battlezone
-	/// \see KNIGHTS_ALLLIST_REQ
+	/// \see DB_KNIGHTS_ALLLIST_REQ
 	/// \note most other functions in this file are db-ops only.  This does db-ops
 	/// and socket IO.  Should likely be separated into separate functions
 	void LoadKnightsAllList(int nation);
@@ -151,5 +154,7 @@ public:
 
 private:
 	/// \brief reference back to the main AujardApp instance
-	AujardApp* _main;
+	AujardApp* _main = nullptr;
 };
+
+#endif // SERVER_AUJARD_DBAGENT_H

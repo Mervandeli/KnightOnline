@@ -60,11 +60,9 @@ public:
 	bool GetBool(std::string_view svAppName, std::string_view svKeyName, const bool bDefault);
 	std::string GetString(
 		std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault);
-	void GetString(std::string_view svAppName, std::string_view svKeyName,
-		std::string_view svDefault, char* szOutBuffer, size_t nBufferLength);
 
-	int SetInt(std::string_view svAppName, std::string_view svKeyName, const int iDefault);
-	int SetString(
+	bool SetInt(std::string_view svAppName, std::string_view svKeyName, const int iDefault);
+	bool SetString(
 		std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault);
 };
 

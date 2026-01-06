@@ -40,13 +40,13 @@ void CN3JpegFile::Release()
 	m_uiHeight  = 0;
 }
 
-BOOL CN3JpegFile::LoadJpegFile(std::string csJpeg)
+BOOL CN3JpegFile::LoadJpegFile(const std::string& csJpeg)
 {
 	// m_buf is the global buffer
 	Release();
 
 	// read to buffer tmp
-	m_pImageBuf = CJpegFile::JpegFileToRGB(csJpeg.c_str(), &m_uiWidth, &m_uiHeight);
+	m_pImageBuf = JpegFileToRGB(csJpeg, &m_uiWidth, &m_uiHeight);
 
 	//////////////////////
 	// set up for display
@@ -54,10 +54,10 @@ BOOL CN3JpegFile::LoadJpegFile(std::string csJpeg)
 	// do this before DWORD-alignment!!!
 	// this works on packed (not DWORD-aligned) buffers
 	// swap red and blue for display
-	CJpegFile::BGRFromRGB(m_pImageBuf, m_uiWidth, m_uiHeight);
+	BGRFromRGB(m_pImageBuf, m_uiWidth, m_uiHeight);
 
 	// vertical flip for display
-	CJpegFile::VertFlipBuf(m_pImageBuf, m_uiWidth * 3, m_uiHeight);
+	VertFlipBuf(m_pImageBuf, m_uiWidth * 3, m_uiHeight);
 
 	return TRUE;
 }

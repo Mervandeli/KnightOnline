@@ -16,6 +16,8 @@
 
 #include "crc32.h"
 
+// NOLINTBEGIN
+
 /* ============================================================= */
 /*  COPYRIGHT (C) 1986 Gary S. Brown.  You may use this program, or	   */
 /*  code or tables extracted from it, as desired without restriction.	 */
@@ -104,3 +106,5 @@ unsigned int crc32(const unsigned char* s, unsigned int len, unsigned int startV
 
 	return crc32val;
 }
+
+// NOLINTEND

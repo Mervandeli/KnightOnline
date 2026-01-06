@@ -5,27 +5,23 @@
 #if !defined(__UIINN_H__)
 #define __UIINN_H__
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <N3Base/N3UIBase.h>
-
-//////////////////////////////////////////////////////////////////////
 
 class CUIInn : public CN3UIBase
 {
 public:
-	bool OnKeyPress(int iChar);
-	void SetVisible(bool bVisible);
+	bool OnKeyPress(int iChar) override;
+	void SetVisible(bool bVisible) override;
 	void Message(int iMessageID);
 
 	void MsgSend_OpenWareHouse();
 
 	CUIInn();
-	virtual ~CUIInn();
+	~CUIInn() override;
 
-	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg);
+	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
 };
 
 #endif //#if !defined(__UIINN_H__)

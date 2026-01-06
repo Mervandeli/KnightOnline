@@ -7,17 +7,14 @@
 #include "GameBase.h"
 #include "text_resources.h"
 
-#define MESSAGE_FONT_SIZE     20
-#define WAR_MESSAGE_SHOW_TIME 60
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+constexpr int MESSAGE_FONT_SIZE     = 20;
+constexpr int WAR_MESSAGE_SHOW_TIME = 60;
 
 CWarMessage::CWarMessage()
 {
 	m_pMessageFont = nullptr;
 	m_fTime        = 0.0f;
+	m_ptMessage    = {};
 }
 
 CWarMessage::~CWarMessage()

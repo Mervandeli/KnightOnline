@@ -79,7 +79,7 @@ bool ParseWAV(FileReader& file, ALenum* format, ALsizei* sampleRate, size_t* pcm
 	if (pcmDataSize_ > static_cast<uintptr_t>(end - pcmDataBuffer_))
 		return false;
 
-	ALenum format_;
+	ALenum format_ = AL_FORMAT_STEREO16;
 
 	if (waveFormat->NumChannels == 2)
 	{

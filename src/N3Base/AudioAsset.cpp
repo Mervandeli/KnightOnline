@@ -41,9 +41,9 @@ bool BufferedAudioAsset::LoadFromFile(const std::string& filename)
 	if (!file.OpenExisting(filename))
 		return false;
 
-	ALenum alFormat;
-	ALsizei sampleRate, pcmDataSize;
-	size_t pcmChunkSize;
+	ALenum alFormat     = AL_FORMAT_STEREO16;
+	size_t pcmChunkSize = 0;
+	ALsizei sampleRate = 0, pcmDataSize = 0;
 	const uint8_t* pcmDataBuffer = nullptr;
 	if (!ParseWAV(file, &alFormat, &sampleRate, &pcmChunkSize, &pcmDataBuffer, &pcmDataSize))
 		return false;

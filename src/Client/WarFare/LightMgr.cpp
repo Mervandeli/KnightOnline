@@ -7,14 +7,8 @@
 
 #include <FileIO/FileReader.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 CLightMgr::CLightMgr()
 {
-	m_Lights.clear();
 	for (int i = 0; i < LGT_MAX; i++)
 		m_pActiveLight[i] = nullptr;
 }
@@ -79,17 +73,16 @@ void CLightMgr::Release()
 
 void CLightMgr::Tick()
 {
-	int i;
 	//거리에 따라 추려내고...
 	int NumSlotEmpty = 0;
-	float LimitLeft, LimitRight, LimitUp, LimitDown;
+	float LimitLeft = 0.0f, LimitRight = 0.0f, LimitUp = 0.0f, LimitDown = 0.0f;
 	LimitLeft  = CN3Base::s_CameraData.vEye.x - LIGHT_VALIDRANGE;
 	LimitRight = CN3Base::s_CameraData.vEye.x + LIGHT_VALIDRANGE;
 	LimitUp    = CN3Base::s_CameraData.vEye.z + LIGHT_VALIDRANGE;
 	LimitDown  = CN3Base::s_CameraData.vEye.z - LIGHT_VALIDRANGE;
 
 	__Vector3 vPosTmp;
-	for (i = LGT_ADDITIONAL0; i < LGT_MAX; i++)
+	for (int i = LGT_ADDITIONAL0; i < LGT_MAX; i++)
 	{
 		if (!m_pActiveLight[i])
 		{
@@ -118,7 +111,7 @@ void CLightMgr::Tick()
 		vPosTmp        = pLgt->Pos();
 		if (vPosTmp.x > LimitLeft && vPosTmp.x < LimitRight && vPosTmp.z > LimitDown && vPosTmp.z < LimitUp)
 		{
-			for (i = LGT_ADDITIONAL0; i < LGT_MAX; i++)
+			for (int i = LGT_ADDITIONAL0; i < LGT_MAX; i++)
 			{
 				if (!m_pActiveLight[i])
 				{
@@ -136,7 +129,7 @@ void CLightMgr::Tick()
 	}
 
 	//tick돌려라..
-	for (i = 0; i < LGT_MAX; i++)
+	for (int i = 0; i < LGT_MAX; i++)
 	{
 		if (m_pActiveLight[i])
 		{
@@ -162,10 +155,10 @@ void CLightMgr::LoadZoneLight(const char* szFN)
 	if (!file.OpenExisting(szFN))
 		return;
 
-	int iVersion;
+	int iVersion = 0;
 	file.Read(&iVersion, sizeof(int));
 
-	int cnt;
+	int cnt = 0;
 	file.Read(&cnt, sizeof(int));
 	for (int i = 0; i < cnt; i++)
 	{

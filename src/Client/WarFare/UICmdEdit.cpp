@@ -13,22 +13,28 @@
 #include <N3Base/N3UIEdit.h>
 #include <N3Base/N3UIString.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUICmdEdit::CUICmdEdit()
 {
+	m_pText_Title = nullptr;
+	m_pEdit_Box   = nullptr;
+	m_pBtn_Cancel = nullptr;
+	m_pBtn_Ok     = nullptr;
 }
 
 CUICmdEdit::~CUICmdEdit()
 {
+}
+
+void CUICmdEdit::Release()
+{
+	CN3UIBase::Release();
+
+	m_pText_Title = nullptr;
+	m_pEdit_Box   = nullptr;
+	m_pBtn_Cancel = nullptr;
+	m_pBtn_Ok     = nullptr;
+
+	m_szArg1.clear();
 }
 
 bool CUICmdEdit::Load(File& file)

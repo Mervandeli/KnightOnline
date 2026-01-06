@@ -5,9 +5,7 @@
 #if !defined(AFX_UIPartyOrForce_H__7B2732B7_C9CA_46A3_89BC_C59934ED3F13__INCLUDED_)
 #define AFX_UIPartyOrForce_H__7B2732B7_C9CA_46A3_89BC_C59934ED3F13__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <list>
 
@@ -27,9 +25,6 @@ protected:
 
 	std::list<__InfoPartyOrForce> m_Members;                  // 파티 멤버
 	int m_iIndexSelected;                                     // 현재 선택된 멤버인덱스..
-
-public:
-	int m_iPartyOrForce;                                      // 파티냐? 부대냐?? 1 이면 파티 2 이면 부대..
 
 public:
 	bool OnKeyPress(int iKey) override;

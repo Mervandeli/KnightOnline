@@ -1,13 +1,11 @@
-// KscViewerView.h : interface of the CKscViewerView class
+﻿// KscViewerView.h : interface of the CKscViewerView class
 //
 /////////////////////////////////////////////////////////////////////////////
 
 #if !defined(AFX_KSCVIEWERVIEW_H__AC830AF2_D01D_48DD_A29E_036847EB5E61__INCLUDED_)
 #define AFX_KSCVIEWERVIEW_H__AC830AF2_D01D_48DD_A29E_036847EB5E61__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 class CKscViewerView : public CView
 {

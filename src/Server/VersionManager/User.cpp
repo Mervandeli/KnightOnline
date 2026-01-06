@@ -12,75 +12,55 @@ CUser::CUser(SocketManager* socketManager) : TcpServerSocket(socketManager)
 
 bool CUser::PullOutCore(char*& data, int& length)
 {
-	uint8_t* pTmp;
-	int len;
-	bool foundCore;
 	MYSHORT slen;
 
-	len = _recvCircularBuffer.GetValidCount();
-
-	if (len == 0 || len < 0)
+	int len = _recvCircularBuffer.GetValidCount();
+	if (len <= 0)
 		return false;
 
-	pTmp = new uint8_t[len];
-
-	_recvCircularBuffer.GetData((char*) pTmp, len);
-
-	foundCore = false;
+	std::vector<uint8_t> tmpBuffer(len);
+	_recvCircularBuffer.GetData(reinterpret_cast<char*>(tmpBuffer.data()), len);
 
 	int sPos = 0, ePos = 0;
-
-	for (int i = 0; i < len && !foundCore; i++)
+	for (int i = 0; i < len; i++)
 	{
 		if (i + 2 >= len)
 			break;
 
-		if (pTmp[i] == PACKET_START1 && pTmp[i + 1] == PACKET_START2)
+		if (tmpBuffer[i] == PACKET_START1 && tmpBuffer[i + 1] == PACKET_START2)
 		{
 			sPos      = i + 2;
 
-			slen.b[0] = pTmp[sPos];
-			slen.b[1] = pTmp[sPos + 1];
+			slen.b[0] = tmpBuffer[sPos];
+			slen.b[1] = tmpBuffer[sPos + 1];
 
 			length    = slen.i;
 
 			if (length < 0)
-				goto cancelRoutine;
+				return false;
 
 			if (length > len)
-				goto cancelRoutine;
+				return false;
 
 			ePos = sPos + length + 2;
 
 			if ((ePos + 2) > len)
-				goto cancelRoutine;
-			//			ASSERT(ePos+2 <= len);
+				return false;
 
-			if (pTmp[ePos] == PACKET_END1 && pTmp[ePos + 1] == PACKET_END2)
-			{
-				data = new char[length + 1];
-				memcpy(data, (pTmp + sPos + 2), length);
-				data[length] = 0;
-				foundCore    = true;
-				//				int head = _recvCircularBuffer.GetHeadPos(), tail = _recvCircularBuffer.GetTailPos();
-				//				TRACE("data : %s, len : %d\n", data, length);
-				//				TRACE("head : %d, tail : %d\n", head, tail );
-				break;
-			}
-			else
+			if (tmpBuffer[ePos] != PACKET_END1 || tmpBuffer[ePos + 1] != PACKET_END2)
 			{
 				_recvCircularBuffer.HeadIncrease(3);
 				break;
 			}
+
+			data = new char[length];
+			memcpy(data, &tmpBuffer[sPos + 2], length);
+			_recvCircularBuffer.HeadIncrease(6 + length); // 6: header 2+ end 2+ length 2
+			return true;
 		}
 	}
 
-	if (foundCore)
-		_recvCircularBuffer.HeadIncrease(6 + length); // 6: header 2+ end 2+ length 2
-
-cancelRoutine:
-	delete[] pTmp;
-	return foundCore;
+	return false;
 }
 
 int CUser::Send(char* pBuf, int length)
@@ -106,8 +86,8 @@ int CUser::Send(char* pBuf, int length)
 
 void CUser::Parsing(int /*len*/, char* pData)
 {
-	int index = 0, send_index = 0, client_version = 0;
-	char buff[2048] = {};
+	int index = 0, sendIndex = 0, client_version = 0;
+	char buff[2048] {};
 	uint8_t command = GetByte(pData, index);
 
 	switch (command)
@@ -116,9 +96,9 @@ void CUser::Parsing(int /*len*/, char* pData)
 		{
 			VersionManagerApp* appInstance = VersionManagerApp::instance();
 
-			SetByte(buff, LS_VERSION_REQ, send_index);
-			SetShort(buff, appInstance->LastVersion(), send_index);
-			Send(buff, send_index);
+			SetByte(buff, LS_VERSION_REQ, sendIndex);
+			SetShort(buff, appInstance->LastVersion(), sendIndex);
+			Send(buff, sendIndex);
 		}
 		break;
 
@@ -129,21 +109,21 @@ void CUser::Parsing(int /*len*/, char* pData)
 			// 기범이가 ^^;
 			appInstance->DbProcess.LoadUserCountList();
 
-			SetByte(buff, LS_SERVERLIST, send_index);
-			SetByte(buff, static_cast<uint8_t>(appInstance->ServerList.size()), send_index);
+			SetByte(buff, LS_SERVERLIST, sendIndex);
+			SetByte(buff, static_cast<uint8_t>(appInstance->ServerList.size()), sendIndex);
 
 			for (const _SERVER_INFO* pInfo : appInstance->ServerList)
 			{
-				SetString2(buff, pInfo->strServerIP, send_index);
-				SetString2(buff, pInfo->strServerName, send_index);
+				SetString2(buff, pInfo->strServerIP, sendIndex);
+				SetString2(buff, pInfo->strServerName, sendIndex);
 
 				if (pInfo->sUserCount <= pInfo->sUserLimit)
-					SetShort(buff, pInfo->sUserCount, send_index); // 기범이가 ^^;
+					SetShort(buff, pInfo->sUserCount, sendIndex); // 기범이가 ^^;
 				else
-					SetShort(buff, -1, send_index);
+					SetShort(buff, -1, sendIndex);
 			}
 
-			Send(buff, send_index);
+			Send(buff, sendIndex);
 		}
 		break;
 
@@ -159,73 +139,82 @@ void CUser::Parsing(int /*len*/, char* pData)
 		case LS_NEWS:
 			NewsReq();
 			break;
+
+		default:
+			spdlog::error("User::Parsing: Unhandled opcode {:02X} [ip={}]", command, GetRemoteIP());
+			break;
 	}
 }
 
 void CUser::LogInReq(char* pBuf)
 {
-	int index = 0, idlen = 0, pwdlen = 0, send_index = 0, result = 0, serverno = 0;
-	bool bCurrentuser   = false;
-	char send_buff[256] = {}, accountid[MAX_ID_SIZE + 1] = {}, pwd[MAX_PW_SIZE + 1] = {};
-	std::string serverIp;
+	VersionManagerApp* appInstance = VersionManagerApp::instance();
+	int index = 0, idlen = 0, pwdlen = 0, sendIndex = 0, result = 0, serverno = 0;
 	int16_t sPremiumTimeDaysRemaining = -1;
-	VersionManagerApp* appInstance    = VersionManagerApp::instance();
+	char sendBuffer[256] {}, accountid[MAX_ID_SIZE + 1] {}, pwd[MAX_PW_SIZE + 1] {};
+	std::string serverIp;
 
-	idlen                             = GetShort(pBuf, index);
+	idlen = GetShort(pBuf, index);
 	if (idlen > MAX_ID_SIZE || idlen <= 0)
-		goto fail_return;
+	{
+		SendAuthNotFound();
+		return;
+	}
 
 	GetString(accountid, pBuf, idlen, index);
 
 	pwdlen = GetShort(pBuf, index);
 	if (pwdlen > MAX_PW_SIZE || pwdlen < 0)
-		goto fail_return;
+	{
+		SendAuthNotFound();
+		return;
+	}
 
 	GetString(pwd, pBuf, pwdlen, index);
 
 	result = appInstance->DbProcess.AccountLogin(accountid, pwd);
-	SetByte(send_buff, LS_LOGIN_REQ, send_index);
+	SetByte(sendBuffer, LS_LOGIN_REQ, sendIndex);
 
-	if (result == AUTH_OK)
+	if (result != AUTH_OK)
 	{
-		bCurrentuser = appInstance->DbProcess.IsCurrentUser(accountid, serverIp, serverno);
-		if (bCurrentuser)
-		{
-			// Kick out
-			result = AUTH_IN_GAME;
+		SetByte(sendBuffer, result, sendIndex);
+		Send(sendBuffer, sendIndex);
+		return;
+	}
 
-			SetByte(send_buff, result, send_index);
-			SetString2(send_buff, serverIp, send_index);
-			SetShort(send_buff, serverno, send_index);
-		}
-		else
-		{
-			SetByte(send_buff, result, send_index);
-
-			if (!appInstance->DbProcess.LoadPremiumServiceUser(
-					accountid, &sPremiumTimeDaysRemaining))
-				sPremiumTimeDaysRemaining = -1;
-
-			SetShort(send_buff, sPremiumTimeDaysRemaining, send_index);
-		}
+	bool bCurrentuser = appInstance->DbProcess.IsCurrentUser(accountid, serverIp, serverno);
+	if (bCurrentuser)
+	{
+		// Kick out
+		SetByte(sendBuffer, AUTH_IN_GAME, sendIndex);
+		SetString2(sendBuffer, serverIp, sendIndex);
+		SetShort(sendBuffer, serverno, sendIndex);
 	}
 	else
 	{
-		SetByte(send_buff, result, send_index);
+		SetByte(sendBuffer, AUTH_OK, sendIndex);
+
+		if (!appInstance->DbProcess.LoadPremiumServiceUser(accountid, &sPremiumTimeDaysRemaining))
+			sPremiumTimeDaysRemaining = -1;
+
+		SetShort(sendBuffer, sPremiumTimeDaysRemaining, sendIndex);
 	}
 
-	Send(send_buff, send_index);
-	return;
+	Send(sendBuffer, sendIndex);
+}
 
-fail_return:
-	SetByte(send_buff, LS_LOGIN_REQ, send_index);
-	SetByte(send_buff, AUTH_NOT_FOUND, send_index); // id, pwd 이상...
-	Send(send_buff, send_index);
+void CUser::SendAuthNotFound()
+{
+	char sendBuffer[4] {};
+	int sendIndex = 0;
+	SetByte(sendBuffer, LS_LOGIN_REQ, sendIndex);
+	SetByte(sendBuffer, AUTH_NOT_FOUND, sendIndex);
+	Send(sendBuffer, sendIndex);
 }
 
 void CUser::SendDownloadInfo(int version)
 {
-	int send_index = 0;
+	int sendIndex = 0;
 	std::set<std::string> downloadset;
 	char buff[2048];
 	VersionManagerApp* appInstance = VersionManagerApp::instance();
@@ -236,37 +225,38 @@ void CUser::SendDownloadInfo(int version)
 			downloadset.insert(pInfo->CompressName);
 	}
 
-	SetByte(buff, LS_DOWNLOADINFO_REQ, send_index);
+	SetByte(buff, LS_DOWNLOADINFO_REQ, sendIndex);
 
-	SetString2(buff, appInstance->FtpUrl(), send_index);
-	SetString2(buff, appInstance->FtpPath(), send_index);
-	SetShort(buff, static_cast<int>(downloadset.size()), send_index);
+	SetString2(buff, appInstance->FtpUrl(), sendIndex);
+	SetString2(buff, appInstance->FtpPath(), sendIndex);
+	SetShort(buff, static_cast<int>(downloadset.size()), sendIndex);
 
 	for (const std::string& filename : downloadset)
-		SetString2(buff, filename.data(), send_index);
+		SetString2(buff, filename.data(), sendIndex);
 
-	Send(buff, send_index);
+	Send(buff, sendIndex);
 }
 
 void CUser::NewsReq()
 {
-	constexpr char
-		szHeader[] = "Login Notice"; // this isn't really used, but it's always set to this
-	constexpr char szEmpty[] =
-		"<empty>"; // unofficial but when used, will essentially cause it to skip since it's not formatted.
+	// this isn't really used, but it's always set to this
+	constexpr std::string_view szHeader = "Login Notice";
 
-	char send_buff[8192];
-	int send_index                 = 0;
+	// unofficial but when used, will essentially cause it to skip since it's not formatted.
+	constexpr std::string_view szEmpty  = "<empty>";
+
+	char sendBuffer[8192];
+	int sendIndex                  = 0;
 	VersionManagerApp* appInstance = VersionManagerApp::instance();
 
-	SetByte(send_buff, LS_NEWS, send_index);
-	SetString2(send_buff, szHeader, sizeof(szHeader) - 1, send_index);
+	SetByte(sendBuffer, LS_NEWS, sendIndex);
+	SetString2(sendBuffer, szHeader, sendIndex);
 
 	const _NEWS& news = appInstance->News;
 	if (news.Size > 0)
-		SetString2(send_buff, news.Content, news.Size, send_index);
+		SetString2(sendBuffer, news.Content, news.Size, sendIndex);
 	else
-		SetString2(send_buff, szEmpty, sizeof(szEmpty) - 1, send_index);
+		SetString2(sendBuffer, szEmpty, sendIndex);
 
-	Send(send_buff, send_index);
+	Send(sendBuffer, sendIndex);
 }

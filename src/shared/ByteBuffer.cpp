@@ -1,39 +1,43 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "ByteBuffer.h"
 
 #include <cassert>
 
-#define IMPL_BYTEBUFFER_POD_TEMPLATE(type)                \
-	template <>                                           \
-	void ByteBuffer::append<type>(type value)             \
-	{                                                     \
-		append(&value, sizeof(value));                    \
-	}                                                     \
-	template <>                                           \
-	void ByteBuffer::put<type>(size_t pos, type value)    \
-	{                                                     \
-		put(pos, &value, sizeof(value));                  \
-	}                                                     \
-	template <>                                           \
-	ByteBuffer& ByteBuffer::operator<< <type>(type value) \
-	{                                                     \
-		append<type>(value);                              \
-		return *this;                                     \
-	}                                                     \
-	template <>                                           \
-	type ByteBuffer::read<type>(size_t pos) const         \
-	{                                                     \
-		/*assert(pos + sizeof(type) <= size());*/         \
-		if (pos + sizeof(type) > size())                  \
-			return {};                                    \
-		return *((type*) &_storage[pos]);                 \
-	}                                                     \
-	template <>                                           \
-	type ByteBuffer::read<type>()                         \
-	{                                                     \
-		type r  = read<type>(_rpos);                      \
-		_rpos  += sizeof(type);                           \
-		return r;                                         \
+// Ideally we shouldn't really be using macros for this kind've thing,
+// but the compile-time benefits from having them implemented are largely worth it here.
+// Doesn't really make sense to implement each of them manually.
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
+#define IMPL_BYTEBUFFER_POD_TEMPLATE(type)                     \
+	template <>                                                \
+	void ByteBuffer::append<type>(type value)                  \
+	{                                                          \
+		append(&value, sizeof(value));                         \
+	}                                                          \
+	template <>                                                \
+	void ByteBuffer::put<type>(size_t pos, type value)         \
+	{                                                          \
+		put(pos, &value, sizeof(value));                       \
+	}                                                          \
+	template <>                                                \
+	ByteBuffer& ByteBuffer::operator<< <type>(type value)      \
+	{                                                          \
+		append<type>(value);                                   \
+		return *this;                                          \
+	}                                                          \
+	template <>                                                \
+	type ByteBuffer::read<type>(size_t pos) const              \
+	{                                                          \
+		/*assert(pos + sizeof(type) <= size());*/              \
+		if (pos + sizeof(type) > size())                       \
+			return {};                                         \
+		return *reinterpret_cast<const type*>(&_storage[pos]); \
+	}                                                          \
+	template <>                                                \
+	type ByteBuffer::read<type>()                              \
+	{                                                          \
+		type r  = read<type>(_rpos);                           \
+		_rpos  += sizeof(type);                                \
+		return r;                                              \
 	}
 
 IMPL_BYTEBUFFER_POD_TEMPLATE(float)
@@ -49,6 +53,7 @@ IMPL_BYTEBUFFER_POD_TEMPLATE(int32_t)
 IMPL_BYTEBUFFER_POD_TEMPLATE(int64_t)
 
 #undef IMPL_BYTEBUFFER_POD_TEMPLATE
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 template <>
 std::string ByteBuffer::read<std::string>(size_t pos) const
@@ -287,13 +292,17 @@ void ByteBuffer::append(const ByteBuffer& buffer)
 void ByteBuffer::append(const ByteBuffer& buffer, size_t len)
 {
 	assert(buffer.rpos() + len <= buffer.size());
-	append(buffer.contents() + buffer.rpos(), len);
+
+	const auto& bufferStorage = buffer.storage();
+	append(&bufferStorage[buffer.rpos()], len);
 }
 
 void ByteBuffer::readFrom(ByteBuffer& buffer, size_t len)
 {
 	assert(buffer.rpos() + len <= buffer.size());
-	append(buffer.contents() + buffer.rpos(), len);
+
+	const auto& bufferStorage = buffer.storage();
+	append(&bufferStorage[buffer.rpos()], len);
 	buffer.rpos(buffer.rpos() + len);
 }
 

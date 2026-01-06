@@ -7,47 +7,59 @@
 #include <N3Base/N3Shape.h>
 #include <N3Base/N3SndObj.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
-// TESTING !@#$%@#$@#$
-
 CBird::CBird()
 {
-	m_pSnd   = nullptr;
-	m_pShape = nullptr;
+	m_pSnd           = nullptr;
+	m_pShape         = nullptr;
 
-	Release();
+	m_vPivot         = {};
+	m_fRadius        = 0.0f;
+	m_fRadian        = 0.0f;
+
+	m_fFactor1       = 0.0f;
+	m_fFactor2       = 0.0f;
+	m_fFactorSpeed1  = 0.0f;
+	m_fFactorSpeed2  = 0.0f;
+
+	m_fRadiusY       = 0.0f;
+	m_fFactorY1      = 0.0f;
+	m_fFactorY2      = 0.0f;
+	m_fFactorYSpeed1 = 0.0f;
+	m_fFactorYSpeed2 = 0.0f;
+
+	m_fRadianSpeed   = 0.0f;
+	m_fSndInterval   = 0.0f;
 }
 
 CBird::~CBird()
 {
-	Release();
+	CBird::Release();
 }
 
 void CBird::Release()
 {
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd);
-	if (m_pShape)
-	{
-		delete m_pShape;
-		m_pShape = nullptr;
-	}
-	m_vPivot.Set(0, 0, 0);
-	m_fRadius  = 0.0f;
-	m_fRadian  = 0.0f;
+	s_SndMgr.ReleaseObj(&m_pSnd);
 
-	m_fFactor1 = m_fFactor2 = 0;
-	m_fFactorSpeed1 = m_fFactorSpeed2 = 0;
+	delete m_pShape;
+	m_pShape         = nullptr;
 
-	m_fRadiusY = m_fFactorY1 = m_fFactorY2 = 0;
-	m_fFactorYSpeed1 = m_fFactorYSpeed2 = 0;
+	m_vPivot         = {};
+	m_fRadius        = 0.0f;
+	m_fRadian        = 0.0f;
+
+	m_fFactor1       = 0.0f;
+	m_fFactor2       = 0.0f;
+	m_fFactorSpeed1  = 0.0f;
+	m_fFactorSpeed2  = 0.0f;
+
+	m_fRadiusY       = 0.0f;
+	m_fFactorY1      = 0.0f;
+	m_fFactorY2      = 0.0f;
+	m_fFactorYSpeed1 = 0.0f;
+	m_fFactorYSpeed2 = 0.0f;
+
+	m_fRadianSpeed   = 0.0f;
+	m_fSndInterval   = 0.0f;
 }
 
 void CBird::Tick()
@@ -108,16 +120,16 @@ void CBird::Tick()
 
 void CBird::Render()
 {
-	if (m_pShape == nullptr)
-		return;
-	m_pShape->Render();
+	if (m_pShape != nullptr)
+		m_pShape->Render();
 }
 
 int CBird::LoadBird(const std::string& szFN)
 {
 	Release();
+
 	FILE* stream = fopen(szFN.c_str(), "r"); //text파일로 만든다
-	if (nullptr == stream)
+	if (stream == nullptr)
 	{
 #if _DEBUG
 		std::string szErr = fmt::format("failed to open file - {}", szFN);
@@ -126,16 +138,50 @@ int CBird::LoadBird(const std::string& szFN)
 		return false;
 	}
 
-	char szRrcName[_MAX_PATH];
+	char szRrcName[_MAX_PATH + 1] {};
 	float fSpeed = 0.0f;
+
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 	int result   = fscanf(stream, "ResourceName = %s\n", szRrcName);
 	__ASSERT(result != EOF, "잘못된 Machine 세팅 파일");
+
+	if (result == EOF)
+	{
+		fclose(stream);
+		return false;
+	}
+
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 	result = fscanf(stream, "Pivot = %f %f %f\n", &(m_vPivot.x), &(m_vPivot.y), &(m_vPivot.z));
 	__ASSERT(result != EOF, "잘못된 Machine 세팅 파일");
+
+	if (result == EOF)
+	{
+		fclose(stream);
+		return false;
+	}
+
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 	result = fscanf(stream, "Radius = %f\n", &m_fRadius);
 	__ASSERT(result != EOF, "잘못된 Machine 세팅 파일");
+
+	if (result == EOF)
+	{
+		fclose(stream);
+		return false;
+	}
+
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 	result = fscanf(stream, "RadiusY = %f\n", &m_fRadiusY);
 	__ASSERT(result != EOF, "잘못된 Machine 세팅 파일");
+
+	if (result == EOF)
+	{
+		fclose(stream);
+		return false;
+	}
+
+	// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 	result = fscanf(stream, "Speed = %f\n", &fSpeed);
 	__ASSERT(result != EOF, "잘못된 Machine 세팅 파일");
 
@@ -153,8 +199,8 @@ int CBird::LoadBird(const std::string& szFN)
 	m_fFactorYSpeed1 = 0.35f + ((rand() % 3000) / 10000.0f);
 	m_fFactorYSpeed2 = 0.18f + ((rand() % 3500) / 10000.0f);
 
-	if (nullptr == m_pSnd)
-		m_pSnd = CN3Base::s_SndMgr.CreateObj(1000);
+	if (m_pSnd == nullptr)
+		m_pSnd = s_SndMgr.CreateObj(1000);
 	m_fSndInterval = 0.0f;
 
 	return true;

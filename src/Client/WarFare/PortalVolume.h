@@ -5,17 +5,14 @@
 #if !defined(AFX_PORTALVOLUME_H__81823A3C_844B_4385_8D5B_F62606F89593__INCLUDED_)
 #define AFX_PORTALVOLUME_H__81823A3C_844B_4385_8D5B_F62606F89593__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <N3Base/N3Shape.h>
 #include <list>
 
-#define INDOOR_FOLDER "N3Indoor\\"
-const float fBaseVolumnSize = 1.0f;
+constexpr float fBaseVolumnSize = 1.0f;
 
-enum e_ExtBool
+enum e_ExtBool : uint8_t
 {
 	TYPE_UNKNOWN = 0,
 	TYPE_TRUE
@@ -41,19 +38,21 @@ typedef struct tagShapeInfo : public CN3Transform
 	//..
 	tagShapeInfo()
 	{
-		m_iID          = -1;
-		m_strShapeFile = "";
-		m_pShape       = nullptr;
+		m_iID         = -1;
+		m_pShape      = nullptr;
 
-		m_iBelong      = 0;
-		m_iEventID     = 0;
-		m_iEventType   = 0;
-		m_iNPC_ID      = 0;
-		m_iNPC_Status  = 0;
+		m_iBelong     = 0;
+		m_iEventID    = 0;
+		m_iEventType  = 0;
+		m_iNPC_ID     = 0;
+		m_iNPC_Status = 0;
 	}
 
-	const tagShapeInfo& operator=(const tagShapeInfo& si)
+	tagShapeInfo& operator=(const tagShapeInfo& si)
 	{
+		if (this == &si)
+			return *this;
+
 		m_iID          = si.m_iID;
 		m_strShapeFile = si.m_strShapeFile;
 		m_pShape       = si.m_pShape;
@@ -69,7 +68,7 @@ typedef struct tagShapeInfo : public CN3Transform
 
 typedef struct tagVisPartIndex
 {
-	int m_iPartIndex;
+	int m_iPartIndex = 0;
 	std::vector<int> m_ivVector;
 } __VPI;
 typedef std::list<__VPI>::iterator viter;
@@ -83,17 +82,14 @@ typedef struct tagShapePart
 	{
 		m_iID = -1;
 	}
+
 	void Clear()
 	{
-		__VPI vpi;
-		viter vit = m_viIndex.begin();
-		while (vit != m_viIndex.end())
-		{
-			vpi = *vit++;
+		for (__VPI& vpi : m_viIndex)
 			vpi.m_ivVector.clear();
-		}
 		m_viIndex.clear();
 	}
+
 	~tagShapePart()
 	{
 		Clear();
@@ -166,7 +162,7 @@ class CPortalVolume : public CN3Transform
 private:
 	void DeleteAllPvsObj();
 	bool Load(File& file) override;
-	bool IsInVolumn(__Vector3 vec);
+	bool IsInVolumn(const __Vector3& vec) const;
 
 	void Render();
 	void RenderShape();
@@ -176,7 +172,7 @@ private:
 	bool CheckCollisionCameraWithTerrain(__Vector3& vEyeResult, const __Vector3& vAt, float fNP);
 	bool CheckCollisionCameraWithShape(__Vector3& vEyeResult, const __Vector3& vAt, float fNP);
 	bool GetHeightWithTerrain(float fx, float fz, float& fy);
-	float GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal = nullptr);
+	float GetHeightNearstPosWithShape(const __Vector3& vPos, __Vector3* pvNormal = nullptr);
 	bool IsInTerrainWithTerrain(__Vector3& vec);
 	BOOL PickWideWithTerrain(int x, int y, __Vector3& vPick);
 	CN3Shape* PickWithShape(int iXScreen, int iYScreen, bool bMustHaveEvent, __Vector3* pvPick = nullptr);

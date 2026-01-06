@@ -7,18 +7,7 @@
 #include "ServerMesh.h"
 #include "N3Terrain.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-static const float SGRID_SIZE = 64.0f;
-static const int SMAP_SIZE    = 4096;
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+constexpr float SGRID_SIZE = 64.0f;
 
 CServerMesh::CServerMesh()
 {
@@ -30,25 +19,22 @@ CServerMesh::~CServerMesh()
 
 void CServerMesh::Tick(CN3Terrain* pTerrain, const __Vector3& vPosPlayer)
 {
-	__Vector3 pos = vPosPlayer;
-	float ixposL, ixposR, izposL, izposR, ixpos, izpos;
-	float fHeightLB, fHeightRB, fHeightTop, fHeightBottom;
+	float ixposL = 0.0f, ixposR = 0.0f, izposL = 0.0f, izposR = 0.0f, ixpos = 0.0f, izpos = 0.0f;
+	float fHeightLB = 0.0f, fHeightRB = 0.0f, fHeightTop = 0.0f, fHeightBottom = 0.0f;
 
-	ixpos           = ((int) pos.x) / SGRID_SIZE;
-	ixpos          *= SGRID_SIZE;
-	izpos           = ((int) pos.z) / SGRID_SIZE;
-	izpos          *= SGRID_SIZE;
-
-	D3DCOLOR color  = D3DCOLOR_RGBA(50, 25, 25, 0);
+	ixpos      = ((int) vPosPlayer.x) / SGRID_SIZE;
+	ixpos     *= SGRID_SIZE;
+	izpos      = ((int) vPosPlayer.z) / SGRID_SIZE;
+	izpos     *= SGRID_SIZE;
 
 	// 제일 왼쪽..
-	ixposL          = ixpos - SGRID_SIZE;
-	izposL          = izpos - SGRID_SIZE;
-	ixposR          = ixpos - SGRID_SIZE;
-	izposR          = izpos + SGRID_SIZE * 2;
+	ixposL     = ixpos - SGRID_SIZE;
+	izposL     = izpos - SGRID_SIZE;
+	ixposR     = ixpos - SGRID_SIZE;
+	izposR     = izpos + SGRID_SIZE * 2;
 
-	fHeightLB       = pTerrain->GetHeight(ixposL, izposL);
-	fHeightRB       = pTerrain->GetHeight(ixposR, izposR);
+	fHeightLB  = pTerrain->GetHeight(ixposL, izposL);
+	fHeightRB  = pTerrain->GetHeight(ixposR, izposR);
 
 	if (fHeightLB >= fHeightRB)
 	{
@@ -62,7 +48,7 @@ void CServerMesh::Tick(CN3Terrain* pTerrain, const __Vector3& vPosPlayer)
 	}
 	fHeightTop += 1.0f;
 
-	AutoConcMesh(color, ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 0);
+	AutoConcMesh(ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 0);
 
 	// 왼쪽 두번째..
 
@@ -86,7 +72,7 @@ void CServerMesh::Tick(CN3Terrain* pTerrain, const __Vector3& vPosPlayer)
 	}
 	fHeightTop += 1.0f;
 
-	AutoConcMesh(color, ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 6);
+	AutoConcMesh(ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 6);
 
 	// 왼쪽 세번째..
 
@@ -110,7 +96,7 @@ void CServerMesh::Tick(CN3Terrain* pTerrain, const __Vector3& vPosPlayer)
 	}
 	fHeightTop += 1.0f;
 
-	AutoConcMesh(color, ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 12);
+	AutoConcMesh(ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 12);
 
 	// 왼쪽에서 끝..
 
@@ -134,7 +120,7 @@ void CServerMesh::Tick(CN3Terrain* pTerrain, const __Vector3& vPosPlayer)
 	}
 	fHeightTop += 1.0f;
 
-	AutoConcMesh(color, ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 18);
+	AutoConcMesh(ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 18);
 
 	// 밑에서 첫번째..
 
@@ -158,7 +144,7 @@ void CServerMesh::Tick(CN3Terrain* pTerrain, const __Vector3& vPosPlayer)
 	}
 	fHeightTop += 1.0f;
 
-	AutoConcMesh(color, ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 24);
+	AutoConcMesh(ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 24);
 
 	// 밑에서 두번째..
 
@@ -182,7 +168,7 @@ void CServerMesh::Tick(CN3Terrain* pTerrain, const __Vector3& vPosPlayer)
 	}
 	fHeightTop += 1.0f;
 
-	AutoConcMesh(color, ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 30);
+	AutoConcMesh(ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 30);
 
 	// 밑에서 세번째..
 
@@ -206,7 +192,7 @@ void CServerMesh::Tick(CN3Terrain* pTerrain, const __Vector3& vPosPlayer)
 	}
 	fHeightTop += 1.0f;
 
-	AutoConcMesh(color, ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 36);
+	AutoConcMesh(ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 36);
 
 	// 밑에서 끝번째..
 
@@ -230,10 +216,10 @@ void CServerMesh::Tick(CN3Terrain* pTerrain, const __Vector3& vPosPlayer)
 	}
 	fHeightTop += 1.0f;
 
-	AutoConcMesh(color, ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 42);
+	AutoConcMesh(ixposL, ixposR, izposL, izposR, fHeightBottom, fHeightTop, 42);
 }
 
-void CServerMesh::AutoConcMesh(D3DCOLOR color, float left, float right, float bottom, float top, float low, float high, int iStart)
+void CServerMesh::AutoConcMesh(float left, float right, float bottom, float top, float low, float high, int iStart)
 {
 	// left, right  : x
 	// bottom, top  : z
@@ -264,6 +250,9 @@ void CServerMesh::AutoConcMesh(D3DCOLOR color, float left, float right, float bo
 			m_vSMesh[iStart + 4].Set(right, low, top);
 			m_vSMesh[iStart + 5].Set(left, high, top);
 			break;
+
+		default:
+			break;
 	}
 }
 
@@ -274,7 +263,7 @@ void CServerMesh::Render()
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, mtxWorld.toD3D());
 	s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
-	DWORD dwFillPrev;
+	DWORD dwFillPrev = 0;
 	s_lpD3DDev->GetRenderState(D3DRS_FILLMODE, &dwFillPrev);
 
 	s_lpD3DDev->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);

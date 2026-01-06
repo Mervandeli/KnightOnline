@@ -92,9 +92,10 @@ void ConnectionManager::SetDatasourceConfigImpl(modelUtil::DbType dbType,
 	}
 	else
 	{
-		auto config            = std::const_pointer_cast<DatasourceConfig>(itr->second);
+		auto config                = std::const_pointer_cast<DatasourceConfig>(itr->second);
 
-		config->DatasourceName = datasourceName, config->DatasourceUsername = datasourceUserName,
+		config->DatasourceName     = datasourceName;
+		config->DatasourceUsername = datasourceUserName;
 		config->DatasourcePassword = datasourcePassword;
 	}
 }

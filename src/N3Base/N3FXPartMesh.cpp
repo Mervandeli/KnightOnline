@@ -8,14 +8,7 @@
 #include "N3FXPartMesh.h"
 #include "N3AnimKey.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+#include <shared/StringUtils.h>
 
 CN3FXPartMesh::CN3FXPartMesh()
 {
@@ -36,8 +29,11 @@ CN3FXPartMesh::CN3FXPartMesh()
 	m_vCurrScaleVel.Set(0, 0, 0);
 	m_vScaleAccel.Set(0, 0, 0);
 
-	m_bTexLoop = false;
-	m_fMeshFPS = 30.0f;
+	m_bShapeLoop       = false;
+	m_bViewFix         = false;
+	m_bUseFadeShowLife = false;
+	m_bTexLoop         = false;
+	m_fMeshFPS         = 30.0f;
 }
 
 CN3FXPartMesh::~CN3FXPartMesh()
@@ -67,8 +63,8 @@ bool CN3FXPartMesh::ParseScript(
 
 	if (lstrcmpi(szCommand, "<shape_name>") == 0)
 	{
-		char szPath[MAX_PATH] = {};
-		strcpy(szPath, szBuff0);
+		char szPath[MAX_PATH] {};
+		strcpy_safe(szPath, szBuff0);
 
 		m_pShape    = new CN3FXShape();
 		m_pRefShape = s_MngFXShape.Get(szPath);
@@ -227,7 +223,7 @@ bool CN3FXPartMesh::Load(File& file)
 	if (!CN3FXPartBase::Load(file))
 		return false;
 
-	char szShapeFileName[_MAX_PATH] = {};
+	char szShapeFileName[_MAX_PATH] {};
 	file.Read(szShapeFileName, _MAX_PATH);
 
 	delete m_pShape;
@@ -282,7 +278,7 @@ bool CN3FXPartMesh::Load(File& file)
 #if defined(_DEBUG)
 	if (m_iVersion > SUPPORTED_PART_VERSION)
 	{
-		TRACE("!!! WARNING: CN3FXPartMesh::Load(%s) encountered version %d (base version %d). "
+		TRACE("!!! WARNING: CN3FXPartMesh::Load({}) encountered version {} (base version {}). "
 			  "Needs support!",
 			m_pRefBundle != nullptr ? m_pRefBundle->FileName().c_str() : "<unknown>", m_iVersion,
 			m_iBaseVersion);
@@ -315,8 +311,8 @@ bool CN3FXPartMesh::Save(File& file)
 	if (!CN3FXPartBase::Save(file))
 		return false;
 
-	char szShapeFileName[_MAX_PATH] = {};
-	strcpy(szShapeFileName, m_pShape->FileName().c_str());
+	char szShapeFileName[_MAX_PATH] {};
+	strcpy_safe(szShapeFileName, m_pShape->FileName().c_str());
 
 	file.Write(szShapeFileName, _MAX_PATH);
 
@@ -367,14 +363,11 @@ void CN3FXPartMesh::Start()
 			pPart->m_Mtl.nRenderFlags += RF_ALPHABLENDING;
 		}
 
-		__VertexXyzColorT1* pVertices;
-		pVertices = pPart->GetColorVertices();
-		if (pVertices)
+		__VertexXyzColorT1* pVertices = pPart->GetColorVertices();
+		if (pVertices != nullptr)
 		{
 			for (int j = 0; j < pPart->Mesh()->GetMaxNumVertices(); j++)
-			{
 				pVertices[j].color = m_dwCurrColor;
-			}
 		}
 	}
 
@@ -559,10 +552,10 @@ void CN3FXPartMesh::Rotate()
 	//mesh방향과 bundle방향을 맞춰라...
 	__Quaternion qtBundle;
 	__Vector3 vDirAxis;
-	float fDirAng;
+	float fDirAng = 0.0f;
 
 	vDirAxis.Cross(m_vDir, m_pRefBundle->m_vDir);
-	int tmp;
+	int tmp    = 0;
 	tmp        = (int) (vDirAxis.x * 10000.0f);
 	vDirAxis.x = (float) (tmp) / 10000.0f;
 	tmp        = (int) (vDirAxis.y * 10000.0f);
@@ -589,10 +582,10 @@ void CN3FXPartMesh::Move()
 
 	__Quaternion qtBundle;
 	__Vector3 vDirAxis;
-	float fDirAng;
+	float fDirAng = 0.0f;
 
 	vDirAxis.Cross(m_vDir, m_pRefBundle->m_vDir);
-	int tmp;
+	int tmp    = 0;
 	tmp        = (int) (vDirAxis.x * 10000.0f);
 	vDirAxis.x = (float) (tmp) / 10000.0f;
 	tmp        = (int) (vDirAxis.y * 10000.0f);
@@ -650,12 +643,11 @@ void CN3FXPartMesh::MoveTexUV()
 	for (int i = 0; i < cnt; i++)
 	{
 		CN3FXSPart* pPart = m_pShape->Part(i);
-		if (!pPart)
+		if (pPart == nullptr)
 			continue;
 
-		__VertexXyzColorT1* pVertices;
-		pVertices = pPart->GetColorVertices();
-		if (pVertices)
+		__VertexXyzColorT1* pVertices = pPart->GetColorVertices();
+		if (pVertices != nullptr)
 		{
 			for (int j = 0; j < pPart->Mesh()->GetMaxNumVertices(); j++)
 			{
@@ -691,17 +683,6 @@ int CN3FXPartMesh::NumVertices(int Part)
 //
 //
 //
-LPDIRECT3DVERTEXBUFFER9 CN3FXPartMesh::GetVB(int Part)
-{
-	if (!m_pShape)
-		return nullptr;
-	return nullptr;
-	//	return m_pShape->Part(Part)->Mesh()->GetVertexBuffer();	//this_fx
-}
-
-//
-//
-//
 bool CN3FXPartMesh::IsDead()
 {
 	float TotalLife = m_fFadeIn + m_fLife + m_fFadeOut;
@@ -718,10 +699,10 @@ bool CN3FXPartMesh::IsDead()
 void CN3FXPartMesh::Render()
 {
 	// render state 세팅
-	if (!m_pShape)
+	if (m_pShape == nullptr)
 		return;
 
-	DWORD dwAlpha;
+	DWORD dwAlpha = 0;
 	s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
 
 	s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, m_bAlpha);

@@ -14,8 +14,12 @@ public:
 	void DeleteAll();
 	void Init();
 	bool LoadEvent(int zone, const std::filesystem::path& questsDir);
-	int m_Zone;
 
+protected:
+	bool LoadEventImpl(int zone, const std::filesystem::path& questsDir);
+
+public:
+	int m_Zone = 0;
 	EventDataArray m_arEvent;
 
 	EVENT();

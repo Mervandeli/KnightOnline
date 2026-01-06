@@ -4,15 +4,6 @@
 #include "StdAfxBase.h"
 #include "N3Skin.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3Skin::CN3Skin()
 {
 	m_dwType        |= OBJ_SKIN;
@@ -107,8 +98,7 @@ bool CN3Skin::Create(int nFC, int nVC, int nUVC)
 		return false;
 
 	delete[] m_pSkinVertices;
-	m_pSkinVertices = new __VertexSkinned[nVC];
-	memset(m_pSkinVertices, 0, sizeof(__VertexSkinned) * nVC);
+	m_pSkinVertices = new __VertexSkinned[nVC] {};
 
 	return true;
 }
@@ -148,9 +138,9 @@ void CN3Skin::RecalcWeight()
 bool CN3Skin::CheckCollisionPrecisely(
 	const __Vector3& vPos, const __Vector3& vDir, __Vector3* pvPick)
 {
-	uint16_t* pwIs;
-	__VertexXyzNormal* pVs;
-	int nFC, nCI0, nCI1, nCI2;
+	uint16_t* pwIs         = nullptr;
+	__VertexXyzNormal* pVs = nullptr;
+	int nFC = 0, nCI0 = 0, nCI1 = 0, nCI2 = 0;
 
 	pVs  = Vertices();
 	pwIs = VertexInices();
@@ -159,21 +149,24 @@ bool CN3Skin::CheckCollisionPrecisely(
 		return false;
 
 	nFC = FaceCount();
-	for (int j = 0; j < nFC; j++) // 각각의 Face 마다 충돌체크..
+
+	// 각각의 Face 마다 충돌체크..
+	for (int j = 0; j < nFC; j++)
 	{
 		nCI0 = pwIs[j * 3 + 0];
 		nCI1 = pwIs[j * 3 + 1];
 		nCI2 = pwIs[j * 3 + 2];
 
-		if (false == ::_IntersectTriangle(vPos, vDir, pVs[nCI0], pVs[nCI1], pVs[nCI2]))
+		if (!::_IntersectTriangle(vPos, vDir, pVs[nCI0], pVs[nCI1], pVs[nCI2]))
 			continue;
 
-		if (pvPick)
+		if (pvPick != nullptr)
 		{
-			float fT, fU, fV;
+			float fT = 0.0f, fU = 0.0f, fV = 0.0f;
 			::_IntersectTriangle(vPos, vDir, pVs[nCI0], pVs[nCI1], pVs[nCI2], fT, fU, fV, pvPick);
 			//			(*pvPick) *= m_Mtx;
 		}
+
 		return true;
 	}
 

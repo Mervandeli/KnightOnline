@@ -16,7 +16,6 @@ public:
 
 public:
 	CNpc* m_pNpc[NPC_NUM];
-	uint8_t m_byNpcUsed[NPC_NUM];
 
 	int16_t m_sThreadNumber; // thread number ,, test
 };

@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 #include "N3FXMgr.h"
 #include "GameBase.h"
-#include "GameProcmain.h"
+#include "GameProcMain.h"
 #include "GameProcedure.h"
 #include "PlayerOtherMgr.h"
 #include "PlayerNPC.h"
@@ -97,7 +97,7 @@ void CN3FXMgr::TriggerBundle(int SourceID, int SourceJoint, int FXID, int Target
 //
 //
 //
-void CN3FXMgr::TriggerBundle(int SourceID, int SourceJoint, int FXID, __Vector3 TargetPos, int idx, int MoveType)
+void CN3FXMgr::TriggerBundle(int SourceID, int SourceJoint, int FXID, const __Vector3& TargetPos, int idx, int MoveType)
 {
 	__TABLE_FX* pFX = s_pTbl_FXSource.Find(FXID);
 	if (!pFX)
@@ -150,43 +150,42 @@ void CN3FXMgr::TriggerBundle(int SourceID, int SourceJoint, int FXID, __Vector3 
 //
 //
 //
-void CN3FXMgr::Stop(int SourceID, int TargetID, int FXID, int idx, bool immediately)
+void CN3FXMgr::Stop(int SourceID, int /*TargetID*/, int FXID, int idx, bool immediately)
 {
-	CN3FXBundleGame* pBundle;
 	if (FXID < 0)
 	{
-		stlLIST_BUNDLEGAME_IT it = m_ListBundle.begin();
+		auto it = m_ListBundle.begin();
 		while (it != m_ListBundle.end())
 		{
-			pBundle = (*it);
-			if (!pBundle)
+			CN3FXBundleGame* pBundle = (*it);
+			if (pBundle == nullptr)
 			{
 				it = m_ListBundle.erase(it);
 				continue;
 			}
+
 			if (pBundle->m_iSourceID == SourceID && pBundle->m_iIdx == idx)
-			{
 				pBundle->Stop(immediately);
-			}
-			it++;
+
+			++it;
 		}
 	}
 	else
 	{
-		stlLIST_BUNDLEGAME_IT it = m_ListBundle.begin();
+		auto it = m_ListBundle.begin();
 		while (it != m_ListBundle.end())
 		{
-			pBundle = (*it);
-			if (!pBundle)
+			CN3FXBundleGame* pBundle = (*it);
+			if (pBundle == nullptr)
 			{
 				it = m_ListBundle.erase(it);
 				continue;
 			}
+
 			if (pBundle->m_iSourceID == SourceID && pBundle->m_iID == FXID && pBundle->m_iIdx == idx)
-			{
 				pBundle->Stop(immediately);
-			}
-			it++;
+
+			++it;
 		}
 	}
 }
@@ -194,19 +193,19 @@ void CN3FXMgr::Stop(int SourceID, int TargetID, int FXID, int idx, bool immediat
 //
 //
 //
-void CN3FXMgr::SetBundlePos(int FXID, int idx, __Vector3& vPos)
+void CN3FXMgr::SetBundlePos(int FXID, int idx, const __Vector3& vPos)
 {
-	stlLIST_BUNDLEGAME_IT it = m_ListBundle.begin();
-	CN3FXBundleGame* pBundle;
+	auto it = m_ListBundle.begin();
 	while (it != m_ListBundle.end())
 	{
-		pBundle = (*it);
-		if (pBundle && pBundle->m_iID == FXID && pBundle->m_iIdx == idx)
+		CN3FXBundleGame* pBundle = *it;
+		if (pBundle != nullptr && pBundle->m_iID == FXID && pBundle->m_iIdx == idx)
 		{
 			pBundle->m_vDestPos = vPos;
 			return;
 		}
-		it++;
+
+		++it;
 	}
 }
 
@@ -215,22 +214,20 @@ void CN3FXMgr::SetBundlePos(int FXID, int idx, __Vector3& vPos)
 //
 void CN3FXMgr::StopMine()
 {
-	CN3FXBundleGame* pBundle;
-
-	stlLIST_BUNDLEGAME_IT it = m_ListBundle.begin();
+	auto it = m_ListBundle.begin();
 	while (it != m_ListBundle.end())
 	{
-		pBundle = (*it);
-		if (!pBundle)
+		CN3FXBundleGame* pBundle = (*it);
+		if (pBundle == nullptr)
 		{
 			it = m_ListBundle.erase(it);
 			continue;
 		}
+
 		if (pBundle->m_iSourceID == CGameBase::s_pPlayer->IDNumber())
-		{
 			pBundle->Stop(true);
-		}
-		it++;
+
+		++it;
 	}
 }
 
@@ -258,19 +255,17 @@ void CN3FXMgr::Tick()
 		}
 		itOrigin++;
 	}
-	//	TRACE("Origin Bundle Count : %d \n", m_OriginBundle.size());
-	//	TRACE("현재쓰고 있는 효과의 수 : %d \n", m_ListBundle.size());
 
-	stlLIST_BUNDLEGAME_IT it = m_ListBundle.begin();
-	//std::list<CN3FXBundleGame*>::iterator it = m_ListBundle.begin();
+	auto it = m_ListBundle.begin();
 	while (it != m_ListBundle.end())
 	{
 		CN3FXBundleGame* pBundle = (*it);
-		if (!pBundle)
+		if (pBundle == nullptr)
 		{
 			it = m_ListBundle.erase(it);
 			continue;
 		}
+
 		if (pBundle->m_dwState == FX_BUNDLE_STATE_DEAD)
 		{
 			stlMAP_BUNDLEORIGIN_IT itOrigin = m_OriginBundle.find(pBundle->FileName());
@@ -279,10 +274,6 @@ void CN3FXMgr::Tick()
 				LPFXBUNDLEORIGIN pSrc = itOrigin->second;
 				pSrc->iNum--;
 			}
-			//			else
-			//			{
-			//				TRACE("Invalid Bundle-.- \n");
-			//			}
 
 			delete pBundle;
 			it = m_ListBundle.erase(it);
@@ -318,7 +309,6 @@ void CN3FXMgr::Tick()
 			if (dwToMe == 1 || dwToMe == 2)
 			{
 				__Vector3 vCol;
-				float fHeight      = 0.5f;
 
 				// npc or player와 충돌체크..
 				bool bCol          = false;
@@ -328,13 +318,10 @@ void CN3FXMgr::Tick()
 
 				if (dwToMe == 2 && ((pBundle->m_vPos - s_pPlayer->Position()).Magnitude() < 16.0f))
 				{
-					__Vector3 vCp = s_pPlayer->Center();
-					if (true
-						== s_pPlayer->CheckCollisionByBox(pBundle->m_vPos,
+					if (s_pPlayer->CheckCollisionByBox(pBundle->m_vPos,
 							pBundle->m_vPos + pBundle->m_vDir * pBundle->m_fVelocity * CN3Base::s_fSecPerFrm, &vCol, nullptr))
-					//if( true == CheckCollisionSphere(pBundle->m_vPos, pBundle->m_vPos + pBundle->m_vDir*pBundle->m_fVelocity*CN3Base::s_fSecPerFrm, vCp, s_pPlayer->Radius(), &vCol) )
 					{
-						bCol            = true;
+						// bCol         = true; // unused
 						pBundle->m_vPos = vCol;
 						pBundle->Stop();
 						int iMagicID = CGameProcedure::s_pProcMain->m_pMagicSkillMng->GetMagicID(pBundle->m_iIdx);
@@ -387,10 +374,7 @@ void CN3FXMgr::Tick()
 					if ((pBundle->m_vPos - pUPC->Position()).Magnitude() > 16.0f)
 						continue; // 16 미터 이상 떨어져 있음 지나간다..
 
-					__Vector3 vCp = pUPC->Center();
-					//if( true == CheckCollisionSphere(pBundle->m_vPos, pBundle->m_vPos + pBundle->m_vDir*pBundle->m_fVelocity*CN3Base::s_fSecPerFrm, vCp, pUPC->Radius(), &vCol) )
-					if (true
-						== pUPC->CheckCollisionByBox(pBundle->m_vPos,
+					if (pUPC->CheckCollisionByBox(pBundle->m_vPos,
 							pBundle->m_vPos + pBundle->m_vDir * pBundle->m_fVelocity * CN3Base::s_fSecPerFrm, &vCol, nullptr))
 					{
 						bCol            = true;
@@ -511,9 +495,7 @@ void CN3FXMgr::Tick()
 							}
 						}
 
-						__Vector3 vCp = pNPC->Center();
-						//if( true == CheckCollisionSphere(pBundle->m_vPos, vNext, vCp, pNPC->Radius(), &vCol) )
-						if (true == pNPC->CheckCollisionByBox(pBundle->m_vPos, vNext, &vCol, nullptr))
+						if (pNPC->CheckCollisionByBox(pBundle->m_vPos, vNext, &vCol, nullptr))
 						{
 							bCol            = true;
 							pBundle->m_vPos = vCol;
@@ -609,11 +591,11 @@ void CN3FXMgr::Tick()
 					CGameProcedure::s_pSocket->Send(byBuff, iOffset); // 보낸다..
 				}
 				// 지형과 충돌체크..
-				if (bCol == false && ACT_WORLD->CheckCollisionWithTerrain(pBundle->m_vPos, pBundle->m_vDir, pBundle->m_fVelocity, &vCol))
+				if (!bCol && ACT_WORLD->CheckCollisionWithTerrain(pBundle->m_vPos, pBundle->m_vDir, pBundle->m_fVelocity, &vCol))
 				{
 					//충돌...
 					//여기서 패킷 날려야 겠구만...
-					bCol            = true;
+					// bCol            = true; // last instance so it's not used
 					pBundle->m_vPos = vCol;
 					pBundle->Stop();
 					int iMagicID = CGameProcedure::s_pProcMain->m_pMagicSkillMng->GetMagicID(pBundle->m_iIdx);
@@ -667,8 +649,8 @@ void CN3FXMgr::Tick()
 void CN3FXMgr::Render()
 {
 	//온갖 renderstate설정...
-	DWORD dwLgt, dwAlpha, dwZEnable;
-	DWORD dwSrcBlend, dwDestBlend;
+	DWORD dwLgt = 0, dwAlpha = 0, dwZEnable = 0;
+	DWORD dwSrcBlend = 0, dwDestBlend = 0;
 
 	s_lpD3DDev->GetRenderState(D3DRS_LIGHTING, &dwLgt);
 	s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
@@ -696,41 +678,6 @@ void CN3FXMgr::Render()
 	s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND, dwDestBlend);
 	s_lpD3DDev->SetRenderState(D3DRS_ZWRITEENABLE, dwZEnable);
 }
-
-bool CN3FXMgr::CheckCollisionSphere(__Vector3 vSp, __Vector3 vEp, __Vector3 vCp, float fRadius, __Vector3* vCol)
-{
-	__Vector3 vSpCp = vCp - vSp;
-	float DistSpCp  = vSpCp.Magnitude();
-	if (DistSpCp <= fRadius)
-	{
-		(*vCol) = vSp;
-		return true;
-	}
-
-	__Vector3 vDir = vEp - vSp;
-	float DistSpEp = vDir.Magnitude();
-	vDir.Normalize();
-
-	__Vector3 vCross;
-	vCross.Cross(vSpCp, vDir);
-	float DistCross = vCross.Magnitude();
-
-	if (DistCross <= fRadius)
-	{
-		float sqDistCross = DistCross * DistCross;
-		float DistSpCross = sqrt((DistSpCp * DistSpCp) - sqDistCross);
-
-		if (DistSpCross < DistSpEp)
-		{
-			float DistCol = DistSpCross - sqrt((fRadius * fRadius) - sqDistCross);
-
-			(*vCol)       = vSp + vDir * DistCol;
-			return true;
-		}
-	}
-	return false;
-}
-
 void CN3FXMgr::ClearAll()
 {
 	stlLIST_BUNDLEGAME_IT it;

@@ -5,21 +5,21 @@
 #if !defined(AFX_N3Pond_H__B9A59A74_B468_4552_8D80_E8AF3FE586E0__INCLUDED_)
 #define AFX_N3Pond_H__B9A59A74_B468_4552_8D80_E8AF3FE586E0__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
-#define MAX_PONDMESH_LINE   200
-#define MAX_PONDMESH_VERTEX 200 * 4
-#define MAX_POND_TEX        32
+constexpr int MAX_PONDMESH_LINE   = 200;
+constexpr int MAX_PONDMESH_VERTEX = 200 * 4;
+constexpr int MAX_POND_TEX        = 32;
 
 #include <N3Base/N3BaseFileAccess.h>
+
+#include <vector>
 
 class CN3Pond : public CN3BaseFileAccess
 {
 public:
 	CN3Pond();
-	virtual ~CN3Pond();
+	~CN3Pond() override;
 
 	struct __VertexPond
 	{
@@ -38,7 +38,7 @@ public:
 		}
 	};
 
-	class CPongMesh
+	class CPondMesh
 	{
 	public:
 		CN3Texture* m_pTexWave;
@@ -56,35 +56,44 @@ public:
 		__Vector3 m_vCenterPo;         //	연못의 중간지점
 		float m_fRadius;               //	연못의 지름
 
-		CPongMesh()
+		CPondMesh()
 		{
-			m_bTick2Rand = FALSE;
-			m_pVertices = nullptr, m_wpIndex = nullptr;
+			m_bTick2Rand      = FALSE;
+			m_pVertices       = nullptr;
+			m_wpIndex         = nullptr;
 			m_pfVelocityArray = nullptr;
 			m_pTexWave        = nullptr;
-		};
-		virtual ~CPongMesh()
+			m_iWidthVtx       = 0;
+			m_iHeightVtx      = 0;
+			m_vCenterPo       = {};
+			m_fRadius         = 0.0f;
+			m_iIC             = 0;
+			m_pfMaxHeight     = 0.0f;
+			m_iVC             = 0;
+			m_fmin            = 0.0f;
+			m_fmincal         = 0.0f;
+			m_fmaxcal         = 0.0f;
+			m_fmax            = 0.0f;
+		}
+
+		~CPondMesh()
 		{
-			if (m_pVertices)
-				delete[] m_pVertices;
+			delete[] m_pVertices;
 			m_pVertices = nullptr;
-			if (m_wpIndex)
-				delete[] m_wpIndex;
+
+			delete[] m_wpIndex;
 			m_wpIndex = nullptr;
-			if (m_pfVelocityArray)
-				delete[] m_pfVelocityArray;
+
+			delete[] m_pfVelocityArray;
 			m_pfVelocityArray = nullptr;
-			if (m_pTexWave)
-			{
-				CN3Base::s_MngTex.Delete(&m_pTexWave);
-				m_pTexWave = nullptr;
-			}
+
+			CN3Base::s_MngTex.Delete(&m_pTexWave);
+			m_pTexWave = nullptr;
 		};
 	};
 
 public:
-	int m_iPondMeshNum;      //	전체 연못의 갯수
-	CPongMesh* m_pCPondMesh; //	연못의 정보
+	std::vector<CPondMesh> m_PondMeshes; //	연못의 정보
 
 	CN3Texture* m_pTexPond[MAX_POND_TEX];
 	float m_fTexIndex;
@@ -99,14 +108,6 @@ public:
 	void Tick();
 
 private:
-	void CheckHeight(float& ChkHeight)
-	{
-		if (ChkHeight < -0.01f)
-			ChkHeight += 0.01f;
-		else if (ChkHeight > 0.01f)
-			ChkHeight += -0.01f;
-	};
-
 	void UpdateWaterPositions();
 };
 

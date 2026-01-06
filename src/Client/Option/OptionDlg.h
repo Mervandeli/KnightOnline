@@ -4,46 +4,22 @@
 // COptionDlg dialog
 struct __GameOption
 {
-	int iTexLOD_Chr;     // Texture LOD
-	int iTexLOD_Shape;   // Texture LOD
-	int iTexLOD_Terrain; // Texture LOD
-	int iUseShadow;      // 그림자 사용 0 사용안함 1 사용
-	int iViewDist;       // 가시거리..
-	int iViewWidth;      // 화면 길이
-	int iViewHeight;     // 화면 너비
-	int iViewColorDepth; // 색상수..
-	int iEffectSndDist;  // 이펙트 사운드 거리
-	int iEffectCount;
-	bool bSndDuplicated; // 중복된 음원 사용
-	bool bSoundBgm;
-	bool bSoundEffect;
-	bool bWindowCursor;  // 윈도우 커서 사용
-	bool bWindowMode;
-	bool bEffectVisible;
-
-	void InitDefault()
-	{
-		iUseShadow      = 1;
-		iTexLOD_Chr     = 0;
-		iTexLOD_Shape   = 0;
-		iTexLOD_Terrain = 0;
-		iViewColorDepth = 16;
-		iViewWidth      = 1024;
-		iViewHeight     = 768;
-		iViewDist       = 512;
-		iEffectSndDist  = 48;
-		bSndDuplicated  = false;
-		bSoundBgm       = true;
-		bSoundEffect    = true;
-		bWindowCursor   = true;
-		bWindowMode     = false;
-		bEffectVisible  = true;
-	}
-
-	__GameOption()
-	{
-		InitDefault();
-	}
+	int iUseShadow      = 1;    // 그림자 사용 0 사용안함 1 사용
+	int iTexLOD_Chr     = 0;    // Texture LOD
+	int iTexLOD_Shape   = 0;    // Texture LOD
+	int iTexLOD_Terrain = 0;    // Texture LOD
+	int iViewDist       = 512;  // 가시거리..
+	int iViewWidth      = 1024; // 화면 길이
+	int iViewHeight     = 768;  // 화면 너비
+	int iViewColorDepth = 16;   // 색상수..
+	int iEffectSndDist  = 48;   // 이펙트 사운드 거리
+	int iEffectCount    = 2000;
+	bool bSndDuplicated = true; // 중복된 음원 사용
+	bool bSoundBgm      = true;
+	bool bSoundEffect   = true;
+	bool bWindowCursor  = true; // 윈도우 커서 사용
+	bool bWindowMode    = false;
+	bool bEffectVisible = true;
 };
 
 class COptionDlg : public CDialog

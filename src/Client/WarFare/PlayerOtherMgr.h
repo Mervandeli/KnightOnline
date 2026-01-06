@@ -5,15 +5,13 @@
 #if !defined(AFX_PlayerOtherMgr_H__B32C59B8_6C08_494E_B9DE_338B3CD026C5__INCLUDED_)
 #define AFX_PlayerOtherMgr_H__B32C59B8_6C08_494E_B9DE_338B3CD026C5__INCLUDED_
 
-#include <map>
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "PlayerOther.h"
 #include "GameBase.h"
 #include "GameProcedure.h"
+
+#include <map>
 
 //typedef std::list<CPlayerOther*>::iterator it_UPC;
 //typedef std::list<CPlayerNPC*>::iterator it_NPC;
@@ -79,10 +77,10 @@ public:
 	void ReleaseUPCs();
 	void ReleaseNPCs();
 	void ReleaseCorpses();
-	void Release();
+	void Release() override;
 
 	CPlayerOtherMgr();
-	virtual ~CPlayerOtherMgr();
+	~CPlayerOtherMgr() override;
 };
 
 inline CPlayerOther* CPlayerOtherMgr::UPCGetByID(int iID, bool bFromAliveOnly)
@@ -107,51 +105,50 @@ inline CPlayerOther* CPlayerOtherMgr::UPCGetByID(int iID, bool bFromAliveOnly)
 
 inline CPlayerNPC* CPlayerOtherMgr::NPCGetByID(int iID, bool bFromAliveOnly)
 {
-	it_NPC it = m_NPCs.find(iID);
-	if (it != m_NPCs.end())
-	{
-		CPlayerNPC* pNPC = it->second;
-		if (bFromAliveOnly)
-		{
-			if (PSA_DEATH != pNPC->m_eState)
-				return pNPC;
-			else
-				return nullptr;
-		}
-		else
-			return pNPC;
-	}
-	else
+	auto it = m_NPCs.find(iID);
+	if (it == m_NPCs.end())
 		return nullptr;
+
+	CPlayerNPC* pNPC = it->second;
+	if (pNPC == nullptr)
+		return nullptr;
+
+	if (bFromAliveOnly)
+	{
+		if (pNPC->m_eState == PSA_DEATH)
+			return nullptr;
+	}
+
+	return pNPC;
 }
 
 inline CPlayerBase* CPlayerOtherMgr::CorpseGetByID(int iID)
 {
-	it_NPC it = m_Corpses.find(iID);
+	auto it = m_Corpses.find(iID);
 	if (it != m_Corpses.end())
 		return it->second;
-	else
-		return nullptr;
+
+	return nullptr;
 }
 
 inline CPlayerNPC* CPlayerOtherMgr::CharacterGetByID(int iID, bool bFromAliveOnly)
 {
 	if (iID < 0)
-		return 0;
+		return nullptr;
 
 	CPlayerNPC* pBPC = this->NPCGetByID(iID, bFromAliveOnly); // 먼저  NPC 중에서 찾아보고..
-	if (nullptr == pBPC)
-		pBPC = this->UPCGetByID(iID, bFromAliveOnly);         // 없음 User 들도 찾아본다..
+	if (pBPC == nullptr)
+		pBPC = UPCGetByID(iID, bFromAliveOnly);               // 없음 User 들도 찾아본다..
 
 	return pBPC;
 }
 
 inline void CPlayerOtherMgr::UPCAdd(CPlayerOther* pUPC)
 {
-	it_UPC it = m_UPCs.find(pUPC->IDNumber());
+	auto it = m_UPCs.find(pUPC->IDNumber());
 	if (it == m_UPCs.end()) // 중복된게 없으면..
 	{
-		m_UPCs.insert(val_UPC(pUPC->IDNumber(), pUPC));
+		m_UPCs.insert(std::make_pair(pUPC->IDNumber(), pUPC));
 	}
 	else // 중복되었으면..
 	{
@@ -162,7 +159,7 @@ inline void CPlayerOtherMgr::UPCAdd(CPlayerOther* pUPC)
 
 inline bool CPlayerOtherMgr::UPCDelete(int iID)
 {
-	it_UPC it = m_UPCs.find(iID);
+	auto it = m_UPCs.find(iID);
 	if (it == m_UPCs.end())
 		return false;
 
@@ -173,10 +170,10 @@ inline bool CPlayerOtherMgr::UPCDelete(int iID)
 
 inline void CPlayerOtherMgr::NPCAdd(CPlayerNPC* pNPC)
 {
-	it_NPC it = m_NPCs.find(pNPC->IDNumber());
+	auto it = m_NPCs.find(pNPC->IDNumber());
 	if (it == m_NPCs.end()) // 중복된게 없으면..
 	{
-		m_NPCs.insert(val_NPC(pNPC->IDNumber(), pNPC));
+		m_NPCs.insert(std::make_pair(pNPC->IDNumber(), pNPC));
 	}
 	else // 중복되었으면..
 	{
@@ -187,7 +184,7 @@ inline void CPlayerOtherMgr::NPCAdd(CPlayerNPC* pNPC)
 
 inline bool CPlayerOtherMgr::NPCDelete(int iID)
 {
-	it_NPC it = m_NPCs.find(iID);
+	auto it = m_NPCs.find(iID);
 	if (it == m_NPCs.end())
 		return false;
 

@@ -6,12 +6,14 @@
 #include "Vector4.inl"
 #include "Quaternion.inl"
 
+#include <array>
 #include <cmath>
 
 bool _CheckCollisionByBox(
 	const __Vector3& vOrig, const __Vector3& vDir, const __Vector3& vMin, const __Vector3& vMax)
 {
-	__Vector3 Vertices[36];
+	constexpr int VertexCount = 36;
+	std::array<__Vector3, VertexCount> Vertices;
 	int nFace = 0;
 
 	// z 축 음의 면
@@ -69,7 +71,7 @@ bool _CheckCollisionByBox(
 	Vertices[nFace + 5].Set(vMin.x, vMin.y, vMax.z);
 
 	// 각 면에 대해서 충돌 검사..
-	for (int i = 0; i < 12; i++)
+	for (int i = 0; i < VertexCount / 3; i++)
 	{
 		if (::_IntersectTriangle(
 				vOrig, vDir, Vertices[i * 3 + 0], Vertices[i * 3 + 1], Vertices[i * 3 + 2]))
@@ -83,23 +85,17 @@ bool _IntersectTriangle(const __Vector3& vOrig, const __Vector3& vDir, const __V
 	const __Vector3& v1, const __Vector3& v2, float& fT, float& fU, float& fV, __Vector3* pVCol)
 {
 	// Find vectors for two edges sharing vert0
-	__Vector3 vEdge1, vEdge2;
-
-	vEdge1 = v1 - v0;
-	vEdge2 = v2 - v0;
+	__Vector3 vEdge1 = v1 - v0;
+	__Vector3 vEdge2 = v2 - v0;
 
 	// Begin calculating determinant - also used to calculate U parameter
-	__Vector3 pVec;
-	float fDet;
 
-	//	By : Ecli666 ( On 2001-09-12 오전 10:39:01 )
-
+	__Vector3 pVec {};
 	pVec.Cross(vEdge1, vEdge2);
-	fDet = pVec.Dot(vDir);
+
+	float fDet = pVec.Dot(vDir);
 	if (fDet > -0.0001f)
 		return false;
-
-	//	~(By Ecli666 On 2001-09-12 오전 10:39:01 )
 
 	pVec.Cross(vDir, vEdge2);
 
@@ -154,8 +150,8 @@ bool _IntersectTriangle(const __Vector3& vOrig, const __Vector3& vDir, const __V
 {
 	// Find vectors for two edges sharing vert0
 	// Begin calculating determinant - also used to calculate U parameter
-	float fDet, fT, fU, fV;
-	__Vector3 vEdge1, vEdge2, tVec, pVec, qVec;
+	float fDet = 0.0f, fT = 0.0f, fU = 0.0f, fV = 0.0f;
+	__Vector3 vEdge1 {}, vEdge2 {}, tVec {}, pVec {}, qVec {};
 
 	vEdge1 = v1 - v0;
 	vEdge2 = v2 - v0;

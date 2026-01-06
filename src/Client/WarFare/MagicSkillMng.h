@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef CLIENT_WARFARE_MAGICSKILLMNG_H
+#define CLIENT_WARFARE_MAGICSKILLMNG_H
+
+#pragma once
 
 #include "GameDef.h"
 #include "GameBase.h"
@@ -82,12 +85,12 @@ private:
 
 protected:
 	bool CheckValidCondition(int iTargetID, const __TABLE_UPC_SKILL* pSkill) const;
-	bool CheckValidDistance(const __TABLE_UPC_SKILL* pSkill, __Vector3 vTargetPos, float fTargetRadius) const;
+	bool CheckValidDistance(const __TABLE_UPC_SKILL* pSkill, const __Vector3& vTargetPos, float fTargetRadius) const;
 
 	void InitType4();
 
 	void StartSkillMagicAtTargetPacket(__TABLE_UPC_SKILL* pSkill, int16_t TargetID);
-	void StartSkillMagicAtPosPacket(__TABLE_UPC_SKILL* pSkill, __Vector3 vPos);
+	void StartSkillMagicAtPosPacket(__TABLE_UPC_SKILL* pSkill, const __Vector3& vPos);
 
 	void ProcessCasting();
 
@@ -97,7 +100,7 @@ protected:
 
 	void EffectingType4(uint32_t dwMagicID);
 	void EffectingType3(uint32_t dwMagicID);
-	bool EffectingType1(uint32_t dwMagicID, int iSourceID, int iTargetID, int16_t* pData);
+	bool EffectingType1(uint32_t dwMagicID, int iSourceID, int iTargetID);
 
 	int AddIdx(uint32_t dwMagicID, int iNum = 1); //return value is index...
 	void RemoveIdx(int idx);
@@ -120,7 +123,6 @@ public:
 	void StunMySelf(__TABLE_UPC_SKILL_TYPE_3* pType3);
 	void StopCastingByRatio();
 	void ClearDurationalMagic();
-	D3DCOLOR TraceColorGet(__TABLE_UPC_SKILL* pSkill); // 스킬의 종류에 따라 검기의 색을 정한다..
 
 	bool IsPositiveMagic(uint32_t dwMagicID);
 	bool IsCasting();
@@ -142,5 +144,7 @@ public:
 
 	CMagicSkillMng();
 	CMagicSkillMng(CGameProcMain* pGameProcMain);
-	virtual ~CMagicSkillMng();
+	~CMagicSkillMng() override;
 };
+
+#endif // CLIENT_WARFARE_MAGICSKILLMNG_H

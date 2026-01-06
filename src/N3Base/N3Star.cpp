@@ -5,20 +5,8 @@
 #include "StdAfxBase.h"
 #include "N3Star.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3Star::CN3Star()
 {
-	m_iCurNumStar  = 0;
-	m_iNextNumStar = 0;
-	m_fAddTime     = 0;
 }
 
 CN3Star::~CN3Star()
@@ -28,6 +16,7 @@ CN3Star::~CN3Star()
 void CN3Star::Release()
 {
 	CN3Base::Release();
+
 	m_iCurNumStar  = 0;
 	m_iNextNumStar = 0;
 	m_fAddTime     = 0;
@@ -88,12 +77,11 @@ void CN3Star::Init()
 {
 	Release();
 
-	int i;
 	uint8_t alpha     = 0xff;
 	uint8_t alpha_min = 0x80;
 	uint8_t alpha_max = 0xff;
 	float fInc        = ((float) (alpha_max - alpha_min)) / MAX_STAR;
-	for (i = 0; i < MAX_STAR; ++i)
+	for (int i = 0; i < MAX_STAR; i++)
 	{
 		float fX = ((float) (rand() % 10000)) / 1000.f - 5.0f;
 		float fY = ((float) (rand() % 10000)) / 1000.f - 2.0f;

@@ -17,16 +17,6 @@
 #include <N3Base/N3UIEdit.h>
 #include <N3Base/N3UIString.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUITradeEditDlg::CUITradeEditDlg()
 {
 	m_pSubProcPerTrade = nullptr;
@@ -101,9 +91,9 @@ void CUITradeEditDlg::Open(bool bCountGold)
 		pEdit->SetFocus();
 
 	RECT rc, rcThis;
-	int iCX, iCY;
+	int iCX = 0, iCY = 0;
 
-	this->SetQuantity(0);
+	SetQuantity(0);
 
 	rc     = CGameProcedure::s_pProcMain->m_pSubProcPerTrade->m_pUIPerTradeDlg->GetRegion();
 	iCX    = (rc.right + rc.left) / 2;

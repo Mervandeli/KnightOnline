@@ -43,6 +43,9 @@ std::filesystem::path ItemManagerApp::ConfigPath() const
 
 bool ItemManagerApp::OnStart()
 {
+	_itemLogger = spdlog::get(std::string(logger::ItemManagerItem));
+	_expLogger  = spdlog::get(std::string(logger::ItemManagerExp));
+
 	// Attempt to open shared memory queue first.
 	// If it fails (memory not yet available), we'll run the _smqOpenThread to periodically check
 	// until it can finally be opened.
@@ -87,8 +90,8 @@ void ItemManagerApp::OnSharedMemoryOpened()
 void ItemManagerApp::ItemLogWrite(const char* pBuf)
 {
 	int index = 0, srclen = 0, tarlen = 0, type = 0, putitem = 0, putcount = 0, putdure = 0;
-	int64_t putserial           = 0;
-	char srcid[MAX_ID_SIZE + 1] = {}, tarid[MAX_ID_SIZE + 1] = {};
+	int64_t putserial = 0;
+	char srcid[MAX_ID_SIZE + 1] {}, tarid[MAX_ID_SIZE + 1] {};
 
 	srclen = GetShort(pBuf, index);
 	if (srclen <= 0 || srclen > MAX_ID_SIZE)
@@ -114,15 +117,14 @@ void ItemManagerApp::ItemLogWrite(const char* pBuf)
 	putcount  = GetShort(pBuf, index);
 	putdure   = GetShort(pBuf, index);
 
-	spdlog::get(logger::ItemManagerItem)
-		->info("{}, {}, {}, {}, {}, {}, {}", srcid, tarid, type, putserial, putitem, putcount,
-			putdure);
+	_itemLogger->info(
+		"{}, {}, {}, {}, {}, {}, {}", srcid, tarid, type, putserial, putitem, putcount, putdure);
 }
 
 void ItemManagerApp::ExpLogWrite(const char* pBuf)
 {
 	int index = 0, aclen = 0, charlen = 0, type = 0, level = 0, exp = 0, loyalty = 0, money = 0;
-	char acname[MAX_ID_SIZE + 1] = {}, charid[MAX_ID_SIZE + 1] = {};
+	char acname[MAX_ID_SIZE + 1] {}, charid[MAX_ID_SIZE + 1] {};
 
 	aclen = GetShort(pBuf, index);
 	if (aclen <= 0 || aclen > MAX_ID_SIZE)
@@ -145,7 +147,6 @@ void ItemManagerApp::ExpLogWrite(const char* pBuf)
 	exp     = GetDWORD(pBuf, index);
 	loyalty = GetDWORD(pBuf, index);
 	money   = GetDWORD(pBuf, index);
-
-	spdlog::get(logger::ItemManagerExp)
-		->info("{}, {}, {}, {}, {}, {}, {}", acname, charid, type, level, exp, loyalty, money);
+	_expLogger->info(
+		"{}, {}, {}, {}, {}, {}, {}", acname, charid, type, level, exp, loyalty, money);
 }

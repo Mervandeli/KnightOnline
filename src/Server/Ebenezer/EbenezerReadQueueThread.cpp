@@ -12,15 +12,15 @@ void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 {
 	EbenezerApp* appInstance = EbenezerApp::instance();
 
-	int index = 0, uid = -1, send_index = 0, buff_length = 0;
-	uint8_t command, result;
-	char send_buff[1024] = {};
-	CUser* pUser         = nullptr;
+	int index = 0, uid = -1, sendIndex = 0, buff_length = 0;
+	uint8_t command = 0, result = 0;
+	CUser* pUser = nullptr;
+	char sendBuffer[1024] {};
 
-	command              = GetByte(buffer, index);
-	uid                  = GetShort(buffer, index);
+	command = GetByte(buffer, index);
+	uid     = GetShort(buffer, index);
 
-	if (command == (KNIGHTS_ALLLIST_REQ + 0x10) && uid == -1)
+	if (command == DB_KNIGHTS_ALLLIST_REQ && uid == -1)
 	{
 		appInstance->m_KnightsManager.RecvKnightsAllList(buffer + index);
 		return;
@@ -36,31 +36,31 @@ void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 			result = GetByte(buffer, index);
 			if (result == 0xFF)
 				memset(pUser->m_strAccountID, 0, sizeof(pUser->m_strAccountID));
-			SetByte(send_buff, WIZ_LOGIN, send_index);
-			SetByte(send_buff, result, send_index); // 성공시 국가 정보
-			pUser->Send(send_buff, send_index);
+			SetByte(sendBuffer, WIZ_LOGIN, sendIndex);
+			SetByte(sendBuffer, result, sendIndex); // 성공시 국가 정보
+			pUser->Send(sendBuffer, sendIndex);
 			break;
 
 		case WIZ_SEL_NATION:
-			SetByte(send_buff, WIZ_SEL_NATION, send_index);
-			SetByte(send_buff, GetByte(buffer, index), send_index); // 국가 정보
-			pUser->Send(send_buff, send_index);
+			SetByte(sendBuffer, WIZ_SEL_NATION, sendIndex);
+			SetByte(sendBuffer, GetByte(buffer, index), sendIndex); // 국가 정보
+			pUser->Send(sendBuffer, sendIndex);
 			break;
 
 		case WIZ_NEW_CHAR:
 			result = GetByte(buffer, index);
-			SetByte(send_buff, WIZ_NEW_CHAR, send_index);
-			SetByte(send_buff, result, send_index); // 성공시 국가 정보
-			pUser->Send(send_buff, send_index);
+			SetByte(sendBuffer, WIZ_NEW_CHAR, sendIndex);
+			SetByte(sendBuffer, result, sendIndex); // 성공시 국가 정보
+			pUser->Send(sendBuffer, sendIndex);
 			break;
 
 		case WIZ_DEL_CHAR:
 			pUser->RecvDeleteChar(buffer + index);
 			/*	result = GetByte( buffer, index );
-			SetByte( send_buff, WIZ_DEL_CHAR, send_index );
-			SetByte( send_buff, result, send_index );					// 성공시 국가 정보
-			SetByte( send_buff, GetByte( buffer, index ), send_index );
-			pUser->Send( send_buff, send_index );	*/
+			SetByte( sendBuffer, WIZ_DEL_CHAR, sendIndex );
+			SetByte( sendBuffer, result, sendIndex );					// 성공시 국가 정보
+			SetByte( sendBuffer, GetByte( buffer, index ), sendIndex );
+			pUser->Send( sendBuffer, sendIndex );	*/
 			break;
 
 		case WIZ_SEL_CHAR:
@@ -72,9 +72,9 @@ void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 			if (buff_length > len)
 				break;
 
-			SetByte(send_buff, WIZ_ALLCHAR_INFO_REQ, send_index);
-			SetString(send_buff, buffer + index, buff_length, send_index);
-			pUser->Send(send_buff, send_index);
+			SetByte(sendBuffer, WIZ_ALLCHAR_INFO_REQ, sendIndex);
+			SetString(sendBuffer, buffer + index, buff_length, sendIndex);
+			pUser->Send(sendBuffer, sendIndex);
 			break;
 
 		case WIZ_LOGOUT:
@@ -86,21 +86,21 @@ void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 			}
 			break;
 
-		case KNIGHTS_CREATE + 0x10:
-		case KNIGHTS_JOIN + 0x10:
-		case KNIGHTS_WITHDRAW + 0x10:
-		case KNIGHTS_REMOVE + 0x10:
-		case KNIGHTS_ADMIT + 0x10:
-		case KNIGHTS_REJECT + 0x10:
-		case KNIGHTS_CHIEF + 0x10:
-		case KNIGHTS_VICECHIEF + 0x10:
-		case KNIGHTS_OFFICER + 0x10:
-		case KNIGHTS_PUNISH + 0x10:
-		case KNIGHTS_DESTROY + 0x10:
-		case KNIGHTS_MEMBER_REQ + 0x10:
-		case KNIGHTS_STASH + 0x10:
-		case KNIGHTS_LIST_REQ + 0x10:
-		case KNIGHTS_ALLLIST_REQ + 0x10:
+		case DB_KNIGHTS_CREATE:
+		case DB_KNIGHTS_JOIN:
+		case DB_KNIGHTS_WITHDRAW:
+		case DB_KNIGHTS_REMOVE:
+		case DB_KNIGHTS_ADMIT:
+		case DB_KNIGHTS_REJECT:
+		case DB_KNIGHTS_CHIEF:
+		case DB_KNIGHTS_VICECHIEF:
+		case DB_KNIGHTS_OFFICER:
+		case DB_KNIGHTS_PUNISH:
+		case DB_KNIGHTS_DESTROY:
+		case DB_KNIGHTS_MEMBER_REQ:
+		case DB_KNIGHTS_STASH:
+		case DB_KNIGHTS_LIST_REQ:
+		case DB_KNIGHTS_ALLLIST_REQ:
 			appInstance->m_KnightsManager.ReceiveKnightsProcess(pUser, buffer + index, command);
 			break;
 
@@ -113,6 +113,11 @@ void EbenezerReadQueueThread::process_packet(const char* buffer, int len)
 		case DB_COUPON_EVENT:
 			if (pUser != nullptr)
 				pUser->CouponEvent(buffer + index);
+			break;
+
+		default:
+			spdlog::error(
+				"EbenezerReadQueueThread::process_packet: Unhandled opcode {:02X}", command);
 			break;
 	}
 }

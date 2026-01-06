@@ -6,53 +6,42 @@
 
 #include <N3Base/N3Texture.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-#define WAVE_TOP  0.02f
-//#define WAVE_STEP		0.0005f
-#define WAVE_STEP 0.001f
+constexpr float WAVE_TOP  = 0.02f;
+constexpr float WAVE_STEP = 0.001f;
 
 CN3River::CN3River()
 {
-	m_fTexIndex   = 0.0f;
-	m_pRiverInfo  = nullptr;
-	m_iRiverCount = 0;
+	m_fTexIndex = 0.0f;
+	memset(m_pTexRiver, 0, sizeof(m_pTexRiver));
 }
 
 CN3River::~CN3River()
 {
-	if (m_pRiverInfo)
-		delete[] m_pRiverInfo, m_pRiverInfo = nullptr;
 }
 
 bool CN3River::Load(File& file)
 {
 	uint16_t wIndex[18] = { 4, 0, 1, 4, 1, 5, 5, 1, 2, 5, 2, 6, 6, 2, 3, 6, 3, 7 };
 
-	file.Read(&m_iRiverCount, sizeof(m_iRiverCount));
-	if (m_iRiverCount == 0)
+	m_Rivers.clear();
+
+	int iRiverCount = 0;
+	file.Read(&iRiverCount, sizeof(iRiverCount));
+	if (iRiverCount <= 0)
 		return true;
 
-	m_pRiverInfo       = new _RIVER_INFO[m_iRiverCount];
+	m_Rivers.resize(iRiverCount);
 
-	_RIVER_INFO* pInfo = nullptr;
-	for (int i = 0; i < m_iRiverCount; i++)
+	for (_RIVER_INFO& river : m_Rivers)
 	{
-		pInfo = m_pRiverInfo + i;
-		file.Read(&pInfo->iVC, sizeof(int));
-		__ASSERT(pInfo->iVC, "CN3River : nVertexCount is zero!!");
-		__ASSERT(pInfo->iVC % 4 == 0, "RiverVertex is a multiple of 4");
+		file.Read(&river.iVC, sizeof(int));
+		__ASSERT(river.iVC, "CN3River : nVertexCount is zero!!");
+		__ASSERT(river.iVC % 4 == 0, "RiverVertex is a multiple of 4");
 
-		pInfo->pVertices = new __VertexRiver[pInfo->iVC];
-		file.Read(pInfo->pVertices, pInfo->iVC * sizeof(__VertexRiver));
-		file.Read(&pInfo->iIC, sizeof(int));
-		__ASSERT(pInfo->iIC % 18 == 0, "River-Vertex-Index is a multiple of 18");
+		river.pVertices = new __VertexRiver[river.iVC];
+		file.Read(river.pVertices, river.iVC * sizeof(__VertexRiver));
+		file.Read(&river.iIC, sizeof(int));
+		__ASSERT(river.iIC % 18 == 0, "River-Vertex-Index is a multiple of 18");
 
 		int iTexNameLength = 0;
 		file.Read(&iTexNameLength, sizeof(int));
@@ -64,30 +53,29 @@ bool CN3River::Load(File& file)
 
 			std::string szTextureFName = fmt::format("misc\\river\\{}", szTexture);
 
-			pInfo->m_pTexWave          = s_MngTex.Get(szTextureFName);
-			__ASSERT(pInfo->m_pTexWave, "CN3River::texture load failed");
+			river.m_pTexWave           = s_MngTex.Get(szTextureFName);
+			__ASSERT(river.m_pTexWave, "CN3River::texture load failed");
 		}
 
-		pInfo->pwIndex = new uint16_t[pInfo->iIC];
-		for (int l = 0; l < pInfo->iIC / 18; l++)
+		river.pwIndex = new uint16_t[river.iIC];
+		for (int l = 0; l < river.iIC / 18; l++)
 		{
 			for (int j = 0; j < 18; j++)
-			{
-				pInfo->pwIndex[l * 18 + j] = wIndex[j] + l * 4;
-			}
+				river.pwIndex[l * 18 + j] = wIndex[j] + l * 4;
 		}
 
 		//
-		pInfo->pDiff = new _RIVER_DIFF[pInfo->iVC];
-		float fAdd   = 0.0f;
-		float fMul   = 0.002f;
-		for (int l = 0; l < pInfo->iVC; l++)
+		river.pDiff = new _RIVER_DIFF[river.iVC];
+		float fAdd  = 0.0f;
+		float fMul  = 0.002f;
+		for (int l = 0; l < river.iVC; l++)
 		{
-			pInfo->pDiff[l].fDiff = fAdd;
+			river.pDiff[l].fDiff = fAdd;
 			if (l % 2 == 0)
-				pInfo->pDiff[l].fWeight = 1.0f;
+				river.pDiff[l].fWeight = 1.0f;
 			else
-				pInfo->pDiff[l].fWeight = -1.0f;
+				river.pDiff[l].fWeight = -1.0f;
+
 			if (l % 4 == 0)
 			{
 				fAdd += fMul;
@@ -98,33 +86,41 @@ bool CN3River::Load(File& file)
 			}
 		}
 
-		int j, k;
-		__VertexRiver* ptVtx = pInfo->pVertices;
-		float StX, EnX, StZ, EnZ;
+		// Below code expects at least 5 vertices.
+		__ASSERT(river.iVC >= 5, "Requires at least 5 vertices per river mesh");
+		if (river.iVC < 5)
+			return false;
+
+		__VertexRiver* ptVtx = river.pVertices;
+		float StX = 0.0f, EnX = 0.0f, StZ = 0.0f, EnZ = 0.0f;
 		StX = ptVtx[0].x, EnX = ptVtx[4].x;
-		StZ = ptVtx[0].z, EnZ = ptVtx[pInfo->iVC / 4].z;
-		for (j = 0; j < pInfo->iVC / 4; j++)
+		StZ = ptVtx[0].z, EnZ = ptVtx[river.iVC / 4].z;
+		for (int j = 0; j < river.iVC / 4; j++)
 		{
-			for (k = 0; k < 4; k++)
+			for (int k = 0; k < 4; k++)
 			{
 				if (StX > ptVtx->x)
 					StX = ptVtx->x;
+
 				if (EnX < ptVtx->x)
 					EnX = ptVtx->x;
+
 				if (StZ > ptVtx->z)
 					StZ = ptVtx->z;
+
 				if (EnZ < ptVtx->z)
 					EnZ = ptVtx->z;
+
 				ptVtx++;
 			}
 		}
 
-		pInfo->m_vCenterPo.Set(((EnX - StX) / 2.0f) + StX, pInfo->pVertices[0].y, ((EnZ - StZ) / 2.0f) + StZ);
+		river.m_vCenterPo.Set(((EnX - StX) / 2.0f) + StX, river.pVertices[0].y, ((EnZ - StZ) / 2.0f) + StZ);
 
 		if (EnX - StX > EnZ - StZ)
-			pInfo->m_fRadius = (float) (EnX - StX) * 2.0f;
+			river.m_fRadius = (float) (EnX - StX) * 2.0f;
 		else
-			pInfo->m_fRadius = (float) (EnZ - StZ) * 2.0f;
+			river.m_fRadius = (float) (EnZ - StZ) * 2.0f;
 	}
 
 	std::string szFileName;
@@ -140,8 +136,9 @@ bool CN3River::Load(File& file)
 
 void CN3River::Render()
 {
-	if (m_iRiverCount <= 0)
+	if (m_Rivers.empty())
 		return;
+
 	int iTex = (int) m_fTexIndex;
 	__ASSERT(iTex < MAX_RIVER_TEX, "River Texture index overflow..");
 	if (iTex >= MAX_RIVER_TEX || nullptr == m_pTexRiver[iTex])
@@ -150,13 +147,16 @@ void CN3River::Render()
 	// Backup
 	__Matrix44 matWorld, matOld;
 	matWorld.Identity();
-	DWORD dwAlphaEnable, dwSrcBlend, dwDestBlend;
+
+	DWORD dwAlphaEnable = 0, dwSrcBlend = 0, dwDestBlend = 0;
+	DWORD dwColor_0 = 0, dwColorArg1_0 = 0, dwColorArg2_0 = 0, dwMipFilter_0 = 0;
+	DWORD dwColor_1 = 0, dwColorArg1_1 = 0, dwColorArg2_1 = 0, dwMipFilter_1 = 0;
+
 	s_lpD3DDev->GetTransform(D3DTS_WORLD, matOld.toD3D());
 	s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlphaEnable);
 	s_lpD3DDev->GetRenderState(D3DRS_SRCBLEND, &dwSrcBlend);
 	s_lpD3DDev->GetRenderState(D3DRS_DESTBLEND, &dwDestBlend);
-	DWORD dwColor_0, dwColorArg1_0, dwColorArg2_0, dwMipFilter_0;
-	DWORD dwColor_1, dwColorArg1_1, dwColorArg2_1, dwMipFilter_1;
+
 	s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLOROP, &dwColor_0);
 	s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLORARG1, &dwColorArg1_0);
 	s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLORARG2, &dwColorArg2_0);
@@ -186,20 +186,18 @@ void CN3River::Render()
 	s_lpD3DDev->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
 	s_lpD3DDev->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX2);
-	_RIVER_INFO* pInfo = nullptr;
-	for (int i = 0; i < m_iRiverCount; i++)
+	for (const _RIVER_INFO& river : m_Rivers)
 	{
-		pInfo = m_pRiverInfo + i;
-		if (pInfo->m_bTick2Rand == TRUE)
-		{
-			if (pInfo->m_pTexWave)
-				s_lpD3DDev->SetTexture(1, pInfo->m_pTexWave->Get());
-			else
-				s_lpD3DDev->SetTexture(1, nullptr);
+		if (!river.m_bTick2Rand)
+			continue;
 
-			s_lpD3DDev->DrawIndexedPrimitiveUP(
-				D3DPT_TRIANGLELIST, 0, pInfo->iVC, pInfo->iIC / 3, pInfo->pwIndex, D3DFMT_INDEX16, pInfo->pVertices, sizeof(__VertexRiver));
-		}
+		if (river.m_pTexWave != nullptr)
+			s_lpD3DDev->SetTexture(1, river.m_pTexWave->Get());
+		else
+			s_lpD3DDev->SetTexture(1, nullptr);
+
+		s_lpD3DDev->DrawIndexedPrimitiveUP(
+			D3DPT_TRIANGLELIST, 0, river.iVC, river.iIC / 3, river.pwIndex, D3DFMT_INDEX16, river.pVertices, sizeof(__VertexRiver));
 	}
 
 	// restore
@@ -220,33 +218,30 @@ void CN3River::Render()
 
 void CN3River::Tick()
 {
-	if (m_iRiverCount == 0)
+	if (m_Rivers.empty())
 		return;
 
-	_RIVER_INFO* pInfo = nullptr;
-	for (int i = 0; i < m_iRiverCount; i++)
+	const float vDelta = 0.01f * s_fSecPerFrm;
+	for (_RIVER_INFO& river : m_Rivers)
 	{
-		pInfo = m_pRiverInfo + i;
-		if (CN3Base::s_CameraData.IsOutOfFrustum(pInfo->m_vCenterPo, pInfo->m_fRadius) == TRUE)
+		if (CN3Base::s_CameraData.IsOutOfFrustum(river.m_vCenterPo, river.m_fRadius))
 		{
-			pInfo->m_bTick2Rand = FALSE;
+			river.m_bTick2Rand = FALSE;
 			continue;
 		}
-		else
-			pInfo->m_bTick2Rand = TRUE;
 
-		for (int j = 0; j < pInfo->iVC; j++)
+		river.m_bTick2Rand = TRUE;
+
+		for (int j = 0; j < river.iVC; j++)
 		{
-			(pInfo->pVertices + j)->v  += 0.01f * s_fSecPerFrm;
-			(pInfo->pVertices + j)->v2 += 0.01f * s_fSecPerFrm;
+			river.pVertices[j].v  += vDelta;
+			river.pVertices[j].v2 += vDelta;
 		}
 	}
 
 	m_fTexIndex += s_fSecPerFrm * 15.0f;
-	if (m_fTexIndex >= 32.0f)
-	{
-		m_fTexIndex -= 32.0f;
-	}
+	if (m_fTexIndex >= MAX_RIVER_TEX)
+		m_fTexIndex -= MAX_RIVER_TEX;
 
 	static float fWave  = 0.0f;
 	fWave              += s_fSecPerFrm;
@@ -259,22 +254,16 @@ void CN3River::Tick()
 
 void CN3River::UpdateWaterPositions()
 {
-	if (m_iRiverCount == 0)
+	if (m_Rivers.empty())
 		return;
 
-	_RIVER_INFO* pInfo = nullptr;
-	_RIVER_DIFF* pDiff = nullptr;
-	__VertexRiver* pVertex;
-	int tmp;
-
-	for (int i = 0; i < m_iRiverCount; i++)
+	int tmp = 0;
+	for (_RIVER_INFO& river : m_Rivers)
 	{
-		pInfo = m_pRiverInfo + i;
-		__ASSERT(pInfo, "pInfo is null");
-		pDiff   = pInfo->pDiff;
+		_RIVER_DIFF* pDiff     = river.pDiff;
 
-		pVertex = pInfo->pVertices;
-		for (int j = 0; j < pInfo->iVC; j++)
+		__VertexRiver* pVertex = river.pVertices;
+		for (int j = 0; j < river.iVC; j++)
 		{
 			// berserk
 			// For optimizing.

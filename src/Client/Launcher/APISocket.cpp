@@ -22,12 +22,14 @@ CAPISocket::CAPISocket()
 {
 	m_hSocket = INVALID_SOCKET;
 	if (s_nInstanceCount == 0)
-	{
-		WSAStartup(0x0101, &s_WSData);
-	}
+		(void) WSAStartup(0x0101, &s_WSData);
+
 	s_nInstanceCount++;
 
 	m_iSendByteCount = 0;
+
+	memset(m_RecvBuf, 0, sizeof(m_RecvBuf));
+	m_hWndTarget = nullptr;
 }
 
 CAPISocket::~CAPISocket()
@@ -93,7 +95,7 @@ BOOL CAPISocket::Connect(HWND hWnd, const char* pszIP, DWORD port)
 		if ((hp = (hostent far*) gethostbyname(pszIP)) == nullptr)
 		{
 #ifdef _DEBUG
-			TCHAR msg[256] = {};
+			TCHAR msg[256] {};
 			_stprintf(msg, _T("Error: Connecting to %hs."), pszIP);
 			MessageBox(hWnd, msg, _T("socket error"), MB_OK | MB_ICONSTOP);
 #endif
@@ -109,7 +111,7 @@ BOOL CAPISocket::Connect(HWND hWnd, const char* pszIP, DWORD port)
 	if ((m_hSocket = socket(AF_INET, SOCK_STREAM, 0)) < 1)
 	{
 #ifdef _DEBUG
-		TCHAR msg[256] = {};
+		TCHAR msg[256] {};
 		_tcscpy(msg, _T("Error opening stream socket"));
 		MessageBox(hWnd, msg, _T("socket error"), MB_OK | MB_ICONSTOP);
 #endif
@@ -124,7 +126,7 @@ BOOL CAPISocket::Connect(HWND hWnd, const char* pszIP, DWORD port)
 		m_hSocket = INVALID_SOCKET;
 
 #ifdef _DEBUG
-		TCHAR msg[256] = {};
+		TCHAR msg[256] {};
 		_stprintf(
 			msg, _T("Cannot connect to %hs on port %u : ErrorCode : %d"), pszIP, port, iErrCode);
 		MessageBox(hWnd, msg, _T("socket error"), MB_OK | MB_ICONSTOP);

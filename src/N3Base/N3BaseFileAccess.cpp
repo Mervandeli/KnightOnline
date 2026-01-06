@@ -8,11 +8,6 @@
 #include <FileIO/FileReader.h>
 #include <FileIO/FileWriter.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 CN3BaseFileAccess::CN3BaseFileAccess()
 {
 	m_iFileFormatVersion  = N3FORMAT_VER_UNKN;

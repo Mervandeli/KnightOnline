@@ -16,7 +16,7 @@ namespace recordset_loader
 {
 struct Error
 {
-	enum class EnumErrorType
+	enum class EnumErrorType : uint8_t
 	{
 		None,
 		DatasourceConfig,

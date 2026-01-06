@@ -33,7 +33,7 @@ std::shared_ptr<BufferedAudioHandle> BufferedAudioHandle::Create(std::shared_ptr
 	if (asset == nullptr)
 		return nullptr;
 
-	uint32_t sourceId;
+	uint32_t sourceId = INVALID_AUDIO_SOURCE_ID;
 	if (!CN3Base::s_SndMgr.PullBufferedSourceIdFromPool(&sourceId))
 		return nullptr;
 
@@ -62,8 +62,7 @@ std::shared_ptr<StreamedAudioHandle> StreamedAudioHandle::Create(std::shared_ptr
 		return nullptr;
 
 	StreamedAudioAsset* streamedAudioAsset = static_cast<StreamedAudioAsset*>(asset.get());
-
-	uint32_t sourceId;
+	uint32_t sourceId                      = INVALID_AUDIO_SOURCE_ID;
 	if (!CN3Base::s_SndMgr.PullStreamedSourceIdFromPool(&sourceId))
 		return nullptr;
 

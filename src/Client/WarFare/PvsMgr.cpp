@@ -13,20 +13,11 @@
 #include <N3Base/N3ShapeMgr.h>
 #include <N3Base/N3ShapeExtra.h>
 
-#define INDOOR_FOLDER "N3Indoor\\"
+constexpr int ciVersion = 1;
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-CN3Mng<class CN3Shape> CPvsMgr::s_MngShape;
-CN3Mng<class CN3ShapeExtra> CPvsMgr::s_MngShapeExt;
+CN3Mng<CN3Shape> CPvsMgr::s_MngShape;
+CN3Mng<CN3ShapeExtra> CPvsMgr::s_MngShapeExt;
 std::list<ShapeInfo*> CPvsMgr::s_plShapeInfoList;
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CPvsMgr::CPvsMgr() : m_IndoorFolder("N3Indoor\\"), m_fVolumeOffs(0.6f) //..
 {
@@ -52,13 +43,8 @@ void CPvsMgr::DeleteAllPvsObj()
 	}
 	m_pPvsList.clear();
 
-	ShapeInfo* pSI;
-	siiter siit = s_plShapeInfoList.begin();
-	while (siit != s_plShapeInfoList.end())
-	{
-		pSI = *siit++;
+	for (ShapeInfo* pSI : s_plShapeInfoList)
 		delete pSI;
-	}
 	s_plShapeInfoList.clear();
 	s_MngShape.Release();
 	s_MngShapeExt.Release();
@@ -66,11 +52,8 @@ void CPvsMgr::DeleteAllPvsObj()
 
 ShapeInfo* CPvsMgr::GetShapeInfoByManager(int iID)
 {
-	ShapeInfo* pSI;
-	siiter siit = s_plShapeInfoList.begin();
-	while (siit != s_plShapeInfoList.end())
+	for (ShapeInfo* pSI : s_plShapeInfoList)
 	{
-		pSI = *siit++;
 		if (pSI->m_iID == iID)
 			return pSI;
 	}
@@ -78,12 +61,21 @@ ShapeInfo* CPvsMgr::GetShapeInfoByManager(int iID)
 	return nullptr;
 }
 
-void CPvsMgr::Tick(bool bWarp, __Vector3 vPos)
+void CPvsMgr::Tick(bool bWarp, const __Vector3* vPos)
 {
 	CPortalVolume* pVol = nullptr;
-	__Vector3 vec       = CGameBase::s_pPlayer->Position();
+	__Vector3 vec {};
 	if (bWarp)
-		vec = vPos;
+	{
+		if (vPos != nullptr)
+			vec = *vPos;
+		else
+			vec = {};
+	}
+	else
+	{
+		vec = CGameBase::s_pPlayer->Position();
+	}
 
 	vec.y     += m_fVolumeOffs;
 	m_pCurVol  = nullptr;
@@ -133,7 +125,7 @@ void CPvsMgr::Render()
 	}
 }
 
-bool CPvsMgr::LoadOldVersion(File& file, int iVersionFromData)
+bool CPvsMgr::LoadOldVersion(File& /*file*/, int /*iVersionFromData*/)
 {
 	//..
 
@@ -142,8 +134,7 @@ bool CPvsMgr::LoadOldVersion(File& file, int iVersionFromData)
 
 bool CPvsMgr::Load(File& file)
 {
-	int iT;
-
+	int iT = 0;
 	file.Read(&iT, sizeof(int));
 	if (iT != ciVersion)
 		return LoadOldVersion(file, iT);
@@ -156,9 +147,8 @@ bool CPvsMgr::Load(File& file)
 	file.Read(&iT, sizeof(int));
 	file.Read(&iT, sizeof(int));
 
-	char szDrive[_MAX_DRIVE], szDir[_MAX_DIR], szFName[_MAX_FNAME], szExt[_MAX_EXT];
-	int iCount;
-
+	char szDrive[_MAX_DRIVE] {}, szDir[_MAX_DIR] {}, szFName[_MAX_FNAME] {}, szExt[_MAX_EXT] {};
+	int iCount = 0;
 	file.Read(&iCount, sizeof(int));
 
 	for (int i = 0; i < iCount; i++)
@@ -188,10 +178,9 @@ bool CPvsMgr::Load(File& file)
 	file.Read(&iCount, sizeof(int));
 
 	CPortalVolume *pVol = nullptr, *pVolTo = nullptr;
-	int iID;
-
 	for (int i = 0; i < iCount; i++)
 	{
+		int iID = 0;
 		file.Read(&iID, sizeof(int));
 
 		pVol             = new CPortalVolume;
@@ -243,12 +232,11 @@ CPortalVolume* CPvsMgr::GetPortalVolPointerByID(int iID)
 	return nullptr;
 }
 
-#define CRY_KEY 0x0816
+constexpr uint16_t CRY_KEY = 0x0816;
 
 std::string CPvsMgr::ReadDecryptString(File& file)
 {
-	int iCount;
-
+	int iCount = 0;
 	file.Read(&iCount, sizeof(int));
 
 	std::string strDest;
@@ -258,7 +246,7 @@ std::string CPvsMgr::ReadDecryptString(File& file)
 		file.Read(&strDest[0], iCount);
 
 		for (int i = 0; i < iCount; i++)
-			strDest[i] ^= CRY_KEY;
+			strDest[i] = static_cast<char>(static_cast<uint8_t>(strDest[i]) ^ CRY_KEY);
 	}
 
 	return strDest;
@@ -334,7 +322,7 @@ bool CPvsMgr::CheckCollisionCameraWithShape(__Vector3& vEyeResult, const __Vecto
 	return bCollision;
 }
 
-float CPvsMgr::GetHeightWithTerrain(float x, float z, bool bWarp)
+float CPvsMgr::GetHeightWithTerrain(float x, float z)
 {
 	if (!m_pCurVol)
 		Tick();
@@ -347,9 +335,9 @@ float CPvsMgr::GetHeightWithTerrain(float x, float z, bool bWarp)
 	return fHeight;
 }
 
-float CPvsMgr::GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal)
+float CPvsMgr::GetHeightNearstPosWithShape(const __Vector3& vPos, __Vector3* pvNormal)
 {
-	float fHeightMax    = FLT_MIN, fHeight;
+	float fHeightMax = FLT_MIN, fHeight = 0.0f;
 
 	CPortalVolume* pVol = nullptr;
 	iter it             = m_pPvsList.begin();
@@ -359,7 +347,7 @@ float CPvsMgr::GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, _
 		pVol = *it++;
 		if (pVol->m_eRenderType == TYPE_TRUE)
 		{
-			fHeight = pVol->GetHeightNearstPosWithShape(vPos, fDist, pvNormal);
+			fHeight = pVol->GetHeightNearstPosWithShape(vPos, pvNormal);
 			if (fHeightMax < fHeight)
 				fHeightMax = fHeight;
 		}
@@ -368,7 +356,7 @@ float CPvsMgr::GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, _
 	return fHeightMax;
 }
 
-bool CPvsMgr::IsInTerrainWithTerrain(float x, float z, __Vector3 vPosBefore)
+bool CPvsMgr::IsInTerrainWithTerrain(float x, float z)
 {
 	if (!m_pCurVol)
 		Tick();
@@ -380,9 +368,9 @@ bool CPvsMgr::IsInTerrainWithTerrain(float x, float z, __Vector3 vPosBefore)
 	return m_pCurVol->GetHeightWithTerrain(x, z, fHeight);
 }
 
-float CPvsMgr::GetHeightWithShape(float fX, float fZ, __Vector3* pvNormal)
+float CPvsMgr::GetHeightWithShape(float fX, float fZ, __Vector3* /*pvNormal*/)
 {
-	float fHeightMax    = FLT_MIN, fHeight;
+	float fHeightMax = FLT_MIN, fHeight = 0.0f;
 
 	CPortalVolume *pVol = nullptr, *pVolNe = nullptr;
 	iter it = m_pPvsList.begin();
@@ -390,7 +378,7 @@ float CPvsMgr::GetHeightWithShape(float fX, float fZ, __Vector3* pvNormal)
 	while (it != m_pPvsList.end())
 	{
 		pVol    = *it++;
-		fHeight = pVol->GetHeightNearstPosWithShape(__Vector3(fX, FLT_MIN, fZ), 0.0f);
+		fHeight = pVol->GetHeightNearstPosWithShape(__Vector3(fX, FLT_MIN, fZ));
 		if (fHeightMax < fHeight)
 		{
 			fHeightMax = fHeight;
@@ -401,19 +389,19 @@ float CPvsMgr::GetHeightWithShape(float fX, float fZ, __Vector3* pvNormal)
 	__Vector3 vPos;
 	vPos.Set(fX, fHeightMax, fZ);
 	if (pVolNe && pVolNe->m_eRenderType != TYPE_TRUE)
-		Tick(true, vPos);
+		Tick(true, &vPos);
 
 	return fHeightMax;
 }
 
 BOOL CPvsMgr::PickWideWithTerrain(int x, int y, __Vector3& vPick)
 {
-	BOOL bColl          = FALSE;
-	__Vector3 vCamPo    = CGameProcedure::s_pEng->CameraGetActive()->EyePos(), vPT;
-	float fDistMax      = FLT_MAX, fDT;
+	BOOL bColl       = FALSE;
+	__Vector3 vCamPo = CGameProcedure::s_pEng->CameraGetActive()->EyePos(), vPT;
+	float fDistMax = FLT_MAX, fDT = 0.0f;
 
-	CPortalVolume *pVol = nullptr, *pVolNe = nullptr;
-	iter it = m_pPvsList.begin();
+	CPortalVolume* pVol = nullptr;
+	iter it             = m_pPvsList.begin();
 
 	while (it != m_pPvsList.end())
 	{

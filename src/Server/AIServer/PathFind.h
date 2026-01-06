@@ -8,21 +8,21 @@
 class _PathNode
 {
 public:
-	int f;
-	int h;
-	int g;
-	int x;
-	int y;
-	_PathNode* Parent;
-	_PathNode* Child[8];
-	_PathNode* NextNode;
+	int f               = 0;
+	int h               = 0;
+	int g               = 0;
+	int x               = 0;
+	int y               = 0;
+	_PathNode* Parent   = nullptr;
+	_PathNode* Child[8] = {};
+	_PathNode* NextNode = nullptr;
 };
 
 class STACK
 {
 public:
-	_PathNode* NodePtr;
-	STACK* NextStackPtr;
+	_PathNode* NodePtr  = nullptr;
+	STACK* NextStackPtr = nullptr;
 };
 
 class AIServerApp;

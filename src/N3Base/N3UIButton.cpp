@@ -9,19 +9,14 @@
 #include "N3SndMgr.h"
 #include "N3SndObj.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 CN3UIButton::CN3UIButton()
 {
 	m_eType   = UI_TYPE_BUTTON;
 
 	m_dwStyle = UISTYLE_BTN_NORMAL;
 	m_eState  = UI_STATE_BUTTON_NORMAL;
-	ZeroMemory(m_ImageRef, sizeof(CN3UIImage*) * NUM_BTN_STATE);
-	ZeroMemory(&m_rcClick, sizeof(m_rcClick));
+	memset(&m_ImageRef, 0, sizeof(CN3UIImage*) * NUM_BTN_STATE);
+	memset(&m_rcClick, 0, sizeof(m_rcClick));
 	m_pSnd_On    = nullptr;
 	m_pSnd_Click = nullptr;
 }
@@ -75,30 +70,29 @@ void CN3UIButton::Render()
 	switch (m_eState)
 	{
 		case UI_STATE_BUTTON_NORMAL:
-		{
-			if (m_ImageRef[BS_NORMAL])
+			if (m_ImageRef[BS_NORMAL] != nullptr)
 				m_ImageRef[BS_NORMAL]->Render();
-		}
-		break;
+			break;
+
 		case UI_STATE_BUTTON_DOWN:
 		case UI_STATE_BUTTON_DOWN_2CHECKDOWN:
 		case UI_STATE_BUTTON_DOWN_2CHECKUP:
-		{
-			if (m_ImageRef[BS_DOWN])
+			if (m_ImageRef[BS_DOWN] != nullptr)
 				m_ImageRef[BS_DOWN]->Render();
-		}
-		break;
+			break;
+
 		case UI_STATE_BUTTON_ON:
-		{
-			if (m_ImageRef[BS_ON])
+			if (m_ImageRef[BS_ON] != nullptr)
 				m_ImageRef[BS_ON]->Render();
-		}
-		break;
+			break;
+
 		case UI_STATE_BUTTON_DISABLE:
-		{
-			if (m_ImageRef[BS_DISABLE])
+			if (m_ImageRef[BS_DISABLE] != nullptr)
 				m_ImageRef[BS_DISABLE]->Render();
-		}
+			break;
+
+		default:
+			break;
 	}
 
 	int i = 0;
@@ -106,8 +100,11 @@ void CN3UIButton::Render()
 	{
 		CN3UIBase* pChild = (*itor);
 		for (i = 0; i < NUM_BTN_STATE; i++) // 버튼의 구성 요소가 아닌지 보고..
+		{
 			if (pChild == m_ImageRef[i])
 				break;
+		}
+
 		if (i >= NUM_BTN_STATE)
 			pChild->Render(); // 버튼 차일드가 아니면 렌더링..
 	}
@@ -311,8 +308,11 @@ bool CN3UIButton::Load(File& file)
 	return true;
 }
 
-void CN3UIButton::operator=(const CN3UIButton& other)
+CN3UIButton& CN3UIButton::operator=(const CN3UIButton& other)
 {
+	if (this == &other)
+		return *this;
+
 	CN3UIBase::operator=(other);
 
 	m_rcClick = other.m_rcClick;            // 클릭 영역
@@ -320,17 +320,17 @@ void CN3UIButton::operator=(const CN3UIButton& other)
 	SetSndClick(other.GetSndFName_Click()); // 사운드
 
 	// m_ImageRef 설정하기
-	for (UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
+	for (CN3UIBase* pChild : m_Children)
 	{
-		CN3UIBase* pChild = (*itor);
 		if (UI_TYPE_IMAGE != pChild->UIType())
 			continue; // image만 골라내기
+
 		int iBtnState = (int) (pChild->GetReserved());
 		if (iBtnState < NUM_BTN_STATE)
-		{
 			m_ImageRef[iBtnState] = (CN3UIImage*) pChild;
-		}
 	}
+
+	return *this;
 }
 
 #ifdef _N3TOOL
@@ -361,8 +361,7 @@ bool CN3UIButton::Save(File& file)
 // 툴에서 사용하기 위한 함수 : n3uiImage를 생성한다.
 void CN3UIButton::CreateImages()
 {
-	int i;
-	for (i = 0; i < NUM_BTN_STATE; ++i)
+	for (int i = 0; i < NUM_BTN_STATE; ++i)
 	{
 		__ASSERT(nullptr == m_ImageRef[i], "이미지가 이미 할당되어 있어여");
 		m_ImageRef[i] = new CN3UIImage();
@@ -376,8 +375,8 @@ void CN3UIButton::CreateImages()
 
 void CN3UIButton::SetSndOn(const std::string& strFileName)
 {
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_On);
-	if (0 == strFileName.size())
+	s_SndMgr.ReleaseObj(&m_pSnd_On);
+	if (strFileName.empty())
 		return;
 
 	CN3BaseFileAccess tmpBase;
@@ -389,8 +388,8 @@ void CN3UIButton::SetSndOn(const std::string& strFileName)
 
 void CN3UIButton::SetSndClick(const std::string& strFileName)
 {
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Click);
-	if (0 == strFileName.size())
+	s_SndMgr.ReleaseObj(&m_pSnd_Click);
+	if (strFileName.empty())
 		return;
 
 	CN3BaseFileAccess tmpBase;

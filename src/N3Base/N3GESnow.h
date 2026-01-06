@@ -5,9 +5,7 @@
 #if !defined(AFX_N3GESNOW_H__F7097F94_15E3_42B8_95DB_9EEC3CFD2E9C__INCLUDED_)
 #define AFX_N3GESNOW_H__F7097F94_15E3_42B8_95DB_9EEC3CFD2E9C__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3GlobalEffect.h"
 
@@ -42,14 +40,14 @@ protected:
 
 									 // Operations
 public:
-	void Release();
-	void Tick();
-	void Render(__Vector3& vPos);
+	void Release() override;
+	void Tick() override;
+	void Render(__Vector3& vPos) override;
 	void Create(float fDensity, float fWidth, float fHeight, float fSnowSize,
 		const __Vector3& vVelocity, float fTimeToFade = 3.0f);
 
 	CN3GESnow();
-	virtual ~CN3GESnow();
+	~CN3GESnow() override;
 };
 
 #endif // !defined(AFX_N3GESNOW_H__F7097F94_15E3_42B8_95DB_9EEC3CFD2E9C__INCLUDED_)

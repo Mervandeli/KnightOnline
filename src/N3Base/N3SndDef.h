@@ -12,14 +12,14 @@
 
 #pragma once
 
-#include <string>     // std::string
+#include <string>          // std::string
 
-struct __TABLE_SOUND  // Sound 리소스 레코드...
+struct __TABLE_SOUND       // Sound 리소스 레코드...
 {
-	uint32_t dwID;    // 고유 ID
-	std::string szFN; // wave file name
-	int iType;        // 사운드 타입...
-	int iNumInst;     // 최대 사용할 수 있는 인스턴스의 갯수..
+	uint32_t dwID    = 0;  // 고유 ID
+	std::string szFN = {}; // wave file name
+	int iType        = 0;  // 사운드 타입...
+	int iNumInst     = 0;  // 최대 사용할 수 있는 인스턴스의 갯수..
 };
 
 /// \struct SoundSettings
@@ -43,7 +43,7 @@ struct SoundSettings
 
 /// \enum e_SndType
 /// \brief Type of sound, used to determine playback behavior.
-enum e_SndType
+enum e_SndType : uint8_t
 {
 	/// Standard 2D sound, unaffected by 3D spatialization.
 	SNDTYPE_2D = 0,
@@ -63,7 +63,7 @@ enum e_SndType
 ///
 /// These states are used by the audio system to manage the lifecycle
 /// of a sound handle, including fades, delays, and stopping.
-enum e_SndState
+enum e_SndState : uint8_t
 {
 	/// Initial state, before playback starts.
 	SNDSTATE_INITIAL = 0,

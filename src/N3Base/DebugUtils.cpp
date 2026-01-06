@@ -1,23 +1,17 @@
 ﻿#include "StdAfxBase.h"
-#include <stdarg.h>
+#include <spdlog/spdlog.h>
 
-void FormattedDebugString(const char* fmt, ...)
+void DebugStringToOutput(const std::string_view logMessage)
 {
-	char buf[4096], *p = buf;
-	va_list args;
-	int n;
+#ifdef _WIN32
+	constexpr std::string_view NewLine = "\r\n";
 
-	va_start(args, fmt);
-	n = _vsnprintf(p, sizeof(buf) - 3, fmt, args); // allow for proper linefeed & null terminator
-	va_end(args);
-	p    += (n < 0) ? sizeof(buf) - 3 : n;
-	*p++  = '\r';
-	*p++  = '\n';
-	*p    = '\0';
-
-#ifdef WIN32
-	OutputDebugStringA(buf);
-#else
-	printf("%s", buf);
+	std::string outputMessage;
+	outputMessage.reserve(logMessage.size() + NewLine.size());
+	outputMessage  = logMessage;
+	outputMessage += NewLine;
+	OutputDebugStringA(outputMessage.c_str());
 #endif
+
+	spdlog::trace(logMessage);
 }

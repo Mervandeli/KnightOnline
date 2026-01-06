@@ -3,12 +3,12 @@
 
 #pragma once
 
+#include <cassert>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <string_view>
 #include <unordered_map>
-#include <assert.h>
 
 #include <ModelUtil/ModelUtil.h>
 

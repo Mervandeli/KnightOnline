@@ -4,14 +4,6 @@
 #include "StdAfxBase.h"
 #include "N3PMeshInstance.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 //
 // an instance of a mesh. Each version of each mesh that is rendered at a
 // separate level of detail needs one of these.
@@ -59,11 +51,8 @@ CN3PMeshInstance::~CN3PMeshInstance()
 
 void CN3PMeshInstance::Release()
 {
-	if (m_pIndices)
-	{
-		delete[] m_pIndices;
-		m_pIndices = nullptr;
-	}
+	delete[] m_pIndices;
+	m_pIndices = nullptr;
 
 	s_MngPMesh.Delete(&m_pPMesh);
 	m_pCollapseUpTo = nullptr;
@@ -87,9 +76,7 @@ bool CN3PMeshInstance::Create(CN3PMesh* pN3PMesh)
 	int iMaxNumIndices = m_pPMesh->GetMaxNumIndices();
 	if (iMaxNumIndices > 0)
 	{
-		if (m_pIndices)
-			delete[] m_pIndices;
-		m_pIndices = nullptr;
+		delete[] m_pIndices;
 		m_pIndices = new uint16_t[m_pPMesh->m_iMaxNumIndices];
 		__ASSERT(m_pIndices, "Failed to create index buffer");
 		CopyMemory(m_pIndices, m_pPMesh->m_pIndices, m_pPMesh->m_iMaxNumIndices * sizeof(uint16_t));
@@ -107,12 +94,13 @@ bool CN3PMeshInstance::Create(CN3PMesh* pN3PMesh)
 
 bool CN3PMeshInstance::Create(const std::string& szFN)
 {
-	if (m_pPMesh && m_pPMesh->FileName() == szFN)
+	if (m_pPMesh != nullptr && m_pPMesh->FileName() == szFN)
 		return true; // 파일 이름이 같으면 새로 만들지 않고 리턴하자
-	this->Release();
+
+	CN3PMeshInstance::Release();
 
 	CN3PMesh* pN3PMesh = s_MngPMesh.Get(szFN);
-	return this->Create(pN3PMesh);
+	return Create(pN3PMesh);
 }
 
 void CN3PMeshInstance::SetLODByNumVertices(int iNumVertices)
@@ -121,34 +109,32 @@ void CN3PMeshInstance::SetLODByNumVertices(int iNumVertices)
 		return;
 
 	int iDiff = iNumVertices - m_iNumVertices;
-
 	if (iDiff == 0)
-	{
 		return;
-	}
-	else if (iDiff > 0)
+
+	if (iDiff > 0)
 	{
 		while (iNumVertices > m_iNumVertices)
 		{
 			if (m_pCollapseUpTo->NumVerticesToLose + m_iNumVertices > iNumVertices)
 				break; // 깜박임 방지 코드..
-			if (SplitOne() == false)
+
+			if (!SplitOne())
 				break;
 		}
 	}
 	else if (iDiff < 0)
 	{
-		iDiff = -iDiff;
 		while (iNumVertices < m_iNumVertices)
 		{
-			if (CollapseOne() == false)
+			if (!CollapseOne())
 				break;
 		}
 	}
 
 	while (m_pCollapseUpTo->bShouldCollapse)
 	{
-		if (SplitOne() == false)
+		if (!SplitOne())
 			break;
 	}
 }
@@ -284,8 +270,8 @@ void CN3PMeshInstance::Render()
 		int iPC = m_iNumIndices / 3;
 
 		int iLC = iPC / iPCToRender;
-		int i;
-		for (i = 0; i < iLC; ++i)
+		int i   = 0;
+		for (; i < iLC; ++i)
 		{
 			s_lpD3DDev->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, m_iNumVertices, iPCToRender,
 				m_pIndices + i * iPCToRender * 3, D3DFMT_INDEX16, m_pPMesh->m_pVertices,
@@ -320,8 +306,8 @@ void CN3PMeshInstance::RenderTwoUV()
 		int iPC = m_iNumIndices / 3;
 
 		int iLC = iPC / iPCToRender;
-		int i;
-		for (i = 0; i < iLC; ++i)
+		int i   = 0;
+		for (; i < iLC; ++i)
 		{
 			s_lpD3DDev->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, m_iNumVertices, iPCToRender,
 				m_pIndices + i * iPCToRender * 3, D3DFMT_INDEX16, m_pPMesh->m_pVertices2,
@@ -372,8 +358,8 @@ void CN3PMeshInstance::PartialRender(int iCount, uint16_t* pIndices)
 	{
 		int iPC = iCount / 3;
 		int iLC = iPC / iPCToRender;
-		int i;
-		for (i = 0; i < iLC; ++i)
+		int i   = 0;
+		for (; i < iLC; ++i)
 		{
 			s_lpD3DDev->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, m_iNumVertices, iPCToRender,
 				pIndices + i * iPCToRender * 3, D3DFMT_INDEX16, m_pPMesh->m_pVertices,
@@ -399,14 +385,12 @@ int CN3PMeshInstance::GetIndexByiOrder(int iOrder)
 __Vector3 CN3PMeshInstance::GetVertexByIndex(int iIndex)
 {
 	if (iIndex < 0 || iIndex >= GetNumVertices())
-	{
-		__Vector3 vec;
-		vec.Zero();
-		return vec;
-	}
+		return __Vector3 { 0, 0, 0 };
 
-	return GetMesh()->m_pVertices[iIndex];
+	CN3PMesh* mesh = GetMesh();
+	if (mesh == nullptr)
+		return __Vector3 { 0, 0, 0 };
+
+	__VertexT1& vtx = mesh->m_pVertices[iIndex];
+	return __Vector3 { vtx.x, vtx.y, vtx.z };
 }
-
-//	~(By Ecli666 On 2002-08-06 오후 4:33:04 )
-

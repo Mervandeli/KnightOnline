@@ -5,11 +5,9 @@
 #if !defined(AFX_SUBPROCPERTRADE_H__555E4865_7877_425D_8F29_DD028F251889__INCLUDED_)
 #define AFX_SUBPROCPERTRADE_H__555E4865_7877_425D_8F29_DD028F251889__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif                                                      // _MSC_VER > 1000
 
-enum e_PerTradeState
+enum e_PerTradeState : uint8_t
 {                                                           // 아이템 개인 거래 상태..
 	PER_TRADE_STATE_NONE = 0,                               // 아무것도 아님..
 	PER_TRADE_STATE_WAIT_FOR_REQ,                           // 상대방에게 요청하고 응답을 기다림..
@@ -20,26 +18,26 @@ enum e_PerTradeState
 	PER_TRADE_STATE_MY_TRADE_DECISION_DONE,                 // 내 거래 버튼 누른 상태..
 };
 
-enum e_PerTradeResultCode
+enum e_PerTradeResultCode : uint8_t
 {                                     // 아이템 거래가 해제되는 코드 정의..
 	PER_TRADE_RESULT_MY_DISAGREE = 0, // 거래를 신청받은 내가 거래 신청을 취소..
 	PER_TRADE_RESULT_OTHER_DISAGREE,  // 거래를 신청받은 상대방이 거래 신청을 취소..
 	PER_TRADE_RESULT_MY_CANCEL,       // 거래를 신청한 내가 거래 신청을 취소..
 };
 
-enum e_PerTradeProceedCode
+enum e_PerTradeProceedCode : uint8_t
 {                                  // 아이템 거래가 계속되는 상태를 정의..
 	PER_TRADE_RESULT_MY_AGREE = 0, // 거래를 신청받은 내가 거래 신청을 허락..
 	PER_TRADE_RESULT_OTHER_AGREE,  // 거래를 신청받은 상대방이 거래 신청을 허락..
 };
 
-enum e_PerTradeItemKindBackup
+enum e_PerTradeItemKindBackup : uint8_t
 {
-	PER_TRADE_ITEM_MONEY = 0,      // 전에 개인 거래창으로 ADD한 것이 돈이다..
-	PER_TRADE_ITEM_OTHER,          // 전에 개인 거래창으로 ADD한 것이 아이템이다..
+	PER_TRADE_ITEM_MONEY = 0,          // 전에 개인 거래창으로 ADD한 것이 돈이다..
+	PER_TRADE_ITEM_OTHER,              // 전에 개인 거래창으로 ADD한 것이 아이템이다..
 };
 
-const uint32_t dwGold = 900000000; // 음...
+constexpr uint32_t dwGold = 900000000; // 음...
 
 class CUIManager;
 class CUIPerTradeDlg;
@@ -64,19 +62,19 @@ public:
 
 public:
 	CSubProcPerTrade();
-	virtual ~CSubProcPerTrade();
+	~CSubProcPerTrade() override;
 
-	void Release();
+	void Release() override;
 
 	void InitPerTradeDlg(CUIManager* pUIManager);
 
-	void EnterWaitMsgFromServerStatePerTradeReq();                   // 내가 아이템 거래를 타인에게 신청한 상태..
-	void EnterWaitMsgFromServerStatePerTradeReq(std::string szName); // 내가 아이템 거래를 타인에게 신청한 상태..
-	void EnterWaitMyDecisionToPerTrade(int iOtherID);                // 내가 타인에게서 아이템 거래를 신청 받은 상태..
-	void LeavePerTradeState(e_PerTradeResultCode ePTRC);             // 아이템 거래 상태가 해제되는 코드..
-	void ProcessProceed(e_PerTradeProceedCode ePTPC);                // 아이템 거래가 계속되는 상태를 정의..
+	void EnterWaitMsgFromServerStatePerTradeReq();                          // 내가 아이템 거래를 타인에게 신청한 상태..
+	void EnterWaitMsgFromServerStatePerTradeReq(const std::string& szName); // 내가 아이템 거래를 타인에게 신청한 상태..
+	void EnterWaitMyDecisionToPerTrade(int iOtherID);                       // 내가 타인에게서 아이템 거래를 신청 받은 상태..
+	void LeavePerTradeState(e_PerTradeResultCode ePTRC);                    // 아이템 거래 상태가 해제되는 코드..
+	void ProcessProceed(e_PerTradeProceedCode ePTPC);                       // 아이템 거래가 계속되는 상태를 정의..
 
-	void SecureCodeBegin();                                          // 보호 코드..
+	void SecureCodeBegin();                                                 // 보호 코드..
 
 	void PerTradeCoreStart();
 	void PerTradeCoreInvDisable();

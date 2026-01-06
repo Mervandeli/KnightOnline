@@ -15,18 +15,6 @@
 #include <N3Base/N3UIString.h>
 #include <N3Base/N3UIButton.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-#define PARTY_BBS_MAXSTRING 69
-#define PARTY_BBS_MAXLINE   23
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIPartyBBS::CUIPartyBBS()
 {
 	//	m_pList_Infos			= nullptr;
@@ -42,6 +30,7 @@ CUIPartyBBS::CUIPartyBBS()
 	m_pText_Page          = nullptr;
 
 	m_iCurPage            = 0;
+	m_iMaxPage            = 0;
 	m_bProcessing         = false;
 	m_fTime               = 0.0f;
 	m_iCurIndex           = -1;
@@ -179,15 +168,15 @@ void CUIPartyBBS::MsgSend_RefreshData(int iCurPage)
 	float fTime = CN3Base::TimeGet();
 	if (fTime - m_fTime < 3.0f)
 		return;
+
 	m_fTime = fTime;
 
 	uint8_t byBuff[4];
-	int iOffset   = 0;
+	int iOffset = 0;
 
-	int16_t sPage = m_iCurPage;
 	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_PARTY_BBS);
 	CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_PARTY_BBS_DATA);
-	CAPISocket::MP_AddShort(byBuff, iOffset, sPage);
+	CAPISocket::MP_AddShort(byBuff, iOffset, static_cast<int16_t>(iCurPage));
 	CGameProcedure::s_pSocket->Send(byBuff, iOffset);
 
 	m_bProcessing = true;
@@ -205,23 +194,27 @@ void CUIPartyBBS::MsgRecv_RefreshData(Packet& pkt)
 	switch (byType)
 	{
 		case N3_SP_PARTY_REGISTER:
-		{
 			if (!IsVisible())
 				SetVisible(true);
-		}
-		case N3_SP_PARTY_REGISTER_CANCEL:
-		{
+
 			PartyStringSet(byType);
 			if (!IsVisible())
 				return;
-		}
-		break;
+			break;
+
+		case N3_SP_PARTY_REGISTER_CANCEL:
+			PartyStringSet(byType);
+			if (!IsVisible())
+				return;
+			break;
+
 		case N3_SP_PARTY_BBS_DATA:
-		{
 			if (!IsVisible())
 				SetVisible(true);
-		}
-		break;
+			break;
+
+		default:
+			break;
 	}
 
 	m_Datas.clear();
@@ -288,13 +281,13 @@ void CUIPartyBBS::RefreshPage()
 
 	it_PartyBBS it = m_Datas.begin();
 
-	std::string szDuty, szClass;
+	std::string szClass;
 	for (int i = 0; i < PARTY_BBS_MAXLINE; i++)
 	{
 		if (it == m_Datas.end())
 			return;
 
-		__InfoPartyBBS IPB = (*it);
+		const __InfoPartyBBS& IPB = (*it);
 		CGameBase::GetTextByClass(IPB.eClass, szClass);
 		SetContentString(i, IPB.szID.c_str(), IPB.iLevel, szClass.c_str());
 		it++;
@@ -310,6 +303,9 @@ void CUIPartyBBS::PartyStringSet(uint8_t byType)
 			break;
 		case N3_SP_PARTY_REGISTER_CANCEL:
 			CGameBase::s_pPlayer->m_bRecruitParty = false;
+			break;
+
+		default:
 			break;
 	}
 
@@ -351,7 +347,7 @@ void CUIPartyBBS::ResetContent()
 	}
 }
 
-void CUIPartyBBS::SetContentString(int iIndex, std::string szID, int iLevel, std::string szClass)
+void CUIPartyBBS::SetContentString(int iIndex, const std::string& szID, int iLevel, const std::string& szClass)
 {
 	if (m_pText[iIndex] != nullptr)
 		m_pText[iIndex]->SetString(szID);
@@ -394,14 +390,15 @@ void CUIPartyBBS::RenderSelectContent()
 	else
 		return;
 
-	__VertexTransformedColor vLines[5];
+	__VertexTransformedColor vLines[5] {};
 	vLines[0].Set((float) rc.left, (float) rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
 	vLines[1].Set((float) rc.right, (float) rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
 	vLines[2].Set((float) rc.right, (float) rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
 	vLines[3].Set((float) rc.left, (float) rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
 	vLines[4] = vLines[0];
 
-	DWORD dwZ, dwFog, dwAlpha, dwCOP, dwCA1, dwSrcBlend, dwDestBlend, dwVertexShader, dwAOP, dwAA1;
+	DWORD dwZ = 0, dwFog = 0, dwAlpha = 0, dwCOP = 0, dwCA1 = 0;
+	DWORD dwSrcBlend = 0, dwDestBlend = 0, dwVertexShader = 0, dwAOP = 0, dwAA1 = 0;
 	CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &dwZ);
 	CN3Base::s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
 	CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
@@ -463,7 +460,7 @@ void CUIPartyBBS::RequestWhisper()
 			break;
 		if (i == m_iCurIndex)
 		{
-			__InfoPartyBBS IPB = (*it);
+			const __InfoPartyBBS& IPB = (*it);
 			//나 자신에게는 귓속말을 못하게 한다...
 			if (lstrcmpi(IPB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) != 0)
 				CGameProcedure::s_pProcMain->MsgSend_ChatSelectTarget(IPB.szID);
@@ -485,13 +482,13 @@ void CUIPartyBBS::RequestParty()
 			break;
 		if (i == m_iCurIndex)
 		{
-			__InfoPartyBBS IPB = (*it);
+			const __InfoPartyBBS& IPB = (*it);
 
 			// 나 자신에게는 파티 신청을 못하게 한다...
 			if (lstrcmpi(IPB.szID.c_str(), CGameBase::s_pPlayer->m_InfoBase.szID.c_str()) != 0)
 			{
 				std::string szMsg;
-				if (CGameProcedure::s_pProcMain->MsgSend_PartyOrForceCreate(0, IPB.szID))
+				if (CGameProcedure::s_pProcMain->MsgSend_PartyOrForceCreate(IPB.szID))
 					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE);        // 파티
 				else
 					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE_FAILED); // 파티 초대 실패
@@ -513,11 +510,10 @@ void CUIPartyBBS::SetVisible(bool bVisible)
 
 bool CUIPartyBBS::OnKeyPress(int iKey)
 {
-	switch (iKey)
+	if (iKey == DIK_ESCAPE)
 	{
-		case DIK_ESCAPE:
-			SetVisible(false);
-			return true;
+		SetVisible(false);
+		return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

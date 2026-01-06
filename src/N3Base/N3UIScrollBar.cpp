@@ -6,20 +6,11 @@
 #include "N3UIScrollBar.h"
 #include "N3UIButton.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3UIScrollBar::CN3UIScrollBar()
 {
 	m_eType        = UI_TYPE_SCROLLBAR;
 	m_pTrackBarRef = nullptr;
-	ZeroMemory(m_pBtnRef, sizeof(CN3UIButton*) * NUM_BTN_TYPE);
+	memset(&m_pBtnRef, 0, sizeof(CN3UIButton*) * NUM_BTN_TYPE);
 	m_iLineSize = 1;
 }
 
@@ -31,20 +22,19 @@ void CN3UIScrollBar::Release()
 {
 	CN3UIBase::Release();
 	m_pTrackBarRef = nullptr;
-	ZeroMemory(m_pBtnRef, sizeof(CN3UIButton*) * NUM_BTN_TYPE);
+	memset(&m_pBtnRef, 0, sizeof(CN3UIButton*) * NUM_BTN_TYPE);
 	m_iLineSize = 1;
 }
 
 bool CN3UIScrollBar::Load(File& file)
 {
-	if (false == CN3UIBase::Load(file))
+	if (!CN3UIBase::Load(file))
 		return false;
 	__ASSERT(nullptr == m_pTrackBarRef, "scrollbar가 초기화되어 있지 않아여");
 
 	// m_pTrackBarRef, m_pBtnRef  설정하기
-	for (UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
+	for (CN3UIBase* pChild : m_Children)
 	{
-		CN3UIBase* pChild = (*itor);
 		if (UI_TYPE_TRACKBAR == pChild->UIType())
 		{
 			m_pTrackBarRef = (CN3UITrackBar*) pChild;
@@ -54,6 +44,7 @@ bool CN3UIScrollBar::Load(File& file)
 			int iBtnType = pChild->GetReserved();
 			if (iBtnType < 0 || iBtnType >= NUM_BTN_TYPE)
 				continue;
+
 			m_pBtnRef[iBtnType] = (CN3UIButton*) pChild;
 		}
 	}
@@ -109,15 +100,17 @@ void CN3UIScrollBar::SetStyle(uint32_t dwStyle)
 }
 
 #ifdef _N3TOOL
-void CN3UIScrollBar::operator=(const CN3UIScrollBar& other)
+CN3UIScrollBar& CN3UIScrollBar::operator=(const CN3UIScrollBar& other)
 {
+	if (this == &other)
+		return *this;
+
 	CN3UIBase::operator=(other);
 	m_iLineSize = other.m_iLineSize; // 버튼을 눌렀을때 trackbar가 움직여지는 크기
 
 	// m_pTrackBarRef, m_pBtnRef  설정하기
-	for (UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
+	for (CN3UIBase* pChild : m_Children)
 	{
-		CN3UIBase* pChild = (*itor);
 		if (UI_TYPE_TRACKBAR == pChild->UIType())
 		{
 			m_pTrackBarRef = (CN3UITrackBar*) pChild;
@@ -127,16 +120,18 @@ void CN3UIScrollBar::operator=(const CN3UIScrollBar& other)
 			int iBtnType = pChild->GetReserved();
 			if (iBtnType < 0 || iBtnType >= NUM_BTN_TYPE)
 				continue;
+
 			m_pBtnRef[iBtnType] = (CN3UIButton*) pChild;
 		}
 	}
+
+	return *this;
 }
 
 void CN3UIScrollBar::CreateTrackBarAndBtns()
 {
 	__ASSERT(nullptr == m_pTrackBarRef, "구성요소가 이미 할당되어 있어요");
-	int i;
-	for (i = 0; i < NUM_BTN_TYPE; ++i)
+	for (int i = 0; i < NUM_BTN_TYPE; ++i)
 	{
 		m_pBtnRef[i] = new CN3UIButton();
 		m_pBtnRef[i]->Init(this);

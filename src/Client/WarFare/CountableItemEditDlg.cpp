@@ -20,15 +20,6 @@
 #include <N3Base/N3UIEdit.h>
 #include <N3Base/N3UIString.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CCountableItemEditDlg::CCountableItemEditDlg()
 {
 	m_eCallerWnd         = UIWND_UNKNOWN;
@@ -76,6 +67,9 @@ bool CCountableItemEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 						case UIWND_DISTRICT_TRADE_MY:
 							CGameProcedure::s_pProcMain->m_pUITransactionDlg->ItemCountOK();
 							break;
+
+						default:
+							break;
 					}
 					break;
 
@@ -85,8 +79,12 @@ bool CCountableItemEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 						case UIWND_DISTRICT_PER_TRADE_MY:
 							CGameProcedure::s_pProcMain->m_pSubProcPerTrade->ItemCountOK();
 							break;
+
+						default:
+							break;
 					}
 					break;
+
 				case UIWND_WARE_HOUSE:
 					switch (m_eCallerWndDistrict)
 					{
@@ -96,13 +94,20 @@ bool CCountableItemEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 							else
 								CGameProcedure::s_pProcMain->m_pUIWareHouseDlg->GoldCountFromWareOK();
 							break;
+
 						case UIWND_DISTRICT_TRADE_MY:
 							if (!m_bWareGold)
 								CGameProcedure::s_pProcMain->m_pUIWareHouseDlg->ItemCountOK();
 							else
 								CGameProcedure::s_pProcMain->m_pUIWareHouseDlg->GoldCountToWareOK();
 							break;
+
+						default:
+							break;
 					}
+					break;
+
+				default:
 					break;
 			}
 		}
@@ -118,6 +123,9 @@ bool CCountableItemEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 						case UIWND_DISTRICT_TRADE_MY:
 							CGameProcedure::s_pProcMain->m_pUITransactionDlg->ItemCountCancel();
 							break;
+
+						default:
+							break;
 					}
 					break;
 
@@ -127,8 +135,12 @@ bool CCountableItemEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 						case UIWND_DISTRICT_PER_TRADE_MY:
 							CGameProcedure::s_pProcMain->m_pSubProcPerTrade->ItemCountCancel();
 							break;
+
+						default:
+							break;
 					}
 					break;
+
 				case UIWND_WARE_HOUSE:
 					switch (m_eCallerWndDistrict)
 					{
@@ -138,13 +150,20 @@ bool CCountableItemEditDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 							else
 								CGameProcedure::s_pProcMain->m_pUIWareHouseDlg->GoldCountFromWareCancel();
 							break;
+
 						case UIWND_DISTRICT_TRADE_MY:
 							if (!m_bWareGold)
 								CGameProcedure::s_pProcMain->m_pUIWareHouseDlg->ItemCountCancel();
 							else
 								CGameProcedure::s_pProcMain->m_pUIWareHouseDlg->GoldCountToWareCancel();
 							break;
+
+						default:
+							break;
 					}
+					break;
+
+				default:
 					break;
 			}
 		}
@@ -166,11 +185,11 @@ void CCountableItemEditDlg::Open(e_UIWND eUW, e_UIWND_DISTRICT eUD, bool bCountG
 	if (pString != nullptr)
 		pString->SetString(szMsg);
 
-	RECT rc, rcThis;
-	int iCX, iCY;
+	RECT rc {}, rcThis {};
+	int iCX = 0, iCY = 0;
 
 	m_bLocked = true;
-	this->SetQuantity(-1);
+	SetQuantity(-1);
 
 	SetVisible(true);
 
@@ -196,6 +215,9 @@ void CCountableItemEditDlg::Open(e_UIWND eUW, e_UIWND_DISTRICT eUD, bool bCountG
 		case UIWND_WARE_HOUSE:
 			rc = CGameProcedure::s_pProcMain->m_pUIWareHouseDlg->GetRegion();
 			break;
+
+		default:
+			return;
 	}
 
 	if ((eUW == UIWND_TRANSACTION) || (eUW == UIWND_PER_TRADE) || (eUW == UIWND_WARE_HOUSE))
@@ -276,9 +298,13 @@ bool CCountableItemEditDlg::OnKeyPress(int iKey)
 		case DIK_RETURN:
 			ReceiveMessage(m_pBtnOk, UIMSG_BUTTON_CLICK);
 			return true;
+
 		case DIK_ESCAPE:
 			ReceiveMessage(m_pBtnCancel, UIMSG_BUTTON_CLICK);
 			return true;
+
+		default:
+			break;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

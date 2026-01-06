@@ -11,22 +11,19 @@ __Quaternion::__Quaternion(const __Matrix44& mtx)
 	this->operator=(mtx);
 }
 
-__Quaternion::__Quaternion(const __Quaternion& qt)
+__Quaternion::__Quaternion(const __Quaternion& qt) : x(qt.x), y(qt.y), z(qt.z), w(qt.w)
 {
-	x = qt.x;
-	y = qt.y;
-	z = qt.z;
-	w = qt.w;
 }
 
-__Quaternion::__Quaternion(float fX, float fY, float fZ, float fW)
+__Quaternion::__Quaternion(float fX, float fY, float fZ, float fW) : x(fX), y(fY), z(fZ), w(fW)
 {
-	Set(fX, fY, fZ, fW);
 }
 
 void __Quaternion::Identity()
 {
-	x = y = z = 0;
+	x = 0.0f;
+	y = 0.0f;
+	z = 0.0f;
 	w = 1.0f;
 }
 
@@ -60,24 +57,22 @@ void __Quaternion::RotationAxis(float fX, float fY, float fZ, float fRadian)
 	w = cosf(fRadian / 2.0f);
 }
 
-void __Quaternion::operator = (const __Matrix44& mtx)
+__Quaternion& __Quaternion::operator=(const __Matrix44& mtx)
 {
-	float s, trace;
-
-	trace = mtx.m[0][0] + mtx.m[1][1] + mtx.m[2][2] + 1.0f;
+	float trace = mtx.m[0][0] + mtx.m[1][1] + mtx.m[2][2] + 1.0f;
 	if (trace > 1.0f)
 	{
-		s = 2.0f * sqrtf(trace);
-		x = (mtx.m[1][2] - mtx.m[2][1]) / s;
-		y = (mtx.m[2][0] - mtx.m[0][2]) / s;
-		z = (mtx.m[0][1] - mtx.m[1][0]) / s;
-		w = 0.25f * s;
+		float s = 2.0f * sqrtf(trace);
+		x       = (mtx.m[1][2] - mtx.m[2][1]) / s;
+		y       = (mtx.m[2][0] - mtx.m[0][2]) / s;
+		z       = (mtx.m[0][1] - mtx.m[1][0]) / s;
+		w       = 0.25f * s;
 	}
 	else
 	{
-		int i, maxi = 0;
-
-		for (i = 1; i < 3; i++)
+		float s  = 0.0f;
+		int maxi = 0;
+		for (int i = 1; i < 3; i++)
 		{
 			if (mtx.m[i][i] > mtx.m[maxi][maxi])
 				maxi = i;
@@ -108,8 +103,13 @@ void __Quaternion::operator = (const __Matrix44& mtx)
 				z = 0.25f * s;
 				w = (mtx.m[0][1] - mtx.m[1][0]) / s;
 				break;
+
+			default:
+				break;
 		}
 	}
+
+	return *this;
 }
 
 void __Quaternion::AxisAngle(__Vector3& vAxisResult, float& fRadianResult) const
@@ -123,23 +123,21 @@ void __Quaternion::AxisAngle(__Vector3& vAxisResult, float& fRadianResult) const
 
 void __Quaternion::Slerp(const __Quaternion& qt1, const __Quaternion& qt2, float fDelta)
 {
-	float dot, temp;
-
-	temp = 1.0f - fDelta;
-	dot = (qt1.x * qt2.x + qt1.y * qt2.y + qt1.z * qt2.z + qt1.w * qt2.w);
+	float temp = 1.0f - fDelta;
+	float dot  = (qt1.x * qt2.x + qt1.y * qt2.y + qt1.z * qt2.z + qt1.w * qt2.w);
 
 	if (dot < 0.0f)
 	{
 		fDelta = -fDelta;
-		dot = -dot;
+		dot    = -dot;
 	}
 
 	if (1.0f - dot > 0.001f)
 	{
 		float theta = acosf(dot);
 
-		temp = sinf(theta * temp) / sinf(theta);
-		fDelta = sinf(theta * fDelta) / sinf(theta);
+		temp        = sinf(theta * temp) / sinf(theta);
+		fDelta      = sinf(theta * fDelta) / sinf(theta);
 	}
 
 	x = temp * qt1.x + fDelta * qt2.x;
@@ -150,22 +148,22 @@ void __Quaternion::Slerp(const __Quaternion& qt1, const __Quaternion& qt2, float
 
 void __Quaternion::RotationYawPitchRoll(float Yaw, float Pitch, float Roll)
 {
-	float syaw, cyaw, spitch, cpitch, sroll, croll;
+	float syaw = 0.0f, cyaw = 0.0f, spitch = 0.0f, cpitch = 0.0f, sroll = 0.0f, croll = 0.0f;
 
-	syaw = sinf(Yaw / 2.0f);
-	cyaw = cosf(Yaw / 2.0f);
+	syaw   = sinf(Yaw / 2.0f);
+	cyaw   = cosf(Yaw / 2.0f);
 	spitch = sinf(Pitch / 2.0f);
 	cpitch = cosf(Pitch / 2.0f);
-	sroll = sinf(Roll / 2.0f);
-	croll = cosf(Roll / 2.0f);
+	sroll  = sinf(Roll / 2.0f);
+	croll  = cosf(Roll / 2.0f);
 
-	x = syaw * cpitch * sroll + cyaw * spitch * croll;
-	y = syaw * cpitch * croll - cyaw * spitch * sroll;
-	z = cyaw * cpitch * sroll - syaw * spitch * croll;
-	w = cyaw * cpitch * croll + syaw * spitch * sroll;
+	x      = syaw * cpitch * sroll + cyaw * spitch * croll;
+	y      = syaw * cpitch * croll - cyaw * spitch * sroll;
+	z      = cyaw * cpitch * sroll - syaw * spitch * croll;
+	w      = cyaw * cpitch * croll + syaw * spitch * sroll;
 }
 
-__Quaternion __Quaternion::operator * (const __Quaternion& q) const
+__Quaternion __Quaternion::operator*(const __Quaternion& q) const
 {
 	__Quaternion out;
 	out.x = q.w * x + q.x * w + q.y * z - q.z * y;
@@ -175,7 +173,7 @@ __Quaternion __Quaternion::operator * (const __Quaternion& q) const
 	return out;
 }
 
-void __Quaternion::operator *= (const __Quaternion& q)
+void __Quaternion::operator*=(const __Quaternion& q)
 {
 	__Quaternion tmp = this->operator*(q);
 	Set(tmp.x, tmp.y, tmp.z, tmp.w);

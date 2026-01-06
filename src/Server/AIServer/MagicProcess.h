@@ -13,7 +13,6 @@ class CMagicProcess
 public:
 	AIServerApp* m_pMain;
 	CUser* m_pSrcUser;
-	uint8_t m_bMagicState;
 
 public:
 	CMagicProcess();
@@ -32,6 +31,9 @@ public:
 	uint8_t ExecuteType2(int magicid, int tid, int data1, int data2, int data3);
 	uint8_t ExecuteType1(int magicid, int tid, int data1, int data2, int data3,
 		uint8_t sequence); // sequence => type1 or type2
+	void SendMagicAttackResult(uint8_t opcode, int magicId, int sourceId, int targetId,
+		int data1 = 0, int data2 = 0, int data3 = 0, int data4 = 0, int data5 = 0, int data6 = 0,
+		int data7 = 0);
 	int16_t GetMagicDamage(
 		int tid, int total_hit, int attribute, int dexpoint, int righthand_damage);
 	int16_t AreaAttack(int magictype, int magicid, int moral, int data1, int data2, int data3,

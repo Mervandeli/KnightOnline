@@ -5,6 +5,7 @@
 
 #include <asio.hpp>
 
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -24,6 +25,9 @@ class SocketManager
 	friend class TcpSocket;
 	friend class TcpClientSocket;
 	friend class TcpServerSocket;
+
+	using StartUserThreadCallback    = std::function<void()>;
+	using ShutdownUserThreadCallback = std::function<void()>;
 
 public:
 	inline asio::io_context& GetIoContext()
@@ -126,37 +130,33 @@ protected:
 	void OnPostClientSocketClose(TcpClientSocket* tcpSocket);
 	bool ProcessClose(TcpSocket* tcpSocket);
 
-	virtual void StartUserThreads()
-	{
-	}
-	virtual void ShutdownUserThreads()
-	{
-	}
-
 public:
 	void Shutdown();
 
 protected:
-	TcpSocket** _serverSocketArray;
-	TcpSocket** _inactiveServerSocketArray;
-	TcpClientSocket** _clientSocketArray;
+	TcpSocket** _serverSocketArray         = nullptr;
+	TcpSocket** _inactiveServerSocketArray = nullptr;
+	TcpClientSocket** _clientSocketArray   = nullptr;
 
-	int _serverSocketCount;
-	int _clientSocketCount;
+	int _serverSocketCount                 = 0;
+	int _clientSocketCount                 = 0;
 
-	int _recvBufferSize;
-	int _sendBufferSize;
+	int _recvBufferSize                    = 0;
+	int _sendBufferSize                    = 0;
 
-	uint32_t _workerThreadCount;
+	uint32_t _workerThreadCount            = 0;
 
 	asio::io_context _io;
 	std::unique_ptr<asio::ip::tcp::acceptor> _acceptor;
 	std::shared_ptr<asio::thread_pool> _workerPool;
 
-	std::atomic<bool> _acceptingConnections;
+	std::atomic<bool> _acceptingConnections = false;
 
 	std::queue<int> _socketIdQueue;
 	std::recursive_mutex _mutex;
+
+	StartUserThreadCallback _startUserThreadCallback       = nullptr;
+	ShutdownUserThreadCallback _shutdownUserThreadCallback = nullptr;
 };
 
 #endif // SERVER_SHAREDSERVER_SOCKETMANAGER_H

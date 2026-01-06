@@ -7,15 +7,6 @@
 
 #include "PlayerMySelf.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CDungeonManager::CDungeonManager()
 {
 }
@@ -26,10 +17,10 @@ CDungeonManager::~CDungeonManager()
 
 //////////////////////////////////////////////////////////////////////
 
-void CDungeonManager::InitWorld(int iZoneID, const __Vector3& vPosPlayer)
+void CDungeonManager::InitWorld(int iZoneID)
 {
 	__TABLE_ZONE* pZone = s_pTbl_Zones.Find(s_pPlayer->m_InfoExt.iZoneCur);
-	if (nullptr == pZone)
+	if (pZone == nullptr)
 	{
 		CLogWriter::Write("Null Zone data : {}", iZoneID);
 		return;
@@ -70,9 +61,9 @@ bool CDungeonManager::CheckCollisionCameraWithTerrain(__Vector3& vEyeResult, con
 	return m_pvsmgr.CheckCollisionCameraWithTerrain(vEyeResult, vAt, fNP);
 }
 
-float CDungeonManager::GetHeightWithTerrain(float x, float z, bool bWarp) // Done..
+float CDungeonManager::GetHeightWithTerrain(float x, float z) // Done..
 {
-	return m_pvsmgr.GetHeightWithTerrain(x, z, bWarp);
+	return m_pvsmgr.GetHeightWithTerrain(x, z);
 }
 
 BOOL CDungeonManager::PickWideWithTerrain(int x, int y, __Vector3& vPick) // Done..
@@ -80,12 +71,12 @@ BOOL CDungeonManager::PickWideWithTerrain(int x, int y, __Vector3& vPick) // Don
 	return m_pvsmgr.PickWideWithTerrain(x, y, vPick);
 }
 
-bool CDungeonManager::CheckCollisionWithTerrain(__Vector3& vPos, __Vector3& vDir, float fVelocity, __Vector3* vCol)
+bool CDungeonManager::CheckCollisionWithTerrain(__Vector3& /*vPos*/, __Vector3& /*vDir*/, float /*fVelocity*/, __Vector3* /*vCol*/)
 {
 	return false;
 }
 
-void CDungeonManager::GetNormalWithTerrain(float x, float z, __Vector3& vNormal)
+void CDungeonManager::GetNormalWithTerrain(float /*x*/, float /*z*/, __Vector3& /*vNormal*/)
 {
 }
 
@@ -94,12 +85,12 @@ float CDungeonManager::GetWidthByMeterWithTerrain()
 	return 100.0f;
 }
 
-bool CDungeonManager::IsInTerrainWithTerrain(float x, float z, __Vector3 vPosBefore) // Done..
+bool CDungeonManager::IsInTerrainWithTerrain(float x, float z) // Done..
 {
-	return m_pvsmgr.IsInTerrainWithTerrain(x, z, vPosBefore);
+	return m_pvsmgr.IsInTerrainWithTerrain(x, z);
 }
 
-bool CDungeonManager::CheckInclineWithTerrain(const __Vector3& vPos, const __Vector3& vDir, float fIncline)
+bool CDungeonManager::CheckInclineWithTerrain(const __Vector3& /*vPos*/, const __Vector3& /*vDir*/, float /*fIncline*/)
 {
 	return false;
 }
@@ -110,9 +101,9 @@ bool CDungeonManager::CheckCollisionCameraWithShape(__Vector3& vEyeResult, const
 	return m_pvsmgr.CheckCollisionCameraWithShape(vEyeResult, vAt, fNP);
 }
 
-float CDungeonManager::GetHeightNearstPosWithShape(const __Vector3& vPos, float fDist, __Vector3* pvNormal) // Done..
+float CDungeonManager::GetHeightNearstPosWithShape(const __Vector3& vPos, __Vector3* pvNormal) // Done..
 {
-	return m_pvsmgr.GetHeightNearstPosWithShape(vPos, fDist, pvNormal);
+	return m_pvsmgr.GetHeightNearstPosWithShape(vPos, pvNormal);
 }
 
 void CDungeonManager::RenderCollisionWithShape(const __Vector3& vPos) // No need..

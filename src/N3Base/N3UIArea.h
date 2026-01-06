@@ -5,13 +5,12 @@
 #if !defined(AFX_N3UIAREA_H__895A2972_7C58_4264_92AA_B740D40B0C22__INCLUDED_)
 #define AFX_N3UIAREA_H__895A2972_7C58_4264_92AA_B740D40B0C22__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3UIBase.h"
 
-enum eUI_AREA_TYPE
+// NOLINTNEXTLINE(performance-enum-size): used by the file format (albeit indirectly), must be this size
+enum eUI_AREA_TYPE : int32_t
 {
 	UI_AREA_TYPE_NONE = 0,
 	UI_AREA_TYPE_SLOT,
@@ -51,7 +50,7 @@ public:
 
 #ifdef _N3TOOL
 	// 툴에서 사용하기 위한 함수
-	virtual void operator=(const CN3UIArea& other);
+	CN3UIArea& operator=(const CN3UIArea& other);
 	bool Save(File& file) override;
 #endif
 };

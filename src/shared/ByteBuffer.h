@@ -11,7 +11,6 @@ class ByteBuffer
 {
 public:
 	constexpr static size_t DEFAULT_SIZE = 32;
-	bool _doubleByte;
 
 	ByteBuffer();
 	ByteBuffer(size_t res);
@@ -77,7 +76,9 @@ public:
 	template <typename T>
 	void put(size_t pos, T value);
 
-protected:
+private:
+	bool _doubleByte;
+
 	// read and write positions
 	size_t _rpos, _wpos;
 	std::vector<uint8_t> _storage;

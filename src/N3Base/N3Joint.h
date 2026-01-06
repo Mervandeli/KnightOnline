@@ -5,19 +5,15 @@
 #if !defined(AFX_N3IJoint_h__INCLUDED_)
 #define AFX_N3IJoint_h__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
-#pragma warning(disable : 4786)
 
 #include "N3Transform.h"
-
 #include <list>
+
 class CN3Joint;
 typedef std::list<CN3Joint*>::iterator it_Joint;
 
-const int MAX_JOINT_TRANSFORM = 64;
+constexpr int MAX_JOINT_TRANSFORM = 64;
 
 class CN3Joint : public CN3Transform
 {

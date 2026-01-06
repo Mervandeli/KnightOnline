@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef CLIENT_WARFARE_GAMEPROCMAIN_H
+#define CLIENT_WARFARE_GAMEPROCMAIN_H
+
+#pragma once
 
 #include "GameProcedure.h"
 #include <set>
@@ -6,6 +9,9 @@
 typedef std::set<int>::iterator it_ID;
 typedef std::pair<it_ID, bool> pair_ID;
 
+enum e_ChatMode : uint8_t;
+enum e_SubPacket_Administrator : uint8_t;
+enum e_SubPacket_State : uint8_t;
 class CGameProcMain : public CGameProcedure
 {
 	friend class CGameProcedure;
@@ -88,8 +94,6 @@ public:
 	int m_iJoinReqClan;
 	int m_iJoinReqClanRequierID;
 
-	int KM_COUNT;
-
 	BOOL m_bIsExitCanceled;
 	e_ExitType m_eExitType;
 	int m_iExitTimeRemaining; // seconds remaining until exit
@@ -99,10 +103,10 @@ public:
 	std::string m_szWarpDestination;
 
 protected:
-	virtual bool ProcessPacket(Packet& pkt);
+	bool ProcessPacket(Packet& pkt) override;
 
-	bool MsgRecv_CharacterSelect(Packet& pkt); // virtual
-	int MsgRecv_VersionCheck(Packet& pkt);     // virtual
+	bool MsgRecv_CharacterSelect(Packet& pkt) override; // virtual
+	int MsgRecv_VersionCheck(Packet& pkt) override;     // virtual
 
 	bool MsgRecv_MyInfo_All(Packet& pkt);
 	void MsgRecv_MyInfo_HP(Packet& pkt);
@@ -208,7 +212,7 @@ protected:
 	void MsgRecv_ZoneAbility(Packet& pkt);
 
 public:
-	void ProcessUIKeyInput(bool bEnable = true);
+	void ProcessUIKeyInput(bool bEnable = true) override;
 	bool OnMouseMove(POINT ptCur, POINT ptPrev);
 	bool OnMouseLbtnDown(POINT ptCur, POINT ptPrev);
 	bool OnMouseLBtnPressd(POINT ptCur, POINT ptPrev);
@@ -246,7 +250,7 @@ public:
 	bool CommandToggleUIMiniMap();
 	bool CommandToggleCmdList();
 	bool CommandToggleLevelGuide();
-	bool OpenCmdEdit(std::string msg);
+	bool OpenCmdEdit(const std::string& msg);
 
 	void CommandMove(e_MoveDirection eMD, bool bStartOrEnd); // 움직이는 방향(전후진, 멈춤), 움직이기 시작하는가?
 
@@ -279,7 +283,7 @@ public:
 		int iTargetID, float fInterval, float fDistance); // 공격 패킷 날리기 - 테이블의 공격 주기를 같이 줘서 해킹을 막는다.
 	void MsgSend_Move(bool bMove, bool bContinous);       // 서버에게 움직임 패킷을 날린다.. // 움직이는가 ? 주기적으로 움직이는 건가?
 	void MsgSend_Rotation();                              // 서버에게 회전 패킷을 날린다..
-	void MsgSend_Chat(enum e_ChatMode eMode, const std::string& szChat);           // 서버에게 채팅 메시지를 날린다..
+	void MsgSend_Chat(e_ChatMode eMode, const std::string& szChat);                // 서버에게 채팅 메시지를 날린다..
 	void MsgSend_ChatSelectTarget(const std::string& szTargetID);                  // 일대일 채팅 상대 정하기.
 	void MsgSend_Regen();
 	bool MsgSend_RequestItemBundleOpen(CPlayerNPC* pCorpse);                       // 아이템 상자를 열거나 시체를 뒤진다..
@@ -289,26 +293,26 @@ public:
 	void MsgSend_NPCInRequest(int iID);                                            // NPC 정보가 없을 경우 요청한다..
 	void MsgSend_UserInRequest(int iID);                                           // User 정보가 없을 경우 요청한다..
 	void MsgSend_Warp();                                                           // 워프?? - 존체인지가 될수도 있다..
-	void MsgSend_StateChange(enum e_SubPacket_State eSP, int iState);
+	void MsgSend_StateChange(e_SubPacket_State eSP, int iState);
 	void MsgSend_PerTradeReq(int iDestID, bool bNear = true);
 	void MsgSend_SpeedCheck(bool bInit = false);
 
-	void MsgSend_PartyOrForcePermit(int iPartyOrForce, bool bYesNo);             // iPartyOrForce 1 : Party, 2:Force
-	void MsgSend_PartyOrForceLeave(int iPartyOrForce);                           // iPartyOrForce 1 : Party, 2:Force
-	bool MsgSend_PartyOrForceCreate(int iPartyOrForce, const std::string& szID); // iPartyOrForce 1 : Party, 2:Force
+	void MsgSend_PartyOrForcePermit(bool bYesNo);             // iPartyOrForce 1 : Party, 2:Force
+	void MsgSend_PartyOrForceLeave();                         // iPartyOrForce 1 : Party, 2:Force
+	bool MsgSend_PartyOrForceCreate(const std::string& szID); // iPartyOrForce 1 : Party, 2:Force
 
-	void MsgSend_ObjectEvent(int iEventID, int iNPCID);                          // 오브젝트에 설정되어 있는 이벤트 요청..
+	void MsgSend_ObjectEvent(int iEventID, int iNPCID);       // 오브젝트에 설정되어 있는 이벤트 요청..
 	void MsgSend_Weather(int iWeather, int iPercent);
 	void MsgSend_Time(int iHour, int iMin);
-	void MsgSend_Administrator(enum e_SubPacket_Administrator eSP, const std::string& szID);
+	void MsgSend_Administrator(e_SubPacket_Administrator eSP, const std::string& szID);
 
 	void MsgSend_KnightsJoin(int iTargetID);
-	void MsgSend_KnightsLeave(std::string& szName);
+	void MsgSend_KnightsLeave(const std::string& szName);
 	void MsgSend_KnightsWithdraw();
-	void MsgSend_KnightsAppointViceChief(std::string& szName);
+	void MsgSend_KnightsAppointViceChief(const std::string& szName);
 	void MsgSend_KnightsJoinReq(bool bJoin);
-	void MsgSend_PerTradeBBSReq(std::string szName, int iDestID);
-	void MsgSend_CharacterSelect();                // virtual
+	void MsgSend_PerTradeBBSReq(const std::string& szName, int iDestID);
+	void MsgSend_CharacterSelect() override;       // virtual
 
 	void ProcessPlayerInclination();               // 경사 처리..(가만히 있어도 경사가 급하면 미끄러짐..).
 	void ProcessLocalInput(uint32_t dwMouseFlags); // 키보드 눌린것을 처리한다..
@@ -324,14 +328,16 @@ public:
 
 	void RenderTarget();
 
-	void Init();    // UI 와 UI 리소스등을 읽는다.
-	void Release(); // Release..
+	void Init() override;    // UI 와 UI 리소스등을 읽는다.
+	void Release() override; // Release..
 	void ReleaseUIs();
 	void ReleaseSound();
 
-	void Tick();              // 잡다한 계산..
-	void Render();            // 렌더링..
+	void Tick() override;      // 잡다한 계산..
+	void Render() override;    // 렌더링..
 
-	CGameProcMain();          // 생성자.
-	virtual ~CGameProcMain(); // 소멸자.
+	CGameProcMain();           // 생성자.
+	~CGameProcMain() override; // 소멸자.
 };
+
+#endif                         // CLIENT_WARFARE_GAMEPROCMAIN_H

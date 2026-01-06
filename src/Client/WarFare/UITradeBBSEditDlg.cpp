@@ -9,16 +9,6 @@
 #include <N3Base/N3UIEdit.h>
 #include <N3Base/N3UIButton.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUITradeBBSEditDlg::CUITradeBBSEditDlg()
 {
 	m_pEditTitle       = nullptr;
@@ -141,19 +131,22 @@ bool CUITradeBBSEditDlg::OnKeyPress(int iKey)
 		case DIK_ESCAPE:
 			ReceiveMessage(m_pBtn_Cancel, UIMSG_BUTTON_CLICK);
 			return true;
+
 		case DIK_RETURN:
 			ReceiveMessage(m_pBtn_Ok, UIMSG_BUTTON_CLICK);
 			return true;
+
 		case DIK_TAB:
-		{
 			if (m_pEditTitle->HaveFocus())
 				m_pEditPrice->SetFocus();
 			else if (m_pEditPrice->HaveFocus())
 				m_pEditExplanation->SetFocus();
 			else if (m_pEditExplanation->HaveFocus())
 				m_pEditTitle->SetFocus();
-		}
 			return true;
+
+		default:
+			break;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

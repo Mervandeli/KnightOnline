@@ -30,8 +30,6 @@ CLocalInput::CLocalInput()
 	SetRect(&m_rcMBDrag, 0, 0, 0, 0);
 	SetRect(&m_rcRBDrag, 0, 0, 0, 0);
 
-	SetRect(&m_rcMLimit, 0, 0, 0, 0);
-
 	memset(m_byCurKeys, 0, sizeof(m_byCurKeys));
 	memset(m_byOldKeys, 0, sizeof(m_byOldKeys));
 	memset(m_bKeyPresses, 0, sizeof(m_bKeyPresses));
@@ -64,11 +62,11 @@ CLocalInput::~CLocalInput()
 //////////////////////////////////////////////////////////////////////////////////
 BOOL CLocalInput::Init(HINSTANCE hInst, HWND hWnd)
 {
-	HRESULT rval;
+	HRESULT rval = DI_OK;
 
-	m_hWnd = hWnd; // 윈도우 핸들 기억..
+	m_hWnd       = hWnd; // 윈도우 핸들 기억..
 
-	rval   = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**) &m_lpDI, nullptr);
+	rval         = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**) &m_lpDI, nullptr);
 	if (rval != DI_OK)
 		return FALSE;
 
@@ -106,33 +104,12 @@ void CLocalInput::KeyboardFlushData()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// This restricts the mouse to a defined area.
-/////////////////////////////////////////////////////////////////////////////////////////////
-void CLocalInput::MouseSetLimits(int x1, int y1, int x2, int y2)
-{
-	m_rcMLimit.left   = x1;
-	m_rcMLimit.top    = y1;
-	m_rcMLimit.right  = x2;
-	m_rcMLimit.bottom = y2;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
 // Sets the mouse position. This restricts the position to the physical display.
 /////////////////////////////////////////////////////////////////////////////////////////////
 void CLocalInput::MouseSetPos(int x, int y)
 {
-	// clamp non-free mouse values to limits
-	if ((m_ptCurMouse.x = x) >= m_rcMLimit.right)
-		m_ptCurMouse.x = m_rcMLimit.right - 1;
-
-	if ((m_ptCurMouse.y = y) >= m_rcMLimit.bottom)
-		m_ptCurMouse.y = m_rcMLimit.bottom - 1;
-
-	if ((m_ptCurMouse.x = x) <= m_rcMLimit.left)
-		m_ptCurMouse.x = m_rcMLimit.left + 1;
-
-	if ((m_ptCurMouse.y = y) <= m_rcMLimit.top)
-		m_ptCurMouse.y = m_rcMLimit.top + 1;
+	m_ptCurMouse.x = x;
+	m_ptCurMouse.y = y;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,10 +151,7 @@ void CLocalInput::UnacquireKeyboard()
 	//	m_bKeyboard = FALSE;
 
 	if (m_lpDIDKeyboard != nullptr)
-	{
-		HRESULT rval = m_lpDIDKeyboard->Unacquire();
-		//		if (rval != DI_OK) MessageBox(::GetActiveWindow(), "UnAcquire Keyboard Failed.", "DirectInput", MB_OK);
-	}
+		m_lpDIDKeyboard->Unacquire();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +160,7 @@ void CLocalInput::UnacquireKeyboard()
 // 되도록이면 전체 프로시저 돌때 한번씩만 도는게 좋다.. 여러번 하면 혼란이 올수도 있다.
 void CLocalInput::Tick()
 {
-	HRESULT err;
+	HRESULT err     = DI_OK;
 
 	HWND hWndActive = ::GetActiveWindow(); // 포커싱되었을때만...
 	if (hWndActive != m_hWnd)

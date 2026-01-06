@@ -13,16 +13,6 @@
 
 #include <N3Base/N3UIButton.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUITradeBBSSelector::CUITradeBBSSelector()
 {
 	m_pBtn_BBSSell   = nullptr;
@@ -93,16 +83,15 @@ void CUITradeBBSSelector::MsgSend_OpenTradeBuyBBS()
 	CGameProcedure::s_pSocket->Send(byBuff, iOffset);
 }
 
-bool CUITradeBBSSelector::OnKeyPress(int iChar)
+bool CUITradeBBSSelector::OnKeyPress(int iKey)
 {
-	switch (iChar)
+	if (iKey == DIK_ESCAPE)
 	{
-		case DIK_ESCAPE:
-			SetVisible(false);
-			return true;
+		SetVisible(false);
+		return true;
 	}
 
-	return CN3UIBase::OnKeyPress(iChar);
+	return CN3UIBase::OnKeyPress(iKey);
 }
 
 void CUITradeBBSSelector::SetVisible(bool bVisible)

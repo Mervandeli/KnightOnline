@@ -19,8 +19,8 @@ void SendThreadMain::shutdown(bool waitForShutdown /*= true*/)
 void SendThreadMain::queue(_SEND_DATA* sendData)
 {
 	{
-		std::lock_guard<std::mutex> lock(_mutex);
-		if (!_canTick)
+		std::lock_guard<std::mutex> lock(ThreadMutex());
+		if (!CanTick())
 		{
 			delete sendData;
 			return;
@@ -31,7 +31,7 @@ void SendThreadMain::queue(_SEND_DATA* sendData)
 
 	// Ensure mutex is unlocked before notification to avoid unnecessary
 	// contention on thread wakeup
-	_cv.notify_one();
+	ThreadCondition().notify_one();
 }
 
 void SendThreadMain::thread_loop()
@@ -39,21 +39,21 @@ void SendThreadMain::thread_loop()
 	std::queue<_SEND_DATA*> processingQueue;
 
 	// Use a predicate here to avoid spurious wakeups
-	auto waitUntilPredicate = [this] -> bool
+	auto waitUntilPredicate = [this]() -> bool
 	{
 		// Wait until we're shutting down
-		return !_canTick
+		return !CanTick()
 			   // Or there's something in the queue
 			   || !_insertionQueue.empty();
 	};
 
-	while (_canTick)
+	while (CanTick())
 	{
 		{
-			std::unique_lock<std::mutex> lock(_mutex);
-			_cv.wait(lock, waitUntilPredicate);
+			std::unique_lock<std::mutex> lock(ThreadMutex());
+			ThreadCondition().wait(lock, waitUntilPredicate);
 
-			if (!_canTick)
+			if (!CanTick())
 				break;
 
 			// As tick() processes the entire queue, we don't need to worry
@@ -117,7 +117,7 @@ void SendThreadMain::tick(std::queue<_SEND_DATA*>& processingQueue)
 
 void SendThreadMain::clear()
 {
-	std::lock_guard<std::mutex> lock(_mutex);
+	std::lock_guard<std::mutex> lock(ThreadMutex());
 	while (!_insertionQueue.empty())
 	{
 		delete _insertionQueue.front();
@@ -127,6 +127,5 @@ void SendThreadMain::clear()
 
 SendThreadMain::~SendThreadMain()
 {
-	shutdown();
-	clear();
+	SendThreadMain::shutdown();
 }

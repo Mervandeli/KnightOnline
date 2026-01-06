@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef CLIENT_WARFARE_UIEXITMENU_H
+#define CLIENT_WARFARE_UIEXITMENU_H
+
+#pragma once
 
 #include <N3Base/N3UIBase.h>
 
@@ -18,3 +21,5 @@ protected:
 	CN3UIButton* m_pBtn_Exit;
 	CN3UIButton* m_pBtn_Cancel;
 };
+
+#endif // CLIENT_WARFARE_UIEXITMENU_H

@@ -5,9 +5,9 @@
 
 #include <stdexcept>
 #include <string>
-#include <format>
 
 #include <nanodbc/nanodbc.h>
+#include <spdlog/fmt/fmt.h>
 
 namespace db
 {
@@ -25,7 +25,7 @@ class ApplicationError : public nanodbc::database_error
 {
 public:
 	explicit ApplicationError(const std::string& message) :
-		nanodbc::database_error(nullptr, 0, std::format("[application error] {}", message))
+		nanodbc::database_error(nullptr, 0, fmt::format("[application error] {}", message))
 	{
 	}
 };

@@ -17,13 +17,13 @@ void AudioDecoderThread::thread_loop()
 	std::vector<QueueType> pendingQueue;
 	std::unordered_map<uint32_t, std::shared_ptr<StreamedAudioHandle>> handleMap;
 
-	while (_canTick)
+	while (CanTick())
 	{
 		{
-			std::unique_lock<std::mutex> lock(_mutex);
-			std::cv_status status = _cv.wait_for(lock, 20ms);
+			std::unique_lock<std::mutex> lock(ThreadMutex());
+			std::cv_status status = ThreadCondition().wait_for(lock, 20ms);
 
-			if (!_canTick)
+			if (!CanTick())
 				break;
 
 			// Ignore spurious wakeups
@@ -66,7 +66,7 @@ void AudioDecoderThread::thread_loop()
 
 void AudioDecoderThread::Add(std::shared_ptr<StreamedAudioHandle> handle)
 {
-	std::lock_guard<std::mutex> lock(_mutex);
+	std::lock_guard<std::mutex> lock(ThreadMutex());
 	_pendingQueue.push_back(std::make_tuple(AUDIO_DECODER_QUEUE_ADD, std::move(handle)));
 }
 
@@ -86,7 +86,7 @@ void AudioDecoderThread::InitialDecode(StreamedAudioHandle* handle)
 
 void AudioDecoderThread::Remove(std::shared_ptr<StreamedAudioHandle> handle)
 {
-	std::lock_guard<std::mutex> lock(_mutex);
+	std::lock_guard<std::mutex> lock(ThreadMutex());
 	_pendingQueue.push_back(std::make_tuple(AUDIO_DECODER_QUEUE_REMOVE, std::move(handle)));
 }
 
@@ -116,14 +116,13 @@ void AudioDecoderThread::decode_impl_mp3(StreamedAudioHandle* handle)
 
 	StreamedAudioAsset* asset   = static_cast<StreamedAudioAsset*>(handle->Asset.get());
 	const size_t ChunksToDecode = MAX_AUDIO_STREAM_BUFFER_COUNT - handle->DecodedChunks.size();
+	size_t done                 = 0;
+	int error                   = 0;
 
 	for (size_t i = 0; i < ChunksToDecode; i++)
 	{
-		AudioDecodedChunk decodedChunk = {};
+		AudioDecodedChunk decodedChunk {};
 		decodedChunk.Data.resize(asset->PcmChunkSize);
-
-		size_t done;
-		int error;
 
 		done  = 0;
 		error = mpg123_read(handle->Mp3Handle, &decodedChunk.Data[0], asset->PcmChunkSize, &done);
@@ -188,9 +187,9 @@ void AudioDecoderThread::decode_impl_pcm(StreamedAudioHandle* handle)
 
 	for (size_t i = 0; i < ChunksToDecode; i++)
 	{
-		AudioDecodedChunk decodedChunk = {};
+		AudioDecodedChunk decodedChunk {};
 
-		size_t bytesRemaining;
+		size_t bytesRemaining = 0;
 		if (fileSize > handle->FileReaderHandle.Offset)
 			bytesRemaining = fileSize - handle->FileReaderHandle.Offset;
 		else

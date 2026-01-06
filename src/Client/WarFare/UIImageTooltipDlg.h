@@ -5,21 +5,17 @@
 #if !defined(AFX_UIIMAGETOOLTIPDLG_H__CC12484D_5DC0_4F7A_ABF7_0506B2F36292__INCLUDED_)
 #define AFX_UIIMAGETOOLTIPDLG_H__CC12484D_5DC0_4F7A_ABF7_0506B2F36292__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
-#include <N3Base/N3UIBase.h>
 
 #include "N3UIWndBase.h" // __IconItemSkill
 
-//////////////////////////////////////////////////////////////////////
-
 class CUIImageTooltipDlg : public CN3UIBase
 {
+public:
 	static constexpr int MAX_TOOLTIP_COUNT       = 30;
 	static constexpr int MIN_WORDS_TO_SPLIT_DESC = 5;
 
+protected:
 	const D3DCOLOR m_CYellow;               // 레어...
 	const D3DCOLOR m_CBlue;                 // 매직...
 	const D3DCOLOR m_CGold;                 // 유니크...
@@ -46,6 +42,7 @@ protected:
 	bool SetTooltipTextColor(e_Race eMyValue, e_Race eTooltipValue);
 	bool SetTooltipTextColor(e_Class eMyValue, e_Class eTooltipValue);
 	int CalcTooltipStringNumAndWrite(__IconItemSkill* spItem, bool bPrice, bool bBuy);
+	void CalcTooltipStringNumAndWriteImpl(__IconItemSkill* spItem, bool bPrice, int& iIndex);
 	void SetPosSomething(int xpos, int ypos);
 
 public:

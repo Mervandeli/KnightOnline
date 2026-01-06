@@ -5,9 +5,7 @@
 #if !defined(AFX_N3Base_h__INCLUDED_)
 #define AFX_N3Base_h__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "My_3DStruct.h"
 #include "N3Mng.h"
@@ -22,21 +20,24 @@
 #include "N3SndMgr.h"
 #endif
 
-const uint32_t TEX_CAPS_DXT1       = 0x00000001;
-const uint32_t TEX_CAPS_DXT2       = 0x00000002;
-const uint32_t TEX_CAPS_DXT3       = 0x00000004;
-const uint32_t TEX_CAPS_DXT4       = 0x00000008;
-const uint32_t TEX_CAPS_DXT5       = 0x00000010;
-const uint32_t TEX_CAPS_SQUAREONLY = 0x00000020;
-const uint32_t TEX_CAPS_MIPMAP     = 0x00000040;
-const uint32_t TEX_CAPS_POW2       = 0x00000080;
-
-const float CAMERA_RADIUS_UNIT     = 2.0f;
-const int MAX_CAMERA_RADIUS = 512; // 2미터 단위로 128 개의 도트 프로덕트 미리 계산해 놓는다..
-
-enum TIMER_COMMAND
+enum e_TexCaps : uint8_t
 {
-	TIMER_RESET,
+	TEX_CAPS_DXT1       = 0x01,
+	TEX_CAPS_DXT2       = 0x02,
+	TEX_CAPS_DXT3       = 0x04,
+	TEX_CAPS_DXT4       = 0x08,
+	TEX_CAPS_DXT5       = 0x10,
+	TEX_CAPS_SQUAREONLY = 0x20,
+	TEX_CAPS_MIPMAP     = 0x40,
+	TEX_CAPS_POW2       = 0x80
+};
+
+constexpr float CAMERA_RADIUS_UNIT = 2.0f;
+constexpr int MAX_CAMERA_RADIUS = 512; // 2미터 단위로 128 개의 도트 프로덕트 미리 계산해 놓는다..
+
+enum TIMER_COMMAND : uint8_t
+{
+	TIMER_RESET = 0,
 	TIMER_START,
 	TIMER_STOP,
 	TIMER_ADVANCE,
@@ -47,151 +48,104 @@ enum TIMER_COMMAND
 
 struct __CameraData
 {
-	__CameraData()
-	{
-		vEye    = {};
-		vAt     = {};
-		vUp     = {};
-
-		fFOV    = 0.0f;
-		fAspect = 0.0f;
-		fNP     = 0.0f;
-		fFP     = 0.0f;
-
-		vp      = {};
-
-		mtxView.Identity();
-		mtxViewInverse.Identity();
-		mtxProjection.Identity();
-
-		memset(&fFrustum, 0, sizeof(fFrustum));
-	}
+	__CameraData() = default;
 
 	void Release()
 	{
 		*this = {};
-
-		mtxView.Identity();
-		mtxViewInverse.Identity();
-		mtxProjection.Identity();
 	}
 
-	__Vector3 vEye;  // Camera Position Vector
-	__Vector3 vAt;   // Camera At Vector
-	__Vector3 vUp;   // Camera Up Vector
+	__Vector3 vEye            = {};   // Camera Position Vector
+	__Vector3 vAt             = {};   // Camera At Vector
+	__Vector3 vUp             = {};   // Camera Up Vector
 
-	float fFOV;      // 카메라 렌즈 각 : Field Of View
-					 //	float			fInverse_SineHalfOfFOV;
-	float fAspect;   // 종횡비
-	float fNP;       // NearPlane
-	float fFP;       // FarPlane
-	D3DVIEWPORT9 vp; // ViewPort;
-	__Matrix44 mtxView;
-	__Matrix44 mtxViewInverse;
-	__Matrix44 mtxProjection;
+	float fFOV                = 0.0f; // 카메라 렌즈 각 : Field Of View
+	float fAspect             = 0.0f; // 종횡비
+	float fNP                 = 0.0f; // NearPlane
+	float fFP                 = 0.0f; // FarPlane
+	D3DVIEWPORT9 vp           = {};   // ViewPort;
+	__Matrix44 mtxView        = __Matrix44::GetIdentity();
+	__Matrix44 mtxViewInverse = __Matrix44::GetIdentity();
+	__Matrix44 mtxProjection  = __Matrix44::GetIdentity();
 
-	float fFrustum[6][4];
+	float fFrustum[6][4]      = {};
 
 	// fRadius - 물체의 반지름보다 약간 더 여유 있게 잡고 넣으면 그만큼 클리핑을 여유있게 한다..
-	BOOL IsOutOfFrustum(const __Vector3& vPosition, float fRadius)
 	// 미리 계산된 카메라 평면의 도트 프로덕트 값을 기준으로 카메라 사면체 밖에 있으면  참을 돌려준다.
+	bool IsOutOfFrustum(const __Vector3& vPosition, float fRadius) const
 	{
 		if ((vEye - vPosition).Magnitude() > fFP + fRadius)
-			return TRUE; // Far Plane 거리체크
+			return true; // Far Plane 거리체크
 
-		int p;
-		for (p = 0; p < 6; p++)
+		for (int p = 0; p < 6; p++)
 		{
 			if (fFrustum[p][0] * vPosition.x + fFrustum[p][1] * vPosition.y
 					+ fFrustum[p][2] * vPosition.z + fFrustum[p][3]
 				<= -fRadius)
-				return TRUE;
+				return true;
 		}
-		return FALSE;
+
+		return false;
 	}
 };
 
 struct __RenderInfo
 {
-	int nShape;
-	int nShape_Part;
-	int nShape_Polygon; // 단순 폴리곤
+	int nShape                = 0;
+	int nShape_Part           = 0;
+	int nShape_Polygon        = 0; // 단순 폴리곤
 
-	int nChr;
-	int nChr_Part;
-	int nChr_Polygon;          // 캐릭터 폴리곤
-	int nChr_Plug;             // 캐릭터에 붙은 무기등..
-	int nChr_Plug_Polygon;     // 캐릭터에 붙은 무기등의 폴리곤..
+	int nChr                  = 0;
+	int nChr_Part             = 0;
+	int nChr_Polygon          = 0; // 캐릭터 폴리곤
+	int nChr_Plug             = 0; // 캐릭터에 붙은 무기등..
+	int nChr_Plug_Polygon     = 0; // 캐릭터에 붙은 무기등의 폴리곤..
 
-	int nTerrain_Polygon;      // 타일 적용된 지형 폴리곤..
-	int nTerrain_Tile_Polygon; // 타일 적용된 지형 폴리곤..
+	int nTerrain_Polygon      = 0; // 타일 적용된 지형 폴리곤..
+	int nTerrain_Tile_Polygon = 0; // 타일 적용된 지형 폴리곤..
 
-	int nAlpha_Polygon;
+	int nAlpha_Polygon        = 0;
 
-	int nTexture_32X32;     // 32 X 32 Texture
-	int nTexture_64X64;     // 64 X 64 Texture
-	int nTexture_128X128;   // 128 X 128 Texture
-	int nTexture_256X256;   // 256 X 256 Texture
-	int nTexture_512X512;   // 512 X 512 Texture
-	int nTexture_Huge;      // 512 X 512 이상 size
-	int nTexture_OtherSize; // Other size
+	int nTexture_32X32        = 0; // 32 X 32 Texture
+	int nTexture_64X64        = 0; // 64 X 64 Texture
+	int nTexture_128X128      = 0; // 128 X 128 Texture
+	int nTexture_256X256      = 0; // 256 X 256 Texture
+	int nTexture_512X512      = 0; // 512 X 512 Texture
+	int nTexture_Huge         = 0; // 512 X 512 이상 size
+	int nTexture_OtherSize    = 0; // Other size
 };
 
 struct __ResrcInfo
 {
-	int nTexture_Loaded_32X32;     // 32 X 32 Texture
-	int nTexture_Loaded_64X64;     // 64 X 64 Texture
-	int nTexture_Loaded_128X128;   // 128 X 128 Texture
-	int nTexture_Loaded_256X256;   // 256 X 256 Texture
-	int nTexture_Loaded_512X512;   // 512 X 512 Texture
-	int nTexture_Loaded_Huge;      // 512 X 512 이상 size
-	int nTexture_Loaded_OtherSize; // Other size
+	int nTexture_Loaded_32X32     = 0; // 32 X 32 Texture
+	int nTexture_Loaded_64X64     = 0; // 64 X 64 Texture
+	int nTexture_Loaded_128X128   = 0; // 128 X 128 Texture
+	int nTexture_Loaded_256X256   = 0; // 256 X 256 Texture
+	int nTexture_Loaded_512X512   = 0; // 512 X 512 Texture
+	int nTexture_Loaded_Huge      = 0; // 512 X 512 이상 size
+	int nTexture_Loaded_OtherSize = 0; // Other size
 };
 
 struct __Options
 {
-	int iUseShadow;
-	int iTexLOD_Chr;     // 0 - 원래 크기.. 1 - 한단계 작게. 2 - 두단계 작게..
-	int iTexLOD_Shape;   // 0 - 원래 크기.. 1 - 한단계 작게. 2 - 두단계 작게..
-	int iTexLOD_Terrain; // 0 - 원래 크기.. 1 - 한단계 작게. 2 - 두단계 작게..
-	int iViewWidth;
-	int iViewHeight;
-	int iViewColorDepth;
-	int iViewDist;
-	int iEffectSndDist; // 이펙트 사운드 거리
+	int iUseShadow        = 1;
+	int iTexLOD_Chr       = 0; // 0 - 원래 크기.. 1 - 한단계 작게. 2 - 두단계 작게..
+	int iTexLOD_Shape     = 0; // 0 - 원래 크기.. 1 - 한단계 작게. 2 - 두단계 작게..
+	int iTexLOD_Terrain   = 0; // 0 - 원래 크기.. 1 - 한단계 작게. 2 - 두단계 작게..
+	int iViewWidth        = 1024;
+	int iViewHeight       = 768;
+	int iViewColorDepth   = 16;
+	int iViewDist         = 512;
+	int iEffectSndDist    = 48; // 이펙트 사운드 거리
 
-	bool bSndEnable;
-	bool bSndBgmEnable;
-	bool bSndEffectEnable;
+	bool bSndEnable       = false;
+	bool bSndBgmEnable    = false;
+	bool bSndEffectEnable = false;
 
-	bool bWindowCursor; // 0 - 게임에서 그려주는 커서 1 - 윈도우 커서 사용
-	bool bWindowMode;
+	bool bWindowCursor    = true; // 0 - 게임에서 그려주는 커서 1 - 윈도우 커서 사용
+	bool bWindowMode      = false;
 
-	bool bVSyncEnabled;
-
-	void InitDefault() // Default options for client window
-	{
-		iUseShadow       = true;
-		iTexLOD_Chr      = 0;
-		iTexLOD_Shape    = 0;
-		iTexLOD_Terrain  = 0;
-		iViewColorDepth  = 16;
-		iViewWidth       = 1024;
-		iViewHeight      = 768;
-		iViewDist        = 512;
-		iEffectSndDist   = 48;
-		bSndEnable       = false;
-		bSndBgmEnable    = false;
-		bSndEffectEnable = false;
-		bWindowCursor    = true;
-		bWindowMode      = false;
-		bVSyncEnabled    = true;
-	}
-
-	__Options()
-	{
-		InitDefault();
-	}
+	bool bVSyncEnabled    = true;
 };
 
 class CN3Base

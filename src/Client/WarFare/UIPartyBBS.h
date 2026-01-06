@@ -5,9 +5,7 @@
 #if !defined(AFX_UIPartyBBS_H__7B2732B7_C9CA_46A3_89BC_C59934ED3F13__INCLUDED_)
 #define AFX_UIPartyBBS_H__7B2732B7_C9CA_46A3_89BC_C59934ED3F13__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <list>
 
@@ -18,19 +16,22 @@ typedef std::list<__InfoPartyBBS>::iterator it_PartyBBS;
 
 class CUIPartyBBS : public CN3UIBase // 파티에 관한 UI, 부대와 같은 클래스로 쓴다..
 {
+	static constexpr int PARTY_BBS_MAXSTRING = 69;
+	static constexpr int PARTY_BBS_MAXLINE   = 23;
+
 protected:
-	class CN3UIButton* m_pBtn_PageUp;
-	class CN3UIButton* m_pBtn_PageDown;
-	class CN3UIButton* m_pBtn_Refresh;
+	CN3UIButton* m_pBtn_PageUp;
+	CN3UIButton* m_pBtn_PageDown;
+	CN3UIButton* m_pBtn_Refresh;
 
-	class CN3UIButton* m_pBtn_Close;
-	class CN3UIButton* m_pBtn_Register;
-	class CN3UIButton* m_pBtn_RegisterCancel;
-	class CN3UIButton* m_pBtn_Whisper;
-	class CN3UIButton* m_pBtn_Party;
+	CN3UIButton* m_pBtn_Close;
+	CN3UIButton* m_pBtn_Register;
+	CN3UIButton* m_pBtn_RegisterCancel;
+	CN3UIButton* m_pBtn_Whisper;
+	CN3UIButton* m_pBtn_Party;
 
-	class CN3UIString* m_pText_Page;
-	class CN3UIString* m_pText[69];
+	CN3UIString* m_pText_Page;
+	CN3UIString* m_pText[PARTY_BBS_MAXSTRING];
 
 	std::list<__InfoPartyBBS> m_Datas; // BBS Data
 	int m_iCurPage;                    // 현재 페이지..
@@ -47,7 +48,7 @@ public:
 	void SetStringColor(int iIndex, uint32_t dwColor);
 	void RenderSelectContent();
 	void Render() override;
-	void SetContentString(int iIndex, std::string szID, int iLevel, std::string szClass);
+	void SetContentString(int iIndex, const std::string& szID, int iLevel, const std::string& szClass);
 	void ResetContent();
 	void MsgSend_Register();
 	void MsgSend_RegisterCancel();

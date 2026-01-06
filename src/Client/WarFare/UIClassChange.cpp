@@ -10,21 +10,11 @@
 #include "UISkillTreeDlg.h"
 #include "APISocket.h"
 #include "UIVarious.h"
-#include "UIHotkeyDlg.h"
+#include "UIHotKeyDlg.h"
 #include "text_resources.h"
 
 #include <N3Base/N3UIButton.h>
 #include <N3Base/N3UIString.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CUIClassChange::CUIClassChange()
 {
@@ -36,6 +26,8 @@ CUIClassChange::CUIClassChange()
 	m_pText_Info    = nullptr;
 	m_pText_Title   = nullptr;
 	m_pText_Message = nullptr;
+
+	m_eClass        = CLASS_UNKNOWN;
 }
 
 CUIClassChange::~CUIClassChange()
@@ -62,8 +54,7 @@ void CUIClassChange::Open(int iCode)
 {
 	SetVisible(true);
 
-	__InfoPlayerBase* pInfoBase  = &CGameBase::s_pPlayer->m_InfoBase;
-	__InfoPlayerMySelf* pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
+	__InfoPlayerBase* pInfoBase = &CGameBase::s_pPlayer->m_InfoBase;
 
 	std::string szSuccess, szNotYet, szAlready, szItemInSlot;
 	szSuccess    = fmt::format_text_resource(IDS_CLASS_CHANGE_SUCCESS);
@@ -125,6 +116,8 @@ void CUIClassChange::Open(int iCode)
 					CGameBase::GetTextByClass(CLASS_EL_CLERIC, szClassTmp);
 					m_pText_Info->SetString(szClassTmp);
 					break;
+				default:
+					break;
 			}
 			break;
 
@@ -141,6 +134,9 @@ void CUIClassChange::Open(int iCode)
 		case IDS_MSG_HASITEMINSLOT: // TODO: FIXME. This is not a valid subopcode!
 			m_pText_Message->SetString(szItemInSlot);
 			m_pBtn_Ok->SetVisible(true);
+			break;
+
+		default:
 			break;
 	}
 }
@@ -183,6 +179,8 @@ bool CUIClassChange::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					break;
 				case CLASS_EL_PRIEST:
 					pInfoBase->eClass = CLASS_EL_CLERIC;
+					break;
+				default:
 					break;
 			}
 

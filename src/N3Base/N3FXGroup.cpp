@@ -6,9 +6,7 @@
 #include "N3FXBundle.h"
 #include "N3FXGroup.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+#include <shared/StringUtils.h>
 
 CN3FXGroup::CN3FXGroup()
 {
@@ -109,7 +107,7 @@ bool CN3FXGroup::DecodeScriptFile(const char* lpPathName)
 		if (lstrcmpi(szCommand, "<fxb>") == 0)
 		{
 			__FXBInfo* pFXB = new __FXBInfo;
-			strcpy(pFXB->FXBName, szBuf[0]);
+			strcpy_safe(pFXB->FXBName, szBuf[0]);
 			pFXB->joint = atoi(szBuf[1]);
 			if (lstrcmpi(szBuf[2], "TRUE") == 0)
 				pFXB->IsLooping = TRUE;

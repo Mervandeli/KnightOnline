@@ -41,8 +41,6 @@ public:
 	int16_t m_sMaxMP;                  // MP
 	int16_t m_sMaxSP;                  // SP
 
-	uint8_t m_state;                   // User의 상태
-
 	int16_t m_sRegionX;                // 현재 영역 X 좌표
 	int16_t m_sRegionZ;                // 현재 영역 Z 좌표
 	int16_t m_sOldRegionX;             // 이전 영역 X 좌표
@@ -92,13 +90,13 @@ public:
 	void HealAreaCheck(int rx, int rz);
 
 	void SendAttackSuccess(int tuid, uint8_t result, int16_t sDamage, int nHP = 0,
-		uint8_t sAttack_type = 1);                                   // 공격 성공
-	void SendMagicAttackResult(
-		int tuid, uint8_t result, int16_t sDamage, int16_t sHP = 0); // 공격 성공
-	void SendHP();                                                   // user의 HP
+		uint8_t sAttack_type = 1);               // 공격 성공
+	void SendMagicAttackResult(uint8_t opcode, int magicId, int targetId, int data1 = 0,
+		int data2 = 0, int data3 = 0, int data4 = 0, int data5 = 0, int data6 = 0, int data7 = 0);
+	void SendHP();                               // user의 HP
 	void SendExp(int iExp, int iLoyalty, int tType = 1);
 	void SendSystemMsg(const std::string_view msg, uint8_t type, int nWho);
-	void SendAll(const char* pBuf, int nLength);                     // game server로 패킷 전송...
+	void SendAll(const char* pBuf, int nLength); // game server로 패킷 전송...
 	bool IsOpIDCheck(const char* szName);
 
 	CUser();

@@ -20,14 +20,6 @@
 
 #include <iterator>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 CUIManager::__RenderStateForUI CUIManager::s_sRSFU; // RenderStateForUI
 
 CUIManager::CUIManager()
@@ -37,7 +29,7 @@ CUIManager::CUIManager()
 	m_pUIFocused       = nullptr;
 #ifdef _DEBUG
 	m_pDFont = nullptr;
-#endif;
+#endif
 
 	m_bDoneSomething = false; // UI 에서 조작을 했다...
 }
@@ -343,20 +335,22 @@ bool CUIManager::BroadcastIconDropMsg(__IconItemSkill* spItem)
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
 
 	// 윈도우들을 돌아 다니면서 검사..
-	for (UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
+	for (CN3UIBase* pChild : m_Children)
 	{
 		if (bFound)
 			break;
-		CN3UIBase* pChild = (*itor);
+
 		if (pChild->UIType() == UI_TYPE_ICON_MANAGER)
 		{
 			// 해당 윈도우가 보이고(활성화 되어 있고), 그 윈도우 영역 안에 있으면..
 			if (((CN3UIWndBase*) pChild)->IsVisible() && ((CN3UIWndBase*) pChild)->IsIn(ptCur.x, ptCur.y))
+			{
 				// 해당 윈도우에 아이콘 드롭 메시지 함수를 호출..
 				if (((CN3UIWndBase*) pChild)->ReceiveIconDrop(spItem, ptCur))
 					return true;
-				else
-					bFound = true;
+
+				bFound = true;
+			}
 		}
 	}
 
@@ -376,8 +370,12 @@ bool CUIManager::BroadcastIconDropMsg(__IconItemSkill* spItem)
 			case UIWND_WARE_HOUSE:
 				CGameProcedure::s_pProcMain->m_pUIWareHouseDlg->CancelIconDrop(spItem);
 				break;
+
+			default:
+				break;
 		}
 	}
+
 	return false;
 }
 
@@ -446,7 +444,7 @@ void CUIManager::SetVisibleFocusedUI(CN3UIBase* pUI)
 
 	UIListItor it = m_Children.begin(), itEnd = m_Children.end();
 
-	uint32_t dwUIStyle, dwUIHideStyle;
+	uint32_t dwUIStyle = 0, dwUIHideStyle = 0;
 	CN3UIBase* pUIHide = nullptr;
 
 	dwUIStyle          = pUI->GetStyle();
@@ -483,11 +481,9 @@ void CUIManager::SetVisibleFocusedUI(CN3UIBase* pUI)
 
 			if (pUIHide->IsVisible() && pUI != pUIHide)
 			{
-				if ((dwUIHideStyle & UISTYLE_SHOW_ME_ALONE) != 0)
-					pUIHide->SetVisibleWithNoSound(false, true);
-				else if ((dwUIStyle & UISTYLE_POS_LEFT) != 0 && (dwUIHideStyle & UISTYLE_POS_LEFT) != 0)
-					pUIHide->SetVisibleWithNoSound(false, true);
-				else if ((dwUIStyle & UISTYLE_POS_RIGHT) != 0 && (dwUIHideStyle & UISTYLE_POS_RIGHT) != 0)
+				if (((dwUIHideStyle & UISTYLE_SHOW_ME_ALONE) != 0)
+					|| ((dwUIStyle & UISTYLE_POS_LEFT) != 0 && (dwUIHideStyle & UISTYLE_POS_LEFT) != 0)
+					|| ((dwUIStyle & UISTYLE_POS_RIGHT) != 0 && (dwUIHideStyle & UISTYLE_POS_RIGHT) != 0))
 					pUIHide->SetVisibleWithNoSound(false, true);
 			}
 

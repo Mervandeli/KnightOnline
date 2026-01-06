@@ -6,7 +6,9 @@
 
 EbenezerSocketManager::EbenezerSocketManager() : SocketManager(SOCKET_BUFF_SIZE, SOCKET_BUFF_SIZE)
 {
-	_sendWorkerThread = new SendWorkerThread(this);
+	_sendWorkerThread           = new SendWorkerThread(this);
+	_startUserThreadCallback    = [this]() { _sendWorkerThread->start(); };
+	_shutdownUserThreadCallback = [this]() { _sendWorkerThread->shutdown(); };
 }
 
 EbenezerSocketManager::~EbenezerSocketManager()
@@ -32,14 +34,4 @@ CUser* EbenezerSocketManager::GetInactiveUser(int socketId) const
 CUser* EbenezerSocketManager::GetInactiveUserUnchecked(int socketId) const
 {
 	return static_cast<CUser*>(GetInactiveServerSocketUnchecked(socketId));
-}
-
-void EbenezerSocketManager::StartUserThreads()
-{
-	_sendWorkerThread->start();
-}
-
-void EbenezerSocketManager::ShutdownUserThreads()
-{
-	_sendWorkerThread->shutdown();
 }

@@ -5,6 +5,8 @@
 #ifndef __N3FXPARTMESH_H__
 #define __N3FXPARTMESH_H__
 
+#pragma once
+
 #include "N3FXPartBase.h"
 
 class CN3FXShape;
@@ -58,7 +60,6 @@ public:
 
 	int NumPart();
 	int NumVertices(int Part);
-	LPDIRECT3DVERTEXBUFFER9 GetVB(int Part);
 
 	CN3FXPartMesh();
 	~CN3FXPartMesh() override;

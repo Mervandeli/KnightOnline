@@ -1,17 +1,13 @@
 ﻿#if !defined(AFX_Bitset_h__INCLUDED_)
 #define AFX_Bitset_h__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
-#pragma warning(disable : 4786)
 
 class CBitset
 {
 public:
 	// Initialize all the data members
-	CBitset() : m_bits(0), m_size(0)
+	CBitset() : m_bits(nullptr), m_size(0)
 	{
 	}
 
@@ -19,11 +15,8 @@ public:
 	~CBitset()
 	{
 		// If we have valid memory, get rid of it
-		if (m_bits)
-		{
-			delete m_bits;
-			m_bits = nullptr;
-		}
+		delete[] m_bits;
+		m_bits = nullptr;
 	}
 
 	// This resizes our bitset to a size so each face has a bit associated with it
@@ -33,11 +26,8 @@ public:
 		m_size = count / 32 + 1;
 
 		// Make sure we haven't already allocated memory for the bits
-		if (m_bits)
-		{
-			delete m_bits;
-			m_bits = 0;
-		}
+		delete[] m_bits;
+		m_bits = nullptr;
 
 		// Allocate the bits and initialize them
 		m_bits = new uint32_t[m_size];

@@ -7,23 +7,13 @@
 #include "UIManager.h"
 #include "GameEng.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIEndingDisplay::CUIEndingDisplay()
 {
 }
 
 CUIEndingDisplay::~CUIEndingDisplay()
 {
-	Release();
+	CUIEndingDisplay::Release();
 }
 
 void CUIEndingDisplay::Release()

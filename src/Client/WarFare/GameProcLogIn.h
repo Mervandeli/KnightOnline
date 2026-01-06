@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef CLIENT_WARFARE_GAMEPROCLOGIN_H
+#define CLIENT_WARFARE_GAMEPROCLOGIN_H
+
+#pragma once
 
 #if defined(LOGIN_SCENE_VERSION) && LOGIN_SCENE_VERSION == 1098
 #include "GameProcLogIn_1098.h"
@@ -7,3 +10,5 @@
 #else
 #pragma error LOGIN_SCENE_VERSION value is unsupported.Expected values : 1098, 1298
 #endif
+
+#endif // CLIENT_WARFARE_GAMEPROCLOGIN_H

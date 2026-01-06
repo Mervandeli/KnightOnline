@@ -14,7 +14,7 @@ typedef std::list<LOGIC_ELSE*> LogicElseArray;
 class EVENT_DATA
 {
 public:
-	int m_EventNum;
+	int m_EventNum = 0;
 	ExecArray m_arExec;
 	LogicElseArray m_arLogicElse;
 

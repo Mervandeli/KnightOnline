@@ -5,27 +5,25 @@
 #if !defined(AFX_N3CLOUD_H__0C780CD3_38F2_48CD_B36E_E7C64C7893EB__INCLUDED_)
 #define AFX_N3CLOUD_H__0C780CD3_38F2_48CD_B36E_E7C64C7893EB__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3Base.h"
 #include "N3ColorChange.h"
 #include <string>
 
-const int NUM_CLOUD_VERTEX = 8;
-//const int NUM_CLOUD_VERTEX = 12;
+constexpr int NUM_CLOUD_VERTEX = 8; // 12
 
-enum e_CLOUDTEX
+// NOLINTNEXTLINE(performance-enum-size): copied from __SKY_DAYCHANGE::dwParam2, __SKY_DAYCHANGE::dwParam2
+enum e_CLOUDTEX : uint32_t
 {
-	CLOUD_NONE  = -1,
 	CLOUD_WISPS = 0,
 	CLOUD_PUFFS,
 	CLOUD_TATTERS,
 	CLOUD_STREAKS,
 	CLOUD_DENSE,
 	CLOUD_OVERCAST,
-	NUM_CLOUD
+	NUM_CLOUD,
+	CLOUD_NONE = 0xFFFFFFFF
 };
 
 class CN3Cloud : public CN3Base
@@ -34,7 +32,7 @@ class CN3Cloud : public CN3Base
 
 public:
 	CN3Cloud();
-	virtual ~CN3Cloud();
+	~CN3Cloud() override;
 
 protected:
 	__VertexXyzColorT2 m_pVertices[NUM_CLOUD_VERTEX]; // 구름층의 버텍스
@@ -58,13 +56,15 @@ public:
 	{
 		m_Color1.ChangeColor(color, fSec);
 	}
+
 	void ChangeColor2(D3DCOLOR color, float fSec)
 	{
 		m_Color2.ChangeColor(color, fSec);
 	}
+
 	void SetCloud(e_CLOUDTEX eCloud1, e_CLOUDTEX eCloud2, float fSec);
 	void Init(const std::string* pszFNs);
-	virtual void Release();
+	void Release() override;
 	virtual void Render();
 	virtual void Tick();
 

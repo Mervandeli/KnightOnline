@@ -209,6 +209,9 @@ int CN3TableBaseImpl::SizeOf(DATA_TYPE DataType) const
 
 		case DT_DOUBLE:
 			return sizeof(double);
+
+		default:
+			break;
 	}
 
 	__ASSERT(0, "");

@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <string_view>
 
 // forward declarations
 class CIni;
@@ -41,7 +42,7 @@ public:
 	}
 
 	/// \param appName application name (VersionManager, Aujard, AIServer, Ebenezer)
-	Logger(const std::string& appName);
+	Logger(const std::string_view appName);
 
 	/// \brief Sets up spdlog from an ini file using standardized server settings
 	/// \param ini server application's ini file (already loaded)
@@ -53,8 +54,8 @@ public:
 		const std::filesystem::path& baseDir);
 
 	void SetupExtraLogger(CIni& ini, std::shared_ptr<spdlog::details::thread_pool> threadPool,
-		const std::filesystem::path& baseDir, const std::string& appName,
-		const std::string& logFileConfigProp);
+		const std::filesystem::path& baseDir, const std::string_view appName,
+		const std::string_view logFileConfigProp);
 
 	virtual ~Logger();
 
@@ -70,46 +71,46 @@ protected:
 //
 
 // AI Server
-static constexpr char AIServer[]        = "AIServer";
-static constexpr char AIServerItem[]    = "AIServerItem";
-static constexpr char AIServerUser[]    = "AIServerUser";
+static constexpr std::string_view AIServer        = "AIServer";
+static constexpr std::string_view AIServerItem    = "AIServerItem";
+static constexpr std::string_view AIServerUser    = "AIServerUser";
 
 // Ebenezer
-static constexpr char Ebenezer[]        = "Ebenezer";
-static constexpr char EbenezerEvent[]   = "EbenezerEvent";
-static constexpr char EbenezerRegion[]  = "EbenezerRegion";
+static constexpr std::string_view Ebenezer        = "Ebenezer";
+static constexpr std::string_view EbenezerEvent   = "EbenezerEvent";
+static constexpr std::string_view EbenezerRegion  = "EbenezerRegion";
 
 // Aujard
-static constexpr char Aujard[]          = "Aujard";
+static constexpr std::string_view Aujard          = "Aujard";
 
 // Version Manager
-static constexpr char VersionManager[]  = "VersionManager";
+static constexpr std::string_view VersionManager  = "VersionManager";
 
 // Item Manager
-static constexpr char ItemManager[]     = "ItemManager";
-static constexpr char ItemManagerItem[] = "ItemManagerItem";
-static constexpr char ItemManagerExp[]  = "ItemManagerExp";
+static constexpr std::string_view ItemManager     = "ItemManager";
+static constexpr std::string_view ItemManagerItem = "ItemManagerItem";
+static constexpr std::string_view ItemManagerExp  = "ItemManagerExp";
 } // namespace logger
 
 namespace ini
 {
 // LOGGER section
-static constexpr char LOGGER[]                      = "LOGGER";
-static constexpr char LEVEL[]                       = "LEVEL";
-static constexpr char PATTERN[]                     = "PATTERN";
-static constexpr char CONSOLE_PATTERN[]             = "CONSOLE_PATTERN";
-static constexpr char FILE[]                        = "FILE";
-static constexpr char ITEM_LOG_FILE[]               = "ITEM_LOG_FILE";
-static constexpr char USER_LOG_FILE[]               = "USER_LOG_FILE";
-static constexpr char REGION_LOG_FILE[]             = "REGION_LOG_FILE";
-static constexpr char EVENT_LOG_FILE[]              = "EVENT_LOG_FILE";
-static constexpr char EXP_LOG_FILE[]                = "EXP_LOG_FILE";
+static constexpr std::string_view LOGGER                      = "LOGGER";
+static constexpr std::string_view LEVEL                       = "LEVEL";
+static constexpr std::string_view PATTERN                     = "PATTERN";
+static constexpr std::string_view CONSOLE_PATTERN             = "CONSOLE_PATTERN";
+static constexpr std::string_view FILE                        = "FILE";
+static constexpr std::string_view ITEM_LOG_FILE               = "ITEM_LOG_FILE";
+static constexpr std::string_view USER_LOG_FILE               = "USER_LOG_FILE";
+static constexpr std::string_view REGION_LOG_FILE             = "REGION_LOG_FILE";
+static constexpr std::string_view EVENT_LOG_FILE              = "EVENT_LOG_FILE";
+static constexpr std::string_view EXP_LOG_FILE                = "EXP_LOG_FILE";
 
 /// \brief default logger line prefix ([12:59:59][AppName][  level] log line...)
-static constexpr char DEFAULT_LOG_PATTERN[]         = "[%H:%M:%S][%n][%7l] %v";
+static constexpr std::string_view DEFAULT_LOG_PATTERN         = "[%H:%M:%S][%n][%7l] %v";
 
 /// \brief default console logger line prefix ([12:59:59][AppName][  level] log line...)
-static constexpr char DEFAULT_CONSOLE_LOG_PATTERN[] = "[%H:%M:%S][%n]%^[%7l] %$%v";
+static constexpr std::string_view DEFAULT_CONSOLE_LOG_PATTERN = "[%H:%M:%S][%n]%^[%7l] %$%v";
 } // namespace ini
 
 #endif // SERVER_SHAREDSERVER_LOGGER_H

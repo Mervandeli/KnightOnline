@@ -5,13 +5,14 @@
 // #include "UIRingUpgrade.h"
 #include "UIManager.h"
 
-#include <N3BASE/N3UIButton.h>
+#include <N3Base/N3UIButton.h>
 
 CUIUpgradeSelect::CUIUpgradeSelect()
 {
 	m_pBtn_Upgrade_1 = nullptr;
 	m_pBtn_Upgrade_2 = nullptr;
 	m_pBtn_Close     = nullptr;
+	m_iNpcID         = 0;
 }
 
 CUIUpgradeSelect::~CUIUpgradeSelect()

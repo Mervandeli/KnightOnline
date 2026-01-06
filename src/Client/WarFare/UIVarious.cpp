@@ -20,15 +20,6 @@
 #include <N3Base/N3UIList.h>
 #include <N3Base/N3SndObj.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIState::CUIState()
 {
 	m_pText_ID           = nullptr;
@@ -127,7 +118,7 @@ void CUIState::Release()
 
 bool CUIState::Load(File& file)
 {
-	if (CN3UIBase::Load(file) == false)
+	if (!CN3UIBase::Load(file))
 		return false;
 
 	N3_VERIFY_UI_COMPONENT(m_pText_ID, GetChildByID<CN3UIString>("Text_ID"));
@@ -517,26 +508,28 @@ void CUIState::MsgSendAblityPointChange(uint8_t byType, int16_t siValueDelta)
 
 CUIKnights::CUIKnights()
 {
-	m_iPageCur           = 1;
+	m_iPageCur          = 1;
 	// m_MemberList = nullptr;
 
-	m_pText_Name         = nullptr;
-	m_pText_Duty         = nullptr;
-	m_pText_Page         = nullptr;
-	m_pText_MemberCount  = nullptr;
+	m_pText_Name        = nullptr;
+	m_pText_Duty        = nullptr;
+	m_pText_Page        = nullptr;
+	m_pText_MemberCount = nullptr;
 
 	// m_pImage_Grade = nullptr;
 
-	m_pList_CharGrades   = nullptr;
-	m_pList_CharIDs      = nullptr;
-	m_pList_CharLevels   = nullptr;
-	m_pList_CharJobs     = nullptr;
+	m_pList_CharGrades  = nullptr;
+	m_pList_CharIDs     = nullptr;
+	m_pList_CharLevels  = nullptr;
+	m_pList_CharJobs    = nullptr;
 
-	m_pBtn_Admit         = nullptr;
-	m_pBtn_Appoint       = nullptr;
-	m_pBtn_Remove        = nullptr;
-	m_pBtn_Refresh       = nullptr;
-	m_pBtn_ClanParty     = nullptr;
+	m_pBtn_Admit        = nullptr;
+	m_pBtn_Appoint      = nullptr;
+	m_pBtn_Remove       = nullptr;
+	m_pBtn_Refresh      = nullptr;
+	m_pBtn_ClanParty    = nullptr;
+
+	memset(m_pImage_Grade, 0, sizeof(m_pImage_Grade));
 
 	m_fTimeLimit_Refresh = 0.0f;
 	m_fTimeLimit_Appoint = 0.0f;
@@ -739,7 +732,7 @@ void CUIKnights::ClanPartyButtonHandler()
 	}
 
 	// Try to send party invite
-	if (CGameProcedure::s_pProcMain->MsgSend_PartyOrForceCreate(0, szID))
+	if (CGameProcedure::s_pProcMain->MsgSend_PartyOrForceCreate(szID))
 		szMsg = fmt::format_text_resource(IDS_PARTY_INVITE);
 	else
 		szMsg = fmt::format_text_resource(IDS_PARTY_INVITE_FAILED);
@@ -1093,11 +1086,11 @@ bool CUIFriends::Load(File& file)
 			{
 				std::string szTmp = szLine;
 
-				size_t pos        = szTmp.find("\r");
+				size_t pos        = szTmp.find('\r');
 				if (pos != std::string::npos)
 					szTmp = szTmp.substr(0, pos);
 
-				pos = szTmp.find("\n");
+				pos = szTmp.find('\n');
 				if (pos != std::string::npos)
 					szTmp = szTmp.substr(0, pos);
 
@@ -1237,7 +1230,7 @@ bool CUIFriends::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			if (it != m_MapFriends.end())
 			{
 				std::string szMsg;
-				if (pProcMain->MsgSend_PartyOrForceCreate(0, szID))
+				if (pProcMain->MsgSend_PartyOrForceCreate(szID))
 					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE);        // 파티
 				else
 					szMsg = fmt::format_text_resource(IDS_PARTY_INVITE_FAILED); // 파티 초대 실패
@@ -1297,11 +1290,11 @@ void CUIFriends::UpdateList()
 	if (m_iPageCur < 0 || m_iPageCur > iPageMax)
 		return;
 
-	size_t iSkip = static_cast<size_t>(m_iPageCur * iLinePerPage);
+	size_t iSkip = static_cast<size_t>(m_iPageCur) * static_cast<size_t>(iLinePerPage);
 	if (iSkip >= m_MapFriends.size())
 		return;
 
-	if (m_pText_Page)
+	if (m_pText_Page != nullptr)
 		m_pText_Page->SetStringAsInt(m_iPageCur + 1); // 페이지 표시..
 
 	auto it = m_MapFriends.begin();
@@ -1312,7 +1305,7 @@ void CUIFriends::UpdateList()
 		__FriendsInfo& FI = it->second;
 		int iIndex        = m_pList_Friends->AddString(FI.szName);
 
-		D3DCOLOR crStatus;
+		D3DCOLOR crStatus = 0xff808080;
 		if (FI.bOnLine)
 		{
 			if (FI.bIsParty)
@@ -1320,8 +1313,6 @@ void CUIFriends::UpdateList()
 			else
 				crStatus = 0xff00ff00;
 		}
-		else
-			crStatus = 0xff808080;
 
 		m_pList_Friends->SetFontColor(iIndex, crStatus);
 	}
@@ -1718,15 +1709,19 @@ void CUIVarious::UpdateAllStates(const __InfoPlayerBase* pInfoBase, const __Info
 		pInfoExt->iRealmPointMonthly); // Edited by @Demircivi while integrating monthly np system.  // 국가 기여도는 10을 나누어서 표시
 
 	// 캐릭터 능력치 포인트 이미지 업데이트..
-	if (m_pPageState->m_pImg_Str)
+	if (m_pPageState->m_pImg_Str != nullptr)
 		m_pPageState->m_pImg_Str->SetVisible(false);
-	if (m_pPageState->m_pImg_Sta)
+
+	if (m_pPageState->m_pImg_Sta != nullptr)
 		m_pPageState->m_pImg_Sta->SetVisible(false);
-	if (m_pPageState->m_pImg_Dex)
+
+	if (m_pPageState->m_pImg_Dex != nullptr)
 		m_pPageState->m_pImg_Dex->SetVisible(false);
-	if (m_pPageState->m_pImg_Int)
+
+	if (m_pPageState->m_pImg_Int != nullptr)
 		m_pPageState->m_pImg_Int->SetVisible(false);
-	if (m_pPageState->m_pImg_MAP)
+
+	if (m_pPageState->m_pImg_MAP != nullptr)
 		m_pPageState->m_pImg_MAP->SetVisible(false);
 
 	switch (pInfoBase->eClass)
@@ -1735,9 +1730,10 @@ void CUIVarious::UpdateAllStates(const __InfoPlayerBase* pInfoBase, const __Info
 		case CLASS_KA_BERSERKER:
 		case CLASS_EL_WARRIOR:
 		case CLASS_EL_BLADE:
-			if (m_pPageState->m_pImg_Str)
+			if (m_pPageState->m_pImg_Str != nullptr)
 				m_pPageState->m_pImg_Str->SetVisible(true);
-			if (m_pPageState->m_pImg_Sta)
+
+			if (m_pPageState->m_pImg_Sta != nullptr)
 				m_pPageState->m_pImg_Sta->SetVisible(true);
 			break;
 
@@ -1745,9 +1741,10 @@ void CUIVarious::UpdateAllStates(const __InfoPlayerBase* pInfoBase, const __Info
 		case CLASS_KA_HUNTER:
 		case CLASS_EL_ROGUE:
 		case CLASS_EL_RANGER:
-			if (m_pPageState->m_pImg_Sta)
+			if (m_pPageState->m_pImg_Sta != nullptr)
 				m_pPageState->m_pImg_Sta->SetVisible(true);
-			if (m_pPageState->m_pImg_Dex)
+
+			if (m_pPageState->m_pImg_Dex != nullptr)
 				m_pPageState->m_pImg_Dex->SetVisible(true);
 			break;
 
@@ -1755,9 +1752,10 @@ void CUIVarious::UpdateAllStates(const __InfoPlayerBase* pInfoBase, const __Info
 		case CLASS_KA_SORCERER:
 		case CLASS_EL_WIZARD:
 		case CLASS_EL_MAGE:
-			if (m_pPageState->m_pImg_Int)
+			if (m_pPageState->m_pImg_Int != nullptr)
 				m_pPageState->m_pImg_Int->SetVisible(true);
-			if (m_pPageState->m_pImg_MAP)
+
+			if (m_pPageState->m_pImg_MAP != nullptr)
 				m_pPageState->m_pImg_MAP->SetVisible(true);
 			break;
 
@@ -1765,10 +1763,14 @@ void CUIVarious::UpdateAllStates(const __InfoPlayerBase* pInfoBase, const __Info
 		case CLASS_KA_SHAMAN:
 		case CLASS_EL_PRIEST:
 		case CLASS_EL_CLERIC:
-			if (m_pPageState->m_pImg_Str)
+			if (m_pPageState->m_pImg_Str != nullptr)
 				m_pPageState->m_pImg_Str->SetVisible(true);
-			if (m_pPageState->m_pImg_Int)
+
+			if (m_pPageState->m_pImg_Int != nullptr)
 				m_pPageState->m_pImg_Int->SetVisible(true);
+			break;
+
+		default:
 			break;
 	}
 }
@@ -1790,10 +1792,10 @@ void CUIVarious::UpdateKnightsInfo()
 
 bool CUIVarious::OnKeyPress(int iKey)
 {
-	if (DIK_ESCAPE == iKey)
+	if (iKey == DIK_ESCAPE)
 	{
 		if (!m_bClosingNow)
-			this->Close();
+			Close();
 		return true;
 	}
 

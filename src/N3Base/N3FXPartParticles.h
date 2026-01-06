@@ -5,7 +5,7 @@
 #ifndef __N3FXPARTPARTICLES_H__
 #define __N3FXPARTPARTICLES_H__
 
-#pragma warning(disable : 4786)
+#pragma once
 
 #include <list>
 #include "N3FXPartBase.h"
@@ -67,8 +67,8 @@ public:
 	bool m_bAnimKey;
 
 	//particle local rotate......2002.10.21.
-	float
-		m_fTexRotateVelocity; //	파티클 텍스쳐를 로컬 Z축으로 회전시켜서 빙글빙글 도는 것처럼 보이게...(속도)
+	//	파티클 텍스쳐를 로컬 Z축으로 회전시켜서 빙글빙글 도는 것처럼 보이게...(속도)
+	float m_fTexRotateVelocity;
 	float m_fScaleVelX;
 	float m_fScaleVelY;
 
@@ -95,16 +95,10 @@ protected:
 
 	bool IsDead() override;
 
-	bool RotateQuaternion(__Vector3 vSrcDir, __Vector3 vDestDir, __Quaternion* pQt);
-	float CameraDist(__Vector3 v1, __Vector3 v2, __Vector3 v3);
-
-	//////////////////////////////////////////////
-	//m_pVBList_Alive를 소트하기위함이야..
-	void PSort();
-	void PMerge(std::list<CN3FXParticle*>& l1, std::list<CN3FXParticle*>& l2);
-	bool PComp(CN3FXParticle* pP1, CN3FXParticle* pP2);
-	//
-	//////////////////////////////////////////////
+	bool RotateQuaternion(
+		const __Vector3& vSrcDir, const __Vector3& vDestDir, __Quaternion* pQt) const;
+	float CameraDist(const __VertexXyzColorT1& v1, const __VertexXyzColorT1& v2,
+		const __VertexXyzColorT1& v3) const;
 
 public:
 	void Init() override;           // 각종 변수들을 처음 로딩한 상태로 초기화...
@@ -116,7 +110,7 @@ public:
 	bool Save(File& file) override; // 게임파일 저장오기.
 	void Duplicate(CN3FXPartParticles* pSrc);
 
-	bool GetColor(int key, uint32_t& color);
+	bool GetColor(int key, uint32_t& color) const;
 
 	CN3FXPartParticles();
 	~CN3FXPartParticles() override;

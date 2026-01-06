@@ -5,11 +5,9 @@
 #if !defined(AFX_GameProcedure_H__0BEC53F2_1282_402C_9A28_FB98CC131F64__INCLUDED_)
 #define AFX_GameProcedure_H__0BEC53F2_1282_402C_9A28_FB98CC131F64__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
-enum e_LogInClassification
+enum e_LogInClassification : uint8_t
 {
 	LIC_KNIGHTONLINE = 0,
 	LIC_MGAME        = 1,
@@ -21,41 +19,27 @@ enum e_LogInClassification
 
 #include "N3WorldManager.h"
 
-#define UI_POST_WND_CHAT   "Wnd_Chat"
-#define UI_POST_WND_HOTKEY "Wnd_Hotkey"
-#define UI_POST_WND_PARTY  "Wnd_Party"
-#define UI_POST_WND_HELP   "Wnd_Help"
-#define UI_POST_WND_INFO   "Wnd_Msg"
-
-const int MAX_MSG_BOX = 4;
+constexpr char UI_POST_WND_CHAT[]   = "Wnd_Chat";
+constexpr char UI_POST_WND_HOTKEY[] = "Wnd_Hotkey";
+constexpr char UI_POST_WND_PARTY[]  = "Wnd_Party";
+constexpr char UI_POST_WND_HELP[]   = "Wnd_Help";
+constexpr char UI_POST_WND_INFO[]   = "Wnd_Msg";
 
 struct __WndInfo
 {
-	char szName[16];
-	bool bVisible;
-	POINT ptPosition;
-
-	__WndInfo()
-	{
-		memset(szName, 0, sizeof(szName));
-		bVisible   = false;
-		ptPosition = {};
-	}
+	char szName[16]  = {};
+	bool bVisible    = false;
+	POINT ptPosition = {};
 };
 
 class CHotkeyData
 {
 public:
-	int row;
-	int column;
-	int iID;
+	int row       = 0;
+	int column    = 0;
+	int iID       = 0;
 
-	CHotkeyData()
-	{
-		row    = 0;
-		column = 0;
-		iID    = 0;
-	}
+	CHotkeyData() = default;
 
 	CHotkeyData(int rw, int cl, int id)
 	{
@@ -140,9 +124,9 @@ public:
 	virtual void MsgSend_CharacterSelect();
 	void MsgRecv_CompressedPacket(Packet& pkt);
 
-	virtual void Release(); // 리소스 풀어주기..
-	virtual void Init();    // 필요한 요소들을 초기화 및 로딩
-	virtual void Tick();    // 프로시져 인덱스를 리턴한다. 0 이면 그대로 진행
+	void Release() override; // 리소스 풀어주기..
+	virtual void Init();     // 필요한 요소들을 초기화 및 로딩
+	virtual void Tick();     // 프로시져 인덱스를 리턴한다. 0 이면 그대로 진행
 	virtual void Render();
 	virtual void ProcessUIKeyInput(bool bEnable = true);
 
@@ -167,6 +151,7 @@ public:
 
 protected:
 	virtual bool ProcessPacket(Packet& pkt);
+	void MsgRecv_ServerChange(Packet& pkt);
 
 private:
 	static std::string GetStrRegKeySetting();
@@ -174,7 +159,7 @@ private:
 public:
 	void LoadingUIChange(int iVictoryNation);
 	CGameProcedure();
-	virtual ~CGameProcedure();
+	~CGameProcedure() override;
 };
 
 #endif // !defined(AFX_GameProcedure_H__0BEC53F2_1282_402C_9A28_FB98CC131F64__INCLUDED_)

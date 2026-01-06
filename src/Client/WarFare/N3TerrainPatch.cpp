@@ -9,11 +9,6 @@
 
 #include <N3Base/N3Texture.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 //
 //	생성자
 //
@@ -23,26 +18,25 @@ CN3TerrainPatch::CN3TerrainPatch()
 	m_iLevel       = 0;
 	m_CellSize     = 0;
 	m_NumCell      = 0;
-	m_ti_LBPoint.x = m_ti_LBPoint.y = -1;
-	m_pRefTerrain                   = nullptr;
+	m_ti_LBPoint.x = -1;
+	m_ti_LBPoint.y = -1;
+	m_pRefTerrain  = nullptr;
 	for (int i = 0; i < 4; i++)
 		m_IsBlunt[i] = true;
 
-	m_pRefColorTex = nullptr;
+	m_pRefColorTex    = nullptr;
 
-	m_VBSize[2]    = 10;
-	m_VBSize[1]    = 56;
-	m_VBSize[0]    = 256;
+	m_VBSize[2]       = 10;
+	m_VBSize[1]       = 56;
+	m_VBSize[0]       = 256;
 
-	m_pVB          = nullptr;
-
-	m_FanInfoList.clear();
+	m_pVB             = nullptr;
 
 	m_pTileTexIndx[0] = nullptr;
 	m_pTileTexIndx[1] = nullptr;
 	m_pIsTileFull     = nullptr;
 
-	//lightmap...
+	// lightmap...
 	m_pLightMapVB     = nullptr;
 	m_pRefLightMapTex = nullptr;
 	m_NumLightMapTex  = 0;
@@ -53,7 +47,7 @@ CN3TerrainPatch::CN3TerrainPatch()
 //
 CN3TerrainPatch::~CN3TerrainPatch()
 {
-	Release();
+	CN3TerrainPatch::Release();
 }
 
 //
@@ -61,13 +55,13 @@ CN3TerrainPatch::~CN3TerrainPatch()
 //
 void CN3TerrainPatch::Release()
 {
-	if (m_pVB)
+	if (m_pVB != nullptr)
 	{
 		m_pVB->Release();
 		m_pVB = nullptr;
 	}
 
-	if (m_pLightMapVB)
+	if (m_pLightMapVB != nullptr)
 	{
 		m_pLightMapVB->Release();
 		m_pLightMapVB = nullptr;
@@ -183,12 +177,10 @@ void CN3TerrainPatch::SetLevel(int level)
 	delete[] m_pRefLightMapTex;
 	m_pRefLightMapTex = nullptr;
 
-	HRESULT hr;
 	if (level == 1)
 	{
-		hr = CN3Base::s_lpD3DDev->CreateVertexBuffer(
-			m_VBSize[level - 1] * sizeof(__VertexT2), 0, FVF_VNT2, D3DPOOL_MANAGED, &m_pVB, nullptr);
-		hr = CN3Base::s_lpD3DDev->CreateVertexBuffer(
+		CN3Base::s_lpD3DDev->CreateVertexBuffer(m_VBSize[level - 1] * sizeof(__VertexT2), 0, FVF_VNT2, D3DPOOL_MANAGED, &m_pVB, nullptr);
+		CN3Base::s_lpD3DDev->CreateVertexBuffer(
 			m_VBSize[level - 1] * sizeof(__VertexT1), 0, FVF_VNT1, D3DPOOL_MANAGED, &m_pLightMapVB, nullptr);
 
 		m_NumLightMapTex  = 0;
@@ -196,8 +188,7 @@ void CN3TerrainPatch::SetLevel(int level)
 	}
 	else
 	{
-		hr = CN3Base::s_lpD3DDev->CreateVertexBuffer(
-			m_VBSize[level - 1] * sizeof(__VertexT1), 0, FVF_VNT1, D3DPOOL_MANAGED, &m_pVB, nullptr);
+		CN3Base::s_lpD3DDev->CreateVertexBuffer(m_VBSize[level - 1] * sizeof(__VertexT1), 0, FVF_VNT1, D3DPOOL_MANAGED, &m_pVB, nullptr);
 	}
 }
 
@@ -211,18 +202,16 @@ void CN3TerrainPatch::Tick()
 	{
 		m_bIsRender = FALSE;
 	}
-	if (m_bIsRender == FALSE)
+
+	if (!m_bIsRender)
 		return;
 
-	int HalfCell    = m_CellSize >> 1;
+	int HalfCell  = m_CellSize >> 1;
 
-	int VertexIdx   = 0;
-	int FaceCount   = 0;
-	int VertexCount = 0;
-
-	int ix, iz;
-	int tx, tz;
-	int cx, cz; //cell center point...
+	int VertexIdx = 0, FaceCount = 0, VertexCount = 0;
+	int ix = 0, iz = 0;
+	int tx = 0, tz = 0;
+	int cx = 0, cz = 0; //cell center point...
 
 	FANINFO FaceInfo;
 
@@ -230,15 +219,15 @@ void CN3TerrainPatch::Tick()
 	{
 		m_FanInfoList.clear();
 		m_NumLightMapTex              = 0;
-		__VertexT1* pLightMapVertices = nullptr;
 
-		__VertexT2* pVertices;
+		__VertexT1* pLightMapVertices = nullptr;
+		__VertexT2* pVertices         = nullptr;
 		if (FAILED(m_pVB->Lock(0, 0, (void**) &pVertices, 0)))
 			return;
 
-		int dir1, dir2;
-		int TileCount = 0;
-		float u1[4], u2[4], v1[4], v2[4];
+		int dir1 = 0, dir2 = 0, TileCount = 0;
+		float u1[4] {}, u2[4] {}, v1[4] {}, v2[4] {};
+		const size_t TileTextureCount = m_pRefTerrain->m_TileTex.size();
 
 		///////////////////////////////////
 		//unitUV
@@ -250,7 +239,7 @@ void CN3TerrainPatch::Tick()
 				tx                           = ix + m_ti_LBPoint.x;
 				tz                           = iz + m_ti_LBPoint.y;
 
-				MAPDATA MapData              = m_pRefTerrain->GetMapData(tx, tz);
+				const MAPDATA& MapData       = m_pRefTerrain->GetMapData(tx, tz);
 
 				dir1                         = MapData.Tex1Dir;
 				dir2                         = MapData.Tex2Dir;
@@ -259,8 +248,9 @@ void CN3TerrainPatch::Tick()
 				m_pTileTexIndx[1][TileCount] = MapData.Tex2Idx;
 				m_pIsTileFull[TileCount]     = MapData.bIsTileFull;
 
-				if (m_pTileTexIndx[0][TileCount] > m_pRefTerrain->m_NumTileTex
-					|| m_pIsTileFull[TileCount] == false) // 타일이 없는 경우..컬러맵을 찍어야 돼...
+				if (m_pTileTexIndx[0][TileCount] >= TileTextureCount
+					// 타일이 없는 경우..컬러맵을 찍어야 돼...
+					|| !m_pIsTileFull[TileCount])
 				{
 					u1[0] = u1[1] = UVConvert((float) (tx % UNITUV) / (float) UNITUV);
 					u1[2] = u1[3] = UVConvert(u1[0] + (1.0f / (float) UNITUV));
@@ -392,11 +382,12 @@ void CN3TerrainPatch::Tick()
 		return;
 	}
 
-	float tu, tv; //center u,v...
+	float tu = 0.0f, tv = 0.0f; //center u,v...
 	if (m_iLevel == 2)
 	{
 		m_FanInfoList.clear();
-		__VertexT1* pVertices;
+
+		__VertexT1* pVertices = nullptr;
 		if (FAILED(m_pVB->Lock(0, 0, (void**) &pVertices, 0)))
 			return;
 
@@ -538,8 +529,9 @@ void CN3TerrainPatch::Tick()
 	if (m_iLevel > 2) // level3 이상..
 	{
 		m_FanInfoList.clear();
-		__VertexT1* pVertices;
-		HRESULT hr = m_pVB->Lock(0, 0, (void**) &pVertices, 0);
+
+		__VertexT1* pVertices = nullptr;
+		HRESULT hr            = m_pVB->Lock(0, 0, (void**) &pVertices, 0);
 		if (FAILED(hr))
 			return;
 
@@ -670,41 +662,37 @@ void CN3TerrainPatch::Tick()
 //
 void CN3TerrainPatch::Render()
 {
-	if (m_bIsRender == FALSE)
+	if (!m_bIsRender)
 		return;
-
-	HRESULT hr;
 
 	if (m_iLevel > 1)
 	{
-		hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-		hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
-		hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TEXTURE);
+		CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+		CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
+		CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TEXTURE);
 
-		hr = CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-		hr = CN3Base::s_lpD3DDev->SetTexture(1, nullptr);
+		CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+		CN3Base::s_lpD3DDev->SetTexture(1, nullptr);
 
-		hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_DISABLE);
-		hr = CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
+		CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_DISABLE);
+		CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
 
 		CN3Base::s_lpD3DDev->SetStreamSource(0, m_pVB, 0, sizeof(__VertexT1));
 		CN3Base::s_lpD3DDev->SetFVF(FVF_VNT1);
 
-		if (m_pRefColorTex->Get())
-			hr = CN3Base::s_lpD3DDev->SetTexture(0, m_pRefColorTex->Get());
+		if (m_pRefColorTex->Get() != nullptr)
+			CN3Base::s_lpD3DDev->SetTexture(0, m_pRefColorTex->Get());
 		else
-			hr = CN3Base::s_lpD3DDev->SetTexture(0, nullptr);
+			CN3Base::s_lpD3DDev->SetTexture(0, nullptr);
 
-		FIIt it;
-		int vc = 0;
-		int fc;
-		for (it = m_FanInfoList.begin(); it != m_FanInfoList.end(); it++)
+		int vc = 0, fc = 0;
+		for (const FANINFO& fi : m_FanInfoList)
 		{
-			fc  = it->NumFace;
-			hr  = CN3Base::s_lpD3DDev->DrawPrimitive(D3DPT_TRIANGLEFAN, vc, fc);
-			vc += it->NumVertex;
+			fc = fi.NumFace;
+			CN3Base::s_lpD3DDev->DrawPrimitive(D3DPT_TRIANGLEFAN, vc, fc);
+			vc += fi.NumVertex;
 #if _DEBUG
-			CN3Base::s_RenderInfo.nTerrain_Polygon += it->NumVertex; // Rendering Information 갱신..
+			CN3Base::s_RenderInfo.nTerrain_Polygon += fi.NumVertex; // Rendering Information 갱신..
 #endif
 		}
 		return;
@@ -712,94 +700,93 @@ void CN3TerrainPatch::Render()
 
 	if (m_iLevel == 1)
 	{
-		hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-		hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+		CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+		CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 
 		CN3Base::s_lpD3DDev->SetStreamSource(0, m_pVB, 0, sizeof(__VertexT2));
 		CN3Base::s_lpD3DDev->SetFVF(FVF_VNT2);
 
-		int TotalTile = PATCH_TILE_SIZE * PATCH_TILE_SIZE;
+		const size_t TileTextureCount = m_pRefTerrain->m_TileTex.size();
+		int TotalTile                 = PATCH_TILE_SIZE * PATCH_TILE_SIZE;
 		for (int i = 0; i < TotalTile; i++)
 		{
-			hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-			hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+			CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+			CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 
-			hr = CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
+			CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
 
-			if (m_pTileTexIndx[0][i] >= m_pRefTerrain->m_NumTileTex
-				|| (m_pIsTileFull[i] == false)) // 0: 컬러맵, 1:무늬 or 0:부분타일 1:NONE...
+			if (m_pTileTexIndx[0][i] >= TileTextureCount || (m_pIsTileFull[i] == false)) // 0: 컬러맵, 1:무늬 or 0:부분타일 1:NONE...
 			{
-				hr = CN3Base::s_lpD3DDev->SetTexture(0, m_pRefColorTex->Get());
-				hr = CN3Base::s_lpD3DDev->SetTexture(1, m_pRefTerrain->m_pBaseTex.Get());
+				CN3Base::s_lpD3DDev->SetTexture(0, m_pRefColorTex->Get());
+				CN3Base::s_lpD3DDev->SetTexture(1, m_pRefTerrain->m_pBaseTex.Get());
 
-				hr = CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE);
-				hr = CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-				hr = CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT);
+				CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE);
+				CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+				CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT);
 
-				hr = CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
-				hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_MODULATE);
-				hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG1, D3DTA_CURRENT);
-				hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+				CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
+				CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_MODULATE);
+				CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG1, D3DTA_CURRENT);
+				CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
 			}
-			else if (m_pTileTexIndx[0][i] < m_pRefTerrain->m_NumTileTex)
+			else if (m_pTileTexIndx[0][i] < TileTextureCount)
 			{
-				if (m_pTileTexIndx[1][i] < m_pRefTerrain->m_NumTileTex) //0: tile, 1: tile..
+				if (m_pTileTexIndx[1][i] < TileTextureCount) //0: tile, 1: tile..
 				{
-					hr = CN3Base::s_lpD3DDev->SetTexture(0, m_pRefTerrain->m_pTileTex[m_pTileTexIndx[0][i]].Get());
-					hr = CN3Base::s_lpD3DDev->SetTexture(1, m_pRefTerrain->m_pTileTex[m_pTileTexIndx[1][i]].Get());
-					hr = CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_ADD);
-					hr = CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-					hr = CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT);
+					CN3Base::s_lpD3DDev->SetTexture(0, m_pRefTerrain->m_TileTex[m_pTileTexIndx[0][i]].Get());
+					CN3Base::s_lpD3DDev->SetTexture(1, m_pRefTerrain->m_TileTex[m_pTileTexIndx[1][i]].Get());
+					CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_ADD);
+					CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+					CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT);
 
 					if (m_pRefTerrain->m_bAvailableTile)
 					{
-						hr = CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
-						hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_MODULATE);
-						hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG1, D3DTA_CURRENT);
-						hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+						CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
+						CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_MODULATE);
+						CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG1, D3DTA_CURRENT);
+						CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
 					}
 				}
 				else //0: tile, 1:NONE...
 				{
-					hr = CN3Base::s_lpD3DDev->SetTexture(0, m_pRefTerrain->m_pTileTex[m_pTileTexIndx[0][i]].Get());
-					hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-					hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-					hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+					CN3Base::s_lpD3DDev->SetTexture(0, m_pRefTerrain->m_TileTex[m_pTileTexIndx[0][i]].Get());
+					CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+					CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+					CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
 
-					hr = CN3Base::s_lpD3DDev->SetTexture(1, nullptr);
-					hr = CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
-					hr = CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-					hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_DISABLE);
+					CN3Base::s_lpD3DDev->SetTexture(1, nullptr);
+					CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
+					CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+					CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_DISABLE);
 				}
 			}
 
-			hr = CN3Base::s_lpD3DDev->DrawPrimitive(D3DPT_TRIANGLEFAN, (i << 2), 2);
+			CN3Base::s_lpD3DDev->DrawPrimitive(D3DPT_TRIANGLEFAN, (i << 2), 2);
 
-			if ((!m_pRefTerrain->m_bAvailableTile) && m_pTileTexIndx[0][i] < m_pRefTerrain->m_NumTileTex
-				&& m_pTileTexIndx[1][i] < m_pRefTerrain->m_NumTileTex)
+			if ((!m_pRefTerrain->m_bAvailableTile) && m_pTileTexIndx[0][i] < TileTextureCount && m_pTileTexIndx[1][i] < TileTextureCount)
 			{
-				DWORD dwAlphaEnable, dwSrcBlend, dwDestBlend;
-				hr = s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlphaEnable);
-				hr = s_lpD3DDev->GetRenderState(D3DRS_SRCBLEND, &dwSrcBlend);
-				hr = s_lpD3DDev->GetRenderState(D3DRS_DESTBLEND, &dwDestBlend);
+				DWORD dwAlphaEnable = 0, dwSrcBlend = 0, dwDestBlend = 0;
+				CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlphaEnable);
+				CN3Base::s_lpD3DDev->GetRenderState(D3DRS_SRCBLEND, &dwSrcBlend);
+				CN3Base::s_lpD3DDev->GetRenderState(D3DRS_DESTBLEND, &dwDestBlend);
 
-				hr = CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-				hr = CN3Base::s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
-				hr = CN3Base::s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_SRCCOLOR);
+				CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+				CN3Base::s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
+				CN3Base::s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_SRCCOLOR);
 
-				hr = CN3Base::s_lpD3DDev->SetTexture(0, nullptr);
-				hr = CN3Base::s_lpD3DDev->SetTexture(1, nullptr);
-				hr = CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
-				hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-				hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
-				hr = CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-				hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_DISABLE);
+				CN3Base::s_lpD3DDev->SetTexture(0, nullptr);
+				CN3Base::s_lpD3DDev->SetTexture(1, nullptr);
+				CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
+				CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+				CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
+				CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+				CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_DISABLE);
 
-				hr = CN3Base::s_lpD3DDev->DrawPrimitive(D3DPT_TRIANGLEFAN, (i << 2), 2);
+				CN3Base::s_lpD3DDev->DrawPrimitive(D3DPT_TRIANGLEFAN, (i << 2), 2);
 
-				hr = s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlphaEnable);
-				hr = s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND, dwSrcBlend);
-				hr = s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND, dwDestBlend);
+				CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlphaEnable);
+				CN3Base::s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND, dwSrcBlend);
+				CN3Base::s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND, dwDestBlend);
 			}
 		}
 
@@ -808,33 +795,33 @@ void CN3TerrainPatch::Render()
 #endif
 
 		// Render Light Map...
-		s_lpD3DDev->SetStreamSource(0, m_pLightMapVB, 0, sizeof(__VertexT1));
-		s_lpD3DDev->SetFVF(FVF_VNT1);
+		CN3Base::s_lpD3DDev->SetStreamSource(0, m_pLightMapVB, 0, sizeof(__VertexT1));
+		CN3Base::s_lpD3DDev->SetFVF(FVF_VNT1);
 
-		DWORD dwAlphaEnable, dwSrcBlend, dwDestBlend;
+		DWORD dwAlphaEnable = 0, dwSrcBlend = 0, dwDestBlend = 0;
 
-		hr = CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-		hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_DISABLE);
-		hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-		hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-		hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+		CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+		CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_DISABLE);
+		CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+		CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+		CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
 
-		hr = s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlphaEnable);
-		hr = s_lpD3DDev->GetRenderState(D3DRS_SRCBLEND, &dwSrcBlend);
-		hr = s_lpD3DDev->GetRenderState(D3DRS_DESTBLEND, &dwDestBlend);
+		CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlphaEnable);
+		CN3Base::s_lpD3DDev->GetRenderState(D3DRS_SRCBLEND, &dwSrcBlend);
+		CN3Base::s_lpD3DDev->GetRenderState(D3DRS_DESTBLEND, &dwDestBlend);
 
-		hr = s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-		hr = s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-		hr = s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+		CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+		CN3Base::s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		CN3Base::s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 		for (int i = 0; i < m_NumLightMapTex; i++)
 		{
-			s_lpD3DDev->SetTexture(0, m_pRefLightMapTex[i]->Get());
-			hr = s_lpD3DDev->DrawPrimitive(D3DPT_TRIANGLEFAN, (i << 2), 2);
+			CN3Base::s_lpD3DDev->SetTexture(0, m_pRefLightMapTex[i]->Get());
+			CN3Base::s_lpD3DDev->DrawPrimitive(D3DPT_TRIANGLEFAN, (i << 2), 2);
 		}
-		hr = s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlphaEnable);
-		hr = s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND, dwSrcBlend);
-		hr = s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND, dwDestBlend);
+		CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlphaEnable);
+		CN3Base::s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND, dwSrcBlend);
+		CN3Base::s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND, dwDestBlend);
 	}
 }
 
@@ -847,4 +834,3 @@ inline float CN3TerrainPatch::UVConvert(float uv)
 	//return ( (uv*((float)COLORMAPTEX_SIZE - 2.0f) + 1.0f) / (float)COLORMAPTEX_SIZE);
 	return uv;
 }
-

@@ -5,15 +5,6 @@
 #include "StdAfxBase.h"
 #include "N3UIString.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3UIString::CN3UIString()
 {
 	m_eType  = UI_TYPE_STRING;
@@ -361,9 +352,10 @@ void CN3UIString::SetStartLine(int iLine)
 		iEndLine  = m_iLineCount;
 		bMoreLine = false;
 	}
-	int i, iCC;
+
+	int i = m_iStartLine, iCC = 0;
 	std::string strNew;
-	for (i = m_iStartLine; i < iEndLine - 1; ++i)
+	for (; i < iEndLine - 1; i++)
 	{
 		iCC = m_NewLineIndices[i + 1] - m_NewLineIndices[i];
 		if (iCC > 0)
@@ -446,8 +438,11 @@ bool CN3UIString::Load(File& file)
 	return true;
 }
 
-void CN3UIString::operator=(const CN3UIString& other)
+CN3UIString& CN3UIString::operator=(const CN3UIString& other)
 {
+	if (this == &other)
+		return *this;
+
 	CN3UIBase::operator=(other);
 
 	m_ptDrawPos          = other.m_ptDrawPos; // 실제 화면에 표시될 글자의 제일 왼쪽 상단 좌표
@@ -459,7 +454,9 @@ void CN3UIString::operator=(const CN3UIString& other)
 		dwFontFlags & D3DFONT_ITALIC);
 
 	// 글씨 설정
-	this->SetString(other.m_szString); // m_szString = other.m_szString;			// string buffer
+	SetString(other.m_szString); // m_szString = other.m_szString;			// string buffer
+
+	return *this;
 }
 
 #ifdef _N3TOOL

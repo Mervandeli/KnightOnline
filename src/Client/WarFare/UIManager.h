@@ -5,9 +5,7 @@
 #if !defined(AFX_UIMANAGER_H__1EED48B7_90A3_4242_99BD_ABC12040CDDE__INCLUDED_)
 #define AFX_UIMANAGER_H__1EED48B7_90A3_4242_99BD_ABC12040CDDE__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <N3Base/N3UIBase.h>
 
@@ -43,37 +41,44 @@ public:
 	static void RenderStateRestore();
 	static void RenderStateSet();
 
+	// UI 조작 가능/불가능..
 	void EnableOperationSet(bool bEnable)
 	{
 		m_bEnableOperation = bEnable;
-	} // UI 조작 가능/불가능..
+	}
+
+	// UI 조작이 가능한 상태인가?
 	bool EnableOperation()
 	{
 		return m_bEnableOperation;
-	} // UI 조작이 가능한 상태인가?
+	}
 
-	void Release();
-	void Tick();
-	uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld);
-	uint32_t GetCurMouseFlags()
+	void Release() override;
+	void Tick() override;
+	uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
+
+	uint32_t GetCurMouseFlags() const
 	{
 		return m_dwMouseFlagsCur;
 	}
+
+	// 찍은 UI 가져오기..
 	CN3UIBase* GetFocusedUI()
 	{
 		return m_pUIFocused;
-	} // 찍은 UI 가져오기..
+	}
+
 	void SetFocusedUI(CN3UIBase* pUI);  // 찍은 UI 가져오기..
 	CN3UIBase* GetTopUI(bool bVisible); // 최상위에 있는 UI 가져오기.
 	void SetVisibleFocusedUI(CN3UIBase* pUI);
 	CN3UIBase* ReFocusUI();
-	void Render();
+	void Render() override;
 	void ReorderChildList();
 
 	bool BroadcastIconDropMsg(__IconItemSkill* spItem);
 
 	CUIManager();
-	virtual ~CUIManager();
+	~CUIManager() override;
 };
 
 #endif // !defined(AFX_UIMANAGER_H__1EED48B7_90A3_4242_99BD_ABC12040CDDE__INCLUDED_)

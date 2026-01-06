@@ -8,15 +8,6 @@
 #include "N3PMeshInstance.h"
 #include "N3Texture.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3Sky::CN3Sky()
 {
 	m_SkyColor.ChangeColor(0xFF5284DE); // Day color

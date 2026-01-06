@@ -586,9 +586,9 @@ void CFormViewProperty::UpdateAllInfo()
 	{
 		for (size_t i = 0; i < pFXP->m_FXPParts.size(); i++)
 		{
-			CN3FXPlugPart* pPart    = pFXP->m_FXPParts[i];
+			CN3FXPlugPart* pPart = pFXP->m_FXPParts[i];
 
-			TCHAR szName[_MAX_PATH] = {};
+			TCHAR szName[_MAX_PATH] {};
 			_stprintf(szName, _T("FXPlugPart_%03zu"), i);
 			hInsert = m_TreeChr.InsertItem(szName, 11, 11, m_hTI_FXPlug);
 			m_TreeChr.SetItemData(hInsert, (DWORD_PTR) pPart);
@@ -882,7 +882,7 @@ void CFormViewProperty::OnEditChrPlugAddcloak()
 	if (nullptr == pChr)
 		return;
 
-	CN3CPlugBase* pPlug = pChr->PlugAdd(PLUGTYPE_CLOAK);
+	CN3CPlugBase* pPlug = pChr->PlugAdd(/*PLUGTYPE_CLOAK*/);
 	if (pPlug)
 	{
 		pPlug->m_szName = "Untitled";

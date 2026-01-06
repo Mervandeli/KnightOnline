@@ -7,13 +7,6 @@
 #include "N3FXBundle.h"
 #include "N3Chr.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-////////////////////////////////////////////////////////////////////////////////////
-// CN3FXPlugPart
 CN3FXPlugPart::CN3FXPlugPart() : m_vOffsetPos(0, 0, 0), m_vOffsetDir(0, 0, 1)
 {
 	m_dwType    |= OBJ_FX_PLUG_PART;
@@ -44,7 +37,7 @@ bool CN3FXPlugPart::Load(File& file)
 
 	__ASSERT(nullptr == m_pFXB, "must null");
 
-	int nStrLen;
+	int nStrLen = 0;
 	file.Read(&nStrLen, sizeof(nStrLen));
 	if (nStrLen > 0)
 	{
@@ -194,7 +187,7 @@ bool CN3FXPlug::Load(File& file)
 
 	__ASSERT(0 == m_FXPParts.size(), "must 0");
 
-	int nCount;
+	int nCount = 0;
 	file.Read(&nCount, sizeof(nCount)); // Part의 갯수
 
 	if (nCount > 0)

@@ -10,17 +10,12 @@
 
 #include <FileIO/FileReader.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-#define EVENT_TYPE_POISON 3
+constexpr int EVENT_TYPE_POISON = 3;
 
 CEventCell::CEventCell()
 {
 	m_sEventType = 1;
-	memset(&m_Rect, 0, sizeof(RECT));
+	m_Rect       = {};
 }
 
 CEventCell::~CEventCell()
@@ -133,6 +128,9 @@ void CEventManager::Behavior(int16_t sEventType, int16_t sPreEventType)
 			CGameProcedure::s_pFX->Stop(iID, iID, iFX, -1, true);
 		}
 		break;
+
+		default:
+			break;
 	}
 
 	switch (sEventType)
@@ -144,5 +142,8 @@ void CEventManager::Behavior(int16_t sEventType, int16_t sPreEventType)
 			CGameProcedure::s_pFX->TriggerBundle(iID, 0, iFX, iID, -1, FX_BUNDLE_REGION_POISON);
 		}
 		break;
+
+		default:
+			break;
 	}
 }

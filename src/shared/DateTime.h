@@ -100,7 +100,7 @@ public:
 private:
 	void Update();
 
-protected:
+private:
 	tm _tm;
 	time_t _unixTimestamp;
 };

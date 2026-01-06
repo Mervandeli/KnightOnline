@@ -5,9 +5,7 @@
 #if !defined(AFX_N3FXPMESHINSTANCE_H__19060ED0_7DDA_4279_A558_B586319324F0__INCLUDED_)
 #define AFX_N3FXPMESHINSTANCE_H__19060ED0_7DDA_4279_A558_B586319324F0__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3Base.h"
 #include "N3PMesh.h"
@@ -21,7 +19,7 @@ public:
 	CN3FXPMeshInstance();
 	CN3FXPMeshInstance(CN3FXPMesh* pN3FXPMesh);
 	CN3FXPMeshInstance(const std::string& szFN);
-	virtual ~CN3FXPMeshInstance();
+	~CN3FXPMeshInstance() override;
 
 protected:
 	__VertexXyzColorT1* m_pColorVertices;
@@ -39,15 +37,14 @@ protected:
 
 public:
 	void SetColor(uint32_t dwColor = 0xffffffff);
-	BOOL IsLOD()
+	bool IsLOD() const
 	{
-		if (nullptr == m_pCollapseUpTo)
-			return FALSE;
-		return TRUE;
+		return (m_pCollapseUpTo != nullptr);
 	}
+
 	bool Create(CN3FXPMesh* pN3FXPMesh);
 	bool Create(const std::string& szFN);
-	void Release();
+	void Release() override;
 	void Render();
 	void RenderTwoUV();
 	// The value you pass into this could be based on distance from camera, frame rate, etc
@@ -59,24 +56,33 @@ public:
 	bool SplitOne();
 
 	void SetLODByNumVertices(int iNumVertices);
+
 	int GetNumVertices() const
 	{
 		return m_iNumVertices;
-	};
+	}
+
 	int GetNumIndices() const
 	{
 		return m_iNumIndices;
-	};
+	}
+
 	CN3FXPMesh* GetMesh()
 	{
 		return m_pFXPMesh;
-	};
+	}
+
+	const CN3FXPMesh* GetMesh() const
+	{
+		return m_pFXPMesh;
+	}
 
 	__VertexXyzColorT1* GetVertices() const;
+
 	uint16_t* GetIndices() const
 	{
 		return m_pIndices;
-	};
+	}
 };
 
 #endif // !defined(AFX_N3FXPMESHINSTANCE_H__19060ED0_7DDA_4279_A558_B586319324F0__INCLUDED_)

@@ -5,9 +5,7 @@
 #if !defined(AFX_N3EFFECTPARTBASE_H__E11B5E1E_C4FF_4186_9645_E05DB129747B__INCLUDED_)
 #define AFX_N3EFFECTPARTBASE_H__E11B5E1E_C4FF_4186_9645_E05DB129747B__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3BaseFileAccess.h"
 #include "N3FXDef.h"
@@ -68,11 +66,7 @@ protected:
 	virtual bool IsDead();
 
 public:
-	virtual float GetGroundHeight(float x, float z)
-	{
-		return 0.01f;
-	}
-
+	virtual float GetGroundHeight(float x, float z);
 	virtual void Init();            // 각종 변수들을 처음 로딩한 상태로 초기화...
 	virtual void Start();           // 파트 구동 시작.
 	virtual void Stop();            // 파트 구동 멈춤..

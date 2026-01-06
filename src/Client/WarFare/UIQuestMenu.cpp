@@ -200,8 +200,8 @@ void CUIQuestMenu::Open(Packet& pkt)
 
 	SetVisible(true);
 
-	int iIH;
-	RECT rcImage, rcText;
+	int iIH = 0;
+	RECT rcImage {}, rcText {};
 
 	rcImage = m_pImageMenu->GetRegion();
 	iIH     = rcImage.bottom - rcImage.top;
@@ -255,11 +255,10 @@ void CUIQuestMenu::Open(Packet& pkt)
 
 bool CUIQuestMenu::OnKeyPress(int iKey)
 {
-	switch (iKey)
+	if (iKey == DIK_ESCAPE)
 	{
-		case DIK_ESCAPE:
-			SetVisible(false);
-			return true;
+		SetVisible(false);
+		return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

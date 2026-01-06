@@ -11,18 +11,10 @@
 #include "N3UIWndBase.h"
 #endif
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3UIIcon::CN3UIIcon()
 {
 	m_eType = UI_TYPE_ICON;
+	m_dc    = 0;
 }
 
 CN3UIIcon::~CN3UIIcon()
@@ -33,8 +25,9 @@ uint32_t CN3UIIcon::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 {
 	uint32_t dwRet = UI_MOUSEPROC_NONE;
 
-	if (!m_bVisible)
+	if (!m_bVisible || m_pParent == nullptr)
 		return dwRet;
+
 	if ((m_pParent->GetState() == UI_STATE_COMMON_NONE) || (m_pParent->GetState() == UI_STATE_ICON_MOVING))
 		SetStyle(GetStyle() & (~UISTYLE_ICON_HIGHLIGHT));
 
@@ -57,13 +50,14 @@ uint32_t CN3UIIcon::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 	{
 		m_pParent->SetState(UI_STATE_ICON_MOVING);
 		m_pParent->ReceiveMessage(this, UIMSG_ICON_DOWN_FIRST);       // 부모에게 버튼 클릭 통지..
+
 		dwRet |= UI_MOUSEPROC_DONESOMETHING;
 		return dwRet;
 	}
 
 	if ((dwFlags & UI_MOUSE_LBCLICKED) && !(dwFlags & UI_MOUSE_RBDOWN)) // 왼쪽버튼을 떼는 순간
 	{
-		if (m_pParent && m_pParent->GetState() == UI_STATE_ICON_MOVING) // 이전 상태가 버튼을 Down 상태이면
+		if (m_pParent->GetState() == UI_STATE_ICON_MOVING)              // 이전 상태가 버튼을 Down 상태이면
 		{
 			m_pParent->SetState(UI_STATE_COMMON_NONE);
 			m_pParent->ReceiveMessage(this, UIMSG_ICON_UP);             // 부모에게 버튼 클릭 통지..

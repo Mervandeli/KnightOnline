@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #if defined(LOGIN_SCENE_VERSION) && LOGIN_SCENE_VERSION == 1098
-#include "UILogIn_1098.h"
+#include "UILogin_1098.h"
 #include "GameProcLogIn_1098.h"
 #include "UIMessageBoxManager.h"
 #include "text_resources.h"
@@ -12,16 +12,6 @@
 
 #include <algorithm>
 #include <shellapi.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CUILogIn_1098::CUILogIn_1098()
 {
@@ -402,43 +392,50 @@ bool CUILogIn_1098::OnKeyPress(int iKey)
 			case DIK_TAB:
 				FocusCircular();
 				return true;
+
 				// case DIK_NUMPADENTER:
 				// case DIK_RETURN:
 				//	CGameProcedure::s_pProcLogIn->MsgSend_AccountLogIn(LIC_KNIGHTONLINE);
 				//	return true;
+
+			default:
+				break;
 		}
 	}
 	else if (!m_bOpenningNow && m_pGroup_ServerList != nullptr && m_pGroup_ServerList->IsVisible())
 	{
+		int iIndex = 0, iCnt = 0;
+
 		switch (iKey)
 		{
 			case DIK_UP:
-			{
 				if (m_pList_Server == nullptr)
 					return false;
 
-				int iIndex = m_pList_Server->GetCurSel();
+				iIndex = m_pList_Server->GetCurSel();
 				if (iIndex > 0)
 					m_pList_Server->SetCurSel(iIndex - 1);
-			}
+
 				return true;
 
 			case DIK_DOWN:
-			{
 				if (m_pList_Server == nullptr)
 					return false;
 
-				int iIndex = m_pList_Server->GetCurSel();
-				int iCnt   = m_pList_Server->GetCount();
+				iIndex = m_pList_Server->GetCurSel();
+				iCnt   = m_pList_Server->GetCount();
 				if ((iCnt - iIndex) > 1)
 					m_pList_Server->SetCurSel(iIndex + 1);
-			}
+
 				return true;
 
 			case DIK_NUMPADENTER:
 			case DIK_RETURN:
 				ReceiveMessage(m_pBtn_Connect, UIMSG_BUTTON_CLICK);
 				return true;
+
+			default:
+				break;
 		}
 	}
 

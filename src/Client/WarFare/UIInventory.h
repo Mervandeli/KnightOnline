@@ -5,51 +5,50 @@
 #if !defined(AFX_UIInventory_H__863D2E52_65A8_47E1_BCBE_6281692DDCA2__INCLUDED_)
 #define AFX_UIInventory_H__863D2E52_65A8_47E1_BCBE_6281692DDCA2__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "GameDef.h"
 #include "N3UIWndBase.h"
 #include "ItemRepairMgr.h"
 
-const int ITEM_SLOT_POS_EAR_RIGHT       = 0;
-const int ITEM_SLOT_POS_HEAD            = 1;
-const int ITEM_SLOT_POS_EAR_LEFT        = 2;
-const int ITEM_SLOT_POS_NECK            = 3;
-const int ITEM_SLOT_POS_UPPER           = 4;
-const int ITEM_SLOT_POS_SHOULDER        = 5;
-const int ITEM_SLOT_POS_HAND_RIGHT      = 6;
-const int ITEM_SLOT_POS_BELT            = 7;
-const int ITEM_SLOT_POS_HAND_LEFT       = 8;
-const int ITEM_SLOT_POS_RING_RIGHT      = 9;
-const int ITEM_SLOT_POS_LOWER           = 10;
-const int ITEM_SLOT_POS_RING_LEFT       = 11;
-const int ITEM_SLOT_POS_GLOVES          = 12;
-const int ITEM_SLOT_POS_SHOES           = 13;
+constexpr int ITEM_SLOT_POS_EAR_RIGHT       = 0;
+constexpr int ITEM_SLOT_POS_HEAD            = 1;
+constexpr int ITEM_SLOT_POS_EAR_LEFT        = 2;
+constexpr int ITEM_SLOT_POS_NECK            = 3;
+constexpr int ITEM_SLOT_POS_UPPER           = 4;
+constexpr int ITEM_SLOT_POS_SHOULDER        = 5;
+constexpr int ITEM_SLOT_POS_HAND_RIGHT      = 6;
+constexpr int ITEM_SLOT_POS_BELT            = 7;
+constexpr int ITEM_SLOT_POS_HAND_LEFT       = 8;
+constexpr int ITEM_SLOT_POS_RING_RIGHT      = 9;
+constexpr int ITEM_SLOT_POS_LOWER           = 10;
+constexpr int ITEM_SLOT_POS_RING_LEFT       = 11;
+constexpr int ITEM_SLOT_POS_GLOVES          = 12;
+constexpr int ITEM_SLOT_POS_SHOES           = 13;
 
-const int ITEM_ATTACH_POS_DUAL          = 0;
-const int ITEM_ATTACH_POS_HAND_RIGHT    = 1;
-const int ITEM_ATTACH_POS_HAND_LEFT     = 2;
-const int ITEM_ATTACH_POS_TWOHAND_RIGHT = 3;
-const int ITEM_ATTACH_POS_TWOHAND_LEFT  = 4;
-const int ITEM_ATTACH_POS_UPPER         = 5;
-const int ITEM_ATTACH_POS_LOWER         = 6;
-const int ITEM_ATTACH_POS_HEAD          = 7;
-const int ITEM_ATTACH_POS_ARM           = 8;
-const int ITEM_ATTACH_POS_FOOT          = 9;
-const int ITEM_ATTACH_POS_EAR           = 10;
-const int ITEM_ATTACH_POS_NECK          = 11;
-const int ITEM_ATTACH_POS_FINGER        = 12;
-const int ITEM_ATTACH_POS_CLOAK         = 13;
-const int ITEM_ATTACH_POS_BELT          = 14;
-const int ITEM_ATTACH_POS_INVENTORY     = 15;
+constexpr int ITEM_ATTACH_POS_DUAL          = 0;
+constexpr int ITEM_ATTACH_POS_HAND_RIGHT    = 1;
+constexpr int ITEM_ATTACH_POS_HAND_LEFT     = 2;
+constexpr int ITEM_ATTACH_POS_TWOHAND_RIGHT = 3;
+constexpr int ITEM_ATTACH_POS_TWOHAND_LEFT  = 4;
+constexpr int ITEM_ATTACH_POS_UPPER         = 5;
+constexpr int ITEM_ATTACH_POS_LOWER         = 6;
+constexpr int ITEM_ATTACH_POS_HEAD          = 7;
+constexpr int ITEM_ATTACH_POS_ARM           = 8;
+constexpr int ITEM_ATTACH_POS_FOOT          = 9;
+constexpr int ITEM_ATTACH_POS_EAR           = 10;
+constexpr int ITEM_ATTACH_POS_NECK          = 11;
+constexpr int ITEM_ATTACH_POS_FINGER        = 12;
+constexpr int ITEM_ATTACH_POS_CLOAK         = 13;
+constexpr int ITEM_ATTACH_POS_BELT          = 14;
+constexpr int ITEM_ATTACH_POS_INVENTORY     = 15;
 
-enum e_InvenState
+// 인벤토리 상태.. 기존의 상태와 구별하기 위해.. 수리 상태가 추가됐다..
+enum e_InvenState : uint8_t
 {
 	INV_STATE_NORMAL = 1,
 	INV_STATE_REPAIR,
-}; // 인벤토리 상태.. 기존의 상태와 구별하기 위해.. 수리 상태가 추가됐다..
+};
 
 //////////////////////////////////////////////////////////////////////
 
@@ -102,35 +101,35 @@ protected:
 public:
 	//this_ui_add_start
 	int GetIndexItemCount(uint32_t dwIndex);
-	void SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false);
-	void SetVisible(bool bVisible);
-	bool OnKeyPress(int iKey);
+	void SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false) override;
+	void SetVisible(bool bVisible) override;
+	bool OnKeyPress(int iKey) override;
 	//this_ui_add_end
 
-	void Release();
+	void Release() override;
 	void ReleaseItem();
 
 	void Open(e_InvenState eIS = INV_STATE_NORMAL);
 	void Close(bool bByKey = false);
 
-	void Tick();
-	void Render();
+	void Tick() override;
+	void Render() override;
 
-	void InitIconWnd(e_UIWND eWnd);
-	void InitIconUpdate();
+	void InitIconWnd(e_UIWND eWnd) override;
+	void InitIconUpdate() override;
 
-	uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld);
-	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg);
+	uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
+	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
 
-	__IconItemSkill* GetHighlightIconItem(CN3UIIcon* pUIIcon);
+	__IconItemSkill* GetHighlightIconItem(CN3UIIcon* pUIIcon) override;
 
 	bool CheckIconDropIfSuccessSendToServer(__IconItemSkill* spItem);
-	void IconRestore();
+	void IconRestore() override;
 
-	bool ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur);
+	bool ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur) override;
 
-	void CancelIconDrop(__IconItemSkill* spItem);
-	void AcceptIconDrop(__IconItemSkill* spItem);
+	void CancelIconDrop(__IconItemSkill* spItem) override;
+	void AcceptIconDrop(__IconItemSkill* spItem) override;
 
 	void SendInvMsg(uint8_t bDir, int iItemID, int SrcPos, int DestPos);
 
@@ -159,12 +158,12 @@ public:
 	void GoldUpdate();
 
 	bool HasAnyItemInSlot();
-	void UpdateWeight(std::string str);
+	void UpdateWeight(const std::string& str);
 
 	int GetIndexInArea(POINT pt);
 
 	CUIInventory();
-	virtual ~CUIInventory();
+	~CUIInventory() override;
 };
 
 #endif // !defined(AFX_UIInventory_H__863D2E52_65A8_47E1_BCBE_6281692DDCA2__INCLUDED_)

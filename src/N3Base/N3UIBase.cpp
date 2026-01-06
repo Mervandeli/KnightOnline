@@ -24,11 +24,6 @@
 #include "N3SndMgr.h"
 #include "N3SndObj.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 #ifdef _N3GAME
 bool CN3UIBase::s_bWaitFromServer = false;
 #endif
@@ -154,10 +149,8 @@ POINT CN3UIBase::GetPos() const
 void CN3UIBase::SetPos(int x, int y)
 {
 	// Find the delta
-	int dx, dy;
-	dx = x - m_rcRegion.left;
-	dy = y - m_rcRegion.top;
-
+	int dx = x - m_rcRegion.left;
+	int dy = y - m_rcRegion.top;
 	MoveOffset(dx, dy);
 }
 
@@ -252,7 +245,7 @@ bool CN3UIBase::Load(File& file)
 	int iCC = 0;
 	if (m_iFileFormatVersion >= N3FORMAT_VER_1264)
 	{
-		int16_t sCC, sIdk0;
+		int16_t sCC = 0, sIdk0 = 0;
 		file.Read(&sCC, sizeof(int16_t)); // children count
 		file.Read(&sIdk0, sizeof(int16_t));
 		iCC = (int) sCC;
@@ -262,10 +255,10 @@ bool CN3UIBase::Load(File& file)
 		file.Read(&iCC, sizeof(iCC)); // children count
 	}
 
-	eUI_TYPE eChildUIType;
 	for (int i = 0; i < iCC; i++)
 	{
-		CN3UIBase* pChild = nullptr;
+		eUI_TYPE eChildUIType = UI_TYPE_UNKNOWN;
+		CN3UIBase* pChild     = nullptr;
 		file.Read(&eChildUIType, sizeof(eChildUIType)); // child의 ui type
 
 		switch (eChildUIType)
@@ -308,8 +301,16 @@ bool CN3UIBase::Load(File& file)
 			case UI_TYPE_LIST:
 				pChild = new CN3UIList();
 				break;
+
+			default:
+				break;
 		}
+
 		__ASSERT(pChild, "Unknown type UserInterface!!!");
+
+		if (pChild == nullptr)
+			continue;
+
 		pChild->Init(this);
 		pChild->Load(file);
 	}
@@ -332,7 +333,7 @@ bool CN3UIBase::Load(File& file)
 	file.Read(&m_dwStyle, sizeof(m_dwStyle));       // style
 	file.Read(&m_dwReserved, sizeof(m_dwReserved)); // m_dwReserved
 
-	int iTooltipLen;
+	int iTooltipLen = 0;
 	file.Read(&iTooltipLen, sizeof(iTooltipLen));   //	tooltip문자열 길이
 	if (iTooltipLen > 0)
 	{
@@ -481,20 +482,8 @@ bool CN3UIBase::EnableTooltip(const std::string& szFN)
 
 void CN3UIBase::DestroyTooltip()
 {
-	if (s_pTooltipCtrl)
-	{
-		delete s_pTooltipCtrl;
-		s_pTooltipCtrl = nullptr;
-	}
-}
-
-void CN3UIBase::PrintChildIDs()
-{
-	for (CN3UIBase* pChild : m_Children)
-	{
-		if (!pChild->m_szID.empty())
-			printf("%s\n", pChild->m_szID.c_str());
-	}
+	delete s_pTooltipCtrl;
+	s_pTooltipCtrl = nullptr;
 }
 
 CN3UIBase* CN3UIBase::GetChildByID(const std::string_view szID) const
@@ -618,29 +607,29 @@ void CN3UIBase::SetVisible(bool bVisible)
 	}
 }
 
-void CN3UIBase::SetVisibleWithNoSound(bool bVisible, bool bWork, bool bReFocus)
+void CN3UIBase::SetVisibleWithNoSound(bool bVisible, bool /*bWork*/, bool /*bReFocus*/)
 {
 	m_bVisible = bVisible;
 	if (!m_bVisible)
 	{
-		if (m_pChildUI)
-		{
+		if (m_pChildUI != nullptr)
 			m_pChildUI->SetVisible(false);
-		}
+
 		m_pChildUI = nullptr;
-		if (m_pParentUI)
-		{
-			if (m_pParentUI->m_pChildUI == this)
-				m_pParentUI->m_pChildUI = nullptr;
-		}
+		if (m_pParentUI != nullptr && m_pParentUI->m_pChildUI == this)
+			m_pParentUI->m_pChildUI = nullptr;
+
 		m_pParentUI = nullptr;
 		m_iChildID  = -1;
 	}
 }
 
 #ifndef _N3TOOL
-void CN3UIBase::operator=(const CN3UIBase& other)
+CN3UIBase& CN3UIBase::operator=(const CN3UIBase& other)
 {
+	if (this == &other)
+		return *this;
+
 	Init(nullptr); // 일단 부모는 없게 초기화
 
 	UIListItorConst it     = other.m_Children.begin();
@@ -751,8 +740,12 @@ void CN3UIBase::operator=(const CN3UIBase& other)
 			}
 			break; // icon slot
 #endif
+
+			default:
+				break;
 		}
-		if (pChild)
+
+		if (pChild != nullptr)
 			pChild->SetParent(this); // 부모 지정
 	}
 
@@ -778,6 +771,8 @@ void CN3UIBase::operator=(const CN3UIBase& other)
 	m_rcRegion  = other.m_rcRegion;
 	m_szID      = other.m_szID;
 	m_szToolTip = other.m_szToolTip;
+
+	return *this;
 }
 #endif
 
@@ -849,31 +844,22 @@ bool CN3UIBase::Save(File& file)
 void CN3UIBase::ChangeImagePath(const std::string& szPathOld, const std::string& szPathNew)
 {
 	// child 정보
-	for (UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
-	{
-		CN3UIBase* pChild = (*itor);
+	for (CN3UIBase* pChild : m_Children)
 		pChild->ChangeImagePath(szPathOld, szPathNew);
-	}
 }
 
 void CN3UIBase::ChangeFont(const std::string& szFont)
 {
 	// child 정보
-	for (UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
-	{
-		CN3UIBase* pChild = (*itor);
+	for (CN3UIBase* pChild : m_Children)
 		pChild->ChangeFont(szFont);
-	}
 }
 
 void CN3UIBase::GatherImageFileName(std::set<std::string>& setImgFile)
 {
 	// child 정보
-	for (UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
-	{
-		CN3UIBase* pChild = (*itor);
+	for (CN3UIBase* pChild : m_Children)
 		pChild->GatherImageFileName(setImgFile);
-	}
 }
 
 void CN3UIBase::ResizeAutomaticalyByChild()
@@ -1056,8 +1042,11 @@ void CN3UIBase::ArrangeZOrder()
 	tempList.clear();
 }
 
-void CN3UIBase::operator=(const CN3UIBase& other)
+CN3UIBase& CN3UIBase::operator=(const CN3UIBase& other)
 {
+	if (this == &other)
+		return *this;
+
 	Init(nullptr); // 일단 부모는 없게 초기화
 
 	UIListItorConst it     = other.m_Children.begin();
@@ -1169,7 +1158,8 @@ void CN3UIBase::operator=(const CN3UIBase& other)
 			break; // icon slot
 #endif
 		}
-		if (pChild)
+
+		if (pChild != nullptr)
 			pChild->SetParent(this); // 부모 지정
 	}
 
@@ -1186,6 +1176,8 @@ void CN3UIBase::operator=(const CN3UIBase& other)
 	m_rcRegion  = other.m_rcRegion;
 	m_szID      = other.m_szID;
 	m_szToolTip = other.m_szToolTip;
+
+	return *this;
 }
 
 void CN3UIBase::SetSndOpen(const std::string& strFileName)

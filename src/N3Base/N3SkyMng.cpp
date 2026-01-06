@@ -20,41 +20,12 @@
 #include "N3SndMgr.h"
 #endif         // #ifdef _N3GAME
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 typedef std::vector<__SKY_DAYCHANGE>::iterator it_SDC;
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CN3SkyMng::CN3SkyMng()
 {
-	m_pMoon  = nullptr;
-	m_pSky   = nullptr;
-	m_pSun   = nullptr;
-	m_pCloud = nullptr;
-	m_pStar  = nullptr;
-
-	memset(m_pLightColorDiffuses, 0, sizeof(m_pLightColorDiffuses));
-	memset(m_pLightColorAmbients, 0, sizeof(m_pLightColorAmbients));
-
-	m_pGERain              = nullptr;
-	m_pGESnow              = nullptr;
-
-	m_iDayChangeCurPos     = 0;
-	m_iWeatherChangeCurPos = 0;
-	m_eWeather             = SW_CLEAR;
-	m_dwCheckTick          = timeGetTime();
-
-	m_iYear                = 0;
-	m_iMonth               = 0;
-	m_iDay                 = 0;
-
-	m_iHourFix             = 0;
+	m_eWeather    = SW_CLEAR;
+	m_dwCheckTick = timeGetTime();
 
 #ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다...
 	m_pSnd_Weather_Snow = nullptr;
@@ -64,95 +35,72 @@ CN3SkyMng::CN3SkyMng()
 
 CN3SkyMng::~CN3SkyMng()
 {
-	if (m_pSky)
-	{
-		delete m_pSky;
-		m_pSky = nullptr;
-	}
-	if (m_pMoon)
-	{
-		delete m_pMoon;
-		m_pMoon = nullptr;
-	}
-	if (m_pSun)
-	{
-		delete m_pSun;
-		m_pSun = nullptr;
-	}
-	if (m_pCloud)
-	{
-		delete m_pCloud;
-		m_pCloud = nullptr;
-	}
-	if (m_pStar)
-	{
-		delete m_pStar;
-		m_pStar = nullptr;
-	}
+	delete m_pSky;
+	m_pSky = nullptr;
+
+	delete m_pMoon;
+	m_pMoon = nullptr;
+
+	delete m_pSun;
+	m_pSun = nullptr;
+
+	delete m_pCloud;
+	m_pCloud = nullptr;
+
+	delete m_pStar;
+	m_pStar = nullptr;
+
 	for (int i = 0; i < MAX_GAME_LIGHT; i++)
 	{
 		delete m_pLightColorDiffuses[i];
 		m_pLightColorDiffuses[i] = nullptr;
+
 		delete m_pLightColorAmbients[i];
 		m_pLightColorAmbients[i] = nullptr;
 	}
 
 	m_fCellSize    = 0.0f;
 	m_CurCellPos.x = m_CurCellPos.y = -1;
-	if (m_pGERain)
-	{
-		delete m_pGERain;
-		m_pGERain = nullptr;
-	}
-	if (m_pGESnow)
-	{
-		delete m_pGESnow;
-		m_pGESnow = nullptr;
-	}
+
+	delete m_pGERain;
+	m_pGERain = nullptr;
+
+	delete m_pGESnow;
+	m_pGESnow = nullptr;
 
 #ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다...
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Weather_Snow);
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Weather_Rain);
+	s_SndMgr.ReleaseObj(&m_pSnd_Weather_Snow);
+	s_SndMgr.ReleaseObj(&m_pSnd_Weather_Rain);
 #endif         // #ifdef _N3GAME
 }
 
 #ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다...
 void CN3SkyMng::ReleaseSound()
 {
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Weather_Snow);
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Weather_Rain);
+	s_SndMgr.ReleaseObj(&m_pSnd_Weather_Snow);
+	s_SndMgr.ReleaseObj(&m_pSnd_Weather_Rain);
 }
 #endif // #ifdef _N3GAME
 
 void CN3SkyMng::Release()
 {
-	CN3Base::Release();
+	CN3BaseFileAccess::Release();
 
-	if (m_pSky)
-	{
-		delete m_pSky;
-		m_pSky = nullptr;
-	}
-	if (m_pMoon)
-	{
-		delete m_pMoon;
-		m_pMoon = nullptr;
-	}
-	if (m_pSun)
-	{
-		delete m_pSun;
-		m_pSun = nullptr;
-	}
-	if (m_pCloud)
-	{
-		delete m_pCloud;
-		m_pCloud = nullptr;
-	}
-	if (m_pStar)
-	{
-		delete m_pStar;
-		m_pStar = nullptr;
-	}
+	delete m_pSky;
+	m_pSky = nullptr;
+
+	delete m_pMoon;
+	m_pMoon = nullptr;
+
+	delete m_pSun;
+	m_pSun = nullptr;
+
+	delete m_pCloud;
+	m_pCloud = nullptr;
+
+	delete m_pStar;
+	m_pStar = nullptr;
+
 	for (int i = 0; i < MAX_GAME_LIGHT; i++)
 	{
 		delete m_pLightColorDiffuses[i];
@@ -168,20 +116,15 @@ void CN3SkyMng::Release()
 	m_iWeatherChangeCurPos = 0;
 	m_eWeather             = SW_CLEAR;
 
-	if (m_pGERain)
-	{
-		delete m_pGERain;
-		m_pGERain = nullptr;
-	}
-	if (m_pGESnow)
-	{
-		delete m_pGESnow;
-		m_pGESnow = nullptr;
-	}
+	delete m_pGERain;
+	m_pGERain = nullptr;
+
+	delete m_pGESnow;
+	m_pGESnow = nullptr;
 
 #ifdef _N3GAME // 게임이 아닌 툴에서는 필요없다...
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Weather_Snow);
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Weather_Rain);
+	s_SndMgr.ReleaseObj(&m_pSnd_Weather_Snow);
+	s_SndMgr.ReleaseObj(&m_pSnd_Weather_Rain);
 #endif         // #ifdef _N3GAME
 }
 
@@ -194,7 +137,8 @@ void CN3SkyMng::Render()
 	s_lpD3DDev->SetTransform(D3DTS_VIEW, matView.toD3D());
 
 	// backup render state
-	DWORD dwAlphaBlend, dwSrcBlend, dwDestBlend, dwZEnable, dwFog, dwLighting;
+	DWORD dwAlphaBlend = 0, dwSrcBlend = 0, dwDestBlend = 0, dwZEnable = 0, dwFog = 0,
+		  dwLighting = 0;
 	s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlphaBlend);
 	s_lpD3DDev->GetRenderState(D3DRS_SRCBLEND, &dwSrcBlend);
 	s_lpD3DDev->GetRenderState(D3DRS_DESTBLEND, &dwDestBlend);
@@ -247,19 +191,15 @@ void CN3SkyMng::Render()
 
 void CN3SkyMng::RenderWeather()
 {
-	int i, j;
-	for (i = 0; i < 3; ++i)
+	for (int i = 0; i < 3; i++)
 	{
-		for (j = 0; j < 3; ++j)
+		for (int j = 0; j < 3; j++)
 		{
-			if (m_pGERain)
-			{
+			if (m_pGERain != nullptr)
 				m_pGERain->Render(m_vPos[j * 3 + i]);
-			}
-			if (m_pGESnow)
-			{
+
+			if (m_pGESnow != nullptr)
 				m_pGESnow->Render(m_vPos[j * 3 + i]);
-			}
 		}
 	}
 }
@@ -321,7 +261,7 @@ void CN3SkyMng::Tick()
 			float fTakeTime       = pSDC->fHowLong - dwDiffTime * TIME_GAME_PER_REAL; // 걸리는 시간
 			if (fTakeTime < 0.0f)
 			{
-				//TRACE("!!!!! 하늘이 즉시 변화됨 !!!!!\n");
+				//TRACE("!!!!! The sky changed instantly !!!!!");
 				fTakeTime = 0.0f; // 0보다 작으면 즉시 변화하게 하자
 			}
 
@@ -390,11 +330,14 @@ void CN3SkyMng::Tick()
 		if (NewCellPos.x != m_CurCellPos.x || NewCellPos.y != m_CurCellPos.y)
 		{
 			m_CurCellPos = NewCellPos;
-			int i, j;
-			for (i = 0; i < 3; ++i)
-				for (j = 0; j < 3; ++j)
+			for (int i = 0; i < 3; i++)
+			{
+				for (int j = 0; j < 3; j++)
+				{
 					m_vPos[j * 3 + i].Set((m_CurCellPos.x + i - 0.5f) * m_fCellSize, 0,
 						(m_CurCellPos.y + j - 0.5f) * m_fCellSize);
+				}
+			}
 		}
 
 		if (m_pGERain)
@@ -434,9 +377,12 @@ bool CN3SkyMng::DayChangeParse(FILE* fp, __SKY_DAYCHANGE* pDayChange)
 	pDayChange->szName = szLine0;
 	if (pDayChange->szName.size() >= 2)
 		pDayChange->szName = pDayChange->szName.substr(0, pDayChange->szName.size() - 2);
+	int iSkyDayChange = 0;
 	sscanf(szLine1, "Type : [%d], Time : [%d], Parameter1 : [%d], Parameter2 : [%d], Elapse : [%f]",
-		&(pDayChange->eSkyDayChange), &pDayChange->dwWhen, &pDayChange->dwParam1,
-		&pDayChange->dwParam2, &pDayChange->fHowLong);
+		&iSkyDayChange, &pDayChange->dwWhen, &pDayChange->dwParam1, &pDayChange->dwParam2,
+		&pDayChange->fHowLong);
+
+	pDayChange->eSkyDayChange = static_cast<eSKY_DAYCHANGE>(iSkyDayChange);
 
 	return true;
 }
@@ -859,8 +805,7 @@ void CN3SkyMng::SetCheckGameTime(uint32_t dwCheckGameTime)
 		m_iDayChangeCurPos = iDCC - 1;
 
 	// 현재 게임시간에서 각 sky상태별로 가장 최근에 변경된 값을 찾아서 값을 지정해준다.
-	int i;
-	for (i = 0; i < NUM_SKYDAYCHANGE; ++i)
+	for (int i = 0; i < NUM_SKYDAYCHANGE; ++i)
 	{
 		if (i == SDC_MOONPHASE)
 			continue;
@@ -868,6 +813,7 @@ void CN3SkyMng::SetCheckGameTime(uint32_t dwCheckGameTime)
 		int iPos = GetLatestChange((eSKY_DAYCHANGE) i, m_iDayChangeCurPos);
 		if (iPos < 0)
 			continue; // 한바퀴를 다 돌았는데도 변화값을 찾을 수 없다.
+
 		__SKY_DAYCHANGE* pSDC = &(m_DayChanges[iPos]);
 		uint32_t dwEnd        = pSDC->dwWhen
 						 + (uint32_t) (TIME_REAL_PER_GAME * pSDC->fHowLong); // 변화가 끝나는 시간
@@ -1011,6 +957,8 @@ void CN3SkyMng::ChangeSky(__SKY_DAYCHANGE* pSDC, float fTakeTime)
 			m_pLightColorAmbients[2]->ChangeColor(pSDC->dwParam2, pSDC->fHowLong);
 			m_pLightColorAmbients[2]->SetPercentage(fPercentage);
 			break;
+		default:
+			break;
 	}
 }
 
@@ -1041,7 +989,7 @@ void CN3SkyMng::SetWeather(eSKY_WEATHER eWeather, int iPercentage)
 	uint32_t dwCurGameTime = m_dwCheckGameTime
 							 + (uint32_t) ((dwCurTickCount - m_dwCheckTick) * TIME_REAL_PER_GAME
 										   * 0.001f);
-	BOOL IsNight = (dwCurGameTime < CONVERT_SEC(6, 0, 0) || dwCurGameTime > CONVERT_SEC(19, 0, 0));
+	// bool IsNight = (dwCurGameTime < CONVERT_SEC(6, 0, 0) || dwCurGameTime > CONVERT_SEC(19, 0, 0));
 
 	if (SW_CLEAR == m_eWeather) // 맑은 날씨. 퍼센트는 안개...
 	{
@@ -1237,8 +1185,8 @@ void CN3SkyMng::SetWeather(eSKY_WEATHER eWeather, int iPercentage)
 		m_WeatherChanges.push_back(tmpWeatherChange);
 
 		// 원래대로 날씨 돌리기..
-		iAfterNSecPos = GetDayChangePos_AfterNSec(
-			dwCurGameTime, 10); // 10초 후에 DayChangePos구하기
+		//iAfterNSecPos = GetDayChangePos_AfterNSec(
+		//	dwCurGameTime, 10); // 10초 후에 DayChangePos구하기
 
 		std::vector<__SKY_DAYCHANGE>(m_WeatherChanges).swap(m_WeatherChanges); // 용량을 딱 맞추기..
 		qsort(
@@ -1260,6 +1208,7 @@ void CN3SkyMng::SetWeather(eSKY_WEATHER eWeather, int iPercentage)
 	{
 		if (SW_CLEAR != ePrevWeather)
 			return; // 이전 날씨가 맑은날이 아니면 변화시키지 않는다.
+
 		float fHowLong = 10.0f;
 
 		// 날씨 변화 큐 만들기
@@ -1273,47 +1222,48 @@ void CN3SkyMng::SetWeather(eSKY_WEATHER eWeather, int iPercentage)
 
 		// 라이트 세팅 변수 구하기..
 		__ColorValue crLgt(1, 1, 1, 1);
-		int iAfterNSecPos = GetDayChangePos_AfterNSec(
-			dwCurGameTime, 10);                                     // 60초 후에 DayChangePos구하기
-		int iPos = GetLatestChange(SDC_LIGHT1COLOR, iAfterNSecPos); // 지형에 내리쬐는 빛
+
+		// 60초 후에 DayChangePos구하기
+		int iAfterNSecPos = GetDayChangePos_AfterNSec(dwCurGameTime, 10);
+
+		int iPos          = GetLatestChange(SDC_LIGHT1COLOR, iAfterNSecPos); // 지형에 내리쬐는 빛
 		if (iPos >= 0)
-		{
 			crLgt = m_DayChanges[iPos].dwParam1;
-		}
+
 		float fDelta2 = (crLgt.r + crLgt.g + crLgt.b) / 3.0f;
 		fDelta2       = 1.0f - fDelta2 * 0.8f * (iPercentage / 100.0f);
 
 		// 해
-		tmpWeatherChange.Init("Sun", SDC_SUNCOLOR, dwWhen, 0xff000000,
-			(uint32_t) (this->GetSunRatio() * 1000), fHowLong);
+		tmpWeatherChange.Init(
+			"Sun", SDC_SUNCOLOR, dwWhen, 0xff000000, (uint32_t) (GetSunRatio() * 1000), fHowLong);
 		m_WeatherChanges.push_back(tmpWeatherChange);
 
 		// 해의 flare
 		tmpWeatherChange.Init("Flare", SDC_FLARECOLOR, dwWhen, 0xff000000,
-			(uint32_t) (this->GetFlareRatio() * 1000), fHowLong);
+			(uint32_t) (GetFlareRatio() * 1000), fHowLong);
 		m_WeatherChanges.push_back(tmpWeatherChange);
 
 		// 해의 glow
 		tmpWeatherChange.Init("Glow", SDC_GLOWCOLOR, dwWhen, 0xff000000,
-			(uint32_t) (this->GetGlowRatio() * 1000), fHowLong);
+			(uint32_t) (GetGlowRatio() * 1000), fHowLong);
 		m_WeatherChanges.push_back(tmpWeatherChange);
 
 		//  하늘색
-		crTmp1    = this->GetSkyColor();
+		crTmp1    = GetSkyColor();
 		crTmp1   *= fDelta;
 		crTmp1.a  = 1.0f;
 		tmpWeatherChange.Init("Sky", SDC_SKYCOLOR, dwWhen, crTmp1.ToD3DCOLOR(), 0, fHowLong);
 		m_WeatherChanges.push_back(tmpWeatherChange);
 
 		//  안개색
-		crTmp1    = this->GetFogColor();
+		crTmp1    = GetFogColor();
 		crTmp1   *= fDelta2;
 		crTmp1.a  = 1.0f;
 		tmpWeatherChange.Init("Fog", SDC_FOGCOLOR, dwWhen, crTmp1.ToD3DCOLOR(), 0, fHowLong);
 		m_WeatherChanges.push_back(tmpWeatherChange);
 
 		// 구름색1
-		crTmp1    = this->GetCloud1Color();
+		crTmp1    = GetCloud1Color();
 		crTmp1   *= fDelta * 0.75f;
 		crTmp1.a  = 1.0f;
 		tmpWeatherChange.Init(
@@ -1321,7 +1271,7 @@ void CN3SkyMng::SetWeather(eSKY_WEATHER eWeather, int iPercentage)
 		m_WeatherChanges.push_back(tmpWeatherChange);
 
 		// 구름색2 - 좀더 어둡게 한다..
-		crTmp1    = this->GetCloud2Color();
+		crTmp1    = GetCloud2Color();
 		crTmp1   *= fDelta * 0.5f;
 		crTmp1.a  = 1.0f;
 		tmpWeatherChange.Init(
@@ -1329,7 +1279,7 @@ void CN3SkyMng::SetWeather(eSKY_WEATHER eWeather, int iPercentage)
 		m_WeatherChanges.push_back(tmpWeatherChange);
 
 		// 구름 텍스쳐
-		uint32_t dwTex1, dwTex2;
+		uint32_t dwTex1 = 0, dwTex2 = 0;
 		if (iPercentage > 80)
 		{
 			dwTex1 = CLOUD_OVERCAST;
@@ -1494,11 +1444,11 @@ void CN3SkyMng::SetGameTime(int iYear, int iMonth, int iDay, int iHour, int iMin
 	SetCheckGameTime(CONVERT_SEC(iHour, iMin, 0));
 }
 
-int CN3SkyMng::GetDayChangePos_AfterNSec(uint32_t dwCurGameTime, float fSec)
+int CN3SkyMng::GetDayChangePos_AfterNSec(uint32_t dwCurGameTime, float fSec) const
 {
 	// n초 후의 체크할 게임 시간을 계산
-	uint32_t dwCheckGameTime = dwCurGameTime
-							   + (uint32_t) (fSec * TIME_REAL_PER_GAME); // 150초 후 게임시간
+	// 150초 후 게임시간
+	uint32_t dwCheckGameTime  = dwCurGameTime + (uint32_t) (fSec * TIME_REAL_PER_GAME);
 	int iCheckDayChangeCurPos = m_iDayChangeCurPos;
 	if (dwCheckGameTime > 86400) // 체크 시간이 게임시간의 24시를 넘으면
 	{
