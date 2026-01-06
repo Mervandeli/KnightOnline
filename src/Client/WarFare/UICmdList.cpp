@@ -26,16 +26,7 @@
 
 #include <algorithm>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 extern std::string g_szCmdMsg[CMD_COUNT];
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CUICmdList::CUICmdList()
 {
@@ -275,6 +266,9 @@ bool CUICmdList::OnKeyPress(int iKey)
 			else
 				m_eSelectedList = CMD_LIST_SEL_CATEGORY;
 			return true;
+
+		default:
+			break;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);
@@ -415,7 +409,7 @@ void CUICmdList::AppendToCommandMap(e_CmdListCategory eCategory, e_ChatCmd eBase
 		CommandInfo commandInfo;
 		commandInfo.ResourceID = iResourceID;
 		commandInfo.Command    = static_cast<e_ChatCmd>(iRealCmdIndex);
-		m_categoryToCommandInfoMap.insert(std::make_pair(eCategory, std::move(commandInfo)));
+		m_categoryToCommandInfoMap.insert(std::make_pair(eCategory, commandInfo));
 	}
 }
 

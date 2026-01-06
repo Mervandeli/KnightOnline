@@ -30,6 +30,11 @@ CLauncherDlg::CLauncherDlg(CWnd* pParent /*=nullptr*/) : CDialog(CLauncherDlg::I
 	m_nCurVersion    = 0;
 	m_nServerVersion = 0;
 	m_nGetFileNum    = 0;
+
+	m_hRegistryKey   = nullptr;
+	memset(m_nVersionNum, 0, sizeof(m_nVersionNum));
+	m_hFtpConnection = nullptr;
+	m_hInetSession   = nullptr;
 }
 
 void CLauncherDlg::DoDataExchange(CDataExchange* pDX)
@@ -57,7 +62,7 @@ BOOL CLauncherDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	CString szInfo;
-	szInfo.LoadString(IDS_INFO_VERSION_CHECK);
+	(void) szInfo.LoadString(IDS_INFO_VERSION_CHECK);
 	m_Status.SetWindowText(szInfo);        // 화면에 표시..
 
 	m_progress.SetColor(RGB(64, 255, 64)); // 프로그래스 색을 정한다.
@@ -65,7 +70,7 @@ BOOL CLauncherDlg::OnInitDialog()
 	m_pSocket = new CAPISocket();
 
 	CString szProduct, szKey = "SOFTWARE\\";
-	szProduct.LoadString(IDS_PRODUCT);
+	(void) szProduct.LoadString(IDS_PRODUCT);
 	szKey          += szProduct;
 
 	m_hRegistryKey  = nullptr;
@@ -73,23 +78,23 @@ BOOL CLauncherDlg::OnInitDialog()
 	if (ERROR_SUCCESS != lStatus)
 	{
 		CString szErr;
-		szErr.LoadString(IDS_ERR_REGISTRY_OPEN);
+		(void) szErr.LoadString(IDS_ERR_REGISTRY_OPEN);
 		MessageBox(szErr);
 		exit(-1);
 	}
 
-	DWORD dwType      = REG_SZ;
-	DWORD dwBytes     = 0;
-	TCHAR szBuff[256] = {};
+	DWORD dwType  = REG_SZ;
+	DWORD dwBytes = 0;
+	TCHAR szBuff[256] {};
 
-	dwType            = REG_DWORD;
-	dwBytes           = 4;
-	lStatus           = RegQueryValueEx(
-        m_hRegistryKey, _T("VERSION"), nullptr, &dwType, (BYTE*) (&m_nCurVersion), &dwBytes);
+	dwType  = REG_DWORD;
+	dwBytes = 4;
+	lStatus = RegQueryValueEx(
+		m_hRegistryKey, _T("VERSION"), nullptr, &dwType, (BYTE*) (&m_nCurVersion), &dwBytes);
 	if (ERROR_SUCCESS != lStatus)
 	{
 		CString szErr;
-		szErr.LoadString(IDS_ERR_REGISTRY_READ_VERSION);
+		(void) szErr.LoadString(IDS_ERR_REGISTRY_READ_VERSION);
 		MessageBox(szErr);
 		exit(-1);
 	}
@@ -104,7 +109,7 @@ BOOL CLauncherDlg::OnInitDialog()
 	if (ERROR_SUCCESS != lStatus)
 	{
 		CString szErr;
-		szErr.LoadString(IDS_ERR_REGISTRY_READ_PATH);
+		(void) szErr.LoadString(IDS_ERR_REGISTRY_READ_PATH);
 		MessageBox(szErr);
 		exit(-1);
 	}
@@ -117,7 +122,7 @@ BOOL CLauncherDlg::OnInitDialog()
 	if (ERROR_SUCCESS != lStatus)
 	{
 		CString szErr;
-		szErr.LoadString(IDS_ERR_REGISTRY_READ_EXE);
+		(void) szErr.LoadString(IDS_ERR_REGISTRY_READ_EXE);
 		MessageBox(szErr);
 		exit(-1);
 	}
@@ -130,36 +135,41 @@ BOOL CLauncherDlg::OnInitDialog()
 	if (ERROR_SUCCESS != lStatus)
 	{
 		CString szErr;
-		szErr.LoadString(IDS_ERR_REGISTRY_READ_SERVICE);
+		(void) szErr.LoadString(IDS_ERR_REGISTRY_READ_SERVICE);
 		MessageBox(szErr);
 		exit(-1);
 	}
 
 	// 소켓 접속..
-	TCHAR szIniPath[_MAX_PATH] = {};
+	TCHAR szIniPath[_MAX_PATH] {};
 	::GetCurrentDirectory(_MAX_PATH, szIniPath);
 	lstrcat(szIniPath, _T("\\Server.Ini"));
-	int iServerCount     = GetPrivateProfileInt(_T("Server"), _T("Count"), 0, szIniPath);
+	int iServerCount = GetPrivateProfileInt(_T("Server"), _T("Count"), 0, szIniPath);
 
-	char szIPs[256][128] = {};
+	std::vector<std::string> ips;
+	ips.reserve(iServerCount);
 	for (int i = 0; i < iServerCount; i++)
 	{
-		TCHAR szKey[32] = {}, szIP[128] = {};
+		TCHAR szKey[32] {}, szIP[128] {};
+		char szIPA[128] {};
+
 		_stprintf(szKey, _T("IP%d"), i);
 		GetPrivateProfileString(_T("Server"), szKey, _T(""), szIP, _countof(szIP), szIniPath);
 
 		// Just a hack for now; we should be able to trust IPs and hostnames to not be too special.
-		sprintf(szIPs[i], "%ls", szIP);
+		sprintf(szIPA, "%ls", szIP);
+		ips.push_back(szIPA);
 	}
 
 	if (iServerCount > 0)
 	{
 		int iServer = rand() % iServerCount;
-		while (!m_pSocket->Connect(m_hWnd, szIPs[iServer], CONNECT_PORT))
+		while (!m_pSocket->Connect(m_hWnd, ips[iServer].c_str(), CONNECT_PORT))
 		{
 			int iErrCode = GetLastError();
 			CString szFmt;
-			szFmt.LoadString(IDS_FMT_FAILED_CONNECT_LOGIN_SERVER);
+			(void) szFmt.LoadString(IDS_FMT_FAILED_CONNECT_LOGIN_SERVER);
+
 			CString szErr;
 			szErr.Format(szFmt, iErrCode);
 			if (MessageBox(szErr, _T(""), MB_YESNO) == IDNO)
@@ -174,12 +184,12 @@ BOOL CLauncherDlg::OnInitDialog()
 	else
 	{
 		CString szErr;
-		szErr.LoadString(IDS_ERR_INVALID_SERVER_COUNT);
+		(void) szErr.LoadString(IDS_ERR_INVALID_SERVER_COUNT);
 		this->MessageBox(szInfo); // 끝낸다.
 		PostQuitMessage(0);
 	}
 
-	TCHAR titlebar[256] = {};
+	TCHAR titlebar[256] {};
 	_stprintf(titlebar, _T("%s AUTO UPGRADE LAUNCHER"), m_strServiceName);
 	SetWindowText(titlebar);
 
@@ -216,8 +226,8 @@ CString CLauncherDlg::GetProgPath()
 
 void CLauncherDlg::PacketSend_VersionReq()
 {
-	int iOffset       = 0;
-	BYTE byBuffs[128] = {};
+	int iOffset = 0;
+	BYTE byBuffs[128] {};
 
 	m_pSocket->MP_AddByte(byBuffs, iOffset, VERSION_REQ);
 	m_pSocket->MP_AddShort(byBuffs, iOffset, m_nCurVersion);
@@ -227,8 +237,8 @@ void CLauncherDlg::PacketSend_VersionReq()
 
 void CLauncherDlg::PacketSend_DownloadInfo()
 {
-	int iOffset       = 0;
-	BYTE byBuffs[128] = {};
+	int iOffset = 0;
+	BYTE byBuffs[128] {};
 
 	m_pSocket->MP_AddByte(byBuffs, iOffset, DOWNLOAD_INFO_REQ);
 	m_pSocket->MP_AddShort(byBuffs, iOffset, (short) m_nCurVersion);
@@ -268,12 +278,12 @@ void CLauncherDlg::PacketReceive_DownloadInfo(const BYTE* pBuf, int& iIndex)
 	if (m_nGetFileNum < 1 || m_nGetFileNum >= 32)
 	{
 		CString szErr;
-		szErr.LoadString(IDS_ERR_INVALID_DOWNLOAD_FILE_COUNT);
+		(void) szErr.LoadString(IDS_ERR_INVALID_DOWNLOAD_FILE_COUNT);
 		MessageBox(szErr);
 		AfxPostQuitMessage(0);
 	}
 
-	char szBuf[MAX_PATH];
+	char szBuf[MAX_PATH] {};
 	std::string szVersion;
 	int nVersion = 0;
 	for (int i = 0; i < m_nGetFileNum; i++)
@@ -281,10 +291,14 @@ void CLauncherDlg::PacketReceive_DownloadInfo(const BYTE* pBuf, int& iIndex)
 		iLen = m_pSocket->Parse_GetShort(pBuf, iIndex);
 		m_pSocket->Parse_GetString(pBuf, iIndex, m_szGetFileNames[i], iLen);
 
-		sscanf(m_szGetFileNames[i].c_str(), "patch%s", szBuf);
+		int components = sscanf(m_szGetFileNames[i].c_str(), "patch%s", szBuf);
+		if (components < 1)
+			continue;
+
 		szVersion = szBuf;
 		szVersion.resize(4);
 		nVersion = atoi(szVersion.c_str());
+
 		if (m_nVersionNum[i] < nVersion)
 			m_nVersionNum[i] = nVersion;
 	}
@@ -306,7 +320,7 @@ void CLauncherDlg::PacketReceive_Version(const BYTE* pBuf, int& iIndex)
 	else
 	{
 		CString szErr;
-		szErr.LoadString(IDS_ERR_INVALID_VERSION);
+		(void) szErr.LoadString(IDS_ERR_INVALID_VERSION);
 		MessageBox(szErr);
 		PostQuitMessage(-1);
 	}
@@ -314,8 +328,8 @@ void CLauncherDlg::PacketReceive_Version(const BYTE* pBuf, int& iIndex)
 
 void CLauncherDlg::StartGame()
 {
-	CString szCmd          = GetCommandLine(); // 커맨드 라인을 가져오고..
-	TCHAR szApp[_MAX_PATH] = {};
+	CString szCmd = GetCommandLine(); // 커맨드 라인을 가져오고..
+	TCHAR szApp[_MAX_PATH] {};
 	GetModuleFileName(nullptr, szApp, _MAX_PATH);
 	int iML = lstrlen(szApp);
 
@@ -357,7 +371,7 @@ void CLauncherDlg::DownloadProcess()
 		while (!bDownloadSuccess)
 		{
 			CString szErr;
-			szErr.LoadString(IDS_ERR_DOWNLOAD_PATCH_FILE_AND_RETRY); // 다시 시도할까여??
+			(void) szErr.LoadString(IDS_ERR_DOWNLOAD_PATCH_FILE_AND_RETRY); // 다시 시도할까여??
 			int iID = MessageBox(szErr, _T("Patch error"), MB_YESNO);
 			if (IDYES == iID)
 				bDownloadSuccess = GetDownloadFile(szFullPath, m_szGetFileNames[i]);
@@ -374,7 +388,7 @@ void CLauncherDlg::DownloadProcess()
 				_T("%s\\%hs"), m_szInstalledPath.GetString(), m_szGetFileNames[i].c_str());
 
 			CString szInfo;
-			szInfo.LoadString(IDS_INFO_EXTRACTING);
+			(void) szInfo.LoadString(IDS_INFO_EXTRACTING);
 			m_Status.SetWindowText(szInfo);
 
 			if (false == ArchiveClose())
@@ -420,7 +434,7 @@ void CLauncherDlg::DownloadProcess()
 			FTP_Close();
 
 			CString szErr, szMsg;
-			szErr.LoadString(IDS_ERR_DOWNLOAD_PATCH_FILE);
+			(void) szErr.LoadString(IDS_ERR_DOWNLOAD_PATCH_FILE);
 			szMsg.Format(_T("%hs"), m_szGetFileNames[i].c_str());
 			MessageBox(szMsg, szErr);
 
@@ -448,7 +462,7 @@ void CLauncherDlg::DownloadProcess()
 	else
 	{
 		CString szErr;
-		szErr.LoadString(IDS_ERR_PATCH);
+		(void) szErr.LoadString(IDS_ERR_PATCH);
 		MessageBox(szErr);
 		PostQuitMessage(-1);
 	}
@@ -461,7 +475,7 @@ BOOL CLauncherDlg::FTP_Open()
 	if (!m_hInetSession)
 	{
 		CString szErr, szMsg;
-		szErr.LoadString(IDS_ERR_INIT_INTERNET);
+		(void) szErr.LoadString(IDS_ERR_INIT_INTERNET);
 		szMsg.Format(_T("%hs"), m_szFtpUrl.c_str());
 		MessageBox(szMsg, szErr);
 		return FALSE;
@@ -474,7 +488,7 @@ BOOL CLauncherDlg::FTP_Open()
 	if (!m_hFtpConnection)
 	{
 		CString szErr, szMsg;
-		szErr.LoadString(IDS_ERR_CONNECT_FTP);
+		(void) szErr.LoadString(IDS_ERR_CONNECT_FTP);
 		szMsg.Format(_T("%hs"), m_szFtpUrl.c_str());
 		MessageBox(szMsg, szErr);
 		return FALSE;
@@ -528,16 +542,13 @@ BOOL CLauncherDlg::GetDownloadFile(const std::string& szFtpUrl, const std::strin
 		return TRUE;
 	}
 
-	DWORD dwReadSize, dwTemp;
+	DWORD dwReadSize = 0, dwTemp = 0;
 	char Buffer[1024];
 	BOOL bRes;
-	dwReadSize          = 0;
-	DWORD dwElaspedTime = 0;
-	DWORD dwCurrent;
 	MSG pMsg;
 	BOOL bPeekMessage;
 
-	DWORD dwLastTime = ::GetTickCount();
+	uint64_t dwLastTime = ::GetTickCount64();
 
 	while (dwReadSize < dwFileSize)
 	{
@@ -550,9 +561,6 @@ BOOL CLauncherDlg::GetDownloadFile(const std::string& szFtpUrl, const std::strin
 		else
 			m_progress.SetPos((dwReadSize / 1024) * 100 / (dwFileSize / 1024));
 
-		dwCurrent      = ::GetTickCount();
-		dwElaspedTime += dwCurrent - dwLastTime;
-
 		CString szInfo;
 		szInfo.Format(_T("%hs Downloading..."), szFileName.c_str());
 		m_Status.SetWindowText(szInfo);
@@ -563,8 +571,6 @@ BOOL CLauncherDlg::GetDownloadFile(const std::string& szFtpUrl, const std::strin
 			TranslateMessage(&pMsg);
 			DispatchMessage(&pMsg);
 		}
-
-		dwLastTime = dwCurrent;
 
 		//		if ( m_fCancel || !bRes )
 		//			break;

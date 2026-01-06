@@ -5,11 +5,9 @@
 #if !defined(AFX_UIMESSAGEBOXMANAGER_H__34454EC5_5C0E_42EE_8321_6C0ECC0EACD0__INCLUDED_)
 #define AFX_UIMESSAGEBOXMANAGER_H__34454EC5_5C0E_42EE_8321_6C0ECC0EACD0__INCLUDED_
 
-#include <map>
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
+
+#include <map>
 
 #include "UIMessageBox.h"
 #include "GameBase.h"
@@ -26,11 +24,13 @@ public:
 
 public:
 	CUIMessageBox* ReFocusMsgBox();
+
 	CUIMessageBox* GetFocusMsgBox()
 	{
 		return m_pMsgBoxLatestRef;
 	}
-	void Release();
+
+	void Release() override;
 	uint32_t MouseProcAndTick(uint32_t& dwFlags, const POINT& ptCur, const POINT& ptOld);
 	void MessageBoxCloseAll();
 	void Render();
@@ -40,7 +40,7 @@ public:
 	std::string MessageBoxPost(const std::string& szMsg, const std::string& szTitle, int iStyle, e_Behavior eBehavior = BEHAVIOR_NOTHING);
 
 	CUIMessageBoxManager();
-	virtual ~CUIMessageBoxManager();
+	~CUIMessageBoxManager() override;
 };
 
 #endif // !defined(AFX_UIMESSAGEBOXMANAGER_H__34454EC5_5C0E_42EE_8321_6C0ECC0EACD0__INCLUDED_)

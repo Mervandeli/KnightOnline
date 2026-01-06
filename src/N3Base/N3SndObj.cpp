@@ -17,11 +17,6 @@
 #include "LogWriter.h"
 #endif
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 bool al_check_error_impl(const char* file, int line)
 {
 	ALenum error = alGetError();
@@ -197,10 +192,8 @@ void CN3SndObj::Play(const __Vector3* pvPos, float delay, float fFadeInTime)
 
 	// OpenAL-side looping needs to be disabled on streamed handles.
 	// They implement their own looping.
-	ALint isLooping;
-	if (_handle->HandleType == AUDIO_HANDLE_STREAMED)
-		isLooping = 0;
-	else
+	ALint isLooping   = 0;
+	if (_handle->HandleType != AUDIO_HANDLE_STREAMED)
 		isLooping = static_cast<ALint>(_soundSettings->IsLooping);
 
 	bool playImmediately = false;
@@ -413,15 +406,18 @@ void CN3SndObj::ReleaseHandle()
 	_handle.reset();
 }
 
-void CN3SndObj::SetPos(const __Vector3 vPos)
+void CN3SndObj::SetPos(const __Vector3& vPos)
 {
 	if (_handle == nullptr || GetType() != SNDTYPE_3D)
 		return;
 
+	// NOLINTNEXTLINE(performance-unnecessary-copy-initialization)
+	__Vector3 posCopy = vPos;
+
 	CN3Base::s_SndMgr.QueueCallback(_handle,
-		[vPos](AudioHandle* handle)
+		[posCopy](AudioHandle* handle)
 		{
-			alSource3f(handle->SourceId, AL_POSITION, vPos.x, vPos.y, vPos.z);
+			alSource3f(handle->SourceId, AL_POSITION, posCopy.x, posCopy.y, posCopy.z);
 			AL_CLEAR_ERROR_STATE();
 		});
 }

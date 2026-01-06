@@ -18,20 +18,13 @@
 #include <N3Base/N3ShapeExtra.h>
 #include <N3Base/N3Camera.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-/////////////////////////////////////////
-// Construction/Destruction
-/////////////////////////////////////////
-
 CN3FXBundleGame::CN3FXBundleGame()
 {
-	m_iIdx    = 0;
-	m_iID     = -1;
-	m_bRegion = false;
+	m_iIdx      = 0;
+	m_iID       = -1;
+	m_bRegion   = false;
+	m_fDistance = 0.0f;
+	m_fHeight   = 0.0f;
 }
 
 CN3FXBundleGame::~CN3FXBundleGame()
@@ -132,7 +125,7 @@ void CN3FXBundleGame::Trigger(int iSourceID, int iTargetID, int iTargetJoint, in
 	CN3FXBundle::Trigger(iSourceID, iTargetID, iTargetJoint, iSndID);
 }
 
-void CN3FXBundleGame::Trigger(int iSourceID, __Vector3 TargetPos, int iSndID)
+void CN3FXBundleGame::Trigger(int iSourceID, const __Vector3& TargetPos, int iSndID)
 {
 	m_bRegion            = true;
 
@@ -211,74 +204,34 @@ bool CN3FXBundleGame::Tick()
 		{
 			case FX_BUNDLE_MOVE_CURVE_FIXEDTARGET:
 			{
-				m_vPos.x = (m_vDir * CN3Base::s_fSecPerFrm * m_fVelocity).x;
-				m_vPos.z = (m_vDir * CN3Base::s_fSecPerFrm * m_fVelocity).z;
-				float fAng;
+				m_vPos.x   = (m_vDir * CN3Base::s_fSecPerFrm * m_fVelocity).x;
+				m_vPos.z   = (m_vDir * CN3Base::s_fSecPerFrm * m_fVelocity).z;
+
+				float fAng = 0.0f;
 				if (m_fDistance != 0.0f)
 					fAng = __PI * (m_fDistance - (m_vDestPos - m_vPos).Magnitude()) / m_fDistance;
-				else
-					fAng = 0.0f;
 
 				m_vPos.y = sinf(fAng) * m_fHeight;
-				break;
 			}
+			break;
+
 			case FX_BUNDLE_MOVE_DIR_SLOW:
 			case FX_BUNDLE_MOVE_DIR_FIXEDTARGET:
-			{
 				m_vPos += m_vDir * CN3Base::s_fSecPerFrm * m_fVelocity;
 				break;
-			}
+
 			case FX_BUNDLE_MOVE_DIR_FLEXABLETARGET_RATIO:
 			{
 				CPlayerBase* pTarget = CGameProcedure::s_pProcMain->CharacterGetByID(m_iTargetID, false);
-				if (!pTarget)
+				if (pTarget == nullptr)
 				{
 					m_vPos += m_vDir * CN3Base::s_fSecPerFrm * m_fVelocity;
 					break;
 				}
-				else
-				{
-					/*
-					m_vDestPos = pTarget->Position();
-					const __Matrix44* pMtx = pTarget->JointMatrixGet(m_iTargetJoint);
-					if(pMtx) pTarget->JointPosGet(m_iTargetJoint, m_vDestPos);
-
-					__Vector3 vDestDir = m_vDestPos - m_vPos;
-					vDestDir.Normalize();
-
-					__Quaternion qtRot;
-					__Vector3 vDirAxis;
-					float fDirAng;
-					
-					vDirAxis.Cross(m_vDir, vDestDir);
-
-					int tmp;
-					tmp = vDirAxis.x*10000.0f;
-					vDirAxis.x = (float)(tmp)/10000.0f;
-					tmp = vDirAxis.y*10000.0f;
-					vDirAxis.y = (float)(tmp)/10000.0f;
-					tmp = vDirAxis.z*10000.0f;
-					vDirAxis.z = (float)(tmp)/10000.0f;
-					if(vDirAxis.x==0.0f && vDirAxis.y==0.0f && vDirAxis.z==0.0f) vDirAxis.Set(0,1,0);
-
-					fDirAng = acos((double)m_vDir.Dot(vDestDir));
-					if(fDirAng > __PI*s_fSecPerFrm) fDirAng = __PI*s_fSecPerFrm;
-					else if(fDirAng < -__PI*s_fSecPerFrm) fDirAng = -__PI*s_fSecPerFrm;
-
-					qtRot.RotationAxis(vDirAxis, fDirAng);
-
-					__Matrix44 mtxRot = qtRot;
-					m_vDir *= mtxRot;
-
-					m_vPos += m_vDir*CN3Base::s_fSecPerFrm*m_fVelocity;
-					
-					float fTerrainY = s_pTerrain->GetHeight(m_vPos.x, m_vPos.z);
-					if(m_vPos.y <= fTerrainY) m_vPos.y = fTerrainY + 0.3f;	//땅을 타고 날라가라..
-					break;
-					*/
-				}
-				//break;
 			}
+
+				[[fallthrough]];
+
 			case FX_BUNDLE_MOVE_DIR_FLEXABLETARGET:
 			{
 				CPlayerBase* pTarget = CGameProcedure::s_pProcMain->CharacterGetByID(m_iTargetID, false);
@@ -314,8 +267,8 @@ bool CN3FXBundleGame::Tick()
 
 				//float fTerrainY = s_pTerrain->GetHeight(m_vPos.x, m_vPos.z);
 				//if(m_vPos.y <= fTerrainY) m_vPos.y = fTerrainY + 0.3f;	//땅을 타고 날라가라..
-				break;
 			}
+			break;
 
 			case FX_BUNDLE_MOVE_NONE:
 			{
@@ -333,8 +286,9 @@ bool CN3FXBundleGame::Tick()
 						m_vDir.Normalize();
 					}
 				}
-				break;
 			}
+			break;
+
 			case FX_BUNDLE_REGION_POISON:
 			{
 				CN3Camera* pCamera = CGameProcedure::s_pEng->CameraGetActive(); // 활성화된 카메라 얻기..
@@ -345,8 +299,11 @@ bool CN3FXBundleGame::Tick()
 				vEyeDir.Normalize();
 				m_vDir = vEyeDir;
 				m_vPos = vEyePos + vEyeDir * CN3Base::s_CameraData.fNP * 3;
-				break;
 			}
+			break;
+
+			default:
+				break;
 		}
 	}
 
@@ -463,6 +420,9 @@ CN3FXPartBase* CN3FXBundleGame::AllocatePart(int iPartType) const
 
 		case FX_PART_TYPE_BOTTOMBOARD:
 			return new CN3FXPartBottomBoardGame();
+
+		default:
+			break;
 	}
 
 	return CN3FXBundle::AllocatePart(iPartType);

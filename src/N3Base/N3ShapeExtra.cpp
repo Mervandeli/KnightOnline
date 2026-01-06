@@ -5,11 +5,6 @@
 #include "StdAfxBase.h"
 #include "N3ShapeExtra.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 CN3ShapeExtra::CN3ShapeExtra()
 {
 	m_dwType |= OBJ_SHAPE_EXTRA;
@@ -49,7 +44,7 @@ void CN3ShapeExtra::Tick(float fFrm)
 		return; // 강제로 렌더링 하지 않는다.
 	}
 
-	CN3Shape::Tick();
+	CN3Shape::Tick(fFrm);
 
 	if (m_bDontRender)
 		return;
@@ -59,7 +54,6 @@ void CN3ShapeExtra::Tick(float fFrm)
 
 	bool bNeedRemakeCollisionMeshes = false;
 	float fDir = 0, fRotDelta = 0;
-	__Rotation* pRot = nullptr;
 	__Quaternion qRot;
 	for (size_t i = 0; i < m_Parts.size(); i++)
 	{

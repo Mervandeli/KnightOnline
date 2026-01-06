@@ -127,6 +127,7 @@ void SetString1(char* tBuf, const std::string_view str, int& index)
 {
 	uint8_t len = static_cast<uint8_t>(str.length());
 	SetByte(tBuf, len, index);
+	// NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
 	SetString(tBuf, str.data(), len, index);
 }
 
@@ -141,6 +142,7 @@ void SetString2(char* tBuf, const std::string_view str, int& index)
 {
 	int16_t len = static_cast<int16_t>(str.length());
 	SetShort(tBuf, len, index);
+	// NOLINTNEXTLINE(bugprone-suspicious-stringview-data-usage)
 	SetString(tBuf, str.data(), len, index);
 }
 
@@ -151,10 +153,12 @@ void SetString2(char* tBuf, const char* str, int length, int& index)
 	SetString(tBuf, str, len, index);
 }
 
-int ParseSpace(char* tBuf, const char* sBuf)
+bool ParseSpace(char* tBuf, const char* sBuf, int& bufferIndex)
 {
 	int i = 0, index = 0;
-	bool flag = false;
+	bool flag  = false;
+
+	sBuf      += bufferIndex;
 
 	while (sBuf[index] == ' ' || sBuf[index] == '\t')
 		index++;
@@ -170,9 +174,10 @@ int ParseSpace(char* tBuf, const char* sBuf)
 		index++;
 
 	if (!flag)
-		return 0;
+		return false;
 
-	return index;
+	bufferIndex += index;
+	return true;
 }
 
 int myrand_ai(int min, int max, bool bSame)

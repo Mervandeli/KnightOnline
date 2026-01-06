@@ -13,15 +13,6 @@
 #include <N3Base/N3UIScrollBar.h>
 #include <N3Base/N3UIEdit.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIChat::CUIChat() //생성자 와 파괴자에서 Release안 불러 주나??
 {
 	m_pChatOut        = nullptr;
@@ -29,11 +20,12 @@ CUIChat::CUIChat() //생성자 와 파괴자에서 Release안 불러 주나??
 	m_iChatLineCount  = 0;
 	m_ppUILines       = nullptr;
 	m_iCurContinueMsg = 0;
-	ZeroMemory(&m_rcChatOutRegion, sizeof(m_rcChatOutRegion));
+	memset(&m_rcChatOutRegion, 0, sizeof(m_rcChatOutRegion));
 
 	m_eChatMode           = N3_CHAT_NORMAL;
 	//	m_eChatBuffer = CHAT_BUFFER_NORMAL;
 
+	m_pBtn_Check          = nullptr;
 	m_pBtn_Normal         = nullptr;
 	m_pBtn_Private        = nullptr;
 	m_pBtn_PartyOrForce   = nullptr;
@@ -178,14 +170,13 @@ bool CUIChat::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 	//son, chat_in
 	else if (dwMsg == UIMSG_EDIT_RETURN)
 	{
-		CN3UIEdit* pEdit = (CN3UIEdit*) pSender;
 		//채팅 m_pEdit->SetString(""); 해버린 후에는 m_pEdit->GetString();해서 얻어온 포인터가
 		// 유효하지 않은 포인터가 되므로 주의..
 
 		// buffer에 카피해둠.
-		m_szString       = m_pEdit->GetString();
+		m_szString  = m_pEdit->GetString();
 
-		int iStrLen      = static_cast<int>(m_szString.size());
+		int iStrLen = static_cast<int>(m_szString.size());
 		if (iStrLen > 0)
 		{
 			if (iStrLen > 1 && '/' == m_szString[0])
@@ -200,7 +191,7 @@ bool CUIChat::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					std::string szID  = m_szString.substr(1, pos - 1);
 					std::string szMsg = m_szString.substr(pos);
 
-					size_t pos2       = szMsg.find_first_not_of(" ");
+					size_t pos2       = szMsg.find_first_not_of(' ');
 					szMsg             = szMsg.substr(pos2);
 
 					CGameProcedure::s_pProcMain->MsgSend_ChatSelectTarget(szID);
@@ -240,27 +231,24 @@ bool CUIChat::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 void CUIChat::CreateLines()
 {
-	int i;
-	if (m_ppUILines)
+	if (m_ppUILines != nullptr)
 	{
-		for (i = 0; i < m_iChatLineCount; ++i)
+		for (int i = 0; i < m_iChatLineCount; ++i)
 		{
-			if (m_ppUILines[i])
-			{
-				delete m_ppUILines[i];
-				m_ppUILines[i] = nullptr;
-			}
+			delete m_ppUILines[i];
+			m_ppUILines[i] = nullptr;
 		}
+
 		delete[] m_ppUILines;
 		m_ppUILines = nullptr;
 	}
-	SIZE size;
-	if (m_pChatOut && m_pChatOut->GetTextExtent("가", lstrlen("가"), &size) && size.cy > 0)
-	{
+
+	SIZE size {};
+	if (m_pChatOut != nullptr && m_pChatOut->GetTextExtent("가", lstrlen("가"), &size) && size.cy > 0)
 		m_iChatLineCount = (m_rcChatOutRegion.bottom - m_rcChatOutRegion.top) / size.cy;
-	}
 	else
 		return;
+
 	const std::string& szFontName = m_pChatOut->GetFontName();
 	uint32_t dwFontHeight         = m_pChatOut->GetFontHeight();
 	uint32_t dwFontFlag           = m_pChatOut->GetFontFlags();
@@ -269,7 +257,7 @@ void CUIChat::CreateLines()
 		return;
 
 	m_ppUILines = new CN3UIString*[m_iChatLineCount];
-	for (i = 0; i < m_iChatLineCount; ++i)
+	for (int i = 0; i < m_iChatLineCount; ++i)
 	{
 		RECT rc;
 		SetRect(&rc, m_rcChatOutRegion.left, m_rcChatOutRegion.top + (i * size.cy), m_rcChatOutRegion.right,
@@ -341,6 +329,8 @@ void CUIChat::AddChatMsg(e_ChatMode eCM, const std::string& szString, D3DCOLOR c
 		case N3_CHAT_SHOUT:
 			if (!m_bChatShout)
 				return;
+			break;
+		default:
 			break;
 	}
 
@@ -478,8 +468,7 @@ void CUIChat::AddLineBuffer(const std::string& szString, D3DCOLOR color)
 			pLineInfo->color = color;
 			if ((iCount - iLineStart) > 0)
 			{
-				int iLineLength = iCount - iLineStart + 1;
-				std::string szLine;
+				int iLineLength   = iCount - iLineStart + 1;
 				pLineInfo->szChat = szString.substr(iLineStart, iLineLength);
 			} // 연속된 \n일 경우 pszLine = nullptr이 될 수 있다.
 
@@ -550,13 +539,11 @@ void CUIChat::SetTopLine(int iTopLine)
 	else if (iTopLine > iLineBufferSize)
 		iTopLine = iLineBufferSize;
 
-	int i;
 	// 앞줄서부터 차례로 임시버퍼에 저장하고 string 길이 측정
-	__ChatInfo** ppLineInfos = new __ChatInfo*[m_iChatLineCount];
-	ZeroMemory(ppLineInfos, sizeof(__ChatInfo*) * m_iChatLineCount);
+	__ChatInfo** ppLineInfos = new __ChatInfo* [m_iChatLineCount] {};
 
-	int iCurLine = 0;
-	for (i = 0; i < m_iChatLineCount; ++i)
+	int i = 0, iCurLine = 0;
+	for (; i < m_iChatLineCount; ++i)
 	{
 		iCurLine = iTopLine + i;
 		if (iLineBufferSize <= iCurLine)
@@ -772,6 +759,8 @@ void CUIChat::ChangeChattingMode(e_ChatMode eCM)
 			//		m_eChatBuffer = CHAT_BUFFER_NORMAL;
 			bNBDs[4] = true;
 			break;
+		default:
+			break;
 	}
 
 	for (int i = 0; i < 5; i++)
@@ -817,22 +806,23 @@ void CUIChat::ChatListenEnable()
 		case N3_CHAT_SHOUT:
 			m_bChatShout = !m_bChatShout;
 			break;
+		default:
+			break;
 	}
 }
 
 bool CUIChat::OnKeyPress(int iKey)
 {
-	switch (iKey)
+	// hotkey가 포커스 잡혀있을때는 다른 ui를 닫을수 없으므로 DIK_ESCAPE가 들어오면 포커스를 다시잡고
+	if (iKey == DIK_ESCAPE)
 	{
-		case DIK_ESCAPE:
-		{ //hotkey가 포커스 잡혀있을때는 다른 ui를 닫을수 없으므로 DIK_ESCAPE가 들어오면 포커스를 다시잡고
-			//열려있는 다른 유아이를 닫아준다.
-			CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
-			CN3UIBase* pFocus = CGameProcedure::s_pUIMgr->GetFocusedUI();
-			if (pFocus && pFocus != this)
-				pFocus->OnKeyPress(iKey);
-		}
-			return true;
+		// 열려있는 다른 유아이를 닫아준다.
+		CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
+		CN3UIBase* pFocus = CGameProcedure::s_pUIMgr->GetFocusedUI();
+		if (pFocus != nullptr && pFocus != this)
+			pFocus->OnKeyPress(iKey);
+
+		return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

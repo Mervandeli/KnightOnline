@@ -5,18 +5,18 @@
 #if !defined(AFX_UISKILLTREEDLG_H__2A724E44_B3A7_41E4_B588_8AF6BC7FB911__INCLUDED_)
 #define AFX_UISKILLTREEDLG_H__2A724E44_B3A7_41E4_B588_8AF6BC7FB911__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "GameDef.h"
 #include "N3UIWndBase.h"
 
-const int SKILL_DEF_BASIC    = 0;
-const int SKILL_DEF_SPECIAL0 = 1;
-const int SKILL_DEF_SPECIAL1 = 2;
-const int SKILL_DEF_SPECIAL2 = 3;
-const int SKILL_DEF_SPECIAL3 = 4;
+#include <optional>
+
+constexpr int SKILL_DEF_BASIC    = 0;
+constexpr int SKILL_DEF_SPECIAL0 = 1;
+constexpr int SKILL_DEF_SPECIAL1 = 2;
+constexpr int SKILL_DEF_SPECIAL2 = 3;
+constexpr int SKILL_DEF_SPECIAL3 = 4;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -42,16 +42,15 @@ public:
 
 	int m_iSkillInfo[MAX_SKILL_FROM_SERVER];                                                   // 서버로 받는 슬롯 정보..
 	__IconItemSkill* m_pMySkillTree[MAX_SKILL_KIND_OF][MAX_SKILL_PAGE_NUM][MAX_SKILL_IN_PAGE]; // 총 스킬 정보..
-	int m_iCurInPageOffset[MAX_SKILL_KIND_OF];                                                 // 스킬당 현재 페이지 옵셋..
 
 protected:
 	void AllClearImageByName(std::string_view svHeaderID, bool bVisible, std::string_view svCategoryID = {});
 	RECT GetSampleRect();
 	void PageButtonInitialize();
-	bool CheckSkillCanBeUse(__TABLE_UPC_SKILL* pUSkill);
+	bool IsSkillUsable(const __TABLE_UPC_SKILL* pUSkill) const;
 
 public:
-	void SetVisible(bool bVisible);
+	void SetVisible(bool bVisible) override;
 	CUISkillTreeDlg();
 	~CUISkillTreeDlg() override;
 
@@ -72,7 +71,8 @@ public:
 	__IconItemSkill* GetHighlightIconItem(CN3UIIcon* pUIIcon) override;
 	int GetSkilliOrder(__IconItemSkill* spSkill);
 
-	void AddSkillToPage(__TABLE_UPC_SKILL* pUSkill, int iOffset = 0, bool bHasLevelToUse = true);
+	std::optional<std::pair<int, int>> FindSlotForSkill(const __TABLE_UPC_SKILL* pUSkill, int iCategoryOffset = 0) const;
+	void AddSkillToPage(__TABLE_UPC_SKILL* pUSkill, int iCategoryOffset = 0, bool bHasLevelToUse = true);
 
 	void SetPageInIconRegion(int iKindOf, int iPageNum); // 아이콘 역역에서 현재 페이지 설정..
 	void SetPageInCharRegion();                          // 문자 역역에서 현재 페이지 설정..
@@ -85,7 +85,7 @@ public:
 
 	void PointPushUpButton(int iValue);
 
-	bool HasIDSkill(int iID);
+	bool HasIDSkill(int iID) const;
 	void ButtonVisibleStateSet();
 
 	void TooltipRenderEnable(__IconItemSkill* spSkill);

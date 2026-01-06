@@ -49,7 +49,7 @@ typedef CSTLMap<EVENT> EventMap;
 
 using EventTriggerMap = std::unordered_map<uint32_t, int32_t>;
 
-enum class NameType
+enum class NameType : uint8_t
 {
 	Account   = 1,
 	Character = 2
@@ -65,6 +65,16 @@ public:
 	static EbenezerApp* instance()
 	{
 		return static_cast<EbenezerApp*>(s_instance);
+	}
+
+	std::shared_ptr<spdlog::logger> regionLogger()
+	{
+		return _regionLogger;
+	}
+
+	std::shared_ptr<spdlog::logger> eventLogger()
+	{
+		return _eventLogger;
 	}
 
 	void GameTimeTick();
@@ -188,7 +198,7 @@ public:
 	}
 
 	EbenezerApp(EbenezerLogger& logger);
-	~EbenezerApp();
+	~EbenezerApp() override;
 
 	EbenezerSocketManager _socketManager;
 
@@ -201,7 +211,7 @@ public:
 	uint32_t m_ServerOffset;
 
 	char m_ppNotice[20][128];
-	char m_AIServerIP[20];
+	std::string m_AIServerIP;
 
 	AISocketMap m_AISocketMap;
 	NpcMap m_NpcMap;
@@ -343,6 +353,9 @@ private:
 
 	std::filesystem::path _questsDir;
 	std::string _overrideQuestsDir;
+
+	std::shared_ptr<spdlog::logger> _regionLogger;
+	std::shared_ptr<spdlog::logger> _eventLogger;
 };
 
 #endif // SERVER_EBENEZER_EBENEZERAPP_H

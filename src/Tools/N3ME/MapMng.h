@@ -5,9 +5,7 @@
 #if !defined(AFX_MAPMNG_H__995D141A_97C5_4CE7_B100_D729B35E9959__INCLUDED_)
 #define AFX_MAPMNG_H__995D141A_97C5_4CE7_B100_D729B35E9959__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 // Cursor Mode
 enum

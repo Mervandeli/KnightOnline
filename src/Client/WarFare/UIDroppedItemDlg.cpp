@@ -7,7 +7,7 @@
 #include "LocalInput.h"
 #include "APISocket.h"
 #include "GameProcMain.h"
-#include "PlayerMyself.h"
+#include "PlayerMySelf.h"
 #include "N3UIWndBase.h"
 #include "UIImageTooltipDlg.h"
 #include "UIInventory.h"
@@ -21,15 +21,6 @@
 
 #include <N3Base/N3UIArea.h>
 #include <N3Base/N3UIString.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CUIDroppedItemDlg::CUIDroppedItemDlg()
 {
@@ -46,7 +37,7 @@ CUIDroppedItemDlg::CUIDroppedItemDlg()
 
 CUIDroppedItemDlg::~CUIDroppedItemDlg()
 {
-	Release();
+	CUIDroppedItemDlg::Release();
 }
 
 void CUIDroppedItemDlg::Release()
@@ -99,11 +90,8 @@ void CUIDroppedItemDlg::Render()
 			pStr = GetChildStringByiOrder(i);
 			if (pStr != nullptr)
 			{
-				if (GetState() == UI_STATE_ICON_MOVING && m_pMyDroppedItem[i] == s_sSelectedIconInfo.pItemSelect)
-				{
-					pStr->SetVisible(false);
-				}
-				else if (m_pMyDroppedItem[i]->pUIIcon->IsVisible())
+				if ((GetState() != UI_STATE_ICON_MOVING || m_pMyDroppedItem[i] != s_sSelectedIconInfo.pItemSelect)
+					&& m_pMyDroppedItem[i]->pUIIcon->IsVisible())
 				{
 					pStr->SetVisible(true);
 					pStr->SetStringAsInt(m_pMyDroppedItem[i]->iCount);
@@ -218,6 +206,7 @@ uint32_t CUIDroppedItemDlg::MouseProc(uint32_t dwFlags, const POINT& ptCur, cons
 	if (!IsVisible())
 		return dwRet;
 
+	// NOLINTNEXTLINE(bugprone-parent-virtual-call)
 	dwRet |= CN3UIBase::MouseProc(dwFlags, ptCur, ptOld);
 	return dwRet;
 }
@@ -239,11 +228,11 @@ void CUIDroppedItemDlg::AddToItemTable(int iItemID, int iItemCount, int iOrder)
 		return;
 	}
 
-	//TRACE("Dropped item from server to ItemDlg %d \n", iItemID);
-	e_PartPosition ePart;
-	e_PlugPosition ePlug;
+	e_PartPosition ePart = PART_POS_UNKNOWN;
+	e_PlugPosition ePlug = PLUG_POS_UNKNOWN;
+
 	// 아이템에 따른 파일 이름을 만들어서
-	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, RACE_UNKNOWN);
+	e_ItemType eType     = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug, RACE_UNKNOWN);
 	if (ITEM_TYPE_UNKNOWN == eType)
 		return;
 
@@ -278,11 +267,10 @@ void CUIDroppedItemDlg::AddToItemTableToInventory(int iItemID, int iItemCount, i
 		return;
 	}
 
-	//TRACE("Dropped item from server to ItemDlg %d \n", iItemID);
-	e_PartPosition ePart;
-	e_PlugPosition ePlug;
+	e_PartPosition ePart = PART_POS_UNKNOWN;
+	e_PlugPosition ePlug = PLUG_POS_UNKNOWN;
 	// 아이템에 따른 파일 이름을 만들어서
-	e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug);
+	e_ItemType eType     = CGameBase::MakeResrcFileNameForUPC(pItem, pItemExt, nullptr, &szIconFN, ePart, ePlug);
 	if (ITEM_TYPE_UNKNOWN == eType)
 		return;
 
@@ -312,10 +300,8 @@ void CUIDroppedItemDlg::AddToItemTableToInventory(int iItemID, int iItemCount, i
 	PlayItemSound(pItem);
 }
 
-bool CUIDroppedItemDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
+bool CUIDroppedItemDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT /*ptCur*/)
 {
-	CN3UIArea* pArea = nullptr;
-
 	if (!m_bVisible)
 		return false;
 
@@ -330,6 +316,9 @@ bool CUIDroppedItemDlg::ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
 		// 상거래 윈도우로부터 온 것이라면...
 		case UIWND_TRANSACTION:
 			CGameProcedure::s_pProcMain->m_pUITransactionDlg->CancelIconDrop(spItem);
+			break;
+
+		default:
 			break;
 	}
 
@@ -380,27 +369,20 @@ int CUIDroppedItemDlg::GetItemiOrder(__IconItemSkill* spItem)
 
 bool CUIDroppedItemDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 {
-// Temp Define
-#define FAIL_CODE                                                  \
-	{                                                              \
-		s_sSelectedIconInfo.eIconSelectState = UIICON_SELECT_NONE; \
-		return false;                                              \
-	}
-
 	// Code Begin
 	if (pSender == nullptr)
 		return false;
 
-	int iOrder, iOrderInv = -1;
+	int iOrder = -1, iOrderInv = -1;
 
 	uint32_t dwBitMask        = 0x000f0000;
 
 	__TABLE_ITEM_BASIC* pItem = nullptr;
 	__IconItemSkill* spItem   = nullptr;
 	std::string szIconFN;
-	e_PartPosition ePart;
-	e_PlugPosition ePlug;
-	e_ItemType eType;
+	e_PartPosition ePart = PART_POS_UNKNOWN;
+	e_PlugPosition ePlug = PLUG_POS_UNKNOWN;
+	e_ItemType eType     = ITEM_TYPE_UNKNOWN;
 
 	// 서버에 보내지 않은 아이템이니까.. 서버에 보낸다..
 	uint8_t byBuff[16];
@@ -474,22 +456,24 @@ bool CUIDroppedItemDlg::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		case UIMSG_ICON_DBLCLK:
 			SetState(UI_STATE_COMMON_NONE);
 			break;
+
+		default:
+			break;
 	}
 
 	return true;
 }
 
 void CUIDroppedItemDlg::GetItemByIDToInventory(
-	uint8_t bResult, int iItemID, int iGold, int iPos, int iItemCount, int iStrLen, const std::string& characterName)
+	uint8_t bResult, int iItemID, int iGold, int iPos, int iItemCount, const std::string& characterName)
 {
 	// 아이템 리스트에서 아이템을 찾고..
-	bool bFound                = false;
+	bool bFound                  = false;
 	// 아이템 테이블 구조체 포인터..
-	__TABLE_ITEM_BASIC* pItem  = nullptr;
-	__TABLE_ITEM_EXT* pItemExt = nullptr;
-	__IconItemSkill* spItem    = nullptr;
-	int i;
-	CN3UIString* pStatic         = nullptr;
+	__TABLE_ITEM_BASIC* pItem    = nullptr;
+	__TABLE_ITEM_EXT* pItemExt   = nullptr;
+	__IconItemSkill* spItem      = nullptr;
+	int i                        = 0;
 	__InfoPlayerMySelf* pInfoExt = nullptr;
 	std::string stdMsg;
 
@@ -517,7 +501,6 @@ void CUIDroppedItemDlg::GetItemByIDToInventory(
 	if (bResult == 2)
 	{
 		// 돈 갱신..
-		pStatic  = nullptr;
 		pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
 
 		// 돈 업데이트..
@@ -827,7 +810,6 @@ void CUIDroppedItemDlg::GetItemByIDToInventory(
 		}
 		else
 		{
-			pStatic  = nullptr;
 			pInfoExt = &CGameBase::s_pPlayer->m_InfoExt;
 
 			// 돈 업데이트..
@@ -835,7 +817,6 @@ void CUIDroppedItemDlg::GetItemByIDToInventory(
 			CGameProcedure::s_pProcMain->MsgOutput(stdMsg, 0xff9b9bff);
 
 			pInfoExt->iGold = iGold;
-			//TRACE("돈 업데이트 %d \n", iGold);
 			CGameProcedure::s_pProcMain->m_pUIInventory->GoldUpdate();
 
 			spItem = s_sRecoveryJobInfo.pItemSource;

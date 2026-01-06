@@ -11,15 +11,6 @@
 
 #include <N3Base/N3UIImage.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CGameCursor::CGameCursor()
 {
 	m_bCursorLocked   = false;
@@ -84,13 +75,13 @@ void CGameCursor::RestoreGameCursor()
 
 void CGameCursor::Render()
 {
-	if (m_eCurGameCursor >= CURSOR_COUNT)
+	if (m_eCurGameCursor < 0 || m_eCurGameCursor >= CURSOR_COUNT)
 		return;
 
-	if (m_pImageCursor[m_eCurGameCursor])
+	if (m_pImageCursor[m_eCurGameCursor] != nullptr)
 	{
 		CGameProcedure::s_pUIMgr->RenderStateSet();
-		DWORD dwZ;
+		DWORD dwZ = 0;
 		CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &dwZ);
 		CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, FALSE);
 

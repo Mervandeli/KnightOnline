@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #if !defined(LOGIN_SCENE_VERSION) || LOGIN_SCENE_VERSION == 1298
-#include "UILogIn_1298.h"
+#include "UILogin_1298.h"
 #include "GameProcLogIn_1298.h"
 #include "UIMessageBoxManager.h"
 #include "text_resources.h"
@@ -12,16 +12,6 @@
 
 #include <algorithm>
 #include <shellapi.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CUILogIn_1298::CUILogIn_1298()
 {
@@ -356,9 +346,8 @@ void CUILogIn_1298::ServerInfoUpdate()
 	// sort(m_ListServerInfos.begin(), m_ListServerInfos.end(), not2(__GameServerInfo()));
 
 	// show ui of existing servers
-	int iMaxPlayerCount = 3000;
-	int iNumUserForLine = 3000 / 12;
-	int iNumLines       = 1;
+	constexpr int NumUserForLine = 3000 / 12;
+	int iNumLines                = 1;
 
 	for (size_t i = 0; i < m_ListServerInfos.size(); i++)
 	{
@@ -374,7 +363,7 @@ void CUILogIn_1298::ServerInfoUpdate()
 			m_pArrow_Group[i]->SetVisible(true);
 
 		// hide number of lines with respect to user number
-		iNumLines = m_ListServerInfos[i].iConcurrentUserCount / iNumUserForLine;
+		iNumLines = m_ListServerInfos[i].iConcurrentUserCount / NumUserForLine;
 
 		if (iNumLines < 1)  // minimum 1 lines
 			iNumLines = 1;
@@ -585,19 +574,23 @@ bool CUILogIn_1298::OnKeyPress(int iKey)
 			case DIK_TAB:
 				FocusCircular();
 				return true;
+
 				// case DIK_NUMPADENTER:
 				// case DIK_RETURN:
 				//	CGameProcedure::s_pProcLogIn->MsgSend_AccountLogIn(LIC_KNIGHTONLINE);
 				//	return true;
+
+			default:
+				break;
 		}
 	}
 	else if (m_pGroup_ServerList != nullptr && m_pGroup_ServerList->IsVisible())
 	{
+		int iServerCount = 0;
 		switch (iKey)
 		{
 			case DIK_UP:
-			{
-				int iServerCount = static_cast<int>(m_ListServerInfos.size());
+				iServerCount = static_cast<int>(m_ListServerInfos.size());
 				if (iServerCount == 0)
 					return false;
 
@@ -606,12 +599,10 @@ bool CUILogIn_1298::OnKeyPress(int iKey)
 					m_iSelectedServerIndex = iServerCount - 1;
 
 				SelectServer(m_iSelectedServerIndex);
-			}
 				return true;
 
 			case DIK_DOWN:
-			{
-				int iServerCount = static_cast<int>(m_ListServerInfos.size());
+				iServerCount = static_cast<int>(m_ListServerInfos.size());
 				if (iServerCount == 0)
 					return false;
 
@@ -620,7 +611,6 @@ bool CUILogIn_1298::OnKeyPress(int iKey)
 					m_iSelectedServerIndex = 0;
 
 				SelectServer(m_iSelectedServerIndex);
-			}
 				return true;
 
 			case DIK_NUMPADENTER:
@@ -628,15 +618,17 @@ bool CUILogIn_1298::OnKeyPress(int iKey)
 				// connect to the selected server if user presses enter at server select screen
 				ReceiveMessage(m_pList_Group[m_iSelectedServerIndex], UIMSG_STRING_LDCLICK);
 				return true;
+
+			default:
+				break;
 		}
 	}
 	else if (m_bIsNewsVisible)
 	{
-		switch (iKey)
+		if (iKey == DIK_RETURN)
 		{
-			case DIK_RETURN:
-				ReceiveMessage(m_pBtn_NoticeOK_1, UIMSG_BUTTON_CLICK);
-				return true;
+			ReceiveMessage(m_pBtn_NoticeOK_1, UIMSG_BUTTON_CLICK);
+			return true;
 		}
 	}
 

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <shared/CircularBuffer.h>
+
 #include <asio.hpp>
 
 #include <mutex>
@@ -61,17 +62,15 @@ public:
 	virtual void CloseProcess();
 	void InitSocket();
 	virtual void Parsing(int length, char* pData) = 0;
-	virtual void Initialize()
-	{
-	}
+	virtual void Initialize();
 	const std::string& GetRemoteIP();
 
 protected:
-	SocketManager* _socketManager;
+	SocketManager* _socketManager = nullptr;
 	RawSocket_t _socket;
 
-	int _recvBufferSize;
-	int _sendBufferSize;
+	int _recvBufferSize = 0;
+	int _sendBufferSize = 0;
 
 	// Data is written here directly from the socket. It shouldn't be used directly.
 	std::vector<char> _recvBuffer;
@@ -104,16 +103,16 @@ protected:
 	std::recursive_mutex _sendMutex;
 
 	CCircularBuffer _sendCircularBuffer;
-	bool _sendInProgress;
+	bool _sendInProgress = false;
 
-	bool _remoteIpCached;
+	bool _remoteIpCached = false;
 	std::string _remoteIp;
 
-	e_ConnectionState _state;
-	bool _pendingDisconnect;
-	int16_t _socketErrorCount;
+	e_ConnectionState _state  = CONNECTION_STATE_DISCONNECTED;
+	bool _pendingDisconnect   = false;
+	int16_t _socketErrorCount = 0;
 
-	int _socketId;
+	int _socketId             = -1;
 };
 
 #endif // SERVER_SHAREDSERVER_TCPSOCKET_H

@@ -5,8 +5,6 @@
 
 CGameEvent::CGameEvent()
 {
-	m_bType = 0;
-	memset(&m_iExec, 0, sizeof(m_iExec));
 }
 
 CGameEvent::~CGameEvent()
@@ -31,6 +29,11 @@ void CGameEvent::RunEvent(CUser* pUser)
 
 		case ZONE_TRAP_AREA:
 			pUser->TrapProcess();
+			break;
+
+		default:
+			spdlog::warn("GameEvent::RunEvent: Unhandled event type [type={} characterName={}]",
+				m_bType, pUser->m_pUserData->m_id);
 			break;
 	}
 }

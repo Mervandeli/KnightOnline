@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef N3BASE_N3TEXTURE_H
+#define N3BASE_N3TEXTURE_H
+
+#pragma once
 
 #include "N3BaseFileAccess.h"
 #include <string>
@@ -72,3 +75,5 @@ public:
 	CN3Texture();
 	~CN3Texture() override;
 };
+
+#endif // N3BASE_N3TEXTURE_H

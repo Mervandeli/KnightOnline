@@ -15,13 +15,13 @@ SendWorkerThread::SendWorkerThread(EbenezerSocketManager* socketManager) :
 
 void SendWorkerThread::thread_loop()
 {
-	while (_canTick)
+	while (CanTick())
 	{
 		{
-			std::unique_lock<std::mutex> lock(_mutex);
-			std::cv_status status = _cv.wait_for(lock, 200ms);
+			std::unique_lock<std::mutex> lock(ThreadMutex());
+			std::cv_status status = ThreadCondition().wait_for(lock, 200ms);
 
-			if (!_canTick)
+			if (!CanTick())
 				break;
 
 			// Only tick every 200ms as per official, ignore spurious wakeups
@@ -44,8 +44,8 @@ void SendWorkerThread::tick()
 		if (userSocket == nullptr)
 			continue;
 
-		char regionBuffer[REGION_BUFF_SIZE] = {};
-		int len                             = userSocket->RegionPacketClear(regionBuffer);
+		char regionBuffer[REGION_BUFF_SIZE] {};
+		int len = userSocket->RegionPacketClear(regionBuffer);
 		if (len <= 0)
 			continue;
 

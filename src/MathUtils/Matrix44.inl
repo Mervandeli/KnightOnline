@@ -52,6 +52,13 @@ void __Matrix44::Identity()
 	m[0][0] = m[1][1] = m[2][2] = m[3][3] = 1.0f;
 }
 
+__Matrix44 __Matrix44::GetIdentity()
+{
+	__Matrix44 mtx;
+	mtx.Identity();
+	return mtx;
+}
+
 __Matrix44 __Matrix44::Inverse() const
 {
 	__Matrix44 mtxOut;
@@ -448,7 +455,7 @@ void __Matrix44::operator*=(const __Quaternion& qRot)
 	*this *= mtx;
 }
 
-void __Matrix44::operator=(const __Quaternion& qt)
+__Matrix44& __Matrix44::operator=(const __Quaternion& qt)
 {
 	m[0][0] = 1.0f - 2.0f * (qt.y * qt.y + qt.z * qt.z);
 	m[0][1] = 2.0f * (qt.x * qt.y + qt.z * qt.w);
@@ -466,6 +473,7 @@ void __Matrix44::operator=(const __Quaternion& qt)
 	m[3][1] = 0.0f;
 	m[3][2] = 0.0f;
 	m[3][3] = 1.0f;
+	return *this;
 }
 
 #endif // MATHUTILS_MATRIX44_INL

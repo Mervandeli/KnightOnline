@@ -6,17 +6,13 @@
 #if !defined(AFX_LYTERRAIN_H__38B10089_4193_49B7_BF2A_CD9C6CD3251A__INCLUDED_)
 #define AFX_LYTERRAIN_H__38B10089_4193_49B7_BF2A_CD9C6CD3251A__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3TerrainDef.h"
-#include <N3Base/N3Base.h>
 
 class CN3Texture;
 class CN3Terrain;
-
-class CN3TerrainPatch : public CN3Base
+class CN3TerrainPatch
 {
 public:
 	BOOL m_bIsRender;
@@ -49,10 +45,12 @@ protected:
 
 public:
 	inline float UVConvert(float uv);
-	int GetLevel()
+
+	int GetLevel() const
 	{
 		return m_iLevel;
 	}
+
 	void SetLevel(int level);
 	void Release();
 	void Init();
@@ -62,7 +60,7 @@ public:
 
 public:
 	CN3TerrainPatch();
-	virtual ~CN3TerrainPatch();
+	~CN3TerrainPatch();
 };
 
 #endif // !defined(AFX_LYTERRAIN_H__38B10089_4193_49B7_BF2A_CD9C6CD3251A__INCLUDED_)

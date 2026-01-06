@@ -5,9 +5,7 @@
 #if !defined(AFX_N3Scene_h__INCLUDED_)
 #define AFX_N3Scene_h__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3Camera.h"
 #include "N3Light.h"
@@ -53,10 +51,10 @@ public:
 	//	void DeleteOverlappedShapes();
 
 	void Tick(float fFrm = FRAME_SELFPLAY);
-	void TickCameras(float fFrm = FRAME_SELFPLAY);
-	void TickLights(float fFrm = FRAME_SELFPLAY);
-	void TickShapes(float fFrm = FRAME_SELFPLAY);
-	void TickChrs(float fFrm = FRAME_SELFPLAY);
+	void TickCameras();
+	void TickLights();
+	void TickShapes();
+	void TickChrs();
 	void Render();
 
 	int CameraCount() const

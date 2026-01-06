@@ -5,6 +5,8 @@
 #ifndef __N3FXPARTBOTTOMBOARD_H__
 #define __N3FXPARTBOTTOMBOARD_H__
 
+#pragma once
+
 #include "N3BaseFileAccess.h"
 #include "N3FXDef.h"
 #include "N3FXPartBase.h"

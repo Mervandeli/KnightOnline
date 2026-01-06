@@ -1,8 +1,11 @@
 ﻿#include "pch.h"
 #include "Ini.h"
+#include "StringUtils.h"
+
 #include <iostream>
 #include <fstream>
-#include "StringUtils.h"
+
+#include <spdlog/fmt/fmt.h>
 
 constexpr char INI_SECTION_START = '[';
 constexpr char INI_SECTION_END   = ']';
@@ -107,14 +110,19 @@ void CIni::Save(const std::filesystem::path& path)
 	if (fp == nullptr)
 		return;
 
+	std::string buffer;
 	for (const auto& [sectionName, keyValuePairs] : _configMap)
 	{
 		// Start the section
-		fprintf(fp, "[%s]\n", sectionName.c_str());
+		buffer = fmt::format("[{}]\n", sectionName);
+		fwrite(buffer.data(), buffer.length(), 1, fp);
 
 		// Now list out all the key/value pairs
 		for (const auto& [key, value] : keyValuePairs)
-			fprintf(fp, "%s=%s\n", key.c_str(), value.c_str());
+		{
+			buffer = fmt::format("{}={}\n", key, value);
+			fwrite(buffer.data(), buffer.length(), 1, fp);
+		}
 
 		// Use a trailing newline to finish the section, to make it easier to read
 		fputc('\n', fp);
@@ -158,33 +166,13 @@ std::string CIni::GetString(
 	return szResult;
 }
 
-void CIni::GetString(std::string_view svAppName, std::string_view svKeyName,
-	std::string_view svDefault, char* szOutBuffer, size_t nBufferLength)
-{
-	auto sectionItr = _configMap.find(svAppName);
-	if (sectionItr != _configMap.end())
-	{
-		auto keyItr = sectionItr->second.find(svKeyName);
-		if (keyItr != sectionItr->second.end())
-		{
-			snprintf(szOutBuffer, nBufferLength, "%s", keyItr->second.c_str());
-			return;
-		}
-	}
-
-	SetString(svAppName, svKeyName, svDefault);
-
-	snprintf(
-		szOutBuffer, nBufferLength, "%.*s", static_cast<int>(svDefault.length()), svDefault.data());
-}
-
-int CIni::SetInt(std::string_view svAppName, std::string_view svKeyName, const int iDefault)
+bool CIni::SetInt(std::string_view svAppName, std::string_view svKeyName, const int iDefault)
 {
 	std::string szDefault = std::to_string(iDefault);
 	return SetString(svAppName, svKeyName, szDefault);
 }
 
-int CIni::SetString(
+bool CIni::SetString(
 	std::string_view svAppName, std::string_view svKeyName, std::string_view svDefault)
 {
 	auto itr = _configMap.find(svAppName);
@@ -192,12 +180,12 @@ int CIni::SetString(
 	{
 		auto ret = _configMap.insert(std::make_pair(svAppName, ConfigEntryMap()));
 		if (!ret.second)
-			return 0;
+			return false;
 
 		itr = ret.first;
 	}
 
 	std::string szKeyName(svKeyName.data(), svKeyName.length());
 	itr->second[szKeyName].assign(svDefault.data(), svDefault.length());
-	return 1;
+	return true;
 }

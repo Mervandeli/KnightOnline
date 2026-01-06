@@ -5,6 +5,8 @@
 #if !defined(AFX_N3IMesh_h__INCLUDED_)
 #define AFX_N3IMesh_h__INCLUDED_
 
+#pragma once
+
 #include "N3BaseFileAccess.h"
 
 const int MAX_IMESH_BUFFER = 10000;

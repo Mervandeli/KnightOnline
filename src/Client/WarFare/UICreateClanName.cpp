@@ -12,22 +12,22 @@
 #include <N3Base/N3UIEdit.h>
 #include <N3Base/N3UIString.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUICreateClanName::CUICreateClanName()
 {
+	m_pEdit_ClanName = nullptr;
+	m_pText_Title    = nullptr;
 }
 
 CUICreateClanName::~CUICreateClanName()
 {
+}
+
+void CUICreateClanName::Release()
+{
+	CN3UIBase::Release();
+
+	m_pEdit_ClanName = nullptr;
+	m_pText_Title    = nullptr;
 }
 
 bool CUICreateClanName::Load(File& file)

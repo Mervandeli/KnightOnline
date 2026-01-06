@@ -5,9 +5,7 @@
 #if !defined(AFX_UIVarious_H__094F9A3E_1620_4E07_8726_82881B21B48C__INCLUDED_)
 #define AFX_UIVarious_H__094F9A3E_1620_4E07_8726_82881B21B48C__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "GameDef.h"
 
@@ -100,17 +98,18 @@ public:
 	~CUIState() override;
 };
 
-struct __KnightsMemberInfo // 기사 단원 정보..
+// 기사 단원 정보..
+struct __KnightsMemberInfo
 {
 	std::string szName;
-	e_KnightsDuty eDuty;   // 기사단 직위.
-	int iLevel;            // 플레이어 레벨..
-	e_Class eClass;        // 직업.
-	int iConnected;
+	e_KnightsDuty eDuty = KNIGHTS_DUTY_UNKNOWN; // 기사단 직위.
+	int iLevel          = 0;                    // 플레이어 레벨..
+	e_Class eClass      = CLASS_UNKNOWN;        // 직업.
+	int iConnected      = 0;
 };
 
 typedef std::list<__KnightsMemberInfo>::iterator it_KMI;
-#define MAX_CLAN_GRADE 5
+constexpr int MAX_CLAN_GRADE = 5;
 
 class CUIKnights : public CN3UIBase
 {

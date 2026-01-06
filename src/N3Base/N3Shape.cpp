@@ -4,11 +4,6 @@
 #include "StdAfxBase.h"
 #include "N3Shape.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 /////////////////////////////
 // CN3Shape Part ....
 CN3SPart::CN3SPart()
@@ -120,7 +115,7 @@ void CN3SPart::Tick(const __Matrix44& mtxParent, const __Quaternion& qRot,
 			m_Matrix.RotationY(-atanf(vDir.z / vDir.x) + (__PI * 0.5f));
 
 		// 부모 회전과 반대로 회전을 시킨다..
-		float fAngle;
+		float fAngle = 0.0f;
 		qRot.AxisAngle(vDir, fAngle);
 		if (fAngle != 0)
 		{
@@ -184,7 +179,7 @@ void CN3SPart::Render()
 		return;
 
 #ifdef _DEBUG
-	CN3Base::s_RenderInfo.nShape_Part++; // Rendering Information Update...
+	s_RenderInfo.nShape_Part++; // Rendering Information Update...
 #endif
 
 	LPDIRECT3DTEXTURE9 lpTex = nullptr;
@@ -220,24 +215,25 @@ void CN3SPart::Render()
 		return; // 렌더링 안하지롱.
 	}
 
-				//	static uint32_t dwAlpha, dwFog, dwCull;
-	DWORD dwFog, dwCull;
+	//	static uint32_t dwAlpha, dwFog, dwCull;
+	DWORD dwFog = 0, dwCull = 0;
 	//	s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
 	//	if(TRUE != dwAlpha) s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	//	s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND,   m_Mtl.dwSrcBlend);
 	//	s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND,  m_Mtl.dwDestBlend);
 
 #ifdef _DEBUG
-	CN3Base::s_RenderInfo.nShape_Polygon += m_PMInst.GetNumIndices()
-											/ 3; // Rendering Information Update...
+	// Rendering Information Update...
+	s_RenderInfo.nShape_Polygon += m_PMInst.GetNumIndices() / 3;
 #endif
 
-	if (m_Mtl.nRenderFlags & RF_NOTUSEFOG)       // Fog 무시..
+	if (m_Mtl.nRenderFlags & RF_NOTUSEFOG) // Fog 무시..
 	{
 		s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
 		if (TRUE == dwFog)
 			s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, FALSE);
 	}
+
 	if (m_Mtl.nRenderFlags & RF_DOUBLESIDED) // Render Flags -
 	{
 		s_lpD3DDev->GetRenderState(D3DRS_CULLMODE, &dwCull);
@@ -246,7 +242,7 @@ void CN3SPart::Render()
 
 	s_lpD3DDev->SetMaterial(&m_Mtl); // 재질 설정..
 	s_lpD3DDev->SetTexture(0, lpTex);
-	if (nullptr != lpTex)
+	if (lpTex != nullptr)
 	{
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, m_Mtl.dwColorOp);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, m_Mtl.dwColorArg1);
@@ -266,6 +262,7 @@ void CN3SPart::Render()
 	//	if((m_Mtl.nRenderFlags & RF_ALPHABLENDING) && FALSE == dwAlpha)	s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	if ((m_Mtl.nRenderFlags & RF_NOTUSEFOG) && TRUE == dwFog)
 		s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, TRUE); // 안개 사용하지 않는다..
+
 	if ((m_Mtl.nRenderFlags & RF_DOUBLESIDED) && D3DCULL_NONE != dwCull)
 		s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, dwCull);
 }
@@ -477,14 +474,14 @@ void CN3SPart::PartialRender(int iCount, uint16_t* pIndices)
 		return; // 렌더링 안하지롱.
 	}
 
-	DWORD dwFog, dwCull;
+	DWORD dwFog = 0, dwCull = 0;
 
 #ifdef _DEBUG
-	CN3Base::s_RenderInfo.nShape_Polygon += m_PMInst.GetNumIndices()
-											/ 3; // Rendering Information Update...
+	// Rendering Information Update...
+	s_RenderInfo.nShape_Polygon += m_PMInst.GetNumIndices() / 3;
 #endif
 
-	if (m_Mtl.nRenderFlags & RF_NOTUSEFOG)       // Fog 무시..
+	if (m_Mtl.nRenderFlags & RF_NOTUSEFOG) // Fog 무시..
 	{
 		s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
 		if (TRUE == dwFog)
@@ -517,6 +514,7 @@ void CN3SPart::PartialRender(int iCount, uint16_t* pIndices)
 
 	if ((m_Mtl.nRenderFlags & RF_NOTUSEFOG) && TRUE == dwFog)
 		s_lpD3DDev->SetRenderState(D3DRS_FOGENABLE, TRUE); // 안개 사용하지 않는다..
+
 	if ((m_Mtl.nRenderFlags & RF_DOUBLESIDED) && D3DCULL_NONE != dwCull)
 		s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, dwCull);
 }
@@ -673,6 +671,7 @@ bool CN3Shape::Load(File& file)
 
 bool CN3Shape::LoadTransformOnly(File& file)
 {
+	// NOLINTNEXTLINE(bugprone-parent-virtual-call)
 	return CN3Transform::Load(file); // 기본정보 읽기...
 }
 
@@ -846,9 +845,9 @@ int CN3Shape::CheckCollisionPrecisely(bool bIgnoreBoxCheck, const __Vector3& vPo
 
 		vPos2            = vPos * mtxWI;
 		mtxWI.PosSet(0, 0, 0);
-		vDir2 = vDir * mtxWI;         // 역행렬로 회전..
+		vDir2    = vDir * mtxWI;      // 역행렬로 회전..
 
-		int nCI0, nCI1, nCI2;
+		int nCI0 = 0, nCI1 = 0, nCI2 = 0;
 		for (int j = 0; j < nFC; j++) // 각각의 Face 마다 충돌체크..
 		{
 			nCI0 = pwIs[j * 3 + 0];
@@ -858,7 +857,7 @@ int CN3Shape::CheckCollisionPrecisely(bool bIgnoreBoxCheck, const __Vector3& vPo
 			if (!_IntersectTriangle(vPos2, vDir2, pVs[nCI0], pVs[nCI1], pVs[nCI2]))
 				continue;
 
-			float fT, fU, fV;
+			float fT = 0.0f, fU = 0.0f, fV = 0.0f;
 			::_IntersectTriangle(vPos2, vDir2, pVs[nCI0], pVs[nCI1], pVs[nCI2], fT, fU, fV, pVCol);
 			if (pVCol != nullptr)
 				(*pVCol) *= pPart->m_Matrix;

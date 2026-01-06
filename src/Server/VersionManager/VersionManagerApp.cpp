@@ -16,10 +16,6 @@ using namespace std::chrono_literals;
 VersionManagerApp::VersionManagerApp(logger::Logger& logger) :
 	AppThread(logger), _socketManager(SOCKET_BUFF_SIZE, SOCKET_BUFF_SIZE)
 {
-	memset(_ftpUrl, 0, sizeof(_ftpUrl));
-	memset(_ftpPath, 0, sizeof(_ftpPath));
-	_lastVersion                                    = 0;
-
 	db::ConnectionManager::DefaultConnectionTimeout = DB_PROCESS_TIMEOUT;
 	db::ConnectionManager::Create();
 
@@ -103,8 +99,8 @@ std::filesystem::path VersionManagerApp::ConfigPath() const
 bool VersionManagerApp::LoadConfig(CIni& iniFile)
 {
 	// ftp config
-	iniFile.GetString(ini::DOWNLOAD, ini::URL, "127.0.0.1", _ftpUrl, sizeof(_ftpUrl));
-	iniFile.GetString(ini::DOWNLOAD, ini::PATH, "/", _ftpPath, sizeof(_ftpPath));
+	_ftpUrl                    = iniFile.GetString(ini::DOWNLOAD, ini::URL, "127.0.0.1");
+	_ftpPath                   = iniFile.GetString(ini::DOWNLOAD, ini::PATH, "/");
 
 	// TODO: KN_online should be Knight_Account
 	std::string datasourceName = iniFile.GetString(ini::ODBC, ini::DSN, "KN_online");
@@ -120,13 +116,13 @@ bool VersionManagerApp::LoadConfig(CIni& iniFile)
 
 	int serverCount = iniFile.GetInt(ini::SERVER_LIST, ini::COUNT, 1);
 
-	if (strlen(_ftpUrl) == 0)
+	if (_ftpUrl.empty())
 	{
 		spdlog::error("VersionManagerApp::LoadConfig: The FTP URL must be set.");
 		return false;
 	}
 
-	if (strlen(_ftpPath) == 0)
+	if (_ftpPath.empty())
 	{
 		spdlog::error("VersionManagerApp::LoadConfig: The FTP path must be set.");
 		return false;
@@ -147,25 +143,23 @@ bool VersionManagerApp::LoadConfig(CIni& iniFile)
 		return false;
 	}
 
-	char key[32] = {};
+	std::string key;
 	ServerList.reserve(serverCount);
 
 	for (int i = 0; i < serverCount; i++)
 	{
-		_SERVER_INFO* pInfo = new _SERVER_INFO;
+		_SERVER_INFO* pInfo  = new _SERVER_INFO;
 
-		snprintf(key, sizeof(key), "SERVER_%02d", i);
-		iniFile.GetString(
-			ini::SERVER_LIST, key, "127.0.0.1", pInfo->strServerIP, sizeof(pInfo->strServerIP));
+		key                  = fmt::format("SERVER_{:02}", i);
+		pInfo->strServerIP   = iniFile.GetString(ini::SERVER_LIST, key, "127.0.0.1");
 
-		snprintf(key, sizeof(key), "NAME_%02d", i);
-		iniFile.GetString(ini::SERVER_LIST, key, "TEST|Server 1", pInfo->strServerName,
-			sizeof(pInfo->strServerName));
+		key                  = fmt::format("NAME_{:02}", i);
+		pInfo->strServerName = iniFile.GetString(ini::SERVER_LIST, key, "TEST|Server 1");
 
-		snprintf(key, sizeof(key), "ID_%02d", i);
-		pInfo->sServerID = static_cast<int16_t>(iniFile.GetInt(ini::SERVER_LIST, key, 1));
+		key                  = fmt::format("ID_{:02}", i);
+		pInfo->sServerID     = static_cast<int16_t>(iniFile.GetInt(ini::SERVER_LIST, key, 1));
 
-		snprintf(key, sizeof(key), "USER_LIMIT_%02d", i);
+		key                  = fmt::format("USER_LIMIT_{:02}", i);
 		pInfo->sUserLimit = static_cast<int16_t>(iniFile.GetInt(ini::SERVER_LIST, key, MAX_USER));
 
 		ServerList.push_back(pInfo);
@@ -178,12 +172,12 @@ bool VersionManagerApp::LoadConfig(CIni& iniFile)
 	News.Size = 0;
 	for (int i = 0; i < MAX_NEWS_COUNT; i++)
 	{
-		snprintf(key, sizeof(key), "TITLE_%02d", i);
+		key   = fmt::format("TITLE_{:02}", i);
 		title = iniFile.GetString("NEWS", key, "");
 		if (title.empty())
 			continue;
 
-		snprintf(key, sizeof(key), "MESSAGE_%02d", i);
+		key     = fmt::format("MESSAGE_{:02}", i);
 		message = iniFile.GetString("NEWS", key, "");
 		if (message.empty())
 			continue;

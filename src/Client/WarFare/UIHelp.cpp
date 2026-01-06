@@ -9,16 +9,6 @@
 
 #include <N3Base/N3UIButton.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIHelp::CUIHelp()
 {
 	m_pBtn_Close = nullptr;
@@ -135,6 +125,9 @@ bool CUIHelp::OnKeyPress(int iKey)
 		case DIK_ESCAPE:
 			ReceiveMessage(m_pBtn_Close, UIMSG_BUTTON_CLICK);
 			return true;
+
+		default:
+			break;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

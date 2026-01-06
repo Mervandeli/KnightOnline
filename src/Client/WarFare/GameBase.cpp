@@ -14,11 +14,6 @@
 #include <ranges>
 #include <algorithm>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 CN3TableBase<__TABLE_TEXTS> CGameBase::s_pTbl_Texts;
 CN3TableBase<__TABLE_ZONE> CGameBase::s_pTbl_Zones;
 CN3TableBase<__TABLE_UI_RESRC> CGameBase::s_pTbl_UI;
@@ -27,7 +22,6 @@ CN3TableBase<__TABLE_ITEM_EXT> CGameBase::s_pTbl_Items_Exts[MAX_ITEM_EXTENSION];
 CN3TableBase<__TABLE_PLAYER_LOOKS> CGameBase::s_pTbl_UPC_Looks;
 CN3TableBase<__TABLE_PLAYER_LOOKS> CGameBase::s_pTbl_NPC_Looks;
 CN3TableBase<__TABLE_UPC_SKILL> CGameBase::s_pTbl_Skill;
-CN3TableBase<__TABLE_EXCHANGE_QUEST> CGameBase::s_pTbl_Exchange_Quest;
 CN3TableBase<__TABLE_FX> CGameBase::s_pTbl_FXSource;
 CN3TableBase<__TABLE_QUEST_MENU> CGameBase::s_pTbl_QuestMenu;
 CN3TableBase<__TABLE_QUEST_TALK> CGameBase::s_pTbl_QuestTalk;
@@ -86,8 +80,6 @@ void CGameBase::StaticMemberInit()
 	s_pTbl_NPC_Looks.LoadFromFile(szFN);
 	szFN = "Data\\skill_magic_main" + szLangTail;
 	s_pTbl_Skill.LoadFromFile(szFN);
-	szFN = "Data\\Exchange_Quest.tbl";
-	s_pTbl_Exchange_Quest.LoadFromFile(szFN);
 	szFN = "Data\\fx.tbl";
 	s_pTbl_FXSource.LoadFromFile(szFN);
 
@@ -426,6 +418,9 @@ e_Class_Represent CGameBase::GetRepresentClass(e_Class eClass)
 		case CLASS_EL_CLERIC:
 		case CLASS_EL_DRUID:
 			return CLASS_REPRESENT_PRIEST;
+
+		default:
+			break;
 	}
 
 	return CLASS_REPRESENT_UNKNOWN;
@@ -531,7 +526,6 @@ e_ItemType CGameBase::MakeResrcFileNameForUPC(__TABLE_ITEM_BASIC* pItem, __TABLE
 	e_ItemType eType    = ITEM_TYPE_UNKNOWN;
 	e_ItemPosition ePos = (e_ItemPosition) pItem->byAttachPoint;
 
-	int iPos            = 0;
 	std::string szExt; // File extension
 
 	if (ePos >= ITEM_POS_DUAL && ePos <= ITEM_POS_TWOHANDLEFT)
@@ -563,7 +557,6 @@ e_ItemType CGameBase::MakeResrcFileNameForUPC(__TABLE_ITEM_BASIC* pItem, __TABLE
 
 		eType = ITEM_TYPE_PART;
 		szExt = ".n3cpart";
-		iPos  = ePartPosition + 1;
 	}
 	else if (ePos >= ITEM_POS_EAR && ePos <= ITEM_POS_INVENTORY)
 	{
@@ -723,6 +716,9 @@ bool CGameBase::IsItemClassWeapon(e_ItemClass itemClass)
 		case ITEM_CLASS_STAFF:
 		case ITEM_CLASS_JAVELIN:
 			return true;
+
+		default:
+			break;
 	}
 
 	return false;

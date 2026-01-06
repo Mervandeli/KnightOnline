@@ -14,7 +14,7 @@
 ///
 /// Used internally by AudioDecoderThread to manage streamed audio handles
 /// that are added to or removed from the active decode set.
-enum e_AudioDecoderQueueType
+enum e_AudioDecoderQueueType : uint8_t
 {
 	AUDIO_DECODER_QUEUE_ADD = 0,
 	AUDIO_DECODER_QUEUE_REMOVE

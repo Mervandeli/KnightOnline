@@ -13,21 +13,28 @@
 #include <Windows.h>
 #include "JpegFile.h"
 
-#include <assert.h>
+#include <cassert>
+#include <ctime>
 #include <filesystem>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 /*
  * <setjmp.h> is used for the optional error recovery mechanism shown in
  * the second part of the example.
  */
 
-//#include <setjmp.h>
-#include <time.h>
+#include <csetjmp>
+
+constexpr WORD PALVERSION = 0x300;
+
+constexpr auto WIDTHBYTES(auto bits)
+{
+	return (((bits) + 31) / 32 * 4);
+}
+
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
+#define IS_WIN30_DIB(lpbi) ((*(LPDWORD) (lpbi)) == sizeof(BITMAPINFOHEADER))
+#define DIB_HEADER_MARKER  ((WORD) ('M' << 8) | 'B')
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 // error handler, to avoid those pesky exit(0)'s
 
@@ -98,7 +105,7 @@ CJpegFile::~CJpegFile()
 //	read a JPEG file
 //
 
-BYTE* CJpegFile::JpegFileToRGB(std::string fileName, UINT* width, UINT* height)
+BYTE* CJpegFile::JpegFileToRGB(const std::string& fileName, UINT* width, UINT* height)
 
 {
 	// get our buffer set to hold data
@@ -119,10 +126,9 @@ BYTE* CJpegFile::JpegFileToRGB(std::string fileName, UINT* width, UINT* height)
 	*/
 	struct my_error_mgr jerr;
 	/* More stuff */
-	FILE* infile = nullptr; /* source file */
-
-	JSAMPARRAY buffer;      /* Output row buffer */
-	int row_stride;         /* physical row width in output buffer */
+	FILE* infile      = nullptr; /* source file */
+	JSAMPARRAY buffer = nullptr; /* Output row buffer */
+	int row_stride    = 0;       /* physical row width in output buffer */
 
 	/* In this example we want to open the input file before doing anything else,
 	* so that the setjmp() error recovery below can assume the file is open.
@@ -157,10 +163,7 @@ BYTE* CJpegFile::JpegFileToRGB(std::string fileName, UINT* width, UINT* height)
 		if (infile != nullptr)
 			fclose(infile);
 
-		if (dataBuf != nullptr)
-		{
-			delete[] dataBuf;
-		}
+		delete[] dataBuf;
 
 		return nullptr;
 	}
@@ -188,11 +191,10 @@ BYTE* CJpegFile::JpegFileToRGB(std::string fileName, UINT* width, UINT* height)
 	*/
 
 	/* Step 5: Start decompressor */
-
-	(void) jpeg_start_decompress(&cinfo);
 	/* We can ignore the return value since suspension is not possible
 	* with the stdio data source.
 	*/
+	(void) jpeg_start_decompress(&cinfo);
 
 	/* We may need to do some setup of our own at this point before reading
 	* the data.  After jpeg_start_decompress() we have the correct scaled
@@ -203,7 +205,10 @@ BYTE* CJpegFile::JpegFileToRGB(std::string fileName, UINT* width, UINT* height)
 
 	////////////////////////////////////////////////////////////
 	// alloc and open our new buffer
-	dataBuf = (BYTE*) new BYTE[cinfo.output_width * 3 * cinfo.output_height];
+	const size_t bufferSize = 3 * static_cast<size_t>(cinfo.output_width)
+							  * static_cast<size_t>(cinfo.output_height);
+
+	dataBuf = new BYTE[bufferSize];
 	if (dataBuf == nullptr)
 	{
 		//		AfxMessageBox("JpegFile :\nOut of memory",MB_ICONSTOP);
@@ -278,296 +283,6 @@ BYTE* CJpegFile::JpegFileToRGB(std::string fileName, UINT* width, UINT* height)
 	return dataBuf;
 }
 
-BOOL CJpegFile::GetJPGDimensions(std::string fileName, UINT* width, UINT* height)
-
-{
-	// basic code from IJG Jpeg Code v6 example.c
-
-	/* This struct contains the JPEG decompression parameters and pointers to
-	* working space (which is allocated as needed by the JPEG library).
-	*/
-	struct jpeg_decompress_struct cinfo;
-	/* We use our private extension JPEG error handler.
-	* Note that this struct must live as long as the main JPEG parameter
-	* struct, to avoid dangling-pointer problems.
-	*/
-	struct my_error_mgr jerr;
-	/* More stuff */
-	FILE* infile = nullptr; /* source file */
-
-	/* In this example we want to open the input file before doing anything else,
-	* so that the setjmp() error recovery below can assume the file is open.
-	* VERY IMPORTANT: use "b" option to fopen() if you are on a machine that
-	* requires it in order to read binary files.
-	*/
-
-#ifdef _MSC_VER
-	fopen_s(&infile, fileName.c_str(), "rb");
-#else
-	infile = fopen(fileName.c_str(), "rb");
-#endif
-
-	if (infile == nullptr)
-		return false;
-
-	/* Step 1: allocate and initialize JPEG decompression object */
-
-	/* We set up the normal JPEG error routines, then override error_exit. */
-	cinfo.err           = jpeg_std_error(&jerr.pub);
-	jerr.pub.error_exit = my_error_exit;
-
-	/* Establish the setjmp return context for my_error_exit to use. */
-	if (setjmp(jerr.setjmp_buffer))
-	{
-		/* If we get here, the JPEG code has signaled an error.
-		 * We need to clean up the JPEG object, close the input file, and return.
-		 */
-
-		jpeg_destroy_decompress(&cinfo);
-
-		if (infile != nullptr)
-			fclose(infile);
-		return FALSE;
-	}
-
-	/* Now we can initialize the JPEG decompression object. */
-	jpeg_create_decompress(&cinfo);
-
-	/* Step 2: specify data source (eg, a file) */
-
-	jpeg_stdio_src(&cinfo, infile);
-
-	/* Step 3: read file parameters with jpeg_read_header() */
-
-	(void) jpeg_read_header(&cinfo, TRUE);
-	/* We can ignore the return value from jpeg_read_header since
-	*   (a) suspension is not possible with the stdio data source, and
-	*   (b) we passed TRUE to reject a tables-only JPEG file as an error.
-	* See libjpeg.doc for more info.
-	*/
-
-	// how big is this thing ?
-	*width  = cinfo.image_width;
-	*height = cinfo.image_height;
-
-	/* Step 8: Release JPEG decompression object */
-
-	/* This is an important step since it will release a good deal of memory. */
-	jpeg_destroy_decompress(&cinfo);
-
-	/* After finish_decompress, we can close the input file.
-	* Here we postpone it until after no more JPEG errors are possible,
-	* so as to simplify the setjmp error logic above.  (Actually, I don't
-	* think that jpeg_destroy can do an error exit, but why assume anything...)
-	*/
-	fclose(infile);
-
-	/* At this point you may want to check to see whether any corrupt-data
-	* warnings occurred (test whether jerr.pub.num_warnings is nonzero).
-	*/
-
-	return TRUE;
-}
-
-//
-//
-//
-
-BYTE* CJpegFile::RGBFromDWORDAligned(BYTE* inBuf, UINT widthPix, UINT widthBytes, UINT height)
-{
-	if (inBuf == nullptr)
-		return nullptr;
-
-	BYTE* tmp;
-	tmp = (BYTE*) new BYTE[height * widthPix * 3];
-	if (tmp == nullptr)
-		return nullptr;
-
-	UINT row;
-
-	for (row = 0; row < height; row++)
-	{
-		memcpy((tmp + row * widthPix * 3), (inBuf + row * widthBytes), widthPix * 3);
-	}
-
-	return tmp;
-}
-
-//
-//
-//
-
-BOOL CJpegFile::RGBToJpegFile(
-	std::string fileName, BYTE* dataBuf, UINT widthPix, UINT height, BOOL color, int quality)
-{
-	if (dataBuf == nullptr)
-		return FALSE;
-	if (widthPix == 0)
-		return FALSE;
-	if (height == 0)
-		return FALSE;
-
-	LPBYTE tmp;
-	if (!color)
-	{
-		tmp = (BYTE*) new BYTE[widthPix * height];
-		if (tmp == nullptr)
-		{
-			//			AfxMessageBox("Memory error");
-			return FALSE;
-		}
-
-		UINT row, col;
-		for (row = 0; row < height; row++)
-		{
-			for (col = 0; col < widthPix; col++)
-			{
-				LPBYTE pRed, pGrn, pBlu;
-				pRed    = dataBuf + row * widthPix * 3 + col * 3;
-				pGrn    = dataBuf + row * widthPix * 3 + col * 3 + 1;
-				pBlu    = dataBuf + row * widthPix * 3 + col * 3 + 2;
-
-				// luminance
-				int lum = (int) (.299 * (double) (*pRed) + .587 * (double) (*pGrn)
-								 + .114 * (double) (*pBlu));
-				LPBYTE pGray;
-				pGray  = tmp + row * widthPix + col;
-				*pGray = (BYTE) lum;
-			}
-		}
-	}
-
-	struct jpeg_compress_struct cinfo;
-	/* More stuff */
-	FILE* outfile = nullptr; /* target file */
-	int row_stride;          /* physical row widthPix in image buffer */
-
-	struct my_error_mgr jerr;
-
-	/* Step 1: allocate and initialize JPEG compression object */
-	cinfo.err           = jpeg_std_error(&jerr.pub);
-	jerr.pub.error_exit = my_error_exit;
-
-	/* Establish the setjmp return context for my_error_exit to use. */
-	if (setjmp(jerr.setjmp_buffer))
-	{
-		/* If we get here, the JPEG code has signaled an error.
-		 * We need to clean up the JPEG object, close the input file, and return.
-		 */
-
-		jpeg_destroy_compress(&cinfo);
-
-		if (outfile != nullptr)
-			fclose(outfile);
-
-		if (!color)
-		{
-			delete[] tmp;
-		}
-		return FALSE;
-	}
-
-	/* Now we can initialize the JPEG compression object. */
-	jpeg_create_compress(&cinfo);
-
-	/* Step 2: specify data destination (eg, a file) */
-	/* Note: steps 2 and 3 can be done in either order. */
-
-#ifdef _MSC_VER
-	fopen_s(&outfile, fileName.c_str(), "wb");
-#else
-	outfile = fopen(fileName.c_str(), "wb");
-#endif
-
-	if (outfile == nullptr)
-		return FALSE;
-
-	jpeg_stdio_dest(&cinfo, outfile);
-
-	/* Step 3: set parameters for compression */
-
-	/* First we supply a description of the input image.
-	* Four fields of the cinfo struct must be filled in:
-	*/
-	cinfo.image_width  = widthPix; /* image widthPix and height, in pixels */
-	cinfo.image_height = height;
-	if (color)
-	{
-		cinfo.input_components = 3;       /* # of color components per pixel */
-		cinfo.in_color_space   = JCS_RGB; /* colorspace of input image */
-	}
-	else
-	{
-		cinfo.input_components = 1;             /* # of color components per pixel */
-		cinfo.in_color_space   = JCS_GRAYSCALE; /* colorspace of input image */
-	}
-
-	/* Now use the library's routine to set default compression parameters.
-   * (You must set at least cinfo.in_color_space before calling this,
-   * since the defaults depend on the source color space.)
-   */
-
-	jpeg_set_defaults(&cinfo);
-	/* Now you can set any non-default parameters you wish to.
-   * Here we just illustrate the use of quality (quantization table) scaling:
-   */
-	jpeg_set_quality(&cinfo, quality, TRUE /* limit to baseline-JPEG values */);
-
-	/* Step 4: Start compressor */
-
-	/* TRUE ensures that we will write a complete interchange-JPEG file.
-   * Pass TRUE unless you are very sure of what you're doing.
-   */
-	jpeg_start_compress(&cinfo, TRUE);
-
-	/* Step 5: while (scan lines remain to be written) */
-	/*           jpeg_write_scanlines(...); */
-
-	/* Here we use the library's state variable cinfo.next_scanline as the
-   * loop counter, so that we don't have to keep track ourselves.
-   * To keep things simple, we pass one scanline per call; you can pass
-   * more if you wish, though.
-   */
-	row_stride = widthPix * 3; /* JSAMPLEs per row in image_buffer */
-
-	while (cinfo.next_scanline < cinfo.image_height)
-	{
-		/* jpeg_write_scanlines expects an array of pointers to scanlines.
-     * Here the array is only one element long, but you could pass
-     * more than one scanline at a time if that's more convenient.
-     */
-		LPBYTE outRow;
-		if (color)
-		{
-			outRow = dataBuf + (cinfo.next_scanline * widthPix * 3);
-		}
-		else
-		{
-			outRow = tmp + (cinfo.next_scanline * widthPix);
-		}
-
-		(void) jpeg_write_scanlines(&cinfo, &outRow, 1);
-	}
-
-	/* Step 6: Finish compression */
-
-	jpeg_finish_compress(&cinfo);
-
-	/* After finish_compress, we can close the output file. */
-	fclose(outfile);
-
-	/* Step 7: release JPEG compression object */
-
-	/* This is an important step since it will release a good deal of memory. */
-	jpeg_destroy_compress(&cinfo);
-
-	if (!color)
-		delete[] tmp;
-	/* And we're done! */
-
-	return TRUE;
-}
-
 //
 //	stash a scanline
 //
@@ -575,12 +290,11 @@ BOOL CJpegFile::RGBToJpegFile(
 void j_putRGBScanline(BYTE* jpegline, int widthPix, BYTE* outBuf, int row)
 {
 	int offset = row * widthPix * 3;
-	int count;
-	for (count = 0; count < widthPix; count++)
+	for (int count = 0; count < widthPix; count++)
 	{
-		*(outBuf + offset + count * 3 + 0) = *(jpegline + count * 3 + 0);
-		*(outBuf + offset + count * 3 + 1) = *(jpegline + count * 3 + 1);
-		*(outBuf + offset + count * 3 + 2) = *(jpegline + count * 3 + 2);
+		outBuf[offset + count * 3 + 0] = jpegline[count * 3 + 0];
+		outBuf[offset + count * 3 + 1] = jpegline[count * 3 + 1];
+		outBuf[offset + count * 3 + 2] = jpegline[count * 3 + 2];
 	}
 }
 
@@ -591,17 +305,14 @@ void j_putRGBScanline(BYTE* jpegline, int widthPix, BYTE* outBuf, int row)
 void j_putGrayScanlineToRGB(BYTE* jpegline, int widthPix, BYTE* outBuf, int row)
 {
 	int offset = row * widthPix * 3;
-	int count;
-	for (count = 0; count < widthPix; count++)
+	for (int count = 0; count < widthPix; count++)
 	{
-		BYTE iGray;
-
 		// get our grayscale value
-		iGray                              = *(jpegline + count);
+		BYTE iGray                     = jpegline[count];
 
-		*(outBuf + offset + count * 3 + 0) = iGray;
-		*(outBuf + offset + count * 3 + 1) = iGray;
-		*(outBuf + offset + count * 3 + 2) = iGray;
+		outBuf[offset + count * 3 + 0] = iGray;
+		outBuf[offset + count * 3 + 1] = iGray;
+		outBuf[offset + count * 3 + 2] = iGray;
 	}
 }
 
@@ -622,30 +333,24 @@ BYTE* CJpegFile::MakeDwordAlignedBuf(BYTE* dataBuf,
 
 	////////////////////////////////////////////////////////////
 	// how big is the smallest DWORD-aligned buffer that we can use?
-	UINT uiWidthBytes;
-	uiWidthBytes    = WIDTHBYTES(widthPix * 24);
+	UINT uiWidthBytes = WIDTHBYTES(widthPix * 24);
 
-	DWORD dwNewsize = (DWORD) ((DWORD) uiWidthBytes * (DWORD) height);
-	BYTE* pNew;
+	DWORD dwNewsize   = (DWORD) ((DWORD) uiWidthBytes * (DWORD) height);
 
 	////////////////////////////////////////////////////////////
 	// alloc and open our new buffer
-	pNew = (BYTE*) new BYTE[dwNewsize];
+	BYTE* pNew        = new BYTE[dwNewsize];
 	if (pNew == nullptr)
-	{
 		return nullptr;
-	}
 
 	////////////////////////////////////////////////////////////
 	// copy row-by-row
 	UINT uiInWidthBytes = widthPix * 3;
-	UINT uiCount;
-	for (uiCount = 0; uiCount < height; uiCount++)
+	for (UINT uiCount = 0; uiCount < height; uiCount++)
 	{
-		BYTE* bpInAdd;
-		BYTE* bpOutAdd;
-		ULONG lInOff;
-		ULONG lOutOff;
+		BYTE* bpInAdd  = nullptr;
+		BYTE* bpOutAdd = nullptr;
+		ULONG lInOff = 0, lOutOff = 0;
 
 		lInOff   = uiInWidthBytes * uiCount;
 		lOutOff  = uiWidthBytes * uiCount;
@@ -667,34 +372,28 @@ BYTE* CJpegFile::MakeDwordAlignedBuf(BYTE* dataBuf,
 
 BOOL CJpegFile::VertFlipBuf(BYTE* inbuf, UINT widthBytes, UINT height)
 {
-	BYTE* tb1;
-	BYTE* tb2;
+	BYTE* tb1    = nullptr;
+	BYTE* tb2    = nullptr;
+	UINT bufsize = 0;
 
 	if (inbuf == nullptr)
 		return FALSE;
 
-	UINT bufsize;
-
 	bufsize = widthBytes;
 
-	tb1     = (BYTE*) new BYTE[bufsize];
+	tb1     = new BYTE[bufsize];
 	if (tb1 == nullptr)
-	{
 		return FALSE;
-	}
 
-	tb2 = (BYTE*) new BYTE[bufsize];
+	tb2 = new BYTE[bufsize];
 	if (tb2 == nullptr)
 	{
 		delete[] tb1;
 		return FALSE;
 	}
 
-	UINT row_cnt;
-	ULONG off1 = 0;
-	ULONG off2 = 0;
-
-	for (row_cnt = 0; row_cnt < (height + 1) / 2; row_cnt++)
+	ULONG off1 = 0, off2 = 0;
+	for (UINT row_cnt = 0; row_cnt < (height + 1) / 2; row_cnt++)
 	{
 		off1 = row_cnt * bufsize;
 		off2 = ((height - 1) - row_cnt) * bufsize;
@@ -723,95 +422,58 @@ BOOL CJpegFile::BGRFromRGB(BYTE* buf, UINT widthPix, UINT height)
 	if (buf == nullptr)
 		return FALSE;
 
-	UINT col, row;
-	for (row = 0; row < height; row++)
+	for (UINT row = 0; row < height; row++)
 	{
-		for (col = 0; col < widthPix; col++)
+		for (UINT col = 0; col < widthPix; col++)
 		{
-			LPBYTE pRed, pGrn, pBlu;
-			pRed = buf + row * widthPix * 3 + col * 3;
-			pGrn = buf + row * widthPix * 3 + col * 3 + 1;
-			pBlu = buf + row * widthPix * 3 + col * 3 + 2;
+			LPBYTE pRed = nullptr, pBlu = nullptr;
+			pRed = &buf[row * widthPix * 3 + col * 3];
+			pBlu = &buf[row * widthPix * 3 + col * 3 + 2];
 
 			// swap red and blue
-			BYTE tmp;
-			tmp   = *pRed;
-			*pRed = *pBlu;
-			*pBlu = tmp;
+			std::swap(*pRed, *pBlu);
 		}
 	}
 	return TRUE;
 }
 
-//
-//	Note! this does its stuff on buffers with a whole number of pixels
-//	per data row!!
-//
-
-BOOL CJpegFile::MakeGrayScale(BYTE* buf, UINT widthPix, UINT height)
+int CJpegFile::PalEntriesOnDevice(HDC hDC)
 {
-	if (buf == nullptr)
-		return FALSE;
-
-	UINT row, col;
-	for (row = 0; row < height; row++)
-	{
-		for (col = 0; col < widthPix; col++)
-		{
-			LPBYTE pRed, pGrn, pBlu;
-			pRed    = buf + row * widthPix * 3 + col * 3;
-			pGrn    = buf + row * widthPix * 3 + col * 3 + 1;
-			pBlu    = buf + row * widthPix * 3 + col * 3 + 2;
-
-			// luminance
-			int lum = (int) (.299 * (double) (*pRed) + .587 * (double) (*pGrn)
-							 + .114 * (double) (*pBlu));
-
-			*pRed   = (BYTE) lum;
-			*pGrn   = (BYTE) lum;
-			*pBlu   = (BYTE) lum;
-		}
-	}
-	return TRUE;
-}
-
-int FAR CJpegFile::PalEntriesOnDevice(HDC hDC)
-{
-	int nColors; // number of colors
+	int nColors = 0; // number of colors
 
 	/*  Find out the number of palette entries on this
 	 *  device.
 	 */
 
 	//	nColors = GetDeviceCaps(hDC, SIZEPALETTE);
-	nColors = GetDeviceCaps(hDC, BITSPIXEL);
+	nColors     = GetDeviceCaps(hDC, BITSPIXEL);
 	if (nColors > 8)
 		return 0;
-	else
-		nColors = 2 << nColors;
+
+	nColors = 2 << nColors;
 
 	/*  For non-palette devices, we'll use the # of system
 	 *  colors for our palette size.
 	 */
-	if (!nColors)
+	if (nColors == 0)
 		nColors = GetDeviceCaps(hDC, NUMCOLORS);
 	assert(nColors);
 	return nColors;
 }
 
-HPALETTE FAR CJpegFile::GetSystemPalette(void)
+HPALETTE CJpegFile::GetSystemPalette()
 {
-	HDC hDC;                        // handle to a DC
-	static HPALETTE hPal = nullptr; // handle to a palette
-	HANDLE hLogPal;                 // handle to a logical palette
-	LPLOGPALETTE lpLogPal;          // pointer to a logical palette
-	int nColors;                    // number of colors
+	HPALETTE hPal         = nullptr; // handle to a palette
+	HDC hDC               = nullptr; // handle to a DC
+	HANDLE hLogPal        = nullptr; // handle to a logical palette
+	LPLOGPALETTE lpLogPal = nullptr; // pointer to a logical palette
+	int nColors           = 0;       // number of colors
 
 	/* Find out how many palette entries we want. */
-
-	hDC = GetDC(nullptr);
-	if (!hDC)
+	hDC                   = GetDC(nullptr);
+	if (hDC == nullptr)
 		return nullptr;
+
 	nColors = PalEntriesOnDevice(hDC); // Number of palette entries
 	if (nColors == 0)
 		return nullptr;
@@ -820,11 +482,13 @@ HPALETTE FAR CJpegFile::GetSystemPalette(void)
 	hLogPal = GlobalAlloc(GHND, sizeof(LOGPALETTE) + nColors * sizeof(PALETTEENTRY));
 
 	/* if we didn't get a logical palette, return nullptr */
-	if (!hLogPal)
+	if (hLogPal == nullptr)
 		return nullptr;
 
 	/* get a pointer to the logical palette */
-	lpLogPal                = (LPLOGPALETTE) GlobalLock(hLogPal);
+	lpLogPal = (LPLOGPALETTE) GlobalLock(hLogPal);
+	if (lpLogPal == nullptr)
+		return nullptr;
 
 	/* set some important fields */
 	lpLogPal->palVersion    = PALVERSION;
@@ -848,9 +512,9 @@ HPALETTE FAR CJpegFile::GetSystemPalette(void)
 	return hPal;
 }
 
-WORD FAR CJpegFile::DIBNumColors(LPSTR lpDIB)
+WORD CJpegFile::DIBNumColors(LPSTR lpDIB)
 {
-	WORD wBitCount; // DIB bit count
+	WORD wBitCount = 0; // DIB bit count
 
 	/*  If this is a Windows-style DIB, the number of colors in the
 	 *  color table can be less than the number of bits per pixel
@@ -860,9 +524,7 @@ WORD FAR CJpegFile::DIBNumColors(LPSTR lpDIB)
 
 	if (IS_WIN30_DIB(lpDIB))
 	{
-		DWORD dwClrUsed;
-
-		dwClrUsed = ((LPBITMAPINFOHEADER) lpDIB)->biClrUsed;
+		DWORD dwClrUsed = ((LPBITMAPINFOHEADER) lpDIB)->biClrUsed;
 		if (dwClrUsed)
 			return (WORD) dwClrUsed;
 	}
@@ -892,7 +554,7 @@ WORD FAR CJpegFile::DIBNumColors(LPSTR lpDIB)
 	}
 }
 
-WORD FAR CJpegFile::PaletteSize(LPSTR lpDIB)
+WORD CJpegFile::PaletteSize(LPSTR lpDIB)
 {
 	/* calculate the size required by the palette */
 	if (IS_WIN30_DIB(lpDIB))
@@ -901,19 +563,18 @@ WORD FAR CJpegFile::PaletteSize(LPSTR lpDIB)
 		return (DIBNumColors(lpDIB) * sizeof(RGBTRIPLE));
 }
 
-HDIB FAR CJpegFile::BitmapToDIB(HBITMAP hBitmap, HPALETTE hPal)
+HANDLE CJpegFile::BitmapToDIB(HBITMAP hBitmap, HPALETTE hPal)
 {
-	BITMAP bm;                  // bitmap structure
-	BITMAPINFOHEADER bi;        // bitmap header
-	BITMAPINFOHEADER FAR* lpbi; // pointer to BITMAPINFOHEADER
-	DWORD dwLen;                // size of memory block
-	HANDLE hDIB, h;             // handle to DIB, temp handle
-	HDC hDC;                    // handle to DC
-	WORD biBits;                // bits per pixel
+	BITMAP bm {};                       // bitmap structure
+	BITMAPINFOHEADER bi {};             // bitmap header
+	BITMAPINFOHEADER* lpbi = nullptr;   // pointer to BITMAPINFOHEADER
+	DWORD dwLen            = 0;         // size of memory block
+	HANDLE hDIB = nullptr, h = nullptr; // handle to DIB, temp handle
+	HDC hDC     = nullptr;              // handle to DC
+	WORD biBits = 0;                    // bits per pixel
 
 	/* check if bitmap handle is valid */
-
-	if (!hBitmap)
+	if (hBitmap == nullptr)
 		return nullptr;
 
 	/* fill in BITMAP structure, return nullptr if it didn't work */
@@ -964,7 +625,7 @@ HDIB FAR CJpegFile::BitmapToDIB(HBITMAP hBitmap, HPALETTE hPal)
 	hDIB = GlobalAlloc(GHND, dwLen);
 
 	/* if we couldn't get memory block */
-	if (!hDIB)
+	if (hDIB == nullptr)
 	{
 		/* clean up and return nullptr */
 		SelectPalette(hDC, hPal, TRUE);
@@ -974,7 +635,17 @@ HDIB FAR CJpegFile::BitmapToDIB(HBITMAP hBitmap, HPALETTE hPal)
 	}
 
 	/* lock memory and get pointer to it */
-	lpbi  = (BITMAPINFOHEADER FAR*) GlobalLock(hDIB);
+	lpbi = (BITMAPINFOHEADER*) GlobalLock(hDIB);
+	if (lpbi == nullptr)
+	{
+		GlobalFree(hDIB);
+
+		/* clean up and return nullptr */
+		SelectPalette(hDC, hPal, TRUE);
+		RealizePalette(hDC);
+		ReleaseDC(nullptr, hDC);
+		return nullptr;
+	}
 
 	/* use our bitmap info. to fill BITMAPINFOHEADER */
 	*lpbi = bi;
@@ -994,9 +665,9 @@ HDIB FAR CJpegFile::BitmapToDIB(HBITMAP hBitmap, HPALETTE hPal)
 
 	/* realloc the buffer big enough to hold all the bits */
 	dwLen = bi.biSize + PaletteSize((LPSTR) &bi) + bi.biSizeImage;
-	if (h = GlobalReAlloc(hDIB, dwLen, 0))
-		hDIB = h;
-	else
+
+	h     = GlobalReAlloc(hDIB, dwLen, 0);
+	if (h == nullptr)
 	{
 		/* clean up and return nullptr */
 		GlobalFree(hDIB);
@@ -1007,8 +678,20 @@ HDIB FAR CJpegFile::BitmapToDIB(HBITMAP hBitmap, HPALETTE hPal)
 		return nullptr;
 	}
 
+	hDIB = h;
+
 	/* lock memory block and get pointer to it */
-	lpbi = (BITMAPINFOHEADER FAR*) GlobalLock(hDIB);
+	lpbi = (BITMAPINFOHEADER*) GlobalLock(hDIB);
+	if (lpbi == nullptr)
+	{
+		/* clean up and return nullptr */
+		GlobalFree(hDIB);
+		hDIB = nullptr;
+		SelectPalette(hDC, hPal, TRUE);
+		RealizePalette(hDC);
+		ReleaseDC(nullptr, hDC);
+		return nullptr;
+	}
 
 	/*  call GetDIBits with a NON-nullptr lpBits param, and actualy get the
 	 *  bits this time
@@ -1038,13 +721,13 @@ HDIB FAR CJpegFile::BitmapToDIB(HBITMAP hBitmap, HPALETTE hPal)
 	return hDIB;
 }
 
-HBITMAP FAR CJpegFile::CopyScreenToBitmap(LPRECT lpRect)
+HBITMAP CJpegFile::CopyScreenToBitmap(LPRECT lpRect)
 {
-	HDC hScrDC, hMemDC;          // screen DC and memory DC
-	HBITMAP hBitmap, hOldBitmap; // handles to deice-dependent bitmaps
-	int nX, nY, nX2, nY2;        // coordinates of rectangle to grab
-	int nWidth, nHeight;         // DIB width and height
-	int xScrn, yScrn;            // screen resolution
+	HDC hScrDC = nullptr, hMemDC = nullptr;          // screen DC and memory DC
+	HBITMAP hBitmap = nullptr, hOldBitmap = nullptr; // handles to deice-dependent bitmaps
+	int nX = 0, nY = 0, nX2 = 0, nY2 = 0;            // coordinates of rectangle to grab
+	int nWidth = 0, nHeight = 0;                     // DIB width and height
+	int xScrn = 0, yScrn = 0;                        // screen resolution
 
 	/* check for an empty rectangle */
 
@@ -1101,17 +784,17 @@ HBITMAP FAR CJpegFile::CopyScreenToBitmap(LPRECT lpRect)
 	return hBitmap;
 }
 
-HDIB FAR CJpegFile::CopyScreenToDIB(LPRECT lpRect)
+HANDLE CJpegFile::CopyScreenToDIB(LPRECT lpRect)
 {
-	HBITMAP hBitmap;     // handle to device-dependent bitmap
-	HPALETTE hPalette;   // handle to palette
-	HDIB hDIB = nullptr; // handle to DIB
+	HBITMAP hBitmap   = nullptr; // handle to device-dependent bitmap
+	HPALETTE hPalette = nullptr; // handle to palette
+	HANDLE hDIB       = nullptr; // handle to DIB
 
 	/*  get the device-dependent bitmap in lpRect by calling
 	 *  CopyScreenToBitmap and passing it the rectangle to grab
      */
 
-	hBitmap   = CopyScreenToBitmap(lpRect);
+	hBitmap           = CopyScreenToBitmap(lpRect);
 
 	/* check for a valid bitmap handle */
 	if (!hBitmap)
@@ -1133,28 +816,34 @@ HDIB FAR CJpegFile::CopyScreenToDIB(LPRECT lpRect)
 
 HANDLE CJpegFile::AllocRoomForDIB(BITMAPINFOHEADER bi, HBITMAP hBitmap)
 {
-	DWORD dwLen;
-	HANDLE hDIB;
-	HDC hDC;
-	LPBITMAPINFOHEADER lpbi;
-	HANDLE hTemp;
+	DWORD dwLen             = 0;
+	HANDLE hDIB             = nullptr;
+	HDC hDC                 = nullptr;
+	LPBITMAPINFOHEADER lpbi = nullptr;
+	HANDLE hTemp            = nullptr;
 
 	/* Figure out the size needed to hold the BITMAPINFO structure
      * (which includes the BITMAPINFOHEADER and the color table).
      */
 
-	dwLen = bi.biSize + PaletteSize((LPSTR) &bi);
-	hDIB  = GlobalAlloc(GHND, dwLen);
+	dwLen                   = bi.biSize + PaletteSize((LPSTR) &bi);
+	hDIB                    = GlobalAlloc(GHND, dwLen);
 
 	/* Check that DIB handle is valid */
-	if (!hDIB)
+	if (hDIB == nullptr)
 		return nullptr;
 
 	/* Set up the BITMAPINFOHEADER in the newly allocated global memory,
 	 * then call GetDIBits() with lpBits = nullptr to have it fill in the
 	 * biSizeImage field for us.
      */
-	lpbi  = (LPBITMAPINFOHEADER) GlobalLock(hDIB);
+	lpbi = (LPBITMAPINFOHEADER) GlobalLock(hDIB);
+	if (lpbi == nullptr)
+	{
+		GlobalFree(hDIB);
+		return nullptr;
+	}
+
 	*lpbi = bi;
 
 	hDC   = GetDC(nullptr);
@@ -1174,299 +863,14 @@ HANDLE CJpegFile::AllocRoomForDIB(BITMAPINFOHEADER bi, HBITMAP hBitmap)
 	GlobalUnlock(hDIB);
 
 	/* ReAlloc the buffer big enough to hold all the bits */
-	if (hTemp = GlobalReAlloc(hDIB, dwLen, 0))
-		return hTemp;
-	else
+	hTemp = GlobalReAlloc(hDIB, dwLen, 0);
+	if (hTemp == nullptr)
 	{
-		/* Else free memory block and return failure */
 		GlobalFree(hDIB);
 		return nullptr;
 	}
-}
 
-HDIB FAR CJpegFile::ChangeBitmapFormat(
-	HBITMAP hBitmap, WORD wBitCount, DWORD dwCompression, HPALETTE hPal)
-{
-	HDC hDC      = nullptr;     // Screen DC
-	HDIB hNewDIB = nullptr;     // Handle to new DIB
-	BITMAP Bitmap;              // BITMAP data structure
-	BITMAPINFOHEADER bi;        // Bitmap info. header
-	LPBITMAPINFOHEADER lpbi;    // Pointer to bitmap header
-	HPALETTE hOldPal = nullptr; // Handle to palette
-	WORD NewBPP;                // New bits per pixel
-	DWORD NewComp;              // New compression format
-
-	/* Check for a valid bitmap handle */
-	if (!hBitmap)
-		return nullptr;
-
-	/* Validate wBitCount and dwCompression
-	 * They must match correctly (i.e., BI_RLE4 and 4 BPP or
-	 * BI_RLE8 and 8BPP, etc.) or we return failure
-     */
-	if (wBitCount == 0)
-	{
-		NewComp = dwCompression;
-		if (NewComp == BI_RLE4)
-			NewBPP = 4;
-		else if (NewComp == BI_RLE8)
-			NewBPP = 8;
-		else /* Not enough info */
-			return nullptr;
-	}
-	else if (wBitCount == 1 && dwCompression == BI_RGB)
-	{
-		NewBPP  = wBitCount;
-		NewComp = BI_RGB;
-	}
-	else if (wBitCount == 4)
-	{
-		NewBPP = wBitCount;
-		if (dwCompression == BI_RGB || dwCompression == BI_RLE4)
-			NewComp = dwCompression;
-		else
-			return nullptr;
-	}
-	else if (wBitCount == 8)
-	{
-		NewBPP = wBitCount;
-		if (dwCompression == BI_RGB || dwCompression == BI_RLE8)
-			NewComp = dwCompression;
-		else
-			return nullptr;
-	}
-	else if (wBitCount == 24 && dwCompression == BI_RGB)
-	{
-		NewBPP  = wBitCount;
-		NewComp = BI_RGB;
-	}
-	else
-		return nullptr;
-
-	/* Get info about the bitmap */
-	GetObject(hBitmap, sizeof(BITMAP), (LPSTR) &Bitmap);
-
-	/* Fill in the BITMAPINFOHEADER appropriately */
-	bi.biSize          = sizeof(BITMAPINFOHEADER);
-	bi.biWidth         = Bitmap.bmWidth;
-	bi.biHeight        = Bitmap.bmHeight;
-	bi.biPlanes        = 1;
-	bi.biBitCount      = NewBPP;
-	bi.biCompression   = NewComp;
-	bi.biSizeImage     = 0;
-	bi.biXPelsPerMeter = 0;
-	bi.biYPelsPerMeter = 0;
-	bi.biClrUsed       = 0;
-	bi.biClrImportant  = 0;
-
-	/* Go allocate room for the new DIB */
-	hNewDIB            = (HDIB) AllocRoomForDIB(bi, hBitmap);
-	if (!hNewDIB)
-		return nullptr;
-
-	/* Get a pointer to the new DIB */
-	lpbi = (LPBITMAPINFOHEADER) GlobalLock(hNewDIB);
-
-	/* If we have a palette, get a DC and select/realize it */
-	if (hPal)
-	{
-		hDC     = GetDC(nullptr);
-		hOldPal = SelectPalette(hDC, hPal, FALSE);
-		RealizePalette(hDC);
-	}
-
-	/* Call GetDIBits and get the new DIB bits */
-	if (!GetDIBits(hDC, hBitmap, 0, (WORD) lpbi->biHeight,
-			(LPSTR) lpbi + (WORD) lpbi->biSize + PaletteSize((LPSTR) lpbi), (LPBITMAPINFO) lpbi,
-			DIB_RGB_COLORS))
-	{
-		GlobalUnlock(hNewDIB);
-		GlobalFree(hNewDIB);
-		hNewDIB = nullptr;
-	}
-
-	/* Clean up and return */
-	if (hOldPal)
-	{
-		SelectPalette(hDC, hOldPal, TRUE);
-		RealizePalette(hDC);
-		ReleaseDC(nullptr, hDC);
-	}
-
-	if (hNewDIB)
-	{
-		/* Unlock the new DIB's memory block */
-		GlobalUnlock(hNewDIB);
-	}
-
-	return hNewDIB;
-}
-
-DWORD PASCAL CJpegFile::MyWrite(int iFileHandle, VOID FAR* lpBuffer, DWORD dwBytes)
-{
-	DWORD dwBytesTmp = dwBytes;          // Save # of bytes for return value
-	BYTE* hpBuffer   = (BYTE*) lpBuffer; // make a huge pointer to the data
-
-	/*
-	 * Write out the data in 32767 byte chunks.
-     */
-
-	while (dwBytes > 32767)
-	{
-		if (_lwrite(iFileHandle, (LPSTR) hpBuffer, (WORD) 32767) != 32767)
-			return 0;
-		dwBytes  -= 32767;
-		hpBuffer += 32767;
-	}
-
-	/* Write out the last chunk (which is < 32767 bytes) */
-	if (_lwrite(iFileHandle, (LPSTR) hpBuffer, (WORD) dwBytes) != (WORD) dwBytes)
-		return 0;
-	return dwBytesTmp;
-}
-
-WORD FAR CJpegFile::SaveDIB(HDIB hDib, LPSTR lpFileName)
-{
-	BITMAPFILEHEADER bmfHdr; // Header for Bitmap file
-	LPBITMAPINFOHEADER lpBI; // Pointer to DIB info structure
-	FILE* fileHandle;        // file handle for opened file
-	DWORD dwDIBSize;
-	//	DWORD dwError;   // Error return from MyWrite
-
-	if (hDib == nullptr)
-		return ERR_INVALIDHANDLE;
-
-#ifdef _MSC_VER
-	fopen_s(&fileHandle, lpFileName, "wb");
-#else
-	fileHandle = fopen(lpFileName, "wb");
-#endif
-
-	if (fileHandle == nullptr)
-		return ERR_OPEN;
-
-	/*
-	* Get a pointer to the DIB memory, the first of which contains
-	* a BITMAPINFO structure
-    */
-	lpBI = (LPBITMAPINFOHEADER) GlobalLock(hDib);
-	if (!lpBI)
-		return ERR_LOCK;
-
-	// Check to see if we're dealing with an OS/2 DIB.  If so, don't
-	// save it because our functions aren't written to deal with these
-	// DIBs.
-
-	if (lpBI->biSize != sizeof(BITMAPINFOHEADER))
-	{
-		GlobalUnlock(hDib);
-		return ERR_NOT_DIB;
-	}
-
-	/*
-    * Fill in the fields of the file header
-    */
-
-	/* Fill in file type (first 2 bytes must be "BM" for a bitmap) */
-	bmfHdr.bfType = DIB_HEADER_MARKER; // "BM"
-
-	// Calculating the size of the DIB is a bit tricky (if we want to
-	// do it right).  The easiest way to do this is to call GlobalSize()
-	// on our global handle, but since the size of our global memory may have
-	// been padded a few bytes, we may end up writing out a few too
-	// many bytes to the file (which may cause problems with some apps,
-	// like HC 3.0).
-	//
-	// So, instead let's calculate the size manually.
-	//
-	// To do this, find size of header plus size of color table.  Since the
-	// first DWORD in both BITMAPINFOHEADER and BITMAPCOREHEADER conains
-	// the size of the structure, let's use this.
-
-	dwDIBSize     = *(LPDWORD) lpBI + PaletteSize((LPSTR) lpBI); // Partial Calculation
-
-	// Now calculate the size of the image
-
-	if ((lpBI->biCompression == BI_RLE8) || (lpBI->biCompression == BI_RLE4))
-	{
-		// It's an RLE bitmap, we can't calculate size, so trust the
-		// biSizeImage field
-
-		dwDIBSize += lpBI->biSizeImage;
-	}
-	else
-	{
-		DWORD dwBmBitsSize; // Size of Bitmap Bits only
-
-		// It's not RLE, so size is Width (DWORD aligned) * Height
-
-		dwBmBitsSize  = WIDTHBYTES((lpBI->biWidth) * ((DWORD) lpBI->biBitCount)) * lpBI->biHeight;
-
-		dwDIBSize    += dwBmBitsSize;
-
-		// Now, since we have calculated the correct size, why don't we
-		// fill in the biSizeImage field (this will fix any .BMP files which
-		// have this field incorrect).
-
-		lpBI->biSizeImage = dwBmBitsSize;
-	}
-
-	// Calculate the file size by adding the DIB size to sizeof(BITMAPFILEHEADER)
-
-	bmfHdr.bfSize      = dwDIBSize + sizeof(BITMAPFILEHEADER);
-	bmfHdr.bfReserved1 = 0;
-	bmfHdr.bfReserved2 = 0;
-
-	/*
-    * Now, calculate the offset the actual bitmap bits will be in
-    * the file -- It's the Bitmap file header plus the DIB header,
-    * plus the size of the color table.
-    */
-	bmfHdr.bfOffBits = (DWORD) sizeof(BITMAPFILEHEADER) + lpBI->biSize + PaletteSize((LPSTR) lpBI);
-
-	// Encrypt Data
-	BYTE* encrypt_data;
-	DWORD encrypt_len, i, j;
-	BYTE random_byte[4];
-
-	// Generate Random Byte.
-	srand((unsigned) time(nullptr));
-	for (i = 0; i < 4; i++)
-		random_byte[i] = rand() % 0x100;
-
-	encrypt_len  = sizeof(BITMAPFILEHEADER) + dwDIBSize + 4;
-	encrypt_data = new BYTE[encrypt_len];
-	for (i = 0, j = 0; i < 4; i++, j++)
-		encrypt_data[j] = Encrypt(random_byte[i]);
-
-	for (i = 0; i < sizeof(BITMAPFILEHEADER); i++, j++)
-		encrypt_data[j] = Encrypt(*((BYTE*) (&bmfHdr) + i));
-
-	for (i = 0; i < dwDIBSize; i++, j++)
-		encrypt_data[j] = Encrypt(*((BYTE*) lpBI + i));
-
-	assert(j == encrypt_len);
-	fwrite(encrypt_data, encrypt_len, 1, fileHandle);
-	/* Write the file header */
-	//	fwrite(&bmfHdr, sizeof(BITMAPFILEHEADER), 1, fileHandle);
-
-	/*
-    * Write the DIB header and the bits -- use local version of
-    * MyWrite, so we can write more than 32767 bytes of data
-    */
-	//	dwError = MyWrite(fh, (LPSTR)lpBI, dwDIBSize);
-	//	fwrite(lpBI, dwDIBSize, 1, fileHandle);
-	GlobalUnlock(hDib);
-	fclose(fileHandle);
-
-	delete[] encrypt_data;
-
-	return 0;
-
-	//	if (dwError == 0)
-	//		return ERR_OPEN; // oops, something happened in the write
-	//	else
-	//		return 0; // Success code
+	return hTemp;
 }
 
 RGBQUAD CJpegFile::QuadFromWord(WORD b16)
@@ -1495,10 +899,10 @@ RGBQUAD CJpegFile::QuadFromWord(WORD b16)
 	return rgb;
 }
 
-BOOL CJpegFile::DibToSamps(HANDLE hDib, int nSampsPerRow, jpeg_compress_struct cinfo,
-	JSAMPARRAY jsmpPixels, const char** pcsMsg)
+BOOL CJpegFile::DibToSamps(
+	HANDLE hDib, int nSampsPerRow, JSAMPARRAY jsmpPixels, const char** pcsMsg)
 {
-	//Sanity...
+	// Sanity...
 	if (hDib == nullptr || nSampsPerRow <= 0 || pcsMsg == nullptr)
 	{
 		if (pcsMsg != nullptr)
@@ -1510,25 +914,31 @@ BOOL CJpegFile::DibToSamps(HANDLE hDib, int nSampsPerRow, jpeg_compress_struct c
 		nLastNibs = 0, nCTEntries = 0, nRow = 0, nByte = 0, nPixel = 0;
 	BYTE bytCTEnt              = 0;
 	LPBITMAPINFOHEADER pbBmHdr = (LPBITMAPINFOHEADER) GlobalLock(hDib);
+	if (pbBmHdr == nullptr)
+	{
+		if (pcsMsg != nullptr)
+			*pcsMsg = "Failed to lock memory";
+		return FALSE;
+	}
 
 	switch (pbBmHdr->biBitCount)
 	{
 		case 1:
-			nCTEntries = 2; //Monochrome
+			nCTEntries = 2; // Monochrome
 			break;
 
 		case 4:
-			nCTEntries = 16; //16-color
+			nCTEntries = 16; // 16-color
 			break;
 
 		case 8:
-			nCTEntries = 256; //256-color
+			nCTEntries = 256; // 256-color
 			break;
 
 		case 16:
 		case 24:
 		case 32:
-			nCTEntries = 0; //No color table needed
+			nCTEntries = 0; // No color table needed
 			break;
 
 		default:
@@ -1540,8 +950,8 @@ BOOL CJpegFile::DibToSamps(HANDLE hDib, int nSampsPerRow, jpeg_compress_struct c
 	}
 
 	//Point to the color table and pixels
-	uintptr_t dwCTab = (uintptr_t) pbBmHdr + pbBmHdr->biSize;
-	LPRGBQUAD pCTab  = (LPRGBQUAD) (dwCTab);
+	LPRGBQUAD pCTab = reinterpret_cast<RGBQUAD*>(
+		reinterpret_cast<char*>(pbBmHdr) + pbBmHdr->biSize);
 	LPSTR lpBits = (LPSTR) pbBmHdr + (WORD) pbBmHdr->biSize + (WORD) (nCTEntries * sizeof(RGBQUAD));
 
 	//Different formats for the image bits
@@ -1600,8 +1010,15 @@ BOOL CJpegFile::DibToSamps(HANDLE hDib, int nSampsPerRow, jpeg_compress_struct c
 
 					for (n = 0; n < nNibbles; n++)
 					{
-						bytCTEnt              = lpPixels[nByte] << (n * 4);
-						bytCTEnt              = bytCTEnt >> (4 - (n * 4));
+						bytCTEnt  = lpPixels[nByte] << (n * 4);
+						// bytCTEnt = bytCTEnt >> (4 - (n * 4));
+
+						int shift = 4 - (n * 4);
+						if (shift >= 0)
+							bytCTEnt = static_cast<uint8_t>(bytCTEnt >> shift);
+						else
+							bytCTEnt = static_cast<uint8_t>(bytCTEnt << -shift);
+
 						jsmpPixels[r][q + 0]  = pCTab[bytCTEnt].rgbRed;
 						jsmpPixels[r][q + 1]  = pCTab[bytCTEnt].rgbGreen;
 						jsmpPixels[r][q + 2]  = pCTab[bytCTEnt].rgbBlue;
@@ -1688,7 +1105,7 @@ BOOL CJpegFile::DibToSamps(HANDLE hDib, int nSampsPerRow, jpeg_compress_struct c
 
 BOOL CJpegFile::JpegFromDib(HANDLE hDib, // Handle to DIB
 	int nQuality,                        // JPEG quality (0-100)
-	std::string csJpeg,                  // Pathname to jpeg file
+	const std::string& csJpeg,           // Pathname to jpeg file
 	const char** pcsMsg)                 // Error msg to return
 {
 	// Basic sanity checks...
@@ -1704,18 +1121,23 @@ BOOL CJpegFile::JpegFromDib(HANDLE hDib, // Handle to DIB
 		*pcsMsg = "";
 
 	LPBITMAPINFOHEADER lpbi = (LPBITMAPINFOHEADER) GlobalLock(hDib);
+	if (lpbi == nullptr)
+	{
+		if (pcsMsg != nullptr)
+			*pcsMsg = "Failed to lock memory";
 
-	byte* buf2              = 0;
+		return FALSE;
+	}
 
-	//Use libjpeg functions to write scanlines to disk in JPEG format
+	// Use libjpeg functions to write scanlines to disk in JPEG format
 	struct jpeg_compress_struct cinfo;
 	struct jpeg_error_mgr jerr;
 
-	FILE* pOutFile;                    //Target file
-	int nSampsPerRow;                  //Physical row width in image buffer
-	JSAMPARRAY jsmpArray;              //Pixel RGB buffer for JPEG file
+	FILE* pOutFile       = nullptr;               // Target file
+	int nSampsPerRow     = 0;                     // Physical row width in image buffer
+	JSAMPARRAY jsmpArray = nullptr;               // Pixel RGB buffer for JPEG file
 
-	cinfo.err = jpeg_std_error(&jerr); //Use default error handling (ugly!)
+	cinfo.err            = jpeg_std_error(&jerr); // Use default error handling (ugly!)
 
 	jpeg_create_compress(&cinfo);
 
@@ -1760,7 +1182,7 @@ BOOL CJpegFile::JpegFromDib(HANDLE hDib, // Handle to DIB
 
 	GlobalUnlock(hDib);
 
-	BOOL convertedSamples = DibToSamps(hDib, nSampsPerRow, cinfo, jsmpArray, pcsMsg);
+	BOOL convertedSamples = DibToSamps(hDib, nSampsPerRow, jsmpArray, pcsMsg);
 	if (convertedSamples)
 	{
 		// Write the array of scan lines to the JPEG file
@@ -1778,14 +1200,14 @@ BOOL CJpegFile::JpegFromDib(HANDLE hDib, // Handle to DIB
 
 BOOL CJpegFile::EncryptJPEG(HANDLE hDib, // Handle to DIB
 	int nQuality,                        // JPEG quality (0-100)
-	std::string csJpeg,                  // Pathname to jpeg file
+	const std::string& csJpeg,           // Pathname to jpeg file
 	const char** pcsMsg)                 // Error msg to return
 {
 	if (!JpegFromDib(hDib, nQuality, csJpeg, pcsMsg))
 		return FALSE;
 
-	uint8_t* data_byte;
-	size_t encrypt_len, i;
+	uint8_t* data_byte = nullptr;
+	size_t encrypt_len = 0, i = 0;
 	FILE* fileHandle = nullptr;
 
 	// JPEG 파일 읽어오기
@@ -1853,13 +1275,13 @@ BOOL CJpegFile::EncryptJPEG(HANDLE hDib, // Handle to DIB
 	return TRUE;
 }
 
-BOOL CJpegFile::DecryptJPEG(std::string csJpeg)
+BOOL CJpegFile::DecryptJPEG(const std::string& csJpeg)
 {
-	char szTempName[MAX_PATH] = {};
+	char szTempName[MAX_PATH] {};
 	std::string szDstpath;
-	uint8_t *dst_data, *src_data;
-	size_t jpegLen, kscLen;
-	size_t i, j;
+	uint8_t *dst_data = nullptr, *src_data = nullptr;
+	size_t jpegLen = 0, kscLen = 0;
+	size_t i = 0, j = 0;
 
 	size_t rfv = csJpeg.rfind('\\');
 	szDstpath  = csJpeg;
@@ -1961,12 +1383,12 @@ BOOL CJpegFile::DecryptJPEG(std::string csJpeg)
 	return TRUE;
 }
 
-BOOL CJpegFile::SaveFromDecryptToJpeg(std::string csKsc, std::string csJpeg)
+BOOL CJpegFile::SaveFromDecryptToJpeg(const std::string& csKsc, const std::string& csJpeg)
 {
-	FILE* kscHandle  = nullptr;
-	FILE* jpegHandle = nullptr;
-	uint8_t *dst_data, *src_data;
-	size_t i, j;
+	FILE* kscHandle   = nullptr;
+	FILE* jpegHandle  = nullptr;
+	uint8_t *dst_data = nullptr, *src_data = nullptr;
+	size_t i = 0, j = 0;
 
 #ifdef _MSC_VER
 	fopen_s(&kscHandle, csKsc.c_str(), "rb");

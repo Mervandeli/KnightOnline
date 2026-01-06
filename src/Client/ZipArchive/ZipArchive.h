@@ -122,11 +122,9 @@
 #if !defined(AFX_ZIPARCHIVE_H__A7F528A6_1872_4071_BE66_D56CC2DDE0E6__INCLUDED_)
 #define AFX_ZIPARCHIVE_H__A7F528A6_1872_4071_BE66_D56CC2DDE0E6__INCLUDED_
 
-#include "ZipStorage.h"      // Added by ClassView
-#if _MSC_VER > 1000
 #pragma once
-#endif                       // _MSC_VER > 1000
 
+#include "ZipStorage.h"      // Added by ClassView
 #include "ZipException.h"
 #include "ZipCentralDir.h"   // Added by ClassView
 #include "ZipInternalInfo.h" // Added by ClassView

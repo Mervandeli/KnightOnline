@@ -852,27 +852,27 @@ void OperationMessage::OffPermanent()
 	_main->m_bPermanentChatMode = false;
 	_main->m_bPermanentChatFlag = false;
 
-	char sendBuff[1024]         = {};
-	int sendIndex               = 0;
+	char sendBuffer[1024] {};
+	int sendIndex = 0;
 
-	SetByte(sendBuff, WIZ_CHAT, sendIndex);
-	SetByte(sendBuff, END_PERMANENT_CHAT, sendIndex);
+	SetByte(sendBuffer, WIZ_CHAT, sendIndex);
+	SetByte(sendBuffer, END_PERMANENT_CHAT, sendIndex);
 
-	SetByte(sendBuff, 0x01, sendIndex); // nation
-	SetShort(sendBuff, -1, sendIndex);  // sid
-	SetByte(sendBuff, 0, sendIndex);    // sender name length
-	SetString2(sendBuff, "", sendIndex);
-	_main->Send_All(sendBuff, sendIndex);
+	SetByte(sendBuffer, 0x01, sendIndex); // nation
+	SetShort(sendBuffer, -1, sendIndex);  // sid
+	SetByte(sendBuffer, 0, sendIndex);    // sender name length
+	SetString2(sendBuffer, "", sendIndex);
+	_main->Send_All(sendBuffer, sendIndex);
 
 	sendIndex = 0;
-	memset(sendBuff, 0, 1024);
-	SetByte(sendBuff, STS_CHAT, sendIndex);
-	SetString2(sendBuff, _command, sendIndex);
+	memset(sendBuffer, 0, 1024);
+	SetByte(sendBuffer, STS_CHAT, sendIndex);
+	SetString2(sendBuffer, _command, sendIndex);
 
 	for (const auto& [_, pInfo] : _main->m_ServerArray)
 	{
 		if (pInfo != nullptr && pInfo->sServerNo != _main->m_nServerNo)
-			_main->m_pUdpSocket->SendUDPPacket(pInfo->strServerIP, sendBuff, sendIndex);
+			_main->m_pUdpSocket->SendUDPPacket(pInfo->strServerIP, sendBuffer, sendIndex);
 	}
 }
 

@@ -44,35 +44,35 @@ TEST_F(Vector3Test, ConstructFromFloats_MatchesReference)
 
 TEST_F(Vector3Test, ConstructFromVector3_MatchesReference)
 {
-	const __Vector3 initialisedVector(1.0f, 2.0f, 3.0f);
+	const __Vector3 expectedVec(1.0f, 2.0f, 3.0f);
 
 	SCOPED_TRACE("__Vector3::__Vector3(const __Vector3&)");
 
-	__Vector3 vec(initialisedVector);
-	ExpectVector3Near(vec, initialisedVector);
+	__Vector3 vec(expectedVec);
+	ExpectVector3Near(vec, expectedVec);
 }
 
 TEST_F(Vector3Test, Normalize_Self_MatchesReference)
 {
-	const __Vector3 expectedVector = { 0.218217880f, 0.436435759f, 0.872871518f };
+	const __Vector3 expectedVec = { 0.218217880f, 0.436435759f, 0.872871518f };
 
 	SCOPED_TRACE("__Vector3::Normalize()");
 
 	__Vector3 vec = { 64.0f, 128.0f, 256.0f };
 	vec.Normalize();
-	ExpectVector3Near(vec, expectedVector);
+	ExpectVector3Near(vec, expectedVec);
 }
 
 TEST_F(Vector3Test, Normalize_Vector3_MatchesReference)
 {
-	const __Vector3 expectedVector = { 0.218217880f, 0.436435759f, 0.872871518f };
+	const __Vector3 expectedVec = { 0.218217880f, 0.436435759f, 0.872871518f };
 
 	SCOPED_TRACE("__Vector3::Normalize(const __Vector3&)");
 
 	__Vector3 inputVec = { 64.0f, 128.0f, 256.0f };
-	__Vector3 vec      = {};
+	__Vector3 vec {};
 	vec.Normalize(inputVec);
-	ExpectVector3Near(vec, expectedVector);
+	ExpectVector3Near(vec, expectedVec);
 }
 
 TEST_F(Vector3Test, Magnitude_MatchesReference)
@@ -143,24 +143,24 @@ TEST_F(Vector3Test, Zero_ClearsAllComponents)
 
 TEST_F(Vector3Test, Set_Floats_MatchesReference)
 {
-	const __Vector3 expectedVector = { 64.0f, 128.0f, 256.0f };
+	const __Vector3 expectedVec = { 64.0f, 128.0f, 256.0f };
 
 	SCOPED_TRACE("__Vector3::Set(float, float, float)");
 
 	__Vector3 vec;
 	vec.Set(64.0f, 128.0f, 256.0f);
-	ExpectVector3Near(vec, expectedVector);
+	ExpectVector3Near(vec, expectedVec);
 }
 
 TEST_F(Vector3Test, Assign_Vector3_MatchesReference)
 {
-	const __Vector3 expectedVector = { 64.0f, 128.0f, 256.0f };
+	const __Vector3 expectedVec = { 64.0f, 128.0f, 256.0f };
 
 	SCOPED_TRACE("__Vector3::operator=(const __Vector3&)");
 
 	__Vector3 vec;
-	vec = expectedVector;
-	ExpectVector3Near(vec, expectedVector);
+	vec = expectedVec;
+	ExpectVector3Near(vec, expectedVec);
 }
 
 TEST_F(Vector3Test, Multiply_Matrix_MatchesReferenceWithinTolerance)

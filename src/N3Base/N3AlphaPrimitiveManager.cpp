@@ -6,15 +6,6 @@
 #include "N3AlphaPrimitiveManager.h"
 #include "N3Base.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3AlphaPrimitiveManager::CN3AlphaPrimitiveManager()
 {
 	m_nToDrawCount = 0;
@@ -30,10 +21,10 @@ void CN3AlphaPrimitiveManager::Render()
 	if (m_nToDrawCount <= 0)
 		return;
 
-	static __AlphaPrimitive* pBuffs[MAX_ALPHAPRIMITIVE_BUFFER];
+	static __AlphaPrimitive* pBuffs[MAX_ALPHAPRIMITIVE_BUFFER] {};
 	for (int i = 0; i < m_nToDrawCount; i++)
-		pBuffs[i] = &(m_Buffers[i]);
-	qsort(pBuffs, m_nToDrawCount, sizeof(__AlphaPrimitive*),
+		pBuffs[i] = &m_Buffers[i];
+	qsort(&pBuffs, m_nToDrawCount, sizeof(__AlphaPrimitive*),
 		SortByCameraDistance); // 버퍼에 쌓인 프리미티브대로 정렬하고..
 
 	struct __RenderState

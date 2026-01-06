@@ -92,8 +92,8 @@ void CN3CEView::OnDraw(CDC* pDC)
 		return;                           // 읽는 도중에는 렌더링하지 않는다...
 
 	float fFrm = pDoc->m_Scene.m_fFrmCur; // 일부러 프레임을 컨트롤 하려고 이렇게 해놓았다..
-	pDoc->m_Scene.TickCameras(fFrm);      // 카메라만 Tick
-	pDoc->m_Scene.TickLights(fFrm);
+	pDoc->m_Scene.TickCameras();          // 카메라만 Tick
+	pDoc->m_Scene.TickLights();
 
 	CMainFrame* pFrm = (CMainFrame*) AfxGetMainWnd();
 	pFrm->m_Eng.Clear(0xff606060);
@@ -114,7 +114,7 @@ void CN3CEView::OnDraw(CDC* pDC)
 		return;
 	}
 
-	DWORD dwAlphaBlend, dwAlphaOP, dwAlphaArg1;
+	DWORD dwAlphaBlend = 0, dwAlphaOP = 0, dwAlphaArg1 = 0;
 	if (m_bRenderOptionXRay) // 반투명 옵션이 켜져 있으면..
 	{
 		// backup state

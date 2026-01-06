@@ -5,20 +5,12 @@
 #include "StdAfxBase.h"
 #include "N3GlobalEffect.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3GlobalEffect::CN3GlobalEffect()
 {
+	m_dwEffectType = 0;
 	m_pVB          = nullptr;
 	m_pIB          = nullptr;
-	m_bActive      = FALSE;
+	m_bActive      = false;
 	m_iVC          = 0;
 	m_iIC          = 0;
 	m_fFadeTime    = 0.0f; // 이시간 동안 차차 목표한 양만큼 파티클의 수가 늘어난다..
@@ -52,7 +44,7 @@ void CN3GlobalEffect::Release()
 		m_pIB->Release();
 		m_pIB = nullptr;
 	}
-	m_bActive      = FALSE;
+	m_bActive      = false;
 	m_iVC          = 0;
 	m_iIC          = 0;
 	m_fFadeTime    = 0.0f; // 이시간 동안 차차 목표한 양만큼 파티클의 수가 늘어난다..

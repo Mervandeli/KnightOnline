@@ -16,6 +16,7 @@ public:
 	void NewsReq();
 	void SendDownloadInfo(int version);
 	void LogInReq(char* pBuf);
+	void SendAuthNotFound();
 };
 
 #endif // SERVER_VERSIONMANAGER_USER_H

@@ -10,15 +10,6 @@
 #include "N3SndMgr.h"
 #include "N3SndObj.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3UIStatic::CN3UIStatic()
 {
 	m_eType       = UI_TYPE_STATIC;
@@ -30,26 +21,17 @@ CN3UIStatic::CN3UIStatic()
 
 CN3UIStatic::~CN3UIStatic()
 {
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Click);
+	s_SndMgr.ReleaseObj(&m_pSnd_Click);
 }
 
 void CN3UIStatic::Release()
 {
 	CN3UIBase::Release();
+
 	m_pBuffOutRef = nullptr;
 	m_pImageBkGnd = nullptr;
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Click);
+	s_SndMgr.ReleaseObj(&m_pSnd_Click);
 }
-
-//void CN3UIStatic::Render()
-//{
-//	if (!m_bVisible) return;
-//
-//	CN3UIBase::Render();
-//
-////	if (m_pImageBkGnd) m_pImageBkGnd->Render();
-////	if (m_pBuffOutRef) m_pBuffOutRef->Render();
-//}
 
 void CN3UIStatic::SetRegion(const RECT& Rect)
 {
@@ -90,10 +72,10 @@ bool CN3UIStatic::Load(File& file)
 
 const std::string& CN3UIStatic::GetString()
 {
-	if (m_pBuffOutRef)
+	if (m_pBuffOutRef != nullptr)
 		return m_pBuffOutRef->GetString();
-	else
-		return s_szStringTmp;
+
+	return s_szStringTmp;
 }
 
 void CN3UIStatic::SetString(const std::string& szString)
@@ -124,16 +106,18 @@ uint32_t CN3UIStatic::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POIN
 }
 
 #ifdef _N3TOOL
-void CN3UIStatic::operator=(const CN3UIStatic& other)
+CN3UIStatic& CN3UIStatic::operator=(const CN3UIStatic& other)
 {
+	if (this == &other)
+		return *this;
+
 	CN3UIBase::operator=(other);
 
 	SetSndClick(other.GetSndFName_Click());
 
 	// m_pImageBkGnd,  m_pBuffOutRef 설정하기
-	for (UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
+	for (CN3UIBase* pChild : m_Children)
 	{
-		CN3UIBase* pChild = (*itor);
 		if (UI_TYPE_IMAGE == pChild->UIType())
 		{
 			m_pImageBkGnd = (CN3UIImage*) pChild;
@@ -143,6 +127,8 @@ void CN3UIStatic::operator=(const CN3UIStatic& other)
 			m_pBuffOutRef = (CN3UIString*) pChild;
 		}
 	}
+
+	return *this;
 }
 
 bool CN3UIStatic::Save(File& file)
@@ -172,17 +158,14 @@ void CN3UIStatic::CreateImageAndString()
 
 void CN3UIStatic::DeleteImage()
 {
-	if (m_pImageBkGnd)
-	{
-		delete m_pImageBkGnd;
-		m_pImageBkGnd = nullptr;
-	}
+	delete m_pImageBkGnd;
+	m_pImageBkGnd = nullptr;
 }
 
 void CN3UIStatic::SetSndClick(const std::string& strFileName)
 {
-	CN3Base::s_SndMgr.ReleaseObj(&m_pSnd_Click);
-	if (0 == strFileName.size())
+	s_SndMgr.ReleaseObj(&m_pSnd_Click);
+	if (strFileName.empty())
 		return;
 
 	CN3BaseFileAccess tmpBase;

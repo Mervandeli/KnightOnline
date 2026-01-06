@@ -82,7 +82,7 @@ int CDBProcess::AccountLogin(const char* accountId, const char* password)
 		if (!recordSet.next())
 			return AUTH_NOT_FOUND;
 
-		model::TbUser user = {};
+		model::TbUser user {};
 		recordSet.get_ref(user);
 
 		if (user.Password != password)

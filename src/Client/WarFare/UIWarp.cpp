@@ -12,16 +12,6 @@
 #include <N3Base/N3UIString.h>
 #include <N3Base/N3UIList.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIWarp::CUIWarp()
 {
 	m_pBtn_Ok         = nullptr;
@@ -76,9 +66,9 @@ bool CUIWarp::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 	return true;
 }
 
-void CUIWarp::InfoAdd(const __WarpInfo& WI)
+void CUIWarp::InfoAdd(__WarpInfo&& WI)
 {
-	m_ListInfos.push_back(WI);
+	m_ListInfos.push_back(std::move(WI));
 }
 
 bool CUIWarp::InfoGetCur(__WarpInfo& WI)
@@ -149,9 +139,13 @@ bool CUIWarp::OnKeyPress(int iKey)
 		case DIK_ESCAPE:
 			ReceiveMessage(m_pBtn_Cancel, UIMSG_BUTTON_CLICK);
 			return true;
+
 		case DIK_RETURN:
 			ReceiveMessage(m_pBtn_Ok, UIMSG_BUTTON_CLICK);
 			return true;
+
+		default:
+			break;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

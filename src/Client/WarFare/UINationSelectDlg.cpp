@@ -6,23 +6,22 @@
 #include "UINationSelectDlg.h"
 #include "GameProcNationSelect.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUINationSelectDlg::CUINationSelectDlg()
 {
 	m_pProcNationSelectRef = nullptr;
+	m_pBtnKarus            = nullptr;
+	m_pBtnElmorad          = nullptr;
+	m_pBtnBack             = nullptr;
 }
 
 CUINationSelectDlg::~CUINationSelectDlg()
 {
+}
+
+void CUINationSelectDlg::Release()
+{
+	CN3UIBase::Release();
+
 	m_pBtnKarus   = nullptr;
 	m_pBtnElmorad = nullptr;
 	m_pBtnBack    = nullptr;

@@ -4,15 +4,6 @@
 #include "StdAfxBase.h"
 #include "N3AnimControl.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3AnimControl::CN3AnimControl()
 {
 	m_dwType |= OBJ_ANIM_CONTROL;

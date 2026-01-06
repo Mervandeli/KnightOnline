@@ -9,14 +9,7 @@
 #include "N3FXDef.h"
 #include "N3FXShape.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+#include <shared/StringUtils.h>
 
 CN3FXPartParticles::CN3FXPartParticles()
 {
@@ -29,13 +22,10 @@ CN3FXPartParticles::CN3FXPartParticles()
 	m_pair_fParticleLife.first  = 0.0f;
 	m_pair_fParticleLife.second = 0.0f;
 
-	m_pVBList_Alive.clear();
-	m_pVBList_Dead.clear();
+	m_CurrCreateDelay           = 0.0f;
+	m_fCreateDelay              = 0.01f;
 
-	m_CurrCreateDelay = 0.0f;
-	m_fCreateDelay    = 0.01f;
-
-	m_iNumCreate      = 1;
+	m_iNumCreate                = 1;
 
 	m_MinCreateRange.Set(0, 0, 0);
 	m_MaxCreateRange.Set(0, 0, 0);
@@ -54,14 +44,13 @@ CN3FXPartParticles::CN3FXPartParticles()
 
 	//emitter...
 	m_dwEmitType = FX_PART_PARTICLE_EMIT_TYPE_NORMAL;
-	ZeroMemory(&m_uEmitCon, sizeof(m_uEmitCon));
+	memset(&m_uEmitCon, 0, sizeof(m_uEmitCon));
 
 	//particle..
 	m_vPtEmitDir.Set(0.0f, 0.0f, -1.0f);
 	m_fPtVelocity = m_fPtAccel = m_fPtRotVelocity = m_fPtGravity = 0.0f;
 
-	int i;
-	for (i = 0; i < NUM_KEY_COLOR; i++)
+	for (int i = 0; i < NUM_KEY_COLOR; i++)
 		m_dwChangeColor[i] = 0xffffffff;
 	m_bChangeColor = false;
 
@@ -79,12 +68,24 @@ CN3FXPartParticles::CN3FXPartParticles()
 	m_fScaleVelX = m_fScaleVelY = 0.0f;
 
 #ifdef _N3TOOL
-	for (i = 0; i < NUM_KEY_COLOR; i++)
+	for (int i = 0; i < NUM_KEY_COLOR; i++)
 	{
 		m_bChangeColorKey[i] = false;
 		m_bChangeAlphaKey[i] = false;
 	}
 #endif // end of _N3TOOL
+
+	m_vEmitterDir = {};
+	m_vShapePos   = {};
+
+	m_mtxVI.Identity();
+
+	m_bDistanceNumFix           = false;
+	m_bParticleYAxisFix         = false;
+	m_bParticle_Not_Rotate      = false;
+	m_vParticle_Not_Rotate_Axis = {};
+	m_fPtRangeMin               = 0.0f;
+	m_fPtRangeMax               = 0.0f;
 }
 
 CN3FXPartParticles::~CN3FXPartParticles()
@@ -290,8 +291,8 @@ bool CN3FXPartParticles::ParseScript(
 		if (lstrcmpi(szBuff0, "") == 0)
 			return false;
 
-		char szPath[MAX_PATH] = {};
-		strcpy(szPath, szBuff0);
+		char szPath[MAX_PATH] {};
+		strcpy_safe(szPath, szBuff0);
 
 		m_pShape    = new CN3FXShape();
 		m_pRefShape = s_MngFXShape.Get(szPath);
@@ -398,7 +399,7 @@ bool CN3FXPartParticles::Load(File& file)
 
 	if (m_iVersion < 4)
 	{
-		float ParticleSize;
+		float ParticleSize = 0.0f;
 		file.Read(&ParticleSize, sizeof(float));
 		m_pair_fParticleSize.first = m_pair_fParticleSize.second = ParticleSize;
 	}
@@ -449,7 +450,7 @@ bool CN3FXPartParticles::Load(File& file)
 	{
 		file.Read(&m_fMeshFPS, sizeof(float));
 
-		char szShapeFileName[_MAX_PATH] = {};
+		char szShapeFileName[_MAX_PATH] {};
 		file.Read(szShapeFileName, _MAX_PATH);
 
 		delete m_pShape;
@@ -499,7 +500,7 @@ bool CN3FXPartParticles::Load(File& file)
 #if defined(_DEBUG)
 	if (m_iVersion > SUPPORTED_PART_VERSION)
 	{
-		TRACE("!!! WARNING: CN3FXPartParticles::Load(%s) encountered version %d (base version %d). "
+		TRACE("!!! WARNING: CN3FXPartParticles::Load({}) encountered version {} (base version {}). "
 			  "Needs support!",
 			m_pRefBundle != nullptr ? m_pRefBundle->FileName().c_str() : "<unknown>", m_iVersion,
 			m_iBaseVersion);
@@ -565,8 +566,8 @@ bool CN3FXPartParticles::Save(File& file)
 	{
 		file.Write(&m_fMeshFPS, sizeof(float));
 
-		char szShapeFileName[_MAX_PATH];
-		strcpy(szShapeFileName, m_pRefShape->FileName().c_str());
+		char szShapeFileName[_MAX_PATH] {};
+		strcpy_safe(szShapeFileName, m_pRefShape->FileName().c_str());
 		file.Write(szShapeFileName, _MAX_PATH);
 	}
 
@@ -601,6 +602,9 @@ bool CN3FXPartParticles::Tick()
 	if (!CN3FXPartBase::Tick())
 		return false;
 
+	if (m_pRefBundle == nullptr)
+		return false;
+
 #ifndef _N3TOOL
 	float fDist = (s_CameraData.vEye - m_pRefBundle->m_vPos).Magnitude();
 
@@ -627,7 +631,7 @@ bool CN3FXPartParticles::Tick()
 		int share   = (int) (fFrm / m_pShape->GetWholeFrm());
 		fFrm       -= ((float) share * m_pShape->GetWholeFrm());
 		m_pShape->SetCurrFrm(fFrm);
-		//TRACE("Frm: %3.2f life: %3.2f\n", fFrm, m_fCurrLife);
+		//TRACE("Frm: {:3.2f} life: {:3.2f}", fFrm, m_fCurrLife);
 
 		m_pShape->m_mtxParent.Identity();
 		Rotate();
@@ -699,6 +703,9 @@ void CN3FXPartParticles::Move()
 //
 void CN3FXPartParticles::Scaling()
 {
+	if (m_pRefBundle == nullptr)
+		return;
+
 	__Vector3 vScale;
 	vScale.Set(1.0f, 1.0f, 1.0f);
 
@@ -738,10 +745,8 @@ void CN3FXPartParticles::Render()
 				continue;
 
 			__AlphaPrimitive* pAP = s_AlphaMgr.Add();
-			if (pAP)
+			if (pAP != nullptr)
 			{
-				//for(int i=0;i<6;i++) m_pIB[i] = m_wUnitIB[i];
-
 				pAP->bUseVB          = FALSE;
 				pAP->dwBlendDest     = m_dwDestBlend;
 				pAP->dwBlendSrc      = m_dwSrcBlend;
@@ -755,9 +760,7 @@ void CN3FXPartParticles::Render()
 				else
 					pAP->lpTex = nullptr;
 
-				__Matrix44 mtxWorld;
-				mtxWorld.Identity();
-				pAP->MtxWorld        = mtxWorld;
+				pAP->MtxWorld        = __Matrix44::GetIdentity();
 				pAP->nRenderFlags    = m_dwRenderFlag; // | RF_UV_CLAMP;
 				pAP->ePrimitiveType  = D3DPT_TRIANGLEFAN;
 				pAP->nPrimitiveCount = 2;
@@ -794,7 +797,7 @@ void CN3FXPartParticles::Render()
 	s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
 	s_lpD3DDev->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
 
-	DWORD dwCullMode, dwZWriteEnable, dwZBufferEnable, dwLight, dwAlpha;
+	DWORD dwCullMode = 0, dwZWriteEnable = 0, dwZBufferEnable = 0, dwLight = 0, dwAlpha = 0;
 	s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
 	s_lpD3DDev->GetRenderState(D3DRS_ZWRITEENABLE, &dwZWriteEnable);
 	s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &dwZBufferEnable);
@@ -828,8 +831,7 @@ void CN3FXPartParticles::Render()
 
 		//for(int i=0;i<6;i++) m_pIB[i] = pParticle->m_iID + m_wUnitIB[i];
 
-		HRESULT hr;
-		hr = CN3Base::s_lpD3DDev->DrawPrimitiveUP(
+		CN3Base::s_lpD3DDev->DrawPrimitiveUP(
 			D3DPT_TRIANGLEFAN, 2, pParticle->m_pVB, sizeof(__VertexXyzColorT1));
 		//hr = CN3Base::s_lpD3DDev->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 4, 2, m_pIB, D3DFMT_INDEX16, m_pVB, sizeof(__VertexXyzColorT1));
 	}
@@ -849,7 +851,8 @@ void CN3FXPartParticles::Render()
 	//CN3Base::s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ADDRESSV, dwTAddrV );
 }
 
-float CN3FXPartParticles::CameraDist(__Vector3 v1, __Vector3 v2, __Vector3 v3)
+float CN3FXPartParticles::CameraDist(
+	const __VertexXyzColorT1& v1, const __VertexXyzColorT1& v2, const __VertexXyzColorT1& v3) const
 {
 	__Vector3 vA = v1 - v3;
 	__Vector3 vB = v2 - v3;
@@ -862,98 +865,6 @@ float CN3FXPartParticles::CameraDist(__Vector3 v1, __Vector3 v2, __Vector3 v3)
 	return (
 		vN.x * s_CameraData.vEye.x + vN.y * s_CameraData.vEye.y + vN.z * s_CameraData.vEye.z + D);
 }
-
-/*
-void CN3FXPartParticles::Render()
-{
-	if(m_pVBList_Alive.size()==0) return;
-
-	m_mtxVI = s_CameraData.mtxViewInverse;
-	m_mtxVI.PosSet(0,0,0);
-
-	CN3Base::s_lpD3DDev->SetFVF(FVF_XYZCOLORT1);
-
-	//uint32_t dwZWriteEnable;
-	//CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ZWRITEENABLE, &dwZWriteEnable);
-	//s_lpD3DDev->SetRenderState( D3DRS_ZWRITEENABLE, FALSE);
-
-	s_lpD3DDev->SetRenderState( D3DRS_ALPHABLENDENABLE, m_bAlpha );
-	s_lpD3DDev->SetRenderState( D3DRS_SRCBLEND, m_dwSrcBlend );
-    s_lpD3DDev->SetRenderState( D3DRS_DESTBLEND, m_dwDestBlend );
-
-	uint32_t dwTAddrU, dwTAddrV;
-	s_lpD3DDev->GetTextureStageState( 0, D3DTSS_ADDRESSU, &dwTAddrU );
-	s_lpD3DDev->GetTextureStageState( 0, D3DTSS_ADDRESSV, &dwTAddrV );
-
-	s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP );
-	s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP );
-	
-	s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
-	s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );		
-	s_lpD3DDev->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
-
-	s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE );
-	s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );		
-	s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
-
-	s_lpD3DDev->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_DISABLE );
-	s_lpD3DDev->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
-
-	if(!m_pNumTex)
-	{
-		m_pNumTex = new int[m_iNumTex];
-		for(int i=0;i<m_iNumTex;i++) m_pNumTex[i] = 0;
-	}
-	
-	//
-	////////////////////////////////////////////////////////////////////////////////////
-	//ParticleGreater pg;
-	//m_pVBList_Alive.sort(pg);
-	// 이거이 안되서 안에 있는 루틴 그대로 베껴서 PSort()함수 만들었엉...ㅠ.ㅠ;;
-	PSort();
-
-	std::list<CN3FXParticle*>::iterator it;
-	it = m_pVBList_Alive.begin();
-	int idx = 0;
-	int VBIdx;
-	for(;it!=m_pVBList_Alive.end();it++,idx++)
-	{
-		VBIdx = idx*NUM_VERTEX_PARTICLE;
-		CN3FXParticle* pParticle = (*it);
-
-		m_pVB[VBIdx] = ((m_vUnit[0] * pParticle->m_fSize) * m_mtxVI) + pParticle->m_vWdPos;
-		m_pVB[VBIdx].color = pParticle->m_dwColor;
-		m_pVB[VBIdx+1] = ((m_vUnit[1] * pParticle->m_fSize) * m_mtxVI) + pParticle->m_vWdPos;
-		m_pVB[VBIdx+1].color = pParticle->m_dwColor;
-		m_pVB[VBIdx+2] = ((m_vUnit[2] * pParticle->m_fSize) * m_mtxVI) + pParticle->m_vWdPos;
-		m_pVB[VBIdx+2].color = pParticle->m_dwColor;
-				
-		m_pNumTex[pParticle->m_iTexIdx]++;		
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////
-	//
-
-	VBIdx = 0;
-	for(int TexIdx=0;TexIdx<m_iNumTex;TexIdx++)
-	{
-		if(m_pNumTex[TexIdx]==0) continue;
-
-		if(m_ppRefTex[TexIdx]) CN3Base::s_lpD3DDev->SetTexture(0, m_ppRefTex[TexIdx]->Get());
-		else
-			CN3Base::s_lpD3DDev->SetTexture(0, nullptr);
-
-		HRESULT hr;
-		hr = CN3Base::s_lpD3DDev->DrawPrimitiveUP( D3DPT_TRIANGLELIST, m_pNumTex[TexIdx], &(m_pVB[VBIdx]), sizeof(__VertexXyzColorT1));
-		VBIdx += (m_pNumTex[TexIdx]*NUM_VERTEX_PARTICLE);
-		m_pNumTex[TexIdx] = 0;
-	}
-
-	//CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ZWRITEENABLE, dwZWriteEnable);
-
-	CN3Base::s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ADDRESSU, dwTAddrU );
-	CN3Base::s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ADDRESSV, dwTAddrV );
-}
-*/
 
 //
 //
@@ -1015,6 +926,9 @@ std::list<CN3FXParticle*>::iterator CN3FXPartParticles::DestroyParticle(
 //
 void CN3FXPartParticles::CreateParticles_Spread()
 {
+	if (m_pRefBundle == nullptr)
+		return;
+
 	std::list<CN3FXParticle*>::iterator it;
 
 	for (int i = 0; i < m_iNumCreate; i++)
@@ -1028,12 +942,10 @@ void CN3FXPartParticles::CreateParticles_Spread()
 		__Vector3 vDir;
 		__Matrix44 RotMtx;
 
-		float fUnitAngleXZ;
+		float fUnitAngleXZ = 0.0f;
 		if (m_uEmitCon.fEmitAngle != 0)
 			fUnitAngleXZ = (float) (rand() % (int) m_uEmitCon.fEmitAngle)
 						   - (m_uEmitCon.fEmitAngle / 2.0f);
-		else
-			fUnitAngleXZ = 0.0f;
 
 		float fUnitAxisZ = (float) (rand() % 360);
 
@@ -1051,21 +963,18 @@ void CN3FXPartParticles::CreateParticles_Spread()
 		__Quaternion Qt;
 
 		//bundle의 방향 적용..
-		if (m_pRefBundle)
+		if (RotateQuaternion(v, m_pRefBundle->m_vDir, &Qt))
 		{
-			if (RotateQuaternion(v, m_pRefBundle->m_vDir, &Qt))
-			{
-				RotMtx    = Qt;
-				//vDir *= RotMtx;
-				vDirPart *= RotMtx;
-				//vDirEmit *=  RotMtx;
-			}
-			else if (Qt.w != 1.0f)
-			{
-				//vDir *= -1.0f;
-				vDirPart *= -1.0f;
-				//vDirEmit *= -1.0f;
-			}
+			RotMtx    = Qt;
+			//vDir *= RotMtx;
+			vDirPart *= RotMtx;
+			//vDirEmit *=  RotMtx;
+		}
+		else if (Qt.w != 1.0f)
+		{
+			//vDir *= -1.0f;
+			vDirPart *= -1.0f;
+			//vDirEmit *= -1.0f;
 		}
 
 		//part(emiiter)의 방향 적용
@@ -1107,7 +1016,7 @@ void CN3FXPartParticles::CreateParticles_Spread()
 		pParticle->m_vAxis     = vDirEmit;
 		pParticle->m_vVelocity = vDir * m_fPtVelocity;
 
-		if (m_pRefBundle && m_pRefBundle->m_bDependScale)
+		if (m_pRefBundle->m_bDependScale)
 		{
 			pParticle->m_fSize     *= m_pRefBundle->m_fTargetScale;
 
@@ -1207,6 +1116,9 @@ void CN3FXPartParticles::CreateParticles_Spread()
 //
 void CN3FXPartParticles::CreateParticles_Gather()
 {
+	if (m_pRefBundle == nullptr)
+		return;
+
 	std::list<CN3FXParticle*>::iterator it;
 
 	for (int i = 0; i < m_iNumCreate; i++)
@@ -1231,21 +1143,18 @@ void CN3FXPartParticles::CreateParticles_Gather()
 		__Quaternion Qt;
 
 		//bundle의 방향 적용..
-		if (m_pRefBundle)
+		if (RotateQuaternion(v, m_pRefBundle->m_vDir, &Qt))
 		{
-			if (RotateQuaternion(v, m_pRefBundle->m_vDir, &Qt))
-			{
-				RotMtx    = Qt;
-				//vDir *= RotMtx;
-				vDirPart *= RotMtx;
-				//vDirEmit *=  RotMtx;
-			}
-			else if (Qt.w != 1.0f)
-			{
-				//vDir *= -1.0f;
-				vDirPart *= -1.0f;
-				//vDirEmit *= -1.0f;
-			}
+			RotMtx    = Qt;
+			//vDir *= RotMtx;
+			vDirPart *= RotMtx;
+			//vDirEmit *=  RotMtx;
+		}
+		else if (Qt.w != 1.0f)
+		{
+			//vDir *= -1.0f;
+			vDirPart *= -1.0f;
+			//vDirEmit *= -1.0f;
 		}
 
 		//part(emiiter)의 방향 적용
@@ -1283,7 +1192,7 @@ void CN3FXPartParticles::CreateParticles_Gather()
 
 		pParticle->m_vAxis = vDirEmit;
 
-		if (m_pRefBundle && m_pRefBundle->m_bDependScale)
+		if (m_pRefBundle->m_bDependScale)
 		{
 			//pParticle->m_fSize *= m_pRefBundle->m_vTargetScale.x;
 			pParticle->m_fSize     *= m_pRefBundle->m_fTargetScale;
@@ -1486,7 +1395,7 @@ void CN3FXPartParticles::Duplicate(CN3FXPartParticles* pSrc)
 //
 //
 //
-bool CN3FXPartParticles::GetColor(int key, uint32_t& color)
+bool CN3FXPartParticles::GetColor(int key, uint32_t& color) const
 {
 	if (key < 0 || key >= NUM_KEY_COLOR)
 		return false;
@@ -1498,18 +1407,19 @@ bool CN3FXPartParticles::GetColor(int key, uint32_t& color)
 //
 // 두 방향 벡터가 있을때 하나의 방향벡터에서 다른 하나의 방향벡터로 회전하는 mtx구하기..
 //
-bool CN3FXPartParticles::RotateQuaternion(__Vector3 vSrcDir, __Vector3 vDestDir, __Quaternion* pQt)
+bool CN3FXPartParticles::RotateQuaternion(
+	const __Vector3& vSrcDir_, const __Vector3& vDestDir_, __Quaternion* pQt) const
 {
+	__Vector3 vSrcDir  = vSrcDir_;
+	__Vector3 vDestDir = vDestDir_;
+
 	vSrcDir.Normalize();
 	vDestDir.Normalize();
 
 	__Vector3 vDirAxis;
-	float fDirAng;
-
 	vDirAxis.Cross(vSrcDir, vDestDir);
 
-	fDirAng = acos(vSrcDir.Dot(vDestDir));
-
+	float fDirAng = acos(vSrcDir.Dot(vDestDir));
 	pQt->RotationAxis(vDirAxis, fDirAng);
 
 	if (vDirAxis.x == 0.0f && vDirAxis.y == 0.0f && vDirAxis.z == 0.0f)
@@ -1517,71 +1427,3 @@ bool CN3FXPartParticles::RotateQuaternion(__Vector3 vSrcDir, __Vector3 vDestDir,
 
 	return true;
 }
-
-//
-///////////////////////////////////////////////////////////////////////////////////////////////
-// related sort list...
-// list의 sort함수 베꼈당..-.-
-// 제대로 동작 안하더라..ㅠ.ㅠ
-//
-
-void CN3FXPartParticles::PSort()
-{
-	if (2 <= m_pVBList_Alive.size())
-	{
-		const size_t _MAXN = 15;
-		std::list<CN3FXParticle*> _X, _A[_MAXN + 1];
-		size_t _N = 0;
-		while (!m_pVBList_Alive.empty())
-		{
-			_X.splice(_X.begin(), m_pVBList_Alive, m_pVBList_Alive.begin());
-			size_t _I;
-			for (_I = 0; _I < _N && !_A[_I].empty(); ++_I)
-			{
-				PMerge(_A[_I], _X); //_A[_I].merge(_X, _Pr);
-				_A[_I].swap(_X);
-			}
-			if (_I == _MAXN)
-				PMerge(_A[_I], _X); // _A[_I].merge(_X, _Pr);
-			else
-			{
-				_A[_I].swap(_X);
-				if (_I == _N)
-					++_N;
-			}
-		}
-		while (0 < _N)
-			PMerge(m_pVBList_Alive, _A[--_N]); //m_pVBList_Alive.merge(_A[--_N], _Pr);
-	}
-}
-
-void CN3FXPartParticles::PMerge(std::list<CN3FXParticle*>& l1, std::list<CN3FXParticle*>& l2)
-{
-	if (&l1 != &l2)
-	{
-		std::list<CN3FXParticle*>::iterator _F1 = l1.begin(), _L1 = l1.end();
-		std::list<CN3FXParticle*>::iterator _F2 = l2.begin(), _L2 = l2.end();
-		while (_F1 != _L1 && _F2 != _L2)
-			if (PComp(*_F2, *_F1))
-			{
-				std::list<CN3FXParticle*>::iterator _Mid2 = _F2;
-				l1.splice(_F1, l2, _F2, ++_Mid2);
-				_F2 = _Mid2;
-			}
-			else
-				++_F1;
-		if (_F2 != _L2)
-			l1.splice(_L1, l2, _F2, _L2);
-	}
-}
-
-bool CN3FXPartParticles::PComp(CN3FXParticle* pP1, CN3FXParticle* pP2)
-{
-	if (pP1->m_iTexIdx < pP2->m_iTexIdx)
-		return true;
-	return false;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-

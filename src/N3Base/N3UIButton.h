@@ -5,41 +5,43 @@
 #if !defined(AFX_N3UIBUTTON_H__7A7B3E89_9D17_45E8_8405_87877F3E6FF0__INCLUDED_)
 #define AFX_N3UIBUTTON_H__7A7B3E89_9D17_45E8_8405_87877F3E6FF0__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3UIBase.h"
+
 class CN3UIImage;
 class CN3SndObj;
 class CN3UIButton : public CN3UIBase
 {
 public:
 	CN3UIButton();
-	virtual ~CN3UIButton();
+	~CN3UIButton() override;
 
 	// Attributes
 public:
-	enum eBTN_STATE
+	// button state
+	enum eBTN_STATE : uint8_t
 	{
 		BS_NORMAL = 0,
 		BS_DOWN,
 		BS_ON,
 		BS_DISABLE,
 		NUM_BTN_STATE
-	}; // button state
+	};
+
 	void SetClickRect(const RECT& Rect)
 	{
 		m_rcClick = Rect;
 	}
+
 	RECT GetClickRect() const
 	{
 		return m_rcClick;
 	}
 
 protected:
-	CN3UIImage* m_ImageRef
-		[NUM_BTN_STATE]; // 버튼의 각 상태별 image의 참조 포인터(참조인 이유는  children list로 관리하므로 참조만 한다.)
+	// 버튼의 각 상태별 image의 참조 포인터(참조인 이유는  children list로 관리하므로 참조만 한다.)
+	CN3UIImage* m_ImageRef[NUM_BTN_STATE];
 	RECT m_rcClick;          // click되는 영역
 
 	CN3SndObj* m_pSnd_On;    // 버튼 위에 마우스가 올라가는 순간 내는 소리
@@ -57,7 +59,7 @@ public:
 
 	// 툴에서 사용하기 위한 함수
 public:
-	virtual void operator=(const CN3UIButton& other);
+	CN3UIButton& operator=(const CN3UIButton& other);
 	void SetSndOn(const std::string& strFileName);
 	void SetSndClick(const std::string& strFileName);
 
@@ -67,6 +69,7 @@ public:
 #ifdef _N3TOOL
 	bool Save(File& file) override;
 	void CreateImages();
+
 	CN3UIImage* GetImageRef(eBTN_STATE eState) const
 	{
 		return m_ImageRef[eState];

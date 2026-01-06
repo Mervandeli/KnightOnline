@@ -7,42 +7,39 @@
 
 CN3Eng::CN3Eng()
 {
-	m_lpDD          = nullptr;
 	m_lpD3D         = nullptr;
 	s_lpD3DDev      = nullptr;
 	m_nModeActive   = -1;
 	m_nAdapterCount = 1;
 
-	memset(&m_DeviceInfo, 0x00, sizeof(__D3DDEV_INFO));
+	memset(&m_DeviceInfo, 0, sizeof(__D3DDEV_INFO));
 
 	delete[] m_DeviceInfo.pModes;
-	memset(&m_DeviceInfo, 0x00, sizeof(m_DeviceInfo));
+	memset(&m_DeviceInfo, 0, sizeof(m_DeviceInfo));
 
 #ifdef _N3GAME
 	CLogWriter::Open("Log.txt");
 #endif
 
 	m_lpD3D = Direct3DCreate9(D3D_SDK_VERSION);
-
 	if (m_lpD3D == nullptr)
 	{
 #ifdef _N3GAME
 		CLogWriter::Write("Direct3D9 is not installed or lower version");
 #endif
-		Release();
 		exit(-1);
 	}
 
 	// 프로그램이 실행된 경로..
 	if (s_szPath.empty())
 	{
-		char szPath[_MAX_PATH]   = {};
-		char szDrive[_MAX_DRIVE] = {}, szDir[_MAX_DIR] = {};
+		char szPath[_MAX_PATH] {}, szDrive[_MAX_DRIVE] {}, szDir[_MAX_DIR] {};
 		::GetModuleFileName(nullptr, szPath, _MAX_PATH);
 		_splitpath(szPath, szDrive, szDir, nullptr, nullptr);
-		strcat(szPath, szDrive);
-		strcat(szPath, szDir);
-		PathSet(szPath); // 경로 설정..
+
+		std::string newPath  = szDrive;
+		newPath             += szDir;
+		PathSet(newPath); // 경로 설정..
 	}
 }
 
@@ -56,7 +53,6 @@ CN3Eng::~CN3Eng()
 	if (s_lpD3DDev)
 	{
 		int nRefCount = s_lpD3DDev->Release();
-
 		if (nRefCount == 0)
 		{
 			s_lpD3DDev = nullptr;
@@ -69,12 +65,8 @@ CN3Eng::~CN3Eng()
 		}
 	}
 
-	if (m_lpD3D)
-		if (m_lpD3D->Release() == 0)
-			m_lpD3D = nullptr;
-	if (m_lpDD)
-		m_lpDD->Release();
-	m_lpDD = nullptr;
+	if (m_lpD3D != nullptr && m_lpD3D->Release() == 0)
+		m_lpD3D = nullptr;
 
 #ifdef _N3GAME
 	CLogWriter::Close();
@@ -104,10 +96,6 @@ void CN3Eng::Release()
 #endif
 		}
 	}
-
-	if (m_lpDD)
-		m_lpDD->Release();
-	m_lpDD = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -311,9 +299,14 @@ bool CN3Eng::Init(
 
 	delete[] m_DeviceInfo.pModes;
 	m_DeviceInfo.pModes = new D3DDISPLAYMODE[nAMC];
+	if (m_DeviceInfo.pModes == nullptr)
+	{
+		Release();
+		return false;
+	}
 
 	// 디스플레이 모드 가져오기..
-	int nModeOffset     = 0;
+	int nModeOffset = 0;
 	for (int i = 0; i < nModesX8R8G8B8; i++)
 		m_lpD3D->EnumAdapterModes(0, D3DFMT_X8R8G8B8, i, &m_DeviceInfo.pModes[nModeOffset++]);
 
@@ -405,11 +398,10 @@ bool CN3Eng::Init(
 #ifdef _N3GAME
 			CLogWriter::Write(
 				"Can't create D3D Device - please, check DirectX or display card driver");
-			CLogWriter::Write(DXGetErrorStringA(rval));
+			CLogWriter::Write("CreateDevice() error code: {:X}", rval);
 #endif
-			//			{ for(int iii = 0; iii < 3; iii++) Beep(2000, 200); Sleep(300); } // 여러번 삑~
 
-			this->Release();
+			Release();
 			return false;
 		}
 #ifdef _N3GAME
@@ -539,27 +531,17 @@ void CN3Eng::Present(HWND hWnd, RECT* pRC)
 	else if (D3DERR_DEVICELOST == rval || D3DERR_DEVICENOTRESET == rval)
 	{
 		rval = s_lpD3DDev->Reset(&s_DevParam);
-
 		if (D3D_OK != rval)
 		{
 #ifdef _N3GAME
-			const char* szErr = DXGetErrorStringA(rval);
-
 			// NOTE: Officially it's ErrCode(%d) but this is horrendously useless
-			CLogWriter::Write("Device Present ErrCode({:X}) : {}", rval, szErr);
+			CLogWriter::Write("Device Present ErrCode({:X})", rval);
 #endif
 
 			WaitForDeviceRestoration();
 		}
 
-		rval = s_lpD3DDev->Present(pRC, pRC, hWnd, nullptr);
-	}
-	else
-	{
-#ifdef _N3GAME
-//		CLogWriter::Write("CNEng::Present - device present failed ({})", DXGetErrorStringA(rval));
-//		Beep(2000, 50);
-#endif
+		s_lpD3DDev->Present(pRC, pRC, hWnd, nullptr);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -621,24 +603,20 @@ void CN3Eng::WaitForDeviceRestoration()
 			if (D3D_OK == s_lpD3DDev->Reset(&s_DevParam))
 			{
 #ifdef _N3GAME
-				const char* szErr = DXGetErrorStringA(rval);
-
 				// NOTE: Officially it's ErrCode(%d) but this is horrendously useless
-				CLogWriter::Write("Device Reset Success ErrCode({:X}) : {}", rval, szErr);
+				//CLogWriter::Write("Device Reset Success ErrCode({:X})", rval);
 #endif
 				SetDefaultEnvironment();
 				break;
 			}
 
 #ifdef _N3GAME
-			const char* szErr = DXGetErrorStringA(rval);
-
 			// NOTE: Officially it's ErrCode(%d) but this is horrendously useless
-			CLogWriter::Write("Device Reset Failed - ErrCode(:X) : {}", rval, szErr);
+			CLogWriter::Write("Device Reset Failed - ErrCode(:X)", rval);
 #endif
 		}
 
-		MSG msg = {};
+		MSG msg {};
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
@@ -685,7 +663,7 @@ void CN3Eng::ClearAuto(RECT* pRC)
 	{
 		CN3Light::__Light Lgt;
 
-		BOOL bEnable;
+		BOOL bEnable = FALSE;
 		s_lpD3DDev->GetLightEnable(0, &bEnable);
 		if (bEnable)
 		{

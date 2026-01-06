@@ -4,21 +4,12 @@
 #include "StdAfxBase.h"
 #include "N3Scene.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3Scene::CN3Scene()
 {
 	m_dwType |= OBJ_SCENE;
 
-	memset(m_pCameras, 0, sizeof(m_pCameras));
-	memset(m_pLights, 0, sizeof(m_pLights));
+	memset(&m_pCameras, 0, sizeof(m_pCameras));
+	memset(&m_pLights, 0, sizeof(m_pLights));
 
 	m_nCameraActive        = 0;
 
@@ -257,14 +248,13 @@ bool CN3Scene::Save(File& file)
 
 void CN3Scene::Render()
 {
-	int i = 0;
-	//	for(i = 0; i < m_nCameraCount; i++)
+	//	for(int i = 0; i < m_nCameraCount; i++)
 	//	{
 	//		__ASSERT(m_pCameras[i], "Camera pointer is NULL");
 	//		if(m_nCameraActive != i) m_pCameras[i]->Render();
 	//	}
 
-	//	for(i = 0; i < m_nLightCount; i++)
+	//	for(int i = 0; i < m_nLightCount; i++)
 	//	{
 	//		__ASSERT(m_pLights[i], "Light pointer is NULL");
 	//		m_pLights[i]->Render(nullptr, 0.5f);
@@ -282,9 +272,8 @@ void CN3Scene::Tick(float fFrm)
 {
 	if (FRAME_SELFPLAY == fFrm || fFrm < m_fFrmStart || fFrm > m_fFrmEnd)
 	{
-		m_fFrmCur += 30.0f
-					 / CN3Base::
-						 s_fFrmPerSec; // 일정하게 움직이도록 시간에 따라 움직이는 양을 조절..
+		// 일정하게 움직이도록 시간에 따라 움직이는 양을 조절..
+		m_fFrmCur += 30.0f / s_fFrmPerSec;
 		if (m_fFrmCur > m_fFrmEnd)
 			m_fFrmCur = m_fFrmStart;
 	}
@@ -293,13 +282,13 @@ void CN3Scene::Tick(float fFrm)
 		m_fFrmCur = fFrm;
 	}
 
-	TickCameras(m_fFrmCur);
-	TickLights(m_fFrmCur);
-	TickShapes(m_fFrmCur);
-	TickChrs(m_fFrmCur);
+	TickCameras();
+	TickLights();
+	TickShapes();
+	TickChrs();
 }
 
-void CN3Scene::TickCameras(float fFrm)
+void CN3Scene::TickCameras()
 {
 	for (int i = 0; i < m_nCameraCount; i++)
 	{
@@ -309,7 +298,7 @@ void CN3Scene::TickCameras(float fFrm)
 	}
 }
 
-void CN3Scene::TickLights(float fFrm)
+void CN3Scene::TickLights()
 {
 	for (int i = 0; i < 8; i++)
 		s_lpD3DDev->LightEnable(i, FALSE); // 일단 라이트 다 끄고..
@@ -343,13 +332,13 @@ void CN3Scene::TickLights(float fFrm)
 	//	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_AMBIENT, dwAmbient);
 }
 
-void CN3Scene::TickShapes(float fFrm)
+void CN3Scene::TickShapes()
 {
 	for (CN3Shape* shape : m_Shapes)
 		shape->Tick(m_fFrmCur);
 }
 
-void CN3Scene::TickChrs(float fFrm)
+void CN3Scene::TickChrs()
 {
 	for (CN3Chr* chr : m_Chrs)
 		chr->Tick(m_fFrmCur);
@@ -510,12 +499,10 @@ void CN3Scene::ChrDelete(int iIndex)
 
 void CN3Scene::ChrDelete(CN3Chr* pChr)
 {
-	it_Chr it = m_Chrs.begin(), itEnd = m_Chrs.end();
-	CN3Chr* pChrSrc;
+	auto it = m_Chrs.begin(), itEnd = m_Chrs.end();
 	for (; it != itEnd; it++)
-		;
 	{
-		pChrSrc = *it;
+		CN3Chr* pChrSrc = *it;
 		if (pChr == pChrSrc)
 		{
 			delete pChrSrc;

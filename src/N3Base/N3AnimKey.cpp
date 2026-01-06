@@ -4,15 +4,6 @@
 #include "StdAfxBase.h"
 #include "N3AnimKey.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3AnimKey::CN3AnimKey()
 {
 	m_eType         = KEY_VECTOR3;
@@ -24,6 +15,7 @@ CN3AnimKey::CN3AnimKey()
 
 CN3AnimKey::~CN3AnimKey()
 {
+	// NOLINTNEXTLINE(clang-diagnostic-delete-incomplete)
 	delete[] m_pDatas;
 	m_pDatas = nullptr;
 }
@@ -32,6 +24,8 @@ void CN3AnimKey::Release()
 {
 	m_nCount        = 0; // 키 카운트
 	m_fSamplingRate = 30.0;
+
+	// NOLINTNEXTLINE(clang-diagnostic-delete-incomplete)
 	delete[] m_pDatas;
 	m_pDatas = nullptr;
 
@@ -42,8 +36,10 @@ void CN3AnimKey::Alloc(int nCount, float fSamplingRate, ANIMATION_KEY_TYPE eType
 {
 	if (nCount <= 0)
 		return;
+
 	if (KEY_VECTOR3 != eType && KEY_QUATERNION != eType)
 		return;
+
 	if (fSamplingRate <= 0.0f)
 	{
 		__ASSERT(0, "Animation Sampling Rate 는 반드시 0 보다 커야 합니다.");
@@ -52,6 +48,7 @@ void CN3AnimKey::Alloc(int nCount, float fSamplingRate, ANIMATION_KEY_TYPE eType
 
 	if (m_pDatas != nullptr)
 	{
+		// NOLINTNEXTLINE(clang-diagnostic-delete-incomplete)
 		delete[] m_pDatas;
 		m_pDatas = nullptr;
 		m_nCount = 0;
@@ -241,7 +238,7 @@ void CN3AnimKey::Duplicate(CN3AnimKey* pSrc)
 	}
 }
 
-void CN3AnimKey::MultiplyDataVector(__Vector3 vM)
+void CN3AnimKey::MultiplyDataVector(const __Vector3& vM)
 {
 	if (KEY_VECTOR3 != m_eType)
 		return;

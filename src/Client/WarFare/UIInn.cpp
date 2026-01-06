@@ -15,18 +15,6 @@
 #include "UITradeBBSSelector.h"
 #include "UIManager.h"
 
-//#include "StdAfxBase.h"
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIInn::CUIInn()
 {
 }
@@ -117,14 +105,13 @@ void CUIInn::SetVisible(bool bVisible)
 		CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
 }
 
-bool CUIInn::OnKeyPress(int iChar)
+bool CUIInn::OnKeyPress(int iKey)
 {
-	switch (iChar)
+	if (iKey == DIK_ESCAPE)
 	{
-		case DIK_ESCAPE:
-			SetVisible(false);
-			return true;
+		SetVisible(false);
+		return true;
 	}
 
-	return CN3UIBase::OnKeyPress(iChar);
+	return CN3UIBase::OnKeyPress(iKey);
 }

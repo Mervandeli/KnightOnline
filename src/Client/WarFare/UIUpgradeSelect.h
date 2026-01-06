@@ -1,6 +1,9 @@
-﻿#pragma once
+﻿#ifndef CLIENT_WARFARE_UIUPGRADESELECT_H
+#define CLIENT_WARFARE_UIUPGRADESELECT_H
 
-#include <N3BASE/N3UIBase.h>
+#pragma once
+
+#include <N3Base/N3UIBase.h>
 
 class CUIUpgradeSelect : public CN3UIBase
 {
@@ -22,3 +25,5 @@ protected:
 	CN3UIButton* m_pBtn_Close;
 	int m_iNpcID;
 };
+
+#endif

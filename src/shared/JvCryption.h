@@ -13,7 +13,7 @@ private:
 	uint64_t m_public_key, m_tkey;
 
 public:
-	inline CJvCryption() : m_public_key(0)
+	inline CJvCryption() : m_public_key(0), m_tkey(0)
 	{
 	}
 

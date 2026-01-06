@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef CLIENT_WARFARE_ICONITEMSKILL_H
+#define CLIENT_WARFARE_ICONITEMSKILL_H
+
+#pragma once
 
 class CN3UIIcon;
 struct __TABLE_ITEM_BASIC;
@@ -22,6 +25,9 @@ struct __IconItemSkill
 		__TABLE_UPC_SKILL* pSkill; // Skill.. ^^
 	};
 
+	__IconItemSkill();
 	int GetBuyPrice() const;
 	int GetSellPrice(bool bHasPremium = false) const;
 };
+
+#endif // CLIENT_WARFARE_ICONITEMSKILL_H

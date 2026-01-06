@@ -5,14 +5,10 @@
 #if !defined(AFX_UIHOTKEYDLG_H__9B85201C_0294_4023_8658_923A6A2174BF__INCLUDED_)
 #define AFX_UIHOTKEYDLG_H__9B85201C_0294_4023_8658_923A6A2174BF__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "GameDef.h"
 #include "N3UIWndBase.h"
-
-//////////////////////////////////////////////////////////////////////
 
 class CUIHotKeyDlg : public CN3UIWndBase
 {
@@ -30,24 +26,24 @@ protected:
 	RECT GetSampleRect();
 
 public:
-	bool OnKeyPress(int iKey);
+	bool OnKeyPress(int iKey) override;
 	void RenderSelectIcon(CN3UIIcon* pUIIcon);
 	bool EffectTriggerByMouse();
 	CUIHotKeyDlg();
-	virtual ~CUIHotKeyDlg();
-	void Release();
+	~CUIHotKeyDlg() override;
+	void Release() override;
 	void ReleaseItem();
 
-	virtual uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld);
-	virtual bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg);
-	void Render();
+	uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
+	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
+	void Render() override;
 	void Open();
 	void Close();
 
-	void InitIconWnd(e_UIWND eWnd);
-	void InitIconUpdate();
+	void InitIconWnd(e_UIWND eWnd) override;
+	void InitIconUpdate() override;
 
-	__IconItemSkill* GetHighlightIconItem(CN3UIIcon* pUIIcon);
+	__IconItemSkill* GetHighlightIconItem(CN3UIIcon* pUIIcon) override;
 
 	void SetHotKeyPage(int iPageNum);
 
@@ -82,7 +78,7 @@ public:
 	void AllFactorClear();
 	void UpdateDisableCheck();
 
-	bool ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur);
+	bool ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur) override;
 	void RenderCooldown(const __IconItemSkill* pSkill, float fCooldown);
 
 	void SetHotKeyTooltip(__IconItemSkill* spSkill);

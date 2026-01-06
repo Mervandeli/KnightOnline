@@ -5,16 +5,15 @@
 #if !defined(__LIGHTMGR_H__)
 #define __LIGHTMGR_H__
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <N3Base/N3Light.h>
 
 #include <list>
 
-const float LIGHT_VALIDRANGE = 100.0f;
-enum eIdxLight
+constexpr float LIGHT_VALIDRANGE = 100.0f;
+
+enum eIdxLight : uint8_t
 {
 	LGT_DEFAULT0    = 0,
 	LGT_DEFAULT1    = 1,
@@ -34,9 +33,10 @@ public:
 	CN3Light* m_pActiveLight[LGT_MAX];
 
 public:
-	void Release();
+	void Release() override;
 	void Tick();
 	void AddLight(CN3Light* pLgt);
+
 	CN3Light* Light(int idx)
 	{
 		return m_pActiveLight[idx];
@@ -45,7 +45,7 @@ public:
 	void LoadZoneLight(const char* szFN);
 
 	CLightMgr();
-	virtual ~CLightMgr();
+	~CLightMgr() override;
 };
 
 #endif // #if !defined(__LIGHTMGR_H__)

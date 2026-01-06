@@ -1,4 +1,4 @@
-// stdafx.h : include file for standard system include files,
+﻿// stdafx.h : include file for standard system include files,
 //  or project specific include files that are used frequently, but
 //      are changed infrequently
 //
@@ -6,9 +6,7 @@
 #if !defined(AFX_STDAFX_H__BCC2A5C5_9F40_4DED_BE79_F5766124E283__INCLUDED_)
 #define AFX_STDAFX_H__BCC2A5C5_9F40_4DED_BE79_F5766124E283__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif                // _MSC_VER > 1000
 
 #define VC_EXTRALEAN  // Exclude rarely-used stuff from Windows headers
 

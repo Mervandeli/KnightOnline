@@ -8,11 +8,6 @@
 
 #include <FileIO/FileWriter.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 std::string CLogWriter::s_szFileName;
 
 CLogWriter::CLogWriter()

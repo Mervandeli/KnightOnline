@@ -30,17 +30,24 @@ const uint16_t PACKET_TAIL   = 0X55AA;
 
 CAPISocket::CAPISocket()
 {
-	m_hSocket    = (void*) INVALID_SOCKET;
+	m_hSocket    = INVALID_SOCKET;
 	m_hWndTarget = nullptr;
 	m_szIP.clear();
 	m_dwPort = 0;
 
 	if (s_nInstanceCount++ == 0)
-		WSAStartup(0x0101, &s_WSData);
+		(void) WSAStartup(0x0101, &s_WSData);
 
 	m_iSendByteCount = 0;
 	m_bConnected     = FALSE;
 	m_bEnableSend    = TRUE; // 보내기 가능..?
+
+#ifdef _DEBUG
+	memset(m_Statistics_Send_Sum, 0, sizeof(m_Statistics_Send_Sum));
+	memset(m_Statistics_Recv_Sum, 0, sizeof(m_Statistics_Recv_Sum));
+#endif
+
+	memset(m_RecvBuf, 0, sizeof(m_RecvBuf));
 }
 
 CAPISocket::~CAPISocket()
@@ -56,7 +63,7 @@ CAPISocket::~CAPISocket()
 
 void CAPISocket::Release()
 {
-	this->Disconnect();
+	Disconnect();
 
 	while (!m_qRecvPkt.empty())
 	{
@@ -75,10 +82,10 @@ void CAPISocket::Release()
 
 void CAPISocket::Disconnect()
 {
-	if ((SOCKET) m_hSocket != INVALID_SOCKET)
-		closesocket((SOCKET) m_hSocket);
+	if (m_hSocket != INVALID_SOCKET)
+		closesocket(m_hSocket);
 
-	m_hSocket    = (void*) INVALID_SOCKET;
+	m_hSocket    = INVALID_SOCKET;
 	m_hWndTarget = nullptr;
 	m_szIP.clear();
 	m_dwPort      = 0;
@@ -91,38 +98,36 @@ void CAPISocket::Disconnect()
 #endif                    // #ifdef _CRYPTION
 }
 
-int CAPISocket::Connect(HWND hWnd, const char* pszIP, uint32_t dwPort)
+int CAPISocket::Connect(HWND hWnd, const std::string& szIP, uint32_t dwPort)
 {
-	if (pszIP == nullptr || dwPort == 0)
+	if (szIP.empty() || dwPort == 0)
 		return -1;
 
-	if ((SOCKET) m_hSocket != INVALID_SOCKET)
-		this->Disconnect();
+	if (m_hSocket != INVALID_SOCKET)
+		Disconnect();
 
 	//
-	struct sockaddr_in far server;
-	struct hostent far* hp;
+	struct sockaddr_in server {};
+	struct hostent* hp = nullptr;
 
-	if ((pszIP[0] >= '0') && (pszIP[0] <= '9'))
+	if ((szIP[0] >= '0') && (szIP[0] <= '9'))
 	{
-		memset(&server, 0, sizeof(server));
 		server.sin_family      = AF_INET;
-		server.sin_addr.s_addr = inet_addr(pszIP);
+		server.sin_addr.s_addr = inet_addr(szIP.c_str());
 		server.sin_port        = htons((u_short) dwPort);
 	}
 	else
 	{
-		hp = gethostbyname(pszIP);
+		hp = gethostbyname(szIP.c_str());
 		if (hp == nullptr)
 		{
 #ifdef _DEBUG
-			std::string msg = fmt::format("Error: Connecting to {}.", pszIP);
+			std::string msg = fmt::format("Error: Connecting to {}.", szIP);
 			MessageBoxA(hWnd, msg.c_str(), "socket error", MB_OK | MB_ICONSTOP);
 #endif
 			return -1;
 		}
 
-		memset(&server, 0, sizeof(server));
 		memcpy(&server.sin_addr, hp->h_addr, hp->h_length);
 		server.sin_family = hp->h_addrtype;
 		server.sin_port   = htons((u_short) dwPort);
@@ -140,18 +145,18 @@ int CAPISocket::Connect(HWND hWnd, const char* pszIP, uint32_t dwPort)
 		return iErrCode;
 	}
 
-	m_hSocket          = (void*) sock;
+	m_hSocket          = sock;
 
 	// 소켓 옵션
 	int iRecvBufferLen = RECEIVE_BUF_SIZE;
-	int iErr           = setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (char*) &iRecvBufferLen, 4);
+	setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (char*) &iRecvBufferLen, 4);
 
-	if (connect(sock, (struct sockaddr far*) &server, sizeof(server)) != 0)
+	if (connect(sock, (struct sockaddr*) &server, sizeof(server)) != 0)
 	{
 		int iErrCode = ::WSAGetLastError();
 
 		closesocket(sock);
-		m_hSocket = (void*) INVALID_SOCKET;
+		m_hSocket = INVALID_SOCKET;
 
 		return iErrCode;
 	}
@@ -159,7 +164,7 @@ int CAPISocket::Connect(HWND hWnd, const char* pszIP, uint32_t dwPort)
 	WSAAsyncSelect(sock, hWnd, WM_SOCKETMSG, FD_CONNECT | FD_READ | FD_CLOSE);
 
 	m_hWndTarget = hWnd;
-	m_szIP       = pszIP;
+	m_szIP       = szIP;
 	m_dwPort     = dwPort;
 	m_bConnected = TRUE;
 
@@ -173,7 +178,7 @@ int CAPISocket::Connect(HWND hWnd, const char* pszIP, uint32_t dwPort)
 
 int CAPISocket::ReConnect()
 {
-	return Connect(m_hWndTarget, m_szIP.c_str(), m_dwPort);
+	return Connect(m_hWndTarget, m_szIP, m_dwPort);
 }
 
 void CAPISocket::Receive()
@@ -195,7 +200,6 @@ void CAPISocket::Receive()
 #ifdef _N3GAME
 			int iErr = ::GetLastError();
 			CLogWriter::Write("socket receive error! : {}", iErr);
-			//TRACE("socket receive error! : %d\n", iErr);
 #endif
 			break;
 		}
@@ -219,7 +223,6 @@ BOOL CAPISocket::ReceiveProcess()
 	{
 		uint8_t* pData = new uint8_t[iCount];
 		m_CB.GetData(pData, iCount);
-		int head_inc_size = 0;
 
 		if (PACKET_HEADER == ntohs(*((uint16_t*) pData)))
 		{
@@ -242,10 +245,9 @@ BOOL CAPISocket::ReceiveProcess()
 						}
 						else
 						{
-							uint16_t sequence = *(uint16_t*) &pTBuf[2];
-							uint8_t empty     = pTBuf[4];
-							uint8_t* payload  = &pTBuf[5];
-
+							// uint16_t sequence = *(uint16_t*) &pTBuf[2];
+							// uint8_t empty     = pTBuf[4];
+							uint8_t* payload = &pTBuf[5];
 							pkt->append(payload, siCore - 5);
 						}
 					}
@@ -319,7 +321,7 @@ void CAPISocket::Send(uint8_t* pData, int nSize)
 	memcpy(pSendData, pData, nSize);
 	pSendData                += nSize;
 	*((uint16_t*) pSendData)  = htons(PACKET_TAIL);
-	pSendData                += 2;
+	// pSendData             += 2;
 
 	int nSent                 = 0;
 	int count                 = 0;
@@ -332,15 +334,13 @@ void CAPISocket::Send(uint8_t* pData, int nSize)
 #ifdef _N3GAME
 			int iErr = ::GetLastError();
 			CLogWriter::Write("socket send error! : {}", iErr);
-			//TRACE("socket send error! : %d\n", iErr);
 			PostQuitMessage(-1);
 #endif
 			break;
 		}
-		if (count)
-		{
+
+		if (count > 0)
 			nSent += count;
-		}
 	}
 
 #ifdef _DEBUG

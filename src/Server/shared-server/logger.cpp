@@ -11,7 +11,7 @@
 #include <spdlog/async.h>
 #include <spdlog/async_logger.h>
 
-logger::Logger::Logger(const std::string& appName) : _appName(appName)
+logger::Logger::Logger(const std::string_view appName) : _appName(appName)
 {
 	_defaultLogPath = fmt::format("logs/{}.log", appName);
 }
@@ -71,6 +71,7 @@ void logger::Logger::Setup(CIni& ini, const std::filesystem::path& baseDir)
 }
 
 void logger::Logger::SetupExtraLoggers(CIni& /*ini*/,
+	// NOLINTNEXTLINE(performance-unnecessary-value-param)
 	std::shared_ptr<spdlog::details::thread_pool> /*threadPool*/,
 	const std::filesystem::path& /*baseDir*/)
 {
@@ -78,8 +79,9 @@ void logger::Logger::SetupExtraLoggers(CIni& /*ini*/,
 }
 
 void logger::Logger::SetupExtraLogger(CIni& ini,
+	// NOLINTNEXTLINE(performance-unnecessary-value-param): threadPool
 	std::shared_ptr<spdlog::details::thread_pool> threadPool, const std::filesystem::path& baseDir,
-	const std::string& appName, const std::string& logFileConfigProp)
+	const std::string_view appName, const std::string_view logFileConfigProp)
 {
 	// setup file logger
 	std::string fileName = ini.GetString(ini::LOGGER, logFileConfigProp, _defaultLogPath);
@@ -98,17 +100,17 @@ void logger::Logger::SetupExtraLogger(CIni& ini,
 
 	// setup multi-sink async logger as default (combines file + console logger [under fxtui])
 	spdlog::sinks_init_list sinks = { fileLogger, _fxtuiSink };
-	auto extraLogger              = std::make_shared<spdlog::async_logger>(
-        appName, sinks.begin(), sinks.end(), threadPool, spdlog::async_overflow_policy::block);
+	auto extraLogger = std::make_shared<spdlog::async_logger>(std::string(appName), sinks.begin(),
+		sinks.end(), threadPool, spdlog::async_overflow_policy::block);
 
 	// set default logger level and pattern
 	// we default to debug level logging
-	int logLevel = ini.GetInt(ini::LOGGER, ini::LEVEL, spdlog::level::debug);
+	int logLevel     = ini.GetInt(ini::LOGGER, ini::LEVEL, spdlog::level::debug);
 	extraLogger->set_level(static_cast<spdlog::level::level_enum>(logLevel));
 
 	// register the logger
 	spdlog::register_logger(extraLogger);
-	spdlog::get(appName)->info("{} logger configured", appName);
+	extraLogger->info("{} logger configured", appName);
 }
 
 logger::Logger::~Logger()

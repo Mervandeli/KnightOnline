@@ -15,18 +15,14 @@
 #include <N3Base/N3UIButton.h>
 #include <N3Base/N3UIString.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUINPCEvent::CUINPCEvent()
 {
+	m_iTradeID     = -1;
+	m_iIDTarget    = -1;
+
+	m_pBtn_Repair  = nullptr;
+	m_pText_Repair = nullptr;
+	m_pText_Title  = nullptr;
 }
 
 CUINPCEvent::~CUINPCEvent()
@@ -36,6 +32,13 @@ CUINPCEvent::~CUINPCEvent()
 void CUINPCEvent::Release()
 {
 	CN3UIBase::Release();
+
+	m_iTradeID     = -1;
+	m_iIDTarget    = -1;
+
+	m_pBtn_Repair  = nullptr;
+	m_pText_Repair = nullptr;
+	m_pText_Title  = nullptr;
 }
 
 bool CUINPCEvent::Load(File& file)
@@ -103,27 +106,24 @@ void CUINPCEvent::Open(e_NpcEvent eNpcEvent, int iTradeId, int iIDTarget)
 		case NPC_EVENT_ITEM_TRADE:
 			szStr = fmt::format_text_resource(IDS_NPC_EVENT_TITLE_TRADE);
 			m_pText_Title->SetString(szStr);
-			if (m_pBtn_Repair)
+			if (m_pBtn_Repair != nullptr && m_pBtn_Repair->IsVisible())
 			{
-				if (m_pBtn_Repair->IsVisible())
-				{
-					m_pBtn_Repair->SetVisible(false);
-					m_pText_Repair->SetVisible(false);
-				}
+				m_pBtn_Repair->SetVisible(false);
+				m_pText_Repair->SetVisible(false);
 			}
 			break;
 
 		case NPC_EVENT_TRADE_REPAIR:
 			szStr = fmt::format_text_resource(IDS_NPCEVENT_TITLE_REPAIR);
 			m_pText_Title->SetString(szStr);
-			if (m_pBtn_Repair)
+			if (m_pBtn_Repair != nullptr && !m_pBtn_Repair->IsVisible())
 			{
-				if (!m_pBtn_Repair->IsVisible())
-				{
-					m_pBtn_Repair->SetVisible(true);
-					m_pText_Repair->SetVisible(true);
-				}
+				m_pBtn_Repair->SetVisible(true);
+				m_pText_Repair->SetVisible(true);
 			}
+			break;
+
+		default:
 			break;
 	}
 }
@@ -135,9 +135,9 @@ void CUINPCEvent::Close()
 
 bool CUINPCEvent::OnKeyPress(int iKey)
 {
-	if (DIK_ESCAPE == iKey)
+	if (iKey == DIK_ESCAPE)
 	{
-		this->Close();
+		Close();
 		return true;
 	}
 

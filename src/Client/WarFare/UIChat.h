@@ -5,9 +5,7 @@
 #if !defined(AFX_UICHAT_H__2CFECA0D_EA38_4900_86BB_BAFD4D5EE6F7__INCLUDED_)
 #define AFX_UICHAT_H__2CFECA0D_EA38_4900_86BB_BAFD4D5EE6F7__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <N3Base/N3UIBase.h>
 #include <deque>
@@ -19,7 +17,11 @@ struct __ChatInfo
 	std::string szChat; // 문자열
 	D3DCOLOR color;     // 문자열 색깔
 
-	__ChatInfo() {};
+	__ChatInfo()
+	{
+		color = 0;
+	}
+
 	__ChatInfo(const std::string& szChat_Arg, D3DCOLOR color_Arg)
 	{
 		szChat = szChat_Arg;
@@ -30,8 +32,9 @@ struct __ChatInfo
 typedef std::deque<__ChatInfo*> ChatList;
 typedef ChatList::iterator ChatListItor;
 typedef ChatList::reverse_iterator ChatListReverseItor;
-const int MAX_CHAT_LINES = 100;
+constexpr int MAX_CHAT_LINES = 100;
 
+enum e_ChatMode : uint8_t;
 class CUIChat : public CN3UIBase
 {
 protected:
@@ -60,7 +63,7 @@ protected:
 	CN3UIBase* m_pBtn_Check;
 	CN3UIBase* m_pBtn_Fold;
 
-	enum e_ChatMode m_eChatMode;
+	e_ChatMode m_eChatMode;
 
 	bool m_bChatNormal;
 	bool m_bChatPrivate;
@@ -92,34 +95,42 @@ public:
 	void SetNoticeTitle(const std::string& szString, D3DCOLOR color);
 	void ShowContinueMsg();
 	void DeleteContinueMsg();
-	bool OnKeyPress(int iKey);
+	bool OnKeyPress(int iKey) override;
+
 	bool GetEnableKillFocus()
 	{
 		return m_bKillFocus;
 	}
+
 	void SetEnableKillFocus(bool bKillFocus)
 	{
 		m_bKillFocus = bKillFocus;
 	}
+
 	void ChatListenEnable();
 	void ChangeChattingMode(e_ChatMode eCM);
-	BOOL MoveOffset(int iOffsetX, int iOffsetY) override; // Offset만큼 이동해준다.(region, children, move rect 이동)
+
+	// Offset만큼 이동해준다.(region, children, move rect 이동)
+	BOOL MoveOffset(int iOffsetX, int iOffsetY) override;
 	bool ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg) override;
 	void Release() override;
 	bool Load(File& file) override;
-	void SetRegion(
-		const RECT& Rect) override; // 영역 지정(사이즈가 변할때 호출된다. 단순 이동은 호출되지 않는다.(단순이동은 MoveOffset이 호출))
+
+	// 영역 지정(사이즈가 변할때 호출된다. 단순 이동은 호출되지 않는다.(단순이동은 MoveOffset이 호출))
+	void SetRegion(const RECT& Rect) override;
 
 	void SetString(const std::string& szChat);
 	void SetCaretPos(int iPos);
+
 	const std::string& GetString() const
 	{
 		return m_szString;
-	} //son, chat_in
-	void AddChatMsg(e_ChatMode eCM, const std::string& szString,
-		D3DCOLOR color = 0xffffffff); // 채팅 메세지를 저장하고 알맞은 형태로 화면에 출력해준다.
+	}
+
+	// 채팅 메세지를 저장하고 알맞은 형태로 화면에 출력해준다.
+	void AddChatMsg(e_ChatMode eCM, const std::string& szString, D3DCOLOR color = 0xffffffff);
 	void AddContinueMsg(e_ChatMode eCM, const std::string& szString, D3DCOLOR color = 0xffffffff);
-	void AdjustScroll();              // 스크롤 위치등 조정..
+	void AdjustScroll(); // 스크롤 위치등 조정..
 
 	BOOL IsChatMode();
 	void SetFocus();

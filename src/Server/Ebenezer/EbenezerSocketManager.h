@@ -20,10 +20,6 @@ public:
 	CUser* GetInactiveUserUnchecked(int socketId) const;
 
 protected:
-	void StartUserThreads() override;
-	void ShutdownUserThreads() override;
-
-protected:
 	SendWorkerThread* _sendWorkerThread;
 };
 

@@ -16,11 +16,6 @@
 
 #include <cassert> // assert()
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 CN3SndMgr::CN3SndMgr()
 {
 	m_bSndEnable = false;
@@ -51,10 +46,10 @@ bool CN3SndMgr::InitOpenAL()
 	const char* deviceName = nullptr;
 	if (alcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT"))
 	{
-		if (alcIsExtensionPresent(0, "ALC_ENUMERATE_ALL_EXT"))
-			deviceName = alcGetString(0, ALC_DEFAULT_ALL_DEVICES_SPECIFIER);
+		if (alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT"))
+			deviceName = alcGetString(nullptr, ALC_DEFAULT_ALL_DEVICES_SPECIFIER);
 		else
-			deviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
+			deviceName = alcGetString(nullptr, ALC_DEFAULT_DEVICE_SPECIFIER);
 	}
 
 	_alcDevice = alcOpenDevice(deviceName);

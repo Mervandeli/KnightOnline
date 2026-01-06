@@ -21,15 +21,6 @@
 #include <N3Base/N3UIImage.h>
 #include <N3Base/N3Texture.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIStateBar::CUIStateBar()
 {
 	m_pText_Position       = nullptr;
@@ -42,6 +33,9 @@ CUIStateBar::CUIStateBar()
 	m_pProgress_ExpP       = nullptr;
 
 	m_pText_FPS            = nullptr;
+	m_pText_MP             = nullptr;
+	m_pText_HP             = nullptr;
+	m_pText_Exp            = nullptr;
 
 	// 미니맵...
 	m_pGroup_MiniMap       = nullptr;
@@ -51,7 +45,8 @@ CUIStateBar::CUIStateBar()
 	m_pBtn_Quest           = nullptr;
 	m_pBtn_Power           = nullptr;
 
-	memset(m_vArrows, 0, sizeof(m_vArrows));
+	for (int i = 0; i < 6; i++)
+		m_vArrows[i] = {};
 
 	m_fZoom      = 6.0f;
 	m_fMapSizeX  = 0.0f;
@@ -99,6 +94,10 @@ void CUIStateBar::Release()
 	CN3UIBase::Release();
 
 	m_pText_Position       = nullptr;
+	m_pText_MP             = nullptr;
+	m_pText_HP             = nullptr;
+	m_pText_Exp            = nullptr;
+
 	m_pProgress_HP         = nullptr;
 	m_pProgress_HP_slow    = nullptr;
 	m_pProgress_HP_drop    = nullptr;
@@ -115,7 +114,8 @@ void CUIStateBar::Release()
 	m_pBtn_Power           = nullptr;
 	m_pBtn_Quest           = nullptr;
 
-	memset(m_vArrows, 0, sizeof(m_vArrows));
+	for (int i = 0; i < 6; i++)
+		m_vArrows[i] = {};
 
 	m_fZoom      = 6.0f;
 	m_fMapSizeX  = 0.0f;
@@ -326,14 +326,16 @@ void CUIStateBar::Render()
 
 	CN3UIBase::Render();
 
-	if (nullptr == m_pGroup_MiniMap || false == m_pGroup_MiniMap->IsVisible())
+	if (m_pGroup_MiniMap == nullptr || !m_pGroup_MiniMap->IsVisible())
 		return; // 미니맵이 안켜져 있음 돌아간다..
-	if (nullptr == m_pImage_Map)
+
+	if (m_pImage_Map == nullptr)
 		return;
+
 	if (m_fMapSizeX <= 0 || m_fMapSizeZ <= 0)
 		return;
 
-	__VertexTransformedColor vPositions[4], vOutLines[4];
+	__VertexTransformedColor vPositions[4] {}, vOutLines[4] {};
 
 	vPositions[0].Set(0, 0, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xffffffff);
 	vPositions[1] = vPositions[0];
@@ -352,7 +354,8 @@ void CUIStateBar::Render()
 	float fCenterX = (float) (rc.left) + fWidth / 2.0f;
 	float fCenterY = (float) (rc.top) + fHeight / 2.0f;
 
-	DWORD dwZ, dwFog, dwAlpha, dwCOP, dwCA1, dwSrcBlend, dwDestBlend, dwVertexShader, dwAOP, dwAA1;
+	DWORD dwZ = 0, dwFog = 0, dwAlpha = 0, dwCOP = 0, dwCA1 = 0;
+	DWORD dwSrcBlend = 0, dwDestBlend = 0, dwVertexShader = 0, dwAOP = 0, dwAA1 = 0;
 	CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &dwZ);
 	CN3Base::s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
 	CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
@@ -551,7 +554,7 @@ void CUIStateBar::TickMiniMap()
 	float fX      = (m_vViewPos.x / m_fMapSizeX);
 	float fY      = (m_vViewPos.z / m_fMapSizeZ);
 
-	float x1, y1, x2, y2 = 0;
+	float x1 = 0.0f, y1 = 0.0f, x2 = 0.0f, y2 = 0;
 	x1 = fX - fOffset;
 	y1 = fY + fOffset;
 	x2 = fX + fOffset;
@@ -822,17 +825,15 @@ uint32_t CUIStateBar::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POIN
 
 bool CUIStateBar::OnKeyPress(int iKey)
 {
-	switch (iKey)
+	// hotkey가 포커스 잡혀있을때는 다른 ui를 닫을수 없으므로 DIK_ESCAPE가 들어오면 포커스를 다시잡고
+	if (iKey == DIK_ESCAPE)
 	{
-		case DIK_ESCAPE:
-		{ //hotkey가 포커스 잡혀있을때는 다른 ui를 닫을수 없으므로 DIK_ESCAPE가 들어오면 포커스를 다시잡고
-			//열려있는 다른 유아이를 닫아준다.
-			CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
-			CN3UIBase* pFocus = CGameProcedure::s_pUIMgr->GetFocusedUI();
-			if (pFocus && pFocus != this)
-				pFocus->OnKeyPress(iKey);
-		}
-			return true;
+		// 열려있는 다른 유아이를 닫아준다.
+		CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
+		CN3UIBase* pFocus = CGameProcedure::s_pUIMgr->GetFocusedUI();
+		if (pFocus != nullptr && pFocus != this)
+			pFocus->OnKeyPress(iKey);
+		return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

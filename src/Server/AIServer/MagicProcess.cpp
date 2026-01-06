@@ -12,9 +12,8 @@ extern std::mutex g_region_mutex;
 
 CMagicProcess::CMagicProcess()
 {
-	m_pMain       = AIServerApp::instance();
-	m_pSrcUser    = nullptr;
-	m_bMagicState = NONE;
+	m_pMain    = AIServerApp::instance();
+	m_pSrcUser = nullptr;
 }
 
 CMagicProcess::~CMagicProcess()
@@ -53,6 +52,10 @@ void CMagicProcess::MagicPacket(char* pBuf)
 	{
 		switch (pTable->Type1)
 		{
+			case 0:
+				/* do nothing */
+				break;
+
 			case 1:
 				result = ExecuteType1(pTable->ID, tid, data1, data2, data3, 1);
 				break;
@@ -93,12 +96,21 @@ void CMagicProcess::MagicPacket(char* pBuf)
 			case 10:
 				ExecuteType10(pTable->ID);
 				break;
+
+			default:
+				spdlog::error("MagicProcess::MagicPacket: Unhandled type1 type - ID={} Type1={}",
+					pTable->ID, pTable->Type1);
+				break;
 		}
 
 		if (result != 0)
 		{
 			switch (pTable->Type2)
 			{
+				case 0:
+					/* do nothing */
+					break;
+
 				case 1:
 					ExecuteType1(pTable->ID, tid, data4, data5, data6, 2);
 					break;
@@ -139,6 +151,12 @@ void CMagicProcess::MagicPacket(char* pBuf)
 				case 10:
 					ExecuteType10(pTable->ID);
 					break;
+
+				default:
+					spdlog::error(
+						"MagicProcess::MagicPacket: Unhandled type2 type - ID={} Type2={}",
+						pTable->ID, pTable->Type2);
+					break;
 			}
 		}
 	}
@@ -151,31 +169,22 @@ model::Magic* CMagicProcess::IsAvailable(int magicid, int /*tid*/, uint8_t /*typ
 	if (m_pSrcUser == nullptr)
 		return nullptr;
 
-	pTable = m_pMain->_magicTableMap.GetData(magicid); // Get main magic table.
+	// Get main magic table.
+	pTable = m_pMain->_magicTableMap.GetData(magicid);
 	if (pTable == nullptr)
-		goto fail_return;
+		return nullptr;
 
 	return pTable; // Magic was successful!
-
-fail_return:       // In case the magic failed.
-	//SetByte( send_buff, WIZ_MAGIC_PROCESS, send_index );
-	//SetByte( send_buff, MAGIC_FAIL, send_index );
-	//SetShort( send_buff, m_pSrcUser->GetSocketID(), send_index );
-
-	m_bMagicState = NONE;
-
-	return nullptr; // Magic was a failure!
 }
 
 // Applied to an attack skill using a weapon.
 uint8_t CMagicProcess::ExecuteType1(
 	int magicid, int tid, int data1, int /*data2*/, int data3, uint8_t /*sequence*/)
 {
-	int damage = 0, send_index = 0,
-		result           = 1; // Variable initialization. result == 1 : success, 0 : fail
-	char send_buff[128]  = {};
 	model::Magic* pMagic = nullptr;
-	pMagic               = m_pMain->_magicTableMap.GetData(magicid); // Get main magic table.
+	int damage = 0, result = 1; // Variable initialization. result == 1 : success, 0 : fail
+
+	pMagic = m_pMain->_magicTableMap.GetData(magicid); // Get main magic table.
 	if (pMagic == nullptr)
 		return 0;
 
@@ -185,51 +194,35 @@ uint8_t CMagicProcess::ExecuteType1(
 
 	//	if (damage > 0) {
 	CNpc* pNpc = m_pMain->_npcMap.GetData(tid - NPC_BAND);
-	if (pNpc == nullptr || pNpc->m_NpcState == NPC_DEAD || pNpc->m_iHP == 0)
+	if (pNpc != nullptr && pNpc->m_NpcState != NPC_DEAD && pNpc->m_iHP > 0)
+	{
+		if (!pNpc->SetDamage(
+				magicid, damage, m_pSrcUser->m_strUserID, m_pSrcUser->m_iUserId + USER_BAND))
+		{
+			// Npc가 죽은 경우,,
+			pNpc->SendExpToUserList(); // 경험치 분배!!
+			pNpc->SendDead();
+			//m_pSrcUser->SendAttackSuccess(tid, MAGIC_ATTACK_TARGET_DEAD, 0, pNpc->m_iHP);
+			m_pSrcUser->SendAttackSuccess(tid, ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
+		}
+		else
+		{
+			// 공격 결과 전송
+			m_pSrcUser->SendAttackSuccess(tid, ATTACK_SUCCESS, damage, pNpc->m_iHP);
+		}
+		//	}
+		//	else
+		//		result = 0;
+	}
+	else // if (pNpc == nullptr || pNpc->m_NpcState == NPC_DEAD || pNpc->m_iHP <= 0)
 	{
 		result = 0;
-		goto packet_send;
 	}
 
-	if (!pNpc->SetDamage(
-			magicid, damage, m_pSrcUser->m_strUserID, m_pSrcUser->m_iUserId + USER_BAND))
-	{
-		// Npc가 죽은 경우,,
-		pNpc->SendExpToUserList(); // 경험치 분배!!
-		pNpc->SendDead();
-		//m_pSrcUser->SendAttackSuccess(tid, MAGIC_ATTACK_TARGET_DEAD, 0, pNpc->m_iHP);
-		m_pSrcUser->SendAttackSuccess(tid, ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
-	}
-	else
-	{
-		// 공격 결과 전송
-		m_pSrcUser->SendAttackSuccess(tid, ATTACK_SUCCESS, damage, pNpc->m_iHP);
-	}
-	//	}
-	//	else
-	//		result = 0;
-
-packet_send:
 	if (pMagic->Type2 == 0 || pMagic->Type2 == 1)
 	{
-		SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
-		SetByte(send_buff, MAGIC_EFFECTING, send_index);
-		SetDWORD(send_buff, magicid, send_index);
-		SetShort(send_buff, m_pSrcUser->m_iUserId, send_index);
-		SetShort(send_buff, tid, send_index);
-		SetShort(send_buff, data1, send_index);
-		SetShort(send_buff, result, send_index);
-		SetShort(send_buff, data3, send_index);
-		SetShort(send_buff, 0, send_index);
-		SetShort(send_buff, 0, send_index);
-		SetShort(send_buff, 0, send_index);
-
-		if (damage == 0)
-			SetShort(send_buff, -104, send_index);
-		else
-			SetShort(send_buff, 0, send_index);
-
-		m_pSrcUser->SendAll(send_buff, send_index);
+		m_pSrcUser->SendMagicAttackResult(MAGIC_EFFECTING, magicid, tid, data1, result, data3, 0, 0,
+			0, damage == 0 ? SKILLMAGIC_FAIL_ATTACKZERO : 0);
 	}
 
 	return result;
@@ -237,80 +230,45 @@ packet_send:
 
 uint8_t CMagicProcess::ExecuteType2(int magicid, int tid, int data1, int /*data2*/, int data3)
 {
-	int damage = 0, send_index = 0,
-		result          = 1;  // Variable initialization. result == 1 : success, 0 : fail
-	char send_buff[128] = {}; // For the packet.
+	int damage = 0, result = 1; // Variable initialization. result == 1 : success, 0 : fail
 
-	damage              = m_pSrcUser->GetDamage(tid, magicid); // Get damage points of enemy.
-															   //	if(damage <= 0)	damage = 1;
+	damage = m_pSrcUser->GetDamage(tid, magicid); // Get damage points of enemy.
+												  //	if(damage <= 0)	damage = 1;
 	//TRACE(_T("magictype2 ,, magicid=%d, damage=%d\n"), magicid, damage);
 
 	if (damage > 0)
 	{
 		CNpc* pNpc = m_pMain->_npcMap.GetData(tid - NPC_BAND);
-		if (pNpc == nullptr || pNpc->m_NpcState == NPC_DEAD || pNpc->m_iHP == 0)
+		if (pNpc != nullptr && pNpc->m_NpcState != NPC_DEAD && pNpc->m_iHP != 0)
+		{
+			if (!pNpc->SetDamage(
+					magicid, damage, m_pSrcUser->m_strUserID, m_pSrcUser->m_iUserId + USER_BAND))
+			{
+				m_pSrcUser->SendMagicAttackResult(MAGIC_EFFECTING, magicid, tid, data1, result,
+					data3, 0, 0, 0, damage == 0 ? SKILLMAGIC_FAIL_ATTACKZERO : 0);
+
+				// Npc가 죽은 경우,,
+				pNpc->SendExpToUserList(); // 경험치 분배!!
+				pNpc->SendDead();
+				m_pSrcUser->SendAttackSuccess(tid, MAGIC_ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
+				//m_pSrcUser->SendAttackSuccess(tid, ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
+
+				return result;
+			}
+			else
+			{
+				// 공격 결과 전송
+				m_pSrcUser->SendAttackSuccess(tid, ATTACK_SUCCESS, damage, pNpc->m_iHP);
+			}
+		}
+		else // if (pNpc == nullptr || pNpc->m_NpcState == NPC_DEAD || pNpc->m_iHP == 0)
 		{
 			result = 0;
-			goto packet_send;
-		}
-
-		if (!pNpc->SetDamage(
-				magicid, damage, m_pSrcUser->m_strUserID, m_pSrcUser->m_iUserId + USER_BAND))
-		{
-			SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
-			SetByte(send_buff, MAGIC_EFFECTING, send_index);
-			SetDWORD(send_buff, magicid, send_index);
-			SetShort(send_buff, m_pSrcUser->m_iUserId, send_index);
-			SetShort(send_buff, tid, send_index);
-			SetShort(send_buff, data1, send_index);
-			SetShort(send_buff, result, send_index);
-			SetShort(send_buff, data3, send_index);
-			SetShort(send_buff, 0, send_index);
-			SetShort(send_buff, 0, send_index);
-			SetShort(send_buff, 0, send_index);
-
-			if (damage == 0)
-				SetShort(send_buff, -104, send_index);
-			else
-				SetShort(send_buff, 0, send_index);
-
-			m_pMain->Send(send_buff, send_index, m_pSrcUser->m_curZone);
-			// Npc가 죽은 경우,,
-			pNpc->SendExpToUserList(); // 경험치 분배!!
-			pNpc->SendDead();
-			m_pSrcUser->SendAttackSuccess(tid, MAGIC_ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
-			//m_pSrcUser->SendAttackSuccess(tid, ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
-
-			return result;
-		}
-		else
-		{
-			// 공격 결과 전송
-			m_pSrcUser->SendAttackSuccess(tid, ATTACK_SUCCESS, damage, pNpc->m_iHP);
 		}
 	}
-	//	else
-	//		result = 0;
 
-packet_send:
-	SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
-	SetByte(send_buff, MAGIC_EFFECTING, send_index);
-	SetDWORD(send_buff, magicid, send_index);
-	SetShort(send_buff, m_pSrcUser->m_iUserId, send_index);
-	SetShort(send_buff, tid, send_index);
-	SetShort(send_buff, data1, send_index);
-	SetShort(send_buff, result, send_index);
-	SetShort(send_buff, data3, send_index);
-	SetShort(send_buff, 0, send_index);
-	SetShort(send_buff, 0, send_index);
-	SetShort(send_buff, 0, send_index);
-
-	if (damage == 0)
-		SetShort(send_buff, -104, send_index);
-	else
-		SetShort(send_buff, 0, send_index);
-
-	m_pMain->Send(send_buff, send_index, m_pSrcUser->m_curZone);
+	m_pSrcUser->SendMagicAttackResult(MAGIC_EFFECTING, magicid, tid, data1, result, data3, 0, 0, 0,
+		damage == 0 ? SKILLMAGIC_FAIL_ATTACKZERO : 0);
 
 	return result;
 }
@@ -319,8 +277,7 @@ packet_send:
 void CMagicProcess::ExecuteType3(int magicid, int tid, int data1, int data2, int data3, int moral,
 	int dexpoint, int righthand_damage)
 {
-	int damage = 0, result = 1, send_index = 0, attack_type = 0;
-	char send_buff[256]      = {};
+	int damage = 0, result = 1, attack_type = 0;
 	model::MagicType3* pType = nullptr;
 	CNpc* pNpc               = nullptr;                                  // Pointer initialization!
 
@@ -331,9 +288,7 @@ void CMagicProcess::ExecuteType3(int magicid, int tid, int data1, int data2, int
 	// 지역 공격
 	if (tid == -1)
 	{
-		result = AreaAttack(3, magicid, moral, data1, data2, data3, dexpoint, righthand_damage);
-		//if(result == 0)		goto packet_send;
-		//else
+		AreaAttack(3, magicid, moral, data1, data2, data3, dexpoint, righthand_damage);
 		return;
 	}
 
@@ -341,7 +296,9 @@ void CMagicProcess::ExecuteType3(int magicid, int tid, int data1, int data2, int
 	if (pNpc == nullptr || pNpc->m_NpcState == NPC_DEAD || pNpc->m_iHP == 0)
 	{
 		result = 0;
-		goto packet_send;
+		m_pSrcUser->SendMagicAttackResult(
+			MAGIC_EFFECTING, magicid, tid, data1, result, data3, moral);
+		return;
 	}
 
 	pType = m_pMain->_magicType3TableMap.GetData(magicid); // Get magic skill table type 3.
@@ -399,9 +356,6 @@ void CMagicProcess::ExecuteType3(int magicid, int tid, int data1, int data2, int
 		else if (pType->DirectType == 2 || pType->DirectType == 3)
 			pNpc->MSpChange(
 				pType->DirectType, pType->FirstDamage); // Change the SP or the MP of the target.
-		// Armor Durability related.
-		else if (pType->DirectType == 4)
-			pNpc->ItemWoreOut(DEFENCE, pType->FirstDamage); // Reduce Slot Item Durability
 	}
 	// Durational Spells! Remember, durational spells only involve HPs.
 	else if (pType->Duration != 0)
@@ -453,40 +407,22 @@ void CMagicProcess::ExecuteType3(int magicid, int tid, int data1, int data2, int
 		}
 	}
 
-packet_send:
-	//if (pMagic->bType2 == 0
-	//	|| pMagic->bType2 == 3)
-	{
-		SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
-		SetByte(send_buff, MAGIC_EFFECTING, send_index);
-		SetDWORD(send_buff, magicid, send_index);
-		SetShort(send_buff, m_pSrcUser->m_iUserId, send_index);
-		SetShort(send_buff, tid, send_index);
-		SetShort(send_buff, data1, send_index);
-		SetShort(send_buff, result, send_index);
-		SetShort(send_buff, data3, send_index);
-		SetShort(send_buff, moral, send_index);
-		SetShort(send_buff, 0, send_index);
-		SetShort(send_buff, 0, send_index);
-		m_pMain->Send(send_buff, send_index, m_pSrcUser->m_curZone);
-	}
+	m_pSrcUser->SendMagicAttackResult(MAGIC_EFFECTING, magicid, tid, data1, result, data3, moral);
 }
 
 void CMagicProcess::ExecuteType4(
 	int magicid, int sid, int tid, int data1, int data2, int data3, int moral)
 {
-	int send_index = 0, result = 1; // Variable initialization. result == 1 : success, 0 : fail
-	char send_buff[128]      = {};
-
 	model::MagicType4* pType = nullptr;
 	CNpc* pNpc               = nullptr; // Pointer initialization!
+	int result               = 1;       // Variable initialization. result == 1 : success, 0 : fail
 
 	// 지역 공격
 	if (tid == -1)
 	{
 		result = AreaAttack(4, magicid, moral, data1, data2, data3, 0, 0);
 		if (result == 0)
-			goto fail_return;
+			SendMagicAttackResult(MAGIC_FAIL, magicid, sid, tid);
 
 		return;
 	}
@@ -494,8 +430,8 @@ void CMagicProcess::ExecuteType4(
 	pNpc = m_pMain->_npcMap.GetData(tid - NPC_BAND);
 	if (pNpc == nullptr || pNpc->m_NpcState == NPC_DEAD || pNpc->m_iHP == 0)
 	{
-		result = 0;
-		goto fail_return;
+		SendMagicAttackResult(MAGIC_FAIL, magicid, sid, tid);
+		return;
 	}
 
 	pType = m_pMain->_magicType4TableMap.GetData(magicid); // Get magic skill table type 4.
@@ -508,73 +444,30 @@ void CMagicProcess::ExecuteType4(
 	switch (pType->BuffType)
 	{
 		case 1: // HP 올리기..
-			break;
-
 		case 2: // 방어력 올리기..
-			break;
-
 		case 4: // 공격력 올리기..
-			break;
-
 		case 5: // 공격 속도 올리기..
+		case 7: // 능력치 올리기...
+		case 8: // 저항력 올리기...
+		case 9: // 공격 성공율 및 회피 성공율 올리기..
+			/* nothing to handle here */
 			break;
 
 		case 6: // 이동 속도 올리기..
-				//			if (pNpc->m_MagicType4[pType->bBuffType-1].sDurationTime > 0) {
-				//				result = 0 ;
-				//				goto fail_return ;
-				//			}
-				//			else {
 			pNpc->m_MagicType4[pType->BuffType - 1].byAmount      = pType->Speed;
 			pNpc->m_MagicType4[pType->BuffType - 1].sDurationTime = pType->Duration;
 			pNpc->m_MagicType4[pType->BuffType - 1].fStartTime    = TimeGet();
 			pNpc->m_fSpeed_1 = pNpc->m_fOldSpeed_1 * (pType->Speed / 100.0f);
 			pNpc->m_fSpeed_2 = pNpc->m_fOldSpeed_2 * (pType->Speed / 100.0f);
 			//TRACE(_T("executeType4 ,, speed1=%.2f, %.2f,, type=%d, cur=%.2f, %.2f\n"), pNpc->m_fOldSpeed_1, pNpc->m_fOldSpeed_2, pType->bSpeed, pNpc->m_fSpeed_1, pNpc->m_fSpeed_2);
-			//			}
-			break;
-
-		case 7: // 능력치 올리기...
-			break;
-
-		case 8: // 저항력 올리기...
-			break;
-
-		case 9: // 공격 성공율 및 회피 성공율 올리기..
 			break;
 
 		default:
-			result = 0;
-			goto fail_return;
+			SendMagicAttackResult(MAGIC_FAIL, magicid, sid, tid);
+			return;
 	}
 
-	SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
-	SetByte(send_buff, MAGIC_EFFECTING, send_index);
-	SetDWORD(send_buff, magicid, send_index);
-	SetShort(send_buff, sid, send_index);
-	SetShort(send_buff, tid, send_index);
-	SetShort(send_buff, data1, send_index);
-	SetShort(send_buff, result, send_index);
-	SetShort(send_buff, data3, send_index);
-	SetShort(send_buff, 0, send_index);
-	SetShort(send_buff, 0, send_index);
-	SetShort(send_buff, 0, send_index);
-	m_pMain->Send(send_buff, send_index, m_pSrcUser->m_curZone);
-	return;
-
-fail_return:
-	SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
-	SetByte(send_buff, MAGIC_FAIL, send_index);
-	SetDWORD(send_buff, magicid, send_index);
-	SetShort(send_buff, sid, send_index);
-	SetShort(send_buff, tid, send_index);
-	SetShort(send_buff, 0, send_index);
-	SetShort(send_buff, 0, send_index);
-	SetShort(send_buff, 0, send_index);
-	SetShort(send_buff, 0, send_index);
-	SetShort(send_buff, 0, send_index);
-	SetShort(send_buff, 0, send_index);
-	m_pMain->Send(send_buff, send_index, m_pSrcUser->m_curZone);
+	SendMagicAttackResult(MAGIC_EFFECTING, magicid, sid, tid, data1, result, data3);
 }
 
 void CMagicProcess::ExecuteType5(int /*magicid*/)
@@ -587,8 +480,7 @@ void CMagicProcess::ExecuteType6(int /*magicid*/)
 
 void CMagicProcess::ExecuteType7(int magicid, int tid, int data1, int data2, int data3, int moral)
 {
-	int damage = 0, result = 1, send_index = 0, attack_type = 0;
-	char send_buff[256]      = {};
+	int damage = 0, result = 1, attack_type = 0;
 	model::MagicType7* pType = nullptr;
 	CNpc* pNpc               = nullptr;
 
@@ -607,7 +499,9 @@ void CMagicProcess::ExecuteType7(int magicid, int tid, int data1, int data2, int
 	if (pNpc == nullptr || pNpc->m_NpcState == NPC_DEAD || pNpc->m_iHP == 0)
 	{
 		result = 0;
-		goto packet_send;
+		m_pSrcUser->SendMagicAttackResult(
+			MAGIC_EFFECTING, magicid, tid, data1, result, data3, moral);
+		return;
 	}
 
 	pType = m_pMain->_magicType7TableMap.GetData(magicid); // Get magic skill table type 3.
@@ -639,19 +533,7 @@ void CMagicProcess::ExecuteType7(int magicid, int tid, int data1, int data2, int
 		pNpc->m_Delay    = pType->Duration;
 	}
 
-packet_send:
-	SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
-	SetByte(send_buff, MAGIC_EFFECTING, send_index);
-	SetDWORD(send_buff, magicid, send_index);
-	SetShort(send_buff, m_pSrcUser->m_iUserId, send_index);
-	SetShort(send_buff, tid, send_index);
-	SetShort(send_buff, data1, send_index);
-	SetShort(send_buff, result, send_index);
-	SetShort(send_buff, data3, send_index);
-	SetShort(send_buff, moral, send_index);
-	SetShort(send_buff, 0, send_index);
-	SetShort(send_buff, 0, send_index);
-	m_pMain->Send(send_buff, send_index, m_pSrcUser->m_curZone);
+	m_pSrcUser->SendMagicAttackResult(MAGIC_EFFECTING, magicid, tid, data1, result, data3, moral);
 }
 
 void CMagicProcess::ExecuteType8(int /*magicid*/)
@@ -666,13 +548,38 @@ void CMagicProcess::ExecuteType10(int /*magicid*/)
 {
 }
 
+void CMagicProcess::SendMagicAttackResult(uint8_t opcode, int magicId, int sourceId, int targetId,
+	int data1 /*= 0*/, int data2 /*= 0*/, int data3 /*= 0*/, int data4 /*= 0*/, int data5 /*= 0*/,
+	int data6 /*= 0*/, int data7 /*= 0*/)
+{
+	int sendIndex = 0;
+	char sendBuffer[128] {};
+	SetByte(sendBuffer, AG_MAGIC_ATTACK_RESULT, sendIndex);
+	SetByte(sendBuffer, opcode, sendIndex);
+	SetDWORD(sendBuffer, magicId, sendIndex);
+	SetShort(sendBuffer, sourceId, sendIndex);
+	SetShort(sendBuffer, targetId, sendIndex);
+	if (opcode == MAGIC_CASTING)
+		SetShort(sendBuffer, SKILLMAGIC_FAIL_CASTING, sendIndex);
+	else
+		SetShort(sendBuffer, data1, sendIndex);
+	SetShort(sendBuffer, data2, sendIndex);
+	SetShort(sendBuffer, data3, sendIndex);
+	SetShort(sendBuffer, data4, sendIndex);
+	SetShort(sendBuffer, data5, sendIndex);
+	SetShort(sendBuffer, data6, sendIndex);
+	if (opcode == MAGIC_EFFECTING)
+		SetShort(sendBuffer, data7, sendIndex);
+	m_pSrcUser->SendAll(sendBuffer, sendIndex);
+}
+
 int16_t CMagicProcess::GetMagicDamage(
 	int tid, int total_hit, int attribute, int dexpoint, int righthand_damage)
 {
 	int16_t damage = 0;
 	int random = 0, total_r = 0;
-	uint8_t result;
-	bool bSign = true; // false이면 -, true이면 +
+	uint8_t result = 0;
+	bool bSign     = true; // false이면 -, true이면 +
 
 	// Check if target id is valid.
 	if (tid < NPC_BAND || tid > INVALID_BAND)
@@ -722,12 +629,8 @@ int16_t CMagicProcess::GetMagicDamage(
 				total_r = pNpc->m_sPoisonR;
 				break;
 
-			case LIGHT_R:
-				// LATER !!!
-				break;
-
-			case DARKNESS_R:
-				// LATER !!!
+			default:
+				/* unhandled */
 				break;
 		}
 
@@ -938,179 +841,69 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 	}
 
 	__Vector3 vStart, vEnd;
-	CNpc* pNpc = nullptr; // Pointer initialization!
-	float fDis = 0.0f;
-	vStart.Set((float) data1, (float) 0, (float) data3);
-	char send_buff[256] = {};
-	int nid = 0, send_index = 0, result = 1, count = 0, total_mon = 0, attack_type = 0;
-	int* pNpcIDList = nullptr;
+	float fDis    = 0.0f;
+	int sendIndex = 0, result = 1, attack_type = 0;
+	char sendBuffer[256] {};
+
+	std::vector<int> npcIds;
+
+	vStart.Set(static_cast<float>(data1), 0.0f, static_cast<float>(data3));
 
 	{
 		std::lock_guard<std::mutex> lock(g_region_mutex);
+		const auto& regionNpcArray = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.m_UserTypeMap;
+		if (regionNpcArray.empty())
+			return;
 
-		auto Iter1 = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.begin();
-		auto Iter2 = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.end();
-
-		total_mon  = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.GetSize();
-		pNpcIDList = new int[total_mon];
-		for (; Iter1 != Iter2; Iter1++)
-		{
-			nid               = *((*Iter1).second);
-			pNpcIDList[count] = nid;
-			count++;
-		}
+		npcIds.reserve(regionNpcArray.size());
+		for (const auto& [npcId, _] : regionNpcArray)
+			npcIds.push_back(npcId);
 	}
 
-	for (int i = 0; i < total_mon; i++)
+	for (int npcId : npcIds)
 	{
-		nid = pNpcIDList[i];
-		if (nid < NPC_BAND)
+		if (npcId < NPC_BAND)
 			continue;
 
-		pNpc = m_pMain->_npcMap.GetData(nid - NPC_BAND);
+		CNpc* pNpc = m_pMain->_npcMap.GetData(npcId - NPC_BAND);
+		if (pNpc == nullptr || pNpc->m_NpcState == NPC_DEAD)
+			continue;
 
-		if (pNpc != nullptr && pNpc->m_NpcState != NPC_DEAD)
+		if (m_pSrcUser->m_bNation == pNpc->m_byGroup)
+			continue;
+
+		vEnd.Set(pNpc->m_fCurX, pNpc->m_fCurY, pNpc->m_fCurZ);
+		fDis = pNpc->GetDistance(vStart, vEnd);
+
+		// NPC가 반경안에 있을 경우...
+		if (fDis > fRadius)
+			continue;
+
+		// 타잎 3일 경우...
+		if (magictype == 3)
 		{
-			if (m_pSrcUser->m_bNation == pNpc->m_byGroup)
-				continue;
-
-			vEnd.Set(pNpc->m_fCurX, pNpc->m_fCurY, pNpc->m_fCurZ);
-			fDis = pNpc->GetDistance(vStart, vEnd);
-
-			// NPC가 반경안에 있을 경우...
-			if (fDis > fRadius)
-				continue;
-
-			// 타잎 3일 경우...
-			if (magictype == 3)
+			damage = GetMagicDamage(
+				pNpc->m_sNid + NPC_BAND, target_damage, attribute, dexpoint, righthand_damage);
+			spdlog::trace("MagicProcess::AreaAttackDamage: magic damage calculated [magicId={} "
+						  "damage={}]",
+				magicid, damage);
+			if (damage >= 0)
 			{
-				damage = GetMagicDamage(
-					pNpc->m_sNid + NPC_BAND, target_damage, attribute, dexpoint, righthand_damage);
-				spdlog::trace("MagicProcess::AreaAttackDamage: magic damage calculated [magicId={} "
-							  "damage={}]",
-					magicid, damage);
-				if (damage >= 0)
-				{
-					result = pNpc->SetHMagicDamage(damage);
-				}
+				result = pNpc->SetHMagicDamage(damage);
+			}
+			else
+			{
+				damage = abs(damage);
+				if (pType3->Attribute == 3)
+					attack_type = 3; // 기절시키는 마법이라면.....
 				else
-				{
-					damage = abs(damage);
-					if (pType3->Attribute == 3)
-						attack_type = 3; // 기절시키는 마법이라면.....
-					else
-						attack_type = magicid;
+					attack_type = magicid;
 
-					if (!pNpc->SetDamage(attack_type, damage, m_pSrcUser->m_strUserID,
-							m_pSrcUser->m_iUserId + USER_BAND))
-					{
-						// Npc가 죽은 경우,,
-						pNpc->SendExpToUserList(); // 경험치 분배!!
-						pNpc->SendDead();
-						m_pSrcUser->SendAttackSuccess(
-							pNpc->m_sNid + NPC_BAND, MAGIC_ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
-					}
-					else
-					{
-						m_pSrcUser->SendAttackSuccess(
-							pNpc->m_sNid + NPC_BAND, ATTACK_SUCCESS, damage, pNpc->m_iHP);
-					}
-				}
-
-				memset(send_buff, 0, sizeof(send_buff));
-				send_index = 0;
-
-				// 패킷 전송.....
-				//if ( pMagic->bType2 == 0 || pMagic->bType2 == 3 )
-				{
-					SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
-					SetByte(send_buff, MAGIC_EFFECTING, send_index);
-					SetDWORD(send_buff, magicid, send_index);
-					SetShort(send_buff, m_pSrcUser->m_iUserId, send_index);
-					SetShort(send_buff, pNpc->m_sNid + NPC_BAND, send_index);
-					SetShort(send_buff, data1, send_index);
-					SetShort(send_buff, result, send_index);
-					SetShort(send_buff, data3, send_index);
-					SetShort(send_buff, moral, send_index);
-					SetShort(send_buff, 0, send_index);
-					SetShort(send_buff, 0, send_index);
-
-					m_pMain->Send(send_buff, send_index, m_pSrcUser->m_curZone);
-				}
-			}
-			// 타잎 4일 경우...
-			else if (magictype == 4)
-			{
-				memset(send_buff, 0, sizeof(send_buff));
-				send_index = 0;
-				result     = 1;
-
-				// Depending on which buff-type it is.....
-				switch (pType4->BuffType)
-				{
-					case 1: // HP 올리기..
-						break;
-
-					case 2: // 방어력 올리기..
-						break;
-
-					case 4: // 공격력 올리기..
-						break;
-
-					case 5: // 공격 속도 올리기..
-						break;
-
-					case 6: // 이동 속도 올리기..
-						//if (pNpc->m_MagicType4[pType4->bBuffType-1].sDurationTime > 0) {
-						//	result = 0 ;
-						//}
-						//else {
-						pNpc->m_MagicType4[pType4->BuffType - 1].byAmount      = pType4->Speed;
-						pNpc->m_MagicType4[pType4->BuffType - 1].sDurationTime = pType4->Duration;
-						pNpc->m_MagicType4[pType4->BuffType - 1].fStartTime    = TimeGet();
-						pNpc->m_fSpeed_1 = pNpc->m_fOldSpeed_1 * (pType4->Speed / 100.0f);
-						pNpc->m_fSpeed_2 = pNpc->m_fOldSpeed_2 * (pType4->Speed / 100.0f);
-						//}
-						break;
-
-					case 7: // 능력치 올리기...
-						break;
-
-					case 8: // 저항력 올리기...
-						break;
-
-					case 9: // 공격 성공율 및 회피 성공율 올리기..
-						break;
-
-					default:
-						result = 0;
-						break;
-				}
-
-				spdlog::trace(
-					"MagicProcess::AreaAttackDamage: type4 processed [magicId={}]", magicid);
-
-				SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
-				SetByte(send_buff, MAGIC_EFFECTING, send_index);
-				SetDWORD(send_buff, magicid, send_index);
-				SetShort(send_buff, m_pSrcUser->m_iUserId, send_index);
-				SetShort(send_buff, pNpc->m_sNid + NPC_BAND, send_index);
-				SetShort(send_buff, data1, send_index);
-				SetShort(send_buff, result, send_index);
-				SetShort(send_buff, data3, send_index);
-				SetShort(send_buff, 0, send_index);
-				SetShort(send_buff, 0, send_index);
-				SetShort(send_buff, 0, send_index);
-				m_pMain->Send(send_buff, send_index, m_pSrcUser->m_curZone);
-			}
-			else if (magictype == 7)
-			{
-				damage      = target_damage;
-				attack_type = magicid;
 				if (!pNpc->SetDamage(attack_type, damage, m_pSrcUser->m_strUserID,
 						m_pSrcUser->m_iUserId + USER_BAND))
 				{
-					pNpc->SendExpToUserList();
+					// Npc가 죽은 경우,,
+					pNpc->SendExpToUserList(); // 경험치 분배!!
 					pNpc->SendDead();
 					m_pSrcUser->SendAttackSuccess(
 						pNpc->m_sNid + NPC_BAND, MAGIC_ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
@@ -1120,37 +913,116 @@ void CMagicProcess::AreaAttackDamage(int magictype, int rx, int rz, int magicid,
 					m_pSrcUser->SendAttackSuccess(
 						pNpc->m_sNid + NPC_BAND, ATTACK_SUCCESS, damage, pNpc->m_iHP);
 				}
+			}
 
-				memset(send_buff, 0, sizeof(send_buff));
-				send_index = 0;
+			memset(sendBuffer, 0, sizeof(sendBuffer));
+			sendIndex = 0;
 
-				SetByte(send_buff, AG_MAGIC_ATTACK_RESULT, send_index);
-				SetByte(send_buff, MAGIC_EFFECTING, send_index);
-				SetDWORD(send_buff, magicid, send_index);
-				SetShort(send_buff, m_pSrcUser->m_iUserId, send_index);
-				SetShort(send_buff, pNpc->m_sNid + NPC_BAND, send_index);
-				SetShort(send_buff, data1, send_index);
-				SetShort(send_buff, result, send_index);
-				SetShort(send_buff, data3, send_index);
-				SetShort(send_buff, moral, send_index);
-				SetShort(send_buff, 0, send_index);
-				SetShort(send_buff, 0, send_index);
-				m_pMain->Send(send_buff, send_index, m_pSrcUser->m_curZone);
+			// 패킷 전송.....
+			//if ( pMagic->bType2 == 0 || pMagic->bType2 == 3 )
+			{
+				SetByte(sendBuffer, AG_MAGIC_ATTACK_RESULT, sendIndex);
+				SetByte(sendBuffer, MAGIC_EFFECTING, sendIndex);
+				SetDWORD(sendBuffer, magicid, sendIndex);
+				SetShort(sendBuffer, m_pSrcUser->m_iUserId, sendIndex);
+				SetShort(sendBuffer, pNpc->m_sNid + NPC_BAND, sendIndex);
+				SetShort(sendBuffer, data1, sendIndex);
+				SetShort(sendBuffer, result, sendIndex);
+				SetShort(sendBuffer, data3, sendIndex);
+				SetShort(sendBuffer, moral, sendIndex);
+				SetShort(sendBuffer, 0, sendIndex);
+				SetShort(sendBuffer, 0, sendIndex);
+
+				m_pMain->Send(sendBuffer, sendIndex, m_pSrcUser->m_curZone);
 			}
 		}
-	}
+		// 타잎 4일 경우...
+		else if (magictype == 4)
+		{
+			memset(sendBuffer, 0, sizeof(sendBuffer));
+			sendIndex = 0;
+			result    = 1;
 
-	delete[] pNpcIDList;
-	pNpcIDList = nullptr;
+			// Depending on which buff-type it is.....
+			switch (pType4->BuffType)
+			{
+				case 1: // HP 올리기..
+				case 2: // 방어력 올리기..
+				case 4: // 공격력 올리기..
+				case 5: // 공격 속도 올리기..
+				case 7: // 능력치 올리기...
+				case 8: // 저항력 올리기...
+				case 9: // 공격 성공율 및 회피 성공율 올리기..
+					break;
 
-	/*
-	for( Iter = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.m_UserTypeMap.begin(); Iter != pMap->m_ppRegion[rx][rz].m_RegionNpcArray.m_UserTypeMap.end(); ) {
-		if( bDead ) {
-			Iter = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.DeleteData( Iter );
-			continue;
+				case 6: // 이동 속도 올리기..
+					//if (pNpc->m_MagicType4[pType4->bBuffType-1].sDurationTime > 0) {
+					//	result = 0 ;
+					//}
+					//else {
+					pNpc->m_MagicType4[pType4->BuffType - 1].byAmount      = pType4->Speed;
+					pNpc->m_MagicType4[pType4->BuffType - 1].sDurationTime = pType4->Duration;
+					pNpc->m_MagicType4[pType4->BuffType - 1].fStartTime    = TimeGet();
+					pNpc->m_fSpeed_1 = pNpc->m_fOldSpeed_1 * (pType4->Speed / 100.0f);
+					pNpc->m_fSpeed_2 = pNpc->m_fOldSpeed_2 * (pType4->Speed / 100.0f);
+					//}
+					break;
+
+				default:
+					result = 0;
+					break;
+			}
+
+			spdlog::trace("MagicProcess::AreaAttackDamage: type4 processed [magicId={}]", magicid);
+
+			SetByte(sendBuffer, AG_MAGIC_ATTACK_RESULT, sendIndex);
+			SetByte(sendBuffer, MAGIC_EFFECTING, sendIndex);
+			SetDWORD(sendBuffer, magicid, sendIndex);
+			SetShort(sendBuffer, m_pSrcUser->m_iUserId, sendIndex);
+			SetShort(sendBuffer, pNpc->m_sNid + NPC_BAND, sendIndex);
+			SetShort(sendBuffer, data1, sendIndex);
+			SetShort(sendBuffer, result, sendIndex);
+			SetShort(sendBuffer, data3, sendIndex);
+			SetShort(sendBuffer, 0, sendIndex);
+			SetShort(sendBuffer, 0, sendIndex);
+			SetShort(sendBuffer, 0, sendIndex);
+			m_pMain->Send(sendBuffer, sendIndex, m_pSrcUser->m_curZone);
 		}
-		Iter++;
-	}	*/
+		else if (magictype == 7)
+		{
+			damage      = target_damage;
+			attack_type = magicid;
+			if (!pNpc->SetDamage(attack_type, damage, m_pSrcUser->m_strUserID,
+					m_pSrcUser->m_iUserId + USER_BAND))
+			{
+				pNpc->SendExpToUserList();
+				pNpc->SendDead();
+				m_pSrcUser->SendAttackSuccess(
+					pNpc->m_sNid + NPC_BAND, MAGIC_ATTACK_TARGET_DEAD, damage, pNpc->m_iHP);
+			}
+			else
+			{
+				m_pSrcUser->SendAttackSuccess(
+					pNpc->m_sNid + NPC_BAND, ATTACK_SUCCESS, damage, pNpc->m_iHP);
+			}
+
+			memset(sendBuffer, 0, sizeof(sendBuffer));
+			sendIndex = 0;
+
+			SetByte(sendBuffer, AG_MAGIC_ATTACK_RESULT, sendIndex);
+			SetByte(sendBuffer, MAGIC_EFFECTING, sendIndex);
+			SetDWORD(sendBuffer, magicid, sendIndex);
+			SetShort(sendBuffer, m_pSrcUser->m_iUserId, sendIndex);
+			SetShort(sendBuffer, pNpc->m_sNid + NPC_BAND, sendIndex);
+			SetShort(sendBuffer, data1, sendIndex);
+			SetShort(sendBuffer, result, sendIndex);
+			SetShort(sendBuffer, data3, sendIndex);
+			SetShort(sendBuffer, moral, sendIndex);
+			SetShort(sendBuffer, 0, sendIndex);
+			SetShort(sendBuffer, 0, sendIndex);
+			m_pMain->Send(sendBuffer, sendIndex, m_pSrcUser->m_curZone);
+		}
+	}
 }
 
 int16_t CMagicProcess::GetWeatherDamage(int16_t damage, int16_t attribute)
@@ -1173,6 +1045,9 @@ int16_t CMagicProcess::GetWeatherDamage(int16_t damage, int16_t attribute)
 			if (attribute == ATTRIBUTE_ICE)
 				weather_buff = true;
 			break;
+
+		default:
+			return damage;
 	}
 
 	if (weather_buff)

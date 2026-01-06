@@ -5,7 +5,8 @@
 
 #include <FileIO/File.h>
 
-enum TBL_DATA_TYPE
+// NOLINTNEXTLINE(performance-enum-size): used for the file format, size must match
+enum TBL_DATA_TYPE : uint32_t
 {
 	DT_NONE,
 	DT_CHAR,

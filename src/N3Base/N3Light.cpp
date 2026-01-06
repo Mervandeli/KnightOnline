@@ -5,19 +5,10 @@
 #include "StdAfxBase.h"
 #include "N3Light.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3Light::CN3Light()
 {
 	m_dwType |= OBJ_LIGHT;
-	memset(&m_Data, 0, sizeof(m_Data));
+	m_Data    = {};
 }
 
 CN3Light::~CN3Light()
@@ -26,7 +17,7 @@ CN3Light::~CN3Light()
 
 void CN3Light::Release()
 {
-	memset(&m_Data, 0, sizeof(m_Data));
+	m_Data = {};
 	CN3Transform::Release();
 }
 

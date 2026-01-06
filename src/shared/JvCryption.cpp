@@ -31,10 +31,10 @@ uint64_t CJvCryption::GenerateKey()
 void CJvCryption::JvEncryptionFast(int len, uint8_t* datain, uint8_t* dataout)
 {
 #ifdef USE_CRYPTION
-	uint8_t *pkey, lkey, rsk;
+	const uint8_t* pkey = reinterpret_cast<const uint8_t*>(&m_tkey);
+	uint8_t lkey = 0, rsk = 0;
 	int rkey = 2157;
 
-	pkey     = (uint8_t*) &m_tkey;
 	lkey     = (len * 157) & 0xff;
 
 	for (int i = 0; i < len; i++)
@@ -53,13 +53,11 @@ void CJvCryption::JvEncryptionFast(int len, uint8_t* datain, uint8_t* dataout)
 int CJvCryption::JvDecryptionWithCRC32(int len, uint8_t* datain, uint8_t* dataout)
 {
 #ifdef USE_CRYPTION
-	int result;
+	int result = -1;
 	JvDecryptionFast(len, datain, dataout);
 
 	if (crc32(dataout, len - 4, -1) == *(uint32_t*) (len - 4 + dataout))
 		result = len - 4;
-	else
-		result = -1;
 
 	return result;
 #else

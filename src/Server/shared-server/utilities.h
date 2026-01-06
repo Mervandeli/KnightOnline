@@ -27,7 +27,7 @@ void SetString1(char* tBuf, const std::string_view str, int& index);
 void SetString1(char* tBuf, const char* str, int length, int& index);
 void SetString2(char* tBuf, const std::string_view str, int& index);
 void SetString2(char* tBuf, const char* str, int length, int& index);
-int ParseSpace(char* tBuf, const char* sBuf);
+bool ParseSpace(char* tBuf, const char* sBuf, int& bufferIndex);
 int myrand_ai(int min, int max, bool bSame = false);
 int myrand_generic(int min, int max);
 

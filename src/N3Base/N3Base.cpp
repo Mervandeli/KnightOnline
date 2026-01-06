@@ -10,16 +10,8 @@
 #include "N3FXShape.h"
 #include "N3Chr.h"
 #include "N3Base.h"
-#include "mmsystem.h"
+#include <mmsystem.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 LPDIRECT3DDEVICE9 CN3Base::s_lpD3DDev = nullptr;      // 참조 포인터.. 멋대로 해제하면 안된다..
 uint32_t CN3Base::s_dwTextureCaps     = 0;            // Texture 호환성..
 float CN3Base::s_fFrmPerSec           = 30.0f;        // Frame Per Second
@@ -67,7 +59,6 @@ CLogWriter g_Log; // 로그 남기기...
 CN3Base::CN3Base()
 {
 	m_dwType = OBJ_BASE; // "MESH", "CAMERA", "SCENE", "???" .... 등등등...
-	m_szName = "";
 }
 
 CN3Base::~CN3Base()
@@ -147,8 +138,7 @@ float CN3Base::TimerProcess(TIMER_COMMAND command)
 		static LONGLONG m_llStopTime        = 0;
 		static LONGLONG m_llLastElapsedTime = 0;
 		static LONGLONG m_llBaseTime        = 0;
-		double fTime;
-		double fElapsedTime;
+		double fTime = 0.0, fElapsedTime = 0.0;
 		LARGE_INTEGER qwTime;
 
 		// Get either the current time or the stop time, depending
@@ -221,8 +211,7 @@ float CN3Base::TimerProcess(TIMER_COMMAND command)
 		static double m_fLastElapsedTime = 0.0;
 		static double m_fBaseTime        = 0.0;
 		static double m_fStopTime        = 0.0;
-		double fTime;
-		double fElapsedTime;
+		double fTime = 0.0, fElapsedTime = 0.0;
 
 		// Get either the current time or the stop time, depending
 		// on whether we're stopped and what command was sent
@@ -303,7 +292,7 @@ void CN3Base::PathSet(const std::string& szPath)
 
 void CN3Base::RenderLines(const __Vector3* pvLines, int nCount, D3DCOLOR color)
 {
-	DWORD dwAlpha, dwFog, dwLight;
+	DWORD dwAlpha = 0, dwFog = 0, dwLight = 0;
 	s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
 	s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
 	s_lpD3DDev->GetRenderState(D3DRS_LIGHTING, &dwLight);
@@ -362,7 +351,8 @@ void CN3Base::RenderLines(const RECT& rc, D3DCOLOR color)
 	vLines[3].Set((float) rc.left, (float) rc.bottom, 0.9f, 1.0f, color);
 	vLines[4] = vLines[0];
 
-	DWORD dwZ, dwFog, dwAlpha, dwCOP, dwCA1, dwSrcBlend, dwDestBlend, dwVertexShader, dwAOP, dwAA1;
+	DWORD dwZ = 0, dwFog = 0, dwAlpha = 0, dwCOP = 0, dwCA1 = 0, dwSrcBlend = 0, dwDestBlend = 0,
+		  dwVertexShader = 0, dwAOP = 0, dwAA1 = 0;
 	CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &dwZ);
 	CN3Base::s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
 	CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);

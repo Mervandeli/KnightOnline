@@ -6,15 +6,6 @@
 #include "N3FXPartBillBoard.h"
 #include "N3FXBundle.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3FXPartBillBoard::CN3FXPartBillBoard()
 {
 	m_iVersion = SUPPORTED_PART_VERSION;
@@ -235,7 +226,7 @@ bool CN3FXPartBillBoard::Load(File& file)
 #if defined(_DEBUG)
 	if (m_iVersion > SUPPORTED_PART_VERSION)
 	{
-		TRACE("!!! WARNING: CN3FXPartBillBoard::Load(%s) encountered version %d (base version %d). "
+		TRACE("!!! WARNING: CN3FXPartBillBoard::Load({}) encountered version {} (base version {}). "
 			  "Needs support!",
 			m_pRefBundle != nullptr ? m_pRefBundle->FileName().c_str() : "<unknown>", m_iVersion,
 			m_iBaseVersion);
@@ -488,7 +479,7 @@ void CN3FXPartBillBoard::Render()
 		__Vector3 AbsoluteCurrPos = Rotate2AbsolutePos(m_vCurrPos);
 		__Vector3 vRadiusPos      = s_CameraData.vEye - (AbsoluteCurrPos + m_pRefBundle->m_vPos);
 
-		float ang;
+		float ang                 = 0.0f;
 		if (vRadiusPos.z == 0.0f && vRadiusPos.x >= 0)
 			ang = __PI * (-0.5f);
 		else if (vRadiusPos.z == 0.0f && vRadiusPos.x < 0)
@@ -628,7 +619,7 @@ void CN3FXPartBillBoard::Render()
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
 
-		DWORD dwCullMode, dwZWriteEnable, dwZBufferEnable, dwLight, dwAlpha;
+		DWORD dwCullMode = 0, dwZWriteEnable = 0, dwZBufferEnable = 0, dwLight = 0, dwAlpha = 0;
 		s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
 		s_lpD3DDev->GetRenderState(D3DRS_ZWRITEENABLE, &dwZWriteEnable);
 		s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &dwZBufferEnable);
@@ -651,8 +642,8 @@ void CN3FXPartBillBoard::Render()
 			s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, m_dwDoubleSide);
 
 		for (int i = 0; i < m_iNum; i++)
-			HRESULT hr = CN3Base::s_lpD3DDev->DrawPrimitiveUP(
-				D3DPT_TRIANGLEFAN, 2, &(m_pVB[i * 4]), sizeof(__VertexXyzColorT1));
+			s_lpD3DDev->DrawPrimitiveUP(
+				D3DPT_TRIANGLEFAN, 2, &m_pVB[i * 4], sizeof(__VertexXyzColorT1));
 
 		if (m_bAlpha != dwAlpha)
 			s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlpha);
@@ -667,7 +658,7 @@ void CN3FXPartBillBoard::Render()
 	}
 }
 
-float CN3FXPartBillBoard::CameraDist()
+float CN3FXPartBillBoard::CameraDist() const
 {
 	__Vector3 vA = m_pVB[1] - m_pVB[0];
 	__Vector3 vB = m_pVB[3] - m_pVB[0];
@@ -681,7 +672,7 @@ float CN3FXPartBillBoard::CameraDist()
 		vN.x * s_CameraData.vEye.x + vN.y * s_CameraData.vEye.y + vN.z * s_CameraData.vEye.z + D);
 }
 
-__Vector3 CN3FXPartBillBoard::Rotate2AbsolutePos(__Vector3 vRelativePos)
+__Vector3 CN3FXPartBillBoard::Rotate2AbsolutePos(const __Vector3& vRelativePos) const
 {
 	__Vector3 vAbsolutePos(0, 0, 1);
 	__Vector3 vAxisZ(0, 0, 1);
@@ -690,7 +681,7 @@ __Vector3 CN3FXPartBillBoard::Rotate2AbsolutePos(__Vector3 vRelativePos)
 	__Quaternion qtRot;
 
 	vDirAxis.Cross(vAxisZ, m_pRefBundle->m_vDir);
-	int tmp;
+	int tmp    = 0;
 	tmp        = (int) (vDirAxis.x * 10000.0f);
 	vDirAxis.x = (float) (tmp) / 10000.0f;
 	tmp        = (int) (vDirAxis.y * 10000.0f);

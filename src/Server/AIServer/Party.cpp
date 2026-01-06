@@ -18,10 +18,8 @@ CParty::~CParty()
 
 void CParty::PartyProcess(char* pBuf)
 {
-	int index = 0;
-	uint8_t subcommand;
-
-	subcommand = GetByte(pBuf, index);
+	int index          = 0;
+	uint8_t subcommand = GetByte(pBuf, index);
 	switch (subcommand)
 	{
 		case PARTY_CREATE:
@@ -38,6 +36,10 @@ void CParty::PartyProcess(char* pBuf)
 
 		case PARTY_DELETE:
 			PartyDelete(pBuf + index);
+			break;
+
+		default:
+			spdlog::error("Party::Parsing: Unhandled opcode {:02X}", subcommand);
 			break;
 	}
 }

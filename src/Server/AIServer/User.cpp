@@ -15,10 +15,6 @@
 	3. GetDamage() 수정
 */
 
-#define MORAL_GOOD    0x01
-#define MORAL_BAD     0x02
-#define MORAL_NEUTRAL 0x03
-
 // 운영자 아이디 넣기..
 /*const char* g_pszOPID[] =
 {
@@ -38,6 +34,62 @@ extern std::mutex g_region_mutex;
 CUser::CUser()
 {
 	m_pMain = AIServerApp::instance();
+
+	memset(m_strUserID, 0, sizeof(m_strUserID));
+	m_iUserId               = -1;
+	m_bLive                 = 0;
+
+	m_curx                  = 0.0f;
+	m_cury                  = 0.0f;
+	m_curz                  = 0.0f;
+	m_fWill_x               = 0.0f;
+	m_fWill_y               = 0.0f;
+	m_fWill_z               = 0.0f;
+	m_sSpeed                = 0;
+	m_curZone               = 0;
+	m_sZoneIndex            = 0;
+
+	m_bNation               = 0;
+	m_byLevel               = 0;
+
+	m_sHP                   = 0;
+	m_sMP                   = 0;
+	m_sSP                   = 0;
+	m_sMaxHP                = 0;
+	m_sMaxMP                = 0;
+	m_sMaxSP                = 0;
+
+	m_sRegionX              = 0;
+	m_sRegionZ              = 0;
+	m_sOldRegionX           = 0;
+	m_sOldRegionZ           = 0;
+
+	m_bResHp                = 0;
+	m_bResMp                = 0;
+	m_bResSta               = 0;
+
+	m_byNowParty            = 0;
+	m_byPartyTotalMan       = 0;
+	m_sPartyTotalLevel      = 0;
+	m_sPartyNumber          = 0;
+
+	m_sHitDamage            = 0;
+	m_fHitrate              = 0.0f;
+	m_fAvoidrate            = 0.0f;
+	m_sAC                   = 0;
+	m_sItemAC               = 0;
+
+	m_byIsOP                = 0;
+	m_lUsed                 = 0;
+
+	m_bLogOut               = false;
+
+	m_bMagicTypeLeftHand    = 0;
+	m_bMagicTypeRightHand   = 0;
+	m_sMagicAmountLeftHand  = 0;
+	m_sMagicAmountRightHand = 0;
+
+	memset(m_sSurroundNpcNumber, 0, sizeof(m_sSurroundNpcNumber));
 }
 
 CUser::~CUser()
@@ -67,7 +119,6 @@ void CUser::Initialize()
 	m_sMaxHP           = 0;     // MaxHP
 	m_sMaxMP           = 0;     // MaxMP
 	m_sMaxSP           = 0;     // MaxSP
-	m_state            = 0;     // User의 상태
 	m_sRegionX         = 0;     // 현재 영역 X 좌표
 	m_sRegionZ         = 0;     // 현재 영역 Z 좌표
 	m_sOldRegionX      = 0;
@@ -148,53 +199,36 @@ void CUser::Attack(int /*sid*/, int tid)
 void CUser::SendAttackSuccess(
 	int tuid, uint8_t result, int16_t sDamage, int nHP, uint8_t byAttackType)
 {
-	int send_index = 0;
+	int sendIndex = 0;
 	int sid = -1, tid = -1;
-	uint8_t type, bResult;
-	char buff[256] = {};
+	uint8_t type = 0, bResult = 0;
+	char buff[256] {};
 
-	type           = 0x01;
-	bResult        = result;
-	sid            = m_iUserId + USER_BAND;
-	tid            = tuid;
+	type    = 0x01;
+	bResult = result;
+	sid     = m_iUserId + USER_BAND;
+	tid     = tuid;
 
-	SetByte(buff, AG_ATTACK_RESULT, send_index);
-	SetByte(buff, type, send_index);
-	SetByte(buff, bResult, send_index);
-	SetShort(buff, sid, send_index);
-	SetShort(buff, tid, send_index);
-	SetShort(buff, sDamage, send_index);
-	SetDWORD(buff, nHP, send_index);
-	SetByte(buff, byAttackType, send_index);
+	SetByte(buff, AG_ATTACK_RESULT, sendIndex);
+	SetByte(buff, type, sendIndex);
+	SetByte(buff, bResult, sendIndex);
+	SetShort(buff, sid, sendIndex);
+	SetShort(buff, tid, sendIndex);
+	SetShort(buff, sDamage, sendIndex);
+	SetDWORD(buff, nHP, sendIndex);
+	SetByte(buff, byAttackType, sendIndex);
 
 	//TRACE(_T("User - SendAttackSuccess() : [sid=%d, tid=%d, result=%d], damage=%d, hp = %d\n"), sid, tid, bResult, sDamage, sHP);
 
-	SendAll(buff, send_index); // thread 에서 send
+	SendAll(buff, sendIndex); // thread 에서 send
 }
 
-void CUser::SendMagicAttackResult(int tuid, uint8_t result, int16_t sDamage, int16_t sHP)
+void CUser::SendMagicAttackResult(uint8_t opcode, int magicId, int targetId, int data1 /*= 0*/,
+	int data2 /*= 0*/, int data3 /*= 0*/, int data4 /*= 0*/, int data5 /*= 0*/, int data6 /*= 0*/,
+	int data7 /*= 0*/)
 {
-	int send_index = 0;
-	int sid = -1, tid = -1;
-	uint8_t type, bResult;
-	char buff[256] = {};
-
-	type           = 0x01;
-	bResult        = result;
-	sid            = m_iUserId + USER_BAND;
-	tid            = tuid;
-
-	SetByte(buff, AG_MAGIC_ATTACK_RESULT, send_index);
-	SetByte(buff, type, send_index);
-	SetByte(buff, bResult, send_index);
-	SetShort(buff, sid, send_index);
-	SetShort(buff, tid, send_index);
-	SetShort(buff, sDamage, send_index);
-	SetShort(buff, sHP, send_index);
-
-	//TRACE(_T("User - SendAttackSuccess() : [sid=%d, tid=%d, result=%d], damage=%d, hp = %d\n"), sid, tid, bResult, sDamage, sHP);
-
-	SendAll(buff, send_index); // thread 에서 send
+	m_MagicProcess.SendMagicAttackResult(opcode, magicId, m_iUserId + USER_BAND, targetId, data1,
+		data2, data3, data4, data5, data6, data7);
 }
 
 // sungyong 2002.05.22
@@ -273,14 +307,13 @@ void CUser::Dead(int tid, int nDamage)
 	pMap->RegionUserRemove(m_sRegionX, m_sRegionZ, m_iUserId);
 	//TRACE(_T("*** User Dead()-> User(%hs, %d)를 Region에 삭제,, region_x=%d, y=%d\n"), m_strUserID, m_iUserId, m_sRegionX, m_sRegionZ);
 
-	m_sRegionX     = -1;
-	m_sRegionZ     = -1;
+	m_sRegionX    = -1;
+	m_sRegionZ    = -1;
 
-	int send_index = 0;
+	int sendIndex = 0;
 	int sid = -1, targid = -1;
-	uint8_t type, result;
-	char buff[256] = {};
-	memset(buff, 0, sizeof(buff));
+	uint8_t type = 0, result = 0;
+	char buff[256] {};
 	spdlog::debug("User::Dead: userId={} charId={}", m_iUserId, m_strUserID);
 
 	type   = 0x02;
@@ -288,26 +321,26 @@ void CUser::Dead(int tid, int nDamage)
 	sid    = tid;
 	targid = m_iUserId + USER_BAND;
 
-	SetByte(buff, AG_ATTACK_RESULT, send_index);
-	SetByte(buff, type, send_index);
-	SetByte(buff, result, send_index);
-	SetShort(buff, sid, send_index);
-	SetShort(buff, targid, send_index);
-	SetShort(buff, nDamage, send_index);
-	SetDWORD(buff, m_sHP, send_index);
-	//SetShort( buff, m_sMaxHP, send_index );
+	SetByte(buff, AG_ATTACK_RESULT, sendIndex);
+	SetByte(buff, type, sendIndex);
+	SetByte(buff, result, sendIndex);
+	SetShort(buff, sid, sendIndex);
+	SetShort(buff, targid, sendIndex);
+	SetShort(buff, nDamage, sendIndex);
+	SetDWORD(buff, m_sHP, sendIndex);
+	//SetShort( buff, m_sMaxHP, sendIndex );
 
 	//TRACE(_T("Npc - SendAttackSuccess()-User Dead : [sid=%d, tid=%d, result=%d], damage=%d, hp = %d\n"), sid, targid, result, nDamage, m_sHP);
 
 	if (tid > 0)
-		SendAll(buff, send_index); // thread 에서 send
+		SendAll(buff, sendIndex); // thread 에서 send
 
-								   /*	SetByte(buff, AG_DEAD, send_index );
-	SetShort(buff, m_iUserId, send_index );
-	SetFloat(buff, m_curx, send_index);
-	SetFloat(buff, m_curz, send_index);
+								  /*	SetByte(buff, AG_DEAD, sendIndex );
+	SetShort(buff, m_iUserId, sendIndex );
+	SetFloat(buff, m_curx, sendIndex);
+	SetFloat(buff, m_curz, sendIndex);
 
-	SendAll(buff, send_index);   // thread 에서 send	*/
+	SendAll(buff, sendIndex);   // thread 에서 send	*/
 }
 
 void CUser::SendHP()
@@ -316,14 +349,14 @@ void CUser::SendHP()
 		return;
 
 	// HP 변동량을 게임서버로...
-	int send_index = 0;
-	char buff[256] = {};
+	int sendIndex = 0;
+	char buff[256] {};
 
-	SetByte(buff, AG_USER_SET_HP, send_index);
-	SetShort(buff, m_iUserId, send_index);
-	SetDWORD(buff, m_sHP, send_index);
+	SetByte(buff, AG_USER_SET_HP, sendIndex);
+	SetShort(buff, m_iUserId, sendIndex);
+	SetDWORD(buff, m_sHP, sendIndex);
 
-	SendAll(buff, send_index);
+	SendAll(buff, sendIndex);
 }
 
 void CUser::SetExp(int iNpcExp, int iLoyalty, int iLevel)
@@ -427,17 +460,17 @@ void CUser::SetPartyExp(int iNpcExp, int iLoyalty, int /*iPartyLevel*/, int /*iM
 //  경험치를 보낸다. (레벨업일때 관련 수치를 준다)
 void CUser::SendExp(int iExp, int iLoyalty, int /*tType*/)
 {
-	int send_index = 0;
-	char buff[256] = {};
+	int sendIndex = 0;
+	char buff[256] {};
 
-	SetByte(buff, AG_USER_EXP, send_index);
-	SetShort(buff, m_iUserId, send_index);
-	SetShort(buff, iExp, send_index);
-	SetShort(buff, iLoyalty, send_index);
+	SetByte(buff, AG_USER_EXP, sendIndex);
+	SetShort(buff, m_iUserId, sendIndex);
+	SetShort(buff, iExp, sendIndex);
+	SetShort(buff, iLoyalty, sendIndex);
 
 	//TRACE(_T("$$ User - SendExp : %hs, exp=%d, loyalty=%d $$\n"), m_strUserID, iExp, iLoyalty);
 
-	SendAll(buff, send_index);
+	SendAll(buff, sendIndex);
 }
 
 int16_t CUser::GetDamage(int tid, int magicid)
@@ -587,7 +620,7 @@ int16_t CUser::GetDamage(int tid, int magicid)
 			}
 			break;
 
-		case FAIL: // 사장님 요구
+		default: // 사장님 요구
 			damage = 0;
 			break;
 	}
@@ -636,7 +669,7 @@ int16_t CUser::GetMagicDamage(int damage, int16_t tid)
 			pNpc->MSpChange(2, -temp_damage);
 			break;
 
-		case 7: // MP Drain
+		default:
 			break;
 	}
 
@@ -680,7 +713,7 @@ int16_t CUser::GetMagicDamage(int damage, int16_t tid)
 			pNpc->MSpChange(2, -temp_damage);
 			break;
 
-		case 7: // MP Drain
+		default:
 			break;
 	}
 
@@ -788,16 +821,16 @@ uint8_t CUser::GetHitRate(float rate)
 
 void CUser::SendSystemMsg(const std::string_view msg, uint8_t type, int nWho)
 {
-	int send_index  = 0;
-	char buff[1024] = {};
+	int sendIndex = 0;
+	char buff[1024] {};
 
-	SetByte(buff, AG_SYSTEM_MSG, send_index);
-	SetByte(buff, type, send_index);  // 채팅형식
-	SetShort(buff, nWho, send_index); // 누구에게
-	SetShort(buff, m_iUserId, send_index);
-	SetString2(buff, msg, send_index);
+	SetByte(buff, AG_SYSTEM_MSG, sendIndex);
+	SetByte(buff, type, sendIndex);  // 채팅형식
+	SetShort(buff, nWho, sendIndex); // 누구에게
+	SetShort(buff, m_iUserId, sendIndex);
+	SetString2(buff, msg, sendIndex);
 
-	SendAll(buff, send_index);
+	SendAll(buff, sendIndex);
 }
 
 void CUser::InitNpcAttack()
@@ -811,7 +844,7 @@ int CUser::IsSurroundCheck(float fX, float fY, float fZ, int NpcID)
 	int nDir = 0;
 	__Vector3 vNpc, vUser, vDis;
 	vNpc.Set(fX, fY, fZ);
-	float fDX, fDZ;
+	float fDX = 0.0f, fDZ = 0.0f;
 	float fDis = 0.0f, fCurDis = 1000.0f;
 	bool bFlag = false;
 	for (int i = 0; i < 8; i++)
@@ -941,53 +974,41 @@ void CUser::HealAreaCheck(int rx, int rz)
 	float fRadius = 10.0f;
 
 	__Vector3 vStart, vEnd;
-	CNpc* pNpc = nullptr;
 	float fDis = 0.0f;
 	vStart.Set(m_curx, (float) 0, m_curz);
-	int nid = 0, count = 0, total_mon = 0;
-	int* pNpcIDList = nullptr;
+
+	std::vector<int> npcIds;
 
 	{
 		std::lock_guard<std::mutex> lock(g_region_mutex);
+		const auto& regionNpcArray = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.m_UserTypeMap;
+		if (regionNpcArray.empty())
+			return;
 
-		auto Iter1 = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.begin();
-		auto Iter2 = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.end();
-
-		total_mon  = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.GetSize();
-
-		pNpcIDList = new int[total_mon];
-		for (; Iter1 != Iter2; Iter1++)
-		{
-			nid               = *((*Iter1).second);
-			pNpcIDList[count] = nid;
-			count++;
-		}
+		npcIds.reserve(regionNpcArray.size());
+		for (const auto& [npcId, _] : regionNpcArray)
+			npcIds.push_back(npcId);
 	}
 
-	for (int i = 0; i < total_mon; i++)
+	for (int npcId : npcIds)
 	{
-		nid = pNpcIDList[i];
-		if (nid < NPC_BAND)
+		if (npcId < NPC_BAND)
 			continue;
 
-		pNpc = m_pMain->_npcMap.GetData(nid - NPC_BAND);
+		CNpc* pNpc = m_pMain->_npcMap.GetData(npcId - NPC_BAND);
+		if (pNpc == nullptr || pNpc->m_NpcState == NPC_DEAD)
+			continue;
 
-		if (pNpc != nullptr && pNpc->m_NpcState != NPC_DEAD)
-		{
-			if (m_bNation == pNpc->m_byGroup)
-				continue;
+		if (m_bNation == pNpc->m_byGroup)
+			continue;
 
-			vEnd.Set(pNpc->m_fCurX, pNpc->m_fCurY, pNpc->m_fCurZ);
-			fDis = pNpc->GetDistance(vStart, vEnd);
+		vEnd.Set(pNpc->m_fCurX, pNpc->m_fCurY, pNpc->m_fCurZ);
+		fDis = pNpc->GetDistance(vStart, vEnd);
 
-			// NPC가 반경안에 있을 경우...
-			if (fDis > fRadius)
-				continue;
+		// NPC가 반경안에 있을 경우...
+		if (fDis > fRadius)
+			continue;
 
-			pNpc->ChangeTarget(1004, this);
-		}
+		pNpc->ChangeTarget(1004, this);
 	}
-
-	delete[] pNpcIDList;
-	pNpcIDList = nullptr;
 }

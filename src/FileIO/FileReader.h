@@ -75,8 +75,8 @@ public:
 
 protected:
 	LLFIO_V2_NAMESPACE::mapped_file_handle
-		_mappedFileHandle; ///< Memory-mapped file handle for read access.
-	void* _address;        ///< Pointer to the memory-mapped data.
+		_mappedFileHandle;    ///< Memory-mapped file handle for read access.
+	void* _address = nullptr; ///< Pointer to the memory-mapped data.
 };
 
-#endif                     // FILEIO_FILEREADER_H
+#endif                        // FILEIO_FILEREADER_H

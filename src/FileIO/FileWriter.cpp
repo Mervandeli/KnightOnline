@@ -1,13 +1,12 @@
 ﻿#include "FileWriter.h"
 
 #include <cassert>
-#include <stdio.h> // SEEK_SET, SEEK_CUR, SEEK_END
+#include <cstdio> // SEEK_SET, SEEK_CUR, SEEK_END
 
 namespace llfio = LLFIO_V2_NAMESPACE;
 
 FileWriter::FileWriter()
 {
-	_sizeOnDisk = 0;
 }
 
 bool FileWriter::OpenExisting(const std::filesystem::path& path)
@@ -32,6 +31,8 @@ bool FileWriter::OpenExisting(const std::filesystem::path& path)
 	_open       = true;
 	_size       = 0;
 
+	// We don't initialize this for performance; we purposefully only request the size component.
+	// NOLINTNEXTLINE(*.cplusplus.UninitializedObject)
 	llfio::stat_t stat;
 
 	auto statResult = stat.fill(_fileHandle, llfio::stat_t::want::size);
@@ -169,7 +170,7 @@ void FileWriter::Flush()
 	// the operating system will fill in the blanks.
 	if (_size > _sizeOnDisk)
 	{
-		std::byte dummy  = {};
+		std::byte dummy {};
 
 		auto writeResult = _fileHandle.write(_size - 1, { { &dummy, 1 } });
 		if (writeResult)

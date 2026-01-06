@@ -7,15 +7,6 @@
 #include "N3UIString.h"
 #include "N3UIScrollBar.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3UIList::CN3UIList()
 {
 	m_eType         = UI_TYPE_LIST;
@@ -208,8 +199,8 @@ void CN3UIList::UpdateChildRegions()
 {
 	RECT rc     = GetRegion();
 	RECT rcThis = rc;
-	POINT pt;
-	SIZE size;
+	POINT pt {};
+	SIZE size {};
 	int iScrollPos = 0;
 	if (m_pScrollBarRef != nullptr)
 	{
@@ -330,8 +321,11 @@ bool CN3UIList::Save(File& file)
 #endif // #ifdef _N3TOOL
 
 #ifdef _N3TOOL
-void CN3UIList::operator=(const CN3UIList& other)
+CN3UIList& CN3UIList::operator=(const CN3UIList& other)
 {
+	if (this == &other)
+		return *this;
+
 	CN3UIBase::operator=(other);
 
 	m_szFontName   = other.m_szFontName;
@@ -339,6 +333,8 @@ void CN3UIList::operator=(const CN3UIList& other)
 	m_bFontBold    = other.m_bFontBold;
 	m_bFontItalic  = other.m_bFontItalic;
 	m_crFont       = other.m_crFont;
+
+	return *this;
 }
 #endif // #ifdef _N3TOOL
 
@@ -351,14 +347,14 @@ uint32_t CN3UIList::MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT&
 	// 특정 이벤트에 대해 메시지 전송..
 	if (IsIn(ptCur.x, ptCur.y) && ((dwFlags & UI_MOUSE_LBCLICK) || (dwFlags & UI_MOUSE_LBDBLCLK)))
 	{
-		RECT rc = this->GetRegion(), rcStr;
-		SIZE size;
+		RECT rc = GetRegion(), rcStr;
+		SIZE size {};
 
 		it_pString it = m_ListString.begin(), itEnd = m_ListString.end();
 		for (int i = 0; it != itEnd; it++, i++)
 		{
 			CN3UIString* pStr = (*it);
-			if (false == pStr->IsVisible())
+			if (!pStr->IsVisible())
 				continue;
 
 			pStr->GetTextExtent("1", 1, &size);
@@ -403,11 +399,11 @@ void CN3UIList::Render()
 		auto it = m_ListString.begin();
 		std::advance(it, m_iCurSel);
 		CN3UIString* pStr = *it;
-		if (pStr)
+		if (pStr != nullptr)
 		{
 			RECT rc = pStr->GetRegion(); // 선택 표시
 
-			__VertexTransformedColor vLines[5];
+			__VertexTransformedColor vLines[5] {};
 			vLines[0].Set(
 				(float) rc.left, (float) rc.top, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
 			vLines[1].Set(
@@ -418,8 +414,8 @@ void CN3UIList::Render()
 				(float) rc.left, (float) rc.bottom, UI_DEFAULT_Z, UI_DEFAULT_RHW, 0xff00ff00);
 			vLines[4] = vLines[0];
 
-			DWORD dwZ, dwFog, dwAlpha, dwCOP, dwCA1, dwSrcBlend, dwDestBlend, dwVertexShader, dwAOP,
-				dwAA1;
+			DWORD dwZ = 0, dwFog = 0, dwAlpha = 0, dwCOP = 0, dwCA1 = 0, dwSrcBlend = 0,
+				  dwDestBlend = 0, dwVertexShader = 0, dwAOP = 0, dwAA1 = 0;
 			CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &dwZ);
 			CN3Base::s_lpD3DDev->GetRenderState(D3DRS_FOGENABLE, &dwFog);
 			CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);

@@ -56,7 +56,7 @@ TEST_F(Matrix44Test, DefaultConstructor_InitializesToZero)
 {
 	SCOPED_TRACE("__Matrix44::__Matrix44() = default");
 
-	__Matrix44 mtx = {};
+	__Matrix44 mtx {};
 	ExpectMatrixNear(mtx, mtxZeroInitialized);
 }
 

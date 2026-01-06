@@ -5,15 +5,6 @@
 #include "N3PMesh.h"
 #include "N3PMeshInstance.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3PMesh::CN3PMesh()
 {
 	m_dwType             |= OBJ_MESH_PROGRESSIVE;
@@ -351,14 +342,19 @@ HRESULT CN3PMesh::GenerateSecondUV()
 
 		for (int i = 0; i < m_iMaxNumVertices; i++)
 		{
-			m_pVertices2[i].x   = m_pVertices[i].x;
-			m_pVertices2[i].y   = m_pVertices[i].y;
-			m_pVertices2[i].z   = m_pVertices[i].z;
-			m_pVertices2[i].n   = m_pVertices[i].n;
-			m_pVertices2[i].tu  = m_pVertices[i].tu;
-			m_pVertices2[i].tv  = m_pVertices[i].tv;
-			m_pVertices2[i].tu2 = m_pVertices[i].tu;
-			m_pVertices2[i].tv2 = m_pVertices[i].tv;
+			auto& dst       = m_pVertices2[i];
+			const auto& src = m_pVertices[i];
+
+			dst.x           = src.x;
+			dst.y           = src.y;
+			dst.z           = src.z;
+			dst.n.x         = src.n.x;
+			dst.n.y         = src.n.y;
+			dst.n.z         = src.n.z;
+			dst.tu          = src.tu;
+			dst.tv          = src.tv;
+			dst.tu2         = src.tu;
+			dst.tv2         = src.tv;
 		}
 	}
 

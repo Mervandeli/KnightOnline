@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef SERVER_AUJARD_AUJARDREADQUEUETHREAD_H
+#define SERVER_AUJARD_AUJARDREADQUEUETHREAD_H
+
+#pragma once
 
 #include <shared-server/ReadQueueThread.h>
 
@@ -11,3 +14,5 @@ public:
 protected:
 	void process_packet(const char* buffer, int len) override;
 };
+
+#endif // SERVER_AUJARD_AUJARDREADQUEUETHREAD_H

@@ -5,9 +5,7 @@
 #if !defined(AFX_N3UITRACKBAR_H__EB496B74_468B_4D7B_89A9_D3A5A1A3E538__INCLUDED_)
 #define AFX_N3UITRACKBAR_H__EB496B74_468B_4D7B_89A9_D3A5A1A3E538__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3UIBase.h"
 
@@ -19,7 +17,7 @@ public:
 
 	// Attributes
 public:
-	enum eIMAGE_TYPE
+	enum eIMAGE_TYPE : uint8_t
 	{
 		IMAGETYPE_BKGND = 0,
 		IMAGETYPE_THUMB,
@@ -87,7 +85,7 @@ protected:
 #ifdef _N3TOOL
 	// tool에서 쓰이는 함수
 public:
-	virtual void operator=(const CN3UITrackBar& other);
+	CN3UITrackBar& operator=(const CN3UITrackBar& other);
 	void CreateImages();  // 이미지 생성
 	void DeleteBkImage(); // 배경이미지 삭제
 

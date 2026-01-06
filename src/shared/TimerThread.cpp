@@ -10,13 +10,13 @@ TimerThread::TimerThread(std::chrono::milliseconds tickDelay, TickCallback_t&& t
 
 void TimerThread::thread_loop()
 {
-	while (_canTick)
+	while (CanTick())
 	{
 		{
-			std::unique_lock<std::mutex> lock(_mutex);
-			std::cv_status status = _cv.wait_for(lock, _tickDelay);
+			std::unique_lock<std::mutex> lock(ThreadMutex());
+			std::cv_status status = ThreadCondition().wait_for(lock, _tickDelay);
 
-			if (!_canTick)
+			if (!CanTick())
 				break;
 
 			// Only tick every _tickDelay, ignore spurious wakeups

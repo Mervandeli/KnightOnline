@@ -4,19 +4,11 @@
 
 TcpSocket::TcpSocket(SocketManager* socketManager) :
 	_socketManager(socketManager), _socket(*socketManager->GetWorkerPool()),
+	_recvBufferSize(socketManager->GetRecvBufferSize()),
+	_sendBufferSize(socketManager->GetSendBufferSize()),
 	_recvCircularBuffer(socketManager->GetRecvBufferSize()),
 	_sendCircularBuffer(socketManager->GetSendBufferSize())
 {
-	_state             = CONNECTION_STATE_DISCONNECTED;
-	_socketId          = -1;
-	_sendInProgress    = false;
-	_socketErrorCount  = 0;
-
-	_remoteIpCached    = false;
-	_pendingDisconnect = false;
-
-	_recvBufferSize    = socketManager->GetRecvBufferSize();
-	_sendBufferSize    = socketManager->GetSendBufferSize();
 	_recvBuffer.resize(_recvBufferSize);
 }
 
@@ -223,6 +215,11 @@ void TcpSocket::InitSocket()
 	_pendingDisconnect = false;
 
 	Initialize();
+}
+
+void TcpSocket::Initialize()
+{
+	/* do nothing */
 }
 
 const std::string& TcpSocket::GetRemoteIP()

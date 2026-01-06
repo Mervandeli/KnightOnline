@@ -5,9 +5,7 @@
 #if !defined(AFX_N3PMeshInstance_h__INCLUDED_)
 #define AFX_N3PMeshInstance_h__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3Base.h"
 #include "N3PMesh.h"
@@ -22,7 +20,7 @@ public:
 	CN3PMeshInstance();
 	CN3PMeshInstance(CN3PMesh* pN3PMesh);
 	CN3PMeshInstance(const std::string& szFN);
-	virtual ~CN3PMeshInstance();
+	~CN3PMeshInstance() override;
 
 protected:
 	uint16_t* m_pIndices;
@@ -36,17 +34,17 @@ protected:
 	CN3PMesh* m_pPMesh; // 참조 포인터
 
 public:
-	BOOL IsLOD()
+	bool IsLOD() const
 	{
-		if (nullptr == m_pCollapseUpTo)
-			return FALSE;
-		return TRUE;
+		return (m_pCollapseUpTo != nullptr);
 	}
+
 	bool Create(CN3PMesh* pN3Mesh);
 	bool Create(const std::string& szFN);
-	void Release();
+	void Release() override;
 	void Render();
 	void RenderTwoUV();
+
 	// The value you pass into this could be based on distance from camera, frame rate, etc
 	void SetLOD(float value); // value = Camera Distance / Camera FOV;
 
@@ -56,24 +54,33 @@ public:
 	bool SplitOne();
 
 	void SetLODByNumVertices(int iNumVertices);
+
 	int GetNumVertices() const
 	{
 		return m_iNumVertices;
-	};
+	}
+
 	int GetNumIndices() const
 	{
 		return m_iNumIndices;
-	};
+	}
+
 	CN3PMesh* GetMesh()
 	{
 		return m_pPMesh;
-	};
+	}
+
+	const CN3PMesh* GetMesh() const
+	{
+		return m_pPMesh;
+	}
 
 	__VertexT1* GetVertices() const;
+
 	uint16_t* GetIndices() const
 	{
 		return m_pIndices;
-	};
+	}
 
 	//	By : Ecli666 ( On 2002-08-06 오후 4:33:04 )
 	//

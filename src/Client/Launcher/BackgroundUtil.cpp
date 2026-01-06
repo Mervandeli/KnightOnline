@@ -13,6 +13,8 @@ static char THIS_FILE[] = __FILE__;
 
 CBackgroundUtil::CBackgroundUtil()
 {
+	m_nBmpHeight = 0;
+	m_nBmpWidth  = 0;
 }
 
 CBackgroundUtil::~CBackgroundUtil()

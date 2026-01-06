@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef CLIENT_WARFARE_UILOGIN_1098_H
+#define CLIENT_WARFARE_UILOGIN_1098_H
+
+#pragma once
 
 #if defined(LOGIN_SCENE_VERSION) && LOGIN_SCENE_VERSION == 1098
 #include <string>
@@ -102,3 +105,5 @@ public:
 };
 
 #endif
+
+#endif // CLIENT_WARFARE_UILOGIN_1098_H

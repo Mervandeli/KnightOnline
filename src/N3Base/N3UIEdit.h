@@ -5,18 +5,19 @@
 #if !defined(AFX_N3UIEDIT_H__91BCC181_3AA5_4CD4_8D33_06D5D96F4F26__INCLUDED_)
 #define AFX_N3UIEDIT_H__91BCC181_3AA5_4CD4_8D33_06D5D96F4F26__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3UIStatic.h"
 
 class CN3UIEdit : public CN3UIStatic
 {
+	static constexpr uint32_t DEFAULT_MAX_LENGTH = 0x7fffffff;
+
 	//	friend class CN3IME;
 public:
 	CN3UIEdit();
-	virtual ~CN3UIEdit();
+	~CN3UIEdit() override;
+
 	// class
 protected:
 	class CN3Caret
@@ -31,6 +32,7 @@ protected:
 		void Render(LPDIRECT3DDEVICE9 lpD3DDev);
 		void InitFlckering();     // 깜박임 초기화..
 		BOOL m_bVisible;          // 보이나
+
 	protected:
 		int m_iSize;              // caret의 pixel 크기
 		float m_fFlickerTimePrev; // 깜박이기 위한 시간..
@@ -41,16 +43,6 @@ protected:
 
 										   // Attributes
 public:
-	/*
-	static bool		AddEdit(CN3UIEdit* pEdit);
-	static bool		DeleteEdit(CN3UIEdit* pEdit);
-	static CN3UIEdit* GetEdit(HWND hWnd);
-	static HWND		s_hWndParent;
-
-	LRESULT APIENTRY EditWndProcFuncPointer(HWND hWnd, uint16_t Message, WPARAM wParam, LPARAM lParam);
-	static LRESULT	APIENTRY EditWndProc(HWND hWnd, uint16_t Message, WPARAM wParam, LPARAM lParam);
-	static			void SetParentWindowHwnd(HWND hWnd) { s_hWndParent = hWnd; }
-*/
 	static HWND s_hWndEdit, s_hWndParent;
 	static WNDPROC s_lpfnEditProc;
 	static char s_szBuffTmp[512];
@@ -79,22 +71,27 @@ public:
 	void Release() override;
 	void SetVisible(bool bVisible) override;
 	uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
-	BOOL MoveOffset(int iOffsetX, int iOffsetY)
-		override;     // 위치 지정(chilren의 위치도 같이 바꾸어준다. caret위치도 같이 바꾸어줌.)
+
+	// 위치 지정(chilren의 위치도 같이 바꾸어준다. caret위치도 같이 바꾸어줌.)
+	BOOL MoveOffset(int iOffsetX, int iOffsetY) override;
+
 	void KillFocus(); // 포커스를 없앤다.
 	bool SetFocus();  // 포커스를 준다.
+
 	bool HaveFocus() const
 	{
 		return (this == s_pFocusedEdit);
 	}
+
 	void SetCaretPos(size_t nPos);                          //몇번째 바이트에 있는지 설정한다.
 	void SetMaxString(size_t nMax);                         // 최대 글씨 수를 정해준다.
+
 protected:
 	BOOL IsHangulMiddleByte(const char* lpszStr, int iPos); // 한글의 2번째 바이트 글자인가?
 
 #ifdef _N3TOOL
 public:
-	virtual void operator=(const CN3UIEdit& other);
+	CN3UIEdit& operator=(const CN3UIEdit& other);
 	bool Save(File& file) override;
 	void SetSndTyping(const std::string& strFileName);
 	std::string GetSndFName_Typing() const;

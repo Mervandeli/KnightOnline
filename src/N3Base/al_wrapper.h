@@ -6,8 +6,10 @@
 #include <AL/al.h>
 #include <limits.h>
 
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define AL_CHECK_ERROR()       al_check_error_impl(__FILE__, __LINE__)
 #define AL_CLEAR_ERROR_STATE() alGetError()
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 bool al_check_error_impl(const char* file, int line);
 

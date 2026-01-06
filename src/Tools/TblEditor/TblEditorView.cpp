@@ -305,8 +305,8 @@ void CTblEditorView::OnDropFiles(HDROP hDropInfo)
 	CTblEditorDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	TCHAR szFile[MAX_PATH + 1] = {};
-	UINT uiFiles               = DragQueryFile(hDropInfo, 0xFFFF, nullptr, 0);
+	TCHAR szFile[MAX_PATH + 1] {};
+	UINT uiFiles = DragQueryFile(hDropInfo, 0xFFFF, nullptr, 0);
 	::DragQueryFile(hDropInfo, 0, szFile, MAX_PATH);
 	::DragFinish(hDropInfo);
 

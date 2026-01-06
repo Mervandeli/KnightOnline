@@ -7,20 +7,14 @@
 #include "My_3DStruct.h"
 #include "N3Texture.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3Moon::CN3Moon()
 {
 	m_pTexture        = nullptr;
 	m_fCurRadian      = __PI;
 	m_iMoonPhaseIndex = 0;
+	m_fMoonRatio      = 0.0f;
+
+	memset(&m_pVertices, 0, sizeof(m_pVertices));
 }
 
 CN3Moon::~CN3Moon()

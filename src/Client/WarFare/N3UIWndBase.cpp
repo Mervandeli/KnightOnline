@@ -16,15 +16,6 @@
 
 #include <N3Base/N3UIString.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 __InfoSelectedIcon CN3UIWndBase::s_sSelectedIconInfo;
 __RecoveryJobInfo CN3UIWndBase::s_sRecoveryJobInfo;
 __SkillSelectInfo CN3UIWndBase::s_sSkillSelectInfo;
@@ -41,6 +32,8 @@ int CN3UIWndBase::s_iRefCount                             = 0;
 
 CN3UIWndBase::CN3UIWndBase()
 {
+	m_eUIWnd          = UIWND_UNKNOWN;
+
 	s_pSelectionImage = new CN3UIImage();
 	s_pSelectionImage->Init(CGameProcedure::s_pUIMgr);
 	s_pSelectionImage->SetUVRect(0.0f, 0.0f, 1.0f, 1.0f);

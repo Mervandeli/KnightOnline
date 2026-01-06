@@ -15,16 +15,6 @@
 
 #include <algorithm>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIQuestTalk::CUIQuestTalk()
 {
 	m_pTextTalk      = nullptr;
@@ -48,17 +38,17 @@ void CUIQuestTalk::Open(Packet& pkt)
 	m_iNumTalk = 0;
 	m_iCurTalk = 0;
 
-	// NOTE(srmeier): two -1s before text ids
-	int index  = pkt.read<uint32_t>();
-	index      = pkt.read<uint32_t>();
+	// Up/OK buttons
+	pkt.read<uint32_t>();
+	pkt.read<uint32_t>();
 
 	for (int i = 0; i < MAX_STRING_TALK; i++)
 	{
-		m_szTalk[i]                         = "";
+		m_szTalk[i].clear();
 
-		index                               = pkt.read<uint32_t>();
+		uint32_t index                      = pkt.read<uint32_t>();
 		__TABLE_QUEST_TALK* pTbl_Quest_Talk = CGameBase::s_pTbl_QuestTalk.Find(index);
-		if (pTbl_Quest_Talk)
+		if (pTbl_Quest_Talk != nullptr)
 		{
 			m_szTalk[i] = pTbl_Quest_Talk->szTalk;
 			CGameBase::ConvertPipesToNewlines(m_szTalk[i]);
@@ -148,9 +138,13 @@ bool CUIQuestTalk::OnKeyPress(int iKey)
 		case DIK_ESCAPE:
 			SetVisible(false);
 			return true;
+
 		case DIK_RETURN:
 			ReceiveMessage(m_pBtnOk, UIMSG_BUTTON_CLICK);
 			return true;
+
+		default:
+			break;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

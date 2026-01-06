@@ -6,21 +6,11 @@
 #include "N3Sun.h"
 #include "N3Texture.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3Sun::CN3Sun()
 {
-	memset(m_Parts, 0, sizeof(__SunPart) * NUM_SUNPART);
-	int i;
-	for (i = 0; i < NUM_SUNPART; ++i)
+	for (int i = 0; i < NUM_SUNPART; ++i)
 	{
+		m_Parts[i] = {};
 		m_Parts[i].Color.ChangeColor(0xffffffff);
 	}
 	m_fCurRadian = 0.0f;
@@ -28,23 +18,18 @@ CN3Sun::CN3Sun()
 
 CN3Sun::~CN3Sun()
 {
-	int i;
-	for (i = 0; i < NUM_SUNPART; ++i)
-	{
-		__SunPart* pSP = m_Parts + i;
-		s_MngTex.Delete(&(pSP->pTex));
-	}
+	for (int i = 0; i < NUM_SUNPART; i++)
+		s_MngTex.Delete(&m_Parts[i].pTex);
 }
 
 void CN3Sun::Release()
 {
 	CN3Base::Release();
 
-	memset(m_Parts, 0, sizeof(__SunPart) * NUM_SUNPART);
-	int i;
-	for (i = 0; i < NUM_SUNPART; ++i)
+	for (int i = 0; i < NUM_SUNPART; i++)
 	{
 		s_MngTex.Delete(&m_Parts[i].pTex);
+		m_Parts[i] = {};
 		m_Parts[i].Color.ChangeColor(0xffffffff);
 	}
 
@@ -74,20 +59,23 @@ void CN3Sun::Render(__Matrix44& matView, __Matrix44& matProj)
 	vSun.z     = vOut.z * rhw;
 	if (vSun.z < 0.0f || vSun.z > 1.0f)
 		return;
+
 	// Mapping Screen Coordinate.
-	vSun.x = (float) X + int((vOut.x * rhw + 1) * Width * 0.5f);
-	vSun.y = (float) Y + int((-vOut.y * rhw + 1) * Height * 0.5f);
+	vSun.x           = (float) X + int((vOut.x * rhw + 1) * Width * 0.5f);
+	vSun.y           = (float) Y + int((-vOut.y * rhw + 1) * Height * 0.5f);
 
 	// back up render state
-	DWORD dwSrcBlend, dwDestBlend;
+	DWORD dwSrcBlend = 0, dwDestBlend = 0;
 	s_lpD3DDev->GetRenderState(D3DRS_SRCBLEND, &dwSrcBlend);
 	s_lpD3DDev->GetRenderState(D3DRS_DESTBLEND, &dwDestBlend);
 
 	// set render state
 	if (D3DBLEND_ONE != dwSrcBlend)
 		s_lpD3DDev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+
 	if (D3DBLEND_ONE != dwDestBlend)
 		s_lpD3DDev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+
 	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
@@ -98,11 +86,12 @@ void CN3Sun::Render(__Matrix44& matView, __Matrix44& matProj)
 	SetRect(&rcScreen, X, Y, X + Width, Y + Width);
 	for (int i = 0; i < NUM_SUNPART; ++i)
 	{
-		__SunPart* pSP = &(m_Parts[i]);
+		__SunPart* pSP = &m_Parts[i];
 
-		float iWTmp = iWTmp = (Width * pSP->Delta.GetCurDelta()) / 2;
-		SetRect(&(rcSun[i]), (int) (vSun.x - iWTmp), (int) (vSun.y - iWTmp), (int) (vSun.x + iWTmp),
+		float iWTmp    = (Width * pSP->Delta.GetCurDelta()) / 2;
+		SetRect(&rcSun[i], (int) (vSun.x - iWTmp), (int) (vSun.y - iWTmp), (int) (vSun.x + iWTmp),
 			(int) (vSun.y + iWTmp));
+
 		// clipping with screen.
 		if (rcSun[i].right < rcScreen.left || rcSun[i].bottom < rcScreen.top
 			|| rcSun[i].left > rcScreen.right || rcSun[i].top > rcScreen.bottom)
@@ -136,8 +125,7 @@ void CN3Sun::Render(__Matrix44& matView, __Matrix44& matProj)
 void CN3Sun::Tick()
 {
 	// 해의 색, 크기 변화 계산
-	int i;
-	for (i = 0; i < NUM_SUNPART; ++i)
+	for (int i = 0; i < NUM_SUNPART; i++)
 	{
 		m_Parts[i].Color.Tick();
 		m_Parts[i].Delta.Tick();

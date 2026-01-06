@@ -6,7 +6,7 @@
 #include "LOGIC_ELSE.h"
 
 #include <filesystem>
-#include <fstream>
+#include <FileIO/FileReader.h>
 
 #include <spdlog/spdlog.h>
 
@@ -21,38 +21,48 @@ EVENT::~EVENT()
 
 bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 {
-	uintmax_t length, count;
-	uint8_t byte;
-	char buf[4096];
-	char first[1024];
-	char temp[1024];
-	int index             = 0;
-	int t_index           = 0;
-	int event_num         = -1;
+	if (!LoadEventImpl(zone, questsDir))
+	{
+		DeleteAll();
+		return false;
+	}
 
+	return true;
+}
+
+bool EVENT::LoadEventImpl(int zone, const std::filesystem::path& questsDir)
+{
+	uintmax_t length = 0, count = 0;
+	uint8_t byte = 0;
+	int index = 0, t_index = 0, event_num = -1;
 	EVENT_DATA* newData   = nullptr;
 	EVENT_DATA* eventData = nullptr;
+
+	char buf[4096] {}, first[1024] {}, temp[1024] {};
+
 	std::error_code ec;
 
 	std::filesystem::path questPath  = questsDir;
 	questPath                       /= std::to_string(zone) + ".evt";
 
 	// Doesn't exist but this isn't a problem; we don't expect it to exist.
-	if (!std::filesystem::exists(questPath))
+	if (!std::filesystem::exists(questPath, ec))
 		return true;
 
 	// Resolve it to strip the relative references (to be nice).
 	// NOTE: Requires the file to exist.
-	questPath = std::filesystem::canonical(questPath);
+	questPath = std::filesystem::canonical(questPath, ec);
+	if (ec)
+		return false;
 
-	length    = std::filesystem::file_size(questPath, ec);
+	length = std::filesystem::file_size(questPath, ec);
 	if (ec)
 		return false;
 
 	m_Zone = zone;
 
-	std::ifstream file(questPath, std::ios::in | std::ios::binary);
-	if (!file)
+	FileReader file;
+	if (!file.OpenExisting(questPath))
 		return false;
 
 	std::u8string filenameUtf8 = questPath.u8string();
@@ -66,7 +76,7 @@ bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 
 	while (count < length)
 	{
-		file.read(reinterpret_cast<char*>(&byte), 1);
+		file.Read(&byte, 1);
 		++count;
 
 		if ((char) byte != '\r' && (char) byte != '\n')
@@ -90,24 +100,30 @@ bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 				continue;
 			}
 
-			t_index += ParseSpace(first, buf + t_index);
+			ParseSpace(first, buf, t_index);
 
 			//			if (0 == strcmp(first, "QUEST"))
 			if (0 == strcmp(first, "EVENT"))
 			{
-				t_index   += ParseSpace(temp, buf + t_index);
-				event_num  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				event_num = atoi(temp);
 
 				if (newData != nullptr)
 				{
 					delete newData;
-					goto cancel_event_load;
+
+					spdlog::error("EVENT::LoadEvent: parsing failed - already within EVENT block "
+								  "[zoneId={} eventId={} lineNumber={}]",
+						zone, event_num, lineNumber);
+					return false;
 				}
 
 				if (m_arEvent.GetData(event_num))
 				{
-					spdlog::error("EVENT::LoadEvent: duplicate definition [eventId={}]", event_num);
-					goto cancel_event_load;
+					spdlog::error("EVENT::LoadEvent: parsing failed - duplicate definition "
+								  "[zoneId={} eventId={} lineNumber={}]",
+						zone, event_num, lineNumber);
+					return false;
 				}
 
 				eventData             = new EVENT_DATA;
@@ -122,7 +138,12 @@ bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 			else if (0 == strcmp(first, "E"))
 			{
 				if (newData == nullptr)
-					goto cancel_event_load;
+				{
+					spdlog::error("EVENT::LoadEvent: parsing failed - '{}' missing existing event "
+								  "[zoneId={} eventId={} lineNumber={}]",
+						first, zone, event_num, lineNumber);
+					return false;
+				}
 
 				EXEC* newExec = new EXEC;
 				newExec->Parse(buf + t_index, filename, lineNumber);
@@ -131,7 +152,12 @@ bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 			else if (0 == strcmp(first, "A"))
 			{
 				if (newData == nullptr)
-					goto cancel_event_load;
+				{
+					spdlog::error("EVENT::LoadEvent: parsing failed - '{}' missing existing event "
+								  "[zoneId={} eventId={} lineNumber={}]",
+						first, zone, event_num, lineNumber);
+					return false;
+				}
 
 				LOGIC_ELSE* newLogicElse = new LOGIC_ELSE;
 				newLogicElse->Parse_and(buf + t_index, filename, lineNumber);
@@ -140,7 +166,12 @@ bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 			else if (0 == strcmp(first, "END"))
 			{
 				if (newData == nullptr)
-					goto cancel_event_load;
+				{
+					spdlog::error("EVENT::LoadEvent: parsing failed - '{}' missing existing event "
+								  "[zoneId={} eventId={} lineNumber={}]",
+						first, zone, event_num, lineNumber);
+					return false;
+				}
 
 				newData = nullptr;
 			}
@@ -152,16 +183,7 @@ bool EVENT::LoadEvent(int zone, const std::filesystem::path& questsDir)
 			index = 0;
 		}
 	}
-
-	file.close();
-
 	return true;
-
-cancel_event_load:
-	spdlog::error("QUEST INFO READ FAIL ({})({})", zone, event_num);
-	file.close();
-	DeleteAll();
-	return false;
 }
 
 void EVENT::Init()
@@ -171,6 +193,5 @@ void EVENT::Init()
 
 void EVENT::DeleteAll()
 {
-	if (!m_arEvent.IsEmpty())
-		m_arEvent.DeleteAllData();
+	m_arEvent.DeleteAllData();
 }

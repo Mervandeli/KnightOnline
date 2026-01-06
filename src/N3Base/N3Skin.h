@@ -5,26 +5,16 @@
 #if !defined(AFX_N3Skin_h__INCLUDED_)
 #define AFX_N3Skin_h__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3IMesh.h"
 
 struct __VertexSkinned
 {
-	__Vector3 vOrigin; // 원래 점 위치..
-	int nAffect;       // 관절 몇개가 영향을 주는지..
-	int* pnJoints;     // 관절 인덱스
-	float* pfWeights;  // 가중치
-
-	__VertexSkinned()
-	{
-		vOrigin   = {};
-		nAffect   = 0;
-		pnJoints  = nullptr;
-		pfWeights = nullptr;
-	}
+	__Vector3 vOrigin = {};      // 원래 점 위치..
+	int nAffect       = 0;       // 관절 몇개가 영향을 주는지..
+	int* pnJoints     = nullptr; // 관절 인덱스
+	float* pfWeights  = nullptr; // 가중치
 
 	~__VertexSkinned()
 	{
@@ -53,7 +43,8 @@ public:
 	{
 		return m_pSkinVertices;
 	}
-	bool Create(int nFC, int nVC, int nUVC);
+
+	bool Create(int nFC, int nVC, int nUVC) override;
 	bool Load(File& file) override;
 
 	bool CheckCollisionPrecisely(const __Vector3& vPos, const __Vector3& vDir, __Vector3* pvPick);

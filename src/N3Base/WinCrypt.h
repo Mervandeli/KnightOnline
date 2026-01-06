@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef N3BASE_WINCRYPT_H
+#define N3BASE_WINCRYPT_H
+
+#pragma once
 
 #include <wincrypt.h>
 
@@ -26,3 +29,5 @@ protected:
 	HCRYPTHASH m_hCryptHash;
 	HCRYPTKEY m_hCryptKey;
 };
+
+#endif // #define N3BASE_WINCRYPT_H

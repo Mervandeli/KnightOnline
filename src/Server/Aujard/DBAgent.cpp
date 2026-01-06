@@ -90,11 +90,12 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 		return false;
 	}
 
-	uint8_t Nation, Race, HairColor, Rank, Title, Level;
-	uint32_t Exp, Loyalty, Gold, PX, PZ, PY, dwTime, MannerPoint, LoyaltyMonthly;
-	uint8_t Face, City, Fame, Authority, Points;
-	int16_t Hp, Mp, Sp, Class, Bind = 0, Knights, QuestCount;
-	uint8_t Str, Sta, Dex, Intel, Cha, Zone;
+	uint8_t Nation = 0, Race = 0, HairColor = 0, Rank = 0, Title = 0, Level = 0;
+	uint32_t Exp = 0, Loyalty = 0, Gold = 0, PX = 0, PZ = 0, PY = 0, dwTime = 0, MannerPoint = 0,
+			 LoyaltyMonthly = 0;
+	uint8_t Face = 0, City = 0, Fame = 0, Authority = 0, Points = 0;
+	int16_t Hp = 0, Mp = 0, Sp = 0, Class = 0, Bind = 0, Knights = 0, QuestCount = 0;
+	uint8_t Str = 0, Sta = 0, Dex = 0, Intel = 0, Cha = 0, Zone = 0;
 	ByteBuffer skills(10), items(400), serials(400), quests(400);
 
 	int16_t rowCount = 0;
@@ -199,9 +200,9 @@ bool CDBAgent::LoadUserData(const char* accountId, const char* charId, int userI
 	}
 
 	user->m_bZone           = Zone;
-	user->m_curx            = static_cast<float>(PX / 100);
-	user->m_curz            = static_cast<float>(PZ / 100);
-	user->m_cury            = static_cast<float>(PY / 100);
+	user->m_curx            = static_cast<float>(PX) / 100.0f;
+	user->m_curz            = static_cast<float>(PZ) / 100.0f;
+	user->m_cury            = static_cast<float>(PY) / 100.0f;
 	user->m_dwTime          = dwTime + 1;
 	user->m_bNation         = Nation;
 	user->m_bRace           = Race;
@@ -851,7 +852,7 @@ bool CDBAgent::UpdateConCurrentUserCount(int serverId, int zoneId, int userCount
 
 bool CDBAgent::LoadWarehouseData(const char* accountId, int userId)
 {
-	char items[1600] = {}, serials[1600] = {};
+	char items[1600] {}, serials[1600] {};
 
 	_USER_DATA* user = UserData[userId];
 	if (user == nullptr || strlen(user->m_id) == 0)
@@ -1162,7 +1163,7 @@ bool CDBAgent::CheckUserData(
 	const char* accountId, const char* charId, int checkType, int userUpdateTime, int compareData)
 {
 	uint32_t dbData = 0, dbTime = 0;
-	modelUtil::DbType dbType;
+	modelUtil::DbType dbType = modelUtil::DbType::INVALID;
 
 	std::string query;
 	if (checkType == 1)
@@ -1221,7 +1222,7 @@ void CDBAgent::LoadKnightsAllList(int nation)
 	int32_t count     = 0;
 	int8_t retryCount = 0, maxRetry = 50;
 	int32_t sendIndex = 0, dbIndex = 0, maxBatchSize = 40;
-	char sendBuff[512] = {}, dbBuff[512] = {};
+	char sendBuffer[512] {}, dbBuff[512] {};
 
 	db::SqlBuilder<model::Knights> sql;
 	sql.PostWhereClause = "ORDER BY [Points] DESC";
@@ -1252,15 +1253,15 @@ void CDBAgent::LoadKnightsAllList(int nation)
 			// send this batch
 			if (count >= maxBatchSize)
 			{
-				SetByte(sendBuff, KNIGHTS_ALLLIST_REQ, sendIndex);
-				SetShort(sendBuff, -1, sendIndex);
-				SetByte(sendBuff, count, sendIndex);
-				SetString(sendBuff, dbBuff, dbIndex, sendIndex);
+				SetByte(sendBuffer, DB_KNIGHTS_ALLLIST_REQ, sendIndex);
+				SetShort(sendBuffer, -1, sendIndex);
+				SetByte(sendBuffer, count, sendIndex);
+				SetString(sendBuffer, dbBuff, dbIndex, sendIndex);
 
 				retryCount = 0;
 				do
 				{
-					if (_main->LoggerSendQueue.PutData(sendBuff, sendIndex) == 1)
+					if (_main->LoggerSendQueue.PutData(sendBuffer, sendIndex) == 1)
 						break;
 
 					retryCount++;
@@ -1269,11 +1270,12 @@ void CDBAgent::LoadKnightsAllList(int nation)
 
 				if (retryCount >= maxRetry)
 				{
-					spdlog::error("DBAgent::LoadKnightsAllList: Packet Drop: KNIGHTS_ALLLIST_REQ");
+					spdlog::error(
+						"DBAgent::LoadKnightsAllList: Packet Drop: DB_KNIGHTS_ALLLIST_REQ");
 					return;
 				}
 
-				memset(sendBuff, 0, sizeof(sendBuff));
+				memset(sendBuffer, 0, sizeof(sendBuffer));
 				memset(dbBuff, 0, sizeof(dbBuff));
 				sendIndex = dbIndex = 0;
 				count               = 0;
@@ -1289,15 +1291,15 @@ void CDBAgent::LoadKnightsAllList(int nation)
 	// send remaining results
 	if (count < maxBatchSize)
 	{
-		SetByte(sendBuff, KNIGHTS_ALLLIST_REQ, sendIndex);
-		SetShort(sendBuff, -1, sendIndex);
-		SetByte(sendBuff, count, sendIndex);
-		SetString(sendBuff, dbBuff, dbIndex, sendIndex);
+		SetByte(sendBuffer, DB_KNIGHTS_ALLLIST_REQ, sendIndex);
+		SetShort(sendBuffer, -1, sendIndex);
+		SetByte(sendBuffer, count, sendIndex);
+		SetString(sendBuffer, dbBuff, dbIndex, sendIndex);
 
 		retryCount = 0;
 		do
 		{
-			if (_main->LoggerSendQueue.PutData(sendBuff, sendIndex) == 1)
+			if (_main->LoggerSendQueue.PutData(sendBuffer, sendIndex) == 1)
 				break;
 
 			retryCount++;
@@ -1305,7 +1307,7 @@ void CDBAgent::LoadKnightsAllList(int nation)
 		while (retryCount < maxRetry);
 
 		if (retryCount >= maxRetry)
-			spdlog::error("DBAgent::LoadKnightsAllList: Packet Drop: KNIGHTS_ALLLIST_REQ");
+			spdlog::error("DBAgent::LoadKnightsAllList: Packet Drop: DB_KNIGHTS_ALLLIST_REQ");
 	}
 }
 
@@ -1351,7 +1353,7 @@ bool CDBAgent::CheckCouponEvent(const char* accountId)
 	SQLHSTMT		hstmt = nullptr;
 	SQLRETURN		retcode;
 	bool			retval = false;
-	TCHAR			szSQL[1024] = {};
+	TCHAR			szSQL[1024] {};
 	SQLINTEGER		Indexind = SQL_NTS;
 	SQLSMALLINT		sRet = 0;
 
@@ -1405,7 +1407,7 @@ bool CDBAgent::UpdateCouponEvent(const char* accountId, char* charId, char* cpid
 	SQLHSTMT		hstmt = nullptr;
 	SQLRETURN		retcode;
 	bool			retval = false;
-	TCHAR			szSQL[1024] = {};
+	TCHAR			szSQL[1024] {};
 	SQLINTEGER		Indexind = SQL_NTS;
 	SQLSMALLINT		sRet = 0;
 
@@ -1450,7 +1452,7 @@ bool CDBAgent::DeleteChar(int index, char* id, char* charId, char* socno)
 {
 	SQLHSTMT		hstmt = nullptr;
 	SQLRETURN		retcode;
-	TCHAR			szSQL[1024] = {};
+	TCHAR			szSQL[1024] {};
 	SQLSMALLINT		sParmRet;
 	SQLINTEGER		cbParmRet = SQL_NTS;
 

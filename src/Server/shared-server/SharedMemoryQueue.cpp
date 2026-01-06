@@ -135,8 +135,8 @@ int SharedMemoryQueue::GetData(char* pBuf)
 void SharedMemoryQueue::FlushQueue()
 {
 	std::vector<char> buffer(_queue->get_max_msg_size());
-	size_t received;
-	uint32_t priority;
+	size_t received   = 0;
+	uint32_t priority = 0;
 
 	while (true)
 	{

@@ -5,16 +5,16 @@
 #ifndef __N3FXPARTBOTTOMBOARDGAME_H__
 #define __N3FXPARTBOTTOMBOARDGAME_H__
 
+#pragma once
+
 #include <N3Base/N3FXPartBottomBoard.h>
 
 class CN3FXPartBottomBoardGame : public CN3FXPartBottomBoard
 {
 public:
-	float GetGroundHeight(float x, float z);
-
-public:
 	CN3FXPartBottomBoardGame();
-	virtual ~CN3FXPartBottomBoardGame();
+	~CN3FXPartBottomBoardGame() override;
+	float GetGroundHeight(float x, float z) override;
 };
 
 #endif // #ifndef __N3FXPARTBOTTOMBOARD_H__

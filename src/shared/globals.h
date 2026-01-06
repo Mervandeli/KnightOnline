@@ -22,7 +22,7 @@ constexpr int MAX_LEVEL      = 80;   // 최고렙...
 constexpr int MAX_GOLD       = 2'100'000'000;
 constexpr int VIEW_DISTANCE  = 48;
 
-enum e_AttackResult
+enum e_AttackResult : uint8_t
 {
 	ATTACK_FAIL              = 0,
 	ATTACK_SUCCESS           = 1,
@@ -31,7 +31,7 @@ enum e_AttackResult
 	MAGIC_ATTACK_TARGET_DEAD = 4
 };
 
-enum e_Authority
+enum e_Authority : uint8_t
 {
 	AUTHORITY_MANAGER         = 0,
 	AUTHORITY_USER            = 1,
@@ -43,7 +43,7 @@ enum e_Authority
 	AUTHORITY_BLOCK_USER      = 255
 };
 
-enum e_Class
+enum e_Class : uint8_t
 {
 	CLASS_KINDOF_WARRIOR = 1,
 	CLASS_KINDOF_ROGUE,
@@ -84,24 +84,37 @@ enum e_Class
 	CLASS_EL_CLERIC = 211,
 	CLASS_EL_DRUID,
 
-	CLASS_UNKNOWN = 0xffffffff
+	CLASS_UNKNOWN = 0xff
 };
 
-enum e_ItemFlag
+enum e_ItemFlag : uint8_t
 {
 	ITEM_FLAG_NONE      = 0,
 	ITEM_FLAG_RENTED    = 1,
 	ITEM_FLAG_DUPLICATE = 3
 };
 
-enum e_ItemSaleType
+enum e_ItemSaleType : uint8_t
 {
 	SALE_TYPE_LOW           = 0, // sells lower than purchase price
 	SALE_TYPE_FULL          = 1, // sells equal to purchase price
 	SALE_TYPE_LOW_NO_REPAIR = 2, // irreparable items sell for lower price than purchase
 };
 
-enum e_NpcState
+// Clan member position/role/duty
+enum e_KnightsDuty : uint8_t
+{
+	KNIGHTS_DUTY_UNKNOWN   = 0,  // Unknown - probably kicked out.
+	KNIGHTS_DUTY_CHIEF     = 1,  // Clan Leader
+	KNIGHTS_DUTY_VICECHIEF = 2,  // Assistant
+	KNIGHTS_DUTY_PUNISH    = 3,  // Under punishment.
+	KNIGHTS_DUTY_TRAINEE   = 4,  // Trainee/apprentice
+	KNIGHTS_DUTY_KNIGHT    = 5,  // Regular member
+	KNIGHTS_DUTY_OFFICER   = 6,  // Officer
+	KNIGHTS_DUTY_CAPTAIN   = 100 // War captain/commander
+};
+
+enum e_NpcState : uint8_t
 {
 	NPC_DEAD = 0,
 	NPC_LIVE,
@@ -271,7 +284,7 @@ enum e_NpcType : uint8_t
 	NPC_BATTLE_MONUMENT    = 211
 };
 
-enum e_ObjectType
+enum e_ObjectType : int8_t
 {
 	OBJECT_TYPE_BIND           = 0,
 	OBJECT_TYPE_BINDPOINT      = OBJECT_TYPE_BIND,
@@ -287,7 +300,7 @@ enum e_ObjectType
 	OBJECT_TYPE_REMOVE_BIND    = 7, // this seems to behave identically to OBJECT_TYPE_BIND
 	OBJECT_TYPE_ANVIL          = 8,
 	OBJECT_TYPE_ARTIFACT       = 9,
-	OBJECT_TYPE_UNKNOWN        = 0xffffffff
+	OBJECT_TYPE_UNKNOWN        = -1
 };
 
 enum e_QuestState : uint8_t
@@ -299,26 +312,37 @@ enum e_QuestState : uint8_t
 
 // These control neutrality-related settings client-side,
 // including whether collision is enabled for other players.
-enum e_ZoneAbilityType
+enum e_ZoneAbilityType : uint8_t
 {
-	ZONE_ABILITY_NEUTRAL =
-		0, // Players cannot attack each other, or NPCs. Can walk through players.
-	ZONE_ABILITY_PVP =
-		1, // Players can attack each other, and only NPCs from the opposite nation. Cannot walk through players.
-	ZONE_ABILITY_SPECTATOR =
-		2, // Player is spectating a 1v1 match (ZoneAbilityPVP is sent for the attacker)
-	ZONE_ABILITY_SIEGE_TYPE_1 = 3, // siege type 1 (unknown)
-	ZONE_ABILITY_SIEGE_TYPE_2 =
-		4, // siege type 2/4: if they have 0 NP & this is set, it will not show the message telling them to buy mo	 re.
-	ZONE_ABILITY_SIEGE_TYPE_3   = 5, // Siege type 3 (unknown)
-	ZONE_ABILITY_SIEGE_DISABLED = 6, // CSW not running
-	ZONE_ABILITY_CAITHAROS_ARENA =
-		7, // Players can attack each other (don't seem to be able to anymore?), but not NPCs. Can walk through players.
-	ZONE_ABILITY_PVP_NEUTRAL_NPCS =
-		8  // Players can attack each other, but not NPCs. Cannot walk through players.
+	// Players cannot attack each other, or NPCs. Can walk through players.
+	ZONE_ABILITY_NEUTRAL          = 0,
+
+	// Players can attack each other, and only NPCs from the opposite nation. Cannot walk through players.
+	ZONE_ABILITY_PVP              = 1,
+
+	// Player is spectating a 1v1 match (ZoneAbilityPVP is sent for the attacker)
+	ZONE_ABILITY_SPECTATOR        = 2,
+
+	// Siege type 1 (unknown)
+	ZONE_ABILITY_SIEGE_TYPE_1     = 3,
+
+	// Siege type 2/4: if they have 0 NP & this is set, it will not show the message telling them to buy mo	 re.
+	ZONE_ABILITY_SIEGE_TYPE_2     = 4,
+
+	// Siege type 3 (unknown)
+	ZONE_ABILITY_SIEGE_TYPE_3     = 5,
+
+	// CSW not running
+	ZONE_ABILITY_SIEGE_DISABLED   = 6,
+
+	// Players can attack each other (don't seem to be able to anymore?), but not NPCs. Can walk through players.
+	ZONE_ABILITY_CAITHAROS_ARENA  = 7,
+
+	// Players can attack each other, but not NPCs. Cannot walk through players.
+	ZONE_ABILITY_PVP_NEUTRAL_NPCS = 8
 };
 
-enum e_ZoneID
+enum e_ZoneID : uint8_t
 {
 	ZONE_KARUS             = 1,
 	ZONE_ELMORAD           = 2,

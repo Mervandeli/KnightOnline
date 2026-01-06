@@ -8,14 +8,7 @@
 #include <FileIO/File.h>
 #include <spdlog/fmt/bundled/format.h>
 
-#include <float.h>
-#include <istream>
-
-CN3ShapeMgr::__CellSub::__CellSub()
-{
-	nCCPolyCount     = 0;
-	pdwCCVertIndices = nullptr;
-}
+#include <cfloat>
 
 void CN3ShapeMgr::__CellSub::Load(File& fs)
 {
@@ -23,11 +16,13 @@ void CN3ShapeMgr::__CellSub::Load(File& fs)
 
 	if (nCCPolyCount > 0)
 	{
+		const size_t indexCount = 3 * static_cast<size_t>(nCCPolyCount);
+
 		delete[] pdwCCVertIndices;
-		pdwCCVertIndices = new uint32_t[nCCPolyCount * 3];
+		pdwCCVertIndices = new uint32_t[indexCount];
 		__ASSERT(pdwCCVertIndices, "New memory failed");
 
-		fs.Read(pdwCCVertIndices, nCCPolyCount * 3 * sizeof(uint32_t));
+		fs.Read(pdwCCVertIndices, indexCount * sizeof(uint32_t));
 
 		// TRACE(_T("CollisionCheckPolygon : %d\n"), nCCPolyCount);
 	}
@@ -36,12 +31,6 @@ void CN3ShapeMgr::__CellSub::Load(File& fs)
 CN3ShapeMgr::__CellSub::~__CellSub()
 {
 	delete[] pdwCCVertIndices;
-}
-
-CN3ShapeMgr::__CellMain::__CellMain()
-{
-	nShapeCount    = 0;
-	pwShapeIndices = nullptr;
 }
 
 void CN3ShapeMgr::__CellMain::Load(File& fs)
@@ -69,11 +58,6 @@ CN3ShapeMgr::__CellMain::~__CellMain()
 
 CN3ShapeMgr::CN3ShapeMgr()
 {
-	m_fMapWidth           = 0.0f;
-	m_fMapLength          = 0.0f;
-	m_nCollisionFaceCount = 0;
-	m_pvCollisions        = nullptr;
-	memset(m_pCells, 0, sizeof(m_pCells));
 }
 
 CN3ShapeMgr::~CN3ShapeMgr()
@@ -105,8 +89,6 @@ void CN3ShapeMgr::Release()
 			m_pCells[x][z] = nullptr;
 		}
 	}
-
-	memset(m_pCells, 0, sizeof(MAX_CELL_MAIN));
 }
 
 bool CN3ShapeMgr::LoadCollisionData(File& fs)
@@ -125,21 +107,23 @@ bool CN3ShapeMgr::LoadCollisionData(File& fs)
 
 	if (m_nCollisionFaceCount > 0)
 	{
-		m_pvCollisions = new __Vector3[m_nCollisionFaceCount * 3];
-		fs.Read(m_pvCollisions, sizeof(__Vector3) * m_nCollisionFaceCount * 3);
+		const size_t vertexCount = 3 * static_cast<size_t>(m_nCollisionFaceCount);
+		m_pvCollisions           = new __Vector3[vertexCount];
+		fs.Read(m_pvCollisions, sizeof(__Vector3) * vertexCount);
 	}
 
+	const int MapLength = static_cast<int>(m_fMapLength / CELL_MAIN_SIZE);
+	const int MapWidth  = static_cast<int>(m_fMapWidth / CELL_MAIN_SIZE);
+
 	// Cell Data 쓰기.
-	int iExist = 0;
-	int z      = 0;
-	for (float fZ = 0.0f; fZ < m_fMapLength; fZ += CELL_MAIN_SIZE, z++)
+	for (int z = 0; z < MapLength; z++)
 	{
-		int x = 0;
-		for (float fX = 0.0f; fX < m_fMapWidth; fX += CELL_MAIN_SIZE, x++)
+		for (int x = 0; x < MapWidth; x++)
 		{
 			delete m_pCells[x][z];
 			m_pCells[x][z] = nullptr;
 
+			int iExist     = 0;
 			fs.Read(&iExist, 4); // 데이터가 있는 셀인지 쓰고..
 
 			if (iExist == 0)
@@ -177,43 +161,47 @@ bool CN3ShapeMgr::CheckCollision(const __Vector3& vPos, // 충돌 위치
 	if (fSpeedPerSec <= 0)
 		return false;
 
-	__CellSub* ppCells[128];
+	__CellSub* ppCells[128] {};
 
 	// 다음 위치
 	__Vector3 vPosNext = vPos + (vDir * fSpeedPerSec);
-
 	int iSubCellCount  = 0;
 
 	if (fSpeedPerSec < 4.0f)
 	{
 		__Vector3 vPos2 = vPos + (vDir * 4.0f);
-		iSubCellCount = SubCellPathThru(vPos, vPos2, 128, ppCells); // 통과하는 서브셀을 가져온다..
+
+		// 통과하는 서브셀을 가져온다..
+		iSubCellCount   = SubCellPathThru(vPos, vPos2, 128, static_cast<__CellSub**>(ppCells));
 	}
 	else
 	{
-		iSubCellCount = SubCellPathThru(
-			vPos, vPosNext, 128, ppCells); // 통과하는 서브셀을 가져온다..
+		// 통과하는 서브셀을 가져온다..
+		iSubCellCount = SubCellPathThru(vPos, vPosNext, 128, static_cast<__CellSub**>(ppCells));
 	}
 
 	// 없음 말자.
 	if (iSubCellCount <= 0)
 		return false;
 
-	__Vector3 vColTmp(0, 0, 0);
-	int nIndex0, nIndex1, nIndex2;
-	float fT, fU, fV;
+	__Vector3 vColTmp = { 0, 0, 0 };
+	int nIndex0 = 0, nIndex1 = 0, nIndex2 = 0;
+	float fT = 0.0f, fU = 0.0f, fV = 0.0f;
 	float fDistClosest = FLT_MAX;
 
 	for (int i = 0; i < iSubCellCount; i++)
 	{
-		if (ppCells[i]->nCCPolyCount <= 0)
+		__CellSub* pCell = ppCells[i];
+		if (pCell == nullptr || pCell->nCCPolyCount <= 0)
 			continue;
 
-		for (int j = 0; j < ppCells[i]->nCCPolyCount; j++)
+		for (int j = 0; j < pCell->nCCPolyCount; j++)
 		{
-			nIndex0 = ppCells[i]->pdwCCVertIndices[j * 3];
-			nIndex1 = ppCells[i]->pdwCCVertIndices[j * 3 + 1];
-			nIndex2 = ppCells[i]->pdwCCVertIndices[j * 3 + 2];
+			// NOLINTBEGIN(bugprone-implicit-widening-of-multiplication-result)
+			nIndex0 = pCell->pdwCCVertIndices[j * 3];
+			nIndex1 = pCell->pdwCCVertIndices[j * 3 + 1];
+			nIndex2 = pCell->pdwCCVertIndices[j * 3 + 2];
+			// NOLINTEND(bugprone-implicit-widening-of-multiplication-result)
 
 			// NOTE: does the vector intersect the triangle?
 			if (!::_IntersectTriangle(vPos, vDir, m_pvCollisions[nIndex0], m_pvCollisions[nIndex1],
@@ -288,8 +276,8 @@ int CN3ShapeMgr::SubCellPathThru(
 		zz2 = (int) (vFrom.z / CELL_SUB_SIZE);
 	}
 
-	bool bPathThru;
-	float fZMin, fZMax, fXMin, fXMax;
+	bool bPathThru = false;
+	float fZMin = 0.0f, fZMax = 0.0f, fXMin = 0.0f, fXMax = 0.0f;
 	int iSubCellCount = 0;
 	for (int z = zz1; z <= zz2; z++) // 범위만큼 처리..
 	{
@@ -333,11 +321,12 @@ int CN3ShapeMgr::SubCellPathThru(
 			if (dwOC0 & dwOC1)
 				bPathThru = false;
 			// 선분이 사각형 내부에 있음
-			else if (dwOC0 == 0 && dwOC1 == 0)
+			else if ((dwOC0 == 0 && dwOC1 == 0)
+					 // 선분 한점은 셀의 내부에 한점은 외부에 있음.
+					 || (dwOC0 == 0 && dwOC1 != 0) || (dwOC0 != 0 && dwOC1 == 0))
+			{
 				bPathThru = true;
-			// 선분 한점은 셀의 내부에 한점은 외부에 있음.
-			else if ((dwOC0 == 0 && dwOC1 != 0) || (dwOC0 != 0 && dwOC1 == 0))
-				bPathThru = true;
+			}
 			// 두 L점 모두 셀 외부에 있지만 판단을 다시 해야 한다.
 			else if ((dwOC0 & dwOC1) == 0)
 			{
@@ -370,8 +359,7 @@ int CN3ShapeMgr::SubCellPathThru(
 			// NOTE: the check on nX and nZ isn't good enough because
 			//       "z/CELL_MAIN_DIVIDE" will round a small neg "z" to zero
 			//       and we'll run into an error!!!!!
-			if (nXSub < 0 || nXSub >= (MAX_CELL_MAIN % CELL_MAIN_DIVIDE) || nZSub < 0
-				|| nZSub >= (MAX_CELL_MAIN % CELL_MAIN_DIVIDE))
+			if (nXSub < 0 || nXSub >= CELL_MAIN_DIVIDE || nZSub < 0 || nZSub >= CELL_MAIN_DIVIDE)
 				continue;
 
 			ppSubCells[iSubCellCount++] = &m_pCells[nX][nZ]->SubCells[nXSub][nZSub];
@@ -395,21 +383,23 @@ float CN3ShapeMgr::GetHeightNearstPos(const __Vector3& vPos, __Vector3* pvNormal
 		return -FLT_MAX;
 
 	// 꼭대기에 위치를 하고..
-	__Vector3 vPosV = vPos;
-	vPosV.y         = 5000.0f;
+	__Vector3 vPosV   = vPos;
+	vPosV.y           = 5000.0f;
 
-	__Vector3 vDir(0, -1, 0);   // 수직 방향 벡터
-	__Vector3 vColTmp(0, 0, 0); // 최종적으로 가장 가까운 충돌 위치..
+	__Vector3 vDir    = { 0, -1, 0 }; // 수직 방향 벡터
+	__Vector3 vColTmp = { 0, 0, 0 };  // 최종적으로 가장 가까운 충돌 위치..
 
-	int nIndex0, nIndex1, nIndex2;
-	float fT, fU, fV;
+	int nIndex0 = 0, nIndex1 = 0, nIndex2 = 0;
+	float fT = 0.0f, fU = 0.0f, fV = 0.0f;
 	float fNearst = FLT_MAX, fHeight = -FLT_MAX; // 일단 최소값을 큰값으로 잡고..
 
 	for (int i = 0; i < pCell->nCCPolyCount; i++)
 	{
+		// NOLINTBEGIN(bugprone-implicit-widening-of-multiplication-result)
 		nIndex0 = pCell->pdwCCVertIndices[i * 3];
 		nIndex1 = pCell->pdwCCVertIndices[i * 3 + 1];
 		nIndex2 = pCell->pdwCCVertIndices[i * 3 + 2];
+		// NOLINTEND(bugprone-implicit-widening-of-multiplication-result)
 
 		// 충돌된 점이 있으면..
 		if (!::_IntersectTriangle(vPosV, vDir, m_pvCollisions[nIndex0], m_pvCollisions[nIndex1],
@@ -445,18 +435,20 @@ float CN3ShapeMgr::GetHeight(float fX, float fZ, __Vector3* pvNormal)
 	if (pCell == nullptr || pCell->nCCPolyCount <= 0)
 		return -FLT_MAX;
 
-	__Vector3 vPosV(fX, 5000.0f, fZ); // 꼭대기에 위치를 하고..
-	__Vector3 vDir(0, -1, 0);         // 수직 방향 벡터
-	__Vector3 vColTmp(0, 0, 0);       // 최종적으로 가장 가까운 충돌 위치..
+	__Vector3 vPosV   = { fX, 5000.0f, fZ }; // 꼭대기에 위치를 하고..
+	__Vector3 vDir    = { 0, -1, 0 };        // 수직 방향 벡터
+	__Vector3 vColTmp = { 0, 0, 0 };         // 최종적으로 가장 가까운 충돌 위치..
 
-	float fT, fU, fV;
+	float fT = 0.0f, fU = 0.0f, fV = 0.0f;
 	float fMaxTmp = -FLT_MAX;
 
 	for (int i = 0; i < pCell->nCCPolyCount; i++)
 	{
+		// NOLINTBEGIN(bugprone-implicit-widening-of-multiplication-result)
 		int nIndex0 = pCell->pdwCCVertIndices[i * 3];
 		int nIndex1 = pCell->pdwCCVertIndices[i * 3 + 1];
 		int nIndex2 = pCell->pdwCCVertIndices[i * 3 + 2];
+		// NOLINTEND(bugprone-implicit-widening-of-multiplication-result)
 
 		// 충돌된 점이 있으면..
 		if (!::_IntersectTriangle(vPosV, vDir, m_pvCollisions[nIndex0], m_pvCollisions[nIndex1],
@@ -836,6 +828,9 @@ void CN3ShapeMgr::SubCell(const __Vector3& vPos, __CellSub** ppSubCell)
 					ppSubCell[i] = &m_pCells[x][z]->SubCells[xx - 1][zz - 1];
 				else
 					ppSubCell[i] = nullptr;
+				break;
+
+			default:
 				break;
 		} // switch
 	} // for

@@ -10,15 +10,6 @@
 
 #include <N3Base/DFont.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CPlayerOther::CPlayerOther()
 {
 	m_ePlayerType = PLAYER_OTHER; // Player Type ... Base, NPC, OTher, MySelf
@@ -34,9 +25,14 @@ CPlayerOther::~CPlayerOther()
 void CPlayerOther::Tick()
 {
 	if (m_bSit)
+	{
+		// NOLINTNEXTLINE(bugprone-parent-virtual-call)
 		CPlayerBase::Tick(); // 회전, 지정된 에니메이션 Tick 및 색깔 지정 처리.. 등등..
+	}
 	else
+	{
 		CPlayerNPC::Tick();
+	}
 }
 
 bool CPlayerOther::Init(e_Race eRace, int iFace, int iHair, uint32_t* pdwItemIDs, int* piItenDurabilities)
@@ -55,7 +51,8 @@ bool CPlayerOther::Init(e_Race eRace, int iFace, int iHair, uint32_t* pdwItemIDs
 		CLogWriter::Write("CPlayerOther::Init() Basic Resource Pointer is NULL Race({})", static_cast<int>(eRace));
 		return false;
 	}
-	this->InitChr(pLooks); // 관절 세팅..
+
+	InitChr(pLooks); // 관절 세팅..
 
 	for (int i = 0; i < MAX_ITEM_SLOT_OPC; i++)
 	{
@@ -106,8 +103,7 @@ bool CPlayerOther::Init(e_Race eRace, int iFace, int iHair, uint32_t* pdwItemIDs
 				continue;
 			}
 
-			e_ItemType eType = CGameBase::MakeResrcFileNameForUPC(
-				pItem, pItemExt, &szFN, nullptr, ePart, ePlug, m_InfoBase.eRace); // 리소스 파일 이름을 만들고..
+			MakeResrcFileNameForUPC(pItem, pItemExt, &szFN, nullptr, ePart, ePlug, m_InfoBase.eRace); // 리소스 파일 이름을 만들고..
 
 			if (0 == i)
 			{
@@ -149,31 +145,26 @@ bool CPlayerOther::Init(e_Race eRace, int iFace, int iHair, uint32_t* pdwItemIDs
 			}
 		}
 
-		if (PART_POS_UPPER == ePart || PART_POS_LOWER == ePart || PART_POS_HANDS == ePart || PART_POS_FEET == ePart)
+		if (PART_POS_UPPER == ePart || PART_POS_LOWER == ePart || PART_POS_HANDS == ePart || PART_POS_FEET == ePart
+			|| PART_POS_HAIR_HELMET == ePart) // 머리카락 혹은 헬멧이면..
 		{
-			this->PartSet(ePart, szFN, pItem, pItemExt);
-		}
-		else if (PART_POS_HAIR_HELMET == ePart) // 머리카락 혹은 헬멧이면..
-		{
-			this->PartSet(ePart, szFN, pItem, pItemExt);
-		}
-		else if (5 == i)
-		{
+			PartSet(ePart, szFN, pItem, pItemExt);
 		}
 		else if ((6 == i || 7 == i) && PLUG_POS_UNKNOWN != ePlug)
 		{
-			this->PlugSet(ePlug, szFN, pItem, pItemExt);
+			PlugSet(ePlug, szFN, pItem, pItemExt);
 		}
 
 		if (ITEM_SLOT_UNKNOWN != eSlot)
-			this->DurabilitySet(eSlot, piItenDurabilities[i]);
+			DurabilitySet(eSlot, piItenDurabilities[i]);
 	}
 
 	// 얼굴은 따로하자..
-	this->InitFace();
-	CN3CPart* pPartHairHelmet = this->Part(PART_POS_HAIR_HELMET);
+	InitFace();
+
+	CN3CPart* pPartHairHelmet = Part(PART_POS_HAIR_HELMET);
 	if (pPartHairHelmet->FileName().empty()) // 헬멧에 해당되는게 없으면.. 머리카락 붙이기..
-		this->InitHair();
+		InitHair();
 
 	return true;
 }
@@ -185,7 +176,7 @@ void CPlayerOther::InitFace()
 	// 아이템이 있고 얼굴 이름이 있으면..
 	if (pItem != nullptr && !pItem->szPartFNs[PART_POS_FACE].empty())
 	{
-		char szDir[_MAX_DIR] = {}, szFName[_MAX_FNAME] = {}, szExt[_MAX_EXT] = {};
+		char szDir[_MAX_DIR] {}, szFName[_MAX_FNAME] {}, szExt[_MAX_EXT] {};
 		_splitpath(pItem->szPartFNs[PART_POS_FACE].c_str(), nullptr, szDir, szFName, szExt);
 
 		std::string szFN = fmt::format("{}{}{:02}{}", szDir, szFName, m_InfoExt.iFace, szExt);
@@ -198,7 +189,7 @@ void CPlayerOther::InitHair()
 	__TABLE_PLAYER_LOOKS* pItem = s_pTbl_UPC_Looks.Find(m_InfoBase.eRace);
 	if (pItem && !pItem->szPartFNs[PART_POS_HAIR_HELMET].empty()) // 아이템이 있고 얼굴 이름이 있으면..
 	{
-		char szDir[_MAX_DIR] = {}, szFName[_MAX_FNAME] = {}, szExt[_MAX_EXT] = {};
+		char szDir[_MAX_DIR] {}, szFName[_MAX_FNAME] {}, szExt[_MAX_EXT] {};
 		_splitpath(pItem->szPartFNs[PART_POS_HAIR_HELMET].c_str(), nullptr, szDir, szFName, szExt);
 
 		std::string szFN = fmt::format("{}{}{:02}{}", szDir, szFName, m_InfoExt.iHair, szExt);
@@ -241,8 +232,9 @@ void CPlayerOther::KnightsInfoSet(int iID, const std::string& szName, int iGrade
 	}
 }
 
-void CPlayerOther::SetSoundAndInitFont(uint32_t dwFontFlag)
+void CPlayerOther::SetSoundAndInitFont(uint32_t /*dwFontFlag*/)
 {
+	// NOLINTNEXTLINE(bugprone-parent-virtual-call)
 	CPlayerBase::SetSoundAndInitFont();
 
 	if (m_InfoExt.szKnights.empty())
@@ -261,6 +253,6 @@ void CPlayerOther::SetSoundAndInitFont(uint32_t dwFontFlag)
 		m_pClanFont->RestoreDeviceObjects();
 	}
 
-	m_pClanFont->SetText(m_InfoExt.szKnights.c_str()); // 폰트에 텍스트 지정.
+	m_pClanFont->SetText(m_InfoExt.szKnights); // 폰트에 텍스트 지정.
 	m_pClanFont->SetFontColor(KNIGHTS_FONT_COLOR);
 }

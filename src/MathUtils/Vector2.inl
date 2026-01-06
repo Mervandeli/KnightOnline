@@ -5,10 +5,8 @@
 
 #include "MathUtils.h"
 
-__Vector2::__Vector2(float fx, float fy)
+__Vector2::__Vector2(float fx, float fy) : x(fx), y(fy)
 {
-	x = fx;
-	y = fy;
 }
 
 void __Vector2::Zero()

@@ -6,18 +6,12 @@
 #include "MathUtils.h"
 #include <cmath> // sqrtf()
 
-__Vector3::__Vector3(float fx, float fy, float fz)
+__Vector3::__Vector3(float fx, float fy, float fz) : x(fx), y(fy), z(fz)
 {
-	x = fx;
-	y = fy;
-	z = fz;
 }
 
-__Vector3::__Vector3(const __Vector3& vec)
+__Vector3::__Vector3(const __Vector3& vec) : x(vec.x), y(vec.y), z(vec.z)
 {
-	x = vec.x;
-	y = vec.y;
-	z = vec.z;
 }
 
 void __Vector3::Normalize()
@@ -84,14 +78,6 @@ void __Vector3::Set(float fx, float fy, float fz)
 	x = fx;
 	y = fy;
 	z = fz;
-}
-
-const __Vector3& __Vector3::operator=(const __Vector3& vec)
-{
-	x = vec.x;
-	y = vec.y;
-	z = vec.z;
-	return *this;
 }
 
 const __Vector3 __Vector3::operator*(const __Matrix44& mtx) const

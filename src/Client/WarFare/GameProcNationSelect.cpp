@@ -13,15 +13,6 @@
 #include "UINationSelectDlg.h"
 #include "UIManager.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CGameProcNationSelect::CGameProcNationSelect()
 {
 	m_pUINationSelectDlg          = nullptr;
@@ -101,22 +92,28 @@ bool CGameProcNationSelect::ProcessPacket(Packet& pkt)
 
 	pkt.rpos(rpos);
 
-	int iCmd = pkt.read<uint8_t>();                                 // 커멘드 파싱..
-	switch (iCmd)                                                   // 커멘드에 다라서 분기..
+	int iCmd = pkt.read<uint8_t>(); // 커멘드 파싱..
+	switch (iCmd)                   // 커멘드에 다라서 분기..
 	{
-		case WIZ_SEL_NATION:                                        // 캐릭터 선택 메시지..
-		{
-			int iNation = pkt.read<uint8_t>();                      // 국가 - 0 실패.. 1 - 카루스 2 - 엘모라드..
-
-			if (0 == iNation)
-				s_pPlayer->m_InfoBase.eNation = NATION_NOTSELECTED; // 아직 국가를 선택하지 않았다..
-			else if (1 == iNation)
-				s_pPlayer->m_InfoBase.eNation = NATION_KARUS;
-			else if (2 == iNation)
-				s_pPlayer->m_InfoBase.eNation = NATION_ELMORAD;
-		}
+		case WIZ_SEL_NATION:        // 캐릭터 선택 메시지..
+			MsgRecv_SelNation(pkt);
 			return true;
+
+		default:
+			break;
 	}
 
 	return false;
+}
+
+void CGameProcNationSelect::MsgRecv_SelNation(Packet& pkt)
+{
+	int iNation = pkt.read<uint8_t>();                      // 국가 - 0 실패.. 1 - 카루스 2 - 엘모라드..
+
+	if (0 == iNation)
+		s_pPlayer->m_InfoBase.eNation = NATION_NOTSELECTED; // 아직 국가를 선택하지 않았다..
+	else if (1 == iNation)
+		s_pPlayer->m_InfoBase.eNation = NATION_KARUS;
+	else if (2 == iNation)
+		s_pPlayer->m_InfoBase.eNation = NATION_ELMORAD;
 }

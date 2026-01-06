@@ -21,7 +21,7 @@ private:
 	std::string _name;
 	std::unique_ptr<shared_memory_object_impl> _sharedMemoryObject;
 	std::unique_ptr<mapped_region_impl> _mappedRegion;
-	bool _created;
+	bool _created = false;
 };
 
 #endif // SERVER_SHAREDSERVER_SHAREDMEMORYBLOCK_H

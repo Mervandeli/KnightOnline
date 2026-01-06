@@ -9,20 +9,18 @@
 SocketManager::SocketManager(int recvBufferSize, int sendBufferSize) :
 	_recvBufferSize(recvBufferSize), _sendBufferSize(sendBufferSize)
 {
-	_serverSocketArray         = nullptr;
-	_inactiveServerSocketArray = nullptr;
-	_clientSocketArray         = nullptr;
-
-	_serverSocketCount         = 0;
-	_clientSocketCount         = 0;
-
-	_workerThreadCount         = 0;
-	_acceptingConnections      = false;
 }
 
 SocketManager::~SocketManager()
 {
-	Shutdown();
+	try
+	{
+		Shutdown();
+	}
+	catch (const std::exception& ex)
+	{
+		spdlog::error("SocketManager::~SocketManager: exception occurred - {}", ex.what());
+	}
 }
 
 void SocketManager::Init(
@@ -62,7 +60,8 @@ void SocketManager::Init(
 		_socketIdQueue.swap(socketIdQueue);
 	}
 
-	StartUserThreads();
+	if (_startUserThreadCallback != nullptr)
+		_startUserThreadCallback();
 }
 
 bool SocketManager::Listen(int port)
@@ -409,7 +408,8 @@ void SocketManager::Shutdown()
 		_acceptor.reset();
 
 	// Shutdown any user-created threads
-	ShutdownUserThreads();
+	if (_shutdownUserThreadCallback != nullptr)
+		_shutdownUserThreadCallback();
 
 	// Explicitly disconnect all sockets now.
 	{

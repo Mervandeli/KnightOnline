@@ -15,18 +15,11 @@
 
 #include <N3Base/N3UIString.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CItemRepairMgr::CItemRepairMgr()
 {
 	m_pspItemBack = nullptr;
+	m_iArm        = 0;
+	m_iOrder      = 0;
 }
 
 CItemRepairMgr::~CItemRepairMgr()
@@ -52,51 +45,41 @@ void CItemRepairMgr::Tick()
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
 
 	// 위치를 구해서
-	int i;
-	int iArm                = 0x00;
-	int iOrder              = -1;
+	int i = 0, iArm = 0, iOrder = -1;
 	__IconItemSkill* spItem = nullptr;
 	for (i = 0; i < ITEM_SLOT_COUNT; i++)
 	{
-		if (spItem)
-			break;
-		if (pInv->m_pMySlot[i])
+		if (pInv->m_pMySlot[i] != nullptr && pInv->m_pMySlot[i]->pUIIcon->IsIn(ptCur.x, ptCur.y))
 		{
-			if (pInv->m_pMySlot[i]->pUIIcon->IsIn(ptCur.x, ptCur.y))
-			{
-				iArm   = 0x01;
-				spItem = pInv->m_pMySlot[i];
-				iOrder = i;
-			}
+			iArm   = 0x01;
+			spItem = pInv->m_pMySlot[i];
+			iOrder = i;
+			break;
 		}
 	}
 
-	if (!spItem)
+	if (spItem == nullptr)
 	{
 		for (i = 0; i < MAX_ITEM_INVENTORY; i++)
 		{
-			if (spItem)
-				break;
-			if (pInv->m_pMyInvWnd[i])
+			if (pInv->m_pMyInvWnd[i] != nullptr && pInv->m_pMyInvWnd[i]->pUIIcon->IsIn(ptCur.x, ptCur.y))
 			{
-				if (pInv->m_pMyInvWnd[i]->pUIIcon->IsIn(ptCur.x, ptCur.y))
-				{
-					iArm   = 0x02;
-					spItem = pInv->m_pMyInvWnd[i];
-					iOrder = i;
-				}
+				iArm   = 0x02;
+				spItem = pInv->m_pMyInvWnd[i];
+				iOrder = i;
+				break;
 			}
 		}
 	}
 
 	// 아이콘 위에 있으면..
 	int iRepairGold = 0;
-	if (spItem)
+	if (spItem != nullptr)
 	{
 		iRepairGold = CalcRepairGold(spItem);
 
 		// 수리 가격 툴팁 표시..
-		if (pDlg)
+		if (pDlg != nullptr)
 		{
 			pDlg->m_bBRender       = true;
 			pDlg->m_iBxpos         = ptCur.x;
@@ -109,13 +92,13 @@ void CItemRepairMgr::Tick()
 		if (iRepairGold > s_pPlayer->m_InfoExt.iGold)
 		{
 			// 빨갛게 표시..
-			if (pDlg)
+			if (pDlg != nullptr)
 				pDlg->m_bBHaveEnough = false;
 		}
 		else
 		{
 			//아이면 원래 색깔..
-			if (pDlg)
+			if (pDlg != nullptr)
 				pDlg->m_bBHaveEnough = true;
 		}
 	}
@@ -125,11 +108,11 @@ void CItemRepairMgr::Tick()
 	{
 		m_pspItemBack = spItem;
 		m_iArm        = iArm;
-		m_iiOrder     = iOrder;
+		m_iOrder      = iOrder;
 	}
 	else if (dwMouseFlags & MOUSE_LBCLICKED)
 	{
-		if (m_pspItemBack && spItem && (m_pspItemBack == spItem))
+		if (m_pspItemBack != nullptr && spItem != nullptr && (m_pspItemBack == spItem))
 		{
 			// Send To Server..
 			if (iRepairGold > 0) // 수리 가격이 있으면..
@@ -169,9 +152,10 @@ void CItemRepairMgr::ReceiveResultFromServer(int iResult, int iUserGold)
 {
 	CUIRepairTooltipDlg* pDlg = CGameProcedure::s_pProcMain->m_pUIRepairTooltip;
 	CUIInventory* pInv        = CGameProcedure::s_pProcMain->m_pUIInventory;
-	if (!pInv)
+	if (pInv == nullptr)
 		return;
-	if (!m_pspItemBack)
+
+	if (m_pspItemBack == nullptr)
 		return;
 
 	// 성공이면 npc영역의 Durability를 최대값으로..
@@ -181,20 +165,23 @@ void CItemRepairMgr::ReceiveResultFromServer(int iResult, int iUserGold)
 
 		switch (m_iArm)
 		{
-			case 0x01:                                                                        // 장착하고 있는 아이템
-				pInv->m_pMySlot[m_iiOrder] = m_pspItemBack;
-				s_pPlayer->DurabilitySet((e_ItemSlot) m_iiOrder, m_pspItemBack->iDurability); // 내구력을 복구 해준다..
+			case 0x01:                                                                       // 장착하고 있는 아이템
+				pInv->m_pMySlot[m_iOrder] = m_pspItemBack;
+				s_pPlayer->DurabilitySet((e_ItemSlot) m_iOrder, m_pspItemBack->iDurability); // 내구력을 복구 해준다..
 				break;
 
-			case 0x02:                                                                        // 인벤토리에 있는 아이템..
-				pInv->m_pMyInvWnd[m_iiOrder] = m_pspItemBack;
+			case 0x02:                                                                       // 인벤토리에 있는 아이템..
+				pInv->m_pMyInvWnd[m_iOrder] = m_pspItemBack;
+				break;
+
+			default:
 				break;
 		}
 
 		// 아이콘 상태가 UISTYLE_DURABILITY_EXHAUST 이면..
 		m_pspItemBack->pUIIcon->SetStyle(m_pspItemBack->pUIIcon->GetStyle() & (~UISTYLE_DURABILITY_EXHAUST));
 
-		if (pDlg)
+		if (pDlg != nullptr)
 			pDlg->m_iBRequiredGold = 0;
 		pInv->PlayRepairSound();
 	}

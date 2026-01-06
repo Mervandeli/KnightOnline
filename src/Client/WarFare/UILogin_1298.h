@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef CLIENT_WARFARE_UILOGIN_1298_H
+#define CLIENT_WARFARE_UILOGIN_1298_H
+
+#pragma once
 
 #include <string>
 #include <vector>
@@ -126,3 +129,5 @@ public:
 	CUILogIn_1298();
 	~CUILogIn_1298() override;
 };
+
+#endif // CLIENT_WARFARE_UILOGIN_1298_H

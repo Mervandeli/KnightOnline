@@ -17,11 +17,6 @@
 
 #include <algorithm>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 CUILevelGuide::CUILevelGuide()
 {
 	m_pEdit_Level  = nullptr;
@@ -130,7 +125,7 @@ void CUILevelGuide::SearchQuests()
 
 void CUILevelGuide::SetPageNo(int iPageNo)
 {
-	int iSearchLevel;
+	int iSearchLevel = 0;
 
 	// if user entered a search level we should use it, otherwise use the user's current level
 	if (m_iSearchLevel <= 0)

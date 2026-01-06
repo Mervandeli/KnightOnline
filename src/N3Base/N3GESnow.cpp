@@ -5,15 +5,6 @@
 #include "N3GESnow.h"
 #include "N3Texture.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3GESnow::CN3GESnow()
 {
 	m_pTex          = nullptr;
@@ -41,7 +32,7 @@ void CN3GESnow::Release()
 
 void CN3GESnow::Tick()
 {
-	if (m_bActive == FALSE || m_iVC <= 0 || m_pVB == nullptr)
+	if (!m_bActive || m_iVC <= 0 || m_pVB == nullptr)
 		return;
 	CN3GlobalEffect::Tick();
 
@@ -72,9 +63,8 @@ void CN3GESnow::Tick()
 	if (iActiveCount <= 0)
 		return;
 
-	int i;
-	__VertexXyzT1* pVertices;
-	HRESULT hr = m_pVB->Lock(0, 0, (void**) &pVertices, D3DLOCK_NOSYSLOCK);
+	__VertexXyzT1* pVertices = nullptr;
+	HRESULT hr               = m_pVB->Lock(0, 0, (void**) &pVertices, D3DLOCK_NOSYSLOCK);
 	if (FAILED(hr))
 		return;
 
@@ -89,7 +79,7 @@ void CN3GESnow::Tick()
 
 	static const float sqrt3 = sqrtf(3.0f);
 
-	for (i = 0; i < iActiveCount; ++i)
+	for (int i = 0; i < iActiveCount; i++)
 	{
 		// 위치 결정하기
 		__VertexXyzT1* pV1         = pVertices + i * 3 + 0;
@@ -161,7 +151,7 @@ void CN3GESnow::Tick()
 
 void CN3GESnow::Render(__Vector3& vPos)
 {
-	if (m_bActive == FALSE || m_iVC <= 0 || m_pVB == nullptr)
+	if (!m_bActive || m_iVC <= 0 || m_pVB == nullptr)
 		return;
 
 	CN3GlobalEffect::Render(vPos);
@@ -194,14 +184,14 @@ void CN3GESnow::Render(__Vector3& vPos)
 		return;
 
 	// 이전 render state 저장
-	DWORD dwAlphaBlend, dwSrcAlpha, dwDestAlpha, dwCullMode, dwLight;
+	DWORD dwAlphaBlend = 0, dwSrcAlpha = 0, dwDestAlpha = 0, dwCullMode = 0, dwLight = 0;
 	s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlphaBlend);
 	s_lpD3DDev->GetRenderState(D3DRS_SRCBLEND, &dwSrcAlpha);
 	s_lpD3DDev->GetRenderState(D3DRS_DESTBLEND, &dwDestAlpha);
 	s_lpD3DDev->GetRenderState(D3DRS_CULLMODE, &dwCullMode);
 	s_lpD3DDev->GetRenderState(D3DRS_LIGHTING, &dwLight);
 
-	DWORD dwAddressU, dwAddressV;
+	DWORD dwAddressU = 0, dwAddressV = 0;
 	s_lpD3DDev->GetSamplerState(0, D3DSAMP_ADDRESSU, &dwAddressU);
 	s_lpD3DDev->GetSamplerState(0, D3DSAMP_ADDRESSV, &dwAddressV);
 
@@ -240,8 +230,10 @@ void CN3GESnow::Render(__Vector3& vPos)
 void CN3GESnow::Create(float fDensity, float fWidth, float fHeight, float fSnowSize,
 	const __Vector3& vVelocity, float fTimeToFade)
 {
-	if (nullptr == s_lpD3DDev)
+	if (s_lpD3DDev == nullptr)
 		return;
+
+	__VertexXyzT1* pVertices = nullptr;
 
 	Release();
 
@@ -251,29 +243,33 @@ void CN3GESnow::Create(float fDensity, float fWidth, float fHeight, float fSnowS
 	m_fHeight     = fHeight;
 	m_fSnowSize   = fSnowSize;
 	m_vVelocity   = vVelocity;
+
 	float fVolume = m_fWidth * m_fWidth * fHeight;
 	__ASSERT(fVolume > 0, "Snow volume is less than 0");
-	int iSnowCount = (int) (fVolume * fDensity);
+
+	int iSnowCount  = (int) (fVolume * fDensity);
+
+	// __SnowParticle 정보 채워 넣기
+	m_pSnowParticle = new __SnowParticle[iSnowCount];
+	if (m_pSnowParticle == nullptr)
+		return;
 
 	// m_pVB, m_pIB 만들기
 	__ASSERT(s_lpD3DDev, "D3D Device pointer is NULL!");
 	m_iVC      = iSnowCount * 3;
+
 	HRESULT hr = s_lpD3DDev->CreateVertexBuffer(m_iVC * sizeof(__VertexXyzT1), D3DUSAGE_DYNAMIC,
 		FVF_XYZT1, D3DPOOL_DEFAULT, &m_pVB, nullptr);
 	if (FAILED(hr))
 		return;
-	__VertexXyzT1* pVertices;
+
 	hr = m_pVB->Lock(
 		0, iSnowCount * 3 * sizeof(__VertexXyzT1), (void**) &pVertices, D3DLOCK_NOSYSLOCK);
 	if (FAILED(hr))
 		return;
 
-	// __SnowParticle 정보 채워 넣기
-	m_pSnowParticle   = new __SnowParticle[iSnowCount];
-
-	const float sqrt3 = sqrtf(3.0f);
-	int i;
-	for (i = 0; i < iSnowCount; ++i)
+	// const float sqrt3 = sqrtf(3.0f);
+	for (int i = 0; i < iSnowCount; ++i)
 	{
 		m_pSnowParticle[i].vPos.Set(fWidth * (rand() % 10000 - 5000) / 10000.f,
 			fHeight * (rand() % 10000 - 5000) / 10000.f,

@@ -5,27 +5,23 @@
 #if !defined(AFX_N3BASEFILEACCESS_H__C99953BD_12BE_4B37_823F_4F4B2379FF74__INCLUDED_)
 #define AFX_N3BASEFILEACCESS_H__C99953BD_12BE_4B37_823F_4F4B2379FF74__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3Base.h"
 #include <string>
 
 #include <FileIO/File.h>
 
-//-----------------------------------------------------------------------------
-#define N3FORMAT_VER_UNKN 0x00000000
-#define N3FORMAT_VER_1068 0x00000001 // (1<<0)
-#define N3FORMAT_VER_1264 0x00000002 // (1<<1)
-#define N3FORMAT_VER_1298 0x00000004 // (1<<2)
-#define N3FORMAT_VER_2062 0x00000008 // (1<<3)
-#define N3FORMAT_VER_CURR 0x40000000 // NOTE: not even going to attempting this right now
-#define N3FORMAT_VER_HERO 0x80000000 // NOTE: Hero Online formatting
+enum e_N3FormatVersion : uint16_t
+{
+	N3FORMAT_VER_UNKN = 0,
+	N3FORMAT_VER_1068 = 1068,
+	N3FORMAT_VER_1264 = 1264,
+	N3FORMAT_VER_1298 = 1298,
+};
 
-static constexpr int N3FORMAT_VER_DEFAULT = N3FORMAT_VER_1264; //N3FORMAT_VER_1068;
+static constexpr e_N3FormatVersion N3FORMAT_VER_DEFAULT = N3FORMAT_VER_1298;
 
-//-----------------------------------------------------------------------------
 class CN3BaseFileAccess : public CN3Base
 {
 protected:
@@ -52,10 +48,10 @@ public:
 	virtual bool Save(File& file);                          // 핸들을 통해 저장..
 
 public:
-	void Release();
+	void Release() override;
 
 	CN3BaseFileAccess();
-	virtual ~CN3BaseFileAccess();
+	~CN3BaseFileAccess() override;
 };
 
 #endif // !defined(AFX_N3BASEFILEACCESS_H__C99953BD_12BE_4B37_823F_4F4B2379FF74__INCLUDED_)

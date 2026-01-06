@@ -18,15 +18,6 @@
 #include <N3Base/N3ShapeMgr.h>
 #include <N3Base/N3SndObj.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CPlayerMySelf::CPlayerMySelf()
 {
 	m_ePlayerType       = PLAYER_MYSELF;      // Player Type ... Base, NPC, OTher, MySelf
@@ -54,6 +45,10 @@ CPlayerMySelf::CPlayerMySelf()
 	m_dwMagicID         = 0xffffffff;
 	m_fCastingTime      = 0.0f;
 	m_pObjectTarget     = nullptr; // 타겟 오브젝트 포인터..
+
+	m_vTargetPos        = {};
+	m_iMoveTarget       = -1;
+	m_bTargetOrPosMove  = false;
 }
 
 CPlayerMySelf::~CPlayerMySelf()
@@ -103,7 +98,7 @@ void CPlayerMySelf::SetMoveTargetID(int iID)
 	m_iMoveTarget      = iID;
 }
 
-void CPlayerMySelf::SetMoveTargetPos(__Vector3 vPos)
+void CPlayerMySelf::SetMoveTargetPos(const __Vector3& vPos)
 {
 	m_vTargetPos       = vPos;
 	m_bTargetOrPosMove = true;
@@ -112,9 +107,9 @@ void CPlayerMySelf::SetMoveTargetPos(__Vector3 vPos)
 
 void CPlayerMySelf::Tick()
 {
-	BOOL bAnim = TRUE;
-
-	if (PSA_DEATH == m_eState) // 죽는 상태이고... 죽는 에니메이션이 끝나면.. // 한번 보내면 다시 죽을때까지 안보내는 플래그
+	// 죽는 상태이고... 죽는 에니메이션이 끝나면..
+	// 한번 보내면 다시 죽을때까지 안보내는 플래그
+	if (PSA_DEATH == m_eState)
 	{
 		if (0 == m_iSendRegeneration)
 		{
@@ -196,11 +191,9 @@ void CPlayerMySelf::Tick()
 							fInterval /= m_fAttackDelta;
 						if (fTime > m_fAttackTimeRecent + fInterval) // 공격 간격이 넘으면.. 공격!
 						{
-							if (CGameProcedure::s_pProcMain->m_pMagicSkillMng->MsgSend_MagicProcess(m_iIDTarget, pSkill))
-							{                                        // 스킬 패킷 보내기에 성공하면.
-																	 //TRACE("%.2f\n", fTime - m_fAttackTimeRecent);
-							}
-							m_fAttackTimeRecent = fTime;             // 최근에 공격한 시간..
+							// 스킬 패킷 보내기에 성공하면.
+							CGameProcedure::s_pProcMain->m_pMagicSkillMng->MsgSend_MagicProcess(m_iIDTarget, pSkill);
+							m_fAttackTimeRecent = fTime; // 최근에 공격한 시간..
 						}
 					}
 				}
@@ -215,8 +208,7 @@ void CPlayerMySelf::Tick()
 					{
 						CGameProcedure::s_pProcMain->m_pMagicSkillMng->MsgSend_MagicProcess(
 							m_iIDTarget, pSkill);                                       // 스킬 패킷 보내기에 성공하면.
-						//TRACE("%.2f\n", fTime - m_fAttackTimeRecent);
-						m_fAttackTimeRecent = fTime; // 최근에 공격한 시간..
+						m_fAttackTimeRecent = fTime;                                    // 최근에 공격한 시간..
 					}
 				}
 			}
@@ -514,13 +506,13 @@ void CPlayerMySelf::InventoryChrRender(const RECT& Rect)
 */
 	// 아래로 dino수정
 	// backup render state
-	DWORD dwLighting;
+	DWORD dwLighting = 0;
 	__D3DLight9 BackupLight0;
 
 	s_lpD3DDev->GetRenderState(D3DRS_LIGHTING, &dwLighting);
-	BOOL bLight[8];
+	BOOL bLight[8] = {};
 	for (int i = 0; i < 8; ++i)
-		s_lpD3DDev->GetLightEnable(i, &(bLight[i]));
+		s_lpD3DDev->GetLightEnable(i, &bLight[i]);
 	s_lpD3DDev->GetLight(0, BackupLight0.toD3D());
 
 	// set render state
@@ -531,8 +523,7 @@ void CPlayerMySelf::InventoryChrRender(const RECT& Rect)
 	s_lpD3DDev->LightEnable(0, TRUE);
 
 	// 0번 light 설정
-	__D3DLight9 Light0;
-	memset(&Light0, 0, sizeof(__D3DLight9));
+	__D3DLight9 Light0  = {};
 	Light0.Type         = D3DLIGHT_POINT;
 	Light0.Attenuation0 = 0.5f;
 	Light0.Range        = 100.0f;
@@ -822,18 +813,14 @@ bool CPlayerMySelf::CheckCollision()
 		vDir   *= -1.0f;
 	}
 	__Vector3 vPosNext = vPos + (vDir * fSpeed); // 다음 위치 계산..
-	if (s_pPlayer->m_InfoBase.iAuthority != AUTHORITY_MANAGER && false == ACT_WORLD->IsInTerrainWithTerrain(vPosNext.x, vPosNext.z, vPos))
+	if (s_pPlayer->m_InfoBase.iAuthority != AUTHORITY_MANAGER && false == ACT_WORLD->IsInTerrainWithTerrain(vPosNext.x, vPosNext.z))
 		return true;                             // 경계 안에 있지 않으면..
 
 	//////////////////////////////////
 	// 다른 플레이어와 체크..
-	CPlayerOther* pUPC = nullptr;
-	float fHeightSum, fMag;
-	it_UPC it = s_pOPMgr->m_UPCs.begin(), itEnd = s_pOPMgr->m_UPCs.end();
-	for (; it != itEnd; it++)
+	float fHeightSum = 0.0f, fMag = 0.0f;
+	for (const auto& [_, pUPC] : s_pOPMgr->m_UPCs)
 	{
-		pUPC = it->second;
-
 		//죽어 있는 상태의 캐릭터는 충돌체크를 하지 않는다.
 		if (pUPC->IsDead())
 			continue;
@@ -861,13 +848,9 @@ bool CPlayerMySelf::CheckCollision()
 	//	if(pZoneInfo && pZoneInfo->bNPCCollisionCheck) //this_zone
 
 	//적국 엔피씨는 충돌 체크를 한다.
-	CPlayerNPC* pNPC = nullptr;
-	it_NPC it_N = s_pOPMgr->m_NPCs.begin(), it_NEnd = s_pOPMgr->m_NPCs.end();
-	for (; it_N != it_NEnd; it_N++)
+	for (const auto& [_, pNPC] : s_pOPMgr->m_NPCs)
 	{
-		pNPC = it_N->second;
-
-		if (pNPC->m_pShapeExtraRef)
+		if (pNPC->m_pShapeExtraRef != nullptr)
 			continue; // 성문등의 형태이면 충돌체크를 하지 않는다..
 
 		// 같은 국가...
@@ -900,32 +883,30 @@ bool CPlayerMySelf::CheckCollision()
 	////////////////////////////////////////////////////////////////////////////////
 	// 지면과 오브젝트의 높이값 구하기..
 	float fYTerrain = ACT_WORLD->GetHeightWithTerrain(vPosNext.x, vPosNext.z); // 지면의 높이값..
-	float fYClimb   = ACT_WORLD->GetHeightNearstPosWithShape(
-        vPosNext, CN3Base::s_fSecPerFrm * 30.0f, &vNormal);                  // 충돌 체크 오브젝트의 높이값..
-	vNormal.y = 0;                                                             // 이래야 정상적인 경사를 얻을수 있다..
+
+	// 충돌 체크 오브젝트의 높이값..
+	float fYClimb   = ACT_WORLD->GetHeightNearstPosWithShape(vPosNext, &vNormal);
+	vNormal.y       = 0; // 이래야 정상적인 경사를 얻을수 있다..
 
 	if (!s_pWorldMgr->IsIndoor())
 	{
 		if (fYClimb > fYTerrain
-			&& fYClimb
-				   < vPosNext.y
-						 + ((30.0f / CN3Base::s_fFrmPerSec) * 0.5f)) // 충돌 체크 오브젝트 높이값이 있고 지형보다 높을 경우만 높이값 적용
+			// 충돌 체크 오브젝트 높이값이 있고 지형보다 높을 경우만 높이값 적용
+			&& fYClimb < vPosNext.y + ((30.0f / CN3Base::s_fFrmPerSec) * 0.5f))
 		{
 			if (s_pPlayer->m_InfoBase.iAuthority != AUTHORITY_MANAGER && vNormal.Magnitude() > MAX_INCLINE_CLIMB
-				&& vNormal.Dot(vDir) <= 0.0f)                        // 경사 체크..
-			{
+				&& vNormal.Dot(vDir) <= 0.0f) // 경사 체크..
 				return true;
-			}
+
 			m_fYNext = fYClimb;
 		}
 		else
 		{
 			// 지형의 경사가 45 도 이하인지 체크
 			if (s_pPlayer->m_InfoBase.iAuthority != AUTHORITY_MANAGER
-				&& true == ACT_WORLD->CheckInclineWithTerrain(vPosNext, vDir, MAX_INCLINE_CLIMB))
-			{
+				&& ACT_WORLD->CheckInclineWithTerrain(vPosNext, vDir, MAX_INCLINE_CLIMB))
 				return true;
-			}
+
 			m_fYNext = fYTerrain; // 다음 위치를 맞추고..
 		}
 	}
@@ -981,7 +962,7 @@ void CPlayerMySelf::InitFace()
 	// 아이템이 있고 얼굴 이름이 있으면..
 	if (pLooks != nullptr && !pLooks->szPartFNs[PART_POS_FACE].empty())
 	{
-		char szDir[_MAX_DIR] = {}, szFName[_MAX_FNAME] = {}, szExt[_MAX_EXT] = {};
+		char szDir[_MAX_DIR] {}, szFName[_MAX_FNAME] {}, szExt[_MAX_EXT] {};
 		_splitpath(pLooks->szPartFNs[PART_POS_FACE].c_str(), nullptr, szDir, szFName, szExt);
 
 		std::string szFN = fmt::format("{}{}{:02}{}", szDir, szFName, m_InfoExt.iFace, szExt);
@@ -996,7 +977,7 @@ void CPlayerMySelf::InitHair()
 	// 아이템이 있고 얼굴 이름이 있으면..
 	if (pLooks != nullptr && !pLooks->szPartFNs[PART_POS_HAIR_HELMET].empty())
 	{
-		char szDir[_MAX_DIR] = {}, szFName[_MAX_FNAME] = {}, szExt[_MAX_EXT] = {};
+		char szDir[_MAX_DIR] {}, szFName[_MAX_FNAME] {}, szExt[_MAX_EXT] {};
 		_splitpath(pLooks->szPartFNs[PART_POS_HAIR_HELMET].c_str(), nullptr, szDir, szFName, szExt);
 
 		std::string szFN = fmt::format("{}{}{:02}{}", szDir, szFName, m_InfoExt.iHair, szExt);
@@ -1037,7 +1018,7 @@ void CPlayerMySelf::KnightsInfoSet(int iID, const std::string& szName, int iGrad
 	m_pClanFont->SetFontColor(KNIGHTS_FONT_COLOR);
 }
 
-void CPlayerMySelf::SetSoundAndInitFont(uint32_t dwFontFlag)
+void CPlayerMySelf::SetSoundAndInitFont(uint32_t /*dwFontFlag*/)
 {
 	CPlayerBase::SetSoundAndInitFont();
 

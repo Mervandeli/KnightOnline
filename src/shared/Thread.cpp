@@ -3,10 +3,8 @@
 
 #include <spdlog/spdlog.h>
 
-Thread::Thread()
+Thread::Thread() : _canTick(false), _isShutdown(true)
 {
-	_canTick    = false;
-	_isShutdown = true;
 }
 
 void Thread::start()
@@ -74,5 +72,14 @@ void Thread::thread_loop_wrapper()
 
 Thread::~Thread()
 {
-	shutdown();
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		if (_canTick)
+		{
+			_canTick = false;
+			_cv.notify_one();
+		}
+	}
+
+	join();
 }

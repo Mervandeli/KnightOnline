@@ -6,15 +6,6 @@
 #include "N3FXPartBottomBoard.h"
 #include "N3FXBundle.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3FXPartBottomBoard::CN3FXPartBottomBoard()
 {
 	m_iVersion = SUPPORTED_PART_VERSION;
@@ -213,8 +204,8 @@ bool CN3FXPartBottomBoard::Load(File& file)
 #if defined(_DEBUG)
 	if (m_iVersion > SUPPORTED_PART_VERSION)
 	{
-		TRACE("!!! WARNING: CN3FXPartBottomBoard::Load(%s) encountered version %d (base version "
-			  "%d). Needs support!",
+		TRACE("!!! WARNING: CN3FXPartBottomBoard::Load({}) encountered version {} (base version "
+			  "{}). Needs support!",
 			m_pRefBundle != nullptr ? m_pRefBundle->FileName().c_str() : "<unknown>", m_iVersion,
 			m_iBaseVersion);
 	}
@@ -323,38 +314,40 @@ bool CN3FXPartBottomBoard::Tick()
 	{
 		for (int i = 0; i < NUM_VERTEX_BOTTOM; i++)
 		{
-			vTmp        = m_pVB[i];
-			m_pVB[i].x  = m_vUnit[i].x * m_fCurrSizeX * m_pRefBundle->m_fTargetScale;
-			m_pVB[i].z  = m_vUnit[i].z * m_fCurrSizeZ * m_pRefBundle->m_fTargetScale;
-			m_pVB[i]   *= mtxRot;
-			m_pVB[i].x += m_pRefBundle->m_vPos.x + m_vCurrPos.x;
-			m_pVB[i].z += m_pRefBundle->m_vPos.z + m_vCurrPos.z;
+			auto& vtx  = m_pVB[i];
+			vTmp       = { vtx.x, vtx.y, vtx.z };
+			vtx.x      = m_vUnit[i].x * m_fCurrSizeX * m_pRefBundle->m_fTargetScale;
+			vtx.z      = m_vUnit[i].z * m_fCurrSizeZ * m_pRefBundle->m_fTargetScale;
+			vtx       *= mtxRot;
+			vtx.x     += m_pRefBundle->m_vPos.x + m_vCurrPos.x;
+			vtx.z     += m_pRefBundle->m_vPos.z + m_vCurrPos.z;
 
-			if (vTmp.x != m_pVB[i].x || vTmp.z != m_pVB[i].z)
-				m_pVB[i].y = GetGroundHeight(m_pVB[i].x, m_pVB[i].z) + m_fGap;
+			if (vTmp.x != vtx.x || vTmp.z != vtx.z)
+				vtx.y = GetGroundHeight(vtx.x, vtx.z) + m_fGap;
 			else
-				m_pVB[i].y = vTmp.y;
+				vtx.y = vTmp.y;
 
-			m_pVB[i].color = m_dwCurrColor;
+			vtx.color = m_dwCurrColor;
 		}
 	}
 	else
 	{
 		for (int i = 0; i < NUM_VERTEX_BOTTOM; i++)
 		{
-			vTmp        = m_pVB[i];
-			m_pVB[i].x  = m_vUnit[i].x * m_fCurrSizeX;
-			m_pVB[i].z  = m_vUnit[i].z * m_fCurrSizeZ;
-			m_pVB[i]   *= mtxRot;
-			m_pVB[i].x += m_pRefBundle->m_vPos.x + m_vCurrPos.x;
-			m_pVB[i].z += m_pRefBundle->m_vPos.z + m_vCurrPos.z;
+			auto& vtx  = m_pVB[i];
+			vTmp       = { vtx.x, vtx.y, vtx.z };
+			vtx.x      = m_vUnit[i].x * m_fCurrSizeX;
+			vtx.z      = m_vUnit[i].z * m_fCurrSizeZ;
+			vtx       *= mtxRot;
+			vtx.x     += m_pRefBundle->m_vPos.x + m_vCurrPos.x;
+			vtx.z     += m_pRefBundle->m_vPos.z + m_vCurrPos.z;
 
-			if (vTmp.x != m_pVB[i].x || vTmp.z != m_pVB[i].z)
-				m_pVB[i].y = GetGroundHeight(m_pVB[i].x, m_pVB[i].z) + m_fGap;
+			if (vTmp.x != vtx.x || vTmp.z != vtx.z)
+				vtx.y = GetGroundHeight(vtx.x, vtx.z) + m_fGap;
 			else
-				m_pVB[i].y = vTmp.y;
+				vtx.y = vTmp.y;
 
-			m_pVB[i].color = m_dwCurrColor;
+			vtx.color = m_dwCurrColor;
 		}
 	}
 	return true;
@@ -428,7 +421,7 @@ void CN3FXPartBottomBoard::Render()
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 		s_lpD3DDev->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
 
-		DWORD dwCullMode, dwZWriteEnable, dwZBufferEnable, dwLight, dwAlpha;
+		DWORD dwCullMode = 0, dwZWriteEnable = 0, dwZBufferEnable = 0, dwLight = 0, dwAlpha = 0;
 		s_lpD3DDev->GetRenderState(D3DRS_ALPHABLENDENABLE, &dwAlpha);
 		s_lpD3DDev->GetRenderState(D3DRS_ZWRITEENABLE, &dwZWriteEnable);
 		s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &dwZBufferEnable);
@@ -450,8 +443,7 @@ void CN3FXPartBottomBoard::Render()
 		if (m_dwDoubleSide != dwCullMode)
 			s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, m_dwDoubleSide);
 
-		HRESULT hr = CN3Base::s_lpD3DDev->DrawPrimitiveUP(
-			D3DPT_TRIANGLEFAN, 8, m_pVB, sizeof(__VertexXyzColorT1));
+		s_lpD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 8, m_pVB, sizeof(__VertexXyzColorT1));
 
 		if (m_bAlpha != dwAlpha)
 			s_lpD3DDev->SetRenderState(D3DRS_ALPHABLENDENABLE, dwAlpha);

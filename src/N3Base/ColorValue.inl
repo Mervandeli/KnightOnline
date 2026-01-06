@@ -15,20 +15,25 @@ __ColorValue::__ColorValue(float r2, float g2, float b2, float a2)
 	Set(r2, g2, b2, a2);
 }
 
-void __ColorValue::operator=(const D3DCOLORVALUE& cv)
+__ColorValue& __ColorValue::operator=(const D3DCOLORVALUE& cv)
 {
+	if (this == &cv)
+		return *this;
+
 	r = cv.r;
 	g = cv.g;
 	b = cv.b;
 	a = cv.a;
+	return *this;
 }
 
-void __ColorValue::operator=(D3DCOLOR cr)
+__ColorValue& __ColorValue::operator=(D3DCOLOR cr)
 {
 	r = ((cr & 0x00ff0000) >> 16) / 255.0f;
 	g = ((cr & 0x0000ff00) >> 8) / 255.0f;
 	b = (cr & 0x000000ff) / 255.0f;
 	a = ((cr & 0xff000000) >> 24) / 255.0f;
+	return *this;
 }
 
 void __ColorValue::Set(float r2, float g2, float b2, float a2)

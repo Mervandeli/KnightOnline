@@ -55,7 +55,7 @@ void CRoomEvent::MainRoom(double currentTime)
 {
 	// 조건 검색먼저 해야 겠지..
 	bool bCheck = false, bRunCheck = false;
-	// char notify[50] = {};
+	// char notify[50] {};
 
 	int event_num = m_Logic[m_byLogicNumber - 1].sNumber;
 
@@ -159,7 +159,7 @@ bool CRoomEvent::CheckEvent(int event_num, double currentTime)
 
 bool CRoomEvent::RunEvent(int event_num)
 {
-	// char notify[50] = {};
+	// char notify[50] {};
 	CNpc* pNpc    = nullptr;
 	int nOption_1 = 0, nOption_2 = 0;
 	switch (event_num)
@@ -258,95 +258,63 @@ bool CRoomEvent::RunEvent(int event_num)
 
 CNpc* CRoomEvent::GetNpcPtr(int sid)
 {
-	CNpc* pNpc     = nullptr;
-	int* pIDList   = nullptr;
-	int nMonsterid = 0, count = 0, nMonster = 0;
+	std::vector<int> npcIds;
 
 	{
 		std::unique_lock<std::mutex> lock(g_region_mutex);
-
-		nMonster = m_mapRoomNpcArray.GetSize();
-		if (nMonster == 0)
+		const auto& roomNpcArray = m_mapRoomNpcArray.m_UserTypeMap;
+		if (roomNpcArray.empty())
 		{
 			lock.unlock();
-			spdlog::error("RoomEvent::GetNpcPtr: mapRoomNpcArray empty");
+			spdlog::error("RoomEvent::GetNpcPtr: roomNpcArray empty");
 			return nullptr;
 		}
 
-		auto Iter1 = m_mapRoomNpcArray.begin();
-		auto Iter2 = m_mapRoomNpcArray.end();
-
-		pIDList    = new int[nMonster];
-		for (; Iter1 != Iter2; Iter1++)
-		{
-			nMonsterid     = *((*Iter1).second);
-			pIDList[count] = nMonsterid;
-			count++;
-		}
+		npcIds.reserve(roomNpcArray.size());
+		for (const auto& [npcId, _] : roomNpcArray)
+			npcIds.push_back(npcId);
 	}
 
-	for (int i = 0; i < nMonster; i++)
+	for (int npcId : npcIds)
 	{
-		nMonsterid = pIDList[i];
-		if (nMonsterid < 0)
+		if (npcId < 0)
 			continue;
 
-		pNpc = m_pMain->_npcMap.GetData(nMonsterid);
-		if (pNpc == nullptr)
-			continue;
-
-		if (pNpc->m_sSid == sid)
-		{
-			delete[] pIDList;
-			pIDList = nullptr;
+		CNpc* pNpc = m_pMain->_npcMap.GetData(npcId);
+		if (pNpc != nullptr && pNpc->m_sSid == sid)
 			return pNpc;
-		}
 	}
-
-	delete[] pIDList;
-	pIDList = nullptr;
-
 	return nullptr;
 }
 
 bool CRoomEvent::CheckMonsterCount(int sid, int count, int type)
 {
-	int nMonsterCount = 0;
-	CNpc* pNpc        = nullptr;
-	int* pIDList      = nullptr;
-	int nMonsterid = 0, nTotalMonster = 0, nMonster = 0;
 	bool bRetValue = false;
+	std::vector<int> npcIds;
 
 	{
 		std::unique_lock<std::mutex> lock(g_region_mutex);
-
-		int nMonster = m_mapRoomNpcArray.GetSize();
-		if (nMonster == 0)
+		const auto& roomNpcArray = m_mapRoomNpcArray.m_UserTypeMap;
+		if (roomNpcArray.empty())
 		{
 			lock.unlock();
-			spdlog::error("RoomEvent::CheckMonsterCount: mapRoomNpcArray empty");
+			spdlog::error("RoomEvent::CheckMonsterCount: roomNpcArray empty");
 			return false;
 		}
 
-		auto Iter1 = m_mapRoomNpcArray.begin();
-		auto Iter2 = m_mapRoomNpcArray.end();
-
-		pIDList    = new int[nMonster];
-		for (; Iter1 != Iter2; Iter1++)
-		{
-			nMonsterid             = *((*Iter1).second);
-			pIDList[nTotalMonster] = nMonsterid;
-			nTotalMonster++;
-		}
+		npcIds.reserve(roomNpcArray.size());
+		for (const auto& [npcId, _] : roomNpcArray)
+			npcIds.push_back(npcId);
 	}
 
-	for (int i = 0; i < nMonster; i++)
+	const int totalMonsterCount = static_cast<int>(npcIds.size());
+	int monsterCount            = 0;
+	for (int npcId : npcIds)
 	{
-		nMonsterid = pIDList[i];
-		if (nMonsterid < 0)
+		if (npcId < 0)
 			continue;
 
-		pNpc = m_pMain->_npcMap.GetData(nMonsterid);
+		CNpc* pNpc = m_pMain->_npcMap.GetData(npcId);
 		if (pNpc == nullptr)
 			continue;
 
@@ -361,9 +329,9 @@ bool CRoomEvent::CheckMonsterCount(int sid, int count, int type)
 		else if (type == 3)
 		{
 			if (pNpc->m_byDeadType == 100)
-				nMonsterCount++;
+				++monsterCount;
 
-			if (nMonsterCount == nMonster)
+			if (monsterCount == totalMonsterCount)
 				bRetValue = true;
 		}
 		else if (pNpc->m_sSid == sid)
@@ -372,25 +340,22 @@ bool CRoomEvent::CheckMonsterCount(int sid, int count, int type)
 			if (type == 1)
 			{
 				if (pNpc->m_byChangeType == 100)
-					nMonsterCount++;
+					++monsterCount;
 
-				if (nMonsterCount == count)
+				if (monsterCount == count)
 					bRetValue = true;
 			}
 			// Make a certain number of specific monsters appear || 특정 몬스터를 마리수 만큼 출현 시켜라,,
 			else if (type == 2)
 			{
 				pNpc->m_byChangeType = 3;
-				nMonsterCount++;
+				++monsterCount;
 
-				if (nMonsterCount == count)
+				if (monsterCount == count)
 					bRetValue = true;
 			}
 		}
 	}
-
-	delete[] pIDList;
-	pIDList = nullptr;
 
 	return bRetValue;
 }
@@ -406,8 +371,8 @@ void CRoomEvent::InitializeRoom()
 
 void CRoomEvent::EndEventSay(int option1, int option2)
 {
-	char send_buff[128] = {};
-	int send_index      = 0;
+	int sendIndex = 0;
+	char sendBuffer[128] {};
 
 	std::string buff;
 
@@ -432,6 +397,12 @@ void CRoomEvent::EndEventSay(int option1, int option2)
 				case 12:
 					buff = "Elmorad's second fort was captured.";
 					break;
+
+				default:
+					spdlog::error(
+						"RoomEvent::EndEventSay: Unhandled option2 - option1={} option2={}",
+						option1, option2);
+					break;
 			}
 
 			m_pMain->SendSystemMsg(buff, m_iZoneNumber, WAR_SYSTEM_CHAT, SEND_ALL);
@@ -443,19 +414,24 @@ void CRoomEvent::EndEventSay(int option1, int option2)
 			{
 				buff = "*** The path to Karus has been opened. ***";
 
-				SetByte(send_buff, AG_BATTLE_EVENT, send_index);
-				SetByte(send_buff, BATTLE_MAP_EVENT_RESULT, send_index);
-				SetByte(send_buff, KARUS_ZONE, send_index);
-				m_pMain->Send(send_buff, send_index, m_iZoneNumber);
+				SetByte(sendBuffer, AG_BATTLE_EVENT, sendIndex);
+				SetByte(sendBuffer, BATTLE_MAP_EVENT_RESULT, sendIndex);
+				SetByte(sendBuffer, KARUS_ZONE, sendIndex);
+				m_pMain->Send(sendBuffer, sendIndex, m_iZoneNumber);
 			}
 			else if (option2 == ELMORAD_ZONE)
 			{
 				buff = "*** The path to Elmorad has been opened. ***";
 
-				SetByte(send_buff, AG_BATTLE_EVENT, send_index);
-				SetByte(send_buff, BATTLE_MAP_EVENT_RESULT, send_index);
-				SetByte(send_buff, ELMORAD_ZONE, send_index);
-				m_pMain->Send(send_buff, send_index, m_iZoneNumber);
+				SetByte(sendBuffer, AG_BATTLE_EVENT, sendIndex);
+				SetByte(sendBuffer, BATTLE_MAP_EVENT_RESULT, sendIndex);
+				SetByte(sendBuffer, ELMORAD_ZONE, sendIndex);
+				m_pMain->Send(sendBuffer, sendIndex, m_iZoneNumber);
+			}
+			else
+			{
+				spdlog::error("RoomEvent::EndEventSay: Unhandled option2 - option1={} option2={}",
+					option1, option2);
 			}
 
 			m_pMain->SendSystemMsg(buff, m_iZoneNumber, WAR_SYSTEM_CHAT, SEND_ALL);
@@ -465,18 +441,28 @@ void CRoomEvent::EndEventSay(int option1, int option2)
 		case 3:
 			if (option2 == KARUS_ZONE)
 			{
-				SetByte(send_buff, AG_BATTLE_EVENT, send_index);
-				SetByte(send_buff, BATTLE_EVENT_RESULT, send_index);
-				SetByte(send_buff, KARUS_ZONE, send_index);
-				m_pMain->Send(send_buff, send_index, m_iZoneNumber);
+				SetByte(sendBuffer, AG_BATTLE_EVENT, sendIndex);
+				SetByte(sendBuffer, BATTLE_EVENT_RESULT, sendIndex);
+				SetByte(sendBuffer, KARUS_ZONE, sendIndex);
+				m_pMain->Send(sendBuffer, sendIndex, m_iZoneNumber);
 			}
 			else if (option2 == ELMORAD_ZONE)
 			{
-				SetByte(send_buff, AG_BATTLE_EVENT, send_index);
-				SetByte(send_buff, BATTLE_EVENT_RESULT, send_index);
-				SetByte(send_buff, ELMORAD_ZONE, send_index);
-				m_pMain->Send(send_buff, send_index, m_iZoneNumber);
+				SetByte(sendBuffer, AG_BATTLE_EVENT, sendIndex);
+				SetByte(sendBuffer, BATTLE_EVENT_RESULT, sendIndex);
+				SetByte(sendBuffer, ELMORAD_ZONE, sendIndex);
+				m_pMain->Send(sendBuffer, sendIndex, m_iZoneNumber);
 			}
+			else
+			{
+				spdlog::error("RoomEvent::EndEventSay: Unhandled option2 - option1={} option2={}",
+					option1, option2);
+			}
+			break;
+
+		default:
+			spdlog::error("RoomEvent::EndEventSay: Unhandled option1 - option1={} option2={}",
+				option1, option2);
 			break;
 	}
 }

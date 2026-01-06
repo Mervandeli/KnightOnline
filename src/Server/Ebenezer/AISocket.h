@@ -11,9 +11,9 @@ class EbenezerApp;
 class CAISocket : public TcpClientSocket
 {
 private:
-	EbenezerApp* _main;
-	CMagicProcess _magicProcess;
-	int _zoneNum;
+	EbenezerApp* _main          = nullptr;
+	CMagicProcess _magicProcess = {};
+	int _zoneNum                = 0;
 
 public:
 	int GetZoneNumber() const
@@ -30,7 +30,6 @@ public:
 	void Parsing(int len, char* pData) override;
 	void CloseProcess() override;
 
-	void InitEventMonster(int index);
 	// Packet recv
 	void LoginProcess(char* pBuf);
 	void RecvCheckAlive();

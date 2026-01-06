@@ -5,15 +5,12 @@
 #if !defined(AFX_N3Mesh_h__INCLUDED_)
 #define AFX_N3Mesh_h__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3BaseFileAccess.h"
 
 class CN3IMesh;
 class CN3PMesh;
-
 class CN3Mesh : public CN3BaseFileAccess
 {
 protected:
@@ -72,7 +69,7 @@ public:
 	void ReleaseIndices();
 
 	CN3Mesh();
-	virtual ~CN3Mesh();
+	~CN3Mesh() override;
 };
 
 #endif // !defined(AFX_N3Mesh_h__INCLUDED_)

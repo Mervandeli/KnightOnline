@@ -74,7 +74,7 @@ public:
 
 protected:
 	LLFIO_V2_NAMESPACE::file_handle _fileHandle; ///< File handle used for writing.
-	uint64_t _sizeOnDisk;                        ///< Current size of the file on disk.
+	uint64_t _sizeOnDisk = 0;                    ///< Current size of the file on disk.
 };
 
 #endif                                           // FILEIO_FILEWRITER_H

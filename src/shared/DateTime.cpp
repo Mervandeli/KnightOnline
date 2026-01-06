@@ -1,29 +1,27 @@
 ﻿#include "pch.h"
 #include "DateTime.h"
 
-DateTime::DateTime()
+DateTime::DateTime() : _tm {}, _unixTimestamp(0)
 {
-	_unixTimestamp = 0;
-	_tm            = {};
 }
 
-DateTime::DateTime(time_t timestamp)
+DateTime::DateTime(time_t timestamp) : DateTime()
 {
 	Set(timestamp);
 }
 
-DateTime::DateTime(
-	int year, int month, int day, int hour /*= 0*/, int minute /*= 0*/, int second /*= 0*/)
+DateTime::DateTime(int year, int month, int day, int hour /*= 0*/, int minute /*= 0*/,
+	int second /*= 0*/) : DateTime()
 {
 	Set(year, month, day, hour, minute, second);
 }
 
-DateTime::DateTime(tm* _tm)
+DateTime::DateTime(tm* _tm) : DateTime()
 {
 	Set(_tm);
 }
 
-DateTime::DateTime(const DateTime& other)
+DateTime::DateTime(const DateTime& other) : DateTime()
 {
 	Set(other);
 }

@@ -13,16 +13,6 @@
 #include <N3Base/N3UIProgress.h>
 #include <N3Base/N3UIStatic.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIPartyOrForce::CUIPartyOrForce()
 {
 	for (int i = 0; i < MAX_PARTY_OR_FORCE; i++)
@@ -468,7 +458,7 @@ void CUIPartyOrForce::Tick()
 	CN3UIBase::Tick();
 
 	bool bBlink      = false;
-	uint32_t dwTime  = GetTickCount();
+	uint64_t dwTime  = GetTickCount64();
 
 	dwTime           = dwTime / 1000;
 	dwTime          %= 2;
@@ -533,17 +523,15 @@ void CUIPartyOrForce::Tick()
 
 bool CUIPartyOrForce::OnKeyPress(int iKey)
 {
-	switch (iKey)
+	// hotkey가 포커스 잡혀있을때는 다른 ui를 닫을수 없으므로 DIK_ESCAPE가 들어오면 포커스를 다시잡고
+	if (iKey == DIK_ESCAPE)
 	{
-		case DIK_ESCAPE:
-		{ //hotkey가 포커스 잡혀있을때는 다른 ui를 닫을수 없으므로 DIK_ESCAPE가 들어오면 포커스를 다시잡고
-			//열려있는 다른 유아이를 닫아준다.
-			CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
-			CN3UIBase* pFocus = CGameProcedure::s_pUIMgr->GetFocusedUI();
-			if (pFocus && pFocus != this)
-				pFocus->OnKeyPress(iKey);
-		}
-			return true;
+		// 열려있는 다른 유아이를 닫아준다.
+		CGameProcedure::s_pUIMgr->ReFocusUI(); //this_ui
+		CN3UIBase* pFocus = CGameProcedure::s_pUIMgr->GetFocusedUI();
+		if (pFocus != nullptr && pFocus != this)
+			pFocus->OnKeyPress(iKey);
+		return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

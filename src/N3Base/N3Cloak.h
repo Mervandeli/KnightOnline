@@ -5,17 +5,17 @@
 #if !defined(AFX_N3CLOAK_H__3ED1C9F5_2F40_47B7_8CEC_6881E0D9FAEE__INCLUDED_)
 #define AFX_N3CLOAK_H__3ED1C9F5_2F40_47B7_8CEC_6881E0D9FAEE__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3Base.h"
 
-#define CLOAK_MAX_WIDTH  7
-#define CLOAK_MAX_HEIGHT 7
-#define CLOAK_SKIP_LINE  2 // 망토에서 장식용 버텍스가 들어가 있는 라인수. 이부분은 이동이 없다. ok?
+constexpr int CLOAK_MAX_WIDTH  = 7;
+constexpr int CLOAK_MAX_HEIGHT = 7;
 
-enum e_Cloak_AnchorMovePattern
+// 망토에서 장식용 버텍스가 들어가 있는 라인수. 이부분은 이동이 없다. ok?
+constexpr int CLOAK_SKIP_LINE  = 2;
+
+enum e_Cloak_AnchorMovePattern : uint8_t
 {
 	AMP_NONE = 0,
 	AMP_YAWCCW,
@@ -27,7 +27,7 @@ enum e_Cloak_AnchorMovePattern
 	AMP_MOVEXZ2
 };
 
-enum e_CloakMove
+enum e_CloakMove : uint8_t
 {
 	CLOAK_MOVE_STOP = 0,
 	CLOAK_MOVE_WALK,
@@ -42,7 +42,7 @@ class CN3Cloak : public CN3Base
 {
 public:
 	CN3Cloak();
-	virtual ~CN3Cloak();
+	~CN3Cloak() override;
 
 	class __Particle
 	{
@@ -109,7 +109,7 @@ protected:
 public:
 	virtual void Tick(int nLOD, float fYaw, e_CloakMove eCurMove);
 	virtual void Render(__Matrix44& mtx);
-	virtual void Release();
+	void Release() override;
 };
 
 #endif // !defined(AFX_N3CLOAK_H__3ED1C9F5_2F40_47B7_8CEC_6881E0D9FAEE__INCLUDED_)

@@ -7,18 +7,13 @@
 #include "AIServerApp.h"
 #include "User.h"
 
-#include <FileIO/File.h>
+#include <FileIO/FileReader.h>
 
 #include <shared/globals.h>
 #include <spdlog/spdlog.h>
 
+#include <cfloat>
 #include <filesystem>
-#include <float.h>
-#include <fstream>
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 extern std::mutex g_region_mutex;
 
@@ -34,8 +29,10 @@ MAP::MAP()
 	m_sizeMap.cx      = 0;
 	m_sizeMap.cy      = 0;
 
+	m_pMap            = nullptr;
 	m_ppRegion        = nullptr;
 	//m_pRoomEvent = nullptr;
+	m_nServerNo       = 0;
 	m_nZoneNumber     = 0;
 	m_byRoomType      = 0;
 	m_byRoomEvent     = 0;
@@ -169,14 +166,14 @@ void MAP::LoadTerrain(File& fs)
 
 float MAP::GetHeight(float x, float z)
 {
-	int iX, iZ;
-	iX = (int) (x / m_fUnitDist);
-	iZ = (int) (z / m_fUnitDist);
+	int iX = 0, iZ = 0;
+	float y = 0.0f, h1 = 0.0f, h2 = 0.0f, h3 = 0.0f;
+	float dX = 0.0f, dZ = 0.0f;
+
+	iX = static_cast<int>(x / m_fUnitDist);
+	iZ = static_cast<int>(z / m_fUnitDist);
 	//assert( iX, iZ가 범위내에 있는 값인지 체크하기);
 
-	float y;
-	float h1, h2, h3;
-	float dX, dZ;
 	dX = (x - iX * m_fUnitDist) / m_fUnitDist;
 	dZ = (z - iZ * m_fUnitDist) / m_fUnitDist;
 
@@ -447,33 +444,31 @@ void MAP::LoadObjectEvent(File& fs)
 
 bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 {
-	uint8_t byte;
-	char buf[4096];
-	char first[1024];
-	char temp[1024];
-	int index   = 0;
-	int t_index = 0, logic = 0, exec = 0;
-	int event_num = 0, nation = 0;
+	uint8_t byte = 0;
+	char buf[4096] {}, first[1024] {}, temp[1024] {};
+	int index = 0, t_index = 0, logic = 0, exec = 0, event_num = 0, nation = 0;
 
 	CRoomEvent* pEvent               = nullptr;
 
 	std::filesystem::path eventPath  = eventDir;
 	eventPath                       /= std::to_string(zone_number) + ".evt";
 
-	if (!std::filesystem::exists(eventPath))
+	std::error_code ec;
+	if (!std::filesystem::exists(eventPath, ec))
 		return true;
 
 	// Resolve it to strip the relative references (to be nice).
 	// NOTE: Requires the file to exist.
-	eventPath = std::filesystem::canonical(eventPath);
+	eventPath = std::filesystem::canonical(eventPath, ec);
+	if (ec)
+		return false;
 
-	std::error_code ec;
 	uintmax_t length = std::filesystem::file_size(eventPath, ec);
 	if (ec)
 		return false;
 
-	std::ifstream file(eventPath, std::ios::in | std::ios::binary);
-	if (!file)
+	FileReader file;
+	if (!file.OpenExisting(eventPath))
 		return false;
 
 	std::u8string filenameUtf8 = eventPath.u8string();
@@ -487,7 +482,7 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 
 	while (count < length)
 	{
-		file.read(reinterpret_cast<char*>(&byte), 1);
+		file.Read(&byte, 1);
 		++count;
 
 		if ((char) byte != '\r' && (char) byte != '\n')
@@ -510,81 +505,101 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 				continue;
 			}
 
-			t_index += ParseSpace(first, buf + t_index);
+			ParseSpace(first, buf, t_index);
 
 			if (0 == strcmp(first, "ROOM"))
 			{
-				logic      = 0;
-				exec       = 0;
+				logic = 0;
+				exec  = 0;
 
-				t_index   += ParseSpace(temp, buf + t_index);
-				event_num  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				event_num = atoi(temp);
 
 				if (m_arRoomEventArray.GetData(event_num) != nullptr)
 				{
-					spdlog::error(
-						"Map::LoadRoomEvent: Duplicate event definition [eventId={} zoneId={}]",
-						event_num, m_nZoneNumber);
-					goto cancel_event_load;
+					spdlog::error("Map::LoadRoomEvent: Duplicate event definition [eventId={} "
+								  "zoneId={} lineNumber={}]",
+						event_num, m_nZoneNumber, lineNumber);
+					return false;
 				}
 
 				pEvent = SetRoomEvent(event_num);
 			}
 			else if (0 == strcmp(first, "TYPE"))
 			{
-				t_index      += ParseSpace(temp, buf + t_index);
-				m_byRoomType  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				m_byRoomType = atoi(temp);
 			}
-			else if (0 == strcmp(first, "L"))
+			else if (0 == strcmp(first, "L") || 0 == strcmp(first, "O")
+					 || 0 == strcmp(first, "END"))
 			{
 				if (pEvent == nullptr)
-					goto cancel_event_load;
+				{
+					spdlog::error(
+						"Map::LoadRoomEvent: parsing failed - '{}' missing existing event "
+						"[zoneId={} eventId={} lineNumber={}]",
+						first, zone_number, event_num, lineNumber);
+					return false;
+				}
 			}
 			else if (0 == strcmp(first, "E"))
 			{
 				if (pEvent == nullptr)
-					goto cancel_event_load;
+				{
+					spdlog::error(
+						"Map::LoadRoomEvent: parsing failed - '{}' missing existing event "
+						"[zoneId={} eventId={} lineNumber={}]",
+						first, zone_number, event_num, lineNumber);
+					return false;
+				}
 
-				t_index                        += ParseSpace(temp, buf + t_index);
-				pEvent->m_Exec[exec].sNumber    = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_Exec[exec].sNumber = atoi(temp);
 
-				t_index                        += ParseSpace(temp, buf + t_index);
-				pEvent->m_Exec[exec].sOption_1  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_Exec[exec].sOption_1 = atoi(temp);
 
-				t_index                        += ParseSpace(temp, buf + t_index);
-				pEvent->m_Exec[exec].sOption_2  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_Exec[exec].sOption_2 = atoi(temp);
 
 				exec++;
 			}
 			else if (0 == strcmp(first, "A"))
 			{
 				if (pEvent == nullptr)
-					goto cancel_event_load;
+				{
+					spdlog::error(
+						"Map::LoadRoomEvent: parsing failed - '{}' missing existing event "
+						"[zoneId={} eventId={} lineNumber={}]",
+						first, zone_number, event_num, lineNumber);
+					return false;
+				}
 
-				t_index                          += ParseSpace(temp, buf + t_index);
-				pEvent->m_Logic[logic].sNumber    = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_Logic[logic].sNumber = atoi(temp);
 
-				t_index                          += ParseSpace(temp, buf + t_index);
-				pEvent->m_Logic[logic].sOption_1  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_Logic[logic].sOption_1 = atoi(temp);
 
-				t_index                          += ParseSpace(temp, buf + t_index);
-				pEvent->m_Logic[logic].sOption_2  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_Logic[logic].sOption_2 = atoi(temp);
 
 				logic++;
 				pEvent->m_byCheck = logic;
 			}
-			else if (0 == strcmp(first, "O"))
-			{
-				if (pEvent == nullptr)
-					goto cancel_event_load;
-			}
 			else if (0 == strcmp(first, "NATION"))
 			{
 				if (pEvent == nullptr)
-					goto cancel_event_load;
+				{
+					spdlog::error(
+						"Map::LoadRoomEvent: parsing failed - '{}' missing existing event "
+						"[zoneId={} eventId={} lineNumber={}]",
+						first, zone_number, event_num, lineNumber);
+					return false;
+				}
 
-				t_index += ParseSpace(temp, buf + t_index);
-				nation   = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				nation = atoi(temp);
 
 				if (nation == KARUS_ZONE)
 					++m_sKarusRoom;
@@ -594,45 +609,52 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 			else if (0 == strcmp(first, "POS"))
 			{
 				if (pEvent == nullptr)
-					goto cancel_event_load;
+				{
+					spdlog::error(
+						"Map::LoadRoomEvent: parsing failed - '{}' missing existing event "
+						"[zoneId={} eventId={} lineNumber={}]",
+						first, zone_number, event_num, lineNumber);
+					return false;
+				}
 
-				t_index             += ParseSpace(temp, buf + t_index);
-				pEvent->m_iInitMinX  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_iInitMinX = atoi(temp);
 
-				t_index             += ParseSpace(temp, buf + t_index);
-				pEvent->m_iInitMinZ  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_iInitMinZ = atoi(temp);
 
-				t_index             += ParseSpace(temp, buf + t_index);
-				pEvent->m_iInitMaxX  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_iInitMaxX = atoi(temp);
 
-				t_index             += ParseSpace(temp, buf + t_index);
-				pEvent->m_iInitMaxZ  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_iInitMaxZ = atoi(temp);
 			}
 			else if (0 == strcmp(first, "POSEND"))
 			{
 				if (pEvent == nullptr)
-					goto cancel_event_load;
+				{
+					spdlog::error(
+						"Map::LoadRoomEvent: parsing failed - '{}' missing existing event "
+						"[zoneId={} eventId={} lineNumber={}]",
+						first, zone_number, event_num, lineNumber);
+					return false;
+				}
 
-				t_index            += ParseSpace(temp, buf + t_index);
-				pEvent->m_iEndMinX  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_iEndMinX = atoi(temp);
 
-				t_index            += ParseSpace(temp, buf + t_index);
-				pEvent->m_iEndMinZ  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_iEndMinZ = atoi(temp);
 
-				t_index            += ParseSpace(temp, buf + t_index);
-				pEvent->m_iEndMaxX  = atoi(temp);
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_iEndMaxX = atoi(temp);
 
-				t_index            += ParseSpace(temp, buf + t_index);
-				pEvent->m_iEndMaxZ  = atoi(temp);
-			}
-			else if (0 == strcmp(first, "END"))
-			{
-				if (pEvent == nullptr)
-					goto cancel_event_load;
+				ParseSpace(temp, buf, t_index);
+				pEvent->m_iEndMaxZ = atoi(temp);
 			}
 			else if (isalnum(first[0]))
 			{
-				spdlog::warn("MAP::LoadRoomEvent({}): unhandled opcode '{}' ({}:{})", zone_number,
+				spdlog::warn("Map::LoadRoomEvent({}): unhandled opcode '{}' ({}:{})", zone_number,
 					first, filename, lineNumber);
 			}
 
@@ -640,13 +662,7 @@ bool MAP::LoadRoomEvent(int zone_number, const std::filesystem::path& eventDir)
 		}
 	}
 
-	file.close();
 	return true;
-
-cancel_event_load:
-	spdlog::error("LoadRoomEvent Failed [zoneId={} eventId={}]", zone_number, event_num);
-	//	DeleteAll();
-	return false;
 }
 
 int MAP::IsRoomCheck(float fx, float fz)
@@ -655,7 +671,7 @@ int MAP::IsRoomCheck(float fx, float fz)
 	// 현재의 존이 던젼인지를 판단, 아니면 리턴처리
 
 	CRoomEvent* pRoom = nullptr;
-	// char notify[100] = {};
+	// char notify[100] {};
 
 	int nSize         = m_arRoomEventArray.GetSize();
 	int nX            = (int) fx;
@@ -699,23 +715,23 @@ int MAP::IsRoomCheck(float fx, float fz)
 
 		if (minX < maxX)
 		{
-			if (COMPARE(nX, minX, maxX))
+			if (nX >= minX && nX < maxX)
 				bFlag_1 = true;
 		}
 		else
 		{
-			if (COMPARE(nX, maxX, minX))
+			if (nX >= maxX && nX < minX)
 				bFlag_1 = true;
 		}
 
 		if (minZ < maxZ)
 		{
-			if (COMPARE(nZ, minZ, maxZ))
+			if (nZ >= minZ && nZ < maxZ)
 				bFlag_2 = true;
 		}
 		else
 		{
-			if (COMPARE(nZ, maxZ, minZ))
+			if (nZ >= maxZ && nZ < minZ)
 				bFlag_2 = true;
 		}
 

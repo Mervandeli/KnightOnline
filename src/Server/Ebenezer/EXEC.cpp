@@ -16,11 +16,11 @@ EXEC::~EXEC()
 void EXEC::Parse(const char* line, const std::string& filename, int lineNumber)
 {
 	int index = 0, argsToParse = 0;
-	char temp[1024];
+	char temp[1024] {};
 
-	index         += ParseSpace(temp, line + index);
+	ParseSpace(temp, line, index);
 
-	size_t opcode  = hashing::djb2::hash(std::string_view(temp));
+	size_t opcode = hashing::djb2::hash(std::string_view(temp));
 	switch (opcode)
 	{
 		// E SAY {'up' event ID} {'ok' event ID} {talk ID 1} {talk ID 2} {talk ID 3} {talk ID 4} {talk ID 5} {talk ID 6} {talk ID 7} {talk ID 8}
@@ -89,8 +89,8 @@ void EXEC::Parse(const char* line, const std::string& filename, int lineNumber)
 	assert(argsToParse >= 0 && argsToParse <= MAX_EXEC_INT);
 	for (int i = 0; i < argsToParse; i++)
 	{
-		index        += ParseSpace(temp, line + index);
-		m_ExecInt[i]  = atoi(temp);
+		ParseSpace(temp, line, index);
+		m_ExecInt[i] = atoi(temp);
 	}
 }
 

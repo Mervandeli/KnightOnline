@@ -5,11 +5,7 @@
 #if !defined(AFX_N3Shape_h__INCLUDED_)
 #define AFX_N3Shape_h__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
-#pragma warning(disable : 4786)
 
 #include "N3TransformCollision.h"
 #include "N3PMeshInstance.h"
@@ -64,6 +60,7 @@ public:
 	}
 
 	void TexAlloc(int nCount);
+
 	CN3Texture* TexSet(int iIndex, const std::string& szFN)
 	{
 		if (iIndex < 0 || iIndex >= static_cast<int>(m_TexRefs.size()))
@@ -87,10 +84,17 @@ public:
 	{
 		return &m_PMInst;
 	}
+
 	CN3PMesh* Mesh()
 	{
 		return m_PMInst.GetMesh();
 	}
+
+	const CN3PMesh* Mesh() const
+	{
+		return m_PMInst.GetMesh();
+	}
+
 	void MeshSet(const std::string& szFN);
 
 	void ReCalcMatrix(const __Matrix44& mtxParent)
@@ -100,40 +104,47 @@ public:
 		m_Matrix *= mtxParent;
 	}
 
-	void Tick(const __Matrix44& mtxParent, const __Quaternion& qRot,
-		float fScale); // 부모 행렬 즉 Shape 행렬, 회전쿼터니언 을 넣는다.
+	// 부모 행렬 즉 Shape 행렬, 회전쿼터니언 을 넣는다.
+	void Tick(const __Matrix44& mtxParent, const __Quaternion& qRot, float fScale);
 	void Render();
 #ifdef _N3TOOL
 	void RenderSelected(bool bWireFrame);
 	void RenderAxis();
 #endif // end of _N3TOOL
 
-	__Vector3 Min()
+	// 월드 상의 최소값
+	__Vector3 Min() const
 	{
-		if (m_PMInst.GetMesh())
-			return m_PMInst.GetMesh()->Min() * m_Matrix;
+		const CN3PMesh* mesh = Mesh();
+		if (mesh != nullptr)
+			return mesh->Min() * m_Matrix;
 		else
 			return __Vector3(0, 0, 0);
-	} // 월드 상의 최소값
-	__Vector3 Max()
+	}
+
+	// 월드 상의 최대값
+	__Vector3 Max() const
 	{
-		if (m_PMInst.GetMesh())
-			return m_PMInst.GetMesh()->Max() * m_Matrix;
+		const CN3PMesh* mesh = Mesh();
+		if (mesh != nullptr)
+			return mesh->Max() * m_Matrix;
 		else
 			return __Vector3(0, 0, 0);
-	} // 월드 상의 최대값
-	float Radius()
+	}
+
+	float Radius() const
 	{
-		if (m_PMInst.GetMesh())
-			return m_PMInst.GetMesh()->Radius();
+		const CN3PMesh* mesh = Mesh();
+		if (mesh != nullptr)
+			return mesh->Radius();
 		else
 			return 0.0f;
 	}
 
-	virtual void Release();
+	void Release() override;
 
 	CN3SPart();
-	virtual ~CN3SPart();
+	~CN3SPart() override;
 
 	void PartialRender(int iCount, uint16_t* pIndices);
 };
@@ -161,14 +172,12 @@ public:
 	void RemoveRenderFlags(int nFlags = -1);
 	void MakeDefaultMaterial();
 #endif // end of _N3TOOL
+	// 정밀하게 폴리곤 단위로 체크 - 먼저 박스 체크후 다시 정밀 체크..
 	int CheckCollisionPrecisely(bool bIgnoreBoxCheck, int ixScreen, int iyScreen,
-		__Vector3* pVCol = nullptr,
-		__Vector3* pVNormal =
-			nullptr); // 정밀하게 폴리곤 단위로 체크 - 먼저 박스 체크후 다시 정밀 체크..
+		__Vector3* pVCol = nullptr, __Vector3* pVNormal = nullptr) override;
+	// 정밀하게 폴리곤 단위로 체크 - 먼저 박스 체크후 다시 정밀 체크..
 	int CheckCollisionPrecisely(bool bIgnoreBoxCheck, const __Vector3& vPos, const __Vector3& vDir,
-		__Vector3* pVCol = nullptr,
-		__Vector3* pVNormal =
-			nullptr); // 정밀하게 폴리곤 단위로 체크 - 먼저 박스 체크후 다시 정밀 체크..
+		__Vector3* pVCol = nullptr, __Vector3* pVNormal = nullptr);
 	bool MakeCollisionMeshByParts();       // 충돌 메시를 박스 형태로 다시 만든다...
 	bool MakeCollisionMeshByPartsDetail(); // 현재 모습 그대로... 충돌 메시를 만든다...
 

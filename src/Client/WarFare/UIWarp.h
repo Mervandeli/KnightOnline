@@ -5,9 +5,7 @@
 #if !defined(AFX_UIWarp_H__27F6610C_5D61_4A22_97F2_93211B77BF9C__INCLUDED_)
 #define AFX_UIWarp_H__27F6610C_5D61_4A22_97F2_93211B77BF9C__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <string>
 #include <list>
@@ -15,13 +13,13 @@
 
 struct __WarpInfo
 {
-	int iID;                 // 이 번호를 서버에게 날린다..
-	std::string szName;
-	std::string szAgreement; // 유저한테 알리고 동의를 구하는 글..
-	int iZone;
-	int iMaxUser;            // 최대 제한 인원수..
-	int iGold;
-	__Vector3 vPos;
+	int iID                 = 0;  // 이 번호를 서버에게 날린다..
+	std::string szName      = {};
+	std::string szAgreement = {}; // 유저한테 알리고 동의를 구하는 글..
+	int iZone               = 0;
+	int iMaxUser            = 0;  // 최대 제한 인원수..
+	int iGold               = 0;
+	__Vector3 vPos          = {};
 };
 
 typedef std::list<__WarpInfo>::iterator it_WI;
@@ -44,7 +42,7 @@ public:
 	CUIWarp();
 	~CUIWarp() override;
 
-	void InfoAdd(const __WarpInfo& ZW);
+	void InfoAdd(__WarpInfo&& ZW);
 	bool InfoGetCur(__WarpInfo& ZW);
 	void UpdateList();
 	void UpdateAgreement();

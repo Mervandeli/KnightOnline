@@ -27,10 +27,6 @@ public:
 	void QueueSendData(_SEND_DATA* sendData);
 
 protected:
-	void StartUserThreads() override;
-	void ShutdownUserThreads() override;
-
-protected:
 	SendThreadMain* _sendThreadMain;
 };
 

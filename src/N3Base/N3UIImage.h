@@ -5,9 +5,7 @@
 #if !defined(AFX_N3UIIMAGE_H__80AE123C_5A12_4A0E_9CF0_511ED98BB896__INCLUDED_)
 #define AFX_N3UIIMAGE_H__80AE123C_5A12_4A0E_9CF0_511ED98BB896__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3UIBase.h"
 
@@ -20,7 +18,7 @@ class CN3UIImage : public CN3UIBase
 
 public:
 	CN3UIImage();
-	virtual ~CN3UIImage();
+	~CN3UIImage() override;
 
 	// Attributes
 public:
@@ -32,8 +30,10 @@ public:
 protected:
 	LPDIRECT3DVERTEXBUFFER9 m_pVB; // vertex buffer
 	CN3Texture* m_pTexRef;         // texture 참조 포인터 (s_TexMng에서 관리하므로 참조포인터이다.)
-	std::string
-		m_szTexFN; // 텍스처 이름.. 따로 갖고 있는 이유는 툴에서 텍스처 부르기가 실패할 경우를 대비해서이다.
+
+	// 텍스처 이름.. 따로 갖고 있는 이유는 툴에서 텍스처 부르기가 실패할 경우를 대비해서이다.
+	std::string m_szTexFN;
+
 	__FLOAT_RECT m_frcUVRect;      // uv 좌표를 저장
 	D3DCOLOR m_Color;              // 칼라(배경 이미지가 없을경우 사용된다.)
 
@@ -49,15 +49,17 @@ public:
 		return m_Color;
 	}
 
+	// Texture 포인터 얻기
 	CN3Texture* GetTex() const
 	{
 		return m_pTexRef;
-	} // Texture 포인터 얻기
+	}
+
 	void SetTex(const std::string& szFN);                             // Texture 지정
 	void SetUVRect(float left, float top, float right, float bottom); // image의 uv좌표 지정
 	void SetColor(D3DCOLOR color);                                    // 칼라 지정
 
-	void SetRegion(const RECT& Rect);                                 // 영역 지정
+	void SetRegion(const RECT& Rect) override;                        // 영역 지정
 	BOOL MoveOffset(int iOffsetX, int iOffsetY) override;
 	void Release() override;                                          // Release
 	void Tick() override;                                             // Tick
@@ -66,7 +68,7 @@ public:
 	void Init(CN3UIBase* pParent) override;                           // 초기화
 	bool Load(File& file) override;
 
-	virtual void operator=(const CN3UIImage& other);
+	CN3UIImage& operator=(const CN3UIImage& other);
 
 protected:
 	bool CreateVB();      // 4개의 vertex를 가진 vertex buffer 생성

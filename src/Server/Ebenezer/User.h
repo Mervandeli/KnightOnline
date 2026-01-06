@@ -20,203 +20,204 @@
 typedef std::list<_EXCHANGE_ITEM*> ItemList;
 typedef std::list<int> UserEventList; // 이밴트를 위하여 ^^;
 
-#define BANISH_DELAY_TIME 30
+constexpr int BANISH_DELAY_TIME = 30;
 
 class EbenezerApp;
 class CUser : public TcpServerSocket
 {
 public:
-	_USER_DATA* m_pUserData;
+	_USER_DATA* m_pUserData              = nullptr;
 
-	char m_strAccountID
-		[MAX_ID_SIZE
-			+ 1]; // Login -> Select Char 까지 한시적으로만 쓰는변수. 이외에는 _USER_DATA 안에있는 변수를 쓴다...agent 와의 데이터 동기화를 위해...
+	// Login -> Select Char 까지 한시적으로만 쓰는변수. 이외에는 _USER_DATA 안에있는 변수를 쓴다...agent 와의 데이터 동기화를 위해...
+	char m_strAccountID[MAX_ID_SIZE + 1] = {};
 
-	int16_t m_RegionX;               // 현재 영역 X 좌표
-	int16_t m_RegionZ;               // 현재 영역 Z 좌표
+	int16_t m_RegionX                    = 0;    // 현재 영역 X 좌표
+	int16_t m_RegionZ                    = 0;    // 현재 영역 Z 좌표
 
-	int m_iMaxExp;                   // 다음 레벨이 되기 위해 필요한 Exp량
-	int m_iMaxWeight;                // 들 수 있는 최대 무게
-	uint8_t m_sSpeed;                // 스피드
+	int m_iMaxExp                        = 0;    // 다음 레벨이 되기 위해 필요한 Exp량
+	int m_iMaxWeight                     = 0;    // 들 수 있는 최대 무게
+	uint8_t m_sSpeed                     = 0;    // 스피드
 
-	int16_t m_sBodyAc;               // 맨몸 방어력
+	int16_t m_sBodyAc                    = 0;    // 맨몸 방어력
 
-	int16_t m_sTotalHit;             // 총 타격공격력
-	int16_t m_sTotalAc;              // 총 방어력
-	float m_fTotalHitRate;           // 총 공격성공 민첩성
-	float m_fTotalEvasionRate;       // 총 방어 민첩성
+	int16_t m_sTotalHit                  = 0;    // 총 타격공격력
+	int16_t m_sTotalAc                   = 0;    // 총 방어력
+	float m_fTotalHitRate                = 0.0f; // 총 공격성공 민첩성
+	float m_fTotalEvasionRate            = 0.0f; // 총 방어 민첩성
 
-	int16_t m_sItemMaxHp;            // 아이템 총 최대 HP Bonus
-	int16_t m_sItemMaxMp;            // 아이템 총 최대 MP Bonus
-	int m_iItemWeight;               // 아이템 총무게
-	int16_t m_sItemHit;              // 아이템 총타격치
-	int16_t m_sItemAc;               // 아이템 총방어력
-	int16_t m_sItemStr;              // 아이템 총힘 보너스
-	int16_t m_sItemSta;              // 아이템 총체력 보너스
-	int16_t m_sItemDex;              // 아이템 총민첩성 보너스
-	int16_t m_sItemIntel;            // 아이템 총지능 보너스
-	int16_t m_sItemCham;             // 아이템 총매력보너스
-	int16_t m_sItemHitrate;          // 아이템 총타격율
-	int16_t m_sItemEvasionrate;      // 아이템 총회피율
+	int16_t m_sItemMaxHp                 = 0;    // 아이템 총 최대 HP Bonus
+	int16_t m_sItemMaxMp                 = 0;    // 아이템 총 최대 MP Bonus
+	int m_iItemWeight                    = 0;    // 아이템 총무게
+	int16_t m_sItemHit                   = 0;    // 아이템 총타격치
+	int16_t m_sItemAc                    = 0;    // 아이템 총방어력
+	int16_t m_sItemStr                   = 0;    // 아이템 총힘 보너스
+	int16_t m_sItemSta                   = 0;    // 아이템 총체력 보너스
+	int16_t m_sItemDex                   = 0;    // 아이템 총민첩성 보너스
+	int16_t m_sItemIntel                 = 0;    // 아이템 총지능 보너스
+	int16_t m_sItemCham                  = 0;    // 아이템 총매력보너스
+	int16_t m_sItemHitrate               = 0;    // 아이템 총타격율
+	int16_t m_sItemEvasionrate           = 0;    // 아이템 총회피율
 
-	uint8_t m_bFireR;                // 불 마법 저항력
-	uint8_t m_bColdR;                // 얼음 마법 저항력
-	uint8_t m_bLightningR;           // 전기 마법 저항력
-	uint8_t m_bMagicR;               // 기타 마법 저항력
-	uint8_t m_bDiseaseR;             // 저주 마법 저항력
-	uint8_t m_bPoisonR;              // 독 마법 저항력
+	uint8_t m_bFireR                     = 0;    // 불 마법 저항력
+	uint8_t m_bColdR                     = 0;    // 얼음 마법 저항력
+	uint8_t m_bLightningR                = 0;    // 전기 마법 저항력
+	uint8_t m_bMagicR                    = 0;    // 기타 마법 저항력
+	uint8_t m_bDiseaseR                  = 0;    // 저주 마법 저항력
+	uint8_t m_bPoisonR                   = 0;    // 독 마법 저항력
 
-	uint8_t m_bMagicTypeLeftHand;    // The type of magic item in user's left hand
-	uint8_t m_bMagicTypeRightHand;   // The type of magic item in user's right hand
-	int16_t m_sMagicAmountLeftHand;  // The amount of magic item in user's left hand
-	int16_t m_sMagicAmountRightHand; // The amount of magic item in user's left hand
+	uint8_t m_bMagicTypeLeftHand         = 0;    // The type of magic item in user's left hand
+	uint8_t m_bMagicTypeRightHand        = 0;    // The type of magic item in user's right hand
+	int16_t m_sMagicAmountLeftHand       = 0;    // The amount of magic item in user's left hand
+	int16_t m_sMagicAmountRightHand      = 0;    // The amount of magic item in user's left hand
 
-	int16_t m_sDaggerR;              // Resistance to Dagger
-	int16_t m_sSwordR;               // Resistance to Sword
-	int16_t m_sAxeR;                 // Resistance to Axe
-	int16_t m_sMaceR;                // Resistance to Mace
-	int16_t m_sSpearR;               // Resistance to Spear
-	int16_t m_sBowR;                 // Resistance to Bow
+	int16_t m_sDaggerR                   = 0;    // Resistance to Dagger
+	int16_t m_sSwordR                    = 0;    // Resistance to Sword
+	int16_t m_sAxeR                      = 0;    // Resistance to Axe
+	int16_t m_sMaceR                     = 0;    // Resistance to Mace
+	int16_t m_sSpearR                    = 0;    // Resistance to Spear
+	int16_t m_sBowR                      = 0;    // Resistance to Bow
 
-	int16_t m_iMaxHp;
-	int16_t m_iMaxMp;
+	int16_t m_iMaxHp                     = 0;
+	int16_t m_iMaxMp                     = 0;
 
-	int16_t m_iZoneIndex;
+	int16_t m_iZoneIndex                 = -1;
 
-	float m_fWill_x;
-	float m_fWill_z;
-	float m_fWill_y;
+	float m_fWill_x                      = 0.0f;
+	float m_fWill_z                      = 0.0f;
+	float m_fWill_y                      = 0.0f;
 
-	uint8_t m_bResHpType;    // HP 회복타입
-	uint8_t m_bWarp;         // 존이동중...
-	uint8_t m_bNeedParty;    // 파티....구해요
+	uint8_t m_bResHpType                 = 0;  // HP 회복타입
+	uint8_t m_bWarp                      = 0;  // 존이동중...
+	uint8_t m_bNeedParty                 = 0;  // 파티....구해요
 
-	int16_t m_sPartyIndex;
-	int16_t m_sExchangeUser; // 교환중인 유저
-	uint8_t m_bExchangeOK;
+	int16_t m_sPartyIndex                = -1;
+	int16_t m_sExchangeUser              = -1; // 교환중인 유저
+	uint8_t m_bExchangeOK                = 0;
 
 	ItemList m_ExchangeItemList;
-	_ITEM_DATA m_MirrorItem[HAVE_MAX]; // 교환시 백업 아이템 리스트를 쓴다.
+	_ITEM_DATA m_MirrorItem[HAVE_MAX]       = {}; // 교환시 백업 아이템 리스트를 쓴다.
 
-	int16_t m_sPrivateChatUser;
+	int16_t m_sPrivateChatUser              = -1;
 
-	double m_fHPLastTimeNormal; // For Automatic HP recovery.
-	int16_t m_bHPAmountNormal;
-	uint8_t m_bHPDurationNormal;
-	uint8_t m_bHPIntervalNormal;
+	double m_fHPLastTimeNormal              = false; // For Automatic HP recovery.
+	int16_t m_bHPAmountNormal               = 0;
+	uint8_t m_bHPDurationNormal             = 0;
+	uint8_t m_bHPIntervalNormal             = 0;
 
-	double m_fHPLastTime
-		[MAX_TYPE3_REPEAT]; // For Automatic HP recovery and Type 3 durational HP recovery.
-	double m_fHPStartTime[MAX_TYPE3_REPEAT];
-	int16_t m_bHPAmount[MAX_TYPE3_REPEAT];
-	uint8_t m_bHPDuration[MAX_TYPE3_REPEAT];
-	uint8_t m_bHPInterval[MAX_TYPE3_REPEAT];
-	int16_t m_sSourceID[MAX_TYPE3_REPEAT];
-	bool m_bType3Flag;
+	// For Automatic HP recovery and Type 3 durational HP recovery.
+	double m_fHPLastTime[MAX_TYPE3_REPEAT]  = {};
+	double m_fHPStartTime[MAX_TYPE3_REPEAT] = {};
+	int16_t m_bHPAmount[MAX_TYPE3_REPEAT]; /* initialized in constructor */
+	uint8_t m_bHPDuration[MAX_TYPE3_REPEAT] = {};
+	uint8_t m_bHPInterval[MAX_TYPE3_REPEAT] = {};
+	int16_t m_sSourceID[MAX_TYPE3_REPEAT]   = {};
+	bool m_bType3Flag                       = false;
 
-	double m_fAreaLastTime; // For Area Damage spells Type 3.
-	double m_fAreaStartTime;
-	uint8_t m_bAreaInterval;
-	int m_iAreaMagicID;
+	double m_fAreaLastTime                  = 0.0; // For Area Damage spells Type 3.
+	double m_fAreaStartTime                 = 0.0;
+	uint8_t m_bAreaInterval                 = 0;
+	int m_iAreaMagicID                      = 0;
 
-	uint8_t m_bAttackSpeedAmount; // For Character stats in Type 4 Durational Spells.
-	uint8_t m_bSpeedAmount;
-	int16_t m_sACAmount;
-	uint8_t m_bAttackAmount;
-	int16_t m_sMaxHPAmount;
-	uint8_t m_bHitRateAmount;
-	int16_t m_sAvoidRateAmount;
-	int16_t m_sStrAmount;
-	int16_t m_sStaAmount;
-	int16_t m_sDexAmount;
-	int16_t m_sIntelAmount;
-	int16_t m_sChaAmount;
-	uint8_t m_bFireRAmount;
-	uint8_t m_bColdRAmount;
-	uint8_t m_bLightningRAmount;
-	uint8_t m_bMagicRAmount;
-	uint8_t m_bDiseaseRAmount;
-	uint8_t m_bPoisonRAmount;
+	uint8_t m_bAttackSpeedAmount            = 0; // For Character stats in Type 4 Durational Spells.
+	uint8_t m_bSpeedAmount                  = 0;
+	int16_t m_sACAmount                     = 0;
+	uint8_t m_bAttackAmount                 = 0;
+	int16_t m_sMaxHPAmount                  = 0;
+	uint8_t m_bHitRateAmount                = 0;
+	int16_t m_sAvoidRateAmount              = 0;
+	int16_t m_sStrAmount                    = 0;
+	int16_t m_sStaAmount                    = 0;
+	int16_t m_sDexAmount                    = 0;
+	int16_t m_sIntelAmount                  = 0;
+	int16_t m_sChaAmount                    = 0;
+	uint8_t m_bFireRAmount                  = 0;
+	uint8_t m_bColdRAmount                  = 0;
+	uint8_t m_bLightningRAmount             = 0;
+	uint8_t m_bMagicRAmount                 = 0;
+	uint8_t m_bDiseaseRAmount               = 0;
+	uint8_t m_bPoisonRAmount                = 0;
 
-	int16_t m_sDuration1;
-	double m_fStartTime1;
-	int16_t m_sDuration2;
-	double m_fStartTime2;
-	int16_t m_sDuration3;
-	double m_fStartTime3;
-	int16_t m_sDuration4;
-	double m_fStartTime4;
-	int16_t m_sDuration5;
-	double m_fStartTime5;
-	int16_t m_sDuration6;
-	double m_fStartTime6;
-	int16_t m_sDuration7;
-	double m_fStartTime7;
-	int16_t m_sDuration8;
-	double m_fStartTime8;
-	int16_t m_sDuration9;
-	double m_fStartTime9;
+	int16_t m_sDuration1                    = 0;
+	int16_t m_sDuration2                    = 0;
+	int16_t m_sDuration3                    = 0;
+	int16_t m_sDuration4                    = 0;
+	int16_t m_sDuration5                    = 0;
+	int16_t m_sDuration6                    = 0;
+	int16_t m_sDuration7                    = 0;
+	int16_t m_sDuration8                    = 0;
+	int16_t m_sDuration9                    = 0;
+	double m_fStartTime1                    = 0.0;
+	double m_fStartTime2                    = 0.0;
+	double m_fStartTime3                    = 0.0;
+	double m_fStartTime4                    = 0.0;
+	double m_fStartTime5                    = 0.0;
+	double m_fStartTime6                    = 0.0;
+	double m_fStartTime7                    = 0.0;
+	double m_fStartTime8                    = 0.0;
+	double m_fStartTime9                    = 0.0;
 
-	uint8_t m_bType4Buff[MAX_TYPE4_BUFF];
-	bool m_bType4Flag;
+	uint8_t m_bType4Buff[MAX_TYPE4_BUFF]    = {};
+	bool m_bType4Flag                       = false;
 
-	EbenezerApp* m_pMain;
-	CMagicProcess m_MagicProcess;
+	EbenezerApp* m_pMain                    = nullptr;
+	CMagicProcess m_MagicProcess            = {};
 
-	double m_fSpeedHackClientTime, m_fSpeedHackServerTime;
-	uint8_t m_bSpeedHackCheck;
+	double m_fSpeedHackClientTime           = 0.0;
+	double m_fSpeedHackServerTime           = 0.0;
+	uint8_t m_bSpeedHackCheck               = 0;
 
-	int16_t m_sFriendUser;    // who are you trying to make friends with?
+	int16_t m_sFriendUser                   = -1;  // who are you trying to make friends with?
 
-	double m_fBlinkStartTime; // When did you start to blink?
+	double m_fBlinkStartTime                = 0.0; // When did you start to blink?
 
-	int16_t m_sAliveCount;
+	int16_t m_sAliveCount                   = 0;
 
-	uint8_t m_bAbnormalType;    // Is the player normal,a giant, or a dwarf?
+	uint8_t m_bAbnormalType    = ABNORMAL_NORMAL; // Is the player normal, a giant, or a dwarf?
 
-	int16_t m_sWhoKilledMe;     // Who killed me???
-	int m_iLostExp;             // Experience point that was lost when you died.
+	int16_t m_sWhoKilledMe     = -1;              // Who killed me???
+	int m_iLostExp             = 0;               // Experience point that was lost when you died.
 
-	double m_fLastTrapAreaTime; // The last moment you were in the trap area.
+	double m_fLastTrapAreaTime = 0.0;             // The last moment you were in the trap area.
 
-	bool m_bZoneChangeFlag;     // 성용씨 미워!!
+	bool m_bZoneChangeFlag     = false;           // 성용씨 미워!!
 
-	uint8_t m_bRegeneType;      // Did you die and go home or did you type '/town'?
+	uint8_t m_bRegeneType      = 0;     // Did you die and go home or did you type '/town'?
 
-	double m_fLastRegeneTime;   // The last moment you got resurrected.
+	double m_fLastRegeneTime   = 0.0;   // The last moment you got resurrected.
 
-	bool m_bZoneChangeSameZone; // Did the server change when you warped?
+	bool m_bZoneChangeSameZone = false; // Did the server change when you warped?
 
 	// 이밴트용 관련.... 정애씨 이거 보면 코카스 쏠께요 ^^;
-	//	int					m_iSelMsgEvent[5];	// 실행중인 선택 메세지박스 이벤트
-	int m_iSelMsgEvent[MAX_MESSAGE_EVENT];    // 실행중인 선택 메세지박스 이벤트
-	int16_t m_sEventNid;                      // 마지막으로 선택한 이벤트 NPC 번호
-	UserEventList m_arUserEvent;              // 실행한 이벤트 리스트
+	// 실행중인 선택 메세지박스 이벤트
+	int m_iSelMsgEvent[MAX_MESSAGE_EVENT];
+	UserEventList m_arUserEvent;                   // 실행한 이벤트 리스트
+	int16_t m_sEventNid                      = -1; // 마지막으로 선택한 이벤트 NPC 번호
 
-	char m_strCouponId[MAX_COUPON_ID_LENGTH]; // What was the number of the coupon?
-	int m_iEditBoxEvent;
+	char m_strCouponId[MAX_COUPON_ID_LENGTH] = {};
+	int m_iEditBoxEvent                      = -1;
 
-	int16_t m_sEvent[MAX_CURRENT_EVENT];      // 이미 실행된 이밴트 리스트들 :)
+	// 이미 실행된 이밴트 리스트들 :)
+	int16_t m_sEvent[MAX_CURRENT_EVENT]; // initialized in constructor
 
-	bool m_bIsPartyLeader;
-	uint8_t m_byInvisibilityState;
-	int16_t m_sDirection;
-	bool m_bIsChicken;
-	uint8_t m_byKnightsRank;
-	uint8_t m_byPersonalRank;
+	bool m_bIsPartyLeader         = false;
+	uint8_t m_byInvisibilityState = 0;
+	int16_t m_sDirection          = 0;
+	bool m_bIsChicken             = false;
+	uint8_t m_byKnightsRank       = 0;
+	uint8_t m_byPersonalRank      = 0;
 
 	// Selected exchange slot for last exchange (1~5).
 	// Applicable only to exchange type 101.
-	uint8_t m_byLastExchangeNum;
+	uint8_t m_byLastExchangeNum   = 0;
 
 	// Game socket specific:
-	_REGION_BUFFER* _regionBuffer;
+	_REGION_BUFFER* _regionBuffer = nullptr;
 
-	CJvCryption _jvCryption;
-	bool _jvCryptionEnabled;
+	CJvCryption _jvCryption       = {};
+	bool _jvCryptionEnabled       = false;
 
-	uint32_t _sendValue;
-	uint32_t _recvValue;
+	uint32_t _sendValue           = 0;
+	uint32_t _recvValue           = 0;
 	//
 
 public:
@@ -248,6 +249,7 @@ public:
 	void CouponEvent(const char* pBuf);
 	void LogCoupon(int itemid, int count);
 	void RecvEditBox(char* pBuf);
+	void ResetEditBox();
 	bool CheckCouponUsed() const;
 	bool CheckRandom(int16_t percent) const;
 	void OpenEditBox(int message, int event);
@@ -266,6 +268,7 @@ public:
 		int16_t class5 = -1, int16_t class6 = -1) const;
 	bool CheckPromotionEligible();
 	void RecvSelectMsg(char* pBuf);
+	void ResetSelectMsg();
 	bool GiveItem(int itemid, int16_t count);
 	bool RobItem(int itemid, int16_t count);
 	bool CheckExistItem(int itemid, int16_t count) const;

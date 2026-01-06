@@ -8,16 +8,6 @@
 
 #include <N3Base/N3UIString.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIRepairTooltipDlg::CUIRepairTooltipDlg()
 {
 	m_iPosXBack            = 0;
@@ -32,11 +22,17 @@ CUIRepairTooltipDlg::CUIRepairTooltipDlg()
 	m_bBHaveEnough         = true;
 
 	m_iBRequiredGoldBackup = 0;
+
+	for (int i = 0; i < MAX_REPAIR_TOOLTIP_COUNT; i++)
+	{
+		m_pStr[i]      = nullptr;
+		m_pStrColor[i] = 0;
+	}
 }
 
 CUIRepairTooltipDlg::~CUIRepairTooltipDlg()
 {
-	Release();
+	CUIRepairTooltipDlg::Release();
 }
 
 void CUIRepairTooltipDlg::Release()
@@ -68,22 +64,19 @@ void CUIRepairTooltipDlg::BackupStrColor()
 void CUIRepairTooltipDlg::DisplayTooltipsEnable(int xpos, int ypos, __IconItemSkill* spItem, int iRequiredGold, bool bHaveEnough)
 {
 	int iIndex = 0;
-	if (!spItem)
+	if (spItem == nullptr)
 		return;
 
 	if (!IsVisible())
-		SetVisible(TRUE);
+		SetVisible(true);
 
 	std::string szMsg;
 
-	if ((m_iPosXBack != xpos) || (m_iPosYBack != ypos))
+	if (m_iPosXBack != xpos || m_iPosYBack != ypos)
 	{
 		int iWidth  = m_rcRegion.right - m_rcRegion.left;
 		int iHeight = m_rcRegion.bottom - m_rcRegion.top;
-
-		int iRight, iTop;
-		iRight = 1024;
-		iTop   = 0;
+		int iRight = 1024, iTop = 0;
 
 		if ((xpos + iWidth < iRight) && ((ypos - iHeight) > iTop))
 			SetPos(xpos + 26, ypos - iHeight);
@@ -101,8 +94,6 @@ void CUIRepairTooltipDlg::DisplayTooltipsEnable(int xpos, int ypos, __IconItemSk
 	if ((!m_spItemBack) || (m_spItemBack->pItemBasic->dwID != spItem->pItemBasic->dwID) || (m_iBRequiredGoldBackup != m_iBRequiredGold))
 	{
 		m_spItemBack = spItem;
-
-		std::string szString;
 
 		if ((spItem->pItemBasic->byContable != UIITEM_TYPE_COUNTABLE) && (spItem->pItemBasic->byContable != UIITEM_TYPE_COUNTABLE_SMALL)
 			&& (spItem->pItemBasic->siMaxDurability + spItem->pItemExt->siMaxDurability != 1))

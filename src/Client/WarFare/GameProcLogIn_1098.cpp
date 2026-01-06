@@ -3,7 +3,7 @@
 #if defined(LOGIN_SCENE_VERSION) && LOGIN_SCENE_VERSION == 1098
 #include "GameProcLogIn_1098.h"
 #include "GameEng.h"
-#include "UILogIn_1098.h"
+#include "UILogin_1098.h"
 #include "PlayerMySelf.h"
 #include "UIManager.h"
 #include "LocalInput.h"
@@ -17,16 +17,7 @@
 #include <N3Base/N3SndObj.h>
 #include <N3Base/N3SndMgr.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 using __GameServerInfo = CUILogIn_1098::__GameServerInfo;
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CGameProcLogIn_1098::CGameProcLogIn_1098()
 {
@@ -124,17 +115,17 @@ void CGameProcLogIn_1098::Init()
 	s_pUIMgr->SetFocusedUI((CN3UIBase*) m_pUILogIn);
 
 	// 소켓 접속..
-	char szIniPath[_MAX_PATH] = {};
+	char szIniPath[_MAX_PATH] {};
 	lstrcpy(szIniPath, CN3Base::PathGet().c_str());
 	lstrcat(szIniPath, "Server.Ini");
 
-	char szRegistrationSite[_MAX_PATH] = {};
+	char szRegistrationSite[_MAX_PATH] {};
 	GetPrivateProfileString("Join", "Registration site", "", szRegistrationSite, _MAX_PATH, szIniPath);
 	m_szRegistrationSite = szRegistrationSite;
 
 	int iServerCount     = GetPrivateProfileInt("Server", "Count", 0, szIniPath);
 
-	char szIPs[256][32]  = {};
+	char szIPs[256][32] {};
 	for (int i = 0; i < iServerCount; i++)
 	{
 		std::string key = fmt::format("IP{}", i);

@@ -12,21 +12,11 @@
 #include "N3SndMgr.h"
 #include "N3SndObj.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 float CN3FXBundle::m_fEffectSndDist = 48.0f;
 
 CN3FXBundle::CN3FXBundle()
 {
 	m_iVersion = SUPPORTED_BUNDLE_VERSION;
-	m_strName.erase();
 	for (int i = 0; i < MAX_FX_PART; i++)
 		m_pPart[i] = nullptr;
 	m_fLife0  = 0.0f;
@@ -50,6 +40,8 @@ CN3FXBundle::CN3FXBundle()
 
 	//m_vTargetScale.Set(1,1,1);
 	m_fTargetScale = 1.0f;
+
+	m_vPrePos      = {};
 
 	m_bStatic      = false;
 
@@ -331,8 +323,8 @@ bool CN3FXBundle::Load(File& file)
 #if defined(_DEBUG)
 	if (m_iVersion > SUPPORTED_BUNDLE_VERSION)
 	{
-		TRACE("!!! WARNING: CN3FXBundle::Load(%s) encountered bundle version %d. Needs support!",
-			FileName().c_str(), m_iVersion);
+		TRACE("!!! WARNING: CN3FXBundle::Load({}) encountered bundle version {}. Needs support!",
+			FileName(), m_iVersion);
 	}
 #endif
 
@@ -344,7 +336,7 @@ bool CN3FXBundle::Load(File& file)
 	file.Read(&m_bDependScale, sizeof(bool));
 
 	const int iPartCount = GetPartCountForVersion();
-	for (int i = 0; i < MAX_FX_PART; i++)
+	for (int i = 0; i < iPartCount; i++)
 	{
 		int iType = FX_PART_TYPE_NONE;
 		file.Read(&iType, sizeof(int));
@@ -355,9 +347,9 @@ bool CN3FXBundle::Load(File& file)
 		CN3FXPartBase* part = AllocatePart(iType);
 		if (part == nullptr)
 		{
-			TRACE("!!! WARNING: CN3FXBundle::Load(%s) encountered invalid part type %d at index "
-				  "%d. Ending parsing here.",
-				FileName().c_str(), iType, i);
+			TRACE("!!! WARNING: CN3FXBundle::Load({}) encountered invalid part type {} at index "
+				  "{}. Ending parsing here.",
+				FileName(), iType, i);
 			break;
 		}
 

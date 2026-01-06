@@ -19,7 +19,7 @@ public:
 
 	void RotationAxis(const __Vector3& v, float fRadian);
 	void RotationAxis(float fX, float fY, float fZ, float fRadian);
-	void operator=(const __Matrix44& mtx);
+	__Quaternion& operator=(const __Matrix44& mtx);
 
 	void AxisAngle(__Vector3& vAxisResult, float& fRadianResult) const;
 	void Slerp(const __Quaternion& qt1, const __Quaternion& qt2, float fDelta);

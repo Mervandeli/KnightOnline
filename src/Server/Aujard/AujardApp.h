@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef SERVER_AUJARD_AUJARDAPP_H
+#define SERVER_AUJARD_AUJARDAPP_H
+
+#pragma once
 
 #include "DBAgent.h"
 #include "Define.h"
@@ -22,7 +25,7 @@ public:
 	}
 
 	AujardApp(logger::Logger& logger);
-	~AujardApp();
+	~AujardApp() override;
 
 	/// \brief handles DB_HEARTBEAT requests
 	/// \see DB_HEARTBEAT
@@ -54,7 +57,7 @@ public:
 	void SetLogInInfo(const char* buffer);
 
 	/// \brief attempts to retrieve metadata for a knights clan
-	/// \see KnightsPacket(), KNIGHTS_LIST_REQ
+	/// \see KnightsPacket(), DB_KNIGHTS_LIST_REQ
 	void KnightsList(const char* buffer);
 
 	/// \brief Called every 5min by _concurrentCheckThread
@@ -62,28 +65,28 @@ public:
 	void ConCurrentUserCount();
 
 	/// \brief attempts to return a list of all knights members
-	/// \see KnightsPacket(), KNIGHTS_MEMBER_REQ
+	/// \see KnightsPacket(), DB_KNIGHTS_MEMBER_REQ
 	void AllKnightsMember(const char* buffer);
 
 	/// \brief attempts to disband a knights clan
-	/// \see KnightsPacket(), KNIGHTS_DESTROY
+	/// \see KnightsPacket(), DB_KNIGHTS_DESTROY
 	void DestroyKnights(const char* buffer);
 
 	/// \brief attempts to modify a knights character
-	/// \see KnightsPacket(), KNIGHTS_REMOVE, KNIGHTS_ADMIT, KNIGHTS_REJECT, KNIGHTS_CHIEF,
-	/// KNIGHTS_VICECHIEF, KNIGHTS_OFFICER, KNIGHTS_PUNISH
+	/// \see KnightsPacket(), DB_KNIGHTS_REMOVE, DB_KNIGHTS_ADMIT, DB_KNIGHTS_REJECT, DB_KNIGHTS_CHIEF,
+	/// DB_KNIGHTS_VICECHIEF, DB_KNIGHTS_OFFICER, DB_KNIGHTS_PUNISH
 	void ModifyKnightsMember(const char* buffer, uint8_t command);
 
 	/// \brief attempt to remove a character from a knights clan
-	/// \see KnightsPacket(), KNIGHTS_WITHDRAW
+	/// \see KnightsPacket(), DB_KNIGHTS_WITHDRAW
 	void WithdrawKnights(const char* buffer);
 
 	/// \brief attempts to add a character to a knights clan
-	/// \see KnightsPacket(), KNIGHTS_JOIN
+	/// \see KnightsPacket(), DB_KNIGHTS_JOIN
 	void JoinKnights(const char* buffer);
 
 	/// \brief attempts to create a knights clan
-	/// \see KnightsPacket(), KNIGHTS_CREATE
+	/// \see KnightsPacket(), DB_KNIGHTS_CREATE
 	void CreateKnights(const char* buffer);
 
 	/// \brief handles WIZ_KNIGHTS_PROCESS and WIZ_CLAN_PROCESS requests
@@ -143,6 +146,10 @@ public:
 	/// \brief loads and sends data after a character is selected
 	void SelectCharacter(const char* buffer);
 
+	/// \brief Sends the WIZ_SEL_CHAR response packet indicating character selection failed
+	/// \param sessionId The associated session ID to send it to.
+	void SendSelectCharacterFailed(int sessionId);
+
 	SharedMemoryQueue LoggerSendQueue;
 	SharedMemoryQueue LoggerRecvQueue;
 
@@ -152,12 +159,12 @@ protected:
 	CDBAgent _dbAgent;
 	SharedMemoryBlock _userDataBlock;
 
-	int _serverId;
-	int _zoneId;
+	int _serverId        = 0;
+	int _zoneId          = 0;
 
-	int _packetCount;     // packet의 수를 체크
-	int _sendPacketCount; // packet의 수를 체크
-	int _recvPacketCount; // packet의 수를 체크
+	int _packetCount     = 0; // packet의 수를 체크
+	int _sendPacketCount = 0; // packet의 수를 체크
+	int _recvPacketCount = 0; // packet의 수를 체크
 
 protected:
 	/// \brief handles user logout functions
@@ -197,7 +204,7 @@ protected:
 	void OnSharedMemoryOpened();
 
 private:
-	time_t _heartbeatReceivedTime;
+	time_t _heartbeatReceivedTime = 0;
 	std::unique_ptr<TimerThread> _dbPoolCheckThread;
 	std::unique_ptr<TimerThread> _heartbeatCheckThread;
 	std::unique_ptr<TimerThread> _concurrentCheckThread;
@@ -206,3 +213,5 @@ private:
 
 	std::unique_ptr<ReadQueueThread> _readQueueThread;
 };
+
+#endif // SERVER_AUJARD_AUJARDAPP_H

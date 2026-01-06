@@ -13,11 +13,11 @@ namespace ftxui
 struct ReplayLog
 {
 	std::string logger_name;
-	spdlog::level::level_enum level;
+	spdlog::level::level_enum level = spdlog::level::debug;
 	spdlog::log_clock::time_point time;
-	size_t thread_id;
+	size_t thread_id = 0;
 	std::string source_filename;
-	int source_line;
+	int source_line = 0;
 	std::string source_funcname;
 	std::string payload;
 };

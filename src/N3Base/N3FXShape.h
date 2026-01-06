@@ -5,7 +5,7 @@
 #ifndef __N3FXSHAPE_H__
 #define __N3FXSHAPE_H__
 
-#pragma warning(disable : 4786)
+#pragma once
 
 #include "N3TransformCollision.h"
 #include "N3Texture.h"
@@ -49,7 +49,6 @@ public:
 	CN3Texture* Tex(int iIndex);
 	void TexAlloc(int nCount);
 	CN3Texture* TexSet(int iIndex, const std::string& szFN);
-	void TexSet(int iIndex, CN3Texture* pTex);
 
 	__Vector3 Min()
 	{

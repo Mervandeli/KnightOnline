@@ -5,20 +5,16 @@
 #if !defined(AFX_UINPCEVENT_H__27F6610C_5D61_4A22_97F2_93211B77BF9C__INCLUDED_)
 #define AFX_UINPCEVENT_H__27F6610C_5D61_4A22_97F2_93211B77BF9C__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <N3Base/N3UIBase.h>
 
-enum e_NpcEvent
+enum e_NpcEvent : uint8_t
 {
 	NPC_EVENT_ITEM_TRADE   = 0,
 	NPC_EVENT_TRADE_REPAIR = 1,
 	NPC_EVENT_KNIGHTS      = 2
 };
-
-//////////////////////////////////////////////////////////////////////
 
 class CUINPCEvent : public CN3UIBase
 {

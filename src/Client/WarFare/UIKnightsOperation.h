@@ -5,9 +5,9 @@
 #if !defined(AFX_UIKNIGHTSOPERATION_H__1AE95FA6_E4DE_45DF_9EEA_6AEDE400ECA7__INCLUDED_)
 #define AFX_UIKNIGHTSOPERATION_H__1AE95FA6_E4DE_45DF_9EEA_6AEDE400ECA7__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
+
+#include "GameDef.h"
 
 #include <N3Base/N3UIBase.h>
 
@@ -16,15 +16,15 @@
 
 struct __KnightsInfoBase
 {
-	int iID;
+	int iID = 0;
 	std::string szName;
 };
 
 struct __KnightsInfoExt : public __KnightsInfoBase
 {
 	std::string szChiefName;
-	int iMemberCount;
-	int iPoint;
+	int iMemberCount = 0;
+	int iPoint       = 0;
 };
 
 typedef std::map<int, __KnightsInfoBase>::iterator it_KIB;
@@ -52,8 +52,8 @@ protected:
 	CN3UIEdit* m_pEdit_KnightsName;
 
 public:
-	void ChangeUIByDuty(enum e_KnightsDuty eDuty); // 권한에 따라 UI 변경..
-	void Open(enum e_KnightsDuty eDuty);
+	void ChangeUIByDuty(e_KnightsDuty eDuty); // 권한에 따라 UI 변경..
+	void Open(e_KnightsDuty eDuty);
 	void Close();
 
 	__KnightsInfoBase* KnightsInfoFind(int iID);

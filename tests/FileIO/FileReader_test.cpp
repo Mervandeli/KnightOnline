@@ -167,8 +167,8 @@ TEST_F(FileReaderTest, Read_SucceedsOnReadOfZero)
 
 TEST_F(FileReaderTest, Read_IsValidReadFromStart)
 {
-	uint8_t input[4] = {};
 	size_t bytesRead = 0;
+	uint8_t input[4] {};
 
 	// Read considered successful
 	ASSERT_TRUE(_file.Read(input, 4, &bytesRead));
@@ -188,8 +188,8 @@ TEST_F(FileReaderTest, Read_IsValidReadFromStart)
 
 TEST_F(FileReaderTest, Read_HasFullDataAfterSeek)
 {
-	uint8_t input[4] = {};
 	size_t bytesRead = 0;
+	uint8_t input[4] {};
 
 	// Seek 10 bytes into the file
 	ASSERT_TRUE(_file.Seek(10, SEEK_SET));
@@ -212,8 +212,8 @@ TEST_F(FileReaderTest, Read_HasFullDataAfterSeek)
 
 TEST_F(FileReaderTest, Read_HasPartialDataAfterSeek)
 {
-	uint8_t input[4] = {};
 	size_t bytesRead = 0;
+	uint8_t input[4] {};
 
 	// Seek to the end of the file
 	ASSERT_TRUE(_file.Seek(TEST_FILE_SIZE - 2, SEEK_SET));
@@ -236,8 +236,8 @@ TEST_F(FileReaderTest, Read_HasPartialDataAfterSeek)
 
 TEST_F(FileReaderTest, Read_FailsAtEndOfFile)
 {
-	uint8_t input[4] = {};
 	size_t bytesRead = 0;
+	uint8_t input[4] {};
 
 	// Seek to the end of the file
 	ASSERT_TRUE(_file.Seek(TEST_FILE_SIZE, SEEK_SET));

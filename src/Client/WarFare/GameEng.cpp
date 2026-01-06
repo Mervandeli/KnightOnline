@@ -10,16 +10,8 @@
 #include <N3Base/N3Camera.h>
 #include <N3Base/N3Light.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
+constexpr float LIGHTNING_DURATION = 2.0f;
 
-const float LIGHTNING_DURATION = 2.0f;
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 CGameEng::CGameEng()
 {
 	m_pActiveCam = nullptr;
@@ -221,6 +213,9 @@ void CGameEng::Tick(const D3DCOLOR* crDiffuses, // Diffuse 라이트 색깔.. 3 
 			m_vEyeToReach = m_vAtToReach + (m_vEyeToReach * mtxRot);
 		}
 		break;
+
+		default:
+			break;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////
@@ -252,7 +247,7 @@ void CGameEng::Tick(const D3DCOLOR* crDiffuses, // Diffuse 라이트 색깔.. 3 
 		if (fFPChange > 0 && m_fFPDeltaCur > m_fFPDeltaToReach)
 			m_fFPDeltaCur = m_fFPDeltaToReach;
 	}
-	float fFPToRestore       = m_pActiveCam->m_Data.fFP;
+
 	m_pActiveCam->m_Data.fFP = s_Options.iViewDist * m_fFPDeltaCur;
 
 	m_pActiveCam->m_FogColor = crFog; // 안개색을 맞춘다..
@@ -466,41 +461,43 @@ void CGameEng::CameraPitchAdd(float fRotXPerSec)
 {
 	if (nullptr == m_pActiveCam)
 		return;
-	float fPitchMax = DegreesToRadians(70.0f);
-	float fPitchMin = -DegreesToRadians(50.0f);
+
+	constexpr float PitchMax = DegreesToRadians(70.0f);
+	constexpr float PitchMin = -DegreesToRadians(50.0f);
+
 	if (VP_BACKWARD == m_eViewPoint)
 	{
 		m_fRotPitchBackward += fRotXPerSec * s_fSecPerFrm;
-		if (m_fRotPitchBackward > fPitchMax)
-			m_fRotPitchBackward = fPitchMax; // 아래 보는값
-		else if (m_fRotPitchBackward < fPitchMin)
-			m_fRotPitchBackward = fPitchMin; // 위보는 값..
+		if (m_fRotPitchBackward > PitchMax)
+			m_fRotPitchBackward = PitchMax; // 아래 보는값
+		else if (m_fRotPitchBackward < PitchMin)
+			m_fRotPitchBackward = PitchMin; // 위보는 값..
 	}
 	else if (VP_FIRST_PERSON == m_eViewPoint)
 	{
 		m_fRotPitchFirstPerson += fRotXPerSec * s_fSecPerFrm;
-		if (m_fRotPitchFirstPerson > fPitchMax)
-			m_fRotPitchFirstPerson = fPitchMax; // 아래 보는값
-		else if (m_fRotPitchFirstPerson < fPitchMin)
-			m_fRotPitchFirstPerson = fPitchMin; // 위보는 값..
+		if (m_fRotPitchFirstPerson > PitchMax)
+			m_fRotPitchFirstPerson = PitchMax; // 아래 보는값
+		else if (m_fRotPitchFirstPerson < PitchMin)
+			m_fRotPitchFirstPerson = PitchMin; // 위보는 값..
 	}
 	else if (VP_FOWARD == m_eViewPoint)
 	{
 		m_fRotPitchFoward += fRotXPerSec * s_fSecPerFrm;
-		if (m_fRotPitchFoward > fPitchMax)
-			m_fRotPitchFoward = fPitchMax;                 // 아래 보는값
-		else if (m_fRotPitchFoward < fPitchMin)
-			m_fRotPitchFoward = fPitchMin;                 // 위보는 값..
+		if (m_fRotPitchFoward > PitchMax)
+			m_fRotPitchFoward = PitchMax;                    // 아래 보는값
+		else if (m_fRotPitchFoward < PitchMin)
+			m_fRotPitchFoward = PitchMin;                    // 위보는 값..
 	}
-	else if (VP_THIRD_PERSON == m_eViewPoint)              // 위에서 보는 건 거리만 늘였다 줄였다 한다..
+	else if (VP_THIRD_PERSON == m_eViewPoint)                // 위에서 보는 건 거리만 늘였다 줄였다 한다..
 	{
-		fPitchMin               = DegreesToRadians(10.0f); // 젤 밑에값 한계
+		constexpr float PitchMin  = DegreesToRadians(10.0f); // 젤 밑에값 한계
 
-		m_fRotPitchThirdFirson += fRotXPerSec * s_fSecPerFrm;
-		if (m_fRotPitchThirdFirson > fPitchMax)
-			m_fRotPitchThirdFirson = fPitchMax; // 아래 보는값
-		else if (m_fRotPitchThirdFirson < fPitchMin)
-			m_fRotPitchThirdFirson = fPitchMin; // 위보는 값..
+		m_fRotPitchThirdFirson   += fRotXPerSec * s_fSecPerFrm;
+		if (m_fRotPitchThirdFirson > PitchMax)
+			m_fRotPitchThirdFirson = PitchMax; // 아래 보는값
+		else if (m_fRotPitchThirdFirson < PitchMin)
+			m_fRotPitchThirdFirson = PitchMin; // 위보는 값..
 	}
 }
 

@@ -15,22 +15,13 @@
 #include <N3Base/N3UIButton.h>
 #include <N3Base/N3UIString.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUIPointInitDlg::CUIPointInitDlg()
 {
 	m_pBtn_Ok        = nullptr;
 	m_pBtn_Cancel    = nullptr;
-
 	m_pText_NeedGold = nullptr;
+
+	m_bAllpoint      = false;
 }
 
 CUIPointInitDlg::~CUIPointInitDlg()
@@ -40,11 +31,15 @@ CUIPointInitDlg::~CUIPointInitDlg()
 void CUIPointInitDlg::Release()
 {
 	CN3UIBase::Release();
+
+	m_pBtn_Ok        = nullptr;
+	m_pBtn_Cancel    = nullptr;
+	m_pText_NeedGold = nullptr;
 }
 
 bool CUIPointInitDlg::Load(File& file)
 {
-	if (CN3UIBase::Load(file) == false)
+	if (!CN3UIBase::Load(file))
 		return false;
 
 	N3_VERIFY_UI_COMPONENT(m_pBtn_Ok, GetChildByID<CN3UIButton>("btn_ok"));
@@ -81,18 +76,12 @@ void CUIPointInitDlg::PushOkButton()
 	uint8_t byBuff[32];
 	int iOffset = 0;
 
-	switch (m_bAllpoint)
-	{
-		case true:
-			CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_CLASS_CHANGE);
-			CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_CLASS_ALL_POINT);
-			break;
+	CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_CLASS_CHANGE);
 
-		case false:
-			CAPISocket::MP_AddByte(byBuff, iOffset, WIZ_CLASS_CHANGE);
-			CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_CLASS_SKILL_POINT);
-			break;
-	}
+	if (m_bAllpoint)
+		CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_CLASS_ALL_POINT);
+	else
+		CAPISocket::MP_AddByte(byBuff, iOffset, N3_SP_CLASS_SKILL_POINT);
 
 	CGameProcedure::s_pSocket->Send(byBuff, iOffset);
 }
@@ -105,9 +94,13 @@ bool CUIPointInitDlg::OnKeyPress(int iKey)
 		case DIK_RETURN:
 			ReceiveMessage(m_pBtn_Ok, UIMSG_BUTTON_CLICK);
 			return true;
+
 		case DIK_ESCAPE:
 			ReceiveMessage(m_pBtn_Cancel, UIMSG_BUTTON_CLICK);
 			return true;
+
+		default:
+			break;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);
@@ -116,18 +109,7 @@ bool CUIPointInitDlg::OnKeyPress(int iKey)
 void CUIPointInitDlg::InitDlg(bool bAllpoint, int iGold)
 {
 	m_bAllpoint = bAllpoint;
-	if (m_pText_NeedGold)
-	{
-		switch (bAllpoint)
-		{
-			case true:
-				m_pText_NeedGold->SetStringAsInt(iGold);
-				break;
-			case false:
-				m_pText_NeedGold->SetStringAsInt(iGold);
-				break;
-		}
-	}
-}
 
-//this_ui_add_end
+	if (m_pText_NeedGold != nullptr)
+		m_pText_NeedGold->SetStringAsInt(iGold);
+}

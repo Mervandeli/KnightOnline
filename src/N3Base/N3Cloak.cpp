@@ -8,15 +8,6 @@
 #include "N3PMeshInstance.h"
 #include "N3Chr.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3Cloak::CN3Cloak()
 {
 	//	m_pPMesh = nullptr;
@@ -30,6 +21,14 @@ CN3Cloak::CN3Cloak()
 	m_fPrevYaw            = 0.0f;
 	m_eAnchorPattern      = AMP_NONE;
 	m_fAnchorPreserveTime = 0.0f;
+	m_nVertexCount        = 0;
+	m_nIndexCount         = 0;
+	m_nGridW              = 0;
+	m_nGridH              = 0;
+	m_Force               = {};
+	m_GravityForce        = {};
+
+	memset(&m_vOffset, 0, sizeof(m_vOffset));
 }
 
 CN3Cloak::~CN3Cloak()
@@ -68,7 +67,7 @@ void CN3Cloak::Init(CN3CPlug_Cloak* pPlugCloak)
 	m_Force.x = m_Force.y = m_Force.z = 0.0f;
 }
 
-void CN3Cloak::Tick(int nLOD, float fYaw, e_CloakMove eCloakMove)
+void CN3Cloak::Tick(int /*nLOD*/, float fYaw, e_CloakMove eCloakMove)
 {
 	//SetLOD(nLOD);
 
@@ -111,7 +110,8 @@ void CN3Cloak::Render(__Matrix44& mtx)
 		return;
 
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, mtx.toD3D());
-	DWORD dwCull, dwLight;
+
+	DWORD dwCull = 0, dwLight = 0;
 	s_lpD3DDev->GetRenderState(D3DRS_LIGHTING, &dwLight);
 	s_lpD3DDev->GetRenderState(D3DRS_CULLMODE, &dwCull);
 
@@ -135,7 +135,7 @@ void CN3Cloak::Render(__Matrix44& mtx)
 		m_pIndex, D3DFMT_INDEX16, m_pVertex, sizeof(__VertexT1));
 
 	//
-	__VertexXyzColor Vtx[2];
+	__VertexXyzColor Vtx[2] {};
 	/*
 	__VertexT1 *pTemp = m_pVertex;
 	Vtx[0].Set(pTemp->x, pTemp->y, pTemp->z, 0xffffffff);
@@ -185,19 +185,20 @@ void CN3Cloak::Render(__Matrix44& mtx)
 		s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, dwCull);
 }
 
-#define SPRING_TOLERANCE   0.000001f
-#define SPRING_COEFFICIENT 0.3f
+constexpr float SPRING_TOLERANCE   = 0.000001f;
+constexpr float SPRING_COEFFICIENT = 0.3f;
+
 void CN3Cloak::UpdateLocalForce()
 {
-	float length;
+	float length = 0.0f;
 
-	int i, j, index, idx;
+	int index = 0, idx = 0;
 	__Vector3 up, down, left, right;
 	const float nSub = 0.2f;
 
-	for (i = 0; i < m_nGridH; i++)
+	for (int i = 0; i < m_nGridH; i++)
 	{
-		for (j = 0; j < m_nGridW; j++)
+		for (int j = 0; j < m_nGridW; j++)
 		{
 			index = i * m_nGridW + j;
 
@@ -223,6 +224,7 @@ void CN3Cloak::UpdateLocalForce()
 					up.z   = (length) *up.z;
 				}
 			}
+
 			if (j + 1 < m_nGridW)
 			{
 				idx    = i * m_nGridW + j + 1;
@@ -239,6 +241,7 @@ void CN3Cloak::UpdateLocalForce()
 					down.z = (length) *down.z;
 				}
 			}
+
 			if (i - 1 >= 0)
 			{
 				idx    = (i - 1) * m_nGridW + j;
@@ -255,6 +258,7 @@ void CN3Cloak::UpdateLocalForce()
 					left.z = (length) *left.z;
 				}
 			}
+
 			if (i + 1 < m_nGridH)
 			{
 				idx     = (i + 1) * m_nGridW + j;
@@ -284,36 +288,33 @@ void CN3Cloak::UpdateLocalForce()
 
 void CN3Cloak::ApplyForce()
 {
-	const float energy_loss = 0.99f;
-	__Particle* pParticle   = m_pParticle;
-	__VertexT1* pVtx;
+	constexpr float energy_loss = 0.99f;
+	__Particle* pParticle       = nullptr;
+	__VertexT1* pVtx            = nullptr;
 	for (int i = m_nGridW; i < m_nGridH * m_nGridW; i++)
 	{
-		pParticle = m_pParticle + i;
-		pVtx      = m_pVertex + i
-			   + m_nGridW
-					 * CLOAK_SKIP_LINE; // 'm_nGridW*CLOAK_SKIP_LINE' means non-movable points..
-		{
-			// Old.
+		pParticle      = m_pParticle + i;
 
-			pParticle->vx += (m_GravityForce.x + m_Force.x + pParticle->LocalForce.x);
-			pParticle->vy += (m_GravityForce.y + m_Force.y + pParticle->LocalForce.y);
-			pParticle->vz += (m_GravityForce.z + m_Force.z + pParticle->LocalForce.z);
+		// 'm_nGridW*CLOAK_SKIP_LINE' means non-movable points..
+		pVtx           = m_pVertex + i + m_nGridW * CLOAK_SKIP_LINE;
+		// Old.
 
-			pParticle->x  += pParticle->vx;
-			pParticle->y  += pParticle->vy;
-			pParticle->z  += pParticle->vz;
+		pParticle->vx += (m_GravityForce.x + m_Force.x + pParticle->LocalForce.x);
+		pParticle->vy += (m_GravityForce.y + m_Force.y + pParticle->LocalForce.y);
+		pParticle->vz += (m_GravityForce.z + m_Force.z + pParticle->LocalForce.z);
 
-			pVtx->x       += pParticle->vx;
-			pVtx->y       += pParticle->vy;
-			pVtx->z       += pParticle->vz;
+		pParticle->x  += pParticle->vx;
+		pParticle->y  += pParticle->vy;
+		pParticle->z  += pParticle->vz;
 
-			// loss process
-			pParticle->vx *= energy_loss;
-			pParticle->vy *= energy_loss;
-			;
-			pParticle->vz *= energy_loss;
-		}
+		pVtx->x       += pParticle->vx;
+		pVtx->y       += pParticle->vy;
+		pVtx->z       += pParticle->vz;
+
+		// loss process
+		pParticle->vx *= energy_loss;
+		pParticle->vy *= energy_loss;
+		pParticle->vz *= energy_loss;
 	}
 }
 
@@ -322,10 +323,10 @@ void CN3Cloak::SetLOD(int nLevel)
 	if (nLevel == m_nLOD)
 		return;
 
-	if (m_pIndex)
-		delete[] m_pIndex, m_pIndex = nullptr;
+	delete[] m_pIndex;
+	m_pIndex = nullptr;
 
-	memset(m_vOffset, 0, sizeof(__Vector3) * CLOAK_MAX_WIDTH);
+	memset(&m_vOffset, 0, sizeof(__Vector3) * CLOAK_MAX_WIDTH);
 
 	switch (nLevel)
 	{
@@ -337,7 +338,7 @@ void CN3Cloak::SetLOD(int nLevel)
 			int nVertexCount = m_pPMesh->GetMaxNumVertices();
 			int nIndexCount  = m_pPMesh->GetMaxNumIndices();
 			m_pVertex        = new __VertexT1[nVertexCount];
-			memcpy(m_pVertex, m_pPMesh->GetVertices(), sizeof(__VertexT1) * nVertexCount);
+			memcpy(&m_pVertex, m_pPMesh->GetVertices(), sizeof(__VertexT1) * nVertexCount);
 			m_pIndex = new uint16_t[nIndexCount];
 			memcpy(m_pIndex, m_pPMesh->GetIndices(), sizeof(uint16_t) * nIndexCount);
 			m_nVertexCount = nVertexCount;
@@ -345,59 +346,18 @@ void CN3Cloak::SetLOD(int nLevel)
 			//
 		}
 		break;
-		case 1:
-		{
-			/*
-			m_nGridW = 5;
-			m_nGridH = 4;
 
-			int nVertexCount = 25;
-			int nIndexCount = 96;
-			m_pVertex = new __VertexT1[nVertexCount];
-			m_pIndex = new uint16_t[nIndexCount];
-			__VertexT1 *pVtx0 = m_pPMesh->GetVertices();
-			memcpy(m_pVertex, pVtx0, sizeof(__VertexT1)*5);
-			memcpy(m_pVertex+5, pVtx0+6, sizeof(__VertexT1)*5);
-			memcpy(m_pVertex+10, pVtx0+12, sizeof(__VertexT1)*5);
-			memcpy(m_pVertex+15, pVtx0+18, sizeof(__VertexT1)*5);
-			memcpy(m_pVertex+20, pVtx0+24, sizeof(__VertexT1)*5);			
-
-			uint16_t *pIndex = m_pIndex;
-			int x,y;
-			for (y=0;y<4;y++)
-			{
-				for(x=0;x<4;x++)
-				{
-					*(pIndex)   = x   + y*5;
-					*(pIndex+1) = x+1 + y*5;
-					*(pIndex+2) = x   + (y+1)*5;
-
-					*(pIndex+3) = *(pIndex+2);
-					*(pIndex+4) = *(pIndex+1);
-					*(pIndex+5) = x+1 + (y+1)*5;
-					pIndex+=6;
-				}
-			}
-			m_nVertexCount = nVertexCount;
-			m_nIndexCount = nIndexCount;
-*/
-		}
-		break;
-		case 2:
-			break;
-		case 3:
+		default:
 			break;
 	}
 
-	if (m_pParticle)
-		delete[] m_pParticle;
-
+	delete[] m_pParticle;
 	m_pParticle           = new __Particle[m_nGridW * m_nGridH];
 	__Particle* pParticle = m_pParticle;
-	int i, j;
-	for (i = 0; i < m_nGridH; i++)
+
+	for (int i = 0; i < m_nGridH; i++)
 	{
-		for (j = 0; j < m_nGridW; j++)
+		for (int j = 0; j < m_nGridW; j++)
 		{
 			pParticle->Set(0.5f, 2.0f - j * .2f, 2.0f - i * .2f, 0.0f, 0.0f, 0.0f, 0.0f);
 			pParticle++;
@@ -405,7 +365,7 @@ void CN3Cloak::SetLOD(int nLevel)
 	}
 
 	m_nLOD = nLevel;
-	//TRACE ("CN3Cloak Set LOD lvl %d\n", nLevel);
+	//TRACE ("CN3Cloak Set LOD lvl {}", nLevel);
 }
 
 void CN3Cloak::ApplyOffset(__Vector3& vDif)
@@ -467,33 +427,30 @@ void CN3Cloak::TickYaw(float fYaw)
 
 void CN3Cloak::TickByPlayerMotion(e_CloakMove eCurMove)
 {
-	static float fTriggerTick  = 0.0f;
-	static bool bForceApply    = false;
-	fTriggerTick              += s_fSecPerFrm;
-
 	switch (eCurMove)
 	{
 		case CLOAK_MOVE_STOP:
 			m_GravityForce.y = -0.0015f;
 			break;
+
 		case CLOAK_MOVE_WALK:
 			m_Force.z        = 0.0005f;
 			m_GravityForce.y = -0.0025f;
 			if (m_eAnchorPattern == AMP_NONE && m_fAnchorPreserveTime < 0.0f)
 				MoveAnchorLine(AMP_MOVEXZ, 2.0f);
 			//m_GravityForce.y = (rand()%2+1)*-0.0015f;
-			//TRACE("Apply force %f\n", m_Force.z);
+			//TRACE("Apply force {}", m_Force.z);
 			break;
+
 		case CLOAK_MOVE_RUN:
 			m_Force.z        = 0.0009f;
 			m_GravityForce.y = -0.0025f;
 			if (m_eAnchorPattern == AMP_NONE && m_fAnchorPreserveTime < 0.0f)
 				MoveAnchorLine(AMP_MOVEXZ2, 2.0f);
 			//m_GravityForce.y = (rand()%2+1)*-0.0015f;
-			//TRACE("Apply force %f\n", m_Force.z);
+			//TRACE("Apply force {}", m_Force.z);
 			break;
-		case CLOAK_MOVE_WALK_BACKWARD:
-			break;
+
 		default:
 			break;
 	}
@@ -520,7 +477,7 @@ void CN3Cloak::MoveAnchorLine(e_Cloak_AnchorMovePattern eType, float fPreserveTi
 				m_vOffset[i].x    = x_Offset;
 				m_vOffset[i].z    = z_Offset;
 			}
-			//TRACE ("AMP_MOVEXZ Applyed \n");
+			//TRACE("AMP_MOVEXZ applied");
 		}
 		break;
 		case AMP_MOVEXZ2:
@@ -537,7 +494,7 @@ void CN3Cloak::MoveAnchorLine(e_Cloak_AnchorMovePattern eType, float fPreserveTi
 				//				m_pParticle[i].y += x_Offset;
 				//				m_vOffset[i].y = x_Offset;
 			}
-			//TRACE ("AMP_MOVEXZ2 Applyed \n");
+			//TRACE("AMP_MOVEXZ2 applied");
 		}
 		break;
 		case AMP_YAWCCW:
@@ -547,7 +504,7 @@ void CN3Cloak::MoveAnchorLine(e_Cloak_AnchorMovePattern eType, float fPreserveTi
 				m_pParticle[i].z += Weight[i];
 				m_vOffset[i].z    = Weight[i];
 			}
-			//TRACE ("AMP_YAWCCW Applyed \n");
+			//TRACE("AMP_YAWCCW applied");
 		}
 		break;
 		case AMP_YAWCW:
@@ -557,7 +514,7 @@ void CN3Cloak::MoveAnchorLine(e_Cloak_AnchorMovePattern eType, float fPreserveTi
 				m_pParticle[i].z += Weight[i];
 				m_vOffset[i].z    = Weight[i];
 			}
-			//TRACE ("AMP_YAWCW Applyed \n");
+			//TRACE("AMP_YAWCW applied");
 		}
 		break;
 		default:
@@ -586,5 +543,5 @@ void CN3Cloak::RestoreAnchorLine()
 
 	m_eAnchorPattern      = AMP_NONE;
 	m_fAnchorPreserveTime = 1.0f;
-	//TRACE ("Anchor Line restored \n");
+	//TRACE("Anchor Line restored");
 }

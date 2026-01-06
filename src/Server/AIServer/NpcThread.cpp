@@ -23,7 +23,7 @@ void CNpcThread::thread_loop()
 
 	double fTime2 = 0.0, fTime3 = 0.0;
 
-	while (_canTick)
+	while (CanTick())
 	{
 		fTime2 = TimeGet();
 
@@ -122,6 +122,13 @@ void CNpcThread::thread_loop()
 
 				case NPC_HEALING:
 					pNpc->NpcHealing();
+					break;
+
+				default:
+					spdlog::error("NpcThread::thread_loop: Unhandled NPC state {}. name={} "
+								  "npcId={} sSid={}, zone={}",
+						pNpc->m_NpcState, pNpc->m_strName, pNpc->m_sNid, pNpc->m_sSid,
+						pNpc->m_sCurZone);
 					break;
 			}
 		}

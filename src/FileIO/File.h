@@ -40,9 +40,6 @@ public:
 
 protected:
 	File() = default;
-	virtual ~File()
-	{
-	}
 
 public:
 	/// \brief Opens an existing file.
@@ -81,6 +78,10 @@ public:
 	/// \brief Closes the file and release resources.
 	/// \returns true if the file was open and closed successfully, false if it was already closed.
 	virtual bool Close()                                                                        = 0;
+
+	virtual ~File()
+	{
+	}
 
 protected:
 	uint64_t _offset = 0;        ///< Current offset within the file.

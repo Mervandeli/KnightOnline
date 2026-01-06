@@ -8,7 +8,6 @@
 #include "N3Terrain.h"
 #include "N3TerrainPatch.h"
 #include "PlayerMySelf.h"
-#include "GameBase.h"
 #include "GameProcedure.h"
 #include "UILoading.h"
 
@@ -17,18 +16,10 @@
 
 #include <FileIO/FileReader.h>
 
-#include <stdio.h>
+#include <cstdio>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
+constexpr float COLLISION_BOX = 100.0f;
 
-const float COLLISION_BOX = 100.0f;
-
-//
-// Construction/Destruction
-//
 CN3Terrain::CN3Terrain()
 {
 	m_Material.Init();
@@ -49,36 +40,24 @@ CN3Terrain::CN3Terrain()
 	m_ti_MapSize     = 0;
 	m_pat_MapSize    = 0;
 
-	//m_ppIsLightMap = nullptr;
-	//m_pppLightMapTex = nullptr;
-
 	m_ti_CenterPos.x = m_ti_CenterPos.y = 0;
 	m_ti_PrevCenterPos                  = m_ti_CenterPos;
 
 	m_ppPatchRadius                     = nullptr;
 	m_ppPatchMiddleY                    = nullptr;
 
-	ZeroMemory(m_pGrassFileName, MAX_PATH);
+	m_iNumColorMap                      = 0;
 
-	for (int i = 0; i < MAX_GRASS; i++)
-		ZeroMemory(m_pGrassTextureName[i], MAX_PATH);
-	m_iNumGrass          = 0;
+	float TileDirU[8][4]                = {
+        { 0.0f, 1.0f, 0.0f, 1.0f }, //[up][LT, RT, LB, RB]
+        { 0.0f, 0.0f, 1.0f, 1.0f }, //[right][ // ]
+        { 1.0f, 0.0f, 1.0f, 0.0f }, //[left][ // ]
+        { 1.0f, 1.0f, 0.0f, 0.0f }, //[bottom][ // ]
 
-	m_NumTileTex         = 0;
-	m_pTileTex           = nullptr;
-	m_ppColorMapTex      = nullptr;
-	m_iNumColorMap       = 0;
-
-	float TileDirU[8][4] = {
-		{ 0.0f, 1.0f, 0.0f, 1.0f }, //[up][LT, RT, LB, RB]
-		{ 0.0f, 0.0f, 1.0f, 1.0f }, //[right][ // ]
-		{ 1.0f, 0.0f, 1.0f, 0.0f }, //[left][ // ]
-		{ 1.0f, 1.0f, 0.0f, 0.0f }, //[bottom][ // ]
-
-		{ 1.0f, 0.0f, 1.0f, 0.0f }, //[up_mirr][LT, RT, LB, RB]
-		{ 0.0f, 0.0f, 1.0f, 1.0f }, //[right_mirr][ // ]
-		{ 0.0f, 1.0f, 0.0f, 1.0f }, //[left_mirr][ // ]
-		{ 1.0f, 1.0f, 0.0f, 0.0f }  //[bottom_mirr][ // ]
+        { 1.0f, 0.0f, 1.0f, 0.0f }, //[up_mirr][LT, RT, LB, RB]
+        { 0.0f, 0.0f, 1.0f, 1.0f }, //[right_mirr][ // ]
+        { 0.0f, 1.0f, 0.0f, 1.0f }, //[left_mirr][ // ]
+        { 1.0f, 1.0f, 0.0f, 0.0f }  //[bottom_mirr][ // ]
 	};
 	memcpy(m_fTileDirU, TileDirU, sizeof(float) * 8 * 4);
 
@@ -97,9 +76,6 @@ CN3Terrain::CN3Terrain()
 
 	MakeDistanceTable();
 
-	m_pGrassAttr     = nullptr;
-	m_pGrassNum      = nullptr;
-
 	m_pRiver         = nullptr;
 	m_pPond          = nullptr;
 	m_pNormal        = nullptr;
@@ -109,7 +85,7 @@ CN3Terrain::CN3Terrain()
 
 CN3Terrain::~CN3Terrain()
 {
-	Release();
+	CN3Terrain::Release();
 }
 
 //
@@ -119,13 +95,11 @@ CN3Terrain::~CN3Terrain()
 //
 void CN3Terrain::MakeDistanceTable()
 {
-	int x, z;
-	double dist;
-	for (x = 0; x < DISTANCE_TABLE_SIZE; x++)
+	for (int x = 0; x < DISTANCE_TABLE_SIZE; x++)
 	{
-		for (z = 0; z < DISTANCE_TABLE_SIZE; z++)
+		for (int z = 0; z < DISTANCE_TABLE_SIZE; z++)
 		{
-			dist                   = sqrt((double) ((x * x) + (z * z))) + 0.6;
+			double dist            = sqrt((double) ((x * x) + (z * z))) + 0.6;
 			m_iDistanceTable[x][z] = (int) dist;
 		}
 	}
@@ -136,136 +110,74 @@ void CN3Terrain::MakeDistanceTable()
 //
 void CN3Terrain::Release()
 {
-	int x;
-
-	if (m_pGrassAttr)
-	{
-		//free(m_pGrassAttr);
-		GlobalFree(m_pGrassAttr);
-		m_pGrassAttr = nullptr;
-	}
-
-	if (m_pGrassNum)
-	{
-		//free(m_pGrassAttr);
-		GlobalFree(m_pGrassNum);
-		m_pGrassNum = nullptr;
-	}
-
-	//	{
-	//		for(x=0;x<m_ti_MapSize;x++)
-	//		{
-	//			if(m_ppGrassAttr[x])
-	//			{
-	//				delete[] m_ppGrassAttr[x];
-	//				m_ppGrassAttr[x] = nullptr;
-	//			}
-	//		}
-	//		delete[] m_ppGrassAttr;
-	//		m_ppGrassAttr = nullptr;
-	//	}
-
-	if (m_pRiver)
+	if (m_pRiver != nullptr)
 	{
 		m_pRiver->Release();
 		delete m_pRiver;
 		m_pRiver = nullptr;
 	}
 
-	if (m_pPond)
-	{
-		delete m_pPond;
-		m_pPond = nullptr;
-	}
+	delete m_pPond;
+	m_pPond = nullptr;
 
-	if (m_pTileTex)
-	{
-		//		for(x=0;x<m_NumTileTex;x++)
-		//			m_pTileTex[x].Release();
-		delete[] m_pTileTex;
-		m_pTileTex = nullptr;
-	}
+	m_TileTex.clear();
+	m_ColorMapTex.clear();
 
-	if (m_ppColorMapTex)
+	if (m_ppPatch != nullptr)
 	{
-		for (x = 0; x < m_iNumColorMap; x++)
+		for (int x = 0; x < m_iNumPatch; x++)
 		{
-			//			for(z=0;z<m_iNumColorMap;z++)
-			//			{
-			//				m_ppColorMapTex[x][z].Release();
-			//			}
-			delete[] m_ppColorMapTex[x];
-			m_ppColorMapTex[x] = nullptr;
-		}
-		delete[] m_ppColorMapTex;
-		m_ppColorMapTex = nullptr;
-	}
-
-	if (m_ppPatch)
-	{
-		for (x = 0; x < m_iNumPatch; x++)
-		{
-			//			for(z=0;z<m_iNumPatch;z++)
-			//			{
-			//				m_ppPatch[x][z].Release();
-			//			}
 			delete[] m_ppPatch[x];
 			m_ppPatch[x] = nullptr;
 		}
+
 		delete[] m_ppPatch;
 		m_ppPatch = nullptr;
 	}
 
-	if (m_pMapData)
+	if (m_pMapData != nullptr)
 	{
-		//free(m_pMapData);
 		GlobalFree(m_pMapData);
 		m_pMapData = nullptr;
 	}
 
-	if (m_pNormal)
+	if (m_pNormal != nullptr)
 	{
 		GlobalFree(m_pNormal);
 		m_pNormal = nullptr;
 	}
 
-	if (m_ppPatchRadius)
+	if (m_ppPatchRadius != nullptr)
 	{
-		for (x = 0; x < m_pat_MapSize; x++)
+		for (int x = 0; x < m_pat_MapSize; x++)
 		{
 			delete[] m_ppPatchRadius[x];
 			m_ppPatchRadius[x] = nullptr;
 		}
+
 		delete[] m_ppPatchRadius;
 		m_ppPatchRadius = nullptr;
 	}
 
-	if (m_ppPatchMiddleY)
+	if (m_ppPatchMiddleY != nullptr)
 	{
-		for (x = 0; x < m_pat_MapSize; x++)
+		for (int x = 0; x < m_pat_MapSize; x++)
 		{
 			delete[] m_ppPatchMiddleY[x];
 			m_ppPatchMiddleY[x] = nullptr;
 		}
+
 		delete[] m_ppPatchMiddleY;
 		m_ppPatchMiddleY = nullptr;
 	}
 
-	int z;
-	for (x = 0; x < 3; x++)
+	for (int x = 0; x < 3; x++)
 	{
-		for (z = 0; z < 3; z++)
+		for (int z = 0; z < 3; z++)
 		{
-			stlMap_N3TexIt itBegin = m_LightMapPatch[x][z].begin();
-			stlMap_N3TexIt itEnd   = m_LightMapPatch[x][z].end();
-			stlMap_N3TexIt it;
+			for (auto& [_, pTex] : m_LightMapPatch[x][z])
+				delete pTex;
 
-			for (it = itBegin; it != itEnd; it++)
-			{
-				CN3Texture* pTex = (*it).second;
-				if (pTex)
-					delete pTex;
-			}
 			m_LightMapPatch[x][z].clear();
 		}
 	}
@@ -298,19 +210,14 @@ void CN3Terrain::Init()
 
 	m_iNumPatch       = (m_pat_Center2Side << 1) + 1;
 
-	int x;
-	m_ppPatch = new CN3TerrainPatch*[m_iNumPatch];
-	for (x = 0; x < m_iNumPatch; x++)
-	{
+	m_ppPatch         = new CN3TerrainPatch*[m_iNumPatch];
+	for (int x = 0; x < m_iNumPatch; x++)
 		m_ppPatch[x] = new CN3TerrainPatch[m_iNumPatch];
-	}
-	int z;
-	for (x = 0; x < m_iNumPatch; x++)
+
+	for (int x = 0; x < m_iNumPatch; x++)
 	{
-		for (z = 0; z < m_iNumPatch; z++)
-		{
+		for (int z = 0; z < m_iNumPatch; z++)
 			m_ppPatch[x][z].Init(this);
-		}
 	}
 
 	m_pBaseTex.LoadFromFile("Misc\\Terrain_Base.bmp");
@@ -326,21 +233,12 @@ void CN3Terrain::Init()
 	m_ti_CenterPos.x = m_ti_CenterPos.y = -100;
 	m_ti_PrevCenterPos                  = m_ti_CenterPos;
 
-	ZeroMemory(m_pGrassFileName, MAX_PATH);
-	for (int i = 0; i < MAX_GRASS; i++)
-		ZeroMemory(m_pGrassTextureName[i], MAX_PATH);
-	m_iNumGrass     = 0;
+	m_TileTex.clear();
+	m_ColorMapTex.clear();
+	m_iNumColorMap = 0;
 
-	m_NumTileTex    = 0;
-	m_pTileTex      = nullptr;
-	m_ppColorMapTex = nullptr;
-	m_iNumColorMap  = 0;
-
-	m_pGrassAttr    = nullptr;
-	m_pGrassNum     = nullptr;
-
-	m_pRiver        = new CN3River();
-	m_pPond         = new CN3Pond();
+	m_pRiver       = new CN3River();
+	m_pPond        = new CN3Pond();
 }
 
 //
@@ -360,57 +258,46 @@ void CN3Terrain::TestAvailableTile()
 
 	return;
 
-	DWORD ColorOP[3], ColorArg1[3], ColorArg2[3];
+	DWORD ColorOP[3] {}, ColorArg1[3] {}, ColorArg2[3] {};
 
-	CN3Base::s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLOROP, &ColorOP[0]);
-	CN3Base::s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLORARG1, &ColorArg1[0]);
+	s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLOROP, &ColorOP[0]);
+	s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLORARG1, &ColorArg1[0]);
 
-	CN3Base::s_lpD3DDev->GetTextureStageState(1, D3DTSS_COLOROP, &ColorOP[1]);
-	CN3Base::s_lpD3DDev->GetTextureStageState(1, D3DTSS_COLORARG1, &ColorArg1[1]);
-	CN3Base::s_lpD3DDev->GetTextureStageState(1, D3DTSS_COLORARG2, &ColorArg2[1]);
+	s_lpD3DDev->GetTextureStageState(1, D3DTSS_COLOROP, &ColorOP[1]);
+	s_lpD3DDev->GetTextureStageState(1, D3DTSS_COLORARG1, &ColorArg1[1]);
+	s_lpD3DDev->GetTextureStageState(1, D3DTSS_COLORARG2, &ColorArg2[1]);
 
-	CN3Base::s_lpD3DDev->GetTextureStageState(2, D3DTSS_COLOROP, &ColorOP[2]);
-	CN3Base::s_lpD3DDev->GetTextureStageState(2, D3DTSS_COLORARG1, &ColorArg1[2]);
-	CN3Base::s_lpD3DDev->GetTextureStageState(2, D3DTSS_COLORARG2, &ColorArg2[2]);
+	s_lpD3DDev->GetTextureStageState(2, D3DTSS_COLOROP, &ColorOP[2]);
+	s_lpD3DDev->GetTextureStageState(2, D3DTSS_COLORARG1, &ColorArg1[2]);
+	s_lpD3DDev->GetTextureStageState(2, D3DTSS_COLORARG2, &ColorArg2[2]);
 
-	CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-	CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 
-	CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_ADD);
-	CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-	CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT);
+	s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_ADD);
+	s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT);
 
-	CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_MODULATE);
-	CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG1, D3DTA_CURRENT);
-	CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+	s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, D3DTOP_MODULATE);
+	s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG1, D3DTA_CURRENT);
+	s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
 
-	DWORD dwNumPasses;
-	HRESULT hr;
-	hr = CN3Base::s_lpD3DDev->ValidateDevice(&dwNumPasses);
+	DWORD dwNumPasses = 0;
+	HRESULT hr        = s_lpD3DDev->ValidateDevice(&dwNumPasses);
 
-	if (hr & D3DERR_TOOMANYOPERATIONS)
-	{
+	if (hr == D3DERR_TOOMANYOPERATIONS || hr == D3DERR_UNSUPPORTEDCOLORARG || hr == D3DERR_UNSUPPORTEDCOLOROPERATION)
 		m_bAvailableTile = false;
-	}
-	if (hr & D3DERR_UNSUPPORTEDCOLORARG)
-	{
-		m_bAvailableTile = false;
-	}
-	if (hr & D3DERR_UNSUPPORTEDCOLOROPERATION)
-	{
-		m_bAvailableTile = false;
-	}
 
-	CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, ColorOP[0]);
-	CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, ColorArg1[0]);
+	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, ColorOP[0]);
+	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, ColorArg1[0]);
 
-	CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, ColorOP[1]);
-	CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG1, ColorArg1[1]);
-	CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG2, ColorArg2[1]);
+	s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, ColorOP[1]);
+	s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG1, ColorArg1[1]);
+	s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG2, ColorArg2[1]);
 
-	CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, ColorOP[2]);
-	CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG1, ColorArg1[2]);
-	CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG2, ColorArg2[2]);
+	s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, ColorOP[2]);
+	s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG1, ColorArg1[2]);
+	s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG2, ColorArg2[2]);
 }
 
 //
@@ -424,10 +311,10 @@ bool CN3Terrain::Load(File& file)
 
 	if (m_iFileFormatVersion >= N3FORMAT_VER_1264)
 	{
-		int iIdk0;
+		int iIdk0 = 0;
 		file.Read(&iIdk0, sizeof(int));
 
-		int iNL;
+		int iNL = 0;
 		file.Read(&iNL, sizeof(int));
 
 		if (iNL > 0)
@@ -453,10 +340,8 @@ bool CN3Terrain::Load(File& file)
 	file.Read(&(m_ti_MapSize), sizeof(int));
 	m_pat_MapSize = (m_ti_MapSize - 1) / PATCH_TILE_SIZE;
 
-	int x, z;
-
 	//m_pMapData = (LPMAPDATA)malloc(sizeof(MAPDATA)*m_ti_MapSize*m_ti_MapSize);
-	m_pMapData = (LPMAPDATA) GlobalAlloc(GMEM_FIXED, sizeof(MAPDATA) * m_ti_MapSize * m_ti_MapSize);
+	m_pMapData    = (LPMAPDATA) GlobalAlloc(GMEM_FIXED, sizeof(MAPDATA) * m_ti_MapSize * m_ti_MapSize);
 #ifdef _N3GAME
 	if (m_pMapData == nullptr)
 		CLogWriter::Write("Terrain Error : MapData Memory Allocation Failed..-.-");
@@ -472,26 +357,25 @@ bool CN3Terrain::Load(File& file)
 	__ASSERT(m_pNormal, "Normal Vector Memory Allocation Failed..-.-");
 	SetNormals();
 
-	if (pUILoading)
+	if (pUILoading != nullptr)
 		pUILoading->Render("", 100);
 
-	//patch middleY & radius...
-
+	// patch middleY & radius...
 	m_ppPatchRadius  = new float*[m_pat_MapSize];
 	m_ppPatchMiddleY = new float*[m_pat_MapSize];
-	for (x = 0; x < m_pat_MapSize; x++)
+	for (int x = 0; x < m_pat_MapSize; x++)
 	{
 		m_ppPatchMiddleY[x] = new float[m_pat_MapSize];
 		m_ppPatchRadius[x]  = new float[m_pat_MapSize];
 	}
 
-	if (pUILoading)
+	if (pUILoading != nullptr)
 		pUILoading->Render("Loading Terrain Patch Data...", 0);
 
 	std::string szLoadingBuff;
-	for (x = 0; x < m_pat_MapSize; x++)
+	for (int x = 0; x < m_pat_MapSize; x++)
 	{
-		for (z = 0; z < m_pat_MapSize; z++)
+		for (int z = 0; z < m_pat_MapSize; z++)
 		{
 			file.Read(&m_ppPatchMiddleY[x][z], sizeof(float));
 			file.Read(&m_ppPatchRadius[x][z], sizeof(float));
@@ -504,42 +388,11 @@ bool CN3Terrain::Load(File& file)
 			pUILoading->Render(szLoadingBuff, iLoading);
 	}
 
-	//	m_ppGrassAttr = new uint8_t* [m_ti_MapSize];
-	//	for(x=0; x<m_ti_MapSize; x++)
-	//	{
-	//		m_ppGrassAttr[x] = new uint8_t[m_ti_MapSize];
-	//		file.Read(m_ppGrassAttr[x], sizeof(uint8_t)*m_ti_MapSize);
-	//
-	//		if(!(x%256))
-	//		{
-	//			pUILoading->SetValue(20 + 7 * x / m_ti_MapSize);
-	//			pUILoading->Render();
-	//		}
-	//
-	//	}
+	// Grass attributes
+	file.Seek(sizeof(uint8_t) * m_ti_MapSize * m_ti_MapSize, SEEK_CUR);
 
-	//m_pGrassAttr = (uint8_t*)malloc(sizeof(uint8_t)*m_ti_MapSize*m_ti_MapSize);
-	m_pGrassAttr = (uint8_t*) GlobalAlloc(GMEM_FIXED, sizeof(uint8_t) * m_ti_MapSize * m_ti_MapSize);
-#ifdef _N3GAME
-	if (m_pGrassAttr == nullptr)
-		CLogWriter::Write("Terrain Error : GrassAttr Data Memory Allocation Failed..-.-");
-#endif
-	__ASSERT(m_pGrassAttr, "GrassAttr Data Memory Allocation Failed..-.-");
-	file.Read(m_pGrassAttr, sizeof(uint8_t) * m_ti_MapSize * m_ti_MapSize);
-
-	//^^v풀갯수 정보 넣기...(조만간 넣어라..)
-	m_pGrassNum = (uint8_t*) GlobalAlloc(GMEM_FIXED, sizeof(uint8_t) * m_ti_MapSize * m_ti_MapSize);
-#ifdef _N3GAME
-	if (m_pGrassNum == nullptr)
-		CLogWriter::Write("Terrain Error : GrassNum Data Memory Allocation Failed..-.-");
-#endif
-	__ASSERT(m_pGrassNum, "GrassNum Data Memory Allocation Failed..-.-");
-	//file.Read(m_pGrassNum, sizeof(uint8_t)*m_ti_MapSize*m_ti_MapSize);
-	memset(m_pGrassNum, 5, sizeof(uint8_t) * m_ti_MapSize * m_ti_MapSize);
-
-	// load colormap....
-	file.Read(m_pGrassFileName, MAX_PATH);
-	LoadGrassInfo();
+	// Grass filename
+	file.Seek(MAX_PATH, SEEK_CUR);
 
 	LoadTileInfo(file);
 
@@ -550,15 +403,15 @@ bool CN3Terrain::Load(File& file)
 	int NumLightMap = 0;
 	file.Read(&NumLightMap, sizeof(int));
 
-	int16_t sx, sz;
 	CN3Texture* pTmpTex = new CN3Texture;
 	for (int i = 0; i < NumLightMap; i++)
 	{
+		int16_t sx = 0, sz = 0;
 		file.Read(&sx, sizeof(int16_t));
 		file.Read(&sz, sizeof(int16_t));
 		pTmpTex->Load(file);
 
-		//loading bar...
+		// loading bar...
 		int iLoading  = (i + 1) * 100 / NumLightMap;
 		szLoadingBuff = fmt::format("Loading Lightmap Data... {} %", iLoading);
 		if (pUILoading != nullptr)
@@ -626,94 +479,13 @@ void CN3Terrain::SetNormals()
 //
 //
 //
-uint16_t CN3Terrain::GetGrassAttr(int x, int z)
+const MAPDATA& CN3Terrain::GetMapData(int x, int z) const
 {
-	uint16_t Attr;
+	static MAPDATA empty = {};
 	if (x < 0 || x >= m_ti_MapSize || z < 0 || z >= m_ti_MapSize)
-		return 0;
-	if (m_pGrassAttr && m_pGrassNum)
-	{
-		Attr = (((uint16_t) m_pGrassAttr[x * m_ti_MapSize + z]) << 8) + m_pGrassNum[x * m_ti_MapSize + z];
-		return Attr;
-	}
-	return 0;
-}
+		return empty;
 
-//
-//
-//
-MAPDATA CN3Terrain::GetMapData(int x, int z)
-{
-	MAPDATA MapData;
-	if (x < 0 || x >= m_ti_MapSize || z < 0 || z >= m_ti_MapSize)
-		return MapData;
-	MapData = m_pMapData[(x * m_ti_MapSize) + z];
-
-	return MapData;
-}
-
-//
-//
-//
-void CN3Terrain::LoadGrassInfo()
-{
-	CUILoading* pUILoading = nullptr;
-#ifdef _N3GAME
-	pUILoading = CGameProcedure::s_pUILoading; // 로딩바..
-#endif
-	if (pUILoading)
-		pUILoading->Render("Loading Terrain Grass Data...", 0);
-
-	m_iNumGrass = 0;
-	if (strcmp(m_pGrassFileName, "") == 0)
-	{
-		ZeroMemory(m_pGrassAttr, sizeof(uint8_t) * m_ti_MapSize * m_ti_MapSize);
-		return;
-	}
-
-	char szDrive[_MAX_DRIVE];
-	char szDir[_MAX_DIR] = {}, szGrassDir[_MAX_DIR] = {}, szModuleFilePath[_MAX_PATH] = {}, szFullPath[_MAX_PATH] = {};
-	GetModuleFileName(nullptr, szModuleFilePath, _MAX_PATH);
-	_splitpath(szModuleFilePath, szDrive, szDir, nullptr, nullptr);
-
-	strcpy(szGrassDir, "misc\\grass");
-	_makepath(szFullPath, szDrive, szGrassDir, m_pGrassFileName, "grs");
-
-	FileReader file;
-	if (!file.OpenExisting(szFullPath))
-		return;
-
-	char Buff[80] = {};
-	if (!file.Read(Buff, 80))
-		return;
-
-	if (strcmp(Buff, "GrassInfoFile") != 0)
-		return;
-
-	if (!file.Read(&m_iNumGrass, sizeof(int)))
-		return;
-
-	int id;
-	char FileName[MAX_PATH] = {}, szDxtFullPath[MAX_PATH] = {};
-	std::string szLoadingBuff;
-
-	for (int i = 0; i < m_iNumGrass; i++)
-	{
-		if (!file.Read(&id, sizeof(int)))
-			return;
-
-		if (!file.Read(FileName, MAX_PATH))
-			return;
-
-		_makepath(szDxtFullPath, szDrive, szGrassDir, FileName, nullptr);
-		strcpy(m_pGrassTextureName[Log2(id)], szDxtFullPath);
-
-		//loading bar...
-		int iLoading  = (i + 1) * 100 / m_iNumGrass;
-		szLoadingBuff = fmt::format("Loading Terrain Grass Data... {} %", iLoading);
-		if (pUILoading != nullptr)
-			pUILoading->Render(szLoadingBuff, iLoading);
-	}
+	return m_pMapData[(x * m_ti_MapSize) + z];
 }
 
 //
@@ -725,13 +497,16 @@ void CN3Terrain::LoadTileInfo(File& file)
 	if (pUILoading != nullptr)
 		pUILoading->Render("Loading Terrain Tile Data...", 0);
 
-	file.Read(&m_NumTileTex, sizeof(uint32_t));
-	if (m_NumTileTex == 0)
+	m_TileTex.clear();
+
+	uint32_t tileTextureCount = 0;
+	file.Read(&tileTextureCount, sizeof(uint32_t));
+	if (tileTextureCount == 0)
 		return;
 
-	m_pTileTex = new CN3Texture[m_NumTileTex];
+	m_TileTex.resize(tileTextureCount);
 
-	int NumTileTexSrc;
+	int NumTileTexSrc = 0;
 	file.Read(&NumTileTexSrc, sizeof(int));
 	if (NumTileTexSrc == 0)
 		return;
@@ -743,15 +518,17 @@ void CN3Terrain::LoadTileInfo(File& file)
 		file.Read(SrcName[i], MAX_PATH);
 	}
 
-	int16_t SrcIdx, TileIdx;
 	std::string szLoadingBuff;
-	for (uint32_t i = 0; i < m_NumTileTex; i++)
+	for (size_t i = 0; i < m_TileTex.size(); i++)
 	{
+		CN3Texture& tex = m_TileTex[i];
+
+		int16_t SrcIdx = 0, TileIdx = 0;
 		file.Read(&SrcIdx, sizeof(int16_t));
 		file.Read(&TileIdx, sizeof(int16_t));
 
 		// NOTE: kinda a temp thing...
-		m_pTileTex[i].m_iFileFormatVersion = m_iFileFormatVersion;
+		tex.m_iFileFormatVersion = m_iFileFormatVersion;
 
 		FileReader gttFile;
 		if (!gttFile.OpenExisting(SrcName[SrcIdx]))
@@ -761,16 +538,17 @@ void CN3Terrain::LoadTileInfo(File& file)
 		{
 			//			m_pTileTex[i].m_iLOD = s_Options.iTexLOD_Terrain; // LOD 적용후 읽기..
 			//			m_pTileTex[i].Load(gttFile);// 앞에 있는 쓸때 없는 것들...
-			m_pTileTex[i].SkipFileHandle(gttFile);        // 앞에 있는 쓸때 없는 것들...
+			tex.SkipFileHandle(gttFile);        // 앞에 있는 쓸때 없는 것들...
 		}
-		m_pTileTex[i].m_iLOD = s_Options.iTexLOD_Terrain; // LOD 적용후 읽기..
-		m_pTileTex[i].Load(gttFile);                      // 진짜 타일...
 
-		//loading bar...
-		int iLoading  = (i + 1) * 100 / m_NumTileTex;
-		szLoadingBuff = fmt::format("Loading Terrain Tile Data... {} %", iLoading);
+		tex.m_iLOD = s_Options.iTexLOD_Terrain; // LOD 적용후 읽기..
+		tex.Load(gttFile);                      // 진짜 타일...
+
+		// loading bar...
+		size_t loadingPercentage = (i + 1) * 100 / m_TileTex.size();
+		szLoadingBuff            = fmt::format("Loading Terrain Tile Data... {} %", loadingPercentage);
 		if (pUILoading != nullptr)
-			pUILoading->Render(szLoadingBuff, iLoading);
+			pUILoading->Render(szLoadingBuff, static_cast<int>(loadingPercentage));
 	}
 
 	for (int i = 0; i < NumTileTexSrc; i++)
@@ -791,18 +569,17 @@ bool CN3Terrain::SetLODLevel(int level)
 {
 	if (level == m_iLodLevel)
 		return false;
+
 	m_iLodLevel = level;
 
 	if (m_iLodLevel < 2)
 		m_iLodLevel = 2;
 
-	int x, z;
-	int dist;
-	for (x = 0; x < m_iNumPatch; x++)
+	for (int x = 0; x < m_iNumPatch; x++)
 	{
-		for (z = 0; z < m_iNumPatch; z++)
+		for (int z = 0; z < m_iNumPatch; z++)
 		{
-			dist = m_iDistanceTable[std::abs(m_pat_Center2Side - x)][std::abs(m_pat_Center2Side - z)];
+			int dist = m_iDistanceTable[std::abs(m_pat_Center2Side - x)][std::abs(m_pat_Center2Side - z)];
 			if (dist <= m_iLodLevel)
 				m_ppPatch[x][z].SetLevel(1);
 			else if (dist <= m_iLodLevel + 3)
@@ -813,7 +590,6 @@ bool CN3Terrain::SetLODLevel(int level)
 	}
 
 	SetBlunt();
-
 	return true;
 }
 
@@ -903,28 +679,28 @@ void CN3Terrain::Tick()
 
 	bool bMovePatch    = CheckMovePatch();
 	if (bMovePatch || ChangeLOD)
-	{
 		DispositionPatch();
-	}
 
 	bool bChangeBound = CheckBound();
 
-	int x, z;
-	if ((bMovePatch) || (bChangeBound) || ChangeLOD)
+	if (bMovePatch || bChangeBound || ChangeLOD)
 	{
-		for (x = m_pat_BoundRect.left; x <= m_pat_BoundRect.right; x++)
+		for (int x = m_pat_BoundRect.left; x <= m_pat_BoundRect.right; x++)
 		{
-			for (z = m_pat_BoundRect.top; z <= m_pat_BoundRect.bottom; z++)
+			for (int z = m_pat_BoundRect.top; z <= m_pat_BoundRect.bottom; z++)
 			{
 				if (x < 0 || z < 0)
 					continue;
+
 				m_ppPatch[x][z].Tick();
 			}
 		}
 	}
-	if (m_pRiver)
+
+	if (m_pRiver != nullptr)
 		m_pRiver->Tick();
-	if (m_pPond)
+
+	if (m_pPond != nullptr)
 		m_pPond->Tick();
 }
 
@@ -951,12 +727,11 @@ bool CN3Terrain::CheckMovePatch()
 //
 void CN3Terrain::DispositionPatch()
 {
-	int x, z;
-	int px, pz;
-	int cx, cz;
-	for (x = 0; x < m_iNumPatch; x++)
+	int px = 0, pz = 0;
+	int cx = 0, cz = 0;
+	for (int x = 0; x < m_iNumPatch; x++)
 	{
-		for (z = 0; z < m_iNumPatch; z++)
+		for (int z = 0; z < m_iNumPatch; z++)
 		{
 			px = m_pat_LBPos.x + x;
 			pz = m_pat_LBPos.y + z;
@@ -972,7 +747,7 @@ void CN3Terrain::DispositionPatch()
 			if (cx < 0 || cz < 0 || cx >= m_iNumColorMap || cz >= m_iNumColorMap)
 				m_ppPatch[x][z].m_pRefColorTex = nullptr;
 			else
-				m_ppPatch[x][z].m_pRefColorTex = &(m_ppColorMapTex[cx][cz]);
+				m_ppPatch[x][z].m_pRefColorTex = &m_ColorMapTex[cx * m_iNumColorMap + cz];
 		}
 	}
 
@@ -1035,8 +810,8 @@ void CN3Terrain::SetLightMap(int dir)
 	if (!file.OpenExisting(pZoneData->szLightMapFN))
 		return;
 
-	int* Addr = new int[m_pat_MapSize * m_pat_MapSize];
-	int iVersion;
+	int* Addr    = new int[m_pat_MapSize * m_pat_MapSize];
+	int iVersion = 0;
 	file.Read(&iVersion, sizeof(int));
 	file.Read(&Addr[0], sizeof(int) * m_pat_MapSize * m_pat_MapSize);
 
@@ -1047,7 +822,6 @@ void CN3Terrain::SetLightMap(int dir)
 	switch (dir)
 	{
 		case DIR_LT:
-		{
 			SetLightMapPatch(0, 0, file, Addr);
 			ReplaceLightMapPatch(1, 0, m_LightMapPatch[0][1]);
 			ReplaceLightMapPatch(2, 0, m_LightMapPatch[1][1]);
@@ -1060,9 +834,8 @@ void CN3Terrain::SetLightMap(int dir)
 			SetLightMapPatch(1, 2, file, Addr);
 			SetLightMapPatch(2, 2, file, Addr);
 			break;
-		}
+
 		case DIR_CT:
-		{
 			ReplaceLightMapPatch(0, 0, m_LightMapPatch[0][1]);
 			ReplaceLightMapPatch(1, 0, m_LightMapPatch[1][1]);
 			ReplaceLightMapPatch(2, 0, m_LightMapPatch[2][1]);
@@ -1075,9 +848,8 @@ void CN3Terrain::SetLightMap(int dir)
 			SetLightMapPatch(1, 2, file, Addr);
 			SetLightMapPatch(2, 2, file, Addr);
 			break;
-		}
+
 		case DIR_RT:
-		{
 			ReplaceLightMapPatch(0, 0, m_LightMapPatch[1][1]);
 			ReplaceLightMapPatch(1, 0, m_LightMapPatch[2][1]);
 			SetLightMapPatch(2, 0, file, Addr);
@@ -1090,9 +862,8 @@ void CN3Terrain::SetLightMap(int dir)
 			SetLightMapPatch(1, 2, file, Addr);
 			SetLightMapPatch(2, 2, file, Addr);
 			break;
-		}
+
 		case DIR_LM:
-		{
 			ReplaceLightMapPatch(2, 0, m_LightMapPatch[1][0]);
 			ReplaceLightMapPatch(2, 1, m_LightMapPatch[1][1]);
 			ReplaceLightMapPatch(2, 2, m_LightMapPatch[1][2]);
@@ -1105,9 +876,8 @@ void CN3Terrain::SetLightMap(int dir)
 			SetLightMapPatch(0, 1, file, Addr);
 			SetLightMapPatch(0, 2, file, Addr);
 			break;
-		}
+
 		case DIR_WARP:
-		{
 			SetLightMapPatch(0, 0, file, Addr);
 			SetLightMapPatch(1, 0, file, Addr);
 			SetLightMapPatch(2, 0, file, Addr);
@@ -1120,9 +890,8 @@ void CN3Terrain::SetLightMap(int dir)
 			SetLightMapPatch(1, 2, file, Addr);
 			SetLightMapPatch(2, 2, file, Addr);
 			break;
-		}
+
 		case DIR_RM:
-		{
 			ReplaceLightMapPatch(0, 0, m_LightMapPatch[1][0]);
 			ReplaceLightMapPatch(0, 1, m_LightMapPatch[1][1]);
 			ReplaceLightMapPatch(0, 2, m_LightMapPatch[1][2]);
@@ -1135,9 +904,8 @@ void CN3Terrain::SetLightMap(int dir)
 			SetLightMapPatch(2, 1, file, Addr);
 			SetLightMapPatch(2, 2, file, Addr);
 			break;
-		}
+
 		case DIR_LB:
-		{
 			ReplaceLightMapPatch(2, 2, m_LightMapPatch[1][1]);
 			ReplaceLightMapPatch(1, 2, m_LightMapPatch[0][1]);
 			SetLightMapPatch(0, 2, file, Addr);
@@ -1150,9 +918,8 @@ void CN3Terrain::SetLightMap(int dir)
 			SetLightMapPatch(1, 0, file, Addr);
 			SetLightMapPatch(2, 0, file, Addr);
 			break;
-		}
+
 		case DIR_CB:
-		{
 			ReplaceLightMapPatch(0, 2, m_LightMapPatch[0][1]);
 			ReplaceLightMapPatch(1, 2, m_LightMapPatch[1][1]);
 			ReplaceLightMapPatch(2, 2, m_LightMapPatch[2][1]);
@@ -1165,9 +932,8 @@ void CN3Terrain::SetLightMap(int dir)
 			SetLightMapPatch(1, 0, file, Addr);
 			SetLightMapPatch(2, 0, file, Addr);
 			break;
-		}
+
 		case DIR_RB:
-		{
 			ReplaceLightMapPatch(0, 2, m_LightMapPatch[1][1]);
 			ReplaceLightMapPatch(1, 2, m_LightMapPatch[2][1]);
 			SetLightMapPatch(2, 2, file, Addr);
@@ -1180,7 +946,9 @@ void CN3Terrain::SetLightMap(int dir)
 			SetLightMapPatch(1, 0, file, Addr);
 			SetLightMapPatch(2, 0, file, Addr);
 			break;
-		}
+
+		default:
+			break;
 	}
 
 	delete[] Addr;
@@ -1212,19 +980,11 @@ void CN3Terrain::ReplaceLightMapPatch(int x, int z, stlMap_N3Tex& LightMapPatch)
 //
 void CN3Terrain::SetLightMapPatch(int x, int z, File& file, int* pAddr)
 {
-	stlMap_N3TexIt itBegin = m_LightMapPatch[x][z].begin();
-	stlMap_N3TexIt itEnd   = m_LightMapPatch[x][z].end();
-	stlMap_N3TexIt it;
-
-	for (it = itBegin; it != itEnd; it++)
-	{
-		CN3Texture* pTex = (*it).second;
-		if (pTex)
-			delete pTex;
-	}
+	for (auto& [_, pTex] : m_LightMapPatch[x][z])
+		delete pTex;
 	m_LightMapPatch[x][z].clear();
 
-	int px, pz;
+	int px = 0, pz = 0;
 	px = m_pat_CenterPos.x - 1 + x;
 	pz = m_pat_CenterPos.y - 1 + z;
 
@@ -1237,11 +997,11 @@ void CN3Terrain::SetLightMapPatch(int x, int z, File& file, int* pAddr)
 
 	file.Seek(jump, SEEK_SET);
 
-	int TexCount;
+	int TexCount = 0;
 	file.Read(&TexCount, sizeof(int));
 
-	int tx, tz;
-	int rtx, rtz;
+	int tx = 0, tz = 0;
+	int rtx = 0, rtz = 0;
 	for (int i = 0; i < TexCount; i++)
 	{
 		file.Read(&tx, sizeof(int));
@@ -1264,7 +1024,7 @@ void CN3Terrain::SetLightMapPatch(int x, int z, File& file, int* pAddr)
 //
 CN3Texture* CN3Terrain::GetLightMap(int tx, int tz)
 {
-	int px, pz;
+	int px = 0, pz = 0;
 	px  = tx / PATCH_TILE_SIZE;
 	pz  = tz / PATCH_TILE_SIZE;
 
@@ -1364,9 +1124,8 @@ bool CN3Terrain::CheckRenderablePatch()
 {
 	bool bChange = false;
 	__Vector3 CenterPoint;
-	int px, pz;
-	int x, z;
-	BOOL PrevState;
+	int px = 0, pz = 0;
+	int x = 0, z = 0;
 	for (x = m_pat_BoundRect.left; x <= m_pat_BoundRect.right; x++)
 	{
 		for (z = m_pat_BoundRect.top; z <= m_pat_BoundRect.bottom; z++)
@@ -1374,7 +1133,7 @@ bool CN3Terrain::CheckRenderablePatch()
 			if (x < 0 || z < 0)
 				continue;
 
-			PrevState                   = m_ppPatch[x][z].m_bIsRender;
+			BOOL PrevState              = m_ppPatch[x][z].m_bIsRender;
 			m_ppPatch[x][z].m_bIsRender = TRUE;
 
 			px                          = m_pat_LBPos.x + x;
@@ -1404,99 +1163,99 @@ void CN3Terrain::Render()
 {
 	__Matrix44 WorldMtx;
 	WorldMtx.Identity();
-	CN3Base::s_lpD3DDev->SetTransform(D3DTS_WORLD, WorldMtx.toD3D());
+	s_lpD3DDev->SetTransform(D3DTS_WORLD, WorldMtx.toD3D());
 
 	__Material mtl;
 	mtl.Init();
-	CN3Base::s_lpD3DDev->SetMaterial(&mtl);
+	s_lpD3DDev->SetMaterial(&mtl);
 
-	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_FILLMODE, m_FillMode);
-	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_SHADEMODE, m_ShadeMode);
+	s_lpD3DDev->SetRenderState(D3DRS_FILLMODE, m_FillMode);
+	s_lpD3DDev->SetRenderState(D3DRS_SHADEMODE, m_ShadeMode);
 
-	DWORD CullMode, ZEnable;
-	CN3Base::s_lpD3DDev->GetRenderState(D3DRS_CULLMODE, &CullMode);
-	CN3Base::s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &ZEnable);
+	DWORD CullMode = 0, ZEnable = 0;
+	s_lpD3DDev->GetRenderState(D3DRS_CULLMODE, &CullMode);
+	s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &ZEnable);
 
-	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
-	//CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ZBIAS, 1);
+	s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+	//s_lpD3DDev->SetRenderState(D3DRS_ZBIAS, 1);
 
-	DWORD ColorOP0, ColorOP1, ColorOP2;
-	DWORD ColorArg01, ColorArg02, ColorArg11, ColorArg12, ColorArg21, ColorArg22;
+	DWORD ColorOP0 = 0, ColorOP1 = 0, ColorOP2 = 0;
+	DWORD ColorArg01 = 0, ColorArg02 = 0, ColorArg11 = 0, ColorArg12 = 0, ColorArg21 = 0, ColorArg22 = 0;
 
-	HRESULT hr;
-	hr = CN3Base::s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLOROP, &ColorOP0);
-	hr = CN3Base::s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLORARG1, &ColorArg01);
-	hr = CN3Base::s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLORARG2, &ColorArg02);
-	hr = CN3Base::s_lpD3DDev->GetTextureStageState(1, D3DTSS_COLOROP, &ColorOP1);
-	hr = CN3Base::s_lpD3DDev->GetTextureStageState(1, D3DTSS_COLORARG1, &ColorArg11);
-	hr = CN3Base::s_lpD3DDev->GetTextureStageState(1, D3DTSS_COLORARG2, &ColorArg12);
-	hr = CN3Base::s_lpD3DDev->GetTextureStageState(2, D3DTSS_COLOROP, &ColorOP2);
-	hr = CN3Base::s_lpD3DDev->GetTextureStageState(2, D3DTSS_COLORARG1, &ColorArg21);
-	hr = CN3Base::s_lpD3DDev->GetTextureStageState(2, D3DTSS_COLORARG2, &ColorArg22);
+	s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLOROP, &ColorOP0);
+	s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLORARG1, &ColorArg01);
+	s_lpD3DDev->GetTextureStageState(0, D3DTSS_COLORARG2, &ColorArg02);
+	s_lpD3DDev->GetTextureStageState(1, D3DTSS_COLOROP, &ColorOP1);
+	s_lpD3DDev->GetTextureStageState(1, D3DTSS_COLORARG1, &ColorArg11);
+	s_lpD3DDev->GetTextureStageState(1, D3DTSS_COLORARG2, &ColorArg12);
+	s_lpD3DDev->GetTextureStageState(2, D3DTSS_COLOROP, &ColorOP2);
+	s_lpD3DDev->GetTextureStageState(2, D3DTSS_COLORARG1, &ColorArg21);
+	s_lpD3DDev->GetTextureStageState(2, D3DTSS_COLORARG2, &ColorArg22);
 
-	DWORD AddressU1, AddressV1, AddressU2, AddressV2;
-	//hr = s_lpD3DDev->GetTextureStageState( 0, D3DTSS_ADDRESSU, &AddressU1 );
-	//hr = s_lpD3DDev->GetTextureStageState( 0, D3DTSS_ADDRESSV, &AddressV1 );
-	//hr = s_lpD3DDev->GetTextureStageState(1, D3DTSS_ADDRESSU, &AddressU2);
-	//hr = s_lpD3DDev->GetTextureStageState(1, D3DTSS_ADDRESSV, &AddressV2);
-	hr = s_lpD3DDev->GetSamplerState(0, D3DSAMP_ADDRESSU, &AddressU1);
-	hr = s_lpD3DDev->GetSamplerState(0, D3DSAMP_ADDRESSV, &AddressV1);
-	hr = s_lpD3DDev->GetSamplerState(1, D3DSAMP_ADDRESSU, &AddressU2);
-	hr = s_lpD3DDev->GetSamplerState(1, D3DSAMP_ADDRESSV, &AddressV2);
+	DWORD AddressU1 = 0, AddressV1 = 0, AddressU2 = 0, AddressV2 = 0;
+	// s_lpD3DDev->GetTextureStageState( 0, D3DTSS_ADDRESSU, &AddressU1 );
+	// s_lpD3DDev->GetTextureStageState( 0, D3DTSS_ADDRESSV, &AddressV1 );
+	// s_lpD3DDev->GetTextureStageState(1, D3DTSS_ADDRESSU, &AddressU2);
+	// s_lpD3DDev->GetTextureStageState(1, D3DTSS_ADDRESSV, &AddressV2);
+	s_lpD3DDev->GetSamplerState(0, D3DSAMP_ADDRESSU, &AddressU1);
+	s_lpD3DDev->GetSamplerState(0, D3DSAMP_ADDRESSV, &AddressV1);
+	s_lpD3DDev->GetSamplerState(1, D3DSAMP_ADDRESSU, &AddressU2);
+	s_lpD3DDev->GetSamplerState(1, D3DSAMP_ADDRESSV, &AddressV2);
 
 	// 각각의 텍스쳐들을 연결했을때 경계선을 없앨 수 있다..^^
-	//hr = s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ADDRESSU,  D3DTADDRESS_MIRROR );
-	//hr = s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ADDRESSV,  D3DTADDRESS_MIRROR );
-	//hr = s_lpD3DDev->SetTextureStageState( 1, D3DTSS_ADDRESSU,  D3DTADDRESS_MIRROR );
-	//hr = s_lpD3DDev->SetTextureStageState( 1, D3DTSS_ADDRESSV,  D3DTADDRESS_MIRROR );
-	hr = s_lpD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_MIRROR);
-	hr = s_lpD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_MIRROR);
-	hr = s_lpD3DDev->SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_MIRROR);
-	hr = s_lpD3DDev->SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_MIRROR);
+	// s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ADDRESSU,  D3DTADDRESS_MIRROR );
+	// s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ADDRESSV,  D3DTADDRESS_MIRROR );
+	// s_lpD3DDev->SetTextureStageState( 1, D3DTSS_ADDRESSU,  D3DTADDRESS_MIRROR );
+	// s_lpD3DDev->SetTextureStageState( 1, D3DTSS_ADDRESSV,  D3DTADDRESS_MIRROR );
+	s_lpD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_MIRROR);
+	s_lpD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_MIRROR);
+	s_lpD3DDev->SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_MIRROR);
+	s_lpD3DDev->SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_MIRROR);
 
-	int x, z;
-	for (x = m_pat_BoundRect.left; x <= m_pat_BoundRect.right; x++)
+	for (int x = m_pat_BoundRect.left; x <= m_pat_BoundRect.right; x++)
 	{
-		for (z = m_pat_BoundRect.top; z <= m_pat_BoundRect.bottom; z++)
+		for (int z = m_pat_BoundRect.top; z <= m_pat_BoundRect.bottom; z++)
 		{
 			if (x < 0 || z < 0)
 				continue;
+
 			m_ppPatch[x][z].Render();
 		}
 	}
 
 	/*
-	hr = s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ADDRESSU, AddressU1 );
-	hr = s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ADDRESSV, AddressV1 );
-	hr = s_lpD3DDev->SetTextureStageState( 1, D3DTSS_ADDRESSU, AddressU2 );
-	hr = s_lpD3DDev->SetTextureStageState( 1, D3DTSS_ADDRESSV, AddressV2 );
+	 s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ADDRESSU, AddressU1 );
+	 s_lpD3DDev->SetTextureStageState( 0, D3DTSS_ADDRESSV, AddressV1 );
+	 s_lpD3DDev->SetTextureStageState( 1, D3DTSS_ADDRESSU, AddressU2 );
+	 s_lpD3DDev->SetTextureStageState( 1, D3DTSS_ADDRESSV, AddressV2 );
 	*/
-	hr = s_lpD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSU, AddressU1);
-	hr = s_lpD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSV, AddressV1);
-	hr = s_lpD3DDev->SetSamplerState(1, D3DSAMP_ADDRESSU, AddressU2);
-	hr = s_lpD3DDev->SetSamplerState(1, D3DSAMP_ADDRESSV, AddressV2);
+	s_lpD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSU, AddressU1);
+	s_lpD3DDev->SetSamplerState(0, D3DSAMP_ADDRESSV, AddressV1);
+	s_lpD3DDev->SetSamplerState(1, D3DSAMP_ADDRESSU, AddressU2);
+	s_lpD3DDev->SetSamplerState(1, D3DSAMP_ADDRESSV, AddressV2);
 
 	// restor texture stage state settings...
-	hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, ColorOP0);
-	hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, ColorArg01);
-	hr = CN3Base::s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG2, ColorArg02);
-	hr = CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, ColorOP1);
-	hr = CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG1, ColorArg11);
-	hr = CN3Base::s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG2, ColorArg12);
-	hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, ColorOP2);
-	hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG1, ColorArg21);
-	hr = CN3Base::s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG2, ColorArg22);
-	hr = CN3Base::s_lpD3DDev->SetTexture(0, nullptr);
-	hr = CN3Base::s_lpD3DDev->SetTexture(1, nullptr);
-	hr = CN3Base::s_lpD3DDev->SetTexture(2, nullptr);
+	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLOROP, ColorOP0);
+	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG1, ColorArg01);
+	s_lpD3DDev->SetTextureStageState(0, D3DTSS_COLORARG2, ColorArg02);
+	s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLOROP, ColorOP1);
+	s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG1, ColorArg11);
+	s_lpD3DDev->SetTextureStageState(1, D3DTSS_COLORARG2, ColorArg12);
+	s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLOROP, ColorOP2);
+	s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG1, ColorArg21);
+	s_lpD3DDev->SetTextureStageState(2, D3DTSS_COLORARG2, ColorArg22);
+	s_lpD3DDev->SetTexture(0, nullptr);
+	s_lpD3DDev->SetTexture(1, nullptr);
+	s_lpD3DDev->SetTexture(2, nullptr);
 
-	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, CullMode);
-	CN3Base::s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, ZEnable);
+	s_lpD3DDev->SetRenderState(D3DRS_CULLMODE, CullMode);
+	s_lpD3DDev->SetRenderState(D3DRS_ZENABLE, ZEnable);
 
-	if (m_pRiver)
+	if (m_pRiver != nullptr)
 		m_pRiver->Render();
-	if (m_pPond)
+
+	if (m_pPond != nullptr)
 		m_pPond->Render();
 }
 
@@ -1520,7 +1279,7 @@ inline int CN3Terrain::Log2(int x)
 //
 float CN3Terrain::GetHeight(float x, float z)
 {
-	int ix, iz;
+	int ix = 0, iz = 0;
 	ix = ((int) x) / (int) TILE_SIZE;
 	iz = ((int) z) / (int) TILE_SIZE;
 
@@ -1529,12 +1288,11 @@ float CN3Terrain::GetHeight(float x, float z)
 	if (iz < 0 || iz > (m_ti_MapSize - 2))
 		return -FLT_MAX;
 
-	float dX, dZ;
-	dX = (x - (ix * TILE_SIZE)) / TILE_SIZE;
-	dZ = (z - (iz * TILE_SIZE)) / TILE_SIZE;
+	float dX = 0.0f, dZ = 0.0f;
+	dX      = (x - (ix * TILE_SIZE)) / TILE_SIZE;
+	dZ      = (z - (iz * TILE_SIZE)) / TILE_SIZE;
 
-	float y;
-	float h1, h2, h3, h12, h13;
+	float y = 0.0f, h1 = 0.0f, h2 = 0.0f, h3 = 0.0f, h12 = 0.0f, h13 = 0.0f;
 
 	if ((ix + iz) % 2 == 0) //사각형이 / 모양..
 	{
@@ -1610,17 +1368,18 @@ void CN3Terrain::GetNormal(float x, float z, __Vector3& vNormal)
 		return;
 	}
 
-	int ix, iz;
-	ix = ((int) x) / (int) TILE_SIZE;
-	iz = ((int) z) / (int) TILE_SIZE;
+	int ix = 0, iz = 0;
+	ix       = ((int) x) / (int) TILE_SIZE;
+	iz       = ((int) z) / (int) TILE_SIZE;
 
-	float dX, dZ;
+	float dX = 0.0f, dZ = 0.0f;
 	dX = (x - ix * TILE_SIZE) / TILE_SIZE;
 	dZ = (z - iz * TILE_SIZE) / TILE_SIZE;
 
 	__Vector3 v1, v2;
 	vNormal.Set(0, 1, 0);
-	float Height;
+
+	float Height = 0.0f;
 	if ((ix + iz) % 2 == 1)
 	{
 		if ((dX + dZ) < 1.0f)
@@ -1688,10 +1447,10 @@ bool CN3Terrain::IsInTerrain(float x, float z)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 
-#define OFFSET_COLLISION_TERRAIN 0.5f
-
 BOOL CN3Terrain::Pick(int x, int y, __Vector3& vPick)
 {
+	constexpr float OFFSET_COLLISION_TERRAIN = 0.5f;
+
 	// Compute the vector of the pick ray in screen space
 	__Vector3 vTmp;
 	vTmp.x             = (((2.0f * x) / (CN3Base::s_CameraData.vp.Width)) - 1) / CN3Base::s_CameraData.mtxProjection.m[0][0];
@@ -1701,18 +1460,17 @@ BOOL CN3Terrain::Pick(int x, int y, __Vector3& vPick)
 	// Transform the screen space pick ray into 3D space
 	__Matrix44* pMtxVI = &CN3Base::s_CameraData.mtxViewInverse;
 	__Vector3 vDir;
-	vDir.x            = vTmp.x * pMtxVI->m[0][0] + vTmp.y * pMtxVI->m[1][0] + vTmp.z * pMtxVI->m[2][0];
-	vDir.y            = vTmp.x * pMtxVI->m[0][1] + vTmp.y * pMtxVI->m[1][1] + vTmp.z * pMtxVI->m[2][1];
-	vDir.z            = vTmp.x * pMtxVI->m[0][2] + vTmp.y * pMtxVI->m[1][2] + vTmp.z * pMtxVI->m[2][2];
-	__Vector3 vPos    = pMtxVI->Pos();
-	__Vector3 vPosCur = vPos;
+	vDir.x          = vTmp.x * pMtxVI->m[0][0] + vTmp.y * pMtxVI->m[1][0] + vTmp.z * pMtxVI->m[2][0];
+	vDir.y          = vTmp.x * pMtxVI->m[0][1] + vTmp.y * pMtxVI->m[1][1] + vTmp.z * pMtxVI->m[2][1];
+	vDir.z          = vTmp.x * pMtxVI->m[0][2] + vTmp.y * pMtxVI->m[1][2] + vTmp.z * pMtxVI->m[2][2];
+	__Vector3 vPos  = pMtxVI->Pos();
 
-	bool bCollision   = FALSE;
+	bool bCollision = FALSE;
 	__Vector3 A, B, C;
-	float t, u, v;
+	float t = 0.0f, u = 0.0f, v = 0.0f;
 
-	int ix = ((int) vPosCur.x) / (int) TILE_SIZE;
-	int iz = ((int) vPosCur.z) / (int) TILE_SIZE;
+	int ix = ((int) vPos.x) / (int) TILE_SIZE;
+	int iz = ((int) vPos.z) / (int) TILE_SIZE;
 
 	if ((ix + iz) % 2 == 1) // 당근.. 왼손 바인딩...
 	{
@@ -1739,8 +1497,8 @@ BOOL CN3Terrain::Pick(int x, int y, __Vector3& vPick)
 		vPick.Set(0, 0, 0);  // 일단 충돌 점은 없고..
 
 		// 음....		!!가상!!  버텍스 버퍼와 인덱스 버퍼 만들기..
-		__Vector3 AA[8]; // 가상 버텍스 버퍼..
-		int pIndex[36];  // 가상 인덱스 버퍼..
+		__Vector3 AA[8] {}; // 가상 버텍스 버퍼..
+		int pIndex[36] {};  // 가상 인덱스 버퍼..
 		int* pIdx = pIndex;
 
 		AA[0]     = __Vector3(vPos.x - COLLISION_BOX, vPos.y - COLLISION_BOX, vPos.z + COLLISION_BOX);
@@ -1800,11 +1558,9 @@ BOOL CN3Terrain::Pick(int x, int y, __Vector3& vPick)
 		*pIdx++   = 4;
 		*pIdx++   = 6;
 
-		for (int i = 0; FALSE == bCollision && i < 36; i += 3)
-		{
-			float t, u, v;
+		float t = 0.0f, u = 0.0f, v = 0.0f;
+		for (int i = 0; !bCollision && i < 36; i += 3)
 			bCollision = ::_IntersectTriangle(vPos, vDir, AA[pIndex[i]], AA[pIndex[i + 1]], AA[pIndex[i + 2]], t, u, v, &vPick);
-		}
 	}
 
 	return bCollision;
@@ -1812,6 +1568,8 @@ BOOL CN3Terrain::Pick(int x, int y, __Vector3& vPick)
 
 BOOL CN3Terrain::PickWide(int x, int y, __Vector3& vPick)
 {
+	constexpr float COL_BOX_OFF = 2000.0f;
+
 	// Compute the vector of the pick ray in screen space
 	__Vector3 vTmp;
 	vTmp.x             = (((2.0f * x) / (CN3Base::s_CameraData.vp.Width)) - 1) / CN3Base::s_CameraData.mtxProjection.m[0][0];
@@ -1831,7 +1589,7 @@ BOOL CN3Terrain::PickWide(int x, int y, __Vector3& vPick)
 
 	bool bCollision = FALSE;
 	__Vector3 A, B, C;
-	float t, u, v;
+	float t = 0.0f, u = 0.0f, v = 0.0f;
 
 	while ((vPosCur.x >= 0.0f) && (vPosCur.z >= 0.0f) && (IsInTerrain(vPosCur.x, vPosCur.z)))
 	{
@@ -1868,8 +1626,6 @@ BOOL CN3Terrain::PickWide(int x, int y, __Vector3& vPick)
 					iz++;
 					break;
 				case 6: //  0, 1
-					ix++;
-					break;
 				case 7: //  1, 1
 					ix++;
 					break;
@@ -1879,7 +1635,9 @@ BOOL CN3Terrain::PickWide(int x, int y, __Vector3& vPick)
 				case 9: //  0, 0
 					ix--;
 					break;
-			};
+				default:
+					break;
+			}
 
 			if ((ix + iz) % 2 == 1) // 당근.. 왼손 바인딩...
 			{
@@ -1888,7 +1646,7 @@ BOOL CN3Terrain::PickWide(int x, int y, __Vector3& vPick)
 				B.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
 
 				bCollision = ::_IntersectTriangle(vPos, vDir, A, B, C, t, u, v, &vPick);
-				if (bCollision == TRUE)
+				if (bCollision)
 					break;
 
 				A.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
@@ -1896,9 +1654,10 @@ BOOL CN3Terrain::PickWide(int x, int y, __Vector3& vPick)
 				C.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
 
 				bCollision = ::_IntersectTriangle(vPos, vDir, A, B, C, t, u, v, &vPick);
-				if (bCollision == TRUE)
+				if (bCollision)
 					break;
 			}
+
 			if ((ix + iz) % 2 == 0)
 			{
 				A.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
@@ -1906,7 +1665,7 @@ BOOL CN3Terrain::PickWide(int x, int y, __Vector3& vPick)
 				B.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
 
 				bCollision = ::_IntersectTriangle(vPos, vDir, A, B, C, t, u, v, &vPick);
-				if (bCollision == TRUE)
+				if (bCollision)
 					break;
 
 				A.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, iz * TILE_SIZE), (float) iz * TILE_SIZE);
@@ -1914,7 +1673,7 @@ BOOL CN3Terrain::PickWide(int x, int y, __Vector3& vPick)
 				C.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
 
 				bCollision = ::_IntersectTriangle(vPos, vDir, A, B, C, t, u, v, &vPick);
-				if (bCollision == TRUE)
+				if (bCollision)
 					break;
 			}
 		}
@@ -1923,226 +1682,78 @@ BOOL CN3Terrain::PickWide(int x, int y, __Vector3& vPick)
 		//이렇게 하지 않으면 체크한 부분을 여러번 체크하기 때문에 부하가 커진다.
 	}
 
-	if (FALSE == bCollision) // 충돌점이 없을 경우....
+	if (!bCollision)        // 충돌점이 없을 경우....
 	{
-		vPick.Set(0, 0, 0);  // 일단 충돌 점은 없고..
+		vPick.Set(0, 0, 0); // 일단 충돌 점은 없고..
 
 		// 음....		!!가상!!  버텍스 버퍼와 인덱스 버퍼 만들기..
-		__Vector3 AA[8]; // 가상 버텍스 버퍼..
-		int pIndex[36];  // 가상 인덱스 버퍼..
+		__Vector3 AA[8] {}; // 가상 버텍스 버퍼..
+		int pIndex[36] {};  // 가상 인덱스 버퍼..
 		int* pIdx = pIndex;
 
-#define COL_BOX_OFF 2000
-
-		AA[0]   = __Vector3(vPos.x - COL_BOX_OFF, vPos.y - COL_BOX_OFF, vPos.z + COL_BOX_OFF);
-		AA[1]   = __Vector3(vPos.x + COL_BOX_OFF, vPos.y - COL_BOX_OFF, vPos.z + COL_BOX_OFF);
-		AA[2]   = __Vector3(vPos.x + COL_BOX_OFF, vPos.y - COL_BOX_OFF, vPos.z - COL_BOX_OFF);
-		AA[3]   = __Vector3(vPos.x - COL_BOX_OFF, vPos.y - COL_BOX_OFF, vPos.z - COL_BOX_OFF);
-		AA[4]   = __Vector3(vPos.x - COL_BOX_OFF, vPos.y + COL_BOX_OFF, vPos.z + COL_BOX_OFF);
-		AA[5]   = __Vector3(vPos.x + COL_BOX_OFF, vPos.y + COL_BOX_OFF, vPos.z + COL_BOX_OFF);
-		AA[6]   = __Vector3(vPos.x + COL_BOX_OFF, vPos.y + COL_BOX_OFF, vPos.z - COL_BOX_OFF);
-		AA[7]   = __Vector3(vPos.x - COL_BOX_OFF, vPos.y + COL_BOX_OFF, vPos.z - COL_BOX_OFF);
+		AA[0]     = __Vector3(vPos.x - COL_BOX_OFF, vPos.y - COL_BOX_OFF, vPos.z + COL_BOX_OFF);
+		AA[1]     = __Vector3(vPos.x + COL_BOX_OFF, vPos.y - COL_BOX_OFF, vPos.z + COL_BOX_OFF);
+		AA[2]     = __Vector3(vPos.x + COL_BOX_OFF, vPos.y - COL_BOX_OFF, vPos.z - COL_BOX_OFF);
+		AA[3]     = __Vector3(vPos.x - COL_BOX_OFF, vPos.y - COL_BOX_OFF, vPos.z - COL_BOX_OFF);
+		AA[4]     = __Vector3(vPos.x - COL_BOX_OFF, vPos.y + COL_BOX_OFF, vPos.z + COL_BOX_OFF);
+		AA[5]     = __Vector3(vPos.x + COL_BOX_OFF, vPos.y + COL_BOX_OFF, vPos.z + COL_BOX_OFF);
+		AA[6]     = __Vector3(vPos.x + COL_BOX_OFF, vPos.y + COL_BOX_OFF, vPos.z - COL_BOX_OFF);
+		AA[7]     = __Vector3(vPos.x - COL_BOX_OFF, vPos.y + COL_BOX_OFF, vPos.z - COL_BOX_OFF);
 
 		// 윗면.
-		*pIdx++ = 0;
-		*pIdx++ = 1;
-		*pIdx++ = 3;
-		*pIdx++ = 2;
-		*pIdx++ = 3;
-		*pIdx++ = 1;
+		*pIdx++   = 0;
+		*pIdx++   = 1;
+		*pIdx++   = 3;
+		*pIdx++   = 2;
+		*pIdx++   = 3;
+		*pIdx++   = 1;
 
 		// 앞면..
-		*pIdx++ = 7;
-		*pIdx++ = 3;
-		*pIdx++ = 6;
-		*pIdx++ = 2;
-		*pIdx++ = 6;
-		*pIdx++ = 3;
+		*pIdx++   = 7;
+		*pIdx++   = 3;
+		*pIdx++   = 6;
+		*pIdx++   = 2;
+		*pIdx++   = 6;
+		*pIdx++   = 3;
 
 		// 왼쪽..
-		*pIdx++ = 4;
-		*pIdx++ = 0;
-		*pIdx++ = 7;
-		*pIdx++ = 3;
-		*pIdx++ = 7;
-		*pIdx++ = 0;
+		*pIdx++   = 4;
+		*pIdx++   = 0;
+		*pIdx++   = 7;
+		*pIdx++   = 3;
+		*pIdx++   = 7;
+		*pIdx++   = 0;
 
 		// 오른쪽..
-		*pIdx++ = 6;
-		*pIdx++ = 2;
-		*pIdx++ = 5;
-		*pIdx++ = 1;
-		*pIdx++ = 5;
-		*pIdx++ = 2;
+		*pIdx++   = 6;
+		*pIdx++   = 2;
+		*pIdx++   = 5;
+		*pIdx++   = 1;
+		*pIdx++   = 5;
+		*pIdx++   = 2;
 
 		// 뒷면..
-		*pIdx++ = 5;
-		*pIdx++ = 1;
-		*pIdx++ = 4;
-		*pIdx++ = 0;
-		*pIdx++ = 4;
-		*pIdx++ = 1;
+		*pIdx++   = 5;
+		*pIdx++   = 1;
+		*pIdx++   = 4;
+		*pIdx++   = 0;
+		*pIdx++   = 4;
+		*pIdx++   = 1;
 
 		// 밑면..
-		*pIdx++ = 7;
-		*pIdx++ = 6;
-		*pIdx++ = 4;
-		*pIdx++ = 5;
-		*pIdx++ = 4;
-		*pIdx++ = 6;
+		*pIdx++   = 7;
+		*pIdx++   = 6;
+		*pIdx++   = 4;
+		*pIdx++   = 5;
+		*pIdx++   = 4;
+		*pIdx++   = 6;
 
-		for (int i = 0; FALSE == bCollision && i < 36; i += 3)
-		{
-			float t, u, v;
+		float t = 0.0f, u = 0.0f, v = 0.0f;
+		for (int i = 0; !bCollision && i < 36; i += 3)
 			bCollision = ::_IntersectTriangle(vPos, vDir, AA[pIndex[i]], AA[pIndex[i + 1]], AA[pIndex[i + 2]], t, u, v, &vPick);
-		}
 	}
 
 	return bCollision;
-}
-
-#define __MAX_DISTANCE 6000
-
-//
-//
-//
-void CN3Terrain::CalcCollisionTerrainByOTPlayer(__Vector3 vOrig, __Vector3 vAt, __Vector3& Vec)
-{
-	bool boo = FALSE;
-	__Vector3 vec2, vec3, vec4, vDir; // vec1 & vec2 is 2D..  vec3 & vec4 is 3D..
-	__Vector3 A, B, C;
-	float ftx, fty, ftz;
-	vec2  = vOrig;
-	vec3  = vAt;
-	vOrig = vec2;
-	vec3.Normalize();
-	vec3   *= TILE_SIZE;
-	vDir    = vec3;
-	vec4    = vec2;
-
-	int ix  = ((int) vec2.x) / (int) TILE_SIZE;
-	int iz  = ((int) vec2.z) / (int) TILE_SIZE;
-
-	if ((ix + iz) % 2 == 1) // 당근.. 왼손 바인딩...
-	{
-		A.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, iz * TILE_SIZE), (float) iz * TILE_SIZE);
-		C.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, iz * TILE_SIZE), (float) iz * TILE_SIZE);
-		B.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
-
-		boo = ::_IntersectTriangle(vOrig, vDir, A, B, C, ftx, fty, ftz);
-		if (boo == TRUE)
-		{
-			Vec = vOrig + vDir * ftx;
-			return;
-		}
-
-		A.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
-		B.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, iz * TILE_SIZE), (float) iz * TILE_SIZE);
-		C.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
-
-		boo = ::_IntersectTriangle(vOrig, vDir, A, B, C, ftx, fty, ftz);
-		if (boo == TRUE)
-		{
-			Vec = vOrig + vDir * ftx;
-			return;
-		}
-	}
-	if ((ix + iz) % 2 == 0)
-	{
-		A.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
-		C.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, iz * TILE_SIZE), (float) iz * TILE_SIZE);
-		B.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
-
-		boo = ::_IntersectTriangle(vOrig, vDir, A, B, C, ftx, fty, ftz);
-		if (boo == TRUE)
-		{
-			Vec = vOrig + vDir * ftx;
-			return;
-		}
-
-		A.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, iz * TILE_SIZE), (float) iz * TILE_SIZE);
-		B.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, iz * TILE_SIZE), (float) iz * TILE_SIZE);
-		C.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
-
-		boo = ::_IntersectTriangle(vOrig, vDir, A, B, C, ftx, fty, ftz);
-		if (boo == TRUE)
-		{
-			Vec = vOrig + vDir * ftx;
-			return;
-		}
-	}
-
-	//#define COLLISION_BOX 6000
-
-	// 음....		!!가상!!  버텍스 버퍼와 인덱스 버퍼 만들기..
-	__Vector3 AA[8]; // 가상 버텍스 버퍼..
-	int pIndex[36];  // 가상 인덱스 버퍼..
-	int* pIdx = pIndex;
-
-	AA[0]     = __Vector3(vec4.x - COLLISION_BOX, vec4.y - COLLISION_BOX, vec4.z + COLLISION_BOX);
-	AA[1]     = __Vector3(vec4.x + COLLISION_BOX, vec4.y - COLLISION_BOX, vec4.z + COLLISION_BOX);
-	AA[2]     = __Vector3(vec4.x + COLLISION_BOX, vec4.y - COLLISION_BOX, vec4.z - COLLISION_BOX);
-	AA[3]     = __Vector3(vec4.x - COLLISION_BOX, vec4.y - COLLISION_BOX, vec4.z - COLLISION_BOX);
-	AA[4]     = __Vector3(vec4.x - COLLISION_BOX, vec4.y + COLLISION_BOX, vec4.z + COLLISION_BOX);
-	AA[5]     = __Vector3(vec4.x + COLLISION_BOX, vec4.y + COLLISION_BOX, vec4.z + COLLISION_BOX);
-	AA[6]     = __Vector3(vec4.x + COLLISION_BOX, vec4.y + COLLISION_BOX, vec4.z - COLLISION_BOX);
-	AA[7]     = __Vector3(vec4.x - COLLISION_BOX, vec4.y + COLLISION_BOX, vec4.z - COLLISION_BOX);
-
-	// 윗면.
-	*pIdx++   = 0;
-	*pIdx++   = 1;
-	*pIdx++   = 3;
-	*pIdx++   = 2;
-	*pIdx++   = 3;
-	*pIdx++   = 1;
-
-	// 앞면..
-	*pIdx++   = 7;
-	*pIdx++   = 3;
-	*pIdx++   = 6;
-	*pIdx++   = 2;
-	*pIdx++   = 6;
-	*pIdx++   = 3;
-
-	// 왼쪽..
-	*pIdx++   = 4;
-	*pIdx++   = 0;
-	*pIdx++   = 7;
-	*pIdx++   = 3;
-	*pIdx++   = 7;
-	*pIdx++   = 0;
-
-	// 오른쪽..
-	*pIdx++   = 6;
-	*pIdx++   = 2;
-	*pIdx++   = 5;
-	*pIdx++   = 1;
-	*pIdx++   = 5;
-	*pIdx++   = 2;
-
-	// 뒷면..
-	*pIdx++   = 5;
-	*pIdx++   = 1;
-	*pIdx++   = 4;
-	*pIdx++   = 0;
-	*pIdx++   = 4;
-	*pIdx++   = 1;
-
-	// 밑면..
-	*pIdx++   = 7;
-	*pIdx++   = 6;
-	*pIdx++   = 4;
-	*pIdx++   = 5;
-	*pIdx++   = 4;
-	*pIdx++   = 6;
-
-	for (int i = 0; i < 36; i += 3)
-	{
-		boo = ::_IntersectTriangle(vOrig, vDir, AA[pIndex[i]], AA[pIndex[i + 1]], AA[pIndex[i + 2]], ftx, fty, ftz);
-		if (boo == TRUE)
-			break;
-	}
-	Vec = vOrig + vDir * ftx;
 }
 
 bool CN3Terrain::CheckIncline(const __Vector3& vPos, const __Vector3& vDir, float fIncline)
@@ -2173,18 +1784,20 @@ bool CN3Terrain::CheckCollisionCamera(__Vector3& vEyeResult, const __Vector3& vA
 
 bool CN3Terrain::CheckCollision(__Vector3& vPos, __Vector3& vDir, float fVelocity, __Vector3* vCol)
 {
-	float fHeight1, fHeight2;
+	float fHeight1 = 0.0f, fHeight2 = 0.0f;
 	vDir.Normalize();
 
-	fHeight1           = vPos.y - this->GetHeight(vPos.x, vPos.z);
+	fHeight1           = vPos.y - GetHeight(vPos.x, vPos.z);
 	__Vector3 vNextPos = vPos + (vDir * (fVelocity * CN3Base::s_fSecPerFrm));
-	fHeight2           = vNextPos.y - this->GetHeight(vNextPos.x, vNextPos.z);
+	fHeight2           = vNextPos.y - GetHeight(vNextPos.x, vNextPos.z);
+
 	if (fHeight1 <= 0)
 	{
 		(*vCol)   = vPos;
-		(*vCol).y = this->GetHeight(vPos.x, vPos.z) + 0.1f;
+		(*vCol).y = GetHeight(vPos.x, vPos.z) + 0.1f;
 		return true;
 	}
+
 	if (fHeight1 * fHeight2 > 0)
 		return false; // both would be positive
 
@@ -2194,92 +1807,6 @@ bool CN3Terrain::CheckCollision(__Vector3& vPos, __Vector3& vDir, float fVelocit
 	(*vCol)   = vPos;
 	(*vCol).y = this->GetHeight(vPos.x, vPos.z) + 0.1f;
 	return true;
-	//
-	/////////////////////////////////////////////
-
-	//정밀하게 하려면 다음과 같이해...
-	//충돌했다...
-	RECT rt;
-	rt.left   = Real2Tile(vPos.x);
-	rt.bottom = Real2Tile(vPos.z);
-	rt.right  = Real2Tile(vNextPos.x);
-	rt.top    = Real2Tile(vNextPos.z);
-
-	if (rt.left > rt.right)
-	{
-		int tmp  = rt.left;
-		rt.left  = rt.right;
-		rt.right = rt.left;
-	}
-	if (rt.bottom > rt.top)
-	{
-		int tmp   = rt.top;
-		rt.top    = rt.bottom;
-		rt.bottom = rt.top;
-	}
-
-	__Vector3 A, B, C;
-	BOOL bCollision;
-	__Vector3 vPick;
-	float t, u, v;
-	for (int ix = rt.left; ix <= rt.right; ix++)
-	{
-		for (int iz = rt.bottom; iz <= rt.top; iz++)
-		{
-			if ((ix + iz) % 2 == 1) // 당근.. 왼손 바인딩...
-			{
-				A.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, iz * TILE_SIZE), (float) iz * TILE_SIZE);
-				C.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, iz * TILE_SIZE), (float) iz * TILE_SIZE);
-				B.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
-
-				bCollision = ::_IntersectTriangle(vPos, vDir, A, B, C, t, u, v, &vPick);
-				if (bCollision == TRUE)
-				{
-					(*vCol) = vPick;
-					return true;
-				}
-
-				A.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
-				B.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, iz * TILE_SIZE), (float) iz * TILE_SIZE);
-				C.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
-
-				bCollision = ::_IntersectTriangle(vPos, vDir, A, B, C, t, u, v, &vPick);
-				if (bCollision == TRUE)
-				{
-					(*vCol) = vPick;
-					return true;
-				}
-			}
-			if ((ix + iz) % 2 == 0)
-			{
-				A.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
-				C.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, iz * TILE_SIZE), (float) iz * TILE_SIZE);
-				B.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
-
-				bCollision = ::_IntersectTriangle(vPos, vDir, A, B, C, t, u, v, &vPick);
-				if (bCollision == TRUE)
-				{
-					(*vCol) = vPick;
-					return true;
-				}
-
-				A.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, iz * TILE_SIZE), (float) iz * TILE_SIZE);
-				B.Set((float) ix * TILE_SIZE, GetHeight(ix * TILE_SIZE, iz * TILE_SIZE), (float) iz * TILE_SIZE);
-				C.Set((float) (ix + 1) * TILE_SIZE, GetHeight((ix + 1) * TILE_SIZE, (iz + 1) * TILE_SIZE), (float) (iz + 1) * TILE_SIZE);
-
-				bCollision = ::_IntersectTriangle(vPos, vDir, A, B, C, t, u, v, &vPick);
-				if (bCollision == TRUE)
-				{
-					(*vCol) = vPick;
-					return true;
-				}
-			}
-		}
-	}
-
-	(*vCol)   = vPos;
-	(*vCol).y = this->GetHeight(vPos.x, vPos.z);
-	return true;
 }
 
 bool CN3Terrain::LoadColorMap(const std::string& szFN)
@@ -2287,14 +1814,9 @@ bool CN3Terrain::LoadColorMap(const std::string& szFN)
 	CUILoading* pUILoading = CGameProcedure::s_pUILoading; // 로딩바..
 
 	m_iNumColorMap         = (m_pat_MapSize * PATCH_PIXEL_SIZE) / COLORMAPTEX_SIZE;
-	m_ppColorMapTex        = new CN3Texture*[m_iNumColorMap];
-	for (int x = 0; x < m_iNumColorMap; x++)
-	{
-		m_ppColorMapTex[x] = new CN3Texture[m_iNumColorMap];
 
-		for (int i = 0; i < m_iNumColorMap; ++i)
-			m_ppColorMapTex[x][i].m_iFileFormatVersion = m_iFileFormatVersion;
-	}
+	m_ColorMapTex.clear();
+	m_ColorMapTex.resize(m_iNumColorMap * m_iNumColorMap);
 
 	FileReader colorMapFile;
 	if (!colorMapFile.OpenExisting(szFN))
@@ -2308,10 +1830,13 @@ bool CN3Terrain::LoadColorMap(const std::string& szFN)
 	std::string szBuff;
 	for (int x = 0; x < m_iNumColorMap; x++)
 	{
-		for (int z = 0; z < m_iNumColorMap; z++)
+		int idx = x * m_iNumColorMap;
+		for (int z = 0; z < m_iNumColorMap; ++z, ++idx)
 		{
-			m_ppColorMapTex[x][z].m_iLOD = s_Options.iTexLOD_Terrain; // LOD 적용후 읽는다..
-			m_ppColorMapTex[x][z].Load(colorMapFile);
+			CN3Texture& tex          = m_ColorMapTex[idx];
+			tex.m_iFileFormatVersion = m_iFileFormatVersion;
+			tex.m_iLOD               = s_Options.iTexLOD_Terrain; // LOD 적용후 읽는다..
+			tex.Load(colorMapFile);
 		}
 
 		szBuff = fmt::format("Loading colormap {} %", x * 100 / m_iNumColorMap);
@@ -2327,30 +1852,32 @@ CN3Texture* CN3Terrain::GetTileTex(int x, int z)
 	if (x < 0 || x >= m_ti_MapSize || z < 0 || z >= m_ti_MapSize)
 		return nullptr;
 
-	MAPDATA MapData;
-	MapData = m_pMapData[(x * m_ti_MapSize) + z];
-	return &(m_pTileTex[MapData.Tex1Idx]);
+	const MAPDATA& MapData = m_pMapData[(x * m_ti_MapSize) + z];
+	if (MapData.Tex1Idx >= m_TileTex.size())
+		return nullptr;
+
+	return &m_TileTex[MapData.Tex1Idx];
 }
 
 bool CN3Terrain::GetTileTexInfo(float x, float z, TERRAINTILETEXINFO& TexInfo1, TERRAINTILETEXINFO& TexInfo2)
 {
-	int tx, tz;
+	int tx = 0, tz = 0;
 	tx = (int) x / (int) TILE_SIZE;
 	tz = (int) z / (int) TILE_SIZE;
 
 	if (tx < 0 || tx >= m_ti_MapSize || tz < 0 || tz >= m_ti_MapSize)
 		return false;
 
-	MAPDATA MapData = m_pMapData[(tx * m_ti_MapSize) + tz];
+	const MAPDATA& MapData = m_pMapData[(tx * m_ti_MapSize) + tz];
 
-	if (MapData.Tex1Idx >= m_NumTileTex)
+	if (MapData.Tex1Idx >= m_TileTex.size())
 	{
 		TexInfo1.pTex = nullptr;
 		TexInfo1.u = TexInfo1.v = 0.0f;
 	}
 	else
 	{
-		TexInfo1.pTex = &(m_pTileTex[MapData.Tex1Idx]);
+		TexInfo1.pTex = &m_TileTex[MapData.Tex1Idx];
 		TexInfo1.u = TexInfo1.v = 0.0f;
 		//u1[0] = m_pRefTerrain->m_fTileDirU[dir1][2];
 		//u1[1] = m_pRefTerrain->m_fTileDirU[dir1][0];
@@ -2373,14 +1900,14 @@ bool CN3Terrain::GetTileTexInfo(float x, float z, TERRAINTILETEXINFO& TexInfo1, 
 		//v2[3] = m_pRefTerrain->m_fTileDirV[dir2][3];
 	}
 
-	if (MapData.Tex2Idx >= m_NumTileTex)
+	if (MapData.Tex2Idx >= m_TileTex.size())
 	{
 		TexInfo2.pTex = nullptr;
 		TexInfo2.u = TexInfo2.v = 0.0f;
 	}
 	else
 	{
-		TexInfo2.pTex = &(m_pTileTex[MapData.Tex2Idx]);
+		TexInfo2.pTex = &m_TileTex[MapData.Tex2Idx];
 		TexInfo2.u = TexInfo2.v = 0.0f;
 		//u1[0] = m_pRefTerrain->m_fTileDirU[dir1][2];
 		//u1[1] = m_pRefTerrain->m_fTileDirU[dir1][0];

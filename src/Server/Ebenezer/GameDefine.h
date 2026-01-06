@@ -51,7 +51,7 @@ constexpr int NORMAL        = 3; // 보통
 constexpr int FAIL          = 4; // 실패
 
 // Item Move Direction Define
-enum e_ItemMoveDirection
+enum e_ItemMoveDirection : uint8_t
 {
 	ITEM_MOVE_INVEN_SLOT  = 1,
 	ITEM_MOVE_SLOT_INVEN  = 2,
@@ -62,7 +62,7 @@ enum e_ItemMoveDirection
 };
 
 // Item Weapon Type Define
-enum e_WeaponType
+enum e_WeaponType : uint8_t
 {
 	WEAPON_DAGGER     = 1,
 	WEAPON_SWORD      = 2,
@@ -84,7 +84,7 @@ enum e_WeaponType
 
 ////////////////////////////////////////////////////////////
 // User Status //
-enum e_UserStatus
+enum e_UserStatus : uint8_t
 {
 	USER_STANDING = 1, // 서 있다.
 	USER_SITDOWN  = 2, // 앉아 있다.
@@ -95,7 +95,7 @@ enum e_UserStatus
 
 ////////////////////////////////////////////////////////////
 // Magic State
-enum e_MagicState
+enum e_MagicState : uint8_t
 {
 	MAGIC_STATE_NONE    = 1,
 	MAGIC_STATE_CASTING = 2
@@ -104,7 +104,7 @@ enum e_MagicState
 
 ////////////////////////////////////////////////////////////
 // Durability Type
-enum e_DurabilityType
+enum e_DurabilityType : uint8_t
 {
 	DURABILITY_TYPE_ATTACK  = 1,
 	DURABILITY_TYPE_DEFENCE = 2
@@ -112,25 +112,12 @@ enum e_DurabilityType
 ////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////
-// Knights Authority Type
-/*
-#define CHIEF				0x06
-#define VICECHIEF			0x05*/
-#define OFFICER         0x04
-#define KNIGHT          0x03
-//#define TRAINEE				0x02
-#define PUNISH          0x01
-
-#define CHIEF           0x01 // 단장
-#define VICECHIEF       0x02 // 부단장
-#define TRAINEE         0x05 // 멤버
-#define COMMAND_CAPTAIN 100  // 지휘권자
-////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////
 // COMMUNITY TYPE DEFINE
-#define CLAN_TYPE       0x01
-#define KNIGHTS_TYPE    0x02
+enum e_ClanType : uint8_t
+{
+	CLAN_TYPE    = 0x01,
+	KNIGHTS_TYPE = 0x02
+};
 ////////////////////////////////////////////////////////////
 
 constexpr int MAX_CLAN         = 36;
@@ -141,28 +128,42 @@ constexpr int ITEM_NO_TRADE    = 900000001; // 거래 불가 아이템들.... �
 
 ////////////////////////////////////////////////////////////
 // EVENT TYPE DEFINE
-#define ZONE_CHANGE        0x01
-#define ZONE_TRAP_DEAD     0x02
-#define ZONE_TRAP_AREA     0x03
+enum e_GameEventType : uint8_t
+{
+	ZONE_CHANGE    = 0x01,
+	ZONE_TRAP_DEAD = 0x02,
+	ZONE_TRAP_AREA = 0x03
+};
 
 ////////////////////////////////////////////////////////////
 // EVENT MISCELLANOUS DATA DEFINE
-#define ZONE_TRAP_INTERVAL 1  // Interval is one second right now.
-#define ZONE_TRAP_DAMAGE   10 // HP Damage is 10 for now :)
+constexpr int ZONE_TRAP_INTERVAL = 1;  // Interval is one second right now.
+constexpr int ZONE_TRAP_DAMAGE   = 10; // HP Damage is 10 for now :)
 
 ////////////////////////////////////////////////////////////
 
 enum e_BeefRoastVictory : uint8_t
 {
-	BEEF_ROAST_VICTORY_START = 0, // Stage for Bifrost to be be captured by a nation - 30 minutes.
-	BEEF_ROAST_VICTORY_KARUS, // Karus captured the Bifrost monument and can now solely enter Bifrost - 60 minutes.
-	BEEF_ROAST_VICTORY_ELMORAD, // El Morad captured the Bifrost monument and can now solely enter Bifrost - 60 minutes.
-	BEEF_ROAST_VICTORY_ALL, // Both nations are allowed to enter Bifrost - 2 hours.
-	BEEF_ROAST_VICTORY_PENDING_RESTART_AFTER_VICTORY, // Bifrost is not active - 4 hours
-	BEEF_ROAST_VICTORY_PENDING_RESTART_AFTER_DRAW,    // Bifrost is not active - 2 hours
+	// Stage for Bifrost to be be captured by a nation - 30 minutes.
+	BEEF_ROAST_VICTORY_START = 0,
+
+	// Karus captured the Bifrost monument and can now solely enter Bifrost - 60 minutes.
+	BEEF_ROAST_VICTORY_KARUS,
+
+	// El Morad captured the Bifrost monument and can now solely enter Bifrost - 60 minutes.
+	BEEF_ROAST_VICTORY_ELMORAD,
+
+	// Both nations are allowed to enter Bifrost - 2 hours.
+	BEEF_ROAST_VICTORY_ALL,
+
+	// Bifrost is not active - 4 hours
+	BEEF_ROAST_VICTORY_PENDING_RESTART_AFTER_VICTORY,
+
+	// Bifrost is not active - 2 hours
+	BEEF_ROAST_VICTORY_PENDING_RESTART_AFTER_DRAW,
 };
 
-enum e_InvasionMonumentType
+enum e_InvasionMonumentType : uint8_t
 {
 	INVASION_MONUMENT_BASE  = 0, // Luferson/El Morad
 	INVASION_MONUMENT_ASGA  = 1, // Asga/Bellua
@@ -173,7 +174,7 @@ enum e_InvasionMonumentType
 
 ////////////////////////////////////////////////////////////
 // USER POINT DEFINE
-enum e_StatType
+enum e_StatType : uint8_t
 { /* explicitly used by CUser::PointChange() */
 	STAT_TYPE_STR   = 1,
 	STAT_TYPE_STA   = 2,
@@ -182,7 +183,7 @@ enum e_StatType
 	STAT_TYPE_CHA   = 5
 };
 
-enum e_SkillPtType
+enum e_SkillPtType : uint8_t
 {
 	SKILLPT_TYPE_ORDER    = 1,
 	SKILLPT_TYPE_MANNER   = 2,
@@ -196,8 +197,9 @@ enum e_SkillPtType
 
 /////////////////////////////////////////////////////////////
 // ITEM TYPE DEFINE
-enum e_ItemType
+enum e_ItemType : uint8_t
 {
+	ITEM_TYPE_NONE          = 0,
 	ITEM_TYPE_FIRE          = 1,
 	ITEM_TYPE_COLD          = 2,
 	ITEM_TYPE_LIGHTNING     = 3,
@@ -210,7 +212,7 @@ enum e_ItemType
 
 /////////////////////////////////////////////////////////////
 // ITEM LOG TYPE
-enum e_ItemLogType
+enum e_ItemLogType : uint8_t
 {
 	ITEM_LOG_MERCHANT_BUY  = 1,
 	ITEM_LOG_MERCHANT_SELL = 2,
@@ -225,7 +227,7 @@ enum e_ItemLogType
 
 /////////////////////////////////////////////////////////////
 // JOB GROUP TYPES
-enum e_JobGroupType
+enum e_JobGroupType : uint8_t
 {
 	JOB_GROUP_WARRIOR         = 1,
 	JOB_GROUP_ROGUE           = 2,
@@ -243,7 +245,7 @@ enum e_JobGroupType
 
 //////////////////////////////////////////////////////////////
 // USER ABNORMAL STATUS TYPES
-enum e_AbnormalStatusType
+enum e_AbnormalStatusType : uint8_t
 {
 	ABNORMAL_NORMAL   = 1,
 	ABNORMAL_GIANT    = 2,
@@ -253,20 +255,29 @@ enum e_AbnormalStatusType
 
 //////////////////////////////////////////////////////////////
 // Object Type
-#define NORMAL_OBJECT       0
-#define SPECIAL_OBJECT      1
+enum e_SpecialObjectType : uint8_t
+{
+	NORMAL_OBJECT  = 0,
+	SPECIAL_OBJECT = 1
+};
 
 //////////////////////////////////////////////////////////////
 // REGENE TYPES
-#define REGENE_NORMAL       0
-#define REGENE_MAGIC        1
-#define REGENE_ZONECHANGE   2
+enum e_RegeneType : uint8_t
+{
+	REGENE_NORMAL     = 0,
+	REGENE_MAGIC      = 1,
+	REGENE_ZONECHANGE = 2
+};
 
 //////////////////////////////////////////////////////////////
 // TYPE 3 ATTRIBUTE TYPES
-#define ATTRIBUTE_FIRE      1
-#define ATTRIBUTE_ICE       2
-#define ATTRIBUTE_LIGHTNING 3
+enum e_AttributeType : uint8_t
+{
+	ATTRIBUTE_FIRE      = 1,
+	ATTRIBUTE_ICE       = 2,
+	ATTRIBUTE_LIGHTNING = 3
+};
 
 #include <Ebenezer/model/EbenezerModel.h>
 namespace model = ebenezer_model;
@@ -274,22 +285,22 @@ namespace model = ebenezer_model;
 // Bundle unit
 struct _ZONE_ITEM
 {
-	uint32_t bundle_index;
-	int itemid[6];
-	int16_t count[6];
-	float x;
-	float z;
-	float y;
-	double time;
+	uint32_t bundle_index = 0;
+	int itemid[6]         = {};
+	int16_t count[6]      = {};
+	float x               = 0.0f;
+	float z               = 0.0f;
+	float y               = 0.0f;
+	double time           = 0.0;
 };
 
 struct _EXCHANGE_ITEM
 {
-	int itemid;
-	int count;
-	int16_t duration;
-	uint8_t pos;        //  교환후 들어갈 자리..
-	int64_t nSerialNum; // item serial code
+	int itemid         = 0;
+	int count          = 0;
+	int16_t duration   = 0;
+	uint8_t pos        = 0; //  교환후 들어갈 자리..
+	int64_t nSerialNum = 0; // item serial code
 };
 
 struct _PARTY_GROUP
@@ -301,6 +312,7 @@ struct _PARTY_GROUP
 	uint8_t bLevel[8];
 	int16_t sClass[8];
 	uint8_t bItemRouting;
+
 	_PARTY_GROUP()
 	{
 		for (int i = 0; i < 8; i++)
@@ -312,51 +324,61 @@ struct _PARTY_GROUP
 			sClass[i] = 0;
 		}
 
+		wIndex       = 0;
 		bItemRouting = 0;
 	}
 };
 
 struct _OBJECT_EVENT
 {
-	uint8_t byLife; // 1:살아있다, 0:켁,, 죽음
-	int sBelong;    // 소속
-	int16_t
-		sIndex; // 100 번대 - 카루스 바인드 포인트 | 200 번대 엘모라드 바인드 포인트 | 1100 번대 - 카루스 성문들 1200 - 엘모라드 성문들
-	int16_t
-		sType; // 0 - 바인드 포인트, 1 - 좌우로 열리는 성문, 2 - 상하로 열리는 성문, 3 - 레버, 4 - 깃발레버, 6:철창, 7-깨지는 부활비석
-	int16_t sControlNpcID; // 조종할 NPC ID (조종할 Object Index), Type-> 5 : Warp Group ID
-	int16_t sStatus;       // status
-	float fPosX;           // 위치값
-	float fPosY;
-	float fPosZ;
+	// 1:살아있다, 0:켁,, 죽음
+	uint8_t byLife        = 0;
+
+	// 소속
+	int sBelong           = 0;
+
+	// 100 번대 - 카루스 바인드 포인트 | 200 번대 엘모라드 바인드 포인트 | 1100 번대 - 카루스 성문들 1200 - 엘모라드 성문들
+	int16_t sIndex        = 0;
+
+	// 0 - 바인드 포인트, 1 - 좌우로 열리는 성문, 2 - 상하로 열리는 성문, 3 - 레버, 4 - 깃발레버, 6:철창, 7-깨지는 부활비석
+	int16_t sType         = 0;
+
+	// 조종할 NPC ID (조종할 Object Index), Type-> 5 : Warp Group ID
+	int16_t sControlNpcID = -1;
+
+	// status
+	int16_t sStatus       = 0;
+
+	// 위치값
+	float fPosX           = 0.0f;
+	float fPosY           = 0.0f;
+	float fPosZ           = 0.0f;
 };
 
 struct _REGENE_EVENT
 {
-	int sRegenePoint;   // 캐릭터 나타나는 지역 번호
-	float fRegenePosX;  // 캐릭터 나타나는 지역의 왼아래쪽 구석 좌표 X
-	float fRegenePosY;  // 캐릭터 나타나는 지역의 왼아래쪽 구석 좌표 Y
-	float fRegenePosZ;  // 캐릭터 나타나는 지역의 왼아래쪽 구석 좌표 Z
-	float fRegeneAreaZ; // 캐릭터 나타나는 지역의 Z 축 길이
-	float fRegeneAreaX; // 캐릭터 나타나는 지역의 X 축 길이
+	int sRegenePoint   = 0;    // 캐릭터 나타나는 지역 번호
+	float fRegenePosX  = 0.0f; // 캐릭터 나타나는 지역의 왼아래쪽 구석 좌표 X
+	float fRegenePosY  = 0.0f; // 캐릭터 나타나는 지역의 왼아래쪽 구석 좌표 Y
+	float fRegenePosZ  = 0.0f; // 캐릭터 나타나는 지역의 왼아래쪽 구석 좌표 Z
+	float fRegeneAreaZ = 0.0f; // 캐릭터 나타나는 지역의 Z 축 길이
+	float fRegeneAreaX = 0.0f; // 캐릭터 나타나는 지역의 X 축 길이
 };
 
 struct _KNIGHTS_USER
 {
-	uint8_t byUsed;                    // 사용중 : 1, 비사용중 : 0
-	char strUserName[MAX_ID_SIZE + 1]; // 캐릭터의 이름
+	// 사용중 : 1, 비사용중 : 0
+	uint8_t byUsed                    = 0;
+
+	// 캐릭터의 이름
+	char strUserName[MAX_ID_SIZE + 1] = {};
 };
 
 struct _ZONE_SERVERINFO
 {
-	int16_t sServerNo;
-	int16_t sPort;
-	char strServerIP[20];
-
-	_ZONE_SERVERINFO()
-	{
-		memset(strServerIP, 0, sizeof(strServerIP));
-	}
+	int16_t sServerNo       = 0;
+	int16_t sPort           = 0;
+	std::string strServerIP = {};
 };
 
 // NOTE: This is loaded as-is from the SMD, padding and all.
@@ -365,26 +387,16 @@ struct _ZONE_SERVERINFO
 #pragma pack(push, 4)
 struct _WARP_INFO
 {
-	int16_t sWarpID;
-	char strWarpName[32];
-	char strAnnounce[256];
-	uint32_t dwPay;
-	int16_t sZone;
-	float fX;
-	float fY;
-	float fZ;
-	float fR;
-	int16_t sNation;
-
-	_WARP_INFO()
-	{
-		sWarpID = 0;
-		sZone   = 0;
-		fX = fZ = fY = fR = 0.0f;
-		memset(strWarpName, 0, sizeof(strWarpName));
-		memset(strAnnounce, 0, sizeof(strAnnounce));
-		sNation = 0;
-	}
+	int16_t sWarpID       = 0;
+	char strWarpName[32]  = {};
+	char strAnnounce[256] = {};
+	uint32_t dwPay        = 0;
+	int16_t sZone         = 0;
+	float fX              = 0.0f;
+	float fY              = 0.0f;
+	float fZ              = 0.0f;
+	float fR              = 0.0f;
+	int16_t sNation       = 0;
 };
 #pragma pack(pop)
 

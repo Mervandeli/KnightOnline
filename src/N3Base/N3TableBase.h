@@ -5,9 +5,7 @@
 #if !defined(AFX_N3TABLEBASE_H__DD4F005E_05B0_49E3_883E_94BE6C8AC7EF__INCLUDED_)
 #define AFX_N3TABLEBASE_H__DD4F005E_05B0_49E3_883E_94BE6C8AC7EF__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <vector>
 #include <map>
@@ -123,8 +121,9 @@ bool CN3TableBase<Type>::Load(File& file)
 	if (iDataTypeCount > 0)
 	{
 		m_DataTypes.insert(m_DataTypes.begin(), iDataTypeCount, DT_NONE);
-		file.Read(&m_DataTypes[0],
-			sizeof(DATA_TYPE) * iDataTypeCount); // 각각의 column에 해당하는 data type
+
+		// 각각의 column에 해당하는 data type
+		file.Read(&m_DataTypes[0], sizeof(DATA_TYPE) * iDataTypeCount);
 
 		if (!MakeOffsetTable(offsets))
 		{
@@ -132,12 +131,11 @@ bool CN3TableBase<Type>::Load(File& file)
 			return FALSE; // structure변수에 대한 offset table 만들어주기
 		}
 
-		int iSize = offsets
-			[iDataTypeCount]; // MakeOffstTable 함수에서 리턴되는 값중 m_iDataTypeCount번째에 이 함수의 실제 사이즈가 들어있다.
-		if (sizeof(Type) != iSize // 전체 type의 크기와 실제 구조체의 크기와 다르거나
-			|| DT_DWORD
-				   != m_DataTypes
-					   [0]) // 맨 처음의 데이타가 DT_DWORD형이 아닐때(맨처음은 고유한 ID이므로)
+		// MakeOffstTable 함수에서 리턴되는 값중 m_iDataTypeCount번째에 이 함수의 실제 사이즈가 들어있다.
+		int iSize = offsets[iDataTypeCount];
+		// 전체 type의 크기와 실제 구조체의 크기와 다르거나
+		// 맨 처음의 데이타가 DT_DWORD형이 아닐때(맨처음은 고유한 ID이므로)
+		if (sizeof(Type) != iSize || DT_DWORD != m_DataTypes[0])
 		{
 			m_DataTypes.clear();
 			__ASSERT(0, "DataType is mismatch or DataSize is incorrect!!");
@@ -146,10 +144,10 @@ bool CN3TableBase<Type>::Load(File& file)
 	}
 
 	// row 가 몇줄인지 읽기
-	int iRC;
+	int iRC = 0;
 	file.Read(&iRC, sizeof(iRC));
 
-	Type Data;
+	Type Data {};
 	for (int i = 0; i < iRC; i++)
 	{
 		for (int j = 0; j < iDataTypeCount; j++)

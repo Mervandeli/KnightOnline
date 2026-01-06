@@ -11,16 +11,6 @@
 #include <N3Base/N3UIScrollBar.h>
 #include <N3Base/N3UIButton.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CUINotice::CUINotice()
 {
 	m_pText_Notice = nullptr;
@@ -117,12 +107,10 @@ void CUINotice::GenerateText()
 
 bool CUINotice::OnKeyPress(int iKey)
 {
-	switch (iKey)
+	if (iKey == DIK_ESCAPE || iKey == DIK_RETURN)
 	{
-		case DIK_ESCAPE:
-		case DIK_RETURN:
-			ReceiveMessage(m_pBtn_OK, UIMSG_BUTTON_CLICK);
-			return true;
+		ReceiveMessage(m_pBtn_OK, UIMSG_BUTTON_CLICK);
+		return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);

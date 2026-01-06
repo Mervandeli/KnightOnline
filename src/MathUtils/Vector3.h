@@ -10,8 +10,8 @@ struct __Vector3
 {
 public:
 	__Vector3() = default;
-	__Vector3(float fx, float fy, float fz);
 	__Vector3(const __Vector3& vec);
+	__Vector3(float fx, float fy, float fz);
 
 	void Normalize();
 	void Normalize(const __Vector3& vec);
@@ -23,7 +23,7 @@ public:
 	void Zero();
 	void Set(float fx, float fy, float fz);
 
-	const __Vector3& operator=(const __Vector3& vec);
+	__Vector3& operator=(const __Vector3& vec) = default;
 
 	const __Vector3 operator*(const __Matrix44& mtx) const;
 	void operator*=(float fDelta);

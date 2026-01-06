@@ -81,12 +81,12 @@ void CUdpSocket::AsyncReceive()
 		});
 }
 
-int CUdpSocket::SendUDPPacket(char* strAddress, char* pBuf, int len)
+int CUdpSocket::SendUDPPacket(const std::string& strAddress, char* pBuf, int len)
 {
 	int s_size = 0, index = 0;
-	uint8_t pTBuf[2048] = {};
+	uint8_t pTBuf[2048] {};
 
-	if (len > static_cast<int>(sizeof(pTBuf)) || len <= 0)
+	if ((len + 6) > static_cast<int>(sizeof(pTBuf)) || len <= 0)
 		return 0;
 
 	pTBuf[index++] = (uint8_t) PACKET_START1;
@@ -126,67 +126,50 @@ int CUdpSocket::SendUDPPacket(char* strAddress, char* pBuf, int len)
 
 bool CUdpSocket::PacketProcess(int len)
 {
-	uint8_t* pTmp;
-	bool foundCore;
-	MYSHORT slen;
-	int length;
-
 	if (len <= 0)
 		return false;
 
-	pTmp = new uint8_t[len + 1];
+	MYSHORT slen;
 
-	memcpy(pTmp, _recvBuff, len);
-
-	foundCore = false;
+	std::vector<uint8_t> tmpBuffer(len);
+	memcpy(&tmpBuffer[0], _recvBuff, len);
 
 	int sPos = 0, ePos = 0;
-
-	for (int i = 0; i < len && !foundCore; i++)
+	for (int i = 0; i < len; i++)
 	{
 		if (i + 2 >= len)
 			break;
 
-		if (pTmp[i] == PACKET_START1 && pTmp[i + 1] == PACKET_START2)
-		{
-			sPos      = i + 2;
+		if (tmpBuffer[i] != PACKET_START1 || tmpBuffer[i + 1] != PACKET_START2)
+			continue;
 
-			slen.b[0] = pTmp[sPos];
-			slen.b[1] = pTmp[sPos + 1];
+		sPos       = i + 2;
 
-			length    = slen.w;
+		slen.b[0]  = tmpBuffer[sPos];
+		slen.b[1]  = tmpBuffer[sPos + 1];
 
-			if (length <= 0)
-				goto cancelRoutine;
+		int length = slen.w;
+		if (length <= 0 || length > len)
+			return false;
 
-			if (length > len)
-				goto cancelRoutine;
+		ePos = sPos + length + 2;
+		if ((ePos + 2) > len)
+			return false;
 
-			ePos = sPos + length + 2;
+		if (tmpBuffer[ePos] != PACKET_END1 || tmpBuffer[ePos + 1] != PACKET_END2)
+			return false;
 
-			if ((ePos + 2) > len)
-				goto cancelRoutine;
-
-			if (pTmp[ePos] != PACKET_END1 || pTmp[ePos + 1] != PACKET_END2)
-				goto cancelRoutine;
-
-			Parsing((char*) (pTmp + sPos + 2), length);
-			foundCore = true;
-			break;
-		}
+		Parsing(reinterpret_cast<char*>(&tmpBuffer[sPos + 2]), length);
+		return true;
 	}
 
-cancelRoutine:
-	delete[] pTmp;
-	return foundCore;
+	return false;
 }
 
 void CUdpSocket::Parsing(char* pBuf, int /*len*/)
 {
-	uint8_t command;
-	int index = 0;
-
-	command   = GetByte(pBuf, index);
+	int index       = 0;
+	uint8_t command = GetByte(pBuf, index);
 	switch (command)
 	{
 		case STS_CHAT:
@@ -204,15 +187,19 @@ void CUdpSocket::Parsing(char* pBuf, int /*len*/)
 		case UDP_BATTLEZONE_CURRENT_USERS:
 			RecvBattleZoneCurrentUsers(pBuf + index);
 			break;
+
+		default:
+			spdlog::error("UdpSocket::Parsing: Unhandled opcode {:02X}", command);
+			break;
 	}
 }
 
 void CUdpSocket::ServerChat(char* pBuf)
 {
 	int index = 0, chatlen = 0;
-	char chatstr[1024] = {};
+	char chatstr[1024] {};
 
-	chatlen            = GetShort(pBuf, index);
+	chatlen = GetShort(pBuf, index);
 	if (chatlen > 512 || chatlen <= 0)
 		return;
 
@@ -223,9 +210,9 @@ void CUdpSocket::ServerChat(char* pBuf)
 
 void CUdpSocket::RecvBattleEvent(char* pBuf)
 {
-	int index = 0, send_index = 0;
+	int index = 0, sendIndex = 0;
 	int nType = 0, nResult = 0, nLen = 0, nKillKarus = 0, nElmoKill = 0;
-	char strMaxUserName[MAX_ID_SIZE + 1] = {}, send_buff[256] = {};
+	char strMaxUserName[MAX_ID_SIZE + 1] {}, sendBuffer[256] {};
 
 	nType   = GetByte(pBuf, index);
 	nResult = GetByte(pBuf, index);
@@ -242,12 +229,12 @@ void CUdpSocket::RecvBattleEvent(char* pBuf)
 			return;
 		}
 
-		if (nResult == KARUS)
+		if (nResult == NATION_KARUS)
 		{
 			//TRACE(_T("--> UDP RecvBattleEvent : 카루스 땅으로 넘어갈 수 있어\n"));
 			_main->m_byKarusOpenFlag = 1; // 카루스 땅으로 넘어갈 수 있어
 		}
-		else if (nResult == ELMORAD)
+		else if (nResult == NATION_ELMORAD)
 		{
 			//TRACE(_T("--> UDP  RecvBattleEvent : 엘모 땅으로 넘어갈 수 있어\n"));
 			_main->m_byElmoradOpenFlag = 1; // 엘모 땅으로 넘어갈 수 있어
@@ -260,14 +247,6 @@ void CUdpSocket::RecvBattleEvent(char* pBuf)
 			spdlog::error("UdpSocket::RecvBattleEvent: No active battle [battleOpen={} type={}]",
 				_main->m_byBattleOpen, nType);
 			return;
-		}
-		if (nResult == KARUS)
-		{
-			//TRACE(_T("-->  UDP RecvBattleEvent : 카루스가 승리하였습니다.\n"));
-		}
-		else if (nResult == ELMORAD)
-		{
-			//TRACE(_T("-->  UDP RecvBattleEvent : 엘모라드가 승리하였습니다.\n"));
 		}
 
 		_main->m_bVictory          = nResult;
@@ -301,23 +280,23 @@ void CUdpSocket::RecvBattleEvent(char* pBuf)
 				chatstr = fmt::format_db_resource(IDS_KILL_ELMO_GUARD2, strMaxUserName);
 
 			chatstr = fmt::format_db_resource(IDP_ANNOUNCEMENT, chatstr);
-			SetByte(send_buff, WIZ_CHAT, send_index);
-			SetByte(send_buff, WAR_SYSTEM_CHAT, send_index);
-			SetByte(send_buff, 1, send_index);
-			SetShort(send_buff, -1, send_index);
-			SetByte(send_buff, 0, send_index); // sender name length
-			SetString2(send_buff, chatstr, send_index);
-			_main->Send_All(send_buff, send_index);
+			SetByte(sendBuffer, WIZ_CHAT, sendIndex);
+			SetByte(sendBuffer, WAR_SYSTEM_CHAT, sendIndex);
+			SetByte(sendBuffer, 1, sendIndex);
+			SetShort(sendBuffer, -1, sendIndex);
+			SetByte(sendBuffer, 0, sendIndex); // sender name length
+			SetString2(sendBuffer, chatstr, sendIndex);
+			_main->Send_All(sendBuffer, sendIndex);
 
-			memset(send_buff, 0, sizeof(send_buff));
-			send_index = 0;
-			SetByte(send_buff, WIZ_CHAT, send_index);
-			SetByte(send_buff, PUBLIC_CHAT, send_index);
-			SetByte(send_buff, 1, send_index);
-			SetShort(send_buff, -1, send_index);
-			SetByte(send_buff, 0, send_index); // sender name length
-			SetString2(send_buff, chatstr, send_index);
-			_main->Send_All(send_buff, send_index);
+			memset(sendBuffer, 0, sizeof(sendBuffer));
+			sendIndex = 0;
+			SetByte(sendBuffer, WIZ_CHAT, sendIndex);
+			SetByte(sendBuffer, PUBLIC_CHAT, sendIndex);
+			SetByte(sendBuffer, 1, sendIndex);
+			SetShort(sendBuffer, -1, sendIndex);
+			SetByte(sendBuffer, 0, sendIndex); // sender name length
+			SetString2(sendBuffer, chatstr, sendIndex);
+			_main->Send_All(sendBuffer, sendIndex);
 		}
 	}
 	else if (nType == BATTLE_EVENT_KILL_USER)
@@ -331,12 +310,12 @@ void CUdpSocket::RecvBattleEvent(char* pBuf)
 
 			//TRACE(_T("-->  UDP RecvBattleEvent type = 1 : 적국 유저 죽인수 : karus=%d->%d, elmo=%d->%d\n"), nKillKarus, _main->m_sKarusDead, nElmoKill, _main->m_sElmoradDead);
 
-			SetByte(send_buff, UDP_BATTLE_EVENT_PACKET, send_index);
-			SetByte(send_buff, BATTLE_EVENT_KILL_USER, send_index);
-			SetByte(send_buff, 2, send_index); // karus의 정보 전송
-			SetShort(send_buff, _main->m_sKarusDead, send_index);
-			SetShort(send_buff, _main->m_sElmoradDead, send_index);
-			_main->Send_UDP_All(send_buff, send_index);
+			SetByte(sendBuffer, UDP_BATTLE_EVENT_PACKET, sendIndex);
+			SetByte(sendBuffer, BATTLE_EVENT_KILL_USER, sendIndex);
+			SetByte(sendBuffer, 2, sendIndex); // karus의 정보 전송
+			SetShort(sendBuffer, _main->m_sKarusDead, sendIndex);
+			SetShort(sendBuffer, _main->m_sElmoradDead, sendIndex);
+			_main->Send_UDP_All(sendBuffer, sendIndex);
 		}
 		else if (nResult == 2)
 		{
@@ -353,10 +332,10 @@ void CUdpSocket::RecvBattleEvent(char* pBuf)
 
 void CUdpSocket::ReceiveKnightsProcess(char* pBuf)
 {
-	int index = 0, command = 0;
+	int index       = 0;
+	uint8_t command = GetByte(pBuf, index);
 
-	command = GetByte(pBuf, index);
-	//TRACE(_T("UDP - ReceiveKnightsProcess - command=%d\n"), command);
+	spdlog::trace("UdpSocket::ReceiveKnightsProcess: command={:02X}", command);
 
 	switch (command)
 	{
@@ -382,19 +361,23 @@ void CUdpSocket::ReceiveKnightsProcess(char* pBuf)
 		case KNIGHTS_DESTROY:
 			RecvDestroyKnights(pBuf + index);
 			break;
+
+		default:
+			spdlog::error("UdpSocket::ReceiveKnightsProcess: Unhandled opcode {:02X}", command);
+			break;
 	}
 }
 
 void CUdpSocket::RecvCreateKnights(char* pBuf)
 {
-	int index = 0, namelen = 0, idlen = 0, knightsindex = 0, nation = 0, community = 0;
-	char knightsname[MAX_ID_SIZE + 1] = {}, chiefname[MAX_ID_SIZE + 1] = {};
 	CKnights* pKnights = nullptr;
+	int index = 0, namelen = 0, idlen = 0, knightsindex = 0, nation = 0, community = 0;
+	char knightsname[MAX_ID_SIZE + 1] {}, chiefname[MAX_ID_SIZE + 1] {};
 
-	community          = GetByte(pBuf, index);
-	knightsindex       = GetShort(pBuf, index);
-	nation             = GetByte(pBuf, index);
-	namelen            = GetShort(pBuf, index);
+	community    = GetByte(pBuf, index);
+	knightsindex = GetShort(pBuf, index);
+	nation       = GetByte(pBuf, index);
+	namelen      = GetShort(pBuf, index);
 	GetString(knightsname, pBuf, namelen, index);
 	idlen = GetShort(pBuf, index);
 	GetString(chiefname, pBuf, idlen, index);
@@ -423,8 +406,8 @@ void CUdpSocket::RecvCreateKnights(char* pBuf)
 
 void CUdpSocket::RecvJoinKnights(char* pBuf, uint8_t command)
 {
-	int send_index = 0, knightsId = 0, index = 0, idlen = 0;
-	char charId[MAX_ID_SIZE + 1] = {}, send_buff[128] = {};
+	int sendIndex = 0, knightsId = 0, index = 0, idlen = 0;
+	char charId[MAX_ID_SIZE + 1] {}, sendBuffer[128] {};
 	std::string finalstr;
 
 	knightsId = GetShort(pBuf, index);
@@ -452,26 +435,26 @@ void CUdpSocket::RecvJoinKnights(char* pBuf, uint8_t command)
 
 	//TRACE(_T("UDP - RecvJoinKnights - command=%d, name=%hs, index=%d\n"), command, charid, knightsindex);
 
-	memset(send_buff, 0, sizeof(send_buff));
-	send_index = 0;
-	SetByte(send_buff, WIZ_CHAT, send_index);
-	SetByte(send_buff, KNIGHTS_CHAT, send_index);
-	SetByte(send_buff, 1, send_index);
-	SetShort(send_buff, -1, send_index);
-	SetByte(send_buff, 0, send_index); // sender name length
-	SetString2(send_buff, finalstr, send_index);
-	_main->Send_KnightsMember(knightsId, send_buff, send_index);
+	memset(sendBuffer, 0, sizeof(sendBuffer));
+	sendIndex = 0;
+	SetByte(sendBuffer, WIZ_CHAT, sendIndex);
+	SetByte(sendBuffer, KNIGHTS_CHAT, sendIndex);
+	SetByte(sendBuffer, 1, sendIndex);
+	SetShort(sendBuffer, -1, sendIndex);
+	SetByte(sendBuffer, 0, sendIndex); // sender name length
+	SetString2(sendBuffer, finalstr, sendIndex);
+	_main->Send_KnightsMember(knightsId, sendBuffer, sendIndex);
 }
 
 void CUdpSocket::RecvModifyFame(char* pBuf, uint8_t command)
 {
-	int index = 0, send_index = 0, knightsindex = 0, idlen = 0;
-	char send_buff[128] = {}, userid[MAX_ID_SIZE + 1] = {};
-	std::string finalstr;
 	CUser* pTUser = nullptr;
+	int index = 0, sendIndex = 0, knightsindex = 0, idlen = 0;
+	char sendBuffer[128] {}, userid[MAX_ID_SIZE + 1] {};
+	std::string finalstr;
 
-	knightsindex  = GetShort(pBuf, index);
-	idlen         = GetShort(pBuf, index);
+	knightsindex = GetShort(pBuf, index);
+	idlen        = GetShort(pBuf, index);
 	GetString(userid, pBuf, idlen, index);
 
 	pTUser = _main->GetUserPtr(userid, NameType::Character);
@@ -495,7 +478,7 @@ void CUdpSocket::RecvModifyFame(char* pBuf, uint8_t command)
 
 		case KNIGHTS_ADMIT:
 			if (pTUser != nullptr)
-				pTUser->m_pUserData->m_bFame = KNIGHT;
+				pTUser->m_pUserData->m_bFame = KNIGHTS_DUTY_KNIGHT;
 			break;
 
 		case KNIGHTS_REJECT:
@@ -507,96 +490,95 @@ void CUdpSocket::RecvModifyFame(char* pBuf, uint8_t command)
 			}
 			break;
 
-		case KNIGHTS_CHIEF + 0x10:
+		case KNIGHTS_CHIEF:
 			if (pTUser != nullptr)
 			{
-				pTUser->m_pUserData->m_bFame = CHIEF;
+				pTUser->m_pUserData->m_bFame = KNIGHTS_DUTY_CHIEF;
 				_main->m_KnightsManager.ModifyKnightsUser(knightsindex, pTUser->m_pUserData->m_id);
 				finalstr = fmt::format_db_resource(IDS_KNIGHTS_CHIEF, pTUser->m_pUserData->m_id);
 			}
 			break;
 
-		case KNIGHTS_VICECHIEF + 0x10:
+		case KNIGHTS_VICECHIEF:
 			if (pTUser != nullptr)
 			{
-				pTUser->m_pUserData->m_bFame = VICECHIEF;
+				pTUser->m_pUserData->m_bFame = KNIGHTS_DUTY_VICECHIEF;
 				_main->m_KnightsManager.ModifyKnightsUser(knightsindex, pTUser->m_pUserData->m_id);
 				finalstr = fmt::format_db_resource(
 					IDS_KNIGHTS_VICECHIEF, pTUser->m_pUserData->m_id);
 			}
 			break;
 
-		case KNIGHTS_OFFICER + 0x10:
+		case KNIGHTS_OFFICER:
 			if (pTUser != nullptr)
-				pTUser->m_pUserData->m_bFame = OFFICER;
+				pTUser->m_pUserData->m_bFame = KNIGHTS_DUTY_OFFICER;
 			break;
 
-		case KNIGHTS_PUNISH + 0x10:
-			if (pTUser != nullptr)
-				pTUser->m_pUserData->m_bFame = PUNISH;
+		default:
+			spdlog::error("UdpSocket::RecvModifyFame: Unhandled opcode {:02X}", command);
 			break;
 	}
 
 	if (pTUser != nullptr)
 	{
 		//TRACE(_T("UDP - RecvModifyFame - command=%d, nid=%d, name=%hs, index=%d, fame=%d\n"), command, pTUser->GetSocketID(), pTUser->m_pUserData->m_id, knightsindex, pTUser->m_pUserData->m_bFame);
-		send_index = 0;
-		memset(send_buff, 0, sizeof(send_buff));
-		SetByte(send_buff, WIZ_KNIGHTS_PROCESS, send_index);
-		SetByte(send_buff, KNIGHTS_MODIFY_FAME, send_index);
-		SetByte(send_buff, 0x01, send_index);
+		sendIndex = 0;
+		memset(sendBuffer, 0, sizeof(sendBuffer));
+		SetByte(sendBuffer, WIZ_KNIGHTS_PROCESS, sendIndex);
+		SetByte(sendBuffer, KNIGHTS_MODIFY_FAME, sendIndex);
+		SetByte(sendBuffer, 0x01, sendIndex);
 		if (command == KNIGHTS_REMOVE)
 		{
-			SetShort(send_buff, pTUser->GetSocketID(), send_index);
-			SetShort(send_buff, pTUser->m_pUserData->m_bKnights, send_index);
-			SetByte(send_buff, pTUser->m_pUserData->m_bFame, send_index);
-			_main->Send_Region(send_buff, send_index, pTUser->m_pUserData->m_bZone,
+			SetShort(sendBuffer, pTUser->GetSocketID(), sendIndex);
+			SetShort(sendBuffer, pTUser->m_pUserData->m_bKnights, sendIndex);
+			SetByte(sendBuffer, pTUser->m_pUserData->m_bFame, sendIndex);
+			_main->Send_Region(sendBuffer, sendIndex, pTUser->m_pUserData->m_bZone,
 				pTUser->m_RegionX, pTUser->m_RegionZ, nullptr, false);
 		}
 		else
 		{
-			SetShort(send_buff, pTUser->GetSocketID(), send_index);
-			SetShort(send_buff, pTUser->m_pUserData->m_bKnights, send_index);
-			SetByte(send_buff, pTUser->m_pUserData->m_bFame, send_index);
-			pTUser->Send(send_buff, send_index);
+			SetShort(sendBuffer, pTUser->GetSocketID(), sendIndex);
+			SetShort(sendBuffer, pTUser->m_pUserData->m_bKnights, sendIndex);
+			SetByte(sendBuffer, pTUser->m_pUserData->m_bFame, sendIndex);
+			pTUser->Send(sendBuffer, sendIndex);
 		}
 
 		if (command == KNIGHTS_REMOVE)
 		{
-			memset(send_buff, 0, sizeof(send_buff));
-			send_index = 0;
-			SetByte(send_buff, WIZ_CHAT, send_index);
-			SetByte(send_buff, KNIGHTS_CHAT, send_index);
-			SetByte(send_buff, 1, send_index);
-			SetShort(send_buff, -1, send_index);
-			SetByte(send_buff, 0, send_index); // sender name length
-			SetString2(send_buff, finalstr, send_index);
-			pTUser->Send(send_buff, send_index);
+			memset(sendBuffer, 0, sizeof(sendBuffer));
+			sendIndex = 0;
+			SetByte(sendBuffer, WIZ_CHAT, sendIndex);
+			SetByte(sendBuffer, KNIGHTS_CHAT, sendIndex);
+			SetByte(sendBuffer, 1, sendIndex);
+			SetShort(sendBuffer, -1, sendIndex);
+			SetByte(sendBuffer, 0, sendIndex); // sender name length
+			SetString2(sendBuffer, finalstr, sendIndex);
+			pTUser->Send(sendBuffer, sendIndex);
 		}
 	}
 
-	memset(send_buff, 0x00, 128);
-	send_index = 0;
-	SetByte(send_buff, WIZ_CHAT, send_index);
-	SetByte(send_buff, KNIGHTS_CHAT, send_index);
-	SetByte(send_buff, 1, send_index);
-	SetShort(send_buff, -1, send_index);
-	SetByte(send_buff, 0, send_index); // sender name length
-	SetString2(send_buff, finalstr, send_index);
-	_main->Send_KnightsMember(knightsindex, send_buff, send_index);
+	memset(sendBuffer, 0x00, 128);
+	sendIndex = 0;
+	SetByte(sendBuffer, WIZ_CHAT, sendIndex);
+	SetByte(sendBuffer, KNIGHTS_CHAT, sendIndex);
+	SetByte(sendBuffer, 1, sendIndex);
+	SetShort(sendBuffer, -1, sendIndex);
+	SetByte(sendBuffer, 0, sendIndex); // sender name length
+	SetString2(sendBuffer, finalstr, sendIndex);
+	_main->Send_KnightsMember(knightsindex, sendBuffer, sendIndex);
 }
 
 void CUdpSocket::RecvDestroyKnights(char* pBuf)
 {
-	int send_index = 0, knightsId = 0, index = 0, flag = 0;
-	char send_buff[128] = {};
-	std::string finalstr;
 	CKnights* pKnights = nullptr;
 	CUser* pTUser      = nullptr;
+	int sendIndex = 0, knightsId = 0, index = 0, flag = 0;
+	char sendBuffer[128] {};
+	std::string finalstr;
 
-	knightsId          = GetShort(pBuf, index);
+	knightsId = GetShort(pBuf, index);
 
-	pKnights           = _main->m_KnightsMap.GetData(knightsId);
+	pKnights  = _main->m_KnightsMap.GetData(knightsId);
 	if (pKnights == nullptr)
 	{
 		spdlog::error("UdpSocket::RecvDestroyKnights: knightsId={} not found", knightsId);
@@ -611,15 +593,15 @@ void CUdpSocket::RecvDestroyKnights(char* pBuf)
 	else if (flag == KNIGHTS_TYPE)
 		finalstr = fmt::format_db_resource(IDS_KNIGHTS_DESTROY, pKnights->m_strName);
 
-	memset(send_buff, 0x00, 128);
-	send_index = 0;
-	SetByte(send_buff, WIZ_CHAT, send_index);
-	SetByte(send_buff, KNIGHTS_CHAT, send_index);
-	SetByte(send_buff, 1, send_index);
-	SetShort(send_buff, -1, send_index);
-	SetByte(send_buff, 0, send_index); // sender name length
-	SetString2(send_buff, finalstr, send_index);
-	_main->Send_KnightsMember(knightsId, send_buff, send_index);
+	memset(sendBuffer, 0x00, 128);
+	sendIndex = 0;
+	SetByte(sendBuffer, WIZ_CHAT, sendIndex);
+	SetByte(sendBuffer, KNIGHTS_CHAT, sendIndex);
+	SetByte(sendBuffer, 1, sendIndex);
+	SetShort(sendBuffer, -1, sendIndex);
+	SetByte(sendBuffer, 0, sendIndex); // sender name length
+	SetString2(sendBuffer, finalstr, sendIndex);
+	_main->Send_KnightsMember(knightsId, sendBuffer, sendIndex);
 
 	int socketCount = _main->GetUserSocketCount();
 	for (int i = 0; i < socketCount; i++)
@@ -635,17 +617,17 @@ void CUdpSocket::RecvDestroyKnights(char* pBuf)
 
 			_main->m_KnightsManager.RemoveKnightsUser(knightsId, pTUser->m_pUserData->m_id);
 
-			memset(send_buff, 0, sizeof(send_buff));
-			send_index = 0;
-			SetByte(send_buff, WIZ_KNIGHTS_PROCESS, send_index);
-			SetByte(send_buff, KNIGHTS_MODIFY_FAME, send_index);
-			SetByte(send_buff, 0x01, send_index);
-			SetShort(send_buff, pTUser->GetSocketID(), send_index);
-			SetShort(send_buff, pTUser->m_pUserData->m_bKnights, send_index);
-			SetByte(send_buff, pTUser->m_pUserData->m_bFame, send_index);
-			_main->Send_Region(send_buff, send_index, pTUser->m_pUserData->m_bZone,
+			memset(sendBuffer, 0, sizeof(sendBuffer));
+			sendIndex = 0;
+			SetByte(sendBuffer, WIZ_KNIGHTS_PROCESS, sendIndex);
+			SetByte(sendBuffer, KNIGHTS_MODIFY_FAME, sendIndex);
+			SetByte(sendBuffer, 0x01, sendIndex);
+			SetShort(sendBuffer, pTUser->GetSocketID(), sendIndex);
+			SetShort(sendBuffer, pTUser->m_pUserData->m_bKnights, sendIndex);
+			SetByte(sendBuffer, pTUser->m_pUserData->m_bFame, sendIndex);
+			_main->Send_Region(sendBuffer, sendIndex, pTUser->m_pUserData->m_bZone,
 				pTUser->m_RegionX, pTUser->m_RegionZ, nullptr, false);
-			//pTUser->Send( send_buff, send_index );
+			//pTUser->Send( sendBuffer, sendIndex );
 		}
 	}
 

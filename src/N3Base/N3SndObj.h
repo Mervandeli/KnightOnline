@@ -132,7 +132,7 @@ public:
 
 	/// \brief Sets the 3D position of the sound.
 	/// \param vPos Position in world coordinates.
-	void SetPos(const __Vector3 vPos);
+	void SetPos(const __Vector3& vPos);
 
 	/// \brief Sets whether the sound should loop.
 	/// \param loop true to loop, false to play once.

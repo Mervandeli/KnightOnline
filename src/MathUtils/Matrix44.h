@@ -28,6 +28,7 @@ public:
 
 	void Zero();
 	void Identity();
+	static __Matrix44 GetIdentity();
 	__Matrix44 Inverse() const;
 	void BuildInverse(__Matrix44& mtxOut) const;
 	const __Vector3 Pos() const;
@@ -53,7 +54,7 @@ public:
 	__Matrix44 operator*(const __Quaternion& qRot) const;
 	void operator*=(const __Quaternion& qRot);
 
-	void operator=(const __Quaternion& qt);
+	__Matrix44& operator=(const __Quaternion& qt);
 
 public:
 	float m[4][4];

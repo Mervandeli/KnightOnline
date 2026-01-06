@@ -65,26 +65,26 @@ void CNpc::MoveResult(float xpos, float ypos, float zpos, float speed)
 
 	RegisterRegion();
 
-	int send_index     = 0;
-	char pOutBuf[1024] = {};
+	int sendIndex = 0;
+	char pOutBuf[1024] {};
 
-	SetByte(pOutBuf, WIZ_NPC_MOVE, send_index);
-	SetShort(pOutBuf, m_sNid, send_index);
-	SetShort(pOutBuf, (uint16_t) m_fCurX * 10, send_index);
-	SetShort(pOutBuf, (uint16_t) m_fCurZ * 10, send_index);
-	SetShort(pOutBuf, (int16_t) m_fCurY * 10, send_index);
-	SetShort(pOutBuf, (int16_t) speed * 10, send_index);
+	SetByte(pOutBuf, WIZ_NPC_MOVE, sendIndex);
+	SetShort(pOutBuf, m_sNid, sendIndex);
+	SetShort(pOutBuf, (uint16_t) m_fCurX * 10, sendIndex);
+	SetShort(pOutBuf, (uint16_t) m_fCurZ * 10, sendIndex);
+	SetShort(pOutBuf, (int16_t) m_fCurY * 10, sendIndex);
+	SetShort(pOutBuf, (int16_t) speed * 10, sendIndex);
 
-	m_pMain->Send_Region(pOutBuf, send_index, m_sCurZone, m_sRegion_X, m_sRegion_Z, nullptr, false);
+	m_pMain->Send_Region(pOutBuf, sendIndex, m_sCurZone, m_sRegion_X, m_sRegion_Z, nullptr, false);
 	//TRACE(_T("RecvNpcMove ==> nid = %d, zone=%d, x = %f, z = %f\n"), m_sNid, m_sCurZone, m_fCurX, m_fCurZ);
 }
 
 void CNpc::NpcInOut(uint8_t Type, float fx, float fz, float fy)
 {
-	int send_index  = 0;
-	char buff[1024] = {};
+	int sendIndex = 0;
+	char buff[1024] {};
 
-	C3DMap* pMap    = m_pMain->GetMapByIndex(m_sZoneIndex);
+	C3DMap* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 	{
 		spdlog::error("Npc::NpcInOut: no map found for zoneIndex={} [serial={} npcId={} npcName={} "
@@ -106,18 +106,18 @@ void CNpc::NpcInOut(uint8_t Type, float fx, float fz, float fy)
 		m_fCurY = fy;
 	}
 
-	SetByte(buff, WIZ_NPC_INOUT, send_index);
-	SetByte(buff, Type, send_index);
-	SetShort(buff, m_sNid, send_index);
+	SetByte(buff, WIZ_NPC_INOUT, sendIndex);
+	SetByte(buff, Type, sendIndex);
+	SetShort(buff, m_sNid, sendIndex);
 
 	if (Type == NPC_OUT)
 	{
-		m_pMain->Send_Region(buff, send_index, m_sCurZone, m_sRegion_X, m_sRegion_Z);
+		m_pMain->Send_Region(buff, sendIndex, m_sCurZone, m_sRegion_X, m_sRegion_Z);
 		return;
 	}
 
-	GetNpcInfo(buff, send_index);
-	m_pMain->Send_Region(buff, send_index, m_sCurZone, m_sRegion_X, m_sRegion_Z);
+	GetNpcInfo(buff, sendIndex);
+	m_pMain->Send_Region(buff, sendIndex, m_sCurZone, m_sRegion_X, m_sRegion_Z);
 }
 
 void CNpc::RegisterRegion()
@@ -148,26 +148,26 @@ void CNpc::RegisterRegion()
 
 void CNpc::RemoveRegion(int del_x, int del_z)
 {
-	int send_index = 0;
-	char buff[128] = {};
+	int sendIndex = 0;
+	char buff[128] {};
 
-	C3DMap* pMap   = m_pMain->GetMapByIndex(m_sZoneIndex);
+	C3DMap* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 		return;
 
-	SetByte(buff, WIZ_NPC_INOUT, send_index);
-	SetByte(buff, NPC_OUT, send_index);
-	SetShort(buff, m_sNid, send_index);
+	SetByte(buff, WIZ_NPC_INOUT, sendIndex);
+	SetByte(buff, NPC_OUT, sendIndex);
+	SetShort(buff, m_sNid, sendIndex);
 
 	// x 축으로 이동되었을때...
 	if (del_x != 0)
 	{
 		m_pMain->Send_UnitRegion(
-			pMap, buff, send_index, m_sRegion_X + del_x * 2, m_sRegion_Z + del_z - 1);
+			pMap, buff, sendIndex, m_sRegion_X + del_x * 2, m_sRegion_Z + del_z - 1);
 		m_pMain->Send_UnitRegion(
-			pMap, buff, send_index, m_sRegion_X + del_x * 2, m_sRegion_Z + del_z);
+			pMap, buff, sendIndex, m_sRegion_X + del_x * 2, m_sRegion_Z + del_z);
 		m_pMain->Send_UnitRegion(
-			pMap, buff, send_index, m_sRegion_X + del_x * 2, m_sRegion_Z + del_z + 1);
+			pMap, buff, sendIndex, m_sRegion_X + del_x * 2, m_sRegion_Z + del_z + 1);
 
 		// TRACE(_T("Remove : (%d %d), (%d %d), (%d %d)\n"), m_sRegion_X+del_x*2, m_sRegion_Z+del_z-1, m_sRegion_X+del_x*2, m_sRegion_Z+del_z, m_sRegion_X+del_x*2, m_sRegion_Z+del_z+1 );
 	}
@@ -176,25 +176,25 @@ void CNpc::RemoveRegion(int del_x, int del_z)
 	if (del_z != 0)
 	{
 		m_pMain->Send_UnitRegion(
-			pMap, buff, send_index, m_sRegion_X + del_x, m_sRegion_Z + del_z * 2);
+			pMap, buff, sendIndex, m_sRegion_X + del_x, m_sRegion_Z + del_z * 2);
 
 		// x, z 축 둘다 이동되었을때 겹치는 부분 한번만 보낸다..
 		if (del_x < 0)
 		{
 			m_pMain->Send_UnitRegion(
-				pMap, buff, send_index, m_sRegion_X + del_x + 1, m_sRegion_Z + del_z * 2);
+				pMap, buff, sendIndex, m_sRegion_X + del_x + 1, m_sRegion_Z + del_z * 2);
 		}
 		else if (del_x > 0)
 		{
 			m_pMain->Send_UnitRegion(
-				pMap, buff, send_index, m_sRegion_X + del_x - 1, m_sRegion_Z + del_z * 2);
+				pMap, buff, sendIndex, m_sRegion_X + del_x - 1, m_sRegion_Z + del_z * 2);
 		}
 		else
 		{
 			m_pMain->Send_UnitRegion(
-				pMap, buff, send_index, m_sRegion_X + del_x - 1, m_sRegion_Z + del_z * 2);
+				pMap, buff, sendIndex, m_sRegion_X + del_x - 1, m_sRegion_Z + del_z * 2);
 			m_pMain->Send_UnitRegion(
-				pMap, buff, send_index, m_sRegion_X + del_x + 1, m_sRegion_Z + del_z * 2);
+				pMap, buff, sendIndex, m_sRegion_X + del_x + 1, m_sRegion_Z + del_z * 2);
 
 			// TRACE(_T("Remove : (%d %d), (%d %d), (%d %d)\n"), m_sRegion_X+del_x-1, m_sRegion_Z+del_z*2, m_sRegion_X+del_x, m_sRegion_Z+del_z*2, m_sRegion_X+del_x+1, m_sRegion_Z+del_z*2 );
 		}
@@ -203,24 +203,24 @@ void CNpc::RemoveRegion(int del_x, int del_z)
 
 void CNpc::InsertRegion(int del_x, int del_z)
 {
-	int send_index = 0;
-	char buff[128] = {};
+	int sendIndex = 0;
+	char buff[128] {};
 
-	C3DMap* pMap   = m_pMain->GetMapByIndex(m_sZoneIndex);
+	C3DMap* pMap = m_pMain->GetMapByIndex(m_sZoneIndex);
 	if (pMap == nullptr)
 		return;
 
-	SetByte(buff, WIZ_NPC_INOUT, send_index);
-	SetByte(buff, NPC_IN, send_index);
-	SetShort(buff, m_sNid, send_index);
-	GetNpcInfo(buff, send_index);
+	SetByte(buff, WIZ_NPC_INOUT, sendIndex);
+	SetByte(buff, NPC_IN, sendIndex);
+	SetShort(buff, m_sNid, sendIndex);
+	GetNpcInfo(buff, sendIndex);
 
 	// x 축으로 이동되었을때...
 	if (del_x != 0)
 	{
-		m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x, m_sRegion_Z - 1);
-		m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x, m_sRegion_Z);
-		m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + del_x, m_sRegion_Z + 1);
+		m_pMain->Send_UnitRegion(pMap, buff, sendIndex, m_sRegion_X + del_x, m_sRegion_Z - 1);
+		m_pMain->Send_UnitRegion(pMap, buff, sendIndex, m_sRegion_X + del_x, m_sRegion_Z);
+		m_pMain->Send_UnitRegion(pMap, buff, sendIndex, m_sRegion_X + del_x, m_sRegion_Z + 1);
 
 		// TRACE(_T("Insert : (%d %d), (%d %d), (%d %d)\n"), m_sRegion_X+del_x, m_sRegion_Z-1, m_sRegion_X+del_x, m_sRegion_Z, m_sRegion_X+del_x, m_sRegion_Z+1 );
 	}
@@ -228,21 +228,21 @@ void CNpc::InsertRegion(int del_x, int del_z)
 	// z 축으로 이동되었을때...
 	if (del_z != 0)
 	{
-		m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X, m_sRegion_Z + del_z);
+		m_pMain->Send_UnitRegion(pMap, buff, sendIndex, m_sRegion_X, m_sRegion_Z + del_z);
 
 		// x, z 축 둘다 이동되었을때 겹치는 부분 한번만 보낸다..
 		if (del_x < 0)
 		{
-			m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + 1, m_sRegion_Z + del_z);
+			m_pMain->Send_UnitRegion(pMap, buff, sendIndex, m_sRegion_X + 1, m_sRegion_Z + del_z);
 		}
 		else if (del_x > 0)
 		{
-			m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X - 1, m_sRegion_Z + del_z);
+			m_pMain->Send_UnitRegion(pMap, buff, sendIndex, m_sRegion_X - 1, m_sRegion_Z + del_z);
 		}
 		else
 		{
-			m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X - 1, m_sRegion_Z + del_z);
-			m_pMain->Send_UnitRegion(pMap, buff, send_index, m_sRegion_X + 1, m_sRegion_Z + del_z);
+			m_pMain->Send_UnitRegion(pMap, buff, sendIndex, m_sRegion_X - 1, m_sRegion_Z + del_z);
+			m_pMain->Send_UnitRegion(pMap, buff, sendIndex, m_sRegion_X + 1, m_sRegion_Z + del_z);
 
 			// TRACE(_T("Insert : (%d %d), (%d %d), (%d %d)\n"), m_sRegion_X-1, m_sRegion_Z+del_z, m_sRegion_X, m_sRegion_Z+del_z, m_sRegion_X+1, m_sRegion_Z+del_z );
 		}

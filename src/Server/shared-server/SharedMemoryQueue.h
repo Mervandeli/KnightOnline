@@ -7,7 +7,7 @@
 
 constexpr int SMQ_ERROR_RANGE = 10000;
 
-enum e_SharedMemQueueError
+enum e_SharedMemQueueError : int16_t
 {
 	SMQ_OK   = 1,
 	SMQ_FULL = SMQ_ERROR_RANGE,

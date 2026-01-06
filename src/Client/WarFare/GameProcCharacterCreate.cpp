@@ -17,20 +17,14 @@
 
 #include <N3Base/N3UIString.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 CGameProcCharacterCreate::CGameProcCharacterCreate()
 {
 	m_pUICharacterCreate         = nullptr;
 
 	s_pPlayer->m_InfoBase.eRace  = RACE_UNKNOWN;
 	s_pPlayer->m_InfoBase.eClass = CLASS_UNKNOWN;
+
+	m_rcChr                      = {};
 }
 
 CGameProcCharacterCreate::~CGameProcCharacterCreate()
@@ -211,48 +205,51 @@ bool CGameProcCharacterCreate::MsgSendCharacterCreate()
 		{
 			// CompadmreString(LOCALE_USER_DEFAULT, NORM_IGNOREWIDTH, id, strlen(id), pUser->m_UserId, strlen(pUser->m_UserId) ) == CSTR_EQUAL )
 			switch (c)
-			case '~':
-			case '`':
-			case '!':
-			case '@':
-			case '#':
-			case '$':
-			case '%':
-			case '^':
-			case '&':
-			case '*':
-			case '(':
-			case ')':
-			// case '_':
-			case '-':
-			case '+':
-			case '=':
-			case '|':
-			case '\\':
-			case '<':
-			case '>':
-			case ',':
-			case '.':
-			case '?':
-			case '/':
-			case '{':
-			case '[':
-			case '}':
-			case ']':
-			case '\"':
-			case '\'':
-			case ' ':
 			{
-				bHasSpecialLetter = true;
-				eErrCode          = ERROR_CHARACTER_CREATE_INVALID_NAME_HAS_SPECIAL_LETTER;
+				case '~':
+				case '`':
+				case '!':
+				case '@':
+				case '#':
+				case '$':
+				case '%':
+				case '^':
+				case '&':
+				case '*':
+				case '(':
+				case ')':
+				// case '_':
+				case '-':
+				case '+':
+				case '=':
+				case '|':
+				case '\\':
+				case '<':
+				case '>':
+				case ',':
+				case '.':
+				case '?':
+				case '/':
+				case '{':
+				case '[':
+				case '}':
+				case ']':
+				case '\"':
+				case '\'':
+				case ' ':
+					bHasSpecialLetter = true;
+					eErrCode          = ERROR_CHARACTER_CREATE_INVALID_NAME_HAS_SPECIAL_LETTER;
+					break;
+
+				default:
+					break;
 			}
-			break;
 		}
 
 		if (!bHasSpecialLetter)
 		{
-			__InfoPlayerBase* pInfoBase  = &(s_pPlayer->m_InfoBase);
-			__InfoPlayerMySelf* pInfoExt = &(s_pPlayer->m_InfoExt);
+			__InfoPlayerBase* pInfoBase  = &s_pPlayer->m_InfoBase;
+			__InfoPlayerMySelf* pInfoExt = &s_pPlayer->m_InfoExt;
 
 			uint8_t byBuff[64];
 			int iOffset = 0;
@@ -260,8 +257,8 @@ bool CGameProcCharacterCreate::MsgSendCharacterCreate()
 			CAPISocket::MP_AddByte(byBuff, iOffset, CGameProcedure::s_iChrSelectIndex);    // 캐릭터 인덱스 b
 			CAPISocket::MP_AddShort(byBuff, iOffset, static_cast<int16_t>(szID.length())); // Id 길이 s
 			CAPISocket::MP_AddString(byBuff, iOffset, s_pPlayer->IDString());              // ID 문자열 str
-			CAPISocket::MP_AddByte(byBuff, iOffset, s_pPlayer->m_InfoBase.eRace);          // 종족 b
-			CAPISocket::MP_AddShort(byBuff, iOffset, s_pPlayer->m_InfoBase.eClass);        // 직업 b
+			CAPISocket::MP_AddByte(byBuff, iOffset, pInfoBase->eRace);                     // 종족 b
+			CAPISocket::MP_AddShort(byBuff, iOffset, pInfoBase->eClass);                   // 직업 b
 			CAPISocket::MP_AddByte(byBuff, iOffset, pInfoExt->iFace);                      // 얼굴모양 b
 			CAPISocket::MP_AddByte(byBuff, iOffset, pInfoExt->iHair);                      // 머리모양 b
 			CAPISocket::MP_AddByte(byBuff, iOffset, pInfoExt->iStrength);                  // 힘 b
@@ -322,24 +319,27 @@ bool CGameProcCharacterCreate::ProcessPacket(Packet& pkt)
 
 	pkt.rpos(rpos);
 
-	int iCmd = pkt.read<uint8_t>();                                                   // 커멘드 파싱..
-	switch (iCmd)                                                                     // 커멘드에 다라서 분기..
+	int iCmd = pkt.read<uint8_t>();                                             // 커멘드 파싱..
+	switch (iCmd)                                                               // 커멘드에 다라서 분기..
 	{
-		case WIZ_NEW_CHAR:                                                            // 캐릭터 선택 메시지..
+		case WIZ_NEW_CHAR:                                                      // 캐릭터 선택 메시지..
 		{
-			uint8_t bySuccess = pkt.read<uint8_t>();                                  // 커멘드 파싱..
+			uint8_t bySuccess = pkt.read<uint8_t>();                            // 커멘드 파싱..
 			if (0 == bySuccess)
 			{
-				ProcActiveSet((CGameProcedure*) s_pProcCharacterSelect);              // 캐릭터 선택창으로 가기..
+				ProcActiveSet((CGameProcedure*) s_pProcCharacterSelect);        // 캐릭터 선택창으로 가기..
 			}
-			else                                                                      // 실패하면.. 이유가 0 이 아닌 값으로 온다..
+			else                                                                // 실패하면.. 이유가 0 이 아닌 값으로 온다..
 			{
-				this->ReportErrorCharacterCreate((e_ErrorCharacterCreate) bySuccess); // 에러 메시지 띄움..
-				s_pUIMgr->EnableOperationSet(false); // UI 조작 가능하게 한다... 다시 캐릭터 만들어야 한다..
+				ReportErrorCharacterCreate((e_ErrorCharacterCreate) bySuccess); // 에러 메시지 띄움..
+				s_pUIMgr->EnableOperationSet(false);                            // UI 조작 가능하게 한다... 다시 캐릭터 만들어야 한다..
 			}
-			s_pUIMgr->EnableOperationSet(false);     // 패킷이 들어올때까지 UI 를 Disable 시킨다...
+			s_pUIMgr->EnableOperationSet(false);                                // 패킷이 들어올때까지 UI 를 Disable 시킨다...
 		}
 			return true;
+
+		default:
+			break;
 	}
 
 	return false;

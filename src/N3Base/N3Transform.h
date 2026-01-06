@@ -5,9 +5,7 @@
 #if !defined(AFX_N3Transform_h__INCLUDED_)
 #define AFX_N3Transform_h__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "N3BaseFileAccess.h"
 #include "N3AnimKey.h"
@@ -31,17 +29,20 @@ public:
 
 public:
 	virtual void Tick(float fFrm = FRAME_SELFPLAY);
-	virtual bool TickAnimationKey(float
-			fFrm); // Animation Key Tick... Animation Key 가 있어 움직이면 true, 아니면 false 를 return;
+
+	// Animation Key Tick... Animation Key 가 있어 움직이면 true, 아니면 false 를 return;
+	virtual bool TickAnimationKey(float fFrm);
 
 	const __Vector3& Pos() const
 	{
 		return m_vPos;
 	}
+
 	const __Quaternion& Rot() const
 	{
 		return m_qRot;
 	}
+
 	const __Vector3& Scale() const
 	{
 		return m_vScale;
@@ -52,31 +53,37 @@ public:
 		m_vPos = v;
 		ReCalcMatrix();
 	}
+
 	virtual void PosSet(float x, float y, float z)
 	{
 		m_vPos.Set(x, y, z);
 		ReCalcMatrix();
 	}
+
 	virtual void RotSet(const __Quaternion& q)
 	{
 		m_qRot = q;
 		ReCalcMatrix();
 	}
+
 	virtual void RotSet(float x, float y, float z, float w)
 	{
 		m_qRot.x = x, m_qRot.y = y, m_qRot.z = z, m_qRot.w = w;
 		ReCalcMatrix();
 	}
+
 	virtual void ScaleSet(const __Vector3& v)
 	{
 		m_vScale = v;
 		ReCalcMatrix();
 	}
+
 	virtual void ScaleSet(float x, float y, float z)
 	{
 		m_vScale.Set(x, y, z);
 		ReCalcMatrix();
 	}
+
 	virtual void ReCalcMatrix();
 
 	bool Load(File& file) override;

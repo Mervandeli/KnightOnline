@@ -9,11 +9,13 @@
 #include <inttypes.h>
 #include <cmath>
 
+#include <spdlog/fmt/bundled/format.h>
+
 #if defined(_N3TOOL)
 #include <afx.h>
-#else
-#include "DebugUtils.h"
 #endif
+
+#include "DebugUtils.h"
 
 #include <MathUtils/MathUtils.h>
 
@@ -26,8 +28,8 @@ public:
 	__ColorValue(D3DCOLOR cr);
 	__ColorValue(float r2, float g2, float b2, float a2);
 
-	void operator=(const D3DCOLORVALUE& cv);
-	void operator=(D3DCOLOR cr);
+	__ColorValue& operator=(const D3DCOLORVALUE& cv);
+	__ColorValue& operator=(D3DCOLOR cr);
 	void Set(float r2, float g2, float b2, float a2);
 
 	D3DCOLOR ToD3DCOLOR() const;
@@ -115,19 +117,19 @@ struct __D3DLight9
 		return reinterpret_cast<const _D3DLIGHT9*>(this);
 	}
 
-	D3DLIGHTTYPE Type;     /* Type of light source */
-	__ColorValue Diffuse;  /* Diffuse color of light */
-	__ColorValue Specular; /* Specular color of light */
-	__ColorValue Ambient;  /* Ambient color of light */
-	__Vector3 Position;    /* Position in world space */
-	__Vector3 Direction;   /* Direction in world space */
-	float Range;           /* Cutoff range */
-	float Falloff;         /* Falloff */
-	float Attenuation0;    /* Constant attenuation */
-	float Attenuation1;    /* Linear attenuation */
-	float Attenuation2;    /* Quadratic attenuation */
-	float Theta;           /* Inner angle of spotlight cone */
-	float Phi;             /* Outer angle of spotlight cone */
+	D3DLIGHTTYPE Type     = D3DLIGHT_POINT; /* Type of light source */
+	__ColorValue Diffuse  = {};             /* Diffuse color of light */
+	__ColorValue Specular = {};             /* Specular color of light */
+	__ColorValue Ambient  = {};             /* Ambient color of light */
+	__Vector3 Position    = {};             /* Position in world space */
+	__Vector3 Direction   = {};             /* Direction in world space */
+	float Range           = 0.0f;           /* Cutoff range */
+	float Falloff         = 0.0f;           /* Falloff */
+	float Attenuation0    = 0.0f;           /* Constant attenuation */
+	float Attenuation1    = 0.0f;           /* Linear attenuation */
+	float Attenuation2    = 0.0f;           /* Quadratic attenuation */
+	float Theta           = 0.0f;           /* Inner angle of spotlight cone */
+	float Phi             = 0.0f;           /* Outer angle of spotlight cone */
 };
 
 struct __VertexColor : public __Vector3
@@ -152,7 +154,7 @@ public:
 		color = sColor;
 	}
 
-	const __VertexColor& operator=(const __Vector3& vec)
+	__VertexColor& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -409,7 +411,7 @@ public:
 		tv = v;
 	}
 
-	const __VertexXyzT1& operator=(const __Vector3& vec)
+	__VertexXyzT1& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -458,7 +460,7 @@ public:
 		tv2 = v2;
 	}
 
-	const __VertexXyzT2& operator=(const __Vector3& vec)
+	__VertexXyzT2& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -503,7 +505,7 @@ public:
 		n.z = nzz;
 	}
 
-	const __VertexXyzNormal& operator=(const __Vector3& vec)
+	__VertexXyzNormal& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -596,7 +598,7 @@ public:
 		tv    = v;
 	}
 
-	const __VertexXyzColorT1& operator=(const __Vector3& vec)
+	__VertexXyzColorT1& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -647,7 +649,7 @@ public:
 		tv2   = v2;
 	}
 
-	const __VertexXyzColorT2& operator=(const __Vector3& vec)
+	__VertexXyzColorT2& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -691,7 +693,7 @@ public:
 		color = sColor;
 	}
 
-	const __VertexXyzColor& operator=(const __Vector3& vec)
+	__VertexXyzColor& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -738,7 +740,7 @@ public:
 		color = sColor;
 	}
 
-	const __VertexXyzNormalColor& operator=(const __Vector3& vec)
+	__VertexXyzNormalColor& operator=(const __Vector3& vec)
 	{
 		x = vec.x;
 		y = vec.y;
@@ -799,15 +801,16 @@ constexpr uint32_t OBJ_ANIM_CONTROL         = 0x40000000;
 #else
 #include "CrtDbg.h"
 
+// NOLINTBEGIN(cppcoreguidelines-pro-type-vararg,cppcoreguidelines-macro-usage)
 #define __ASSERT(expr, expMessage)                                                               \
 	if (!(expr))                                                                                 \
 	{                                                                                            \
 		_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, "N3 Custom Assert Function", expMessage); \
-		char __szErr[512] = {};                                                                  \
-		snprintf(__szErr, sizeof(__szErr), "%s(%d): %s\n", __FILE__, __LINE__, expMessage);      \
-		OutputDebugStringA(__szErr);                                                             \
+		FormattedDebugString("{}({}): {}\n", __FILE__, __LINE__, expMessage);                    \
 		_CrtDbgBreak();                                                                          \
 	}
+// NOLINTEND(cppcoreguidelines-pro-type-vararg,cppcoreguidelines-macro-usage)
+
 #endif
 
 D3DCOLOR _RGB_To_D3DCOLOR(COLORREF cr, uint32_t dwAlpha);

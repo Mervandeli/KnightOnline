@@ -51,10 +51,6 @@ void AujardReadQueueThread::process_packet(const char* buffer, int /*len*/)
 			appInstance->KnightsPacket(buffer + index);
 			break;
 
-		case WIZ_CLAN_PROCESS:
-			appInstance->KnightsPacket(buffer + index);
-			break;
-
 		case WIZ_LOGIN_INFO:
 			appInstance->SetLogInInfo(buffer + index);
 			break;
@@ -73,6 +69,11 @@ void AujardReadQueueThread::process_packet(const char* buffer, int /*len*/)
 
 		case DB_HEARTBEAT:
 			appInstance->HeartbeatReceived();
+			break;
+
+		default:
+			spdlog::error(
+				"AujardReadQueueThread::process_packet: Unhandled opcode {:02X}", command);
 			break;
 	}
 }

@@ -5,6 +5,8 @@
 #if !defined(AFX_N3FXPMESH_H__18E8E609_322F_4F0F_839B_0411986DA76E__INCLUDED_)
 #define AFX_N3FXPMESH_H__18E8E609_322F_4F0F_839B_0411986DA76E__INCLUDED_
 
+#pragma once
+
 #include "N3BaseFileAccess.h"
 #include "N3PMesh.h"
 
@@ -22,7 +24,8 @@ public:
 	bool Load(File& file) override;
 	void SetColor(uint32_t dwColor = 0xffffffff);
 	HRESULT Create(int iNumVertices, int iNumIndices);
-	void operator=(const CN3FXPMesh& fxPMesh);
+	CN3FXPMesh& operator=(const CN3FXPMesh& fxPMesh);
+
 	__VertexXyzColorT1* GetColorVertices()
 	{
 		return m_pColorVertices;

@@ -5,6 +5,8 @@
 #include "NpcThread.h"
 #include "RoomEvent.h"
 
+using namespace std::chrono_literals;
+
 ZoneEventThread::ZoneEventThread() : Thread()
 {
 	_main = AIServerApp::instance();
@@ -12,7 +14,7 @@ ZoneEventThread::ZoneEventThread() : Thread()
 
 void ZoneEventThread::thread_loop()
 {
-	while (_canTick)
+	while (CanTick())
 	{
 		double fCurrentTime = TimeGet();
 		for (MAP* pMap : _main->_zones)
@@ -43,6 +45,6 @@ void ZoneEventThread::thread_loop()
 			}
 		}
 
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::this_thread::sleep_for(1s);
 	}
 }

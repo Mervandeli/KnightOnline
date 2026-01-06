@@ -7,7 +7,9 @@
 #if defined(_DEBUG)
 #include <iostream>
 #endif
+
 #include <string>
+#include <string_view>
 
 #include <shared/globals.h>
 #include <shared-server/STLMap.h>
@@ -20,18 +22,13 @@ constexpr int DB_PROCESS_TIMEOUT = 100;
 ////////////////////////////////////////////////////////////
 // Socket Define
 ////////////////////////////////////////////////////////////
-#define SOCKET_BUFF_SIZE   (1024 * 16)
-#define MAX_PACKET_SIZE    (1024 * 8)
+constexpr int SOCKET_BUFF_SIZE   = 1024 * 16;
+constexpr int MAX_PACKET_SIZE    = 1024 * 8;
 
-#define PACKET_START1      0XAA
-#define PACKET_START2      0X55
-#define PACKET_END1        0X55
-#define PACKET_END2        0XAA
-
-// status
-#define STATE_CONNECTED    0X01
-#define STATE_DISCONNECTED 0X02
-////////////////////////////////////////////////////////////
+constexpr uint8_t PACKET_START1  = 0xAA;
+constexpr uint8_t PACKET_START2  = 0x55;
+constexpr uint8_t PACKET_END1    = 0x55;
+constexpr uint8_t PACKET_END2    = 0xAA;
 
 typedef union
 {
@@ -50,11 +47,11 @@ struct _NEWS
 
 struct _SERVER_INFO
 {
-	char strServerIP[20]   = {};
-	char strServerName[20] = {};
-	int16_t sUserCount     = 0;
-	int16_t sUserLimit     = 0;
-	int16_t sServerID      = 1;
+	std::string strServerIP;
+	std::string strServerName;
+	int16_t sUserCount = 0;
+	int16_t sUserLimit = 0;
+	int16_t sServerID  = 1;
 };
 
 typedef CSTLMap<model::Version> VersionInfoList;
@@ -63,19 +60,19 @@ typedef CSTLMap<model::Version> VersionInfoList;
 namespace ini
 {
 // ODBC Config Section
-static constexpr char ODBC[]        = "ODBC";
-static constexpr char DSN[]         = "DSN";
-static constexpr char UID[]         = "UID";
-static constexpr char PWD[]         = "PWD";
+static constexpr std::string_view ODBC        = "ODBC";
+static constexpr std::string_view DSN         = "DSN";
+static constexpr std::string_view UID         = "UID";
+static constexpr std::string_view PWD         = "PWD";
 
 // SERVER_LIST section
-static constexpr char SERVER_LIST[] = "SERVER_LIST";
-static constexpr char COUNT[]       = "COUNT";
+static constexpr std::string_view SERVER_LIST = "SERVER_LIST";
+static constexpr std::string_view COUNT       = "COUNT";
 
 // Download section
-static constexpr char DOWNLOAD[]    = "DOWNLOAD";
-static constexpr char URL[]         = "URL";
-static constexpr char PATH[]        = "PATH";
+static constexpr std::string_view DOWNLOAD    = "DOWNLOAD";
+static constexpr std::string_view URL         = "URL";
+static constexpr std::string_view PATH        = "PATH";
 } // namespace ini
 
 #endif // SERVER_VERSIONMANAGER_DEFINE_H

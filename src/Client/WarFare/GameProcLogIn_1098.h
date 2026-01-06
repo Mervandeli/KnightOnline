@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef CLIENT_WARFARE_GAMEPROCLOGIN_1098_H
+#define CLIENT_WARFARE_GAMEPROCLOGIN_1098_H
+
+#pragma once
 
 #if defined(LOGIN_SCENE_VERSION) && LOGIN_SCENE_VERSION == 1098
 
@@ -51,3 +54,5 @@ class CGameProcLogIn : public CGameProcLogIn_1098
 };
 
 #endif
+
+#endif // CLIENT_WARFARE_GAMEPROCLOGIN_1098_H

@@ -6,27 +6,22 @@
 #include "N3UIImage.h"
 #include "N3UIProgress.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 CN3UIProgress::CN3UIProgress()
 {
 	m_eType        = UI_TYPE_PROGRESS;
 
 	m_pBkGndImgRef = nullptr;
 	m_pFrGndImgRef = nullptr;
-	ZeroMemory(&m_frcFrGndImgUV, sizeof(m_frcFrGndImgUV));
-	m_iMaxValue = m_iMinValue = 0;
-	m_iValueToReach           = 0;
-	m_fCurValue               = 0;
-	m_fChangeSpeedPerSec      = 0;
-	m_fTimeToDelay            = 0; // 지연시간..
+
+	memset(&m_frcFrGndImgUV, 0, sizeof(m_frcFrGndImgUV));
+
+	m_iMinValue          = 0;
+	m_iMaxValue          = 0;
+	m_iValueToReach      = 0;
+	m_fCurValue          = 0;
+	m_fChangeSpeedPerSec = 0;
+	m_fTimeToDelay       = 0; // 지연시간..
+	m_iStepValue         = 0;
 }
 
 CN3UIProgress::~CN3UIProgress()
@@ -214,27 +209,34 @@ bool CN3UIProgress::Load(File& file)
 }
 
 #ifdef _N3TOOL
-void CN3UIProgress::operator=(const CN3UIProgress& other)
+CN3UIProgress& CN3UIProgress::operator=(const CN3UIProgress& other)
 {
+	if (this == &other)
+		return *this;
+
 	CN3UIBase::operator=(other);
 
-	m_frcFrGndImgUV = other.m_frcFrGndImgUV; // m_FrGndImgRef 의 uv좌표
-	m_iMaxValue     = other.m_iMaxValue;     // 최대
-	m_iMinValue     = other.m_iMinValue;     // 최소
-	m_fCurValue     = other.m_fCurValue; // 현재 값 - 부드럽게 점차 값을 올려가려고 float 로 했다..
-	m_fChangeSpeedPerSec =
-		other.m_fChangeSpeedPerSec;      // 현재값이 변해야 되는 속도.. Unit SpeedPerSec
-	m_iValueToReach =
-		other.m_iValueToReach;           // 도달해야 될값 - 부드럽게 값이 올라가는 경우에 필요하다..
-	m_fTimeToDelay = other.m_fTimeToDelay; // 지연시간..
-	m_iStepValue   = other.m_iStepValue;   // 변화값 StepIt()을 통한 변화되는 값
+	m_frcFrGndImgUV      = other.m_frcFrGndImgUV; // m_FrGndImgRef 의 uv좌표
+	m_iMaxValue          = other.m_iMaxValue;     // 최대
+	m_iMinValue          = other.m_iMinValue;     // 최소
+
+	// 현재 값 - 부드럽게 점차 값을 올려가려고 float 로 했다..
+	m_fCurValue          = other.m_fCurValue;
+
+	// 현재값이 변해야 되는 속도.. Unit SpeedPerSec
+	m_fChangeSpeedPerSec = other.m_fChangeSpeedPerSec;
+
+	// 도달해야 될값 - 부드럽게 값이 올라가는 경우에 필요하다..
+	m_iValueToReach      = other.m_iValueToReach;
+	m_fTimeToDelay       = other.m_fTimeToDelay; // 지연시간..
+	m_iStepValue         = other.m_iStepValue;   // 변화값 StepIt()을 통한 변화되는 값
 
 	// m_ImageRef 설정하기
-	for (UIListItor itor = m_Children.begin(); m_Children.end() != itor; ++itor)
+	for (CN3UIBase* pChild : m_Children)
 	{
-		CN3UIBase* pChild = (*itor);
 		if (UI_TYPE_IMAGE != pChild->UIType())
 			continue; // image만 골라내기
+
 		int iImageType = (int) (pChild->GetReserved());
 		if (iImageType == IMAGETYPE_BKGND)
 		{
@@ -245,7 +247,10 @@ void CN3UIProgress::operator=(const CN3UIProgress& other)
 			m_pFrGndImgRef = (CN3UIImage*) pChild;
 		}
 	}
+
 	SetFrGndUVFromFrGndImage();
+
+	return *this;
 }
 
 bool CN3UIProgress::Save(File& file)

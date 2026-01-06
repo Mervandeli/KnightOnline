@@ -4,11 +4,6 @@
 #include "StdAfxBase.h"
 #include "N3Transform.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 CN3Transform::CN3Transform()
 {
 	m_dwType |= OBJ_TRANSFORM;
@@ -43,7 +38,7 @@ void CN3Transform::Release()
 	m_KeyRot.Release();
 	m_KeyScale.Release();
 
-	CN3Base::Release();
+	CN3BaseFileAccess::Release();
 }
 
 bool CN3Transform::Load(File& file)
@@ -104,24 +99,25 @@ void CN3Transform::Tick(float fFrm)
 	if (FRAME_SELFPLAY == fFrm)
 	{
 		m_fFrmCur += s_fSecPerFrm;
+
 		if (m_fFrmCur < 0)
 			m_fFrmCur = 0.0f;
+
 		if (m_fFrmCur >= m_fFrmWhole)
 			m_fFrmCur = 0.0f;
-		fFrm = m_fFrmCur;
 	}
 	else
 	{
 		m_fFrmCur = fFrm;
 	}
 
-	bool bNdeedReCalcMatrix = this->TickAnimationKey(m_fFrmCur);
+	bool bNdeedReCalcMatrix = TickAnimationKey(m_fFrmCur);
 
 	if (m_dwType & OBJ_JOINT)
 		return; // Joint 일 경우는 행렬을 계산하는 방법이 다르기 땜시 넘어간다..
 
 	if (bNdeedReCalcMatrix)
-		this->ReCalcMatrix();
+		ReCalcMatrix();
 }
 
 void CN3Transform::ReCalcMatrix()

@@ -1,6 +1,9 @@
-﻿#pragma once
+﻿#ifndef N3BASE_STDAFX_H
+#define N3BASE_STDAFX_H
+
+#pragma once
 
 #include "My_3DStruct.h"
 #include <filesystem>
 
-#include <spdlog/fmt/bundled/format.h>
+#endif // N3BASE_STDAFX_H

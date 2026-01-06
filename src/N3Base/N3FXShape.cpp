@@ -5,15 +5,6 @@
 #include "StdAfxBase.h"
 #include "N3FXShape.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-//////////////////////////////////////////////////////////////////////
-//	CN3FXSPart class.....
-//////////////////////////////////////////////////////////////////////
-
 CN3FXSPart::CN3FXSPart()
 {
 	m_vPivot.Set(0, 0, 0);
@@ -89,14 +80,6 @@ CN3Texture* CN3FXSPart::TexSet(int iIndex, const std::string& szFN)
 	s_MngTex.Delete(&m_TexRefs[iIndex]);
 	m_TexRefs[iIndex] = s_MngTex.Get(szFN);
 	return m_TexRefs[iIndex];
-}
-
-void CN3FXSPart::TexSet(int iIndex, CN3Texture* pTex)
-{
-	if (iIndex < 0 || iIndex >= static_cast<int>(m_TexRefs.size()))
-		return;
-
-	s_MngTex.Delete(&m_TexRefs[iIndex]);
 }
 
 // timeGetTime 으로 얻은 값을 넣으면 Texture Animation 을 컨트롤 한다..
@@ -206,7 +189,7 @@ void CN3FXSPart::Render()
 	s_lpD3DDev->GetTransform(D3DTS_WORLD, mtx.toD3D());
 	s_lpD3DDev->SetTransform(D3DTS_WORLD, m_WorldMtx.toD3D());
 
-	DWORD dwCullMode, dwZWriteEnable, dwZBufferEnable, dwLight;
+	DWORD dwCullMode = 0, dwZWriteEnable = 0, dwZBufferEnable = 0, dwLight = 0;
 	s_lpD3DDev->GetRenderState(D3DRS_ZWRITEENABLE, &dwZWriteEnable);
 	s_lpD3DDev->GetRenderState(D3DRS_ZENABLE, &dwZBufferEnable);
 	s_lpD3DDev->GetRenderState(D3DRS_CULLMODE, &dwCullMode);
@@ -291,19 +274,21 @@ void CN3FXSPart::Duplicate(CN3FXSPart* pSrc)
 
 	int iTC   = 0;
 	iTC       = pSrc->TexCount();
-	m_fTexFPS = m_fTexFPS;
+	m_fTexFPS = pSrc->m_fTexFPS;
 
 	m_TexRefs.clear();
-	this->TexAlloc(iTC);          // Texture Pointer Pointer 할당..
-	for (int j = 0; j < iTC; j++) // Texture Count 만큼 파일 이름 읽어서 텍스처 부르기..
+
+	TexAlloc(iTC);
+	for (int j = 0; j < iTC; j++)
 	{
-		if (pSrc->Tex(j))
-			m_TexRefs[j] = s_MngTex.Get(pSrc->Tex(j)->FileName());
+		CN3Texture* pTex = pSrc->Tex(j);
+		if (pTex != nullptr)
+			m_TexRefs[j] = s_MngTex.Get(pTex->FileName());
 	}
 	return;
 }
 
-bool CN3FXSPart::Save(File& file)
+bool CN3FXSPart::Save(File& /*file*/)
 {
 	return true;
 }
@@ -360,8 +345,8 @@ void CN3FXShape::Release()
 
 void CN3FXShape::Tick(float fFrm)
 {
-	CN3TransformCollision::Tick(m_fFrmCur);
-	m_mtxFinalTransform = CN3Transform::m_Matrix * m_mtxParent;
+	CN3TransformCollision::Tick(fFrm);
+	m_mtxFinalTransform = m_Matrix * m_mtxParent;
 
 	for (CN3FXSPart* pPart : m_Parts)
 		pPart->Tick(m_mtxFinalTransform);
@@ -399,19 +384,19 @@ bool CN3FXShape::Load(File& file)
 		}
 	}
 
-	uint32_t dwTmp;
+	uint32_t dwTmp = 0;
 	file.Read(&dwTmp, 4); // 소속
 	file.Read(&dwTmp, 4); // 속성 0
 	file.Read(&dwTmp, 4); // 속성 1
 	file.Read(&dwTmp, 4); // 속성 2
 	file.Read(&dwTmp, 4); // 속성 3
 
-	this->FindMinMax();
+	FindMinMax();
 
 	return true;
 }
 
-bool CN3FXShape::Save(File& file)
+bool CN3FXShape::Save(File& /*file*/)
 {
 	/*
 	CN3TransformCollision::Save(file); // 기본정보 읽기...
@@ -587,7 +572,7 @@ void CN3FXShape::SetPartsMtl(BOOL bAlpha, uint32_t dwSrcBlend, uint32_t dwDestBl
 	uint32_t dwRenderFlag = RF_ALPHABLENDING | RF_NOTUSEFOG | RF_DIFFUSEALPHA | RF_NOTUSELIGHT
 							| RF_DOUBLESIDED | RF_NOTZWRITE | RF_NOTZBUFFER;
 
-	if (m_dwZEnable == D3DZB_TRUE)
+	if (static_cast<D3DZBUFFERTYPE>(m_dwZEnable) == D3DZB_TRUE)
 		dwRenderFlag ^= RF_NOTZBUFFER;
 
 	if (m_dwZWrite == TRUE)

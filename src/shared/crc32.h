@@ -31,8 +31,14 @@ Functions for computing 32-bit CRC.
 
 #pragma once
 
+// This is a third party library written for C.
+// We can ignore it.
+// NOLINTBEGIN
+
 /* This computes a 32 bit CRC of the data in the buffer, and returns the
 CRC.  The polynomial used is 0xedb88320. */
 unsigned int crc32(const unsigned char* s, unsigned int len, unsigned int startVal = 0);
+
+// NOLINTEND
 
 #endif // SHARED_CRC32_H

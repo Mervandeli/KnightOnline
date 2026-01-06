@@ -11,7 +11,7 @@
 #include "UICreateClanName.h"
 #include "UIPartyBBS.h"
 #include "GameEng.h"
-#include "GameProcLogin.h"
+#include "GameProcLogIn.h"
 #include "LocalInput.h"
 #include "UIMessageBoxManager.h"
 #include "SubProcPerTrade.h"
@@ -23,16 +23,6 @@
 #include <N3Base/N3UIString.h>
 #include <N3Base/N3UIEdit.h>
 #include <N3Base/N3Shape.h>
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CUIMessageBox::CUIMessageBox()
 {
@@ -89,9 +79,9 @@ bool CUIMessageBox::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 	if (dwMsg == UIMSG_BUTTON_CLICK)
 	{
-		CPlayerMySelf* pPlayer                   = CGameBase::s_pPlayer;
+		// CPlayerMySelf* pPlayer                 = CGameBase::s_pPlayer;
 		CGameProcMain* pProcMain                 = CGameProcedure::s_pProcMain;
-		CGameProcLogIn* pProcLogIn               = CGameProcedure::s_pProcLogIn;
+		// CGameProcLogIn* pProcLogIn             = CGameProcedure::s_pProcLogIn;
 		CGameProcCharacterSelect* pProcChrSelect = CGameProcedure::s_pProcCharacterSelect;
 		CN3Shape* pShape                         = CGameBase::s_pPlayer->m_pObjectTarget;
 
@@ -121,8 +111,8 @@ bool CUIMessageBox::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 						CGameProcedure::s_bNeedReportConnectionClosed = false; // 서버접속이 끊어진걸 보고해야 하는지..
 						CGameProcedure::s_pSocket->Disconnect();
 						Sleep(2000);                                           // 2초 딜레이.. 서버가 처리할 시간을 준다.
-						//CGameProcedure::s_pSocket->Connect(s_hWndBase, szIP.c_str(), dwPort);
-						CGameProcedure::s_bNeedReportConnectionClosed = true; // 서버접속이 끊어진걸 보고해야 하는지..
+						CGameProcedure::s_pSocket->Connect(s_hWndBase, szIP, dwPort);
+						CGameProcedure::s_bNeedReportConnectionClosed = true;  // 서버접속이 끊어진걸 보고해야 하는지..
 
 						CGameProcedure::MsgSend_GameServerLogIn();
 						CGameProcedure::ProcActiveSet((CGameProcedure*) CGameProcedure::s_pProcCharacterSelect); // 다시 캐릭터 고르자..
@@ -133,16 +123,10 @@ bool CUIMessageBox::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 					pProcMain->MsgSend_Regen();
 					break; // 부활 메시지 날리기..
 				case BEHAVIOR_PARTY_PERMIT:
-					pProcMain->MsgSend_PartyOrForcePermit(0, true);
+					pProcMain->MsgSend_PartyOrForcePermit(true);
 					break;
 				case BEHAVIOR_PARTY_DISBAND:
-					pProcMain->MsgSend_PartyOrForceLeave(0);
-					break;
-				case BEHAVIOR_FORCE_PERMIT:
-					pProcMain->MsgSend_PartyOrForcePermit(1, true);
-					break;
-				case BEHAVIOR_FORCE_DISBAND:
-					pProcMain->MsgSend_PartyOrForceLeave(1);
+					pProcMain->MsgSend_PartyOrForceLeave();
 					break;
 				case BEHAVIOR_REQUEST_BINDPOINT:
 					if (pShape)
@@ -193,38 +177,41 @@ bool CUIMessageBox::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 		}
 		else if (pSender == m_pBtn_No || pSender == m_pBtn_Cancel)
 		{
-			//this_ui
-			if (m_pParentUI)
+			if (m_pParentUI != nullptr)
 				m_pParentUI->CallBackProc(m_iChildID, 2);
 
-			this->SetVisible(false);
-			this->SetText("");
-			this->SetTitle("");
+			SetVisible(false);
+			SetText("");
+			SetTitle("");
 
 			switch (m_eBehavior)
 			{
 				case BEHAVIOR_PARTY_PERMIT:
-					pProcMain->MsgSend_PartyOrForcePermit(0, false);
+					pProcMain->MsgSend_PartyOrForcePermit(false);
 					break;
-				case BEHAVIOR_FORCE_PERMIT:
-					pProcMain->MsgSend_PartyOrForcePermit(1, false);
-					break;
+
 				case BEHAVIOR_PERSONAL_TRADE_PERMIT:
 					pProcMain->m_pSubProcPerTrade->LeavePerTradeState(PER_TRADE_RESULT_MY_DISAGREE);
 					break; // 내가 거절..
+
 				case BEHAVIOR_PERSONAL_TRADE_FMT_WAIT:
 					pProcMain->m_pSubProcPerTrade->LeavePerTradeState(PER_TRADE_RESULT_MY_CANCEL);
 					break; // 내가 취소..
+
 				case BEHAVIOR_CLAN_JOIN:
 					pProcMain->MsgSend_KnightsJoinReq(false);
+					break;
+
+				default:
 					break;
 			}
 		}
 
-		this->SetVisible(false);
-		this->SetText("");
-		this->SetTitle("");
-		this->SetVisibleEditControl(false);
+		SetVisible(false);
+		SetText("");
+		SetTitle("");
+		SetVisibleEditControl(false);
+
 		m_eBehavior = BEHAVIOR_NOTHING;
 		pSender->SetState(UI_STATE_BUTTON_NORMAL);
 	}
@@ -306,9 +293,13 @@ bool CUIMessageBox::OnKeyPress(int iKey)
 			case DIK_ESCAPE:
 				ReceiveMessage(m_pBtn_No, UIMSG_BUTTON_CLICK);
 				return true;
+
 			case DIK_RETURN:
 				ReceiveMessage(m_pBtn_Yes, UIMSG_BUTTON_CLICK);
 				return true;
+
+			default:
+				break;
 		}
 	}
 	else if (MB_CANCEL == m_iStyle)
@@ -319,6 +310,9 @@ bool CUIMessageBox::OnKeyPress(int iKey)
 			case DIK_RETURN:
 				ReceiveMessage(m_pBtn_Cancel, UIMSG_BUTTON_CLICK);
 				return true;
+
+			default:
+				break;
 		}
 	}
 	else if (MB_OK == m_iStyle)
@@ -329,6 +323,9 @@ bool CUIMessageBox::OnKeyPress(int iKey)
 			case DIK_RETURN:
 				ReceiveMessage(m_pBtn_OK, UIMSG_BUTTON_CLICK);
 				return true;
+
+			default:
+				break;
 		}
 	}
 

@@ -5,11 +5,8 @@
 #if !defined(AFX_N3UIWNDBASE_H__A30E8AD0_2EB8_4F27_8E0D_3E0979560761__INCLUDED_)
 #define AFX_N3UIWNDBASE_H__A30E8AD0_2EB8_4F27_8E0D_3E0979560761__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
-#include <N3Base/N3UIBase.h>
 #include <N3Base/N3UIArea.h>
 #include "N3UIIcon.h"
 #include "GameProcedure.h"
@@ -21,7 +18,7 @@
 //////////////////////////////////////////////////////////////////////
 
 // Wnd Info..
-enum e_UIWND
+enum e_UIWND : uint8_t
 {
 	UIWND_INVENTORY = 0,  // Inventory Wnd..
 	UIWND_TRANSACTION,    // Transaction Wnd..
@@ -35,7 +32,7 @@ enum e_UIWND
 };
 
 // District Info..
-enum e_UIWND_DISTRICT
+enum e_UIWND_DISTRICT : uint8_t
 {
 	UIWND_DISTRICT_INVENTORY_SLOT = 0, // Slot district of Inventory Wnd..
 	UIWND_DISTRICT_INVENTORY_INV,      // Inv district of Inventory Wnd..
@@ -50,7 +47,7 @@ enum e_UIWND_DISTRICT
 	UIWND_DISTRICT_UNKNOWN,            // District Unknown..
 };
 
-enum e_UIIconState
+enum e_UIIconState : uint8_t
 {
 	UIICON_SELECTED = 0,               // Icon Selected..
 	UIICON_NOT_SELECTED_BUT_HIGHLIGHT, // Icon Not Selected But Highlight..
@@ -65,7 +62,7 @@ struct __UIWndIconInfo
 };
 
 // enum Icon Type Info..//
-enum e_UIIconType
+enum e_UIIconType : uint8_t
 {
 	UIICON_TYPE_ITEM = 0, // Icon type item..
 	UIICON_TYPE_SKILL,    // Icon type skill..
@@ -74,45 +71,39 @@ enum e_UIIconType
 // Select Icon Info..
 struct __InfoSelectedIcon
 {
-	__UIWndIconInfo UIWndSelect;
-	__IconItemSkill* pItemSelect;
-
-	__InfoSelectedIcon()
-	{
-		UIWndSelect = {};
-		pItemSelect = nullptr;
-	}
+	__UIWndIconInfo UIWndSelect  = {};
+	__IconItemSkill* pItemSelect = nullptr;
 };
 
 // Recovery Job Info..
 struct __RecoveryJobInfo
 {
-	__IconItemSkill* pItemSource;
-	__UIWndIconInfo UIWndSourceStart;
-	__UIWndIconInfo UIWndSourceEnd;
-	__IconItemSkill* pItemTarget;
-	__UIWndIconInfo UIWndTargetStart;
-	__UIWndIconInfo UIWndTargetEnd;
-	int m_iPage;
+	__IconItemSkill* pItemSource     = nullptr;
+	__UIWndIconInfo UIWndSourceStart = {};
+	__UIWndIconInfo UIWndSourceEnd   = {};
+	__IconItemSkill* pItemTarget     = nullptr;
+	__UIWndIconInfo UIWndTargetStart = {};
+	__UIWndIconInfo UIWndTargetEnd   = {};
+	int m_iPage                      = 0;
 };
 
 struct __SkillSelectInfo
 {
-	e_UIWND UIWnd;
-	int iOrder;
-	__IconItemSkill* pSkillDoneInfo;
+	e_UIWND UIWnd                   = UIWND_UNKNOWN;
+	int iOrder                      = -1;
+	__IconItemSkill* pSkillDoneInfo = nullptr;
 };
 
-const int UIITEM_TYPE_ONLYONE         = 0;
-const int UIITEM_TYPE_COUNTABLE       = 1;
-const int UITEIM_TYPE_GOLD            = 2;
-const int UIITEM_TYPE_COUNTABLE_SMALL = 3;
-const int UIITEM_TYPE_SOMOONE         = 4;
+constexpr int UIITEM_TYPE_ONLYONE         = 0;
+constexpr int UIITEM_TYPE_COUNTABLE       = 1;
+constexpr int UITEIM_TYPE_GOLD            = 2;
+constexpr int UIITEM_TYPE_COUNTABLE_SMALL = 3;
+constexpr int UIITEM_TYPE_SOMOONE         = 4;
 
-const int UIITEM_TYPE_USABLE_ID_MIN   = 450000;
+constexpr int UIITEM_TYPE_USABLE_ID_MIN   = 450000;
 
-const int UIITEM_COUNT_MANY           = 9999;
-const int UIITEM_COUNT_FEW            = 500;
+constexpr int UIITEM_COUNT_MANY           = 9999;
+constexpr int UIITEM_COUNT_FEW            = 500;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -150,7 +141,7 @@ protected:
 
 public:
 	CN3UIWndBase();
-	virtual ~CN3UIWndBase();
+	~CN3UIWndBase() override;
 
 	e_UIWND GetUIWnd()
 	{
@@ -160,25 +151,30 @@ public:
 	virtual CN3UIArea* GetChildAreaByiOrder(eUI_AREA_TYPE eUAT, int iOrder);
 	virtual CN3UIString* GetChildStringByiOrder(int iOrder);
 
-	virtual uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld);
+	uint32_t MouseProc(uint32_t dwFlags, const POINT& ptCur, const POINT& ptOld) override;
 	virtual void AllHighLightIconFree();
 
 	virtual __IconItemSkill* GetHighlightIconItem(CN3UIIcon* pUIIcon) = 0;
+
 	virtual void IconRestore()
 	{
 	}
-	virtual bool CheckIconDropFromOtherWnd(__IconItemSkill* spItem)
+
+	virtual bool CheckIconDropFromOtherWnd(__IconItemSkill* /*spItem*/)
 	{
 		return false;
 	}
-	virtual bool ReceiveIconDrop(__IconItemSkill* spItem, POINT ptCur)
+
+	virtual bool ReceiveIconDrop(__IconItemSkill* /*spItem*/, POINT /*ptCur*/)
 	{
 		return false;
 	}
-	virtual void CancelIconDrop(__IconItemSkill* spItem)
+
+	virtual void CancelIconDrop(__IconItemSkill* /*spItem*/)
 	{
 	}
-	virtual void AcceptIconDrop(__IconItemSkill* spItem)
+
+	virtual void AcceptIconDrop(__IconItemSkill* /*spItem*/)
 	{
 	}
 

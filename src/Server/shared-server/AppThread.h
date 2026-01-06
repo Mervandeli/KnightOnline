@@ -8,6 +8,8 @@
 
 #include <ftxui/component/event.hpp>
 
+#include <memory>
+
 namespace argparse
 {
 class ArgumentParser;
@@ -28,7 +30,7 @@ public:
 	}
 
 	AppThread(logger::Logger& logger);
-	~AppThread();
+	~AppThread() override;
 
 	/// \returns The base directory for logs. By default this is the working directory.
 	virtual std::filesystem::path LogBaseDir() const;
@@ -99,16 +101,19 @@ public:
 
 		// Logger config/setup is handled by the server instance.
 		// We just instantiate it early for signal handling.
-		AppThreadType appThread(logger);
-		if (!appThread.parse_commandline(argc, argv))
+		auto appThread = std::make_unique<AppThreadType>(logger);
+		if (appThread == nullptr)
 			return 1;
 
-		appThread.start();
+		if (!appThread->parse_commandline(argc, argv))
+			return 1;
+
+		appThread->start();
 
 		// We keep the main() thread alive to catch interrupt signals and call shutdown
-		appThread.join();
+		appThread->join();
 
-		return appThread.ExitCode();
+		return appThread->ExitCode();
 	}
 
 private:

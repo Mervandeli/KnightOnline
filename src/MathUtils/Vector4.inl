@@ -5,12 +5,8 @@
 
 #include "MathUtils.h"
 
-__Vector4::__Vector4(float fx, float fy, float fz, float fw)
+__Vector4::__Vector4(float fx, float fy, float fz, float fw) : x(fx), y(fy), z(fz), w(fw)
 {
-	x = fx;
-	y = fy;
-	z = fz;
-	w = fw;
 }
 
 void __Vector4::Zero()

@@ -48,6 +48,16 @@ public:
 		return static_cast<AIServerApp*>(s_instance);
 	}
 
+	std::shared_ptr<spdlog::logger>& itemLogger()
+	{
+		return _itemLogger;
+	}
+
+	std::shared_ptr<spdlog::logger>& userLogger()
+	{
+		return _userLogger;
+	}
+
 	void GameServerAcceptThread();
 	bool AddObjectEventNpc(_OBJECT_EVENT* pEvent, int zone_number);
 	void AllNpcInfo();
@@ -66,7 +76,7 @@ public:
 	MAP* GetMapByID(int iZoneID) const;
 
 	AIServerApp(AIServerLogger& logger);
-	~AIServerApp();
+	~AIServerApp() override;
 
 	NpcMap _npcMap;
 	NpcTableMap _monTableMap;
@@ -87,44 +97,53 @@ public:
 	ZoneArray _zones;
 	ZoneInfoTableMap _zoneInfoTableMap;
 
-	ZoneEventThread* _zoneEventThread;
+	ZoneEventThread* _zoneEventThread = nullptr;
 
-	CUser* _users[MAX_USER];
+	CUser* _users[MAX_USER]           = {};
 
 	// class 객체
 	CNpcItem _npcItem;
 
 	// 전역 객체 변수
-	long _totalNpcCount;               // DB에있는 총 수
-	std::atomic<long> _loadedNpcCount; // 현재 게임상에서 실제로 셋팅된 수
-	int16_t _mapCount;                 // Zone 수
-	int16_t _mapEventNpcCount;         // Map에서 읽어들이는 event npc 수
+	long _totalNpcCount                = 0; // DB에있는 총 수
+	std::atomic<long> _loadedNpcCount  = 0; // 현재 게임상에서 실제로 셋팅된 수
+	int16_t _mapCount                  = 0; // Zone 수
+	int16_t _mapEventNpcCount          = 0; // Map에서 읽어들이는 event npc 수
 
-	// sungyong 2002.05.23
-	bool _firstServerFlag; // 서버가 처음시작한 후 게임서버가 붙은 경우에는 1, 붙지 않은 경우 0
-	int16_t _socketCount;  // GameServer와 처음접시 필요
-	int16_t _reconnectSocketCount; // GameServer와 재접시 필요
-	double _reconnectStartTime;    // 처음 소켓이 도착한 시간
-	int16_t _aliveSocketCount;     // 이상소켓 감시용
-	// ~sungyong 2002.05.23
-	uint8_t _battleEventType; // 전쟁 이벤트 관련 플래그( 1:전쟁중이 아님, 0:전쟁중)
-	int16_t _battleNpcsKilledByKarus, _battleNpcsKilledByElmorad; // 전쟁동안에 죽은 npc숫자
+	// 서버가 처음시작한 후 게임서버가 붙은 경우에는 1, 붙지 않은 경우 0
+	bool _firstServerFlag              = false;
+	int16_t _socketCount               = 0;   // GameServer와 처음접시 필요
+	int16_t _reconnectSocketCount      = 0;   // GameServer와 재접시 필요
+	double _reconnectStartTime         = 0.0; // 처음 소켓이 도착한 시간
+	int16_t _aliveSocketCount          = 0;   // 이상소켓 감시용
 
-	int _year, _month, _dayOfMonth, _hour, _minute;
-	int _weatherType, _weatherAmount;
-	uint8_t _nightMode; // 밤인지,, 낮인지를 판단... 1:낮, 2:밤
-	uint8_t _testMode;
+	// 전쟁 이벤트 관련 플래그( 1:전쟁중이 아님, 0:전쟁중)
+	uint8_t _battleEventType           = BATTLEZONE_CLOSE;
+
+	// 전쟁동안에 죽은 npc숫자
+	int16_t _battleNpcsKilledByKarus   = 0;
+	int16_t _battleNpcsKilledByElmorad = 0;
+
+	int _year                          = 0;
+	int _month                         = 0;
+	int _dayOfMonth                    = 0;
+	int _hour                          = 0;
+	int _minute                        = 0;
+	int _weatherType                   = 0;
+	int _weatherAmount                 = 0;
+	uint8_t _nightMode                 = 1; // 밤인지,, 낮인지를 판단... 1:낮, 2:밤
+	uint8_t _testMode                  = 0;
 
 	AISocketManager _socketManager;
 
 private:
 	// 패킷 압축에 필요 변수   -------------
-	int _compressedPacketCount;
+	int _compressedPacketCount = 0;
 	char _compressedPacketBuffer[10240];
-	int _compressedPacketIndex;
+	int _compressedPacketIndex = 0;
 	// ~패킷 압축에 필요 변수   -------------
 
-	uint8_t _serverZoneType;
+	uint8_t _serverZoneType    = KARUS_ZONE;
 
 	std::unique_ptr<TimerThread> _checkAliveThread;
 
@@ -133,6 +152,9 @@ private:
 
 	std::filesystem::path _eventDir;
 	std::string _overrideEventDir;
+
+	std::shared_ptr<spdlog::logger> _itemLogger;
+	std::shared_ptr<spdlog::logger> _userLogger;
 
 protected:
 	/// \brief Loads config, database caches, then starts sockets and thread pools.
@@ -186,8 +208,9 @@ private:
 	bool LoadConfig(CIni& iniFile) override;
 
 	void SyncTest();
-	void
-	RegionCheck(); // region안에 들어오는 유저 체크 (스레드에서 FindEnermy()함수의 부하를 줄이기 위한 꽁수)
+
+	// region안에 들어오는 유저 체크 (스레드에서 FindEnermy()함수의 부하를 줄이기 위한 꽁수)
+	void RegionCheck();
 };
 
-#endif             // SERVER_AISERVER_AISERVERAPP_H
+#endif // SERVER_AISERVER_AISERVERAPP_H

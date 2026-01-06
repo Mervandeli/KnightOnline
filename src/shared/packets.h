@@ -3,7 +3,7 @@
 
 #pragma once
 
-enum e_GameOpcode
+enum e_GameOpcode : uint8_t
 {
 	WIZ_LOGIN               = 0x01, // Account Login
 	WIZ_NEW_CHAR            = 0x02, // Create Character DB
@@ -85,6 +85,7 @@ enum e_GameOpcode
 	WIZ_CORPSE              = 0x4e, // To have your corpse have an ID on top of it.
 	WIZ_PARTY_BBS           = 0x4f, // For the party wanted bulletin board service..
 	WIZ_MARKET_BBS          = 0x50, // For the market bulletin board service...
+	WIZ_LOGIN_INFO          = 0x50, // TODO: Move to its own opcode enum (Aujard only)
 	WIZ_KICKOUT             = 0x51, // Account ID forbid duplicate connection
 	WIZ_CLIENT_EVENT        = 0x52, // Client Event (for quest)
 	WIZ_MAP_EVENT           = 0x53, // 클라이언트에서 무슨 에코로 쓰고 있데요.
@@ -146,7 +147,7 @@ enum e_DBOpcode : uint8_t
 	DB_HEARTBEAT    = 0x7F
 };
 
-enum e_LoginOpcode
+enum e_LoginOpcode : uint8_t
 {
 	LS_VERSION_REQ      = 0x01,
 	LS_DOWNLOADINFO_REQ = 0x02,
@@ -179,7 +180,7 @@ constexpr int MAX_NEWS_COUNT        = 3;
 ////////////////////////////////////////////////////////////////
 // chat define
 ////////////////////////////////////////////////////////////////
-enum e_ChatType
+enum e_ChatType : uint8_t
 {
 	GENERAL_CHAT       = 1,
 	PRIVATE_CHAT       = 2,
@@ -200,21 +201,21 @@ enum e_ChatType
 	SEEKING_PARTY_CHAT = 19,
 };
 
-enum e_GoldChangeOpcode
+enum e_GoldChangeOpcode : uint8_t
 {
 	GOLD_CHANGE_GAIN  = 1,
 	GOLD_CHANGE_LOSE  = 2,
 	GOLD_CHANGE_SPEND = 3
 };
 
-enum e_ZoneChangeOpcode
+enum e_ZoneChangeOpcode : uint8_t
 {
 	ZONE_CHANGE_LOADING  = 1,
 	ZONE_CHANGE_LOADED   = 2,
 	ZONE_CHANGE_TELEPORT = 3
 };
 
-enum e_QuestOpcode
+enum e_QuestOpcode : uint8_t
 {
 	QUEST_LIST   = 1,
 	QUEST_UPDATE = 2
@@ -225,18 +226,18 @@ enum e_QuestOpcode
 ////////////////////////////////////////////////////////////////
 // weather define
 ////////////////////////////////////////////////////////////////
-enum e_WeatherType
+enum e_WeatherType : uint8_t
 {
-	WEATHER_FINE = 0x01,
-	WEATHER_RAIN = 0x02,
-	WEATHER_SNOW = 0x03
+	WEATHER_FINE = 1,
+	WEATHER_RAIN = 2,
+	WEATHER_SNOW = 3
 };
 ////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////
 // Party Related subpacket define
 ////////////////////////////////////////////////////////////////
-enum e_PartyOpcode
+enum e_PartyOpcode : uint8_t
 {
 	PARTY_CREATE           = 0x01, // Party Group Create
 	PARTY_PERMIT           = 0x02, // Party Insert Permit
@@ -254,7 +255,7 @@ enum e_PartyOpcode
 };
 
 // NOTE: Used for trading
-enum e_ExchangeOpcode
+enum e_ExchangeOpcode : uint8_t
 {
 	EXCHANGE_REQ         = 1,
 	EXCHANGE_AGREE       = 2,
@@ -266,7 +267,7 @@ enum e_ExchangeOpcode
 	EXCHANGE_CANCEL      = 8
 };
 
-enum e_MerchantOpcode
+enum e_MerchantOpcode : uint8_t
 {
 	MERCHANT_OPEN           = 1,
 	MERCHANT_CLOSE          = 2,
@@ -280,7 +281,7 @@ enum e_MerchantOpcode
 };
 
 // NOTE: This needs downgrading.
-enum e_NameChangeOpcode
+enum e_NameChangeOpcode : uint8_t
 {
 	NAME_CHANGE_PLAYER_REQUEST = 0, // contains the request with the player's name
 	NAME_CHANGE_SHOW_DIALOG    = 1,
@@ -290,17 +291,16 @@ enum e_NameChangeOpcode
 	NAME_CHANGE_KING           = 5
 };
 
-enum e_KingSystemOpcode
+enum e_KingSystemOpcode : uint8_t
 {
-	KING_ELECTION     = 1,
-	KING_IMPEACHMENT  = 2,
-	KING_TAX          = 3,
-	KING_EVENT        = 4,
-	KING_NPC          = 5,
-	KING_NATION_INTRO = 6
+	KING_ELECTION    = 1,
+	KING_IMPEACHMENT = 2,
+	KING_TAX         = 3,
+	KING_EVENT       = 4,
+	KING_NPC         = 5,
 };
 
-enum e_KingEventOpcode
+enum e_KingEventOpcode : uint8_t
 {
 	KING_EVENT_NOAH     = 1,
 	KING_EVENT_EXP      = 2,
@@ -310,7 +310,7 @@ enum e_KingEventOpcode
 	KING_EVENT_NOTICE   = 6
 };
 
-enum e_KingSystemElectionOpcode
+enum e_KingSystemElectionOpcode : uint8_t
 {
 	KING_ELECTION_SCHEDULE     = 1,
 	KING_ELECTION_NOMINATE     = 2,
@@ -319,20 +319,20 @@ enum e_KingSystemElectionOpcode
 	KING_ELECTION_RESIGN       = 5
 };
 
-enum e_KingSystemElectionDBOpcode
+enum e_KingSystemElectionDBOpcode : uint8_t
 {
 	KING_ELECTION_UPDATE_STATUS,
 	KING_ELECTION_UPDATE_LIST
 };
 
-enum e_KingSystemCandidacyNoticeBoardOpcode
+enum e_KingSystemCandidacyNoticeBoardOpcode : uint8_t
 {
 	KING_CANDIDACY_BOARD_WRITE = 1,
 	KING_CANDIDACY_BOARD_READ  = 2,
 	// 4, 5
 };
 
-enum e_KingSystemImpeachmentOpcode
+enum e_KingSystemImpeachmentOpcode : uint8_t
 {
 	KING_IMPEACHMENT_REQUEST          = 1,
 	KING_IMPEACHMENT_REQUEST_ELECT    = 2,
@@ -345,39 +345,49 @@ enum e_KingSystemImpeachmentOpcode
 ////////////////////////////////////////////////////////////////
 // Magic Packet sub define
 ////////////////////////////////////////////////////////////////
-enum e_MagicOpcode
+enum e_MagicOpcode : uint8_t
 {
 	MAGIC_CASTING               = 1,
 	MAGIC_FLYING                = 2,
 	MAGIC_EFFECTING             = 3,
 	MAGIC_FAIL                  = 4,
-	MAGIC_DURATION_EXPIRED      = 5, // For the removal of durational (i.e. type 3/4) skills.
+
+	// For the removal of durational (i.e. type 3/4) skills.
+	MAGIC_DURATION_EXPIRED      = 5,
 	MAGIC_TYPE3_END             = MAGIC_DURATION_EXPIRED,
 	MAGIC_TYPE4_END             = MAGIC_DURATION_EXPIRED,
-	MAGIC_CANCEL                = 6, // When the client requests a buff to be removed.
-	MAGIC_CANCEL_TRANSFORMATION = 7, // When removing a transformation.
-	MAGIC_TYPE4_EXTEND =
-		8, // Extends the time of your type4 buffs by 2 times (requires "Duration Item" (PUS))
-	MAGIC_TRANSFORM_LIST      = 9,  // Shows the transformation list
-	MAGIC_FAIL_TRANSFORMATION = 10, // Transformation errors
-	MAGIC_UNKNOWN             = 12,
-	MAGIC_CANCEL2             = 13  // Not sure but it cancels...
+
+	// When the client requests a buff to be removed.
+	MAGIC_CANCEL                = 6,
+
+	// When removing a transformation.
+	MAGIC_CANCEL_TRANSFORMATION = 7,
+
+	// Extends the time of your type4 buffs by 2 times (requires "Duration Item" (PUS))
+	MAGIC_TYPE4_EXTEND          = 8,
+
+	// Shows the transformation list
+	MAGIC_TRANSFORM_LIST        = 9,
+
+	// Transformation errors
+	MAGIC_FAIL_TRANSFORMATION   = 10,
+
+	MAGIC_UNKNOWN               = 0xff
 };
 
-enum e_SkillMagicFailMsg
+enum e_SkillMagicFailMsg : int8_t
 {
 	SKILLMAGIC_FAIL_CASTING    = -100, // "Casting failed."
 	SKILLMAGIC_FAIL_KILLFLYING = -101,
 	SKILLMAGIC_FAIL_ENDCOMBO   = -102,
 	SKILLMAGIC_FAIL_NOEFFECT   = -103, // "<skill name> failed"
 	SKILLMAGIC_FAIL_ATTACKZERO = -104, // "<skill name> missed"
-	SKILLMAGIC_FAIL_UNKNOWN    = 0xffffffff
 };
 
 ////////////////////////////////////////////////////////////////
 // Knights Packet sub define
 ////////////////////////////////////////////////////////////////
-enum e_KnightsOpcode
+enum e_KnightsOpcode : uint8_t
 {
 	KNIGHTS_CREATE           = 0x01, // clan creation
 	KNIGHTS_JOIN             = 0x02, // joining a clan
@@ -419,7 +429,29 @@ enum e_KnightsOpcode
 	KNIGHTS_UPDATE_GRADE     = 0x30,
 };
 
-enum e_OperatorOpcode
+enum e_DBKnightsOpcode : uint8_t
+{
+	DB_KNIGHTS_CREATE      = 0x11, // 생성
+	DB_KNIGHTS_JOIN        = 0x12, // 가입
+	DB_KNIGHTS_WITHDRAW    = 0x13, // 탈퇴
+	DB_KNIGHTS_REMOVE      = 0x14, // 멤버 삭제
+	DB_KNIGHTS_DESTROY     = 0x15, // 뽀개기
+	DB_KNIGHTS_ADMIT       = 0x16, // 멤버 가입 허가
+	DB_KNIGHTS_REJECT      = 0x17, // 멤버 가입 거절
+	DB_KNIGHTS_PUNISH      = 0x18, // 멤버 징계
+	DB_KNIGHTS_CHIEF       = 0x19, // 단장 임명
+	DB_KNIGHTS_VICECHIEF   = 0x1A, // 부단장 임명
+	DB_KNIGHTS_OFFICER     = 0x1B, // 장교임명
+	DB_KNIGHTS_ALLLIST_REQ = 0x1C, // 리스트를 10개 단위로 Page 요청
+	DB_KNIGHTS_MEMBER_REQ  = 0x1D, // 모든 멤버 요청
+	DB_KNIGHTS_CURRENT_REQ = 0x1E, // 현재 접속 리스트
+	DB_KNIGHTS_STASH       = 0x1F, // 기사단 창고
+	DB_KNIGHTS_MODIFY_FAME = 0x20, // 멤버의 직위 변경.. 해당 멤버에게 간다
+	DB_KNIGHTS_JOIN_REQ    = 0x21, // 해당멤버에게 가입요청을 한다
+	DB_KNIGHTS_LIST_REQ    = 0x22  // 기사단 리스트를  요청 ( index 검색 )
+};
+
+enum e_OperatorOpcode : uint8_t
 {
 	OPERATOR_ARREST         = 1,
 	OPERATOR_FORBID_CONNECT = 2,
@@ -442,20 +474,12 @@ enum e_WarpListError : uint8_t
 	WARP_LIST_ERROR_NEED_LOYALTY    = 5, // "You cannot enter when you have 0 national points."
 	WARP_LIST_ERROR_WRONG_LEVEL_DLW = 6, // "Only characters with level 30~50 can enter." (dialog)
 	WARP_LIST_ERROR_DO_NOT_QUALIFY  = 7, // "You can not enter because you do not qualify." (dialog)
-
-	// Available only in newer client versions:
-	WARP_LIST_ERROR_RECENTLY_TRADED =
-		8,  // "You can't teleport for 2 minutes after trading." (dialog)
-	WARP_LIST_ERROR_ARENA_FULL =
-		9,  // "Arena Server is full to capacity. Please try again later." (dialog)
-	WARP_LIST_ERROR_FINISHED_7_KEYS_QUEST =
-		10, // "You can't enter because you completed Guardian of 7 Keys quest." (dialog)
 };
 
 ////////////////////////////////////////////////////////////////
 // WareHouse Packet sub define
 ////////////////////////////////////////////////////////////////
-enum e_WarehouseOpcode
+enum e_WarehouseOpcode : uint8_t
 {
 	WAREHOUSE_OPEN      = 0x01,
 	WAREHOUSE_INPUT     = 0x02,
@@ -469,7 +493,7 @@ enum e_WarehouseOpcode
 ////////////////////////////////////////////////////////////////
 // Class change define
 ////////////////////////////////////////////////////////////////
-enum e_ClassChangeOpcode
+enum e_ClassChangeOpcode : uint8_t
 {
 	CLASS_CHANGE_REQ        = 0x01,
 	CLASS_CHANGE_RESULT     = 0x02,
@@ -482,7 +506,7 @@ enum e_ClassChangeOpcode
 ////////////////////////////////////////////////////////////////
 // Friend subpacket define
 ////////////////////////////////////////////////////////////////
-enum e_FriendOpcode
+enum e_FriendOpcode : uint8_t
 {
 	FRIEND_REQUEST = 1,
 	FRIEND_REPORT  = 2,
@@ -490,7 +514,7 @@ enum e_FriendOpcode
 	FRIEND_REMOVE  = 4
 };
 
-enum e_FriendAddResult
+enum e_FriendAddResult : uint8_t
 {
 	FRIEND_ADD_SUCCESS = 0,
 	FRIEND_ADD_ERROR   = 1,
@@ -499,7 +523,7 @@ enum e_FriendAddResult
 	FRIEND_ADD_MAX
 };
 
-enum e_FriendRemoveResult
+enum e_FriendRemoveResult : uint8_t
 {
 	FRIEND_REMOVE_SUCCESS   = 0,
 	FRIEND_REMOVE_ERROR     = 1,
@@ -508,7 +532,7 @@ enum e_FriendRemoveResult
 	FRIEND_REMOVE_MAX
 };
 
-enum e_ItemUpgradeOpcode
+enum e_ItemUpgradeOpcode : uint8_t
 {
 	ITEM_UPGRADE_REQ         = 1,
 	ITEM_UPGRADE_PROCESS     = 2,
@@ -520,7 +544,7 @@ enum e_ItemUpgradeOpcode
 ////////////////////////////////////////////////////////////////
 // Party BBS subpacket define
 ////////////////////////////////////////////////////////////////
-enum e_PartyBBSOpcode
+enum e_PartyBBSOpcode : uint8_t
 {
 	PARTY_BBS_REGISTER = 0x01,
 	PARTY_BBS_DELETE   = 0x02,
@@ -532,7 +556,7 @@ enum e_PartyBBSOpcode
 ////////////////////////////////////////////////////////////////
 // Market BBS primary subpacket define
 ////////////////////////////////////////////////////////////////
-enum e_MarketBBSOpcode
+enum e_MarketBBSOpcode : uint8_t
 {
 	MARKET_BBS_REGISTER        = 0x01,
 	MARKET_BBS_DELETE          = 0x02,
@@ -545,7 +569,7 @@ enum e_MarketBBSOpcode
 ////////////////////////////////////////////////////////////////
 // Market BBS secondary subpacket define
 ////////////////////////////////////////////////////////////////
-enum e_MarketBBSType
+enum e_MarketBBSType : uint8_t
 {
 	MARKET_BBS_BUY  = 0x01,
 	MARKET_BBS_SELL = 0x02
@@ -554,25 +578,34 @@ enum e_MarketBBSType
 ////////////////////////////////////////////////////////////////
 // Server to Server Communication
 ////////////////////////////////////////////////////////////////
-#define STS_CHAT                     0xD0
-#define UDP_BATTLE_EVENT_PACKET      0xD1
-#define UDP_KNIGHTS_PROCESS          0xD2
-#define UDP_BATTLEZONE_CURRENT_USERS 0xD3
+enum e_UDPOpcode : uint8_t
+{
+	STS_CHAT                     = 0xD0,
+	UDP_BATTLE_EVENT_PACKET      = 0xD1,
+	UDP_KNIGHTS_PROCESS          = 0xD2,
+	UDP_BATTLEZONE_CURRENT_USERS = 0xD3
+};
 ////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////
 // Server to DB Agnent Communication
 ////////////////////////////////////////////////////////////////
-#define CHECK_COUPON_EVENT           0x01
-#define UPDATE_COUPON_EVENT          0x02
+enum e_CouponEventOpcode : uint8_t
+{
+	CHECK_COUPON_EVENT  = 1,
+	UPDATE_COUPON_EVENT = 2
+};
 ////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////
 // Authority change subpacket define
 ////////////////////////////////////////////////////////////////
-#define COMMAND_AUTHORITY            0x01
+enum e_AuthorityChangeOpcode : uint8_t
+{
+	COMMAND_AUTHORITY = 1
+};
 
-enum e_StoreOpcode
+enum e_StoreOpcode : uint8_t
 {
 	STORE_OPEN    = 1,
 	STORE_CLOSE   = 2,
@@ -581,14 +614,14 @@ enum e_StoreOpcode
 	STORE_PROCESS = 5
 };
 
-enum e_RentalOpcode
+enum e_RentalOpcode : uint8_t
 {
 	RENTAL_PREMIUM = 1,
 	RENTAL_PVP     = 2,
 	RENTAL_NPC     = 3
 };
 
-enum e_RentalPvPOpcode
+enum e_RentalPvPOpcode : uint8_t
 {
 	RENTAL_OPEN        = 0,
 	RENTAL_REGISTER    = 1,
@@ -599,13 +632,13 @@ enum e_RentalPvPOpcode
 };
 
 // Skillbar
-enum e_SkillBarOpcode
+enum e_SkillBarOpcode : uint8_t
 {
 	SKILL_DATA_SAVE = 1,
 	SKILL_DATA_LOAD = 2
 };
 
-enum e_ZoneAbilityOpcode
+enum e_ZoneAbilityOpcode : uint8_t
 {
 	ZONE_ABILITY_UPDATE = 1
 };
