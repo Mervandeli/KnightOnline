@@ -3,7 +3,8 @@
 #include <N3Base/N3UIBase.h>
 
 #include "GameDef.h"
-enum e_UIWND_DISTRICT;
+#include "N3UIWndBase.h"
+
 class CN3UIIcon;
 class CUIImageTooltipDlg;
 class CUIMsgBoxOkCancel;
