@@ -12707,15 +12707,10 @@ void CUser::ItemUpgradeProcess(char* pBuf)
 {
 	int index           = 0;
 	uint8_t upgradeType = GetByte(pBuf, index);
-
 	if (upgradeType == ITEM_UPGRADE_PROCESS)
-	{
 		ItemUpgrade(pBuf + index);
-	}
 	else if (upgradeType == ITEM_UPGRADE_ACCESSORIES)
-	{
 		ItemUpgradeAccesories(pBuf + index);
-	}
 }
 
 void CUser::ItemUpgrade(char* pBuf)
@@ -13040,12 +13035,12 @@ void CUser::ItemUpgrade(char* pBuf)
 
 	if (upgradeSuccess)
 	{
-		SetByte(sendBuffer, 1, sendIndex);
+		SetByte(sendBuffer, ITEM_UPGRADE_ERROR_SUCCEEDED, sendIndex);
 		SetDWORD(sendBuffer, newItemId, sendIndex);
 	}
 	else
 	{
-		SetByte(sendBuffer, 0, sendIndex);
+		SetByte(sendBuffer, ITEM_UPGRADE_ERROR_FAILED, sendIndex);
 		SetDWORD(sendBuffer, originItemId, sendIndex);
 	}
 
@@ -13384,7 +13379,7 @@ void CUser::GameStart(char* pBuf)
 		// NOTE: This behaviour is flipped as compared to official to give it a more meaningful name.
 		// bool bRecastSavedMagic = true;
 
-		_state = CONNECTION_STATE_GAMESTART;
+		SetState(CONNECTION_STATE_GAMESTART);
 
 		spdlog::debug(
 			"User::GameStart: in game [charId={} socketId={}]", m_pUserData->m_id, _socketId);

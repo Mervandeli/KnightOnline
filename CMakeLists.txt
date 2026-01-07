@@ -222,4 +222,8 @@ if(OPENKO_BUILD_TESTS)
   set(CMAKE_FOLDER "Tests")
   add_subdirectory(tests/FileIO)
   add_subdirectory(tests/MathUtils)
+  
+  if(OPENKO_BUILD_SERVERS)
+    add_subdirectory(tests/Server/Ebenezer)
+  endif() 
 endif()
