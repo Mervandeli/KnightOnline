@@ -446,7 +446,7 @@ RECT CUIItemUpgrade::GetSampleRect()
 	return rect;
 }
 
-e_UIWND_DISTRICT CUIItemUpgrade::GetWndDistrict()
+e_UIWND_DISTRICT CUIItemUpgrade::GetWndDistrict() const
 {
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
 
