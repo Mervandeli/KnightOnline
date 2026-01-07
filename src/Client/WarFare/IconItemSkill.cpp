@@ -1,6 +1,19 @@
 ﻿#include "StdAfx.h"
 #include "IconItemSkill.h"
 #include "GameDef.h"
+#include "N3UIWndBase.h"
+
+uint32_t __IconItemSkill::GetItemID() const
+{
+	if (pItemBasic == nullptr)
+		return 0;
+
+	uint32_t nItemID = pItemBasic->dwID;
+	if (pItemExt != nullptr)
+		nItemID += pItemExt->dwID;
+
+	return nItemID;
+}
 
 __IconItemSkill::__IconItemSkill()
 {
@@ -42,4 +55,12 @@ int __IconItemSkill::GetSellPrice(bool bHasPremium /*= false*/) const
 		iSellPrice = 1;
 
 	return iSellPrice;
+}
+
+bool __IconItemSkill::IsStackable() const
+{
+	if (pItemBasic == nullptr)
+		return false;
+
+	return pItemBasic->byContable == UIITEM_TYPE_COUNTABLE || pItemBasic->byContable == UIITEM_TYPE_COUNTABLE_SMALL;
 }

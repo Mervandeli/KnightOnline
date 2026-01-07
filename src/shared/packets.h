@@ -221,6 +221,15 @@ enum e_QuestOpcode : uint8_t
 	QUEST_UPDATE = 2
 };
 
+enum e_ItemUpgradeResult : uint8_t
+{
+	ITEM_UPGRADE_RESULT_FAILED		= 0,
+	ITEM_UPGRADE_RESULT_SUCCEEDED	= 1,
+	ITEM_UPGRADE_RESULT_TRADING		= 2,
+	ITEM_UPGRADE_RESULT_NEED_COINS	= 3,
+	ITEM_UPGRADE_RESULT_NO_MATCH	= 4
+};
+
 ////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////

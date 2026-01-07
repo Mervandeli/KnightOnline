@@ -26,8 +26,10 @@ struct __IconItemSkill
 	};
 
 	__IconItemSkill();
+	uint32_t GetItemID() const;
 	int GetBuyPrice() const;
 	int GetSellPrice(bool bHasPremium = false) const;
+	bool IsStackable() const;
 };
 
 #endif // CLIENT_WARFARE_ICONITEMSKILL_H

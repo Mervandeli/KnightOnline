@@ -350,6 +350,9 @@
     <ClCompile Include="UIUpgradeSelect.cpp">
       <Filter>Scene\Ingame\UI</Filter>
     </ClCompile>
+    <ClCompile Include="UIItemUpgrade.cpp">
+      <Filter>Scene\Ingame\UI</Filter>
+    </ClCompile>
     <ClCompile Include="UIVarious.cpp">
       <Filter>Scene\Ingame\UI</Filter>
     </ClCompile>
@@ -442,6 +445,9 @@
     <ClInclude Include="UIUpgradeSelect.h">
       <Filter>Scene\Ingame\UI</Filter>
     </ClInclude>
+    <ClCompile Include="UIItemUpgrade.h">
+      <Filter>Scene\Ingame\UI</Filter>
+    </ClCompile>
     <ClInclude Include="UIVarious.h">
       <Filter>Scene\Ingame\UI</Filter>
     </ClInclude>
