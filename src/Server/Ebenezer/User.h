@@ -258,7 +258,7 @@ public:
 	void ItemUpgradeProcess(char* pBuf);
 	void ItemUpgrade(char* pBuf);
 	void ItemUpgradeAccesories(char* pBuf);
-	void ItemUpgradeFailure(char* sendBuffer, int sendIndex, e_ItemUpgradeResult resultCode);
+	void SendItemUpgradeFailed(e_ItemUpgradeResult resultCode);
 	bool MatchingItemUpgrade(uint8_t inventoryPosition, int itemRequested, int itemExpected) const;
 	bool CheckCouponUsed() const;
 	bool CheckRandom(int16_t percent) const;

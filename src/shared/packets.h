@@ -543,14 +543,14 @@ enum e_ItemUpgradeOpcode : uint8_t
 	ITEM_BIFROST_EXCHANGE    = 5,
 };
 
-enum e_ItemUpgradeResult
+enum e_ItemUpgradeResult : uint8_t
 {
 	ITEM_UPGRADE_ERROR_FAILED      = 0,
 	ITEM_UPGRADE_ERROR_SUCCEEDED   = 1,
 	ITEM_UPGRADE_ERROR_TRADING     = 2,
 	ITEM_UPGRADE_ERROR_NEED_COINS  = 3,
 	ITEM_UPGRADE_ERROR_NO_MATCH    = 4,
-	ITEM_UPGRADE_ERROR_ITEM_SEALED = 5,
+	ITEM_UPGRADE_ERROR_ITEM_RENTED = 5,
 };
 
 ////////////////////////////////////////////////////////////////
