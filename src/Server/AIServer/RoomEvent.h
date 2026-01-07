@@ -8,9 +8,9 @@
 namespace AIServer
 {
 
-constexpr int MAX_CHECK_EVENT = 5;
+inline constexpr int MAX_CHECK_EVENT = 5;
 
-using mapNpcArray             = CSTLMap<int>;
+using mapNpcArray                    = CSTLMap<int>;
 
 struct _RoomEvent
 {
