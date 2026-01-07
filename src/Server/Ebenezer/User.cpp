@@ -12818,7 +12818,7 @@ void CUser::ItemUpgrade(char* pBuf)
 		return;
 	}
 
-	for (const auto& [upgradeIndex, upgradeInfo] : m_pMain->m_ItemUpgradeTableMap.m_UserTypeMap)
+	for (const auto& [upgradeIndex, upgradeInfo] : m_pMain->m_ItemUpgradeTableMap)
 	{
 		if (upgradeInfo == nullptr)
 		{
