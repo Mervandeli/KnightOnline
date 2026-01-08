@@ -35,6 +35,7 @@ using ZoneArray              = std::vector<C3DMap*>;
 using LevelUpTableArray      = std::vector<model::LevelUp*>;
 using CoefficientTableMap    = CSTLMap<model::Coefficient>;
 using ItemTableMap           = CSTLMap<model::Item>;
+using ItemUpgradeTableMap    = CSTLMap<model::ItemUpgrade>;
 using MagicTableMap          = CSTLMap<model::Magic>;
 using MagicType1TableMap     = CSTLMap<model::MagicType1>;
 using MagicType2TableMap     = CSTLMap<model::MagicType2>;
@@ -157,6 +158,7 @@ public:
 	bool LoadCoefficientTable();
 	bool LoadMagicTable();
 	bool LoadItemTable();
+	bool LoadItemUpgradeTable();
 	bool MapFileLoad();
 	void UserAcceptThread();
 	// sungyong 2001.11.06
@@ -221,6 +223,7 @@ public:
 	NpcMap m_NpcMap;
 	ZoneArray m_ZoneArray;
 	ItemTableMap m_ItemTableMap;
+	ItemUpgradeTableMap m_ItemUpgradeTableMap;
 	MagicTableMap m_MagicTableMap;
 	MagicType1TableMap m_MagicType1TableMap;
 	MagicType2TableMap m_MagicType2TableMap;

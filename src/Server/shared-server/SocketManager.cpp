@@ -23,8 +23,7 @@ SocketManager::~SocketManager()
 	}
 }
 
-void SocketManager::Init(
-	int serverSocketCount, int clientSocketCount, uint32_t workerThreadCount /*= 0*/)
+void SocketManager::InitSockets(int serverSocketCount, int clientSocketCount)
 {
 	_serverSocketCount         = serverSocketCount;
 	_clientSocketCount         = clientSocketCount;
@@ -32,14 +31,6 @@ void SocketManager::Init(
 	_serverSocketArray         = new TcpSocket*[serverSocketCount];
 	_inactiveServerSocketArray = new TcpSocket*[serverSocketCount];
 	_clientSocketArray         = new TcpClientSocket*[clientSocketCount];
-
-	// NOTE: Specifically allocate the worker pool first, as we'll need this for our sockets.
-	if (workerThreadCount == 0)
-		_workerThreadCount = std::thread::hardware_concurrency() * 2;
-	else
-		_workerThreadCount = workerThreadCount;
-
-	_workerPool = std::make_shared<asio::thread_pool>(_workerThreadCount);
 
 	std::queue<int> socketIdQueue;
 	for (int i = 0; i < serverSocketCount; i++)
@@ -59,6 +50,21 @@ void SocketManager::Init(
 		std::lock_guard<std::recursive_mutex> lock(_mutex);
 		_socketIdQueue.swap(socketIdQueue);
 	}
+}
+
+void SocketManager::Init(
+	int serverSocketCount, int clientSocketCount, uint32_t workerThreadCount /*= 0*/)
+{
+	InitSockets(serverSocketCount, clientSocketCount);
+
+	// NOTE: We need to allocate the worker pool for our sockets.
+	// They won't be able to be allocated until after this exists.
+	if (workerThreadCount == 0)
+		_workerThreadCount = std::thread::hardware_concurrency() * 2;
+	else
+		_workerThreadCount = workerThreadCount;
+
+	_workerPool = std::make_shared<asio::thread_pool>(_workerThreadCount);
 
 	if (_startUserThreadCallback != nullptr)
 		_startUserThreadCallback();

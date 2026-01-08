@@ -255,6 +255,11 @@ public:
 	void LogCoupon(int itemid, int count);
 	void RecvEditBox(char* pBuf);
 	void ResetEditBox();
+	void ItemUpgradeProcess(char* pBuf);
+	void ItemUpgrade(char* pBuf);
+	void ItemUpgradeAccesories(char* pBuf);
+	void SendItemUpgradeFailed(e_ItemUpgradeResult resultCode);
+	bool MatchingItemUpgrade(uint8_t inventoryPosition, int itemRequested, int itemExpected) const;
 	bool CheckCouponUsed() const;
 	bool CheckRandom(int16_t percent) const;
 	void OpenEditBox(int message, int event);
@@ -315,6 +320,7 @@ public:
 	bool GateLeverObjectEvent(int16_t objectindex, int16_t nid);
 	bool GateObjectEvent(int16_t objectindex, int16_t nid);
 	bool BindObjectEvent(int16_t objectindex, int16_t nid);
+	void SendAnvilRequest(int16_t nid);
 	void InitType3();
 	bool GetWarpList(int warp_group);
 	void ServerChangeOk(char* pBuf);
@@ -360,6 +366,7 @@ public:
 	void MSpChange(int amount);
 	void UpdateGameWeather(char* pBuf, uint8_t type);
 	void ObjectEvent(char* pBuf);
+	void SendObjectEventFailed(uint8_t objectType, uint8_t errorCode = 0);
 	void SkillPointChange(char* pBuf);
 	bool ExecuteExchange();
 	void InitExchange(bool bStart);

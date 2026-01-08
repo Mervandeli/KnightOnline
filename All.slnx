@@ -102,6 +102,12 @@
       <BuildDependency Project="src/MathUtils/MathUtils.vcxproj" />
     </Project>
   </Folder>
+  <Folder Name="/tests/Server/">
+    <Project Path="tests/Server/Ebenezer/Ebenezer.Tests.vcxproj" Id="e8b0e1e7-a1e2-4174-af92-97e826ec4fd9">
+      <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-googletest.vcxproj" />
+      <BuildDependency Project="src/Server/Ebenezer/Ebenezer.Core.vcxproj" />
+    </Project>
+  </Folder>
   <Folder Name="/tools/">
     <Project Path="src/Tools/N3CE/N3CE.vcxproj" Id="1ad3ffcd-745f-4e6d-8698-f750ebb8dbcd">
       <BuildDependency Project="src/N3Base/N3Base_tool.vcxproj" />

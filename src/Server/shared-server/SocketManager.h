@@ -25,6 +25,7 @@ class SocketManager
 	friend class TcpSocket;
 	friend class TcpClientSocket;
 	friend class TcpServerSocket;
+	friend class TestApp;
 
 	using StartUserThreadCallback    = std::function<void()>;
 	using ShutdownUserThreadCallback = std::function<void()>;
@@ -109,6 +110,11 @@ public:
 public:
 	SocketManager(int recvBufferSize, int sendBufferSize);
 	virtual ~SocketManager();
+
+private:
+	void InitSockets(int serverSocketCount, int clientSocketCount);
+
+public:
 	void Init(int serverSocketCount, int clientSocketCount, uint32_t workerThreadCount = 0);
 	bool Listen(int port);
 	void StartAccept();
