@@ -5790,7 +5790,6 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 
 		case OBJECT_TYPE_ANVIL:
 		{
-
 			/*
 			if (iResult == 0) // anvil object failed animation	
 			if (iResult == 1) // anvil object succeeded animation

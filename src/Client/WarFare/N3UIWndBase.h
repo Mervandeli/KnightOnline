@@ -34,20 +34,20 @@ enum e_UIWND : uint8_t
 // District Info..
 enum e_UIWND_DISTRICT : uint8_t
 {
-	UIWND_DISTRICT_INVENTORY_SLOT = 0, // Slot district of Inventory Wnd..
-	UIWND_DISTRICT_INVENTORY_INV,      // Inv district of Inventory Wnd..
-	UIWND_DISTRICT_TRADE_NPC,          // Transaction district of Transaction Wnd of Npc..
-	UIWND_DISTRICT_PER_TRADE_MY,       // My Transaction district of Per Transaction Wnd..
-	UIWND_DISTRICT_PER_TRADE_OTHER,    // Other Transaction district of Per Transaction Wnd..
-	UIWND_DISTRICT_DROPITEM,           // Dropitem district of Drop item wnd..
-	UIWND_DISTRICT_SKILL_TREE,         // Skillicon district of Skill icon wnd..
-	UIWND_DISTRICT_SKILL_HOTKEY,       // Skillicon district of Hotkey icon wnd..
-	UIWND_DISTRICT_TRADE_MY,           // Npc 와의 거래에서 내 영역..
-	UIWND_DISTRICT_PER_TRADE_INV,      // Inv District of Per Trade Wnd ..
-	UIWND_DISTRICT_UPGRADE_INV,			// Upgrade Inv
-	UIWND_DISTRICT_UPGRADE_SLOT,		// Upgrade material slot
-	UIWND_DISTRICT_UPGRADE_RESULT_SLOT,	// Upgrade result slot
-	UIWND_DISTRICT_UNKNOWN,            // District Unknown..
+	UIWND_DISTRICT_INVENTORY_SLOT = 0,  // Slot district of Inventory Wnd..
+	UIWND_DISTRICT_INVENTORY_INV,       // Inv district of Inventory Wnd..
+	UIWND_DISTRICT_TRADE_NPC,           // Transaction district of Transaction Wnd of Npc..
+	UIWND_DISTRICT_PER_TRADE_MY,        // My Transaction district of Per Transaction Wnd..
+	UIWND_DISTRICT_PER_TRADE_OTHER,     // Other Transaction district of Per Transaction Wnd..
+	UIWND_DISTRICT_DROPITEM,            // Dropitem district of Drop item wnd..
+	UIWND_DISTRICT_SKILL_TREE,          // Skillicon district of Skill icon wnd..
+	UIWND_DISTRICT_SKILL_HOTKEY,        // Skillicon district of Hotkey icon wnd..
+	UIWND_DISTRICT_TRADE_MY,            // Npc 와의 거래에서 내 영역..
+	UIWND_DISTRICT_PER_TRADE_INV,       // Inv District of Per Trade Wnd ..
+	UIWND_DISTRICT_UPGRADE_INV,         // Upgrade Inv
+	UIWND_DISTRICT_UPGRADE_SLOT,        // Upgrade material slot
+	UIWND_DISTRICT_UPGRADE_RESULT_SLOT, // Upgrade result slot
+	UIWND_DISTRICT_UNKNOWN,             // District Unknown..
 };
 
 enum e_UIIconState : uint8_t
