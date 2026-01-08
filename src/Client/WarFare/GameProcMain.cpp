@@ -8020,12 +8020,12 @@ void CGameProcMain::MsgRecv_ItemUpgrade(Packet& pkt)
 			}
 			break;
 
-		// NOLINTNEXTLINE(bugprone-branch-clone)
 		case ITEM_UPGRADE_PROCESS:
 			if (m_pUIItemUpgrade != nullptr)
 				m_pUIItemUpgrade->MsgRecv_ItemUpgrade(pkt);
 			break;
 
+		// NOLINTNEXTLINE(bugprone-branch-clone)
 		case ITEM_UPGRADE_ACCESSORIES:
 #if 0 // TODO
 			if (m_pUIRingUpgrade != nullptr)
