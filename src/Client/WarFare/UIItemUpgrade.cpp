@@ -877,9 +877,6 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 		byPos[i] = pkt.read<uint8_t>();
 	}
 
-	if (byPos[0] < MAX_ITEM_INVENTORY)
-		m_iUpgradeItemSlotInvPos = byPos[0];
-
 	std::string szMsg;
 
 	if (result == ITEM_UPGRADE_RESULT_FAILED)
