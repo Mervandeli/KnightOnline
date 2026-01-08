@@ -5751,13 +5751,6 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 					{
 						bShouldBeRotate = false; // 돌려야 하는지??
 					}
-					else if (OBJECT_TYPE_ANVIL == iType)
-					{
-						/*
-						if (iResult == 0) // anvil object failed animation	
-						if (iResult == 1) // anvil object succeeded animation
-						*/
-					}
 
 					if (0x01 == iActivate)
 					{
@@ -5792,6 +5785,15 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 			if (iResult == 0)
 				szMsg = fmt::format_text_resource(IDS_WARP_WRONG_GATE);
 			MsgOutput(szMsg, 0xff00ff00);
+		}
+		break;
+
+		case OBJECT_TYPE_ANVIL:
+		{
+			/*
+			if (iResult == 0) // anvil object failed animation	
+			if (iResult == 1) // anvil object succeeded animation
+			*/
 		}
 		break;
 
