@@ -89,6 +89,8 @@ set(WARFARE_SCENE_INGAME_UI_SOURCES
   UIInn.h
   UIInventory.cpp
   UIInventory.h
+  UIItemUpgrade.cpp
+  UIItemUpgrade.h
   UIKnightsOperation.cpp
   UIKnightsOperation.h
   UILevelGuide.cpp
