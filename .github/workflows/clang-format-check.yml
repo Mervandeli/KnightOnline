@@ -1,16 +1,32 @@
-name: clang-format
+name: "clang-format-check"
 
 on:
   push:
     branches:
     - master
 
+    paths:
+      - '**/*.cpp'
+      - '**/*.h'
+      - '**/*.hpp'
+      - '**/*.inl'
+      
   pull_request:
     branches:
     - master
 
+    paths:
+      - '**/*.cpp'
+      - '**/*.h'
+      - '**/*.hpp'
+      - '**/*.inl'
+
   merge_group: 
   workflow_dispatch:
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref || github.run_id }}"
+  cancel-in-progress: true
 
 jobs:
   formatting-check:
