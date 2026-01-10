@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+﻿#include "StdAfx.h"
 #include "UIItemUpgrade.h"
 #include "APISocket.h"
 #include "GameProcMain.h"
@@ -21,59 +21,10 @@
 
 #include <unordered_set>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 CUIItemUpgrade::CUIItemUpgrade()
 {
-	m_eAnimationState    = AnimationState::None;
-	m_fAnimationTimer    = 0.0f;
-	m_iCurrentFrame      = 0;
-	m_bUpgradeSucceeded  = false;
-	m_bUpgradeInProgress = false;
-	m_iNpcID             = 0;
-
-	m_rcCover1Original   = {};
-	m_rcCover2Original   = {};
-
-	m_pBtnClose          = nullptr;
-	m_pBtnOk             = nullptr;
-	m_pBtnCancel         = nullptr;
-	m_pStrMyGold         = nullptr;
-	m_pAreaUpgrade       = nullptr;
-	m_pAreaResult        = nullptr;
-
-	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
-	{
-		m_pInvArea[i]      = nullptr;
-		m_pInvString[i]    = nullptr;
-		m_pMyUpgradeInv[i] = nullptr;
-	}
-
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
-	{
-		m_pSlotArea[i]                = nullptr;
 		m_iUpgradeScrollSlotInvPos[i] = -1;
-	}
-
-	for (int i = 0; i < FLIPFLOP_MAX_FRAMES; i++)
-	{
-		m_pImgFail[i]    = nullptr;
-		m_pImgSuccess[i] = nullptr;
-	}
-
-	m_pImageCover1           = nullptr;
-	m_pImageCover2           = nullptr;
-
-	m_pUITooltipDlg          = nullptr;
-	m_pUIMsgBoxOkCancel      = nullptr;
-
-	m_pSelectedItem          = nullptr;
-	m_iSelectedItemSourcePos = -1;
-
-	m_iUpgradeItemSlotInvPos = -1;
 }
 
 CUIItemUpgrade::~CUIItemUpgrade()
@@ -176,6 +127,9 @@ void CUIItemUpgrade::Tick()
 				m_fAnimationTimer = 0.0f;
 				m_iCurrentFrame   = 0;
 				break;
+
+			case AnimationState::Done:
+				break;
 		}
 	}
 
@@ -192,8 +146,7 @@ void CUIItemUpgrade::Render()
 	if (m_pUITooltipDlg != nullptr)
 		m_pUITooltipDlg->DisplayTooltipsDisable();
 
-	bool bTooltipRender     = false;
-	__IconItemSkill* spItem = nullptr;
+	bool bTooltipRender = false;
 
 	for (auto itor = m_Children.rbegin(); m_Children.rend() != itor; ++itor)
 	{
@@ -207,7 +160,7 @@ void CUIItemUpgrade::Render()
 		if (GetState() == UI_STATE_COMMON_NONE && pChild->UIType() == UI_TYPE_ICON && pChild->GetStyle() & UISTYLE_ICON_HIGHLIGHT)
 		{
 			bTooltipRender = true;
-			SetSelectedIconInfo((CN3UIIcon*) pChild);
+			SetSelectedIconInfo(static_cast<CN3UIIcon*>(pChild));
 		}
 	}
 
@@ -217,36 +170,30 @@ void CUIItemUpgrade::Render()
 	for (int i = 0; i < MAX_ITEM_INVENTORY; i++)
 	{
 		CN3UIString* pStr = m_pInvString[i];
+		if (pStr == nullptr)
+			continue;
 
-		if (m_pMyUpgradeInv[i] == nullptr)
+		if (m_pMyUpgradeInv[i] == nullptr || !m_pMyUpgradeInv[i]->IsStackable() || m_pMyUpgradeInv[i]->iCount <= 0)
 		{
-			if (pStr != nullptr)
-			{
-				pStr->SetVisible(false);
-			}
+			pStr->SetVisible(false);
 			continue;
 		}
 
-		if (m_pMyUpgradeInv[i]->IsStackable() && m_pMyUpgradeInv[i]->iCount > 1)
+		if (GetState() == UI_STATE_ICON_MOVING && i == m_iSelectedItemSourcePos)
 		{
-			if (GetState() == UI_STATE_ICON_MOVING && i == m_iSelectedItemSourcePos)
-			{
-				pStr->SetStringAsInt(m_pMyUpgradeInv[m_iSelectedItemSourcePos]->iCount - 1);
-				pStr->Render();
-			}
-			else
-			{
-				if (m_pMyUpgradeInv[i]->pUIIcon->IsVisible())
-				{
-					pStr->SetVisible(true);
-					pStr->SetStringAsInt(m_pMyUpgradeInv[i]->iCount);
-					pStr->Render();
-				}
-				else
-				{
-					pStr->SetVisible(false);
-				}
-			}
+			pStr->SetVisible(true);
+			pStr->SetStringAsInt(m_pMyUpgradeInv[m_iSelectedItemSourcePos]->iCount - 1);
+			pStr->Render();
+		}
+		else if (m_pMyUpgradeInv[i]->pUIIcon->IsVisible())
+		{
+			pStr->SetVisible(true);
+			pStr->SetStringAsInt(m_pMyUpgradeInv[i]->iCount);
+			pStr->Render();
+		}
+		else
+		{
+			pStr->SetVisible(false);
 		}
 	}
 
@@ -259,7 +206,7 @@ void CUIItemUpgrade::SetSelectedIconInfo(CN3UIIcon* pUIIcon)
 	POINT ptCur = CGameProcedure::s_pLocalInput->MouseGetPos();
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		int iOrder = m_iUpgradeScrollSlotInvPos[i];
+		int8_t iOrder = m_iUpgradeScrollSlotInvPos[i];
 		if (iOrder < 0 || iOrder >= MAX_ITEM_INVENTORY)
 			continue;
 
@@ -520,7 +467,7 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 
 		case UIMSG_ICON_UP:
 			spItem = m_pSelectedItem;
-			iOrder = m_iSelectedItemSourcePos;
+			// iOrder = m_iSelectedItemSourcePos;
 			if (spItem == nullptr)
 				break;
 
@@ -567,7 +514,11 @@ bool CUIItemUpgrade::ReceiveMessage(CN3UIBase* pSender, uint32_t dwMsg)
 			if (!m_bUpgradeInProgress)
 				HandleInventoryIconRightClick(m_pSelectedItem);
 			break;
+
+		default:
+			break;
 	}
+
 	return true;
 }
 
@@ -703,11 +654,10 @@ bool CUIItemUpgrade::Load(File& file)
 // Handles key press events, such as closing the UI with ESC.
 bool CUIItemUpgrade::OnKeyPress(int iKey)
 {
-	switch (iKey)
+	if (iKey == DIK_ESCAPE)
 	{
-		case DIK_ESCAPE:
-			Close();
-			return true;
+		Close();
+		return true;
 	}
 
 	return CN3UIBase::OnKeyPress(iKey);
