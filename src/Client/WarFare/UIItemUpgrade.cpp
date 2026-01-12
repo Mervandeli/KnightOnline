@@ -674,7 +674,7 @@ void CUIItemUpgrade::ResetUpgradeInventory()
 
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		int iOrder = m_iUpgradeScrollSlotInvPos[i];
+		int8_t iOrder = m_iUpgradeScrollSlotInvPos[i];
 		if (iOrder == -1)
 			continue;
 
@@ -802,7 +802,7 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 	{
 		for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 		{
-			int iOrder = m_iUpgradeScrollSlotInvPos[i];
+			int8_t iOrder = m_iUpgradeScrollSlotInvPos[i];
 			if (iOrder != -1)
 			{
 				__IconItemSkill* spItem = m_pMaterialSlot[i];
@@ -889,7 +889,7 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 	{
 		for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 		{
-			int iOrder = m_iUpgradeScrollSlotInvPos[i];
+			int8_t iOrder = m_iUpgradeScrollSlotInvPos[i];
 			if (iOrder != -1)
 			{
 				__IconItemSkill* spItem = m_pMaterialSlot[i];
@@ -960,11 +960,10 @@ void CUIItemUpgrade::MsgRecv_ItemUpgrade(Packet& pkt)
 		szMsg = fmt::format_text_resource(IDS_ITEM_UPGRADE_SUCCEEDED);
 		CGameProcedure::s_pProcMain->MsgOutput(szMsg, D3DCOLOR_XRGB(128, 128, 255));
 
-		e_PartPosition ePart;
-		e_PlugPosition ePlug;
-		e_ItemType eItemType;
+		e_PartPosition ePart = PART_POS_UNKNOWN;
+		e_PlugPosition ePlug = PLUG_POS_UNKNOWN;
+		e_ItemType eItemType = ITEM_TYPE_UNKNOWN;
 		std::string szIconFN;
-		constexpr float fUVAspect      = (float) 45.0f / (float) 64.0f;
 
 		__TABLE_ITEM_BASIC* pItemBasic = CGameBase::s_pTbl_Items_Basic.Find(nItemID[0] / 1000 * 1000);
 		__TABLE_ITEM_EXT* pItemExt     = nullptr;
@@ -1143,7 +1142,7 @@ bool CUIItemUpgrade::IsMaterialSlotCompatible(__IconItemSkill* pSrc) const
 
 	for (int i = 0; i < MAX_ITEM_UPGRADE_SLOT; i++)
 	{
-		int iOrder = m_iUpgradeScrollSlotInvPos[i];
+		int8_t iOrder = m_iUpgradeScrollSlotInvPos[i];
 		if (iOrder < 0)
 			continue;
 

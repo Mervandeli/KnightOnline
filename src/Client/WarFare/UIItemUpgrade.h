@@ -71,7 +71,7 @@ public:
 	void SetVisibleWithNoSound(bool bVisible, bool bWork = false, bool bReFocus = false) override;
 	void MsgRecv_ItemUpgrade(Packet& pkt);
 	void SetNpcID(int iNpcID);
-	void SetVisible(bool bVisible);
+	void SetVisible(bool bVisible) override;
 
 private:
 	RECT GetSampleRect();
@@ -92,7 +92,7 @@ private:
 	void GoldUpdate();
 	bool IsAllowedUpgradeItem(const __IconItemSkill* spItem) const;
 	void SendToServerUpgradeMsg();
-	void CallBackProc(int iID, uint32_t dwFlag);
+	void CallBackProc(int iID, uint32_t dwFlag) override;
 
 	void FlipFlopAnim();
 	void AnimClose();
