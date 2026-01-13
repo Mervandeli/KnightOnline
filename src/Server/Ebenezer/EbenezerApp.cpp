@@ -44,6 +44,11 @@ EbenezerApp::EbenezerApp(EbenezerLogger& logger) :
 	AppThread(logger), m_LoggerSendQueue(MAX_SMQ_SEND_QUEUE_RETRY_COUNT),
 	m_ItemLoggerSendQ(MAX_SMQ_SEND_QUEUE_RETRY_COUNT)
 {
+	// Ebenezer is the only server that had built in command line support, so we'll
+	// default _enableTelnet to on.
+	_enableTelnet     = true;
+	_telnetPort       = 2324;
+
 	m_nYear           = 0;
 	m_nMonth          = 0;
 	m_nDate           = 0;
@@ -470,7 +475,6 @@ bool EbenezerApp::OnStart()
 	_readQueueThread->start();
 
 	spdlog::info("EbenezerApp::OnInitDialog: successfully initialized");
-
 	return true;
 }
 
@@ -1934,6 +1938,9 @@ int EbenezerApp::GetZoneIndex(int zonenumber) const
 
 bool EbenezerApp::HandleCommand(const std::string& command)
 {
+	if (AppThread::HandleCommand(command))
+		return true;
+
 	OperationMessage opMessage(this, nullptr);
 	if (opMessage.Process(command))
 		return true;

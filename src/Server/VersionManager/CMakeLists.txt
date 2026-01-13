@@ -40,7 +40,6 @@ target_precompile_headers(VersionManager.Core PRIVATE pch.h)
 # Setup dependencies
 target_link_libraries(VersionManager.Core PUBLIC
   shared-server
-  db-library
   FileIO
 )
 

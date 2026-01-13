@@ -19,6 +19,7 @@ namespace VersionManager
 VersionManagerApp::VersionManagerApp(logger::Logger& logger) :
 	AppThread(logger), _socketManager(SOCKET_BUFF_SIZE, SOCKET_BUFF_SIZE)
 {
+	_telnetPort                                     = 2326;
 	db::ConnectionManager::DefaultConnectionTimeout = DB_PROCESS_TIMEOUT;
 	db::ConnectionManager::Create();
 

@@ -38,6 +38,7 @@ std::mutex g_region_mutex;
 
 AIServerApp::AIServerApp(AIServerLogger& logger) : AppThread(logger)
 {
+	_telnetPort = 2323;
 	memset(_compressedPacketBuffer, 0, sizeof(_compressedPacketBuffer));
 
 	ConnectionManager::Create();
@@ -297,15 +298,15 @@ bool AIServerApp::OnStart()
 	//----------------------------------------------------------------------
 
 	//----------------------------------------------------------------------
-	//	Start NPC THREAD
-	//----------------------------------------------------------------------
-	StartNpcThreads();
-
-	//----------------------------------------------------------------------
 	//	Start Accepting...
 	//----------------------------------------------------------------------
 	if (!ListenByServerZoneType())
 		return false;
+
+	//----------------------------------------------------------------------
+	//	Start NPC THREAD
+	//----------------------------------------------------------------------
+	StartNpcThreads();
 
 	_checkAliveThread->start();
 

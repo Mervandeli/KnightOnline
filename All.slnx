@@ -83,11 +83,14 @@
   </Folder>
   <Folder Name="/server/_deps/">
     <Project Path="src/Server/shared-server/shared-server.vcxproj" Id="c630cf44-84a8-4586-a710-c420bf54dc13">
+      <BuildDependency Project="deps/db-models-msvc/db-models.vcxproj" />
       <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-argparse.vcxproj" />
       <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-asio.vcxproj" />
       <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-boost.vcxproj" />
       <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-FTXUI.vcxproj" />
+      <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-nanodbc.vcxproj" />
       <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-spdlog.vcxproj" />
+      <BuildDependency Project="src/db-library/db-library.vcxproj" />
       <BuildDependency Project="src/MathUtils/MathUtils.vcxproj" />
       <BuildDependency Project="src/shared/shared.vcxproj" />
     </Project>

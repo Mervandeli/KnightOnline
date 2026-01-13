@@ -39,7 +39,6 @@ target_precompile_headers(Aujard.Core PRIVATE pch.h)
 
 # Setup dependencies
 target_link_libraries(Aujard.Core PUBLIC
-  db-library
   FileIO
   shared-server
 )

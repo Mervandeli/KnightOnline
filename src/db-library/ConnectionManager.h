@@ -3,14 +3,14 @@
 
 #pragma once
 
+#include <ModelUtil/ModelUtil.h>
+
 #include <cassert>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <string_view>
 #include <unordered_map>
-
-#include <ModelUtil/ModelUtil.h>
 
 namespace nanodbc
 {

@@ -51,6 +51,7 @@
       <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-boost.vcxproj" />
       <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-FTXUI.vcxproj" />
       <BuildDependency Project="deps/fetch-and-build-wrappers/fetch-spdlog.vcxproj" />
+      <BuildDependency Project="src/db-library/db-library.vcxproj" />
       <BuildDependency Project="src/shared/shared.vcxproj" />
     </Project>
     <Project Path="src/shared/shared.vcxproj" Id="c2feb024-8e46-4533-918b-7196caaa4e7d">

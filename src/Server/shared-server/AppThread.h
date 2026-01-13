@@ -15,10 +15,26 @@ namespace argparse
 class ArgumentParser;
 }
 
+/// \brief Possible application states.  Used for health checks
+enum class AppStatus : uint8_t
+{
+	INITIALIZING, ///< Initial state for an application, has not started loading resources
+	STARTING,     ///< Loading resources, not ready for connections
+	READY,        ///< Resources loaded, ready for connection
+	STOPPING      ///< Shutdown underway
+};
+
 class CIni;
+class TelnetThread;
+
 class AppThread : public Thread
 {
 public:
+	static AppThread* instance()
+	{
+		return s_instance;
+	}
+
 	int ExitCode() const
 	{
 		return _exitCode;
@@ -29,6 +45,12 @@ public:
 		return *_iniFile;
 	}
 
+	/// \brief Retrieves the application's current status
+	AppStatus GetAppStatus() const
+	{
+		return _appStatus;
+	}
+
 	AppThread(logger::Logger& logger);
 	~AppThread() override;
 
@@ -37,6 +59,9 @@ public:
 
 	/// \returns The application's ini config path.
 	virtual std::filesystem::path ConfigPath() const = 0;
+
+	/// \brief Sets the application status to STOPPING when shutdown is triggered
+	void before_shutdown() override;
 
 private:
 	/// \brief Sets up the parser & parses the command-line args, dispatching it to the app
@@ -120,13 +145,32 @@ private:
 	static void catchInterruptSignals();
 	static void signalHandler(int signalNumber);
 
-private:
-	CIni* _iniFile;
+	CIni* _iniFile              = nullptr;
+	TelnetThread* _telnetThread = nullptr;
 
 protected:
 	logger::Logger& _logger;
-	int _exitCode;
-	bool _headless;
+
+	int _exitCode                      = 0; // EXIT_SUCCESS
+	bool _headless                     = true;
+
+	/// \brief Indicates if telnet was enabled through config or default constructor override
+	bool _enableTelnet                 = false;
+
+	/// \brief Indicates if --enable-telnet was passed as a command line argument. Overrides _enableTelnet
+	bool _overrideEnableTelnet         = false;
+
+	/// \brief Listen address for the Telnet server
+	std::string _telnetAddress         = "127.0.0.1";
+
+	/// \brief Listen address for the Telnet server. Overrides _telnetAddress
+	std::string _overrideTelnetAddress = {};
+
+	/// \brief Listen port for the Telnet server
+	uint16_t _telnetPort               = 2323;
+
+	/// \brief Application status used for health checks
+	AppStatus _appStatus               = AppStatus::INITIALIZING;
 
 	static AppThread* s_instance;
 	static bool s_shutdown;

@@ -38,6 +38,10 @@ add_library(shared-server STATIC
   TcpServerSocket.h
   TcpSocket.cpp
   TcpSocket.h
+  TelnetThread.h
+  TelnetThread.cpp
+  TelnetClientThread.h
+  TelnetClientThread.cpp
   utilities.cpp
   utilities.h
   "${TARGET_SERVER_CONFIG_HEADER}"
@@ -60,6 +64,7 @@ target_link_libraries(shared-server
   PUBLIC
     argparse
     asio
+    db-library
     djb2
     ftxui::component
     ftxui::dom

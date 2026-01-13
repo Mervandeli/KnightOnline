@@ -32,6 +32,12 @@
       <Filter>Threads</Filter>
     </ClCompile>
     <ClCompile Include="ftxui_sink_mt.cpp" />
+    <ClCompile Include="TelnetClientThread.cpp">
+      <Filter>Threads</Filter>
+    </ClCompile>
+    <ClCompile Include="TelnetThread.cpp">
+      <Filter>Threads</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="server_config.h" />
@@ -70,6 +76,12 @@
       <Filter>Threads</Filter>
     </ClInclude>
     <ClInclude Include="ftxui_sink_mt.h" />
+    <ClInclude Include="TelnetClientThread.h">
+      <Filter>Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="TelnetThread.h">
+      <Filter>Threads</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="N3Base">
