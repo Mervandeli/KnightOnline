@@ -5790,10 +5790,16 @@ void CGameProcMain::MsgRecv_ObjectEvent(Packet& pkt)
 
 		case OBJECT_TYPE_ANVIL:
 		{
-			/*
-			if (iResult == 0) // anvil object failed animation	
-			if (iResult == 1) // anvil object succeeded animation
-			*/
+			int ID = m_pUIItemUpgrade->GetNpcID();
+			if (iResult == 0)
+			{
+				CGameProcedure::s_pFX->TriggerBundle(ID, -1, FXID_ITEM_UPGRADE_FAIL, ID, -1, FX_BUNDLE_MOVE_NONE);
+			}
+			if (iResult == 1)
+			{
+				CGameProcedure::s_pFX->TriggerBundle(ID, -1, FXID_ITEM_UPGRADE_SUCCESS, ID, -1, FX_BUNDLE_MOVE_NONE);
+			}
+			
 		}
 		break;
 

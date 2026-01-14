@@ -302,6 +302,11 @@ void CUIItemUpgrade::SetNpcID(int iNpcID)
 	m_iNpcID = iNpcID;
 }
 
+int CUIItemUpgrade::GetNpcID()
+{
+	return m_iNpcID;
+}
+
 void CUIItemUpgrade::GoldUpdate()
 {
 	if (m_pStrMyGold == nullptr)

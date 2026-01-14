@@ -71,6 +71,7 @@ public:
 	void MsgRecv_ItemUpgrade(Packet& pkt);
 	void SetNpcID(int iNpcID);
 	void SetVisible(bool bVisible);
+	int	 GetNpcID();
 
 private:
 	RECT GetSampleRect();

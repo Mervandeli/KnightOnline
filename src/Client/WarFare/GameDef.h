@@ -1378,6 +1378,10 @@ inline constexpr int FXID_CLAN_RANK_1             = 10041;
 inline constexpr int FXID_WARP_KARUS              = 10046;
 inline constexpr int FXID_WARP_ELMORAD            = 10047;
 inline constexpr int FXID_REGION_POISON           = 10100;
+
+inline constexpr int FXID_ITEM_UPGRADE_FAIL       = 10100;
+inline constexpr int FXID_ITEM_UPGRADE_SUCCESS    = 10101;
+
 inline constexpr int FXID_TARGET_POINTER          = 30001;
 inline constexpr int FXID_ZONE_POINTER            = 30002;
 
