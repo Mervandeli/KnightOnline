@@ -9,20 +9,17 @@
 
 constexpr float ATISQRT = 4.94974747f;
 
-// 생성자.. 변수 디폴트값 할당..
-CN3Pond::CN3Pond()
-{
-	m_pfMaxVtx   = nullptr;
-
-	m_fTexIndex  = 0.0f;
-	m_iMaxVtxNum = 0;
-
-	memset(m_pTexPond, 0, sizeof(m_pTexPond));
-}
-
 CN3Pond::~CN3Pond()
 {
-	CN3Pond::Release();
+	if (m_iMaxVtxNum > 0)
+	{
+		delete[] m_pfMaxVtx;
+		m_pfMaxVtx   = nullptr;
+		m_iMaxVtxNum = 0;
+	}
+
+	for (int i = 0; i < MAX_POND_TEX; i++)
+		s_MngTex.Delete(&m_pTexPond[i]);
 }
 
 void CN3Pond::Release()
@@ -42,28 +39,28 @@ void CN3Pond::Release()
 	m_fTexIndex = 0.0f;
 }
 
-bool CN3Pond::Load(File& file)
+bool CN3Pond::Load(File& file, int iGtdVersion)
 {
+	constexpr int MAX_SUPPORTED_POND_MESH_COUNT = 1024;
+	constexpr int MAX_SUPPORTED_TEX_NAME_LENGTH = 50;
+
 	Release();
 
-	m_PondMeshes.clear();
-
-	// TODO: Update format; prior to this commit, this method was effectively disabled.
-	// We'll preserve this for now.
-	// Note that this is the last thing in the GTD file, so stopping here is OK.
-#if 0
 	int iPondMeshNum = 0;
 
 	file.Read(&iPondMeshNum, sizeof(int));
 	if (iPondMeshNum <= 0)
 		return true;
 
+	if (iPondMeshNum > MAX_SUPPORTED_POND_MESH_COUNT)
+		throw std::runtime_error("invalid pond mesh count");
+
 	m_PondMeshes.resize(iPondMeshNum);
 
 	for (CPondMesh& mesh : m_PondMeshes)
 	{
 		int iVC = 0;
-		file.Read(&iVC, sizeof(iVC)); // 점 갯수
+		file.Read(&iVC, sizeof(int)); // 점 갯수
 		mesh.m_iVC        = iVC;      ///
 		mesh.m_bTick2Rand = FALSE;    ///
 		if (iVC <= 0)
@@ -73,15 +70,19 @@ bool CN3Pond::Load(File& file)
 		}
 
 		int iWidthVertex = 0;
-		file.Read(&iWidthVertex, sizeof(iWidthVertex)); // 한 라인당 점 갯수
-		mesh.m_iWidthVtx   = iWidthVertex;              ///
-		mesh.m_iHeightVtx  = iVC / iWidthVertex;        ///
+		file.Read(&iWidthVertex, sizeof(int));   // 한 라인당 점 갯수
+		mesh.m_iWidthVtx   = iWidthVertex;       ///
+		mesh.m_iHeightVtx  = iVC / iWidthVertex; ///
 
 		int iTexNameLength = 0;
 		file.Read(&iTexNameLength, sizeof(int));
+
+		if (iTexNameLength < 0 || iTexNameLength > MAX_SUPPORTED_TEX_NAME_LENGTH)
+			throw std::runtime_error("invalid pond mesh texture name length");
+
 		if (iTexNameLength > 0)
 		{
-			char szTexture[50];
+			char szTexture[MAX_SUPPORTED_TEX_NAME_LENGTH + 1] {};
 			file.Read(szTexture, iTexNameLength); // texture name
 			szTexture[iTexNameLength]  = '\0';
 
@@ -92,17 +93,23 @@ bool CN3Pond::Load(File& file)
 		}
 
 		// XyxT2 -> XyzColorT2 Converting.
-		mesh.m_pVertices = new __VertexPond[iVC];                        ///
+		mesh.m_pVertices = new __VertexPond[iVC]; ///
 		file.Read(mesh.m_pVertices, iVC * sizeof(__VertexPond));
 
-		mesh.m_pVertices[0].y            += 0.2f;                        //	수치가 높으면 물결이 크게 요동친다
-		mesh.m_pVertices[iWidthVertex].y += 0.2f;                        //	수치가 높으면 물결이 크게 요동친다
-		mesh.m_pfMaxHeight = mesh.m_pVertices[0].y += 0.3f;              //	물결의 최대치
+		float fWaveVariance = 0.2f;
+		if (iGtdVersion >= 2)
+			file.Read(&fWaveVariance, sizeof(float));
+
+		// NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+		mesh.m_pVertices[0].y            += fWaveVariance;           //	수치가 높으면 물결이 크게 요동친다
+		mesh.m_pVertices[iWidthVertex].y += fWaveVariance;           //	수치가 높으면 물결이 크게 요동친다
+		mesh.m_pfMaxHeight = mesh.m_pVertices[0].y += fWaveVariance; //	물결의 최대치
+		// NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
 		mesh.m_pfVelocityArray                      = new float[iVC] {}; ///
 
 		int iIC                                     = 0;
-		file.Read(&iIC, sizeof(iIC));                                    // IndexBuffer Count.
+		file.Read(&iIC, sizeof(int));                                    // IndexBuffer Count.
 		mesh.m_iIC     = iIC;                                            ///
 		mesh.m_wpIndex = new uint16_t[iVC * 6];                          ///
 
@@ -196,7 +203,6 @@ bool CN3Pond::Load(File& file)
 		m_pTexPond[i] = CN3Base::s_MngTex.Get(szFileName);
 		__ASSERT(m_pTexPond[i], "CN3Pond::texture load failed");
 	}
-#endif
 
 	return true;
 }

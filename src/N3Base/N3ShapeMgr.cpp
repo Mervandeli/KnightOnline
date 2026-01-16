@@ -80,13 +80,78 @@ void CN3ShapeMgr::ReleaseShapes()
 #endif // end of #ifndef _3DSERVER
 
 #ifndef _3DSERVER
+bool CN3ShapeMgr::LoadSupportedVersions(File& file)
+{
+	std::string szFNBackup;
+
+	// Fetch current offset, so we can rewind and try reading the file again.
+	const int64_t originalOffset = static_cast<int64_t>(file.Offset());
+
+	// Try supported file format versions, starting with our preferred version:
+	constexpr int SupportedVersions[] { N3FORMAT_VER_1264, N3FORMAT_VER_1098 };
+	for (int iFileFormatVersion : SupportedVersions)
+	{
+		// Attempt to load with the provided file format version.
+		m_iFileFormatVersion = iFileFormatVersion;
+
+		try
+		{
+			if (Load(file))
+				return true;
+#ifdef _N3GAME
+			CLogWriter::Write(
+				"CN3ShapeMgr: Failed to load {} for format version {} (Load() failed).", szFNBackup,
+				iFileFormatVersion);
+#endif
+		}
+		catch (const std::runtime_error& ex)
+		{
+#ifdef _N3GAME
+			CLogWriter::Write("CN3ShapeMgr: Failed to load {} for format version {} ({}).",
+				szFNBackup, iFileFormatVersion, ex.what());
+#else
+			ex;
+#endif
+		}
+
+		// Release will unset the filename.
+		// We should preserve and restore it.
+		szFNBackup = m_szFileName;
+
+		Release();
+
+		// Restore the filename after it was released.
+		m_szFileName = szFNBackup;
+
+		// Rewind
+		file.Seek(originalOffset, SEEK_SET);
+	}
+
+#ifdef _N3GAME
+	CLogWriter::Write("CN3ShapeMgr: Failed to load {} - unsupported.", szFNBackup);
+#endif
+	return false;
+}
+
 bool CN3ShapeMgr::Load(File& file)
 {
+	constexpr int MAX_SUPPORTED_VERSION     = 2;
+	constexpr int MAX_SUPPORTED_NAME_LENGTH = 30;
+
+	int iVersion                            = 0;
 	if (m_iFileFormatVersion >= N3FORMAT_VER_1264)
 	{
-		int iIdk0 = 0, iNL = 0;
-		file.Read(&iIdk0, sizeof(int));
+		int iNL = 0;
+		file.Read(&iVersion, sizeof(int));
+
+		if (iVersion < 0 || iVersion > MAX_SUPPORTED_VERSION)
+			throw std::runtime_error("invalid version in header");
+
 		file.Read(&iNL, sizeof(int));
+
+		if (iNL < 0 || iNL > MAX_SUPPORTED_NAME_LENGTH)
+			throw std::runtime_error("invalid name length in header");
+
 		if (iNL > 0)
 		{
 			m_szName.resize(iNL);
@@ -102,7 +167,7 @@ bool CN3ShapeMgr::Load(File& file)
 		ReleaseShapes();
 	m_ShapesHaveID.clear();
 
-	file.Read(&iSC, 4); // Shape Count
+	file.Read(&iSC, sizeof(int)); // Shape Count
 	if (iSC > 0)
 	{
 		CN3Shape* pShape = nullptr;
@@ -111,7 +176,7 @@ bool CN3ShapeMgr::Load(File& file)
 		uint32_t dwType = 0;
 		for (int i = 0; i < iSC; i++)
 		{
-			file.Read(&dwType, 4); // Shape Type
+			file.Read(&dwType, sizeof(uint32_t)); // Shape Type
 
 			// 성문등 확장된 Object 로 쓸경우..
 			if (dwType & OBJ_SHAPE_EXTRA)
@@ -173,11 +238,19 @@ bool CN3ShapeMgr::Load(File& file)
 
 bool CN3ShapeMgr::LoadCollisionData(File& file)
 {
-	file.Read(&m_fMapWidth, 4);
-	file.Read(&m_fMapLength, 4);
+	constexpr float MAX_SUPPORTED_MAP_SIZE = static_cast<float>(MAX_CELL_MAIN * CELL_MAIN_SIZE);
 
-	if (!Create(m_fMapWidth, m_fMapLength))
-		return false;
+	static_assert(sizeof(float) == 4);
+
+	file.Read(&m_fMapWidth, sizeof(float));
+	file.Read(&m_fMapLength, sizeof(float));
+
+	if (m_fMapWidth <= 0.0f || m_fMapLength <= 0.0f || m_fMapWidth > MAX_SUPPORTED_MAP_SIZE
+		|| m_fMapLength > MAX_SUPPORTED_MAP_SIZE)
+		throw std::runtime_error("invalid map size");
+
+	if ((static_cast<int>(m_fMapWidth) % 4) != 0)
+		throw std::runtime_error("invalid map size; must be multiple of 4");
 
 	// 충돌 체크 폴리곤 데이터 읽기..
 	file.Read(&m_nCollisionFaceCount, 4);
