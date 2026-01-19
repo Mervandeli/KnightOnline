@@ -184,10 +184,8 @@ bool CN3Texture::CreateFromSurface(
 }
 #endif // end of _N3TOOL
 
-bool CN3Texture::LoadFromFile(const std::string& szFileName, uint32_t iVer)
+bool CN3Texture::LoadFromFile(const std::string& szFileName)
 {
-	m_iFileFormatVersion = iVer;
-
 	if (m_lpTexture != nullptr)
 		this->Release();
 
@@ -217,7 +215,21 @@ bool CN3Texture::LoadFromFile(const std::string& szFileName, uint32_t iVer)
 			return false;
 		}
 
-		Load(file);
+		try
+		{
+			LoadSupportedVersions(file);
+		}
+		catch (const std::exception& ex)
+		{
+			std::string szErr = szFullPath + " - Failed to read file (" + std::string(ex.what())
+								+ ")";
+#ifdef _N3GAME
+			CLogWriter::Write(szErr);
+#endif
+#ifdef _N3TOOL
+			MessageBox(s_hWndBase, szErr.c_str(), "Failed to read file", MB_OK);
+#endif
+		}
 	}
 	else
 	{
@@ -258,26 +270,29 @@ bool CN3Texture::LoadFromFile(const std::string& szFileName, uint32_t iVer)
 			s_ResrcInfo.nTexture_Loaded_OtherSize++;
 	}
 
-	if (nullptr == m_lpTexture)
+	if (m_lpTexture == nullptr)
 	{
-		this->Release();
+		Release();
 		return false;
 	}
+
 	return true;
 }
 
 bool CN3Texture::Load(File& file)
 {
-	CN3BaseFileAccess::Load(file);
+	if (!CN3BaseFileAccess::Load(file))
+		return false;
 
 	CWinCrypt crypt;
 
-	__DXT_HEADER HeaderOrg;                   // 헤더를 저장해 놓고..
+	__DXT_HEADER HeaderOrg {};                // 헤더를 저장해 놓고..
 	file.Read(&HeaderOrg, sizeof(HeaderOrg)); // 헤더를 읽는다..
-	if ('N' != HeaderOrg.szID[0] || 'T' != HeaderOrg.szID[1]
-		|| 'F' != HeaderOrg.szID[2]
-		// "NTF"3 - Noah Texture File Ver. 3.0
-		|| HeaderOrg.szID[3] < 3)
+	if ('N' != HeaderOrg.szID[0] || 'T' != HeaderOrg.szID[1] || 'F' != HeaderOrg.szID[2])
+		return false;
+
+	// "NTF"3 - Noah Texture File Ver. 3.0
+	if (HeaderOrg.szID[3] < 3)
 	{
 #ifdef _N3GAME
 		CLogWriter::Write("N3Texture Warning - Old format DXT file ({})", m_szFileName);
@@ -570,12 +585,16 @@ bool CN3Texture::Load(File& file)
 
 bool CN3Texture::SkipFileHandle(File& file)
 {
-	CN3BaseFileAccess::Load(file);
+	if (!CN3BaseFileAccess::Load(file))
+		return false;
 
-	__DXT_HEADER HeaderOrg;                   // 헤더를 저장해 놓고..
+	__DXT_HEADER HeaderOrg {};                // 헤더를 저장해 놓고..
 	file.Read(&HeaderOrg, sizeof(HeaderOrg)); // 헤더를 읽는다..
-	if ('N' != HeaderOrg.szID[0] || 'T' != HeaderOrg.szID[1] || 'F' != HeaderOrg.szID[2]
-		|| 3 != HeaderOrg.szID[3])            // "NTF"3 - Noah Texture File Ver. 3.0
+	if (HeaderOrg.szID[0] != 'N' || HeaderOrg.szID[1] != 'T' || HeaderOrg.szID[2] != 'F')
+		return false;
+
+	// "NTF"3 - Noah Texture File Ver. 3.0
+	if (3 != HeaderOrg.szID[3])
 	{
 #ifdef _N3GAME
 		CLogWriter::Write("N3Texture Warning - Old format DXT file ({})", m_szFileName);
@@ -753,7 +772,7 @@ bool CN3Texture::Save(File& file)
 			m_lpTexture->GetSurfaceLevel(i, &lpSurfSrc);
 			int nW = sd.Width / 2, nH = sd.Height / 2;
 			s_lpD3DDev->CreateOffscreenPlainSurface(
-				nW, nH, fmtExtra, D3DPOOL_MANAGED, &lpSurfDest, nullptr);
+				nW, nH, fmtExtra, D3DPOOL_DEFAULT, &lpSurfDest, nullptr);
 			D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr,
 				D3DX_FILTER_TRIANGLE, 0); // 서피스 복사.
 			int nPixelSize = 2;
@@ -775,7 +794,7 @@ bool CN3Texture::Save(File& file)
 			m_lpTexture->GetSurfaceLevel(0, &lpSurfSrc);
 			int nW = 256, nH = 256;
 			s_lpD3DDev->CreateOffscreenPlainSurface(
-				nW, nH, fmtExtra, D3DPOOL_MANAGED, &lpSurfDest, nullptr);
+				nW, nH, fmtExtra, D3DPOOL_DEFAULT, &lpSurfDest, nullptr);
 			D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc, nullptr, nullptr,
 				D3DX_FILTER_TRIANGLE, 0); // 서피스 복사.
 			int nPixelSize = 2;
@@ -824,7 +843,7 @@ bool CN3Texture::Save(File& file)
 			m_lpTexture->GetSurfaceLevel(0, &lpSurfSrc);
 			int nW = 256, nH = 256;
 			s_lpD3DDev->CreateOffscreenPlainSurface(
-				nW, nH, sd.Format, D3DPOOL_MANAGED, &lpSurfDest, nullptr);
+				nW, nH, sd.Format, D3DPOOL_DEFAULT, &lpSurfDest, nullptr);
 			HRESULT rval = D3DXLoadSurfaceFromSurface(lpSurfDest, nullptr, nullptr, lpSurfSrc,
 				nullptr, nullptr, D3DX_FILTER_TRIANGLE, 0); // 서피스 복사.
 			lpSurfDest->LockRect(&LR, nullptr, 0);
@@ -997,7 +1016,7 @@ bool CN3Texture::SaveToBitmapFile(const std::string& szFN)
 
 	LPDIRECT3DSURFACE9 lpSurfDest = nullptr;
 	s_lpD3DDev->CreateOffscreenPlainSurface(
-		m_Header.nWidth, m_Header.nHeight, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &lpSurfDest, nullptr);
+		m_Header.nWidth, m_Header.nHeight, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &lpSurfDest, nullptr);
 
 	if (nullptr == lpSurfDest)
 		return false;

@@ -279,6 +279,8 @@ public:
 	bool CheckExistItem(int itemid, int16_t count) const;
 	bool CheckWeight(int itemid, int16_t count) const;
 	bool CheckSkillPoint(uint8_t skillnum, uint8_t min, uint8_t max) const;
+	bool CheckSkillTotal(uint8_t min, uint8_t max) const;
+	bool CheckStatTotal(uint8_t min, uint8_t max) const;
 	bool CheckExistEvent(int16_t questId, uint8_t questState) const;
 	bool GoldLose(int gold);
 	void GoldGain(int gold);
@@ -326,7 +328,7 @@ public:
 	void ClassChangeReq();
 	void FriendReport(char* pBuf);
 	CUser* GetItemRoutingUser(int itemid, int16_t itemcount);
-	bool GetStartPosition(int16_t* x, int16_t* z);
+	bool GetStartPosition(int16_t* x, int16_t* z, int zoneId) const;
 	void Home();
 	void ReportBug(char* pBuf);
 	int GetEmptySlot(int itemid, int bCountable) const;
@@ -396,6 +398,7 @@ public:
 	bool IsValidSlotPos(model::Item* pTable, int destpos) const;
 	void ItemMove(char* pBuf);
 	void Warp(char* pBuf);
+	void Warp(float x, float z);
 	void RequestNpcIn(char* pBuf);
 	void SetUserAbility();
 	void LevelChange(int16_t level, bool bLevelUp = true);

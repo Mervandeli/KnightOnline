@@ -74,7 +74,6 @@ target_precompile_headers(AIServer.Core PRIVATE pch.h)
 
 # Setup dependencies
 target_link_libraries(AIServer.Core PUBLIC
-  db-library
   FileIO
   shared-server
 )

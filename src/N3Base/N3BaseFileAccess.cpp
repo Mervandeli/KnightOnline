@@ -10,7 +10,7 @@
 
 CN3BaseFileAccess::CN3BaseFileAccess()
 {
-	m_iFileFormatVersion  = N3FORMAT_VER_UNKN;
+	m_iFileFormatVersion  = N3FORMAT_VER_DEFAULT;
 
 	m_dwType             |= OBJ_BASE_FILEACCESS;
 	m_iLOD                = 0; // 로딩할때 쓸 LOD
@@ -41,21 +41,30 @@ void CN3BaseFileAccess::FileNameSet(const std::string& szFileName)
 		m_szFileName = szTmpFN;
 }
 
+bool CN3BaseFileAccess::LoadSupportedVersions(File& file)
+{
+	return Load(file);
+}
+
 bool CN3BaseFileAccess::Load(File& file)
 {
-	int nL = 0;
-	file.Read(&nL, 4);
-	if (nL > 0)
-	{
-		m_szName.assign(nL, '\0');
-		file.Read(&m_szName[0], nL);
-	}
-	else
-	{
-		m_szName.clear();
-	}
+	constexpr int MAX_SUPPORTED_NAME_LENGTH = 256;
 
-	return true;
+	int nL                                  = 0;
+	if (!file.Read(&nL, 4))
+		throw std::runtime_error("CN3BaseFileAccess: failed to load length, EOF");
+
+	if (nL < 0 || nL > MAX_SUPPORTED_NAME_LENGTH)
+		throw std::runtime_error("CN3BaseFileAccess: invalid length");
+
+	if (nL == 0)
+		return true;
+
+	size_t bytesRead = 0;
+	m_szName.assign(nL, '\0');
+	file.Read(&m_szName[0], nL, &bytesRead);
+
+	return static_cast<int>(bytesRead) == nL;
 }
 
 bool CN3BaseFileAccess::LoadFromFile()
@@ -89,22 +98,35 @@ bool CN3BaseFileAccess::LoadFromFile()
 	if (!file.OpenExisting(szFullPath))
 	{
 		std::string szErr = szFullPath + " - Can't open file (read)";
-#ifdef _N3TOOL
-		MessageBox(s_hWndBase, szErr.c_str(), "File Handle error", MB_OK);
-#endif
 #ifdef _N3GAME
 		CLogWriter::Write(szErr);
+#endif
+#ifdef _N3TOOL
+		MessageBox(s_hWndBase, szErr.c_str(), "File Handle error", MB_OK);
 #endif
 		return false;
 	}
 
-	return Load(file);
+	try
+	{
+		return LoadSupportedVersions(file);
+	}
+	catch (const std::exception& ex)
+	{
+		std::string szErr = szFullPath + " - Failed to read file (" + std::string(ex.what()) + ")";
+#ifdef _N3GAME
+		CLogWriter::Write(szErr);
+#endif
+#ifdef _N3TOOL
+		MessageBox(s_hWndBase, szErr.c_str(), "Failed to read file", MB_OK);
+#endif
+	}
+
+	return false;
 }
 
-bool CN3BaseFileAccess::LoadFromFile(const std::string& szFileName, uint32_t iVer)
+bool CN3BaseFileAccess::LoadFromFile(const std::string& szFileName)
 {
-	m_iFileFormatVersion = iVer;
-
 	FileNameSet(szFileName);
 	return LoadFromFile();
 }

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <memory>
+#include <memory> // std::shared_ptr<>
 #include <nanodbc/nanodbc.h>
 
 namespace db

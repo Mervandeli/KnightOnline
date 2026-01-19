@@ -87,7 +87,6 @@ target_precompile_headers(Ebenezer.Core PRIVATE pch.h)
 
 # Setup dependencies
 target_link_libraries(Ebenezer.Core PUBLIC
-  db-library
   FileIO
   shared-server
 )

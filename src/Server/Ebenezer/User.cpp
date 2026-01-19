@@ -2409,7 +2409,7 @@ void CUser::Regene(char* pBuf, int magicid)
 			else
 			{
 				int16_t spawnX = 0, spawnZ = 0;
-				if (GetStartPosition(&spawnX, &spawnZ))
+				if (GetStartPosition(&spawnX, &spawnZ, m_pUserData->m_bZone))
 				{
 					x = static_cast<float>(spawnX);
 					z = static_cast<float>(spawnZ);
@@ -2553,8 +2553,6 @@ void CUser::Regene(char* pBuf, int magicid)
 
 void CUser::ZoneChange(int zone, float x, float z)
 {
-	m_bZoneChangeFlag = true;
-
 	int sendIndex = 0, zoneindex = 0;
 	char sendBuffer[128] {};
 	C3DMap* pMap            = nullptr;
@@ -2562,6 +2560,34 @@ void CUser::ZoneChange(int zone, float x, float z)
 
 	if (g_serverdown_flag)
 		return;
+
+	// This is unofficial behaviour, but official behaviour causes players
+	// to be unintentionally reset back to 0,0 which is never desired, so we'll
+	// ensure players get returned to the intended /town positions.
+	if (static_cast<int>(x) == 0 && static_cast<int>(z) == 0)
+	{
+		int16_t sx = 0, sz = 0;
+		if (!GetStartPosition(&sx, &sz, zone))
+		{
+			spdlog::warn("User::ZoneChange: failed to fetch start position for zone {} "
+						 "[accountId={} characterName={}]",
+				zone, m_pUserData->m_Accountid, m_pUserData->m_id);
+			return;
+		}
+
+		x = static_cast<float>(sx);
+		z = static_cast<float>(sz);
+	}
+
+	// Zone changes within the same zone should just warp instead.
+	// This eliminates a redundant full zone reload.
+	// Officially this is applied inconsistently per case (calling Warp() instead of ZoneChange()),
+	// but we'll just make this consistent.
+	if (zone == m_pUserData->m_bZone)
+	{
+		Warp(x, z);
+		return;
+	}
 
 	zoneindex = m_pMain->GetZoneIndex(zone);
 
@@ -2648,7 +2674,8 @@ void CUser::ZoneChange(int zone, float x, float z)
 		}
 	}
 
-	m_bWarp = 0x01;
+	m_bZoneChangeFlag = true;
+	m_bWarp           = 0x01;
 
 	UserInOut(USER_OUT);
 
@@ -2742,42 +2769,45 @@ void CUser::ZoneChange(int zone, float x, float z)
 
 void CUser::Warp(char* pBuf)
 {
+	int index       = 0;
+	uint16_t warp_x = 0, warp_z = 0;
+
+	warp_x = GetShort(pBuf, index);
+	warp_z = GetShort(pBuf, index);
+
+	Warp(warp_x / 10.0f, warp_z / 10.0f);
+}
+
+void CUser::Warp(float x, float z)
+{
 	if (m_bWarp)
 		return;
 
 	//	if (m_pUserData->m_bAuthority != AUTHORITY_MANAGER)
 	//		return;
 
-	C3DMap* pMap = nullptr;
-	int index = 0, sendIndex = 0;
-	uint16_t warp_x = 0, warp_z = 0;
-	float real_x = 0.0f, real_z = 0.0f;
+	C3DMap* pMap  = nullptr;
+	int sendIndex = 0;
 	char sendBuffer[128] {};
 
-	warp_x = GetShort(pBuf, index);
-	warp_z = GetShort(pBuf, index);
-
-	pMap   = m_pMain->GetMapByIndex(m_iZoneIndex);
+	pMap = m_pMain->GetMapByIndex(m_iZoneIndex);
 	if (pMap == nullptr)
 		return;
 
-	real_x = warp_x / 10.0f;
-	real_z = warp_z / 10.0f;
-
-	if (!pMap->IsValidPosition(real_x, real_z))
+	if (!pMap->IsValidPosition(x, z))
 		return;
 
 	SetByte(sendBuffer, WIZ_WARP, sendIndex);
-	SetShort(sendBuffer, warp_x, sendIndex);
-	SetShort(sendBuffer, warp_z, sendIndex);
+	SetShort(sendBuffer, static_cast<uint16_t>(x * 10.0f), sendIndex);
+	SetShort(sendBuffer, static_cast<uint16_t>(z * 10.0f), sendIndex);
 	Send(sendBuffer, sendIndex);
 
 	UserInOut(USER_OUT);
 
-	m_pUserData->m_curx = real_x;
-	m_fWill_x           = real_x;
-	m_pUserData->m_curz = real_z;
-	m_fWill_z           = real_z;
+	m_pUserData->m_curx = x;
+	m_fWill_x           = x;
+	m_pUserData->m_curz = z;
+	m_fWill_z           = z;
 
 	m_RegionX           = (int) (m_pUserData->m_curx / VIEW_DISTANCE);
 	m_RegionZ           = (int) (m_pUserData->m_curz / VIEW_DISTANCE);
@@ -8925,22 +8955,16 @@ void CUser::ReportBug(char* pBuf)
 
 void CUser::Home()
 {
-	int sendIndex = 0;
-	char sendBuffer[128] {};
-
-	int16_t x = 0, z = 0; // The point where you will be warped to.
-	if (!GetStartPosition(&x, &z))
+	int16_t x = 0, z = 0;
+	if (!GetStartPosition(&x, &z, m_pUserData->m_bZone))
 		return;
 
-	SetShort(sendBuffer, (uint16_t) (x * 10), sendIndex);
-	SetShort(sendBuffer, (uint16_t) (z * 10), sendIndex);
-	Warp(sendBuffer);
+	Warp(static_cast<float>(x), static_cast<float>(z));
 }
 
-bool CUser::GetStartPosition(int16_t* x, int16_t* z)
+bool CUser::GetStartPosition(int16_t* x, int16_t* z, int zoneId) const
 {
-	model::StartPosition* startPosition = m_pMain->m_StartPositionTableMap.GetData(
-		m_pUserData->m_bZone);
+	model::StartPosition* startPosition = m_pMain->m_StartPositionTableMap.GetData(zoneId);
 	if (startPosition == nullptr)
 		return false;
 
@@ -11528,6 +11552,16 @@ bool CUser::CheckEventLogic(const EVENT_DATA* pEventData)
 					bExact = true;
 				break;
 
+			case LOGIC_CHECK_SKILL_TOTAL:
+				if (CheckSkillTotal(pLE->m_LogicElseInt[0], pLE->m_LogicElseInt[1]))
+					bExact = true;
+				break;
+
+			case LOGIC_CHECK_STAT_TOTAL:
+				if (CheckStatTotal(pLE->m_LogicElseInt[0], pLE->m_LogicElseInt[1]))
+					bExact = true;
+				break;
+
 			case LOGIC_CHECK_EXIST_ITEM:
 				if (CheckExistItem(pLE->m_LogicElseInt[0], pLE->m_LogicElseInt[1]))
 					bExact = true;
@@ -11790,7 +11824,7 @@ bool CUser::RunEvent(const EVENT_DATA* pEventData)
 					return false;
 				break;
 
-				//	비러머글 복권 >.<
+			// 비러머글 복권 >.<
 			case EXEC_OPEN_EDITBOX:
 				OpenEditBox(pExec->m_ExecInt[1], pExec->m_ExecInt[2]);
 				break;
@@ -11803,13 +11837,18 @@ bool CUser::RunEvent(const EVENT_DATA* pEventData)
 				LogCoupon(pExec->m_ExecInt[0], pExec->m_ExecInt[1]);
 				break;
 
-				// 비러머글 엑셀 >.<
+			// 비러머글 엑셀 >.<
 			case EXEC_SAVE_COM_EVENT:
 				SaveComEvent(pExec->m_ExecInt[0]);
 				break;
 
 			case EXEC_ROB_NOAH:
 				GoldLose(pExec->m_ExecInt[0]);
+				break;
+
+			case EXEC_ZONE_CHANGE:
+				ZoneChange(pExec->m_ExecInt[0], static_cast<float>(pExec->m_ExecInt[1]),
+					static_cast<float>(pExec->m_ExecInt[2]));
 				break;
 
 			case EXEC_RETURN:
@@ -11825,12 +11864,9 @@ bool CUser::RunEvent(const EVENT_DATA* pEventData)
 	return true;
 }
 
-// 정애씨가 고생하면서 해주신 퀘스트 부분 끝
 void CUser::TestPacket()
 {
-	// npc의 리스트를 재 요청하는 군,,,,,
-	m_pMain->RegionNpcInfoForMe(this, 1);
-	m_pMain->SyncTest(2);
+	/* do nothing */
 }
 
 void CUser::ItemLogToAgent(const char* srcid, const char* tarid, int type, int64_t serial,
@@ -11931,6 +11967,31 @@ bool CUser::CheckSkillPoint(uint8_t skillnum, uint8_t min, uint8_t max) const
 		return false;
 
 	if (m_pUserData->m_bstrSkill[skillnum] < min || m_pUserData->m_bstrSkill[skillnum] > max)
+		return false;
+
+	return true;
+}
+
+bool CUser::CheckSkillTotal(uint8_t min, uint8_t max) const
+{
+	uint8_t skillTotal = m_pUserData->m_bstrSkill[SKILLPT_TYPE_ORDER]
+						 + m_pUserData->m_bstrSkill[SKILLPT_TYPE_PRO_1]
+						 + m_pUserData->m_bstrSkill[SKILLPT_TYPE_PRO_2]
+						 + m_pUserData->m_bstrSkill[SKILLPT_TYPE_PRO_3]
+						 + m_pUserData->m_bstrSkill[SKILLPT_TYPE_PRO_4];
+
+	if (skillTotal < min || skillTotal > max)
+		return false;
+
+	return true;
+}
+
+bool CUser::CheckStatTotal(uint8_t min, uint8_t max) const
+{
+	uint8_t statTotal = m_pUserData->m_bDex + m_pUserData->m_bIntel + m_pUserData->m_bCha
+						+ m_pUserData->m_bPoints + m_pUserData->m_bStr + m_pUserData->m_bSta;
+
+	if (statTotal < min || statTotal > max)
 		return false;
 
 	return true;

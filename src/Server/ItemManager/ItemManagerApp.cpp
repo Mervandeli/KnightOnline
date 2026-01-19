@@ -16,6 +16,7 @@ namespace ItemManager
 
 ItemManagerApp::ItemManagerApp(ItemManagerLogger& logger) : AppThread(logger)
 {
+	_telnetPort      = 2327;
 	_readQueueThread = std::make_unique<ItemManagerReadQueueThread>();
 	_smqOpenThread   = std::make_unique<TimerThread>(
         5s, std::bind(&ItemManagerApp::AttemptOpenSharedMemoryThreadTick, this));
