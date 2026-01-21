@@ -179,21 +179,30 @@ void CUIItemUpgrade::Render()
 			continue;
 		}
 
-		if (GetState() == UI_STATE_ICON_MOVING && i == m_iSelectedItemSourcePos)
+		if (m_pMyUpgradeInv[i]->IsStackable())
 		{
-			pStr->SetVisible(true);
-			pStr->SetStringAsInt(m_pMyUpgradeInv[m_iSelectedItemSourcePos]->iCount - 1);
-			pStr->Render();
-		}
-		else if (m_pMyUpgradeInv[i]->pUIIcon->IsVisible())
-		{
-			pStr->SetVisible(true);
-			pStr->SetStringAsInt(m_pMyUpgradeInv[i]->iCount);
-			pStr->Render();
-		}
-		else
-		{
-			pStr->SetVisible(false);
+			if (GetState() == UI_STATE_ICON_MOVING && i == m_iSelectedItemSourcePos)
+			{
+				if (m_pMyUpgradeInv[i]->iCount > 2)
+				{
+					pStr->SetStringAsInt(m_pMyUpgradeInv[m_iSelectedItemSourcePos]->iCount - 1);
+					pStr->Render();
+				}
+				else
+				{
+					pStr->SetVisible(false);
+				}
+			}
+			else if (m_pMyUpgradeInv[i]->iCount > 1)
+			{
+				pStr->SetVisible(true);
+				pStr->SetStringAsInt(m_pMyUpgradeInv[i]->iCount);
+				pStr->Render();
+			}
+			else
+			{
+				pStr->SetVisible(false);
+			}
 		}
 	}
 
@@ -683,13 +692,12 @@ void CUIItemUpgrade::ResetUpgradeInventory()
 		{
 			SetupIconArea(spItem, m_pInvArea[iOrder]);
 
-			if (spItem->iCount > 1 && spItem->IsStackable())
+			if (spItem->iCount > 0 && spItem->IsStackable() 
+				&& m_pMaterialSlot[i]->pUIIcon != nullptr)
 			{
-				if (m_pMaterialSlot[i]->pUIIcon != nullptr)
-				{
-					delete m_pMaterialSlot[i]->pUIIcon;
-					m_pMaterialSlot[i]->pUIIcon = nullptr;
-				}
+				delete m_pMaterialSlot[i]->pUIIcon;
+				m_pMaterialSlot[i]->pUIIcon = nullptr;
+
 				++spItem->iCount;
 			}
 
@@ -1286,7 +1294,7 @@ bool CUIItemUpgrade::MaterialSlotDrop(__IconItemSkill* spItem, int iOrder)
 	int iSourceOrder = m_iSelectedItemSourcePos;
 
 	// If countable reduce inv item count
-	if (spItem->iCount > 1 && spItem->IsStackable())
+	if (spItem->iCount > 0 && spItem->IsStackable())
 		--m_pMyUpgradeInv[iSourceOrder]->iCount;
 
 	SetupIconArea(spItem, pArea);
