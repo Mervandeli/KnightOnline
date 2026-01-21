@@ -23,15 +23,13 @@
     <ProjectGuid>{2F8D19F8-5AB6-4AEA-8C56-24C7B103E47E}</ProjectGuid>
   </PropertyGroup>
   <Import Project="..\..\..\props\platform_root.props" />
-  <PropertyGroup Label="Configuration">
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <Import Project="$(PropsDir)db-library.props" />
   <Import Project="$(PropsDir)server.props" />
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup>
@@ -188,7 +186,7 @@
     <Image Include="res\ItemManager.ico" />
   </ItemGroup>
   <PropertyGroup Label="Debugger defaults">
-    <LocalDebuggerWorkingDirectory>$(OutputPath)\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

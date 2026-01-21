@@ -220,6 +220,7 @@ public:
 
 	void Tick();
 	void Render();
+	bool LoadSupportedVersions(File& file) override;
 	bool Load(File& file) override;
 	bool CheckCollisionCamera(__Vector3& vEye, const __Vector3& vAt, float fNP);
 	static int SortByCameraDistance(const void* pArg1, const void* pArg2);
@@ -242,7 +243,7 @@ public:
 	int Add(CN3Shape* pShape);
 	bool AddCollisionTriangle(const __Vector3& v1, const __Vector3& v2, const __Vector3& v3);
 	void GenerateCollisionData();
-	bool Save(File& file);
+	bool Save(File& file) override;
 	bool SaveCollisionData(File& file);
 #endif // end of _N3TOOL
 

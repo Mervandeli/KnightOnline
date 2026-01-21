@@ -23,15 +23,15 @@ IMPLEMENT_DYNCREATE(CN3TexViewerView, CView)
 
 BEGIN_MESSAGE_MAP(CN3TexViewerView, CView)
 //{{AFX_MSG_MAP(CN3TexViewerView)
-ON_COMMAND(ID_VIEW_ALPHA, OnViewAlpha)
-ON_UPDATE_COMMAND_UI(ID_VIEW_ALPHA, OnUpdateViewAlpha)
+ON_COMMAND(ID_VIEW_ALPHA, &CN3TexViewerView::OnViewAlpha)
+ON_UPDATE_COMMAND_UI(ID_VIEW_ALPHA, &CN3TexViewerView::OnUpdateViewAlpha)
 ON_WM_SIZE()
 ON_WM_ERASEBKGND()
 //}}AFX_MSG_MAP
 // Standard printing commands
-ON_COMMAND(ID_FILE_PRINT, CView::OnFilePrint)
-ON_COMMAND(ID_FILE_PRINT_DIRECT, CView::OnFilePrint)
-ON_COMMAND(ID_FILE_PRINT_PREVIEW, CView::OnFilePrintPreview)
+ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
+ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
+ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CView::OnFilePrintPreview)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -94,6 +94,38 @@ void CN3TexViewerView::OnBeginPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 void CN3TexViewerView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 {
 	// TODO: add cleanup after printing
+}
+
+BOOL CN3TexViewerView::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_KEYDOWN)
+	{
+		switch (pMsg->wParam)
+		{
+			case VK_UP:
+			case VK_LEFT:
+				if (GetDocument()->HasMultipleTextures())
+				{
+					GetDocument()->SelectPreviousTexture();
+					return TRUE;
+				}
+				break;
+
+			case VK_DOWN:
+			case VK_RIGHT:
+				if (GetDocument()->HasMultipleTextures())
+				{
+					GetDocument()->SelectNextTexture();
+					return TRUE;
+				}
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	return CView::PreTranslateMessage(pMsg);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -159,6 +191,4 @@ void CN3TexViewerView::OnSize(UINT nType, int cx, int cy)
 BOOL CN3TexViewerView::OnEraseBkgnd(CDC* pDC)
 {
 	return TRUE;
-
-	return CView::OnEraseBkgnd(pDC);
 }

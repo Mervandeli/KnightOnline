@@ -30,16 +30,16 @@ add_executable(Launcher
   res/Edit_PW.bmp
   res/Edit_id.bmp)
 
+set_target_properties(Launcher PROPERTIES
+  CXX_SCAN_FOR_MODULES OFF
+)
+
 if(WIN32)
   set_target_properties(Launcher PROPERTIES WIN32_EXECUTABLE TRUE)
   target_sources(Launcher PRIVATE
     Launcher.rc
     res/Launcher.rc2
     res/Launcher.ico)
-  target_compile_definitions(Launcher PRIVATE
-    "_UNICODE"
-    "UNICODE"
-  )
 endif()
 
 # Enable warnings as errors

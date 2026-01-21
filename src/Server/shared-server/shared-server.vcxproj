@@ -38,6 +38,7 @@
   </ImportGroup>
   <Import Project="$(PropsDir)asio.props" />
   <Import Project="$(PropsDir)boost.props" />
+  <Import Project="$(PropsDir)db-library.props" />
   <Import Project="$(PropsDir)MathUtils.props" />
   <Import Project="$(PropsDir)server.props" />
   <PropertyGroup Label="UserMacros" />
@@ -118,7 +119,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppThread.cpp" />
-    <ClCompile Include="ftxui_sink_mt.cpp" />
+    <ClCompile Include="TelnetClientThread.cpp" />
+    <ClCompile Include="TelnetThread.cpp" />
     <ClCompile Include="utilities.cpp" />
     <ClCompile Include="N3ShapeMgr.cpp" />
     <ClCompile Include="ReadQueueThread.cpp" />
@@ -135,7 +137,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppThread.h" />
-    <ClInclude Include="ftxui_sink_mt.h" />
+    <ClInclude Include="TelnetClientThread.h" />
+    <ClInclude Include="TelnetThread.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="My_3DStruct.h" />
     <ClInclude Include="N3ShapeMgr.h" />

@@ -146,13 +146,18 @@ bool SocketManager::Listen(int port)
 
 void SocketManager::StartAccept()
 {
-	_acceptingConnections = true;
+	if (_acceptingConnections.exchange(true))
+	{
+		// already accepting connections
+		return;
+	}
+
 	AsyncAccept();
 }
 
 void SocketManager::StopAccept()
 {
-	_acceptingConnections = false;
+	_acceptingConnections.store(false);
 
 	if (_acceptor != nullptr && _acceptor->is_open())
 	{
@@ -166,7 +171,7 @@ void SocketManager::StopAccept()
 
 void SocketManager::AsyncAccept()
 {
-	if (!_acceptingConnections)
+	if (!_acceptingConnections.load())
 		return;
 
 	try
@@ -176,7 +181,7 @@ void SocketManager::AsyncAccept()
 			{
 				if (!ec)
 				{
-					if (!_acceptingConnections)
+					if (!_acceptingConnections.load())
 					{
 						rawSocket.close();
 						return;

@@ -18,16 +18,16 @@ add_executable(TblEditor
   TblListCtrl.h
   resource.h)
 
+set_target_properties(TblEditor PROPERTIES
+  CXX_SCAN_FOR_MODULES OFF
+)
+
 if(WIN32)
   set_target_properties(TblEditor PROPERTIES WIN32_EXECUTABLE TRUE)
   target_sources(TblEditor PRIVATE
     TblEditor.rc
     res/TblEditor.rc2
     res/TblEditor.ico)
-  target_compile_definitions(TblEditor PRIVATE
-    "_UNICODE"
-    "UNICODE"
-  )
 endif()
 
 # Enable warnings as errors

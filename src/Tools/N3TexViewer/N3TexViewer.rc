@@ -269,7 +269,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDR_MAINFRAME           "N3TexViewer\n\nN3TexV\nCompressed Texture(*.DXT)\n.DXT\nN3TexViewer.Document\nN3TexV Document"
+IDR_MAINFRAME           "N3TexViewer\n\nN3TexV\nCompressed Texture(*.DXT;*.GTT)\n.DXT;.GTT\nN3TexViewer.Document\nN3TexV Document"
 END
 
 STRINGTABLE

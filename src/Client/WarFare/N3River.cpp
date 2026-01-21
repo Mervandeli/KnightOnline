@@ -9,45 +9,60 @@
 constexpr float WAVE_TOP  = 0.02f;
 constexpr float WAVE_STEP = 0.001f;
 
-CN3River::CN3River()
-{
-	m_fTexIndex = 0.0f;
-	memset(m_pTexRiver, 0, sizeof(m_pTexRiver));
-}
-
 CN3River::~CN3River()
 {
+	for (int i = 0; i < MAX_RIVER_TEX; i++)
+		s_MngTex.Delete(&m_pTexRiver[i]);
+}
+
+void CN3River::Release()
+{
+	m_Rivers.clear();
+
+	for (int i = 0; i < MAX_RIVER_TEX; i++)
+		s_MngTex.Delete(&m_pTexRiver[i]);
 }
 
 bool CN3River::Load(File& file)
 {
-	uint16_t wIndex[18] = { 4, 0, 1, 4, 1, 5, 5, 1, 2, 5, 2, 6, 6, 2, 3, 6, 3, 7 };
+	constexpr int MAX_SUPPORTED_RIVER_COUNT     = 1024;
+	constexpr int MAX_SUPPORTED_TEX_NAME_LENGTH = 50;
+	constexpr uint16_t wIndex[18]               = { 4, 0, 1, 4, 1, 5, 5, 1, 2, 5, 2, 6, 6, 2, 3, 6, 3, 7 };
 
-	m_Rivers.clear();
+	Release();
 
 	int iRiverCount = 0;
-	file.Read(&iRiverCount, sizeof(iRiverCount));
+	file.Read(&iRiverCount, sizeof(int));
 	if (iRiverCount <= 0)
 		return true;
+
+	if (iRiverCount > MAX_SUPPORTED_RIVER_COUNT)
+		throw std::runtime_error("CN3River: invalid river count");
 
 	m_Rivers.resize(iRiverCount);
 
 	for (_RIVER_INFO& river : m_Rivers)
 	{
 		file.Read(&river.iVC, sizeof(int));
-		__ASSERT(river.iVC, "CN3River : nVertexCount is zero!!");
-		__ASSERT(river.iVC % 4 == 0, "RiverVertex is a multiple of 4");
+		if (river.iVC == 0 || (river.iVC % 4) != 0)
+			throw std::runtime_error("CN3River: invalid river mesh vertex count");
 
 		river.pVertices = new __VertexRiver[river.iVC];
 		file.Read(river.pVertices, river.iVC * sizeof(__VertexRiver));
 		file.Read(&river.iIC, sizeof(int));
-		__ASSERT(river.iIC % 18 == 0, "River-Vertex-Index is a multiple of 18");
 
-		int iTexNameLength = 0;
+		if ((river.iIC % 18) != 0)
+			throw std::runtime_error("CN3River: invalid river mesh index count");
+
+		int iTexNameLength = -1;
 		file.Read(&iTexNameLength, sizeof(int));
+
+		if (iTexNameLength < 0 || iTexNameLength > MAX_SUPPORTED_TEX_NAME_LENGTH)
+			throw std::runtime_error("CN3River: invalid river mesh texture name length");
+
 		if (iTexNameLength > 0)
 		{
-			char szTexture[50];
+			char szTexture[MAX_SUPPORTED_TEX_NAME_LENGTH + 1] {};
 			file.Read(szTexture, iTexNameLength); // texture name
 			szTexture[iTexNameLength]  = '\0';
 
@@ -87,9 +102,8 @@ bool CN3River::Load(File& file)
 		}
 
 		// Below code expects at least 5 vertices.
-		__ASSERT(river.iVC >= 5, "Requires at least 5 vertices per river mesh");
 		if (river.iVC < 5)
-			return false;
+			throw std::runtime_error("CN3River: insufficient vertex count");
 
 		__VertexRiver* ptVtx = river.pVertices;
 		float StX = 0.0f, EnX = 0.0f, StZ = 0.0f, EnZ = 0.0f;

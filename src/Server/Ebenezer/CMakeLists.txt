@@ -61,6 +61,14 @@ add_executable(Ebenezer
   resource.h
 )
 
+set_target_properties(Ebenezer.Core PROPERTIES
+  CXX_SCAN_FOR_MODULES OFF
+)
+
+set_target_properties(Ebenezer PROPERTIES
+  CXX_SCAN_FOR_MODULES OFF
+)
+
 # Ensure we require the server assets to be copied
 add_dependencies(Ebenezer copy-server-assets)
 
@@ -79,7 +87,6 @@ target_precompile_headers(Ebenezer.Core PRIVATE pch.h)
 
 # Setup dependencies
 target_link_libraries(Ebenezer.Core PUBLIC
-  db-library
   FileIO
   shared-server
 )

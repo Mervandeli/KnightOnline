@@ -177,6 +177,7 @@ set(N3BASE_COMMON_SOURCES
   WaveFormat.h
   WinCrypt.cpp
   WinCrypt.h
+  VertexTypes.inl
   ${N3BASE_COMMON_AUDIO_SOURCES}
   ${N3BASE_COMMON_EFFECT_SOURCES}
   ${N3BASE_COMMON_SKY_SOURCES}
@@ -218,6 +219,14 @@ source_group("Effects" FILES ${N3BASE_COMMON_EFFECT_SOURCES} ${N3BASE_TOOL_EFFEC
 source_group("Sky" FILES ${N3BASE_COMMON_SKY_SOURCES})
 source_group("UI" FILES ${N3BASE_COMMON_UI_SOURCES})
 source_group("Weather" FILES ${N3BASE_COMMON_WEATHER_SOURCES} ${N3BASE_TOOL_WEATHER_SOURCES})
+
+set_target_properties(N3Base_client PROPERTIES
+  CXX_SCAN_FOR_MODULES OFF
+)
+
+set_target_properties(N3Base_tool PROPERTIES
+  CXX_SCAN_FOR_MODULES OFF
+)
 
 # Enable warnings as errors
 if(OPENKO_COMPILE_WARNINGS_AS_ERROR)

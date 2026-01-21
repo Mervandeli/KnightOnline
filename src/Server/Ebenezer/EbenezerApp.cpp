@@ -44,6 +44,11 @@ EbenezerApp::EbenezerApp(EbenezerLogger& logger) :
 	AppThread(logger), m_LoggerSendQueue(MAX_SMQ_SEND_QUEUE_RETRY_COUNT),
 	m_ItemLoggerSendQ(MAX_SMQ_SEND_QUEUE_RETRY_COUNT)
 {
+	// Ebenezer is the only server that had built in command line support, so we'll
+	// default _enableTelnet to on.
+	_enableTelnet     = true;
+	_telnetPort       = 2324;
+
 	m_nYear           = 0;
 	m_nMonth          = 0;
 	m_nDate           = 0;
@@ -477,7 +482,6 @@ bool EbenezerApp::OnStart()
 	_readQueueThread->start();
 
 	spdlog::info("EbenezerApp::OnInitDialog: successfully initialized");
-
 	return true;
 }
 
@@ -1953,6 +1957,9 @@ int EbenezerApp::GetZoneIndex(int zonenumber) const
 
 bool EbenezerApp::HandleCommand(const std::string& command)
 {
+	if (AppThread::HandleCommand(command))
+		return true;
+
 	OperationMessage opMessage(this, nullptr);
 	if (opMessage.Process(command))
 		return true;
@@ -2002,25 +2009,6 @@ bool EbenezerApp::HandleCommand(const std::string& command)
 	return true;
 }
 
-bool EbenezerApp::HandleInputEvent(const ftxui::Event& event)
-{
-	using namespace ftxui;
-
-	if (event == Event::F8)
-	{
-		SyncTest(1);
-		return true;
-	}
-
-	if (event == Event::F9)
-	{
-		SyncTest(2);
-		return true;
-	}
-
-	return false;
-}
-
 bool EbenezerApp::LoadNoticeData()
 {
 	std::filesystem::path NoticePath = "Notice.txt";
@@ -2057,138 +2045,6 @@ bool EbenezerApp::LoadNoticeData()
 	file.close();
 
 	return loadedNotice;
-}
-
-void EbenezerApp::SyncTest(int nType)
-{
-	char strPath[100] {};
-	if (nType == 1)
-		strcpy_safe(strPath, "./userlist.txt");
-	else if (nType == 2)
-		strcpy_safe(strPath, "./npclist.txt");
-
-	FILE* stream = nullptr;
-#if defined(_MSC_VER)
-	fopen_s(&stream, strPath, "w");
-#else
-	stream = fopen(strPath, "w");
-#endif
-	if (stream == nullptr)
-		return;
-
-	int len = 0;
-	char pBuf[256] {};
-
-	SetByte(pBuf, AG_CHECK_ALIVE_REQ, len);
-
-	std::string buffer;
-	for (C3DMap* pMap : m_ZoneArray)
-	{
-		if (pMap == nullptr)
-			continue;
-
-		CAISocket* pSocket = m_AISocketMap.GetData(pMap->m_nZoneNumber);
-		if (pSocket == nullptr)
-			continue;
-
-		int size = pSocket->Send(pBuf, len);
-		buffer   = fmt::format(
-            "size={}, zone={}, number={}\n", size, pSocket->GetZoneNumber(), pMap->m_nZoneNumber);
-		fwrite(buffer.data(), buffer.size(), 1, stream);
-	}
-
-	buffer = "*****   Region List  *****\n";
-	fwrite(buffer.data(), buffer.size(), 1, stream);
-
-	for (C3DMap* pMap : m_ZoneArray)
-	{
-		if (pMap == nullptr)
-			continue;
-
-		for (int i = 0; i < pMap->GetXRegionMax(); i++)
-		{
-			for (int j = 0; j < pMap->GetZRegionMax(); j++)
-			{
-				int total_user = 0, total_mon = 0;
-
-				{
-					std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
-
-					total_user = pMap->m_ppRegion[i][j].m_RegionUserArray.GetSize();
-					total_mon  = pMap->m_ppRegion[i][j].m_RegionNpcArray.GetSize();
-				}
-
-				if (total_user > 0 || total_mon > 0)
-				{
-					buffer = fmt::format(
-						"rx={}, rz={}, user={}, monster={}\n", i, j, total_user, total_mon);
-					fwrite(buffer.data(), buffer.size(), 1, stream);
-					SyncRegionTest(pMap, i, j, stream, nType);
-				}
-			}
-		}
-	}
-
-	fclose(stream);
-}
-
-void EbenezerApp::SyncRegionTest(C3DMap* pMap, int rx, int rz, FILE* pfile, int nType)
-{
-	std::string buffer = fmt::format("ZONE={}, [{},{}] : ", pMap->m_nZoneNumber, rx, rz);
-	fwrite(buffer.data(), buffer.size(), 1, pfile);
-
-	std::map<int, int*>::iterator Iter1;
-	std::map<int, int*>::iterator Iter2;
-
-	std::lock_guard<std::recursive_mutex> lock(g_region_mutex);
-
-	if (nType == 2)
-	{
-		Iter1 = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.begin();
-		Iter2 = pMap->m_ppRegion[rx][rz].m_RegionNpcArray.end();
-	}
-	else if (nType == 1)
-	{
-		Iter1 = pMap->m_ppRegion[rx][rz].m_RegionUserArray.begin();
-		Iter2 = pMap->m_ppRegion[rx][rz].m_RegionUserArray.end();
-	}
-
-	for (; Iter1 != Iter2; Iter1++)
-	{
-		int nid = *Iter1->second;
-		if (nType == 1)
-		{
-			CUser* pUser = GetUserPtr(nid);
-			if (pUser == nullptr)
-			{
-				spdlog::error("EbenezerApp::SyncRegionTest: userId={} not found", nid);
-				buffer = fmt::format("{}(fail)	", nid);
-				fwrite(buffer.data(), buffer.size(), 1, pfile);
-				continue;
-			}
-
-			buffer = fmt::format("{}({},{})	", nid, static_cast<int>(pUser->m_pUserData->m_curx),
-				static_cast<int>(pUser->m_pUserData->m_curz));
-			fwrite(buffer.data(), buffer.size(), 1, pfile);
-		}
-		else if (nType == 2)
-		{
-			CNpc* pNpc = m_NpcMap.GetData(nid);
-			if (pNpc == nullptr)
-			{
-				spdlog::error("EbenezerApp::SyncRegionTest: npcId={} not found", nid);
-				buffer = fmt::format("{}(fail)	", nid);
-				fwrite(buffer.data(), buffer.size(), 1, pfile);
-				continue;
-			}
-
-			buffer = fmt::format("{}({},{})	", nid, static_cast<int>(pNpc->m_fCurX),
-				static_cast<int>(pNpc->m_fCurZ));
-			fwrite(buffer.data(), buffer.size(), 1, pfile);
-		}
-	}
-
-	fputc('\n', pfile);
 }
 
 void EbenezerApp::SendAllUserInfo()

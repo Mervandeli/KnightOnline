@@ -645,9 +645,8 @@ bool CN3CPlug::Load(File& file)
 
 	if (iUseVMesh != 0)
 	{
-		CN3PMesh* pPMesh = new CN3PMesh();
-		pPMesh->m_iFileFormatVersion =
-			m_iFileFormatVersion; // NOTE: Setting the version for further components
+		CN3PMesh* pPMesh             = new CN3PMesh();
+		pPMesh->m_iFileFormatVersion = m_iFileFormatVersion;
 		pPMesh->Load(file);
 
 		static int iSN      = 0;
@@ -680,7 +679,7 @@ void CN3CPlug::InitFX(std::string& szFXMain, std::string& szFXTail, D3DCOLOR Tra
 		if (m_pFXMainBundle)
 			delete m_pFXMainBundle;
 		m_pFXMainBundle = new CN3FXBundle;
-		if (!m_pFXMainBundle->LoadFromFile(m_strFXMainName.c_str()))
+		if (!m_pFXMainBundle->LoadFromFile(m_strFXMainName))
 		{
 			delete m_pFXMainBundle;
 			m_pFXMainBundle = nullptr;
@@ -714,7 +713,7 @@ void CN3CPlug::InitFX(std::string& szFXMain, std::string& szFXTail, D3DCOLOR Tra
 		if (m_pFXTailBundle[0])
 			delete m_pFXTailBundle[0];
 		m_pFXTailBundle[0] = new CN3FXBundle;
-		if (!m_pFXTailBundle[0]->LoadFromFile(m_strFXTailName.c_str()))
+		if (!m_pFXTailBundle[0]->LoadFromFile(m_strFXTailName))
 		{
 			delete m_pFXTailBundle[0];
 			m_pFXTailBundle[0] = nullptr;

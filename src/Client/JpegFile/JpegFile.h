@@ -64,16 +64,7 @@
 #include <cstdio>
 #include <string>
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif // __cplusplus
-
-#include "jpeglib.h"
-
-#ifdef __cplusplus
-}
-#endif // __cplusplus
+#include <Windows.h>
 
 enum e_JpegFileError : uint8_t
 {
@@ -161,8 +152,6 @@ public:
 	HANDLE CopyScreenToDIB(LPRECT lpRect);
 	HANDLE AllocRoomForDIB(BITMAPINFOHEADER bi, HBITMAP hBitmap);
 	HPALETTE GetSystemPalette(void);
-	RGBQUAD QuadFromWord(WORD b16);
-	BOOL DibToSamps(HANDLE hDib, int nSampsPerRow, JSAMPARRAY jsmpPixels, const char** pcsMsg);
 	BOOL JpegFromDib(HANDLE hDib,         // Handle to DIB
 		int nQuality,                     // JPEG quality (0-100)
 		const std::string& csJpeg,        // Pathname to jpeg file

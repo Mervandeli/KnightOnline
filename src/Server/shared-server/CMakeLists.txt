@@ -15,8 +15,6 @@ add_library(shared-server STATIC
   _USER_DATA.h
   AppThread.cpp
   AppThread.h
-  ftxui_sink_mt.cpp
-  ftxui_sink_mt.h
   logger.cpp
   logger.h
   My_3DStruct.h
@@ -38,9 +36,17 @@ add_library(shared-server STATIC
   TcpServerSocket.h
   TcpSocket.cpp
   TcpSocket.h
+  TelnetThread.h
+  TelnetThread.cpp
+  TelnetClientThread.h
+  TelnetClientThread.cpp
   utilities.cpp
   utilities.h
   "${TARGET_SERVER_CONFIG_HEADER}"
+)
+
+set_target_properties(shared-server PROPERTIES
+  CXX_SCAN_FOR_MODULES OFF
 )
 
 # Enable warnings as errors
@@ -56,10 +62,8 @@ target_link_libraries(shared-server
   PUBLIC
     argparse
     asio
+    db-library
     djb2
-    ftxui::component
-    ftxui::dom
-    ftxui::screen
 	MathUtils
     nanodbc
     shared
