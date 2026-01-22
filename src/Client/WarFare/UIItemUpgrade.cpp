@@ -692,8 +692,7 @@ void CUIItemUpgrade::ResetUpgradeInventory()
 		{
 			SetupIconArea(spItem, m_pInvArea[iOrder]);
 
-			if (spItem->iCount > 0 && spItem->IsStackable() 
-				&& m_pMaterialSlot[i]->pUIIcon != nullptr)
+			if (spItem->iCount > 0 && spItem->IsStackable() && m_pMaterialSlot[i]->pUIIcon != nullptr)
 			{
 				delete m_pMaterialSlot[i]->pUIIcon;
 				m_pMaterialSlot[i]->pUIIcon = nullptr;
